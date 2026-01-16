@@ -10,12 +10,18 @@ interface Steps {
   [key: string]: StepData;
 }
 
-function getInput(name: string): string {
-  const val = process.env[`INPUT_${name.replace(/ /g, '_').toUpperCase()}`] || '';
+interface AnalysisResult {
+  success: boolean;
+  failedSteps: string[];
+  totalSteps: number;
+}
+
+export function getInput(name: string): string {
+  const val = process.env[`INPUT_${name.replace(/[ -]/g, '_').toUpperCase()}`] || '';
   return val.trim();
 }
 
-function setFailed(message: string): void {
+export function setFailed(message: string): void {
   console.error(`::error::${message}`);
   process.exit(1);
 }
@@ -105,7 +111,7 @@ async function postComment(
   await httpsRequest(options, payload);
 }
 
-function analyzeSteps(steps: Steps): { success: boolean; failedSteps: string[]; totalSteps: number } {
+export function analyzeSteps(steps: Steps): AnalysisResult {
   const stepEntries = Object.entries(steps);
   const totalSteps = stepEntries.length;
   const failedSteps: string[] = [];
@@ -124,7 +130,7 @@ function analyzeSteps(steps: Steps): { success: boolean; failedSteps: string[]; 
   };
 }
 
-function generateCommentBody(workspace: string, analysis: { success: boolean; failedSteps: string[]; totalSteps: number }): string {
+export function generateCommentBody(workspace: string, analysis: AnalysisResult): string {
   const { success, failedSteps, totalSteps } = analysis;
   const marker = `<!-- tf-report-action:${workspace} -->`;
   
@@ -143,6 +149,10 @@ function generateCommentBody(workspace: string, analysis: { success: boolean; fa
   }
   
   return comment;
+}
+
+export function getWorkspaceMarker(workspace: string): string {
+  return `<!-- tf-report-action:${workspace} -->`;
 }
 
 async function run(): Promise<void> {
@@ -206,7 +216,7 @@ async function run(): Promise<void> {
       return;
     }
 
-    const marker = `<!-- tf-report-action:${workspace} -->`;
+    const marker = getWorkspaceMarker(workspace);
     
     const existingComments = await getExistingComments(token, repo, owner, issueNumber);
     
@@ -230,4 +240,6 @@ async function run(): Promise<void> {
   }
 }
 
-run();
+if (require.main === module) {
+  run();
+}

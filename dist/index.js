@@ -33,9 +33,14 @@ var __importStar = (this && this.__importStar) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.getInput = getInput;
+exports.setFailed = setFailed;
+exports.analyzeSteps = analyzeSteps;
+exports.generateCommentBody = generateCommentBody;
+exports.getWorkspaceMarker = getWorkspaceMarker;
 const https = __importStar(require("https"));
 function getInput(name) {
-    const val = process.env[`INPUT_${name.replace(/ /g, '_').toUpperCase()}`] || '';
+    const val = process.env[`INPUT_${name.replace(/[ -]/g, '_').toUpperCase()}`] || '';
     return val.trim();
 }
 function setFailed(message) {
@@ -139,6 +144,9 @@ function generateCommentBody(workspace, analysis) {
     }
     return comment;
 }
+function getWorkspaceMarker(workspace) {
+    return `<!-- tf-report-action:${workspace} -->`;
+}
 async function run() {
     try {
         const stepsInput = getInput('steps');
@@ -189,7 +197,7 @@ async function run() {
             console.log('Not a pull request event, skipping comment');
             return;
         }
-        const marker = `<!-- tf-report-action:${workspace} -->`;
+        const marker = getWorkspaceMarker(workspace);
         const existingComments = await getExistingComments(token, repo, owner, issueNumber);
         for (const comment of existingComments) {
             if (comment.body && comment.body.includes(marker)) {
@@ -210,4 +218,6 @@ async function run() {
         }
     }
 }
-run();
+if (require.main === module) {
+    run();
+}
