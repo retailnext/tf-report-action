@@ -1,0 +1,21 @@
+{
+  "name": "tf-report-action",
+  "version": "1.0.0",
+  "description": "GitHub Action for reporting OpenTofu workflow execution status",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "prepare": "npm run build"
+  },
+  "keywords": [
+    "github-action",
+    "opentofu",
+    "terraform"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^20.11.0",
+    "typescript": "^5.3.3"
+  }
+}
