@@ -1,5 +1,5 @@
 name: 'OpenTofu Report Action'
-description: 'Reports OpenTofu workflow execution status as PR comments'
+description: 'Reports OpenTofu workflow execution status with step outputs as PR comments'
 author: 'eriksw'
 inputs:
   steps:
@@ -15,3 +15,4 @@ inputs:
 runs:
   using: 'node24'
   main: 'dist/index.js'
+

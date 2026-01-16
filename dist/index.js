@@ -35,10 +35,15 @@ var __importStar = (this && this.__importStar) || (function () {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getInput = getInput;
 exports.setFailed = setFailed;
+exports.truncateOutput = truncateOutput;
 exports.analyzeSteps = analyzeSteps;
 exports.generateCommentBody = generateCommentBody;
 exports.getWorkspaceMarker = getWorkspaceMarker;
 const https = __importStar(require("https"));
+const fs = __importStar(require("fs"));
+// GitHub comment max size is 65536 characters
+const MAX_COMMENT_SIZE = 60000;
+const MAX_OUTPUT_PER_STEP = 20000;
 function getInput(name) {
     const val = process.env[`INPUT_${name.replace(/[ -]/g, '_').toUpperCase()}`] || '';
     return val.trim();
@@ -110,14 +115,29 @@ async function postComment(token, repo, owner, issueNumber, body) {
     const payload = JSON.stringify({ body });
     await httpsRequest(options, payload);
 }
+function truncateOutput(text, maxLength) {
+    if (text.length <= maxLength)
+        return text;
+    const halfLength = Math.floor(maxLength / 2);
+    return text.substring(0, halfLength) +
+        '\n\n... [output truncated] ...\n\n' +
+        text.substring(text.length - halfLength);
+}
 function analyzeSteps(steps) {
     const stepEntries = Object.entries(steps);
     const totalSteps = stepEntries.length;
     const failedSteps = [];
     for (const [stepName, stepData] of stepEntries) {
-        const conclusion = stepData.conclusion || stepData.outcome;
+        const conclusion = stepData.conclusion || stepData.outcome || '';
         if (conclusion && conclusion !== 'success' && conclusion !== 'skipped') {
-            failedSteps.push(stepName);
+            const failure = {
+                name: stepName,
+                conclusion,
+                stdout: stepData.outputs?.stdout,
+                stderr: stepData.outputs?.stderr,
+                exitCode: stepData.outputs?.exit_code
+            };
+            failedSteps.push(failure);
         }
     }
     return {
@@ -129,18 +149,37 @@ function analyzeSteps(steps) {
 function generateCommentBody(workspace, analysis) {
     const { success, failedSteps, totalSteps } = analysis;
     const marker = `<!-- tf-report-action:${workspace} -->`;
+    const statusIcon = success ? '✅' : '❌';
+    const statusText = success ? 'Success' : 'Failed';
     let comment = `${marker}\n\n`;
     comment += `## OpenTofu Workflow Report - \`${workspace}\`\n\n`;
+    comment += `### ${statusIcon} ${statusText}\n\n`;
     if (success) {
-        comment += `### ✅ Success\n\n`;
         comment += `All ${totalSteps} step(s) completed successfully.\n`;
     }
     else {
-        comment += `### ❌ Failed\n\n`;
         comment += `${failedSteps.length} of ${totalSteps} step(s) failed:\n\n`;
         for (const step of failedSteps) {
-            comment += `- ❌ \`${step}\`\n`;
+            comment += `#### ❌ Step: \`${step.name}\`\n\n`;
+            comment += `**Status:** ${step.conclusion}\n`;
+            if (step.exitCode) {
+                comment += `**Exit Code:** ${step.exitCode}\n`;
+            }
+            comment += '\n';
+            if (step.stdout) {
+                const truncatedStdout = truncateOutput(step.stdout, MAX_OUTPUT_PER_STEP);
+                comment += `<details>\n<summary>📄 Output</summary>\n\n\`\`\`\n${truncatedStdout}\n\`\`\`\n</details>\n\n`;
+            }
+            if (step.stderr) {
+                const truncatedStderr = truncateOutput(step.stderr, MAX_OUTPUT_PER_STEP);
+                comment += `<details>\n<summary>⚠️ Errors</summary>\n\n\`\`\`\n${truncatedStderr}\n\`\`\`\n</details>\n\n`;
+            }
         }
+    }
+    // Final safety check
+    if (comment.length > MAX_COMMENT_SIZE) {
+        const availableSpace = MAX_COMMENT_SIZE - 1000;
+        comment = comment.substring(0, availableSpace) + '\n\n... [comment truncated] ...\n';
     }
     return comment;
 }
@@ -164,23 +203,23 @@ async function run() {
             setFailed('github-token input is required');
             return;
         }
-        const steps = JSON.parse(stepsInput);
+        let steps;
+        try {
+            steps = JSON.parse(stepsInput);
+        }
+        catch (error) {
+            setFailed(`Failed to parse steps input as JSON: ${error instanceof Error ? error.message : 'Unknown error'}`);
+            return;
+        }
+        console.log(`Analyzing ${Object.keys(steps).length} steps for workspace: ${workspace}`);
         const analysis = analyzeSteps(steps);
-        const commentBody = generateCommentBody(workspace, analysis);
+        console.log(`Analysis complete: ${analysis.success ? 'Success' : `Failed (${analysis.failedSteps.length} failures)`}`);
         const context = {
             repo: process.env.GITHUB_REPOSITORY || '',
-            eventName: process.env.GITHUB_EVENT_NAME || '',
-            sha: process.env.GITHUB_SHA || '',
-            ref: process.env.GITHUB_REF || '',
-            workflow: process.env.GITHUB_WORKFLOW || '',
-            action: process.env.GITHUB_ACTION || '',
-            actor: process.env.GITHUB_ACTOR || '',
-            job: process.env.GITHUB_JOB || '',
-            runNumber: process.env.GITHUB_RUN_NUMBER || '',
-            runId: process.env.GITHUB_RUN_ID || ''
+            eventName: process.env.GITHUB_EVENT_NAME || ''
         };
         if (!context.repo) {
-            setFailed('GITHUB_REPOSITORY environment variable is not set');
+            console.log('GITHUB_REPOSITORY not set, skipping comment');
             return;
         }
         const [owner, repo] = context.repo.split('/');
@@ -188,16 +227,22 @@ async function run() {
         if (context.eventName === 'pull_request' || context.eventName === 'pull_request_target') {
             const eventPath = process.env.GITHUB_EVENT_PATH;
             if (eventPath) {
-                const fs = require('fs');
-                const event = JSON.parse(fs.readFileSync(eventPath, 'utf8'));
-                issueNumber = event.pull_request?.number;
+                try {
+                    const event = JSON.parse(fs.readFileSync(eventPath, 'utf8'));
+                    issueNumber = event.pull_request?.number;
+                }
+                catch (error) {
+                    console.log(`Failed to read GitHub event file: ${error instanceof Error ? error.message : 'Unknown error'}`);
+                }
             }
         }
         if (!issueNumber) {
             console.log('Not a pull request event, skipping comment');
             return;
         }
+        const commentBody = generateCommentBody(workspace, analysis);
         const marker = getWorkspaceMarker(workspace);
+        console.log(`Comment body length: ${commentBody.length} characters`);
         const existingComments = await getExistingComments(token, repo, owner, issueNumber);
         for (const comment of existingComments) {
             if (comment.body && comment.body.includes(marker)) {

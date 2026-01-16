@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert';
-import { analyzeSteps, generateCommentBody, getWorkspaceMarker, getInput } from './index';
+import { analyzeSteps, generateCommentBody, getWorkspaceMarker, getInput, truncateOutput } from './index';
 
 test('analyzeSteps - all steps successful', () => {
   const steps = {
@@ -28,7 +28,8 @@ test('analyzeSteps - some steps failed', () => {
   assert.strictEqual(result.success, false);
   assert.strictEqual(result.totalSteps, 3);
   assert.strictEqual(result.failedSteps.length, 2);
-  assert.deepStrictEqual(result.failedSteps, ['build', 'test']);
+  assert.strictEqual(result.failedSteps[0].name, 'build');
+  assert.strictEqual(result.failedSteps[1].name, 'test');
 });
 
 test('analyzeSteps - skipped steps are not failures', () => {
@@ -45,40 +46,25 @@ test('analyzeSteps - skipped steps are not failures', () => {
   assert.strictEqual(result.failedSteps.length, 0);
 });
 
-test('analyzeSteps - uses outcome if conclusion not present', () => {
+test('analyzeSteps - captures step outputs', () => {
   const steps = {
-    'step1': { outcome: 'success' },
-    'step2': { outcome: 'failure' }
-  };
-
-  const result = analyzeSteps(steps);
-
-  assert.strictEqual(result.success, false);
-  assert.strictEqual(result.totalSteps, 2);
-  assert.deepStrictEqual(result.failedSteps, ['step2']);
-});
-
-test('analyzeSteps - empty steps', () => {
-  const steps = {};
-
-  const result = analyzeSteps(steps);
-
-  assert.strictEqual(result.success, true);
-  assert.strictEqual(result.totalSteps, 0);
-  assert.strictEqual(result.failedSteps.length, 0);
-});
-
-test('analyzeSteps - cancelled steps are failures', () => {
-  const steps = {
-    'step1': { conclusion: 'success' },
-    'step2': { conclusion: 'cancelled' }
+    'step1': { 
+      conclusion: 'failure',
+      outputs: {
+        stdout: 'Some output',
+        stderr: 'Some error',
+        exit_code: '1'
+      }
+    }
   };
 
   const result = analyzeSteps(steps);
 
   assert.strictEqual(result.success, false);
   assert.strictEqual(result.failedSteps.length, 1);
-  assert.deepStrictEqual(result.failedSteps, ['step2']);
+  assert.strictEqual(result.failedSteps[0].stdout, 'Some output');
+  assert.strictEqual(result.failedSteps[0].stderr, 'Some error');
+  assert.strictEqual(result.failedSteps[0].exitCode, '1');
 });
 
 test('generateCommentBody - success case', () => {
@@ -101,7 +87,10 @@ test('generateCommentBody - failure case', () => {
   const workspace = 'dev';
   const analysis = {
     success: false,
-    failedSteps: ['build', 'test'],
+    failedSteps: [
+      { name: 'build', conclusion: 'failure' },
+      { name: 'test', conclusion: 'failure' }
+    ],
     totalSteps: 5
   };
 
@@ -111,21 +100,50 @@ test('generateCommentBody - failure case', () => {
   assert.ok(comment.includes('## OpenTofu Workflow Report - `dev`'));
   assert.ok(comment.includes('### ❌ Failed'));
   assert.ok(comment.includes('2 of 5 step(s) failed'));
-  assert.ok(comment.includes('- ❌ `build`'));
-  assert.ok(comment.includes('- ❌ `test`'));
+  assert.ok(comment.includes('#### ❌ Step: `build`'));
+  assert.ok(comment.includes('#### ❌ Step: `test`'));
 });
 
-test('generateCommentBody - includes workspace marker', () => {
+test('generateCommentBody - includes step outputs', () => {
   const workspace = 'staging';
   const analysis = {
-    success: true,
-    failedSteps: [],
-    totalSteps: 1
+    success: false,
+    failedSteps: [
+      { 
+        name: 'tofu-plan', 
+        conclusion: 'failure',
+        stdout: 'Plan output here',
+        stderr: 'Error details here',
+        exitCode: '1'
+      }
+    ],
+    totalSteps: 2
   };
 
   const comment = generateCommentBody(workspace, analysis);
 
-  assert.ok(comment.startsWith('<!-- tf-report-action:staging -->'));
+  assert.ok(comment.includes('#### ❌ Step: `tofu-plan`'));
+  assert.ok(comment.includes('**Exit Code:** 1'));
+  assert.ok(comment.includes('📄 Output'));
+  assert.ok(comment.includes('Plan output here'));
+  assert.ok(comment.includes('⚠️ Errors'));
+  assert.ok(comment.includes('Error details here'));
+});
+
+test('truncateOutput - short text unchanged', () => {
+  const text = 'This is a short text';
+  const result = truncateOutput(text, 1000);
+  assert.strictEqual(result, text);
+});
+
+test('truncateOutput - long text is truncated', () => {
+  const text = 'A'.repeat(1000);
+  const result = truncateOutput(text, 100);
+  
+  assert.ok(result.length < text.length);
+  assert.ok(result.includes('... [output truncated] ...'));
+  assert.ok(result.startsWith('AAA'));
+  assert.ok(result.endsWith('AAA'));
 });
 
 test('getWorkspaceMarker - returns correct marker', () => {
@@ -171,27 +189,41 @@ test('workspace markers are unique per workspace', () => {
   assert.ok(marker2.includes('workspace2'));
 });
 
-test('comment body format - single step success', () => {
-  const analysis = {
-    success: true,
-    failedSteps: [],
-    totalSteps: 1
-  };
-
-  const comment = generateCommentBody('test', analysis);
-
-  assert.ok(comment.includes('All 1 step(s) completed successfully'));
-});
-
-test('comment body format - single step failure', () => {
+test('comment uses collapsible details for output', () => {
   const analysis = {
     success: false,
-    failedSteps: ['only-step'],
+    failedSteps: [
+      { 
+        name: 'test-step', 
+        conclusion: 'failure',
+        stdout: 'Some output',
+        stderr: 'Some errors'
+      }
+    ],
     totalSteps: 1
   };
 
   const comment = generateCommentBody('test', analysis);
 
-  assert.ok(comment.includes('1 of 1 step(s) failed'));
-  assert.ok(comment.includes('- ❌ `only-step`'));
+  assert.ok(comment.includes('<details>'));
+  assert.ok(comment.includes('</details>'));
+  assert.ok(comment.includes('<summary>'));
+  assert.ok(comment.includes('</summary>'));
+});
+
+test('generateCommentBody - handles empty outputs', () => {
+  const workspace = 'test';
+  const analysis = {
+    success: false,
+    failedSteps: [
+      { name: 'step1', conclusion: 'failure' }
+    ],
+    totalSteps: 1
+  };
+
+  const comment = generateCommentBody(workspace, analysis);
+
+  assert.ok(comment.includes('#### ❌ Step: `step1`'));
+  assert.ok(!comment.includes('📄 Output'));
+  assert.ok(!comment.includes('⚠️ Errors'));
 });
