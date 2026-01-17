@@ -1,46 +1,6 @@
-"use strict";
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    var desc = Object.getOwnPropertyDescriptor(m, k);
-    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-      desc = { enumerable: true, get: function() { return m[k]; } };
-    }
-    Object.defineProperty(o, k2, desc);
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || (function () {
-    var ownKeys = function(o) {
-        ownKeys = Object.getOwnPropertyNames || function (o) {
-            var ar = [];
-            for (var k in o) if (Object.prototype.hasOwnProperty.call(o, k)) ar[ar.length] = k;
-            return ar;
-        };
-        return ownKeys(o);
-    };
-    return function (mod) {
-        if (mod && mod.__esModule) return mod;
-        var result = {};
-        if (mod != null) for (var k = ownKeys(mod), i = 0; i < k.length; i++) if (k[i] !== "default") __createBinding(result, mod, k[i]);
-        __setModuleDefault(result, mod);
-        return result;
-    };
-})();
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.getInput = getInput;
-exports.setFailed = setFailed;
-exports.truncateOutput = truncateOutput;
-exports.analyzeSteps = analyzeSteps;
-exports.generateCommentBody = generateCommentBody;
-exports.getWorkspaceMarker = getWorkspaceMarker;
-const https = __importStar(require("https"));
-const fs = __importStar(require("fs"));
+import * as https from 'https';
+import * as fs from 'fs';
+
 // GitHub comment max size is 65536 characters
 const MAX_COMMENT_SIZE = 60000;
 const MAX_OUTPUT_PER_STEP = 20000;
@@ -81,9 +41,9 @@ async function getExistingComments(token, repo, owner, issueNumber) {
         path: `/repos/${owner}/${repo}/issues/${issueNumber}/comments`,
         method: 'GET',
         headers: {
-            'Authorization': `Bearer ${token}`,
+            Authorization: `Bearer ${token}`,
             'User-Agent': 'tf-report-action',
-            'Accept': 'application/vnd.github+json'
+            Accept: 'application/vnd.github+json'
         }
     };
     const response = await httpsRequest(options);
@@ -95,9 +55,9 @@ async function deleteComment(token, repo, owner, commentId) {
         path: `/repos/${owner}/${repo}/issues/comments/${commentId}`,
         method: 'DELETE',
         headers: {
-            'Authorization': `Bearer ${token}`,
+            Authorization: `Bearer ${token}`,
             'User-Agent': 'tf-report-action',
-            'Accept': 'application/vnd.github+json'
+            Accept: 'application/vnd.github+json'
         }
     };
     await httpsRequest(options);
@@ -108,9 +68,9 @@ async function postComment(token, repo, owner, issueNumber, body) {
         path: `/repos/${owner}/${repo}/issues/${issueNumber}/comments`,
         method: 'POST',
         headers: {
-            'Authorization': `Bearer ${token}`,
+            Authorization: `Bearer ${token}`,
             'User-Agent': 'tf-report-action',
-            'Accept': 'application/vnd.github+json',
+            Accept: 'application/vnd.github+json',
             'Content-Type': 'application/json'
         }
     };
@@ -126,9 +86,9 @@ function truncateOutput(text, maxLength) {
         return text.substring(0, maxLength);
     }
     const halfLength = Math.floor(availableLength / 2);
-    return text.substring(0, halfLength) +
+    return (text.substring(0, halfLength) +
         truncationMessage +
-        text.substring(text.length - halfLength);
+        text.substring(text.length - halfLength));
 }
 function analyzeSteps(steps) {
     const stepEntries = Object.entries(steps);
@@ -191,7 +151,8 @@ function generateCommentBody(workspace, analysis) {
     // Final safety check
     if (comment.length > MAX_COMMENT_SIZE) {
         const availableSpace = MAX_COMMENT_SIZE - COMMENT_TRUNCATION_BUFFER;
-        comment = comment.substring(0, availableSpace) + '\n\n... [comment truncated] ...\n';
+        comment =
+            comment.substring(0, availableSpace) + '\n\n... [comment truncated] ...\n';
     }
     return comment;
 }
@@ -241,7 +202,8 @@ async function run() {
         }
         const [owner, repo] = repoParts;
         let issueNumber;
-        if (context.eventName === 'pull_request' || context.eventName === 'pull_request_target') {
+        if (context.eventName === 'pull_request' ||
+            context.eventName === 'pull_request_target') {
             const eventPath = process.env.GITHUB_EVENT_PATH;
             if (eventPath) {
                 try {
@@ -280,6 +242,11 @@ async function run() {
         }
     }
 }
-if (require.main === module) {
+// Run the action if this is the main module
+if (import.meta.url === `file://${process.argv[1]}` ||
+    import.meta.url.endsWith(process.argv[1])) {
     run();
 }
+
+export { analyzeSteps, generateCommentBody, getInput, getWorkspaceMarker, setFailed, truncateOutput };
+//# sourceMappingURL=index.js.map

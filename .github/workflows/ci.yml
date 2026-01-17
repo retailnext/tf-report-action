@@ -2,42 +2,60 @@ name: CI
 
 on:
   push:
-    branches: [ main, copilot/** ]
+    branches: [main, copilot/**]
   pull_request:
-    branches: [ main ]
+    branches: [main]
+
+permissions:
+  contents: read
+  pull-requests: write
 
 jobs:
   test:
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
-    
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '24'
+          node-version-file: .node-version
           cache: 'npm'
-      
+
       - name: Install dependencies
         run: npm ci
-      
+
+      - name: Check Format
+        run: npm run format:check
+
+      - name: Lint
+        run: npm run lint
+
       - name: Run tests
-        run: npm test
-      
-      - name: Build
-        run: npm run build
-      
+        id: test
+        run: npm run ci-test
+
+      - name: Package
+        id: package
+        run: npm run package
+
       - name: Check dist is up to date
+        id: check-dist
         run: |
           if [ -n "$(git status --porcelain dist/)" ]; then
             echo "Error: dist/ directory has uncommitted changes after build"
-            echo "Please run 'npm run build' and commit the changes"
+            echo "Please run 'npm run package' and commit the changes"
             git status --porcelain dist/
             git diff dist/
             exit 1
           fi
           echo "✅ dist/ directory is up to date"
+
+      - name: Report CI Status
+        if: always()
+        uses: ./
+        with:
+          steps: ${{ toJSON(steps) }}
+          workspace: 'ci'
