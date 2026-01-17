@@ -55,9 +55,10 @@ function setFailed(message) {
 async function httpsRequest(options, data) {
     return new Promise((resolve, reject) => {
         const req = https.request(options, (res) => {
-            let body = '';
-            res.on('data', (chunk) => body += chunk);
+            const chunks = [];
+            res.on('data', (chunk) => chunks.push(chunk));
             res.on('end', () => {
+                const body = Buffer.concat(chunks).toString('utf8');
                 if (res.statusCode && res.statusCode >= 200 && res.statusCode < 300) {
                     resolve(body);
                 }
@@ -118,9 +119,14 @@ async function postComment(token, repo, owner, issueNumber, body) {
 function truncateOutput(text, maxLength) {
     if (text.length <= maxLength)
         return text;
-    const halfLength = Math.floor(maxLength / 2);
+    const truncationMessage = '\n\n... [output truncated] ...\n\n';
+    const availableLength = maxLength - truncationMessage.length;
+    if (availableLength <= 0) {
+        return text.substring(0, maxLength);
+    }
+    const halfLength = Math.floor(availableLength / 2);
     return text.substring(0, halfLength) +
-        '\n\n... [output truncated] ...\n\n' +
+        truncationMessage +
         text.substring(text.length - halfLength);
 }
 function analyzeSteps(steps) {
@@ -222,7 +228,12 @@ async function run() {
             console.log('GITHUB_REPOSITORY not set, skipping comment');
             return;
         }
-        const [owner, repo] = context.repo.split('/');
+        const repoParts = context.repo.split('/');
+        if (repoParts.length !== 2) {
+            console.log(`Invalid GITHUB_REPOSITORY format: ${context.repo}, skipping comment`);
+            return;
+        }
+        const [owner, repo] = repoParts;
         let issueNumber;
         if (context.eventName === 'pull_request' || context.eventName === 'pull_request_target') {
             const eventPath = process.env.GITHUB_EVENT_PATH;
