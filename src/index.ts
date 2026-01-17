@@ -257,7 +257,6 @@ async function run(): Promise<void> {
   try {
     const stepsInput = getInput('steps')
     const workspace = getInput('workspace')
-    const token = getInput('github-token')
 
     if (!stepsInput) {
       setFailed('steps input is required')
@@ -266,11 +265,6 @@ async function run(): Promise<void> {
 
     if (!workspace) {
       setFailed('workspace input is required')
-      return
-    }
-
-    if (!token) {
-      setFailed('github-token input is required')
       return
     }
 
@@ -335,6 +329,12 @@ async function run(): Promise<void> {
 
     if (!issueNumber) {
       info('Not a pull request event, skipping comment')
+      return
+    }
+
+    const token = getInput('github-token')
+    if (!token) {
+      setFailed('github-token input is required')
       return
     }
 

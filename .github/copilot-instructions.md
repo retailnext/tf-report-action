@@ -93,10 +93,11 @@ npm run bundle
 - Do NOT use external runtime dependencies like `@actions/core` to keep the
   action lightweight. Implement needed functions within the project instead.
   Only use Node.js built-in modules (https, fs, etc.)
-- After updating any markdown files, always run `npm run format:write` to ensure
-  consistent formatting with Prettier. The super-linter workflow includes a
-  NATURAL_LANGUAGE linter (textlint) and MARKDOWN_PRETTIER check that will
-  validate markdown files.
+- After updating any Markdown files, always run `npm run format:write` to ensure
+  consistent formatting with Prettier, then run `npx textlint README.md` to
+  check for natural language issues. The super-linter workflow includes a
+  NATURAL_LANGUAGE linter (textlint using textlint-rule-no-todo) and
+  MARKDOWN_PRETTIER check that will validate Markdown files.
 
 ### Versioning
 

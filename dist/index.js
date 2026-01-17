@@ -175,17 +175,12 @@ async function run() {
     try {
         const stepsInput = getInput('steps');
         const workspace = getInput('workspace');
-        const token = getInput('github-token');
         if (!stepsInput) {
             setFailed('steps input is required');
             return;
         }
         if (!workspace) {
             setFailed('workspace input is required');
-            return;
-        }
-        if (!token) {
-            setFailed('github-token input is required');
             return;
         }
         let steps;
@@ -229,6 +224,11 @@ async function run() {
         }
         if (!issueNumber) {
             info('Not a pull request event, skipping comment');
+            return;
+        }
+        const token = getInput('github-token');
+        if (!token) {
+            setFailed('github-token input is required');
             return;
         }
         const commentBody = generateCommentBody(workspace, analysis);
