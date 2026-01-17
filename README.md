@@ -58,16 +58,16 @@ jobs:
         with:
           steps: ${{ toJSON(steps) }}
           workspace: 'production'
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+          github-token: ${{ github.token }}
 ```
 
 ## Inputs
 
-| Input          | Description                                  | Required | Default               |
-| -------------- | -------------------------------------------- | -------- | --------------------- |
-| `steps`        | JSON string of steps (`${{ toJSON(steps) }}` | Yes      | -                     |
-| `workspace`    | Workspace name for comment disambiguation    | Yes      | -                     |
-| `github-token` | GitHub token for posting comments            | No       | `${{ github.token }}` |
+| Input          | Description                                  | Required | Default |
+| -------------- | -------------------------------------------- | -------- | ------- |
+| `steps`        | JSON string of steps (`${{ toJSON(steps) }}` | Yes      | -       |
+| `workspace`    | Workspace name for comment disambiguation    | Yes      | -       |
+| `github-token` | GitHub token for posting comments            | Yes      | -       |
 
 ## Multiple Workspaces Example
 
@@ -98,7 +98,7 @@ jobs:
         with:
           steps: ${{ toJSON(steps) }}
           workspace: 'dev'
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+          github-token: ${{ github.token }}
 
   tofu-prod:
     runs-on: ubuntu-latest
@@ -123,7 +123,7 @@ jobs:
         with:
           steps: ${{ toJSON(steps) }}
           workspace: 'production'
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+          github-token: ${{ github.token }}
 ```
 
 ## How It Works

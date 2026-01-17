@@ -94,7 +94,9 @@ npm run bundle
   action lightweight. Implement needed functions within the project instead.
   Only use Node.js built-in modules (https, fs, etc.)
 - After updating any markdown files, always run `npm run format:write` to ensure
-  consistent formatting with Prettier
+  consistent formatting with Prettier. The super-linter workflow includes a
+  NATURAL_LANGUAGE linter (textlint) and MARKDOWN_PRETTIER check that will
+  validate markdown files.
 
 ### Versioning
 
