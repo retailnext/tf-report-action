@@ -1,0 +1,179 @@
+name: Test Action
+
+on:
+  pull_request:
+    branches:
+      - main
+      - copilot/**
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  test-action-success:
+    name: Test Action - Success Case
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup OpenTofu
+        uses: opentofu/setup-opentofu@v1
+        with:
+          tofu_version: '1.6.0'
+
+      - name: Create Test Terraform Config
+        run: |
+          mkdir -p /tmp/test-tofu
+          cat > /tmp/test-tofu/main.tf << 'EOF'
+          terraform {
+            required_version = ">= 1.0"
+          }
+
+          output "test_output" {
+            value = "Hello from OpenTofu!"
+          }
+          EOF
+
+      - name: OpenTofu Init
+        id: init
+        uses: retailnext/exec-action@v1
+        working-directory: /tmp/test-tofu
+        with:
+          command: tofu init
+
+      - name: OpenTofu Plan
+        id: plan
+        uses: retailnext/exec-action@v1
+        working-directory: /tmp/test-tofu
+        with:
+          command: tofu plan -no-color
+        continue-on-error: true
+
+      - name: Report Status
+        if: always()
+        uses: ./
+        with:
+          steps: ${{ toJSON(steps) }}
+          workspace: 'test-success'
+
+  test-action-failure:
+    name: Test Action - Failure Case
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup OpenTofu
+        uses: opentofu/setup-opentofu@v1
+        with:
+          tofu_version: '1.6.0'
+
+      - name: Create Invalid Terraform Config
+        run: |
+          mkdir -p /tmp/test-tofu-fail
+          cat > /tmp/test-tofu-fail/main.tf << 'EOF'
+          # Invalid syntax to trigger failure
+          resource "invalid_provider" "test" {
+            this_will_fail = true
+          }
+          EOF
+
+      - name: OpenTofu Init
+        id: init-fail
+        uses: retailnext/exec-action@v1
+        working-directory: /tmp/test-tofu-fail
+        with:
+          command: tofu init
+        continue-on-error: true
+
+      - name: OpenTofu Validate
+        id: validate-fail
+        uses: retailnext/exec-action@v1
+        working-directory: /tmp/test-tofu-fail
+        with:
+          command: tofu validate -no-color
+        continue-on-error: true
+
+      - name: Report Status
+        if: always()
+        uses: ./
+        with:
+          steps: ${{ toJSON(steps) }}
+          workspace: 'test-failure'
+
+  test-action-multiple-workspaces:
+    name: Test Action - Multiple Workspaces
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup OpenTofu
+        uses: opentofu/setup-opentofu@v1
+        with:
+          tofu_version: '1.6.0'
+
+      - name: Create Dev Config
+        run: |
+          mkdir -p /tmp/test-dev
+          cat > /tmp/test-dev/main.tf << 'EOF'
+          output "env" {
+            value = "dev"
+          }
+          EOF
+
+      - name: Create Prod Config
+        run: |
+          mkdir -p /tmp/test-prod
+          cat > /tmp/test-prod/main.tf << 'EOF'
+          output "env" {
+            value = "prod"
+          }
+          EOF
+
+      - name: Dev Init
+        id: dev-init
+        uses: retailnext/exec-action@v1
+        working-directory: /tmp/test-dev
+        with:
+          command: tofu init
+
+      - name: Dev Plan
+        id: dev-plan
+        uses: retailnext/exec-action@v1
+        working-directory: /tmp/test-dev
+        with:
+          command: tofu plan -no-color
+        continue-on-error: true
+
+      - name: Report Dev Status
+        if: always()
+        uses: ./
+        with:
+          steps: ${{ toJSON(steps) }}
+          workspace: 'dev'
+
+      - name: Prod Init
+        id: prod-init
+        uses: retailnext/exec-action@v1
+        working-directory: /tmp/test-prod
+        with:
+          command: tofu init
+
+      - name: Prod Plan
+        id: prod-plan
+        uses: retailnext/exec-action@v1
+        working-directory: /tmp/test-prod
+        with:
+          command: tofu plan -no-color
+        continue-on-error: true
+
+      - name: Report Prod Status
+        if: always()
+        uses: ./
+        with:
+          steps: ${{ toJSON(steps) }}
+          workspace: 'production'
