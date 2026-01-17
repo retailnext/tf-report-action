@@ -219,10 +219,10 @@ describe('getWorkspaceMarker', () => {
 
 describe('getInput', () => {
   test('reads from environment variables', () => {
-    process.env.INPUT_TEST_VALUE = 'hello'
+    process.env['INPUT_TEST-VALUE'] = 'hello'
     const value = getInput('test-value')
     expect(value).toBe('hello')
-    delete process.env.INPUT_TEST_VALUE
+    delete process.env['INPUT_TEST-VALUE']
   })
 
   test('handles spaces in input names', () => {

@@ -40,7 +40,7 @@ const COMMENT_TRUNCATION_BUFFER = 1000
  */
 export function getInput(name: string): string {
   const val =
-    process.env[`INPUT_${name.replace(/[ -]/g, '_').toUpperCase()}`] || ''
+    process.env[`INPUT_${name.replace(/ /g, '_').toUpperCase()}`] || ''
   return val.trim()
 }
 

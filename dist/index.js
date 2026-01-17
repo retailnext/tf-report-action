@@ -9,7 +9,7 @@ const COMMENT_TRUNCATION_BUFFER = 1000;
  * Get an input value from the environment
  */
 function getInput(name) {
-    const val = process.env[`INPUT_${name.replace(/[ -]/g, '_').toUpperCase()}`] || '';
+    const val = process.env[`INPUT_${name.replace(/ /g, '_').toUpperCase()}`] || '';
     return val.trim();
 }
 /**
