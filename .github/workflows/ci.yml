@@ -54,7 +54,7 @@ jobs:
           echo "✅ dist/ directory is up to date"
 
       - name: Report CI Status
-        if: always()
+        if: always() && github.event_name == 'pull_request'
         uses: ./
         with:
           steps: ${{ toJSON(steps) }}

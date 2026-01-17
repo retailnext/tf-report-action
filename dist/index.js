@@ -223,12 +223,12 @@ async function run() {
             }
         }
         if (!issueNumber) {
-            info('Not a pull request event, skipping comment');
+            setFailed('Not a pull request event - cannot post comment. This action must run in a pull_request event.');
             return;
         }
         const token = getInput('github-token');
         if (!token) {
-            info('github-token not provided, cannot post comment (use github-token: ${{ github.token }})');
+            setFailed('github-token input is required to post comments. Use: github-token: ${{ github.token }}');
             return;
         }
         const commentBody = generateCommentBody(workspace, analysis);
