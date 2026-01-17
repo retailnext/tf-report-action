@@ -11,8 +11,8 @@ inputs:
       'Workspace name to disambiguate comments from multiple workspaces'
     required: true
   github-token:
-    description: 'GitHub token for posting comments'
-    required: true
+    description: 'GitHub token for posting comments (required for PR comments)'
+    required: false
 runs:
   using: 'node24'
   main: 'dist/index.js'

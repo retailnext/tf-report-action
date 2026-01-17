@@ -334,7 +334,9 @@ async function run(): Promise<void> {
 
     const token = getInput('github-token')
     if (!token) {
-      setFailed('github-token input is required')
+      info(
+        'github-token not provided, cannot post comment (use github-token: ${{ github.token }})'
+      )
       return
     }
 

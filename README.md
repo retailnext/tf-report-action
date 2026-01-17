@@ -63,11 +63,11 @@ jobs:
 
 ## Inputs
 
-| Input          | Description                                  | Required | Default |
-| -------------- | -------------------------------------------- | -------- | ------- |
-| `steps`        | JSON string of steps (`${{ toJSON(steps) }}` | Yes      | -       |
-| `workspace`    | Workspace name for comment disambiguation    | Yes      | -       |
-| `github-token` | GitHub token for posting comments            | Yes      | -       |
+| Input          | Description                                   | Required                  | Default |
+| -------------- | --------------------------------------------- | ------------------------- | ------- |
+| `steps`        | JSON string of steps (`${{ toJSON(steps) }}`) | Yes                       | -       |
+| `workspace`    | Workspace name for comment disambiguation     | Yes                       | -       |
+| `github-token` | GitHub token for posting comments             | No (required for PR only) | -       |
 
 ## Multiple Workspaces Example
 
