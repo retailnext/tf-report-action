@@ -76,9 +76,9 @@ async function getExistingComments(
     path: `/repos/${owner}/${repo}/issues/${issueNumber}/comments`,
     method: 'GET',
     headers: {
-      'Authorization': `token ${token}`,
+      'Authorization': `Bearer ${token}`,
       'User-Agent': 'tf-report-action',
-      'Accept': 'application/vnd.github.v3+json'
+      'Accept': 'application/vnd.github+json'
     }
   };
 
@@ -97,9 +97,9 @@ async function deleteComment(
     path: `/repos/${owner}/${repo}/issues/comments/${commentId}`,
     method: 'DELETE',
     headers: {
-      'Authorization': `token ${token}`,
+      'Authorization': `Bearer ${token}`,
       'User-Agent': 'tf-report-action',
-      'Accept': 'application/vnd.github.v3+json'
+      'Accept': 'application/vnd.github+json'
     }
   };
 
@@ -118,9 +118,9 @@ async function postComment(
     path: `/repos/${owner}/${repo}/issues/${issueNumber}/comments`,
     method: 'POST',
     headers: {
-      'Authorization': `token ${token}`,
+      'Authorization': `Bearer ${token}`,
       'User-Agent': 'tf-report-action',
-      'Accept': 'application/vnd.github.v3+json',
+      'Accept': 'application/vnd.github+json',
       'Content-Type': 'application/json'
     }
   };
