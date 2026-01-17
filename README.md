@@ -62,11 +62,11 @@ jobs:
 
 ## Inputs
 
-| Input          | Description                                                      | Required | Default               |
-| -------------- | ---------------------------------------------------------------- | -------- | --------------------- |
-| `steps`        | JSON string of workflow steps (use `${{ toJSON(steps) }}`)       | Yes      | -                     |
-| `workspace`    | Workspace name to disambiguate comments from multiple workspaces | Yes      | -                     |
-| `github-token` | GitHub token for posting comments                                | No       | `${{ github.token }}` |
+| Input          | Description                                  | Required | Default               |
+| -------------- | -------------------------------------------- | -------- | --------------------- |
+| `steps`        | JSON string of steps (`${{ toJSON(steps) }}` | Yes      | -                     |
+| `workspace`    | Workspace name for comment disambiguation    | Yes      | -                     |
+| `github-token` | GitHub token for posting comments            | No       | `${{ github.token }}` |
 
 ## Multiple Workspaces Example
 
@@ -126,12 +126,12 @@ jobs:
 ## How It Works
 
 1. The action receives all workflow steps as JSON input
-2. Analyzes step outcomes to determine which steps failed
-3. For failed steps, extracts stdout/stderr from step outputs (populated by
+1. Analyzes step outcomes to determine which steps failed
+1. For failed steps, extracts stdout/stderr from step outputs (populated by
    retailnext/exec-action)
-4. Generates a formatted comment with the workspace status and outputs
-5. Posts the comment to the pull request
-6. Deletes any previous comments for the same workspace (identified by HTML
+1. Generates a formatted comment with the workspace status and outputs
+1. Posts the comment to the pull request
+1. Deletes any previous comments for the same workspace (identified by HTML
    comment marker)
 
 ## Comment Format
@@ -140,7 +140,7 @@ The action posts comments in the following format:
 
 **Success:**
 
-```
+```markdown
 ## OpenTofu Workflow Report - `production`
 
 ### ✅ Success
@@ -150,7 +150,7 @@ All 3 step(s) completed successfully.
 
 **Failure with outputs:**
 
-```
+```markdown
 ## OpenTofu Workflow Report - `production`
 
 ### ❌ Failed
@@ -165,7 +165,7 @@ All 3 step(s) completed successfully.
 <details>
 <summary>📄 Output</summary>
 
-```
+```text
 
 Terraform will perform the following actions...
 
@@ -176,7 +176,7 @@ Terraform will perform the following actions...
 <details>
 <summary>⚠️ Errors</summary>
 
-```
+```text
 
 Error: Invalid configuration ...
 
@@ -210,7 +210,7 @@ npm test
 
 ### Project Structure
 
-```
+```text
 .
 ├── action.yml          # Action metadata
 ├── src/
