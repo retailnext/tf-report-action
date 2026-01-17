@@ -1,0 +1,18 @@
+name: 'OpenTofu Report Action'
+description:
+  'Reports OpenTofu workflow execution status with step outputs as PR comments'
+author: 'eriksw'
+inputs:
+  steps:
+    description: 'JSON string of workflow steps (e.g., toJSON(steps))'
+    required: true
+  workspace:
+    description:
+      'Workspace name to disambiguate comments from multiple workspaces'
+    required: true
+  github-token:
+    description: 'GitHub token for posting comments'
+    required: true
+runs:
+  using: 'node24'
+  main: 'dist/index.js'
