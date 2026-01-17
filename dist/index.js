@@ -44,6 +44,7 @@ const fs = __importStar(require("fs"));
 // GitHub comment max size is 65536 characters
 const MAX_COMMENT_SIZE = 60000;
 const MAX_OUTPUT_PER_STEP = 20000;
+const COMMENT_TRUNCATION_BUFFER = 1000;
 function getInput(name) {
     const val = process.env[`INPUT_${name.replace(/[ -]/g, '_').toUpperCase()}`] || '';
     return val.trim();
@@ -135,7 +136,12 @@ function analyzeSteps(steps) {
     const failedSteps = [];
     for (const [stepName, stepData] of stepEntries) {
         const conclusion = stepData.conclusion || stepData.outcome || '';
-        if (conclusion && conclusion !== 'success' && conclusion !== 'skipped') {
+        // Treat as failure if not success, skipped, cancelled, or neutral
+        if (conclusion &&
+            conclusion !== 'success' &&
+            conclusion !== 'skipped' &&
+            conclusion !== 'cancelled' &&
+            conclusion !== 'neutral') {
             const failure = {
                 name: stepName,
                 conclusion,
@@ -184,7 +190,7 @@ function generateCommentBody(workspace, analysis) {
     }
     // Final safety check
     if (comment.length > MAX_COMMENT_SIZE) {
-        const availableSpace = MAX_COMMENT_SIZE - 1000;
+        const availableSpace = MAX_COMMENT_SIZE - COMMENT_TRUNCATION_BUFFER;
         comment = comment.substring(0, availableSpace) + '\n\n... [comment truncated] ...\n';
     }
     return comment;

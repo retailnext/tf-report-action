@@ -46,6 +46,32 @@ test('analyzeSteps - skipped steps are not failures', () => {
   assert.strictEqual(result.failedSteps.length, 0);
 });
 
+test('analyzeSteps - cancelled steps are not failures', () => {
+  const steps = {
+    'step1': { conclusion: 'success' },
+    'step2': { conclusion: 'cancelled' },
+    'step3': { conclusion: 'success' }
+  };
+
+  const result = analyzeSteps(steps);
+
+  assert.strictEqual(result.success, true);
+  assert.strictEqual(result.failedSteps.length, 0);
+});
+
+test('analyzeSteps - neutral steps are not failures', () => {
+  const steps = {
+    'step1': { conclusion: 'success' },
+    'step2': { conclusion: 'neutral' },
+    'step3': { conclusion: 'success' }
+  };
+
+  const result = analyzeSteps(steps);
+
+  assert.strictEqual(result.success, true);
+  assert.strictEqual(result.failedSteps.length, 0);
+});
+
 test('analyzeSteps - captures step outputs', () => {
   const steps = {
     'step1': { 

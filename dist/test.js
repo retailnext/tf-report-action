@@ -41,6 +41,26 @@ const index_1 = require("./index");
     node_assert_1.default.strictEqual(result.totalSteps, 3);
     node_assert_1.default.strictEqual(result.failedSteps.length, 0);
 });
+(0, node_test_1.test)('analyzeSteps - cancelled steps are not failures', () => {
+    const steps = {
+        'step1': { conclusion: 'success' },
+        'step2': { conclusion: 'cancelled' },
+        'step3': { conclusion: 'success' }
+    };
+    const result = (0, index_1.analyzeSteps)(steps);
+    node_assert_1.default.strictEqual(result.success, true);
+    node_assert_1.default.strictEqual(result.failedSteps.length, 0);
+});
+(0, node_test_1.test)('analyzeSteps - neutral steps are not failures', () => {
+    const steps = {
+        'step1': { conclusion: 'success' },
+        'step2': { conclusion: 'neutral' },
+        'step3': { conclusion: 'success' }
+    };
+    const result = (0, index_1.analyzeSteps)(steps);
+    node_assert_1.default.strictEqual(result.success, true);
+    node_assert_1.default.strictEqual(result.failedSteps.length, 0);
+});
 (0, node_test_1.test)('analyzeSteps - captures step outputs', () => {
     const steps = {
         'step1': {
