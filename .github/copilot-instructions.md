@@ -93,6 +93,8 @@ npm run bundle
 - Do NOT use external runtime dependencies like `@actions/core` to keep the
   action lightweight. Implement needed functions within the project instead.
   Only use Node.js built-in modules (https, fs, etc.)
+- After updating any markdown files, always run `npm run format:write` to ensure
+  consistent formatting with Prettier
 
 ### Versioning
 

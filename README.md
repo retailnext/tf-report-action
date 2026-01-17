@@ -58,6 +58,7 @@ jobs:
         with:
           steps: ${{ toJSON(steps) }}
           workspace: 'production'
+          github-token: ${{ secrets.GITHUB_TOKEN }}
 ```
 
 ## Inputs
@@ -97,6 +98,7 @@ jobs:
         with:
           steps: ${{ toJSON(steps) }}
           workspace: 'dev'
+          github-token: ${{ secrets.GITHUB_TOKEN }}
 
   tofu-prod:
     runs-on: ubuntu-latest
@@ -121,6 +123,7 @@ jobs:
         with:
           steps: ${{ toJSON(steps) }}
           workspace: 'production'
+          github-token: ${{ secrets.GITHUB_TOKEN }}
 ```
 
 ## How It Works
