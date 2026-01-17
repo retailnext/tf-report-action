@@ -4,8 +4,7 @@ description:
 author: 'eriksw'
 inputs:
   steps:
-    description:
-      'JSON string of workflow steps (e.g., steps: ${{ toJSON(steps) }})'
+    description: 'JSON string of workflow steps (e.g., toJSON(steps))'
     required: true
   workspace:
     description:

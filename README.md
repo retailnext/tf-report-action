@@ -150,7 +150,7 @@ All 3 step(s) completed successfully.
 
 **Failure with outputs:**
 
-```markdown
+````markdown
 ## OpenTofu Workflow Report - `production`
 
 ### ❌ Failed
@@ -159,8 +159,7 @@ All 3 step(s) completed successfully.
 
 #### ❌ Step: `plan`
 
-**Status:** failure
-**Exit Code:** 1
+**Status:** failure **Exit Code:** 1
 
 <details>
 <summary>📄 Output</summary>
@@ -168,8 +167,8 @@ All 3 step(s) completed successfully.
 ```text
 
 Terraform will perform the following actions...
-
 ```
+````
 
 </details>
 
