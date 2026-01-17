@@ -5,10 +5,22 @@ import * as fs from 'fs';
 const MAX_COMMENT_SIZE = 60000;
 const MAX_OUTPUT_PER_STEP = 20000;
 const COMMENT_TRUNCATION_BUFFER = 1000;
+/**
+ * Get an input value from the environment
+ */
 function getInput(name) {
     const val = process.env[`INPUT_${name.replace(/[ -]/g, '_').toUpperCase()}`] || '';
     return val.trim();
 }
+/**
+ * Log an informational message
+ */
+function info(message) {
+    console.log(message);
+}
+/**
+ * Set the action as failed and exit
+ */
 function setFailed(message) {
     console.error(`::error::${message}`);
     process.exit(1);
@@ -184,20 +196,20 @@ async function run() {
             setFailed(`Failed to parse steps input as JSON: ${error instanceof Error ? error.message : 'Unknown error'}`);
             return;
         }
-        console.log(`Analyzing ${Object.keys(steps).length} steps for workspace: ${workspace}`);
+        info(`Analyzing ${Object.keys(steps).length} steps for workspace: ${workspace}`);
         const analysis = analyzeSteps(steps);
-        console.log(`Analysis complete: ${analysis.success ? 'Success' : `Failed (${analysis.failedSteps.length} failures)`}`);
+        info(`Analysis complete: ${analysis.success ? 'Success' : `Failed (${analysis.failedSteps.length} failures)`}`);
         const context = {
             repo: process.env.GITHUB_REPOSITORY || '',
             eventName: process.env.GITHUB_EVENT_NAME || ''
         };
         if (!context.repo) {
-            console.log('GITHUB_REPOSITORY not set, skipping comment');
+            info('GITHUB_REPOSITORY not set, skipping comment');
             return;
         }
         const repoParts = context.repo.split('/');
         if (repoParts.length !== 2) {
-            console.log(`Invalid GITHUB_REPOSITORY format: ${context.repo}, skipping comment`);
+            info(`Invalid GITHUB_REPOSITORY format: ${context.repo}, skipping comment`);
             return;
         }
         const [owner, repo] = repoParts;
@@ -211,27 +223,27 @@ async function run() {
                     issueNumber = event.pull_request?.number;
                 }
                 catch (error) {
-                    console.log(`Failed to read GitHub event file: ${error instanceof Error ? error.message : 'Unknown error'}`);
+                    info(`Failed to read GitHub event file: ${error instanceof Error ? error.message : 'Unknown error'}`);
                 }
             }
         }
         if (!issueNumber) {
-            console.log('Not a pull request event, skipping comment');
+            info('Not a pull request event, skipping comment');
             return;
         }
         const commentBody = generateCommentBody(workspace, analysis);
         const marker = getWorkspaceMarker(workspace);
-        console.log(`Comment body length: ${commentBody.length} characters`);
+        info(`Comment body length: ${commentBody.length} characters`);
         const existingComments = await getExistingComments(token, repo, owner, issueNumber);
         for (const comment of existingComments) {
             if (comment.body && comment.body.includes(marker)) {
-                console.log(`Deleting previous comment for workspace: ${workspace}`);
+                info(`Deleting previous comment for workspace: ${workspace}`);
                 await deleteComment(token, repo, owner, comment.id);
             }
         }
-        console.log(`Posting new comment for workspace: ${workspace}`);
+        info(`Posting new comment for workspace: ${workspace}`);
         await postComment(token, repo, owner, issueNumber, commentBody);
-        console.log('Comment posted successfully');
+        info('Comment posted successfully');
     }
     catch (error) {
         if (error instanceof Error) {

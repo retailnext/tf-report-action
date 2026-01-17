@@ -35,12 +35,25 @@ const MAX_COMMENT_SIZE = 60000
 const MAX_OUTPUT_PER_STEP = 20000
 const COMMENT_TRUNCATION_BUFFER = 1000
 
+/**
+ * Get an input value from the environment
+ */
 export function getInput(name: string): string {
   const val =
     process.env[`INPUT_${name.replace(/[ -]/g, '_').toUpperCase()}`] || ''
   return val.trim()
 }
 
+/**
+ * Log an informational message
+ */
+function info(message: string): void {
+  console.log(message)
+}
+
+/**
+ * Set the action as failed and exit
+ */
 export function setFailed(message: string): void {
   console.error(`::error::${message}`)
   process.exit(1)
@@ -271,13 +284,13 @@ async function run(): Promise<void> {
       return
     }
 
-    console.log(
+    info(
       `Analyzing ${Object.keys(steps).length} steps for workspace: ${workspace}`
     )
 
     const analysis = analyzeSteps(steps)
 
-    console.log(
+    info(
       `Analysis complete: ${analysis.success ? 'Success' : `Failed (${analysis.failedSteps.length} failures)`}`
     )
 
@@ -287,13 +300,13 @@ async function run(): Promise<void> {
     }
 
     if (!context.repo) {
-      console.log('GITHUB_REPOSITORY not set, skipping comment')
+      info('GITHUB_REPOSITORY not set, skipping comment')
       return
     }
 
     const repoParts = context.repo.split('/')
     if (repoParts.length !== 2) {
-      console.log(
+      info(
         `Invalid GITHUB_REPOSITORY format: ${context.repo}, skipping comment`
       )
       return
@@ -313,7 +326,7 @@ async function run(): Promise<void> {
           const event = JSON.parse(fs.readFileSync(eventPath, 'utf8'))
           issueNumber = event.pull_request?.number
         } catch (error) {
-          console.log(
+          info(
             `Failed to read GitHub event file: ${error instanceof Error ? error.message : 'Unknown error'}`
           )
         }
@@ -321,14 +334,14 @@ async function run(): Promise<void> {
     }
 
     if (!issueNumber) {
-      console.log('Not a pull request event, skipping comment')
+      info('Not a pull request event, skipping comment')
       return
     }
 
     const commentBody = generateCommentBody(workspace, analysis)
     const marker = getWorkspaceMarker(workspace)
 
-    console.log(`Comment body length: ${commentBody.length} characters`)
+    info(`Comment body length: ${commentBody.length} characters`)
 
     const existingComments = await getExistingComments(
       token,
@@ -339,15 +352,15 @@ async function run(): Promise<void> {
 
     for (const comment of existingComments) {
       if (comment.body && comment.body.includes(marker)) {
-        console.log(`Deleting previous comment for workspace: ${workspace}`)
+        info(`Deleting previous comment for workspace: ${workspace}`)
         await deleteComment(token, repo, owner, comment.id)
       }
     }
 
-    console.log(`Posting new comment for workspace: ${workspace}`)
+    info(`Posting new comment for workspace: ${workspace}`)
     await postComment(token, repo, owner, issueNumber, commentBody)
 
-    console.log('Comment posted successfully')
+    info('Comment posted successfully')
   } catch (error) {
     if (error instanceof Error) {
       setFailed(error.message)

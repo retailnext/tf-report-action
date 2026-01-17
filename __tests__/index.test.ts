@@ -5,7 +5,7 @@ import {
   getWorkspaceMarker,
   getInput,
   truncateOutput
-} from './index'
+} from '../src/index'
 
 describe('analyzeSteps', () => {
   test('all steps successful', () => {
