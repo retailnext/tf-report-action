@@ -117,8 +117,8 @@ jobs:
 
 When `target-step` is specified:
 
-- The comment title includes both workspace and step:
-  `## ✅ 'production' 'plan' Succeeded`
+- The comment title includes both workspace and step: `## ✅ \`production\`
+  \`plan\` Succeeded`
 - On success, the step's stdout/stderr are displayed
 - On failure, the step's error output is highlighted
 - If the step didn't run, other failures are reported

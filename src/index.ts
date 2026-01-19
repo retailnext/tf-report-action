@@ -362,27 +362,21 @@ export function generateCommentBody(
 
         comment += '\n'
 
-        const hasStdout = step.stdout && step.stdout.trim().length > 0
-        const hasStderr = step.stderr && step.stderr.trim().length > 0
+        const stdout = step.stdout
+        const stderr = step.stderr
+        const hasStdout = stdout && stdout.trim().length > 0
+        const hasStderr = stderr && stderr.trim().length > 0
 
         if (!hasStdout && !hasStderr) {
           comment += `> [!NOTE]\n> Failed with no output.\n\n`
         } else {
-          if (hasStdout) {
-            const truncated = truncateOutput(
-              step.stdout!,
-              MAX_OUTPUT_PER_STEP,
-              true
-            )
+          if (hasStdout && stdout) {
+            const truncated = truncateOutput(stdout, MAX_OUTPUT_PER_STEP, true)
             comment += `<details>\n<summary>📄 Output</summary>\n\n\`\`\`\n${truncated}\n\`\`\`\n</details>\n\n`
           }
 
-          if (hasStderr) {
-            const truncated = truncateOutput(
-              step.stderr!,
-              MAX_OUTPUT_PER_STEP,
-              true
-            )
+          if (hasStderr && stderr) {
+            const truncated = truncateOutput(stderr, MAX_OUTPUT_PER_STEP, true)
             comment += `<details>\n<summary>⚠️ Errors</summary>\n\n\`\`\`\n${truncated}\n\`\`\`\n</details>\n\n`
           }
         }
