@@ -204,18 +204,20 @@ function generateCommentBody(workspace, analysis) {
         }
         else if (targetStepResult.conclusion === 'success') {
             // Success case - show stdout/stderr if available
-            const hasStdout = targetStepResult.stdout && targetStepResult.stdout.trim().length > 0;
-            const hasStderr = targetStepResult.stderr && targetStepResult.stderr.trim().length > 0;
+            const stdout = targetStepResult.stdout;
+            const stderr = targetStepResult.stderr;
+            const hasStdout = stdout && stdout.trim().length > 0;
+            const hasStderr = stderr && stderr.trim().length > 0;
             if (!hasStdout && !hasStderr) {
                 comment += `> [!NOTE]\n> Completed successfully with no output.\n\n`;
             }
             else {
-                if (hasStdout) {
-                    const truncated = truncateOutput(targetStepResult.stdout, MAX_OUTPUT_PER_STEP, true);
+                if (hasStdout && stdout) {
+                    const truncated = truncateOutput(stdout, MAX_OUTPUT_PER_STEP, true);
                     comment += `<details>\n<summary>📄 Output</summary>\n\n\`\`\`\n${truncated}\n\`\`\`\n</details>\n\n`;
                 }
-                if (hasStderr) {
-                    const truncated = truncateOutput(targetStepResult.stderr, MAX_OUTPUT_PER_STEP, true);
+                if (hasStderr && stderr) {
+                    const truncated = truncateOutput(stderr, MAX_OUTPUT_PER_STEP, true);
                     comment += `<details>\n<summary>⚠️ Errors</summary>\n\n\`\`\`\n${truncated}\n\`\`\`\n</details>\n\n`;
                 }
             }
@@ -227,18 +229,20 @@ function generateCommentBody(workspace, analysis) {
                 comment += `**Exit Code:** ${targetStepResult.exitCode}\n`;
             }
             comment += '\n';
-            const hasStdout = targetStepResult.stdout && targetStepResult.stdout.trim().length > 0;
-            const hasStderr = targetStepResult.stderr && targetStepResult.stderr.trim().length > 0;
+            const stdout = targetStepResult.stdout;
+            const stderr = targetStepResult.stderr;
+            const hasStdout = stdout && stdout.trim().length > 0;
+            const hasStderr = stderr && stderr.trim().length > 0;
             if (!hasStdout && !hasStderr) {
                 comment += `> [!NOTE]\n> Failed with no output.\n\n`;
             }
             else {
-                if (hasStdout) {
-                    const truncated = truncateOutput(targetStepResult.stdout, MAX_OUTPUT_PER_STEP, true);
+                if (hasStdout && stdout) {
+                    const truncated = truncateOutput(stdout, MAX_OUTPUT_PER_STEP, true);
                     comment += `<details>\n<summary>📄 Output</summary>\n\n\`\`\`\n${truncated}\n\`\`\`\n</details>\n\n`;
                 }
-                if (hasStderr) {
-                    const truncated = truncateOutput(targetStepResult.stderr, MAX_OUTPUT_PER_STEP, true);
+                if (hasStderr && stderr) {
+                    const truncated = truncateOutput(stderr, MAX_OUTPUT_PER_STEP, true);
                     comment += `<details>\n<summary>⚠️ Errors</summary>\n\n\`\`\`\n${truncated}\n\`\`\`\n</details>\n\n`;
                 }
             }
@@ -301,7 +305,7 @@ async function run() {
             const workflowName = process.env.GITHUB_WORKFLOW || 'Workflow';
             const jobName = process.env.GITHUB_JOB || 'Job';
             workspace = `${workflowName}/${jobName}`;
-            info(`No workspace provided, using: ${workspace}`);
+            info(`No workspace provided, using: \`${workspace}\``);
         }
         let steps;
         try {
@@ -311,7 +315,7 @@ async function run() {
             setFailed(`Failed to parse steps input as JSON: ${error instanceof Error ? error.message : 'Unknown error'}`);
             return;
         }
-        info(`Analyzing ${Object.keys(steps).length} steps for workspace: ${workspace}${targetStep ? ` (target: ${targetStep})` : ''}`);
+        info(`Analyzing ${Object.keys(steps).length} steps for workspace: \`${workspace}\`${targetStep ? ` (target: \`${targetStep}\`)` : ''}`);
         const analysis = analyzeSteps(steps, targetStep);
         info(`Analysis complete: ${analysis.success ? 'Success' : `Failed (${analysis.failedSteps.length} failures)`}`);
         const context = {
@@ -357,11 +361,11 @@ async function run() {
         const existingComments = await getExistingComments(token, repo, owner, issueNumber);
         for (const comment of existingComments) {
             if (comment.body && comment.body.includes(marker)) {
-                info(`Deleting previous comment for workspace: ${workspace}`);
+                info(`Deleting previous comment for workspace: \`${workspace}\``);
                 await deleteComment(token, repo, owner, comment.id);
             }
         }
-        info(`Posting new comment for workspace: ${workspace}`);
+        info(`Posting new comment for workspace: \`${workspace}\``);
         await postComment(token, repo, owner, issueNumber, commentBody);
         info('Comment posted successfully');
     }
