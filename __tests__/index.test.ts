@@ -4,7 +4,8 @@ import {
   generateCommentBody,
   getWorkspaceMarker,
   getInput,
-  truncateOutput
+  truncateOutput,
+  getJobLogsUrl
 } from '../src/index'
 
 describe('analyzeSteps', () => {
@@ -20,6 +21,7 @@ describe('analyzeSteps', () => {
     expect(result.success).toBe(true)
     expect(result.totalSteps).toBe(3)
     expect(result.failedSteps.length).toBe(0)
+    expect(result.targetStepResult).toBeUndefined()
   })
 
   test('some steps failed', () => {
@@ -98,10 +100,86 @@ describe('analyzeSteps', () => {
     expect(result.failedSteps[0].stderr).toBe('Some error')
     expect(result.failedSteps[0].exitCode).toBe('1')
   })
+
+  test('target step found and successful', () => {
+    const steps = {
+      init: { conclusion: 'success' },
+      plan: {
+        conclusion: 'success',
+        outputs: {
+          stdout: 'Plan output',
+          stderr: 'Plan warnings'
+        }
+      },
+      validate: { conclusion: 'success' }
+    }
+
+    const result = analyzeSteps(steps, 'plan')
+
+    expect(result.success).toBe(true)
+    expect(result.targetStepResult).toBeDefined()
+    expect(result.targetStepResult?.name).toBe('plan')
+    expect(result.targetStepResult?.found).toBe(true)
+    expect(result.targetStepResult?.conclusion).toBe('success')
+    expect(result.targetStepResult?.stdout).toBe('Plan output')
+    expect(result.targetStepResult?.stderr).toBe('Plan warnings')
+  })
+
+  test('target step found and failed', () => {
+    const steps = {
+      init: { conclusion: 'success' },
+      apply: {
+        conclusion: 'failure',
+        outputs: {
+          stdout: 'Apply output',
+          stderr: 'Apply errors',
+          exit_code: '1'
+        }
+      }
+    }
+
+    const result = analyzeSteps(steps, 'apply')
+
+    expect(result.success).toBe(false)
+    expect(result.targetStepResult).toBeDefined()
+    expect(result.targetStepResult?.name).toBe('apply')
+    expect(result.targetStepResult?.found).toBe(true)
+    expect(result.targetStepResult?.conclusion).toBe('failure')
+    expect(result.targetStepResult?.exitCode).toBe('1')
+  })
+
+  test('target step not found', () => {
+    const steps = {
+      init: { conclusion: 'success' },
+      validate: { conclusion: 'success' }
+    }
+
+    const result = analyzeSteps(steps, 'plan')
+
+    expect(result.success).toBe(true)
+    expect(result.targetStepResult).toBeDefined()
+    expect(result.targetStepResult?.name).toBe('plan')
+    expect(result.targetStepResult?.found).toBe(false)
+  })
+
+  test('target step not found with failures', () => {
+    const steps = {
+      init: { conclusion: 'failure' },
+      validate: { conclusion: 'success' }
+    }
+
+    const result = analyzeSteps(steps, 'plan')
+
+    expect(result.success).toBe(false)
+    expect(result.failedSteps.length).toBe(1)
+    expect(result.targetStepResult).toBeDefined()
+    expect(result.targetStepResult?.name).toBe('plan')
+    expect(result.targetStepResult?.found).toBe(false)
+  })
 })
 
 describe('generateCommentBody', () => {
-  test('success case', () => {
+  test('success case without target step', () => {
     const workspace = 'production'
     const analysis = {
       success: true,
@@ -111,13 +189,12 @@ describe('generateCommentBody', () => {
 
     const comment = generateCommentBody(workspace, analysis)
 
-    expect(comment).toContain('<!-- tf-report-action:production -->')
-    expect(comment).toContain('## OpenTofu Workflow Report - `production`')
-    expect(comment).toContain('### ✅ Success')
+    expect(comment).toContain('<!-- tf-report-action:"production" -->')
+    expect(comment).toContain('## ✅ `production` Succeeded')
     expect(comment).toContain('All 3 step(s) completed successfully')
   })
 
-  test('failure case', () => {
+  test('failure case without target step', () => {
     const workspace = 'dev'
     const analysis = {
       success: false,
@@ -130,21 +207,20 @@ describe('generateCommentBody', () => {
 
     const comment = generateCommentBody(workspace, analysis)
 
-    expect(comment).toContain('<!-- tf-report-action:dev -->')
-    expect(comment).toContain('## OpenTofu Workflow Report - `dev`')
-    expect(comment).toContain('### ❌ Failed')
+    expect(comment).toContain('<!-- tf-report-action:"dev" -->')
+    expect(comment).toContain('## ❌ `dev` Failed')
     expect(comment).toContain('2 of 5 step(s) failed')
     expect(comment).toContain('#### ❌ Step: `build`')
     expect(comment).toContain('#### ❌ Step: `test`')
   })
 
-  test('includes step outputs', () => {
+  test('includes step outputs only when non-empty', () => {
     const workspace = 'staging'
     const analysis = {
       success: false,
       failedSteps: [
         {
-          name: 'tofu-plan',
+          name: 'plan',
           conclusion: 'failure',
           stdout: 'Plan output here',
           stderr: 'Error details here',
@@ -156,7 +232,7 @@ describe('generateCommentBody', () => {
 
     const comment = generateCommentBody(workspace, analysis)
 
-    expect(comment).toContain('#### ❌ Step: `tofu-plan`')
+    expect(comment).toContain('#### ❌ Step: `plan`')
     expect(comment).toContain('**Exit Code:** 1')
     expect(comment).toContain('📄 Output')
     expect(comment).toContain('Plan output here')
@@ -164,19 +240,143 @@ describe('generateCommentBody', () => {
     expect(comment).toContain('Error details here')
   })
 
-  test('handles empty outputs', () => {
+  test('shows notice when outputs are empty', () => {
     const workspace = 'test'
     const analysis = {
       success: false,
-      failedSteps: [{ name: 'step1', conclusion: 'failure' }],
+      failedSteps: [
+        {
+          name: 'step1',
+          conclusion: 'failure',
+          stdout: '',
+          stderr: ''
+        }
+      ],
       totalSteps: 1
     }
 
     const comment = generateCommentBody(workspace, analysis)
 
     expect(comment).toContain('#### ❌ Step: `step1`')
+    expect(comment).toContain('> [!NOTE]')
+    expect(comment).toContain('Failed with no output')
     expect(comment).not.toContain('📄 Output')
     expect(comment).not.toContain('⚠️ Errors')
+  })
+
+  test('target step successful with outputs', () => {
+    const workspace = 'prod'
+    const analysis = {
+      success: true,
+      failedSteps: [],
+      totalSteps: 3,
+      targetStepResult: {
+        name: 'plan',
+        found: true,
+        conclusion: 'success',
+        stdout: 'Plan succeeded',
+        stderr: 'Some warnings'
+      }
+    }
+
+    const comment = generateCommentBody(workspace, analysis)
+
+    expect(comment).toContain('<!-- tf-report-action:"prod" -->')
+    expect(comment).toContain('## ✅ `prod` `plan` Succeeded')
+    expect(comment).toContain('📄 Output')
+    expect(comment).toContain('Plan succeeded')
+    expect(comment).toContain('⚠️ Errors')
+    expect(comment).toContain('Some warnings')
+  })
+
+  test('target step successful with no outputs', () => {
+    const workspace = 'dev'
+    const analysis = {
+      success: true,
+      failedSteps: [],
+      totalSteps: 2,
+      targetStepResult: {
+        name: 'apply',
+        found: true,
+        conclusion: 'success',
+        stdout: '',
+        stderr: ''
+      }
+    }
+
+    const comment = generateCommentBody(workspace, analysis)
+
+    expect(comment).toContain('## ✅ `dev` `apply` Succeeded')
+    expect(comment).toContain('> [!NOTE]')
+    expect(comment).toContain('Completed successfully with no output')
+  })
+
+  test('target step failed', () => {
+    const workspace = 'staging'
+    const analysis = {
+      success: false,
+      failedSteps: [{ name: 'apply', conclusion: 'failure' }],
+      totalSteps: 2,
+      targetStepResult: {
+        name: 'apply',
+        found: true,
+        conclusion: 'failure',
+        stdout: 'Apply output',
+        stderr: 'Apply errors',
+        exitCode: '1'
+      }
+    }
+
+    const comment = generateCommentBody(workspace, analysis)
+
+    expect(comment).toContain('## ❌ `staging` `apply` Failed')
+    expect(comment).toContain('**Status:** failure')
+    expect(comment).toContain('**Exit Code:** 1')
+  })
+
+  test('target step not found', () => {
+    const workspace = 'test'
+    const analysis = {
+      success: true,
+      failedSteps: [],
+      totalSteps: 2,
+      targetStepResult: {
+        name: 'plan',
+        found: false
+      }
+    }
+
+    const comment = generateCommentBody(workspace, analysis)
+
+    expect(comment).toContain('## ❌ `test` `plan` Failed')
+    expect(comment).toContain('### Did Not Run')
+    expect(comment).toContain('`plan` was not found in the workflow steps')
+  })
+
+  test('target step not found with other failures', () => {
+    const workspace = 'prod'
+    const analysis = {
+      success: false,
+      failedSteps: [
+        { name: 'init', conclusion: 'failure' },
+        { name: 'validate', conclusion: 'failure' }
+      ],
+      totalSteps: 3,
+      targetStepResult: {
+        name: 'plan',
+        found: false
+      }
+    }
+
+    const comment = generateCommentBody(workspace, analysis)
+
+    expect(comment).toContain('## ❌ `prod` `plan` Failed')
+    // Should NOT contain "Did Not Run" when there are other failures
+    expect(comment).not.toContain('### Did Not Run')
+    // Should focus on the failures
+    expect(comment).toContain('2 of 3 step(s) failed')
+    expect(comment).toContain('- ❌ `init` (failure)')
+    expect(comment).toContain('- ❌ `validate` (failure)')
   })
 })
 
@@ -196,15 +396,33 @@ describe('truncateOutput', () => {
     expect(result.startsWith('AAA')).toBe(true)
     expect(result.endsWith('AAA')).toBe(true)
   })
+
+  test('truncation includes log link when requested', () => {
+    process.env.GITHUB_REPOSITORY = 'owner/repo'
+    process.env.GITHUB_RUN_ID = '12345'
+    process.env.GITHUB_RUN_ATTEMPT = '1'
+
+    const text = 'A'.repeat(1000)
+    const result = truncateOutput(text, 500, true)
+
+    expect(result).toContain('view full logs')
+    expect(result).toContain(
+      'https://github.com/owner/repo/actions/runs/12345/attempts/1'
+    )
+
+    delete process.env.GITHUB_REPOSITORY
+    delete process.env.GITHUB_RUN_ID
+    delete process.env.GITHUB_RUN_ATTEMPT
+  })
 })
 
 describe('getWorkspaceMarker', () => {
-  test('returns correct marker', () => {
+  test('returns correct marker with quotes', () => {
     const marker1 = getWorkspaceMarker('production')
     const marker2 = getWorkspaceMarker('dev')
 
-    expect(marker1).toBe('<!-- tf-report-action:production -->')
-    expect(marker2).toBe('<!-- tf-report-action:dev -->')
+    expect(marker1).toBe('<!-- tf-report-action:"production" -->')
+    expect(marker2).toBe('<!-- tf-report-action:"dev" -->')
   })
 
   test('workspace markers are unique per workspace', () => {
@@ -214,6 +432,29 @@ describe('getWorkspaceMarker', () => {
     expect(marker1).not.toBe(marker2)
     expect(marker1).toContain('workspace1')
     expect(marker2).toContain('workspace2')
+  })
+})
+
+describe('getJobLogsUrl', () => {
+  test('returns URL when all env vars are set', () => {
+    process.env.GITHUB_REPOSITORY = 'owner/repo'
+    process.env.GITHUB_RUN_ID = '12345'
+    process.env.GITHUB_RUN_ATTEMPT = '2'
+
+    const url = getJobLogsUrl()
+
+    expect(url).toBe(
+      'https://github.com/owner/repo/actions/runs/12345/attempts/2'
+    )
+
+    delete process.env.GITHUB_REPOSITORY
+    delete process.env.GITHUB_RUN_ID
+    delete process.env.GITHUB_RUN_ATTEMPT
+  })
+
+  test('returns empty string when env vars are missing', () => {
+    const url = getJobLogsUrl()
+    expect(url).toBe('')
   })
 })
 
