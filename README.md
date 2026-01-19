@@ -170,8 +170,8 @@ All 3 step(s) completed successfully.
 ```text
 
 Terraform will perform the following actions...
+
 ```
-````
 
 </details>
 
@@ -185,7 +185,7 @@ Error: Invalid configuration ...
 ```
 
 </details>
-```
+````
 
 ## Size Limits
 

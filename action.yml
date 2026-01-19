@@ -8,8 +8,14 @@ inputs:
     required: true
   workspace:
     description:
-      'Workspace name to disambiguate comments from multiple workspaces'
-    required: true
+      'Workspace name to disambiguate comments from multiple workspaces. If not
+      provided, uses workflow name and job name.'
+    required: false
+  target-step:
+    description:
+      'Optional step name to focus the comment on. When specified, the comment
+      will highlight this step status and outputs.'
+    required: false
   github-token:
     description: 'GitHub token for posting comments'
     required: true

@@ -89,10 +89,25 @@ async function postComment(token, repo, owner, issueNumber, body) {
     const payload = JSON.stringify({ body });
     await httpsRequest(options, payload);
 }
-function truncateOutput(text, maxLength) {
+/**
+ * Get the GitHub job logs URL
+ */
+function getJobLogsUrl() {
+    const repo = process.env.GITHUB_REPOSITORY || '';
+    const runId = process.env.GITHUB_RUN_ID || '';
+    const runAttempt = process.env.GITHUB_RUN_ATTEMPT || '1';
+    if (repo && runId) {
+        return `https://github.com/${repo}/actions/runs/${runId}/attempts/${runAttempt}`;
+    }
+    return '';
+}
+function truncateOutput(text, maxLength, includeLogLink = false) {
     if (text.length <= maxLength)
         return text;
-    const truncationMessage = '\n\n... [output truncated] ...\n\n';
+    const logLink = includeLogLink ? getJobLogsUrl() : '';
+    const truncationMessage = logLink
+        ? `\n\n... [output truncated - [view full logs](${logLink})] ...\n\n`
+        : '\n\n... [output truncated] ...\n\n';
     const availableLength = maxLength - truncationMessage.length;
     if (availableLength <= 0) {
         return text.substring(0, maxLength);
@@ -102,12 +117,24 @@ function truncateOutput(text, maxLength) {
         truncationMessage +
         text.substring(text.length - halfLength));
 }
-function analyzeSteps(steps) {
+function analyzeSteps(steps, targetStep) {
     const stepEntries = Object.entries(steps);
     const totalSteps = stepEntries.length;
     const failedSteps = [];
+    let targetStepResult;
     for (const [stepName, stepData] of stepEntries) {
         const conclusion = stepData.conclusion || stepData.outcome || '';
+        // Check if this is the target step
+        if (targetStep && stepName === targetStep) {
+            targetStepResult = {
+                name: stepName,
+                found: true,
+                conclusion,
+                stdout: stepData.outputs?.stdout,
+                stderr: stepData.outputs?.stderr,
+                exitCode: stepData.outputs?.exit_code
+            };
+        }
         // Treat as failure if not success, skipped, cancelled, or neutral
         if (conclusion &&
             conclusion !== 'success' &&
@@ -124,39 +151,124 @@ function analyzeSteps(steps) {
             failedSteps.push(failure);
         }
     }
+    // If target step was specified but not found
+    if (targetStep && !targetStepResult) {
+        targetStepResult = {
+            name: targetStep,
+            found: false
+        };
+    }
     return {
         success: failedSteps.length === 0,
         failedSteps,
-        totalSteps
+        totalSteps,
+        targetStepResult
     };
 }
 function generateCommentBody(workspace, analysis) {
-    const { success, failedSteps, totalSteps } = analysis;
-    const marker = `<!-- tf-report-action:${workspace} -->`;
-    const statusIcon = success ? '✅' : '❌';
-    const statusText = success ? 'Success' : 'Failed';
-    let comment = `${marker}\n\n`;
-    comment += `## OpenTofu Workflow Report - \`${workspace}\`\n\n`;
-    comment += `### ${statusIcon} ${statusText}\n\n`;
-    if (success) {
-        comment += `All ${totalSteps} step(s) completed successfully.\n`;
+    const { success, failedSteps, totalSteps, targetStepResult } = analysis;
+    const marker = `<!-- tf-report-action:"${workspace}" -->`;
+    let title = '';
+    let statusIcon = '';
+    let statusText = '';
+    if (targetStepResult) {
+        // Target step mode
+        // Show as failure if target step didn't run or overall workflow failed
+        const showAsFailure = !targetStepResult.found || !success;
+        statusIcon = showAsFailure ? '❌' : '✅';
+        statusText = showAsFailure ? 'Failed' : 'Succeeded';
+        title = `## ${statusIcon} \`${workspace}\` \`${targetStepResult.name}\` ${statusText}`;
     }
     else {
-        comment += `${failedSteps.length} of ${totalSteps} step(s) failed:\n\n`;
-        for (const step of failedSteps) {
-            comment += `#### ❌ Step: \`${step.name}\`\n\n`;
-            comment += `**Status:** ${step.conclusion}\n`;
-            if (step.exitCode) {
-                comment += `**Exit Code:** ${step.exitCode}\n`;
+        // Normal mode
+        statusIcon = success ? '✅' : '❌';
+        statusText = success ? 'Succeeded' : 'Failed';
+        title = `## ${statusIcon} \`${workspace}\` ${statusText}`;
+    }
+    let comment = `${marker}\n\n${title}\n\n`;
+    if (targetStepResult) {
+        // Target step focused comment
+        if (!targetStepResult.found) {
+            comment += `### Did Not Run\n\n`;
+            comment += `The target step \`${targetStepResult.name}\` was not found in the workflow steps.\n\n`;
+            if (failedSteps.length > 0) {
+                comment += `${failedSteps.length} of ${totalSteps} step(s) failed:\n\n`;
+                for (const step of failedSteps) {
+                    comment += `- ❌ \`${step.name}\` (${step.conclusion})\n`;
+                }
+            }
+        }
+        else if (targetStepResult.conclusion === 'success') {
+            // Success case - show stdout/stderr if available
+            const hasStdout = targetStepResult.stdout && targetStepResult.stdout.trim().length > 0;
+            const hasStderr = targetStepResult.stderr && targetStepResult.stderr.trim().length > 0;
+            if (!hasStdout && !hasStderr) {
+                comment += `> [!NOTE]\n> The step completed successfully with no output.\n\n`;
+            }
+            else {
+                if (hasStdout) {
+                    const truncated = truncateOutput(targetStepResult.stdout, MAX_OUTPUT_PER_STEP, true);
+                    comment += `<details>\n<summary>📄 Output</summary>\n\n\`\`\`\n${truncated}\n\`\`\`\n</details>\n\n`;
+                }
+                if (hasStderr) {
+                    const truncated = truncateOutput(targetStepResult.stderr, MAX_OUTPUT_PER_STEP, true);
+                    comment += `<details>\n<summary>⚠️ Errors</summary>\n\n\`\`\`\n${truncated}\n\`\`\`\n</details>\n\n`;
+                }
+            }
+        }
+        else {
+            // Target step failed or has other status
+            comment += `**Status:** ${targetStepResult.conclusion}\n`;
+            if (targetStepResult.exitCode) {
+                comment += `**Exit Code:** ${targetStepResult.exitCode}\n`;
             }
             comment += '\n';
-            if (step.stdout) {
-                const truncatedStdout = truncateOutput(step.stdout, MAX_OUTPUT_PER_STEP);
-                comment += `<details>\n<summary>📄 Output</summary>\n\n\`\`\`\n${truncatedStdout}\n\`\`\`\n</details>\n\n`;
+            const hasStdout = targetStepResult.stdout && targetStepResult.stdout.trim().length > 0;
+            const hasStderr = targetStepResult.stderr && targetStepResult.stderr.trim().length > 0;
+            if (!hasStdout && !hasStderr) {
+                comment += `> [!NOTE]\n> The step failed with no output.\n\n`;
             }
-            if (step.stderr) {
-                const truncatedStderr = truncateOutput(step.stderr, MAX_OUTPUT_PER_STEP);
-                comment += `<details>\n<summary>⚠️ Errors</summary>\n\n\`\`\`\n${truncatedStderr}\n\`\`\`\n</details>\n\n`;
+            else {
+                if (hasStdout) {
+                    const truncated = truncateOutput(targetStepResult.stdout, MAX_OUTPUT_PER_STEP, true);
+                    comment += `<details>\n<summary>📄 Output</summary>\n\n\`\`\`\n${truncated}\n\`\`\`\n</details>\n\n`;
+                }
+                if (hasStderr) {
+                    const truncated = truncateOutput(targetStepResult.stderr, MAX_OUTPUT_PER_STEP, true);
+                    comment += `<details>\n<summary>⚠️ Errors</summary>\n\n\`\`\`\n${truncated}\n\`\`\`\n</details>\n\n`;
+                }
+            }
+        }
+    }
+    else {
+        // Normal mode - show all failed steps
+        if (success) {
+            comment += `All ${totalSteps} step(s) completed successfully.\n`;
+        }
+        else {
+            comment += `${failedSteps.length} of ${totalSteps} step(s) failed:\n\n`;
+            for (const step of failedSteps) {
+                comment += `#### ❌ Step: \`${step.name}\`\n\n`;
+                comment += `**Status:** ${step.conclusion}\n`;
+                if (step.exitCode) {
+                    comment += `**Exit Code:** ${step.exitCode}\n`;
+                }
+                comment += '\n';
+                const hasStdout = step.stdout && step.stdout.trim().length > 0;
+                const hasStderr = step.stderr && step.stderr.trim().length > 0;
+                if (!hasStdout && !hasStderr) {
+                    comment += `> [!NOTE]\n> The step failed with no output.\n\n`;
+                }
+                else {
+                    if (hasStdout) {
+                        const truncated = truncateOutput(step.stdout, MAX_OUTPUT_PER_STEP, true);
+                        comment += `<details>\n<summary>📄 Output</summary>\n\n\`\`\`\n${truncated}\n\`\`\`\n</details>\n\n`;
+                    }
+                    if (hasStderr) {
+                        const truncated = truncateOutput(step.stderr, MAX_OUTPUT_PER_STEP, true);
+                        comment += `<details>\n<summary>⚠️ Errors</summary>\n\n\`\`\`\n${truncated}\n\`\`\`\n</details>\n\n`;
+                    }
+                }
             }
         }
     }
@@ -169,19 +281,23 @@ function generateCommentBody(workspace, analysis) {
     return comment;
 }
 function getWorkspaceMarker(workspace) {
-    return `<!-- tf-report-action:${workspace} -->`;
+    return `<!-- tf-report-action:"${workspace}" -->`;
 }
 async function run() {
     try {
         const stepsInput = getInput('steps');
-        const workspace = getInput('workspace');
+        let workspace = getInput('workspace');
+        const targetStep = getInput('target-step');
         if (!stepsInput) {
             setFailed('steps input is required');
             return;
         }
+        // If workspace is not provided, use workflow name and job name
         if (!workspace) {
-            setFailed('workspace input is required');
-            return;
+            const workflowName = process.env.GITHUB_WORKFLOW || 'Workflow';
+            const jobName = process.env.GITHUB_JOB || 'Job';
+            workspace = `${workflowName}/${jobName}`;
+            info(`No workspace provided, using: ${workspace}`);
         }
         let steps;
         try {
@@ -191,8 +307,8 @@ async function run() {
             setFailed(`Failed to parse steps input as JSON: ${error instanceof Error ? error.message : 'Unknown error'}`);
             return;
         }
-        info(`Analyzing ${Object.keys(steps).length} steps for workspace: ${workspace}`);
-        const analysis = analyzeSteps(steps);
+        info(`Analyzing ${Object.keys(steps).length} steps for workspace: ${workspace}${targetStep ? ` (target: ${targetStep})` : ''}`);
+        const analysis = analyzeSteps(steps, targetStep);
         info(`Analysis complete: ${analysis.success ? 'Success' : `Failed (${analysis.failedSteps.length} failures)`}`);
         const context = {
             repo: process.env.GITHUB_REPOSITORY || '',
@@ -260,5 +376,5 @@ if (import.meta.url === `file://${process.argv[1]}` ||
     run();
 }
 
-export { analyzeSteps, generateCommentBody, getInput, getWorkspaceMarker, setFailed, truncateOutput };
+export { analyzeSteps, generateCommentBody, getInput, getJobLogsUrl, getWorkspaceMarker, setFailed, truncateOutput };
 //# sourceMappingURL=index.js.map
