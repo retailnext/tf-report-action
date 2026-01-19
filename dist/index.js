@@ -189,13 +189,17 @@ function generateCommentBody(workspace, analysis) {
     if (targetStepResult) {
         // Target step focused comment
         if (!targetStepResult.found) {
-            comment += `### Did Not Run\n\n`;
-            comment += `The target step \`${targetStepResult.name}\` was not found in the workflow steps.\n\n`;
             if (failedSteps.length > 0) {
+                // If there are failed steps, focus on reporting those failures
                 comment += `${failedSteps.length} of ${totalSteps} step(s) failed:\n\n`;
                 for (const step of failedSteps) {
                     comment += `- ❌ \`${step.name}\` (${step.conclusion})\n`;
                 }
+            }
+            else {
+                // Only mention step not found if no other failures
+                comment += `### Did Not Run\n\n`;
+                comment += `\`${targetStepResult.name}\` was not found in the workflow steps.\n\n`;
             }
         }
         else if (targetStepResult.conclusion === 'success') {
@@ -203,7 +207,7 @@ function generateCommentBody(workspace, analysis) {
             const hasStdout = targetStepResult.stdout && targetStepResult.stdout.trim().length > 0;
             const hasStderr = targetStepResult.stderr && targetStepResult.stderr.trim().length > 0;
             if (!hasStdout && !hasStderr) {
-                comment += `> [!NOTE]\n> The step completed successfully with no output.\n\n`;
+                comment += `> [!NOTE]\n> Completed successfully with no output.\n\n`;
             }
             else {
                 if (hasStdout) {
@@ -226,7 +230,7 @@ function generateCommentBody(workspace, analysis) {
             const hasStdout = targetStepResult.stdout && targetStepResult.stdout.trim().length > 0;
             const hasStderr = targetStepResult.stderr && targetStepResult.stderr.trim().length > 0;
             if (!hasStdout && !hasStderr) {
-                comment += `> [!NOTE]\n> The step failed with no output.\n\n`;
+                comment += `> [!NOTE]\n> Failed with no output.\n\n`;
             }
             else {
                 if (hasStdout) {
@@ -257,7 +261,7 @@ function generateCommentBody(workspace, analysis) {
                 const hasStdout = step.stdout && step.stdout.trim().length > 0;
                 const hasStderr = step.stderr && step.stderr.trim().length > 0;
                 if (!hasStdout && !hasStderr) {
-                    comment += `> [!NOTE]\n> The step failed with no output.\n\n`;
+                    comment += `> [!NOTE]\n> Failed with no output.\n\n`;
                 }
                 else {
                     if (hasStdout) {

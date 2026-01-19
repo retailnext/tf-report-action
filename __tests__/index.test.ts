@@ -259,7 +259,7 @@ describe('generateCommentBody', () => {
 
     expect(comment).toContain('#### ❌ Step: `step1`')
     expect(comment).toContain('> [!NOTE]')
-    expect(comment).toContain('The step failed with no output')
+    expect(comment).toContain('Failed with no output')
     expect(comment).not.toContain('📄 Output')
     expect(comment).not.toContain('⚠️ Errors')
   })
@@ -308,7 +308,7 @@ describe('generateCommentBody', () => {
 
     expect(comment).toContain('## ✅ `dev` `apply` Succeeded')
     expect(comment).toContain('> [!NOTE]')
-    expect(comment).toContain('The step completed successfully with no output')
+    expect(comment).toContain('Completed successfully with no output')
   })
 
   test('target step failed', () => {
@@ -350,9 +350,7 @@ describe('generateCommentBody', () => {
 
     expect(comment).toContain('## ❌ `test` `plan` Failed')
     expect(comment).toContain('### Did Not Run')
-    expect(comment).toContain(
-      'The target step `plan` was not found in the workflow steps'
-    )
+    expect(comment).toContain('`plan` was not found in the workflow steps')
   })
 
   test('target step not found with other failures', () => {
@@ -373,7 +371,9 @@ describe('generateCommentBody', () => {
     const comment = generateCommentBody(workspace, analysis)
 
     expect(comment).toContain('## ❌ `prod` `plan` Failed')
-    expect(comment).toContain('### Did Not Run')
+    // Should NOT contain "Did Not Run" when there are other failures
+    expect(comment).not.toContain('### Did Not Run')
+    // Should focus on the failures
     expect(comment).toContain('2 of 3 step(s) failed')
     expect(comment).toContain('- ❌ `init` (failure)')
     expect(comment).toContain('- ❌ `validate` (failure)')
