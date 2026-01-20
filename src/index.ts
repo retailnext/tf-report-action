@@ -179,8 +179,14 @@ async function searchIssues(
   }
 
   const response = await httpsRequest(options)
-  const result = JSON.parse(response)
-  return result.items || []
+  try {
+    const result = JSON.parse(response)
+    return result.items || []
+  } catch (error) {
+    throw new Error(
+      `Failed to parse search issues response: ${error instanceof Error ? error.message : 'Unknown error'}`
+    )
+  }
 }
 
 async function createIssue(
@@ -204,8 +210,17 @@ async function createIssue(
 
   const payload = JSON.stringify({ title, body })
   const response = await httpsRequest(options, payload)
-  const issue = JSON.parse(response)
-  return issue.number
+  try {
+    const issue = JSON.parse(response)
+    if (!issue.number) {
+      throw new Error('API response missing issue number')
+    }
+    return issue.number
+  } catch (error) {
+    throw new Error(
+      `Failed to parse create issue response: ${error instanceof Error ? error.message : 'Unknown error'}`
+    )
+  }
 }
 
 async function updateIssue(
@@ -424,7 +439,9 @@ export function generateCommentBody(
 }
 
 export function getWorkspaceMarker(workspace: string): string {
-  return `<!-- tf-report-action:"${workspace}" -->`
+  // Escape double quotes in workspace name to prevent breaking the HTML comment
+  const escapedWorkspace = workspace.replace(/"/g, '\\"')
+  return `<!-- tf-report-action:"${escapedWorkspace}" -->`
 }
 
 /**

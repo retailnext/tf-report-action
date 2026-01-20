@@ -320,8 +320,13 @@ async function searchIssues(token, repo, owner, query) {
         }
     };
     const response = await httpsRequest(options);
-    const result = JSON.parse(response);
-    return result.items || [];
+    try {
+        const result = JSON.parse(response);
+        return result.items || [];
+    }
+    catch (error) {
+        throw new Error(`Failed to parse search issues response: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
 }
 async function createIssue(token, repo, owner, title, body) {
     const options = {
@@ -337,8 +342,16 @@ async function createIssue(token, repo, owner, title, body) {
     };
     const payload = JSON.stringify({ title, body });
     const response = await httpsRequest(options, payload);
-    const issue = JSON.parse(response);
-    return issue.number;
+    try {
+        const issue = JSON.parse(response);
+        if (!issue.number) {
+            throw new Error('API response missing issue number');
+        }
+        return issue.number;
+    }
+    catch (error) {
+        throw new Error(`Failed to parse create issue response: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
 }
 async function updateIssue(token, repo, owner, issueNumber, title, body) {
     const options = {
@@ -515,7 +528,9 @@ function generateCommentBody(workspace, analysis) {
     return comment;
 }
 function getWorkspaceMarker(workspace) {
-    return `<!-- tf-report-action:"${workspace}" -->`;
+    // Escape double quotes in workspace name to prevent breaking the HTML comment
+    const escapedWorkspace = workspace.replace(/"/g, '\\"');
+    return `<!-- tf-report-action:"${escapedWorkspace}" -->`;
 }
 /**
  * Generate title for the comment/issue
