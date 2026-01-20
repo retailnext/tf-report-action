@@ -7,10 +7,10 @@ This directory contains test fixtures for OpenTofu JSON Lines output format.
 All message types and formats are based on the official OpenTofu documentation:
 
 **Primary Source:**
-https://github.com/opentofu/opentofu/blob/main/website/docs/internals/machine-readable-ui.mdx
+<https://github.com/opentofu/opentofu/blob/main/website/docs/internals/machine-readable-ui.mdx>
 
 **Published Documentation:**
-https://opentofu.org/docs/internals/machine-readable-ui/
+<https://opentofu.org/docs/internals/machine-readable-ui/>
 
 ## Fixture Files
 
@@ -40,7 +40,7 @@ These fixtures demonstrate the following OpenTofu JSON message types:
 When updating these fixtures or adding new ones:
 
 1. Refer to the official documentation (link above) for the correct format
-2. Ensure all required fields are present (@level, @message, @module,
+1. Ensure all required fields are present (@level, @message, @module,
    @timestamp, type)
-3. Use realistic timestamps and resource addresses
-4. Test that the parser correctly handles the new fixtures
+1. Use realistic timestamps and resource addresses
+1. Test that the parser correctly handles the new fixtures
