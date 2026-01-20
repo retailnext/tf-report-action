@@ -80,6 +80,8 @@ npm run bundle
 - Keep functions focused and manageable
 - Use descriptive variable and function names that clearly convey their purpose
 - Use JSDoc comments to document functions, classes, and complex logic
+- **Prefer TypeScript over JavaScript when writing scripts.** Use the `.ts`
+  extension and run scripts with `npx tsx` for TypeScript execution.
 - After doing any refactoring, ensure to run `npm run test` to ensure that all
   tests still pass and coverage requirements are met
 - When suggesting code changes, always opt for the most maintainable approach.
@@ -93,15 +95,58 @@ npm run bundle
 - Do NOT use external runtime dependencies like `@actions/core` to keep the
   action lightweight. Implement needed functions within the project instead.
   Only use Node.js built-in modules (https, fs, etc.)
+- Example outputs in documentation must always be produced by executing the
+  action code with real OpenTofu outputs. The inputs to those executions must
+  always be produced by actually executing `tofu`. Use the script
+  `scripts/generate-examples.sh` to generate real OpenTofu JSON outputs, and
+  `scripts/demonstrate-formatting.ts` (run with `npx tsx`) to demonstrate how
+  the action formats those outputs.
 - After updating any Markdown files, always run the following checks:
   1. Format with Prettier: `npm run format:write`
-  2. Check natural language: `npx textlint <file>.md` or check all Markdown
-     files:
+  1. Lint Markdown: `npx markdownlint-cli2 "**/*.md" "#node_modules" "#dist"`
+  1. Check natural language: `npx textlint <file>.md` or check all Markdown
+     files with:
+     <!-- markdownlint-disable-next-line MD013 -->
      `find . -name "*.md" -not -path "./node_modules/*" -not -path "./dist/*" | xargs npx textlint`
-  3. The super-linter workflow includes a NATURAL_LANGUAGE linter (textlint
-     using textlint-rule-terminology) and MARKDOWN_PRETTIER check. The
-     `.textlintrc` configuration matches super-linter's default settings to
-     ensure consistency.
+  1. The super-linter workflow includes Markdown (markdownlint),
+     NATURAL_LANGUAGE (textlint using textlint-rule-terminology) and
+     MARKDOWN_PRETTIER check. Configuration files: `.markdownlint.yml`,
+     `.textlintrc` to ensure consistency.
+- After updating any shell scripts, run the shell formatter:
+  `docker run --rm -v "$(pwd)":/mnt mvdan/shfmt:v3.12.0 -w /mnt/scripts/*.sh`
+- **Before updating any pull request**, if there are changes to Markdown or
+  shell files between the base branch and current state, run the super-linter
+  Docker image exactly as the CI workflow does:
+
+  ```bash
+  docker run --rm \
+    -e RUN_LOCAL=true \
+    -e USE_FIND_ALGORITHM=true \
+    -e CHECKOV_FILE_NAME=.checkov.yml \
+    -e FILTER_REGEX_EXCLUDE="dist/**/*" \
+    -e LINTER_RULES_PATH=. \
+    -e VALIDATE_ALL_CODEBASE=true \
+    -e VALIDATE_BIOME_FORMAT=false \
+    -e VALIDATE_BIOME_LINT=false \
+    -e VALIDATE_GITHUB_ACTIONS_ZIZMOR=false \
+    -e VALIDATE_JAVASCRIPT_ES=false \
+    -e VALIDATE_JSCPD=false \
+    -e VALIDATE_TYPESCRIPT_ES=false \
+    -e VALIDATE_JSON=false \
+    -v "$(pwd)":/tmp/lint:ro \
+    --workdir=/tmp/lint \
+    ghcr.io/super-linter/super-linter:slim-v8
+  ```
+
+  This command uses all environment variables from the linter workflow
+  (`.github/workflows/linter.yml`) except `GITHUB_TOKEN` (not needed for local
+  runs) and `DEFAULT_BRANCH` (not compatible with `USE_FIND_ALGORITHM=true`).
+  The `RUN_LOCAL=true` flag enables local execution mode. This ensures linting
+  is performed using the same versions and configurations as CI.
+
+  **Important:** Always check this command against
+  `.github/workflows/linter.yml` and update it whenever there are changes to the
+  linter workflow to ensure it stays synchronized with the CI configuration.
 
 ### Versioning
 

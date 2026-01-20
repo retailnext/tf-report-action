@@ -1,5 +1,9 @@
 import * as https from 'https'
 import * as fs from 'fs'
+import { isJsonLines, parseJsonLines, formatJsonLines } from './jsonlines.js'
+
+// Re-export jsonlines functions for use by scripts and tests
+export { isJsonLines, parseJsonLines, formatJsonLines }
 
 interface StepData {
   conclusion?: string
@@ -300,21 +304,12 @@ export function generateCommentBody(
       // Success case - show stdout/stderr if available
       const stdout = targetStepResult.stdout
       const stderr = targetStepResult.stderr
-      const hasStdout = stdout && stdout.trim().length > 0
-      const hasStderr = stderr && stderr.trim().length > 0
+      const { formattedContent } = formatOutput(stdout, stderr)
 
-      if (!hasStdout && !hasStderr) {
+      if (!formattedContent) {
         comment += `> [!NOTE]\n> Completed successfully with no output.\n\n`
       } else {
-        if (hasStdout && stdout) {
-          const truncated = truncateOutput(stdout, MAX_OUTPUT_PER_STEP, true)
-          comment += `<details>\n<summary>📄 Output</summary>\n\n\`\`\`\n${truncated}\n\`\`\`\n</details>\n\n`
-        }
-
-        if (hasStderr && stderr) {
-          const truncated = truncateOutput(stderr, MAX_OUTPUT_PER_STEP, true)
-          comment += `<details>\n<summary>⚠️ Errors</summary>\n\n\`\`\`\n${truncated}\n\`\`\`\n</details>\n\n`
-        }
+        comment += formattedContent
       }
     } else {
       // Target step failed or has other status
@@ -328,21 +323,12 @@ export function generateCommentBody(
 
       const stdout = targetStepResult.stdout
       const stderr = targetStepResult.stderr
-      const hasStdout = stdout && stdout.trim().length > 0
-      const hasStderr = stderr && stderr.trim().length > 0
+      const { formattedContent } = formatOutput(stdout, stderr)
 
-      if (!hasStdout && !hasStderr) {
+      if (!formattedContent) {
         comment += `> [!NOTE]\n> Failed with no output.\n\n`
       } else {
-        if (hasStdout && stdout) {
-          const truncated = truncateOutput(stdout, MAX_OUTPUT_PER_STEP, true)
-          comment += `<details>\n<summary>📄 Output</summary>\n\n\`\`\`\n${truncated}\n\`\`\`\n</details>\n\n`
-        }
-
-        if (hasStderr && stderr) {
-          const truncated = truncateOutput(stderr, MAX_OUTPUT_PER_STEP, true)
-          comment += `<details>\n<summary>⚠️ Errors</summary>\n\n\`\`\`\n${truncated}\n\`\`\`\n</details>\n\n`
-        }
+        comment += formattedContent
       }
     }
   } else {
@@ -362,23 +348,12 @@ export function generateCommentBody(
 
         comment += '\n'
 
-        const stdout = step.stdout
-        const stderr = step.stderr
-        const hasStdout = stdout && stdout.trim().length > 0
-        const hasStderr = stderr && stderr.trim().length > 0
+        const { formattedContent } = formatOutput(step.stdout, step.stderr)
 
-        if (!hasStdout && !hasStderr) {
+        if (!formattedContent) {
           comment += `> [!NOTE]\n> Failed with no output.\n\n`
         } else {
-          if (hasStdout && stdout) {
-            const truncated = truncateOutput(stdout, MAX_OUTPUT_PER_STEP, true)
-            comment += `<details>\n<summary>📄 Output</summary>\n\n\`\`\`\n${truncated}\n\`\`\`\n</details>\n\n`
-          }
-
-          if (hasStderr && stderr) {
-            const truncated = truncateOutput(stderr, MAX_OUTPUT_PER_STEP, true)
-            comment += `<details>\n<summary>⚠️ Errors</summary>\n\n\`\`\`\n${truncated}\n\`\`\`\n</details>\n\n`
-          }
+          comment += formattedContent
         }
       }
     }
@@ -396,6 +371,46 @@ export function generateCommentBody(
 
 export function getWorkspaceMarker(workspace: string): string {
   return `<!-- tf-report-action:"${workspace}" -->`
+}
+
+/**
+ * Format output, detecting and handling JSON Lines format
+ */
+function formatOutput(
+  stdout: string | undefined,
+  stderr: string | undefined
+): { formattedContent: string; isJsonLines: boolean } {
+  const hasStdout = stdout && stdout.trim().length > 0
+  const hasStderr = stderr && stderr.trim().length > 0
+
+  // Check if stdout is JSON Lines format
+  if (hasStdout && stdout && isJsonLines(stdout)) {
+    const parsed = parseJsonLines(stdout)
+    const formatted = formatJsonLines(parsed)
+
+    if (formatted.trim().length > 0) {
+      return { formattedContent: formatted, isJsonLines: true }
+    }
+  }
+
+  // Fall back to standard output formatting
+  let content = ''
+
+  if (!hasStdout && !hasStderr) {
+    return { formattedContent: '', isJsonLines: false }
+  }
+
+  if (hasStdout && stdout) {
+    const truncated = truncateOutput(stdout, MAX_OUTPUT_PER_STEP, true)
+    content += `<details>\n<summary>📄 Output</summary>\n\n\`\`\`\n${truncated}\n\`\`\`\n</details>\n\n`
+  }
+
+  if (hasStderr && stderr) {
+    const truncated = truncateOutput(stderr, MAX_OUTPUT_PER_STEP, true)
+    content += `<details>\n<summary>⚠️ Errors</summary>\n\n\`\`\`\n${truncated}\n\`\`\`\n</details>\n\n`
+  }
+
+  return { formattedContent: content, isJsonLines: false }
 }
 
 async function run(): Promise<void> {
