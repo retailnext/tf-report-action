@@ -95,12 +95,12 @@ npm run bundle
   Only use Node.js built-in modules (https, fs, etc.)
 - After updating any Markdown files, always run the following checks:
   1. Format with Prettier: `npm run format:write`
-  1. Lint markdown: `npx markdownlint-cli2 "**/*.md" "#node_modules" "#dist"`
+  1. Lint Markdown: `npx markdownlint-cli2 "**/*.md" "#node_modules" "#dist"`
   1. Check natural language: `npx textlint <file>.md` or check all Markdown
      files with:
      <!-- markdownlint-disable-next-line MD013 -->
      `find . -name "*.md" -not -path "./node_modules/*" -not -path "./dist/*" | xargs npx textlint`
-  1. The super-linter workflow includes MARKDOWN (markdownlint),
+  1. The super-linter workflow includes Markdown (markdownlint),
      NATURAL_LANGUAGE (textlint using textlint-rule-terminology) and
      MARKDOWN_PRETTIER check. Configuration files: `.markdownlint.yml`,
      `.textlintrc` to ensure consistency.
