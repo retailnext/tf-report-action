@@ -440,11 +440,11 @@ export function generateCommentBody(
 
 export function getWorkspaceMarker(workspace: string): string {
   // Escape characters that could break HTML comments or search queries
-  // Replace: double quotes, HTML comment end sequences, and backslashes
+  // Replace: double quotes, HTML comment end sequences (both --> and --!>), and backslashes
   const escapedWorkspace = workspace
     .replace(/\\/g, '\\\\') // Escape backslashes first
     .replace(/"/g, '\\"') // Escape double quotes
-    .replace(/-->/g, '--\\>') // Escape HTML comment end sequence
+    .replace(/--[!>]/g, (match) => `--\\${match.charAt(2)}`) // Escape HTML comment end sequences
   return `<!-- tf-report-action:"${escapedWorkspace}" -->`
 }
 
