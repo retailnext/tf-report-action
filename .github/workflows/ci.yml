@@ -9,6 +9,7 @@ on:
 permissions:
   contents: read
   pull-requests: write
+  issues: write
 
 jobs:
   test:
@@ -54,7 +55,7 @@ jobs:
           echo "✅ dist/ directory is up to date"
 
       - name: Report CI Status
-        if: always() && github.event_name == 'pull_request'
+        if: always()
         uses: ./
         with:
           steps: ${{ toJSON(steps) }}

@@ -5,7 +5,8 @@ import {
   getWorkspaceMarker,
   getInput,
   truncateOutput,
-  getJobLogsUrl
+  getJobLogsUrl,
+  generateTitle
 } from '../src/index'
 
 describe('analyzeSteps', () => {
@@ -625,5 +626,97 @@ Plan: 1 to add, 0 to change, 0 to destroy.
 
     // Either no details, or summary comes before details
     expect(hasDetails ? summaryIndex < detailsIndex : hasSummary).toBe(true)
+  })
+})
+
+describe('generateTitle', () => {
+  test('success without target step', () => {
+    const analysis = {
+      success: true,
+      failedSteps: [],
+      totalSteps: 3
+    }
+
+    const title = generateTitle('production', analysis)
+
+    expect(title).toBe('✅ `production` Succeeded')
+  })
+
+  test('failure without target step', () => {
+    const analysis = {
+      success: false,
+      failedSteps: [{ name: 'build', conclusion: 'failure' }],
+      totalSteps: 3
+    }
+
+    const title = generateTitle('dev', analysis)
+
+    expect(title).toBe('❌ `dev` Failed')
+  })
+
+  test('target step successful', () => {
+    const analysis = {
+      success: true,
+      failedSteps: [],
+      totalSteps: 3,
+      targetStepResult: {
+        name: 'plan',
+        found: true,
+        conclusion: 'success'
+      }
+    }
+
+    const title = generateTitle('staging', analysis)
+
+    expect(title).toBe('✅ `staging` `plan` Succeeded')
+  })
+
+  test('target step failed', () => {
+    const analysis = {
+      success: false,
+      failedSteps: [{ name: 'apply', conclusion: 'failure' }],
+      totalSteps: 2,
+      targetStepResult: {
+        name: 'apply',
+        found: true,
+        conclusion: 'failure'
+      }
+    }
+
+    const title = generateTitle('prod', analysis)
+
+    expect(title).toBe('❌ `prod` `apply` Failed')
+  })
+
+  test('target step not found', () => {
+    const analysis = {
+      success: true,
+      failedSteps: [],
+      totalSteps: 3,
+      targetStepResult: {
+        name: 'missing',
+        found: false
+      }
+    }
+
+    const title = generateTitle('test', analysis)
+
+    expect(title).toBe('❌ `test` `missing` Failed')
+  })
+
+  test('target step not found with overall failure', () => {
+    const analysis = {
+      success: false,
+      failedSteps: [{ name: 'init', conclusion: 'failure' }],
+      totalSteps: 3,
+      targetStepResult: {
+        name: 'plan',
+        found: false
+      }
+    }
+
+    const title = generateTitle('workspace', analysis)
+
+    expect(title).toBe('❌ `workspace` `plan` Failed')
   })
 })
