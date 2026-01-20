@@ -607,5 +607,5 @@ if (import.meta.url === `file://${process.argv[1]}` ||
     run();
 }
 
-export { analyzeSteps, generateCommentBody, getInput, getJobLogsUrl, getWorkspaceMarker, setFailed, truncateOutput };
+export { analyzeSteps, formatJsonLines, generateCommentBody, getInput, getJobLogsUrl, getWorkspaceMarker, isJsonLines, parseJsonLines, setFailed, truncateOutput };
 //# sourceMappingURL=index.js.map

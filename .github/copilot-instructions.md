@@ -80,6 +80,8 @@ npm run bundle
 - Keep functions focused and manageable
 - Use descriptive variable and function names that clearly convey their purpose
 - Use JSDoc comments to document functions, classes, and complex logic
+- **Prefer TypeScript over JavaScript when writing scripts.** Use the `.ts`
+  extension and run scripts with `npx tsx` for TypeScript execution.
 - After doing any refactoring, ensure to run `npm run test` to ensure that all
   tests still pass and coverage requirements are met
 - When suggesting code changes, always opt for the most maintainable approach.
@@ -93,6 +95,12 @@ npm run bundle
 - Do NOT use external runtime dependencies like `@actions/core` to keep the
   action lightweight. Implement needed functions within the project instead.
   Only use Node.js built-in modules (https, fs, etc.)
+- Example outputs in documentation must always be produced by executing the
+  action code with real OpenTofu outputs. The inputs to those executions must
+  always be produced by actually executing `tofu`. Use the script
+  `scripts/generate-examples.sh` to generate real OpenTofu JSON outputs, and
+  `scripts/demonstrate-formatting.ts` (run with `npx tsx`) to demonstrate how
+  the action formats those outputs.
 - After updating any Markdown files, always run the following checks:
   1. Format with Prettier: `npm run format:write`
   1. Lint Markdown: `npx markdownlint-cli2 "**/*.md" "#node_modules" "#dist"`

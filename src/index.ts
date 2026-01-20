@@ -2,6 +2,9 @@ import * as https from 'https'
 import * as fs from 'fs'
 import { isJsonLines, parseJsonLines, formatJsonLines } from './jsonlines.js'
 
+// Re-export jsonlines functions for use by scripts and tests
+export { isJsonLines, parseJsonLines, formatJsonLines }
+
 interface StepData {
   conclusion?: string
   outcome?: string
