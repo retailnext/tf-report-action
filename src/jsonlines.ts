@@ -1,12 +1,12 @@
 /**
  * OpenTofu/Terraform JSON Lines Output Parser
- * 
+ *
  * Implements parsing and formatting of machine-readable JSON output as documented at:
  * https://opentofu.org/docs/internals/machine-readable-ui/
- * 
+ *
  * DOCUMENTATION SOURCE (for future updates):
  * https://github.com/opentofu/opentofu/blob/main/website/docs/internals/machine-readable-ui.mdx
- * 
+ *
  * This module defines TypeScript interfaces for all message types and provides
  * functions to detect, parse, and format JSON Lines output from OpenTofu/Terraform
  * commands run with the -json flag.
@@ -107,7 +107,14 @@ export interface PlannedChangeMessage extends BaseMessage {
       resource_name: string
       resource_key: string | number | null
     }
-    action: 'noop' | 'create' | 'read' | 'update' | 'replace' | 'delete' | 'move'
+    action:
+      | 'noop'
+      | 'create'
+      | 'read'
+      | 'update'
+      | 'replace'
+      | 'delete'
+      | 'move'
     reason?:
       | 'tainted'
       | 'requested'
@@ -537,7 +544,14 @@ export function parseJsonLines(text: string): ParsedJsonLines {
  */
 function getActionEmoji(
   action: string
-): ':heavy_plus_sign:' | '🔄' | ':heavy_minus_sign:' | '±' | '📖' | '🚚' | '⚪' {
+):
+  | ':heavy_plus_sign:'
+  | '🔄'
+  | ':heavy_minus_sign:'
+  | '±'
+  | '📖'
+  | '🚚'
+  | '⚪' {
   switch (action) {
     case 'create':
       return ':heavy_plus_sign:'
@@ -564,7 +578,8 @@ function getActionEmoji(
 function formatPlannedChange(change: PlannedChangeMessage): string {
   const emoji = getActionEmoji(change.change.action)
   const resource = change.change.resource
-  const addr = resource.addr || `${resource.resource_type}.${resource.resource_name}`
+  const addr =
+    resource.addr || `${resource.resource_type}.${resource.resource_name}`
 
   return `${emoji} **${addr}** (${change.change.action})`
 }

@@ -509,3 +509,119 @@ describe('comment formatting', () => {
     expect(comment).toContain('</summary>')
   })
 })
+
+describe('JSON Lines integration', () => {
+  test('detects and formats JSON Lines in target step stdout', () => {
+    const jsonLinesOutput = `{"@level":"info","@message":"OpenTofu 1.6.0","@module":"tofu.ui","@timestamp":"2024-01-15T10:30:00.000000Z","type":"version","tofu":"1.6.0","ui":"1.0"}
+{"@level":"info","@message":"aws_instance.example: Plan to create","@module":"tofu.ui","@timestamp":"2024-01-15T10:30:01.000000Z","type":"planned_change","change":{"resource":{"addr":"aws_instance.example","module":"","resource":"aws_instance.example","implied_provider":"aws","resource_type":"aws_instance","resource_name":"example","resource_key":null},"action":"create"}}
+{"@level":"info","@message":"Plan: 1 to add, 0 to change, 0 to destroy.","@module":"tofu.ui","@timestamp":"2024-01-15T10:30:02.000000Z","type":"change_summary","changes":{"add":1,"change":0,"remove":0,"import":0,"operation":"plan"}}`
+
+    const steps = {
+      init: { conclusion: 'success' },
+      plan: {
+        conclusion: 'success',
+        outputs: {
+          stdout: jsonLinesOutput
+        }
+      }
+    }
+
+    const analysis = analyzeSteps(steps, 'plan')
+    const comment = generateCommentBody('test-workspace', analysis)
+
+    // Should contain formatted JSON Lines output
+    expect(comment).toContain('**Plan:**')
+    expect(comment).toContain('**1** to add :heavy_plus_sign:')
+    expect(comment).toContain(
+      ':heavy_plus_sign: **aws_instance.example** (create)'
+    )
+
+    // Should NOT contain raw JSON
+    expect(comment).not.toContain('"@level"')
+    expect(comment).not.toContain('"type":"version"')
+  })
+
+  test('falls back to standard formatting for non-JSON Lines output', () => {
+    const plainTextOutput = `
+OpenTofu will perform the following actions:
+
+  + aws_instance.example
+      id: <computed>
+
+Plan: 1 to add, 0 to change, 0 to destroy.
+`
+
+    const steps = {
+      plan: {
+        conclusion: 'success',
+        outputs: {
+          stdout: plainTextOutput
+        }
+      }
+    }
+
+    const analysis = analyzeSteps(steps, 'plan')
+    const comment = generateCommentBody('test-workspace', analysis)
+
+    // Should contain standard formatted output in collapsible
+    expect(comment).toContain('<details>')
+    expect(comment).toContain('📄 Output')
+    expect(comment).toContain('OpenTofu will perform the following actions')
+
+    // Should NOT contain JSON Lines formatting
+    expect(comment).not.toContain('**Plan:**')
+    expect(comment).not.toContain(':heavy_plus_sign:')
+  })
+
+  test('formats JSON Lines with errors in target step', () => {
+    const jsonLinesWithErrors = `{"@level":"info","@message":"OpenTofu 1.6.0","@module":"tofu.ui","@timestamp":"2024-01-15T10:30:00.000000Z","type":"version","tofu":"1.6.0","ui":"1.0"}
+{"@level":"error","@message":"Error: Invalid resource type","@module":"tofu.ui","@timestamp":"2024-01-15T10:30:01.000000Z","type":"diagnostic","diagnostic":{"severity":"error","summary":"Invalid resource type","detail":"The provider hashicorp/aws does not support resource type."}}`
+
+    const steps = {
+      plan: {
+        conclusion: 'failure',
+        outputs: {
+          stdout: jsonLinesWithErrors,
+          exit_code: '1'
+        }
+      }
+    }
+
+    const analysis = analyzeSteps(steps, 'plan')
+    const comment = generateCommentBody('test-workspace', analysis)
+
+    // Should contain error formatting
+    expect(comment).toContain('### ❌ Errors')
+    expect(comment).toContain('**Invalid resource type**')
+
+    // Should NOT contain raw JSON
+    expect(comment).not.toContain('"@level"')
+  })
+
+  test('formats change summary outside of collapsing', () => {
+    const jsonLinesOutput = `{"@level":"info","@message":"OpenTofu 1.6.0","@module":"tofu.ui","@timestamp":"2024-01-15T10:30:00.000000Z","type":"version","tofu":"1.6.0","ui":"1.0"}
+{"@level":"info","@message":"Plan: 2 to add, 1 to change, 1 to destroy.","@module":"tofu.ui","@timestamp":"2024-01-15T10:30:01.000000Z","type":"change_summary","changes":{"add":2,"change":1,"remove":1,"import":0,"operation":"plan"}}`
+
+    const steps = {
+      plan: {
+        conclusion: 'success',
+        outputs: {
+          stdout: jsonLinesOutput
+        }
+      }
+    }
+
+    const analysis = analyzeSteps(steps, 'plan')
+    const comment = generateCommentBody('test-workspace', analysis)
+
+    // Change summary should appear before any <details> tags
+    const summaryIndex = comment.indexOf('**Plan:**')
+    const detailsIndex = comment.indexOf('<details>')
+
+    expect(summaryIndex).toBeGreaterThan(-1)
+    // If there are details tags, summary should come first, otherwise it's fine
+    if (detailsIndex > -1) {
+      expect(summaryIndex).toBeLessThan(detailsIndex)
+    }
+  })
+})

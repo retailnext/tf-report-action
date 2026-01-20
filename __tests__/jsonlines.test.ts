@@ -1,6 +1,6 @@
 /**
  * Tests for OpenTofu JSON Lines Parser
- * 
+ *
  * Tests validation against examples from OpenTofu documentation:
  * https://github.com/opentofu/opentofu/blob/main/website/docs/internals/machine-readable-ui.mdx
  */
@@ -9,11 +9,7 @@ import { describe, expect, test } from '@jest/globals'
 import * as fs from 'fs'
 import * as path from 'path'
 import { fileURLToPath } from 'url'
-import {
-  isJsonLines,
-  parseJsonLines,
-  formatJsonLines
-} from '../src/jsonlines'
+import { isJsonLines, parseJsonLines, formatJsonLines } from '../src/jsonlines'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
@@ -162,9 +158,13 @@ describe('formatJsonLines', () => {
     expect(formatted).toContain('**1** to change 🔄')
     expect(formatted).toContain('**1** to remove :heavy_minus_sign:')
     expect(formatted).toContain('📋 Planned Changes')
-    expect(formatted).toContain(':heavy_plus_sign: **aws_instance.example** (create)')
+    expect(formatted).toContain(
+      ':heavy_plus_sign: **aws_instance.example** (create)'
+    )
     expect(formatted).toContain('🔄 **aws_s3_bucket.data** (update)')
-    expect(formatted).toContain(':heavy_minus_sign: **aws_security_group.old** (delete)')
+    expect(formatted).toContain(
+      ':heavy_minus_sign: **aws_security_group.old** (delete)'
+    )
   })
 
   test('formats plan with errors', () => {

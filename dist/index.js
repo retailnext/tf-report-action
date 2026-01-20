@@ -1,6 +1,224 @@
 import * as https from 'https';
 import * as fs from 'fs';
 
+/**
+ * OpenTofu/Terraform JSON Lines Output Parser
+ *
+ * Implements parsing and formatting of machine-readable JSON output as documented at:
+ * https://opentofu.org/docs/internals/machine-readable-ui/
+ *
+ * DOCUMENTATION SOURCE (for future updates):
+ * https://github.com/opentofu/opentofu/blob/main/website/docs/internals/machine-readable-ui.mdx
+ *
+ * This module defines TypeScript interfaces for all message types and provides
+ * functions to detect, parse, and format JSON Lines output from OpenTofu/Terraform
+ * commands run with the -json flag.
+ */
+/**
+ * Check if a string appears to be JSON Lines format
+ */
+function isJsonLines(text) {
+    if (!text || text.trim().length === 0) {
+        return false;
+    }
+    const lines = text.split('\n').filter((line) => line.trim().length > 0);
+    // Need at least one line
+    if (lines.length === 0) {
+        return false;
+    }
+    // Check if first few lines are valid JSON objects with required fields
+    const samplesToCheck = Math.min(lines.length, 3);
+    let validJsonCount = 0;
+    for (let i = 0; i < samplesToCheck; i++) {
+        try {
+            const parsed = JSON.parse(lines[i]);
+            // Check for required fields in OpenTofu/Terraform JSON output
+            if (parsed &&
+                typeof parsed === 'object' &&
+                'type' in parsed &&
+                '@message' in parsed) {
+                validJsonCount++;
+            }
+        }
+        catch {
+            // Not valid JSON, continue checking other lines
+        }
+    }
+    // If at least one line is valid JSON with required fields, consider it JSON Lines
+    return validJsonCount > 0;
+}
+/**
+ * Parse JSON Lines output into structured messages
+ */
+function parseJsonLines(text) {
+    const lines = text.split('\n').filter((line) => line.trim().length > 0);
+    const messages = [];
+    const diagnostics = [];
+    const plannedChanges = [];
+    const resourceDrifts = [];
+    let changeSummary;
+    let outputs;
+    let hasErrors = false;
+    for (const line of lines) {
+        try {
+            const parsed = JSON.parse(line);
+            messages.push(parsed);
+            // Categorize by type
+            switch (parsed.type) {
+                case 'diagnostic':
+                    diagnostics.push(parsed);
+                    if (parsed.diagnostic.severity === 'error') {
+                        hasErrors = true;
+                    }
+                    break;
+                case 'planned_change':
+                    plannedChanges.push(parsed);
+                    break;
+                case 'change_summary':
+                    changeSummary = parsed;
+                    break;
+                case 'resource_drift':
+                    resourceDrifts.push(parsed);
+                    break;
+                case 'outputs':
+                    outputs = parsed;
+                    break;
+            }
+        }
+        catch {
+            // Skip lines that aren't valid JSON
+        }
+    }
+    return {
+        messages,
+        diagnostics,
+        plannedChanges,
+        changeSummary,
+        resourceDrifts,
+        outputs,
+        hasErrors
+    };
+}
+/**
+ * Get emoji for a change action
+ */
+function getActionEmoji(action) {
+    switch (action) {
+        case 'create':
+            return ':heavy_plus_sign:';
+        case 'update':
+            return '🔄';
+        case 'delete':
+        case 'remove':
+            return ':heavy_minus_sign:';
+        case 'replace':
+            return '±';
+        case 'read':
+            return '📖';
+        case 'move':
+            return '🚚';
+        case 'noop':
+        default:
+            return '⚪';
+    }
+}
+/**
+ * Format a planned change for display
+ */
+function formatPlannedChange(change) {
+    const emoji = getActionEmoji(change.change.action);
+    const resource = change.change.resource;
+    const addr = resource.addr || `${resource.resource_type}.${resource.resource_name}`;
+    return `${emoji} **${addr}** (${change.change.action})`;
+}
+/**
+ * Format a diagnostic message for display
+ */
+function formatDiagnostic(diag) {
+    const icon = diag.diagnostic.severity === 'error'
+        ? '❌'
+        : diag.diagnostic.severity === 'warning'
+            ? '⚠️'
+            : 'ℹ️';
+    let result = `${icon} **${diag.diagnostic.summary}**`;
+    if (diag.diagnostic.detail) {
+        result += `\n\n${diag.diagnostic.detail}`;
+    }
+    if (diag.diagnostic.range) {
+        result += `\n\n📄 \`${diag.diagnostic.range.filename}:${diag.diagnostic.range.start.line}\``;
+    }
+    if (diag.diagnostic.snippet?.code) {
+        result += '\n\n```hcl\n' + diag.diagnostic.snippet.code + '\n```';
+    }
+    return result;
+}
+/**
+ * Format change summary for display
+ */
+function formatChangeSummary(summary) {
+    const { add, change, remove } = summary.changes;
+    const operation = summary.changes.operation.charAt(0).toUpperCase() +
+        summary.changes.operation.slice(1);
+    const parts = [];
+    if (add > 0)
+        parts.push(`**${add}** to add :heavy_plus_sign:`);
+    if (change > 0)
+        parts.push(`**${change}** to change 🔄`);
+    if (remove > 0)
+        parts.push(`**${remove}** to remove :heavy_minus_sign:`);
+    if (parts.length === 0) {
+        return `**${operation}:** No changes.`;
+    }
+    return `**${operation}:** ${parts.join(', ')}`;
+}
+/**
+ * Format parsed JSON Lines into a markdown comment
+ */
+function formatJsonLines(parsed) {
+    let result = '';
+    // Show change summary first (outside of any collapsing)
+    if (parsed.changeSummary) {
+        result += formatChangeSummary(parsed.changeSummary) + '\n\n';
+    }
+    // Show diagnostics (errors and warnings)
+    if (parsed.diagnostics.length > 0) {
+        const errors = parsed.diagnostics.filter((d) => d.diagnostic.severity === 'error');
+        const warnings = parsed.diagnostics.filter((d) => d.diagnostic.severity === 'warning');
+        if (errors.length > 0) {
+            result += '### ❌ Errors\n\n';
+            for (const error of errors) {
+                result += formatDiagnostic(error) + '\n\n';
+            }
+        }
+        if (warnings.length > 0) {
+            result += '### ⚠️ Warnings\n\n';
+            for (const warning of warnings) {
+                result += formatDiagnostic(warning) + '\n\n';
+            }
+        }
+    }
+    // Show planned changes in a collapsible section
+    if (parsed.plannedChanges.length > 0) {
+        result += '<details>\n<summary>📋 Planned Changes</summary>\n\n';
+        for (const change of parsed.plannedChanges) {
+            result += formatPlannedChange(change) + '\n';
+        }
+        result += '\n</details>\n\n';
+    }
+    // Show resource drifts if any
+    if (parsed.resourceDrifts.length > 0) {
+        result += '<details>\n<summary>🔀 Resource Drift</summary>\n\n';
+        for (const drift of parsed.resourceDrifts) {
+            const emoji = getActionEmoji(drift.change.action);
+            const addr = drift.change.resource.addr ||
+                `${drift.change.resource.resource_type}.${drift.change.resource.resource_name}`;
+            result += `${emoji} **${addr}** (${drift.change.action})\n`;
+        }
+        result += '\n</details>\n\n';
+    }
+    return result.trim();
+}
+
 // GitHub comment max size is 65536 characters
 const MAX_COMMENT_SIZE = 60000;
 const MAX_OUTPUT_PER_STEP = 20000;
@@ -206,20 +424,12 @@ function generateCommentBody(workspace, analysis) {
             // Success case - show stdout/stderr if available
             const stdout = targetStepResult.stdout;
             const stderr = targetStepResult.stderr;
-            const hasStdout = stdout && stdout.trim().length > 0;
-            const hasStderr = stderr && stderr.trim().length > 0;
-            if (!hasStdout && !hasStderr) {
+            const { formattedContent } = formatOutput(stdout, stderr);
+            if (!formattedContent) {
                 comment += `> [!NOTE]\n> Completed successfully with no output.\n\n`;
             }
             else {
-                if (hasStdout && stdout) {
-                    const truncated = truncateOutput(stdout, MAX_OUTPUT_PER_STEP, true);
-                    comment += `<details>\n<summary>📄 Output</summary>\n\n\`\`\`\n${truncated}\n\`\`\`\n</details>\n\n`;
-                }
-                if (hasStderr && stderr) {
-                    const truncated = truncateOutput(stderr, MAX_OUTPUT_PER_STEP, true);
-                    comment += `<details>\n<summary>⚠️ Errors</summary>\n\n\`\`\`\n${truncated}\n\`\`\`\n</details>\n\n`;
-                }
+                comment += formattedContent;
             }
         }
         else {
@@ -231,20 +441,12 @@ function generateCommentBody(workspace, analysis) {
             comment += '\n';
             const stdout = targetStepResult.stdout;
             const stderr = targetStepResult.stderr;
-            const hasStdout = stdout && stdout.trim().length > 0;
-            const hasStderr = stderr && stderr.trim().length > 0;
-            if (!hasStdout && !hasStderr) {
+            const { formattedContent } = formatOutput(stdout, stderr);
+            if (!formattedContent) {
                 comment += `> [!NOTE]\n> Failed with no output.\n\n`;
             }
             else {
-                if (hasStdout && stdout) {
-                    const truncated = truncateOutput(stdout, MAX_OUTPUT_PER_STEP, true);
-                    comment += `<details>\n<summary>📄 Output</summary>\n\n\`\`\`\n${truncated}\n\`\`\`\n</details>\n\n`;
-                }
-                if (hasStderr && stderr) {
-                    const truncated = truncateOutput(stderr, MAX_OUTPUT_PER_STEP, true);
-                    comment += `<details>\n<summary>⚠️ Errors</summary>\n\n\`\`\`\n${truncated}\n\`\`\`\n</details>\n\n`;
-                }
+                comment += formattedContent;
             }
         }
     }
@@ -262,22 +464,12 @@ function generateCommentBody(workspace, analysis) {
                     comment += `**Exit Code:** ${step.exitCode}\n`;
                 }
                 comment += '\n';
-                const stdout = step.stdout;
-                const stderr = step.stderr;
-                const hasStdout = stdout && stdout.trim().length > 0;
-                const hasStderr = stderr && stderr.trim().length > 0;
-                if (!hasStdout && !hasStderr) {
+                const { formattedContent } = formatOutput(step.stdout, step.stderr);
+                if (!formattedContent) {
                     comment += `> [!NOTE]\n> Failed with no output.\n\n`;
                 }
                 else {
-                    if (hasStdout && stdout) {
-                        const truncated = truncateOutput(stdout, MAX_OUTPUT_PER_STEP, true);
-                        comment += `<details>\n<summary>📄 Output</summary>\n\n\`\`\`\n${truncated}\n\`\`\`\n</details>\n\n`;
-                    }
-                    if (hasStderr && stderr) {
-                        const truncated = truncateOutput(stderr, MAX_OUTPUT_PER_STEP, true);
-                        comment += `<details>\n<summary>⚠️ Errors</summary>\n\n\`\`\`\n${truncated}\n\`\`\`\n</details>\n\n`;
-                    }
+                    comment += formattedContent;
                 }
             }
         }
@@ -292,6 +484,35 @@ function generateCommentBody(workspace, analysis) {
 }
 function getWorkspaceMarker(workspace) {
     return `<!-- tf-report-action:"${workspace}" -->`;
+}
+/**
+ * Format output, detecting and handling JSON Lines format
+ */
+function formatOutput(stdout, stderr) {
+    const hasStdout = stdout && stdout.trim().length > 0;
+    const hasStderr = stderr && stderr.trim().length > 0;
+    // Check if stdout is JSON Lines format
+    if (hasStdout && stdout && isJsonLines(stdout)) {
+        const parsed = parseJsonLines(stdout);
+        const formatted = formatJsonLines(parsed);
+        if (formatted.trim().length > 0) {
+            return { formattedContent: formatted, isJsonLines: true };
+        }
+    }
+    // Fall back to standard output formatting
+    let content = '';
+    if (!hasStdout && !hasStderr) {
+        return { formattedContent: '', isJsonLines: false };
+    }
+    if (hasStdout && stdout) {
+        const truncated = truncateOutput(stdout, MAX_OUTPUT_PER_STEP, true);
+        content += `<details>\n<summary>📄 Output</summary>\n\n\`\`\`\n${truncated}\n\`\`\`\n</details>\n\n`;
+    }
+    if (hasStderr && stderr) {
+        const truncated = truncateOutput(stderr, MAX_OUTPUT_PER_STEP, true);
+        content += `<details>\n<summary>⚠️ Errors</summary>\n\n\`\`\`\n${truncated}\n\`\`\`\n</details>\n\n`;
+    }
+    return { formattedContent: content, isJsonLines: false };
 }
 async function run() {
     try {

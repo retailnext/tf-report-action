@@ -14,7 +14,8 @@ https://opentofu.org/docs/internals/machine-readable-ui/
 
 ## Fixture Files
 
-- `plan-with-changes.jsonl` - Example plan output with create, update, and delete operations
+- `plan-with-changes.jsonl` - Example plan output with create, update, and
+  delete operations
 - `plan-with-errors.jsonl` - Example plan output with diagnostic error messages
 - `plan-with-replace.jsonl` - Example plan output with replace operation
 - `plan-no-changes.jsonl` - Example plan output when no changes are needed
@@ -39,6 +40,7 @@ These fixtures demonstrate the following OpenTofu JSON message types:
 When updating these fixtures or adding new ones:
 
 1. Refer to the official documentation (link above) for the correct format
-2. Ensure all required fields are present (@level, @message, @module, @timestamp, type)
+2. Ensure all required fields are present (@level, @message, @module,
+   @timestamp, type)
 3. Use realistic timestamps and resource addresses
 4. Test that the parser correctly handles the new fixtures

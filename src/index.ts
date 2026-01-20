@@ -1,6 +1,6 @@
 import * as https from 'https'
 import * as fs from 'fs'
-import { isJsonLines, parseJsonLines, formatJsonLines } from './jsonlines'
+import { isJsonLines, parseJsonLines, formatJsonLines } from './jsonlines.js'
 
 interface StepData {
   conclusion?: string
@@ -301,10 +301,7 @@ export function generateCommentBody(
       // Success case - show stdout/stderr if available
       const stdout = targetStepResult.stdout
       const stderr = targetStepResult.stderr
-      const { formattedContent, isJsonLines: isJson } = formatOutput(
-        stdout,
-        stderr
-      )
+      const { formattedContent } = formatOutput(stdout, stderr)
 
       if (!formattedContent) {
         comment += `> [!NOTE]\n> Completed successfully with no output.\n\n`
@@ -323,10 +320,7 @@ export function generateCommentBody(
 
       const stdout = targetStepResult.stdout
       const stderr = targetStepResult.stderr
-      const { formattedContent, isJsonLines: isJson } = formatOutput(
-        stdout,
-        stderr
-      )
+      const { formattedContent } = formatOutput(stdout, stderr)
 
       if (!formattedContent) {
         comment += `> [!NOTE]\n> Failed with no output.\n\n`
@@ -351,10 +345,7 @@ export function generateCommentBody(
 
         comment += '\n'
 
-        const { formattedContent, isJsonLines: isJson } = formatOutput(
-          step.stdout,
-          step.stderr
-        )
+        const { formattedContent } = formatOutput(step.stdout, step.stderr)
 
         if (!formattedContent) {
           comment += `> [!NOTE]\n> Failed with no output.\n\n`
