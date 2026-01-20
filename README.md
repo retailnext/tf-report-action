@@ -210,6 +210,12 @@ When JSON Lines format is detected, the action will:
 - **Skip noisy progress messages** (apply_start, apply_progress, apply_complete)
   to keep comments focused
 
+### Full Examples
+
+For complete examples showing JSON Lines input and formatted output for various
+scenarios (plan with changes, apply success, errors, replacements, and drift
+detection), see [`__fixtures__/EXAMPLES.md`](./__fixtures__/EXAMPLES.md).
+
 ### Fallback to Standard Formatting
 
 If the output is not in JSON Lines format (e.g., when using `-no-color` without
