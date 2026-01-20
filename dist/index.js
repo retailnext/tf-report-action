@@ -340,7 +340,7 @@ async function createIssue(token, repo, owner, title, body) {
     const issue = JSON.parse(response);
     return issue.number;
 }
-async function updateIssue(token, repo, owner, issueNumber, body) {
+async function updateIssue(token, repo, owner, issueNumber, title, body) {
     const options = {
         hostname: 'api.github.com',
         path: `/repos/${owner}/${repo}/issues/${issueNumber}`,
@@ -352,7 +352,7 @@ async function updateIssue(token, repo, owner, issueNumber, body) {
             'Content-Type': 'application/json'
         }
     };
-    const payload = JSON.stringify({ body });
+    const payload = JSON.stringify({ title, body });
     await httpsRequest(options, payload);
 }
 /**
@@ -666,7 +666,7 @@ async function run() {
             if (statusIssueNumber) {
                 // Update existing issue
                 info(`Updating status issue #${statusIssueNumber}`);
-                await updateIssue(token, repo, owner, statusIssueNumber, commentBody);
+                await updateIssue(token, repo, owner, statusIssueNumber, title, commentBody);
                 info('Status issue updated successfully');
             }
             else {

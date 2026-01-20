@@ -213,6 +213,7 @@ async function updateIssue(
   repo: string,
   owner: string,
   issueNumber: number,
+  title: string,
   body: string
 ): Promise<void> {
   const options: https.RequestOptions = {
@@ -227,7 +228,7 @@ async function updateIssue(
     }
   }
 
-  const payload = JSON.stringify({ body })
+  const payload = JSON.stringify({ title, body })
   await httpsRequest(options, payload)
 }
 
@@ -633,7 +634,14 @@ async function run(): Promise<void> {
       if (statusIssueNumber) {
         // Update existing issue
         info(`Updating status issue #${statusIssueNumber}`)
-        await updateIssue(token, repo, owner, statusIssueNumber, commentBody)
+        await updateIssue(
+          token,
+          repo,
+          owner,
+          statusIssueNumber,
+          title,
+          commentBody
+        )
         info('Status issue updated successfully')
       } else {
         // Create new issue

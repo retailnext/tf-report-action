@@ -1,20 +1,23 @@
 # OpenTofu Report Action
 
 A lightweight GitHub Action for reporting the status of OpenTofu (or Terraform)
-workflow executions as pull request comments. This action automatically posts
-workflow status updates with command outputs and cleans up previous comments for
-the same workspace.
+workflow executions as pull request comments or status issues. This action
+automatically posts workflow status updates with command outputs and cleans up
+previous comments/issues for the same workspace.
 
 ## Features
 
-- 📊 Reports workflow execution status as PR comments
+- 📊 Reports workflow execution status as PR comments or status issues
+- 🔀 **Automatically adapts to context**: posts comments in PRs, creates/updates
+  status issues on main branch
 - 🎯 Optional target step focus for highlighting specific operations (e.g.,
   `tofu plan`, `tofu apply`)
 - 📄 Displays stdout/stderr from failed steps or successful target steps (using
   retailnext/exec-action outputs)
 - 🔍 **Automatically detects and formats OpenTofu JSON Lines output** with rich
   formatting and emoji annotations
-- 🧹 Automatically deletes previous bot comments for the same workspace
+- 🧹 Automatically deletes previous bot comments/updates issues for the same
+  workspace
 - 🏷️ Supports multiple workspaces with unique identifiers
 - 🪶 Lightweight - no external dependencies, small dist bundle (~22KB)
 - ✅ Clear success/failure indicators with step-level details
@@ -27,6 +30,8 @@ This action works with
 [retailnext/exec-action](https://github.com/retailnext/exec-action) to capture
 command outputs. Use `exec-action` to run your OpenTofu commands, then pass all
 steps to this action for reporting.
+
+### In Pull Requests
 
 ```yaml
 name: OpenTofu Workflow
@@ -66,6 +71,63 @@ jobs:
           github-token: ${{ github.token }}
 ```
 
+### On Main Branch (Status Issues)
+
+When running outside of a pull request context (e.g., on the main branch), the
+action creates or updates a status issue instead of posting comments. Each
+workspace gets its own status issue that is updated with each run.
+
+```yaml
+name: OpenTofu Workflow
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+  pull-requests: write
+  issues: write # Required for status issues on main branch
+
+jobs:
+  tofu-plan:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup OpenTofu
+        uses: opentofu/setup-opentofu@v1
+
+      - name: OpenTofu Init
+        id: init
+        uses: retailnext/exec-action@main
+        with:
+          command: tofu init
+
+      - name: OpenTofu Plan
+        id: plan
+        uses: retailnext/exec-action@main
+        with:
+          command: tofu plan -no-color
+        continue-on-error: true
+
+      - name: Report Status
+        if: always()
+        uses: eriksw/tf-report-action@v1
+        with:
+          steps: ${{ toJSON(steps) }}
+          workspace: 'production'
+          github-token: ${{ github.token }}
+```
+
+**Behavior:**
+
+- **In PR context**: Posts/updates a comment on the pull request
+- **Outside PR context**: Creates/updates a status issue with a title like
+  `✅ production Succeeded` or `❌ production plan Failed`
+
 ## Inputs
 
 | Input          | Description                                                                                                  | Required | Default            |
@@ -73,7 +135,32 @@ jobs:
 | `steps`        | JSON string of steps (`${{ toJSON(steps) }}`)                                                                | Yes      | -                  |
 | `workspace`    | Workspace name for comment disambiguation. If not provided, uses workflow name and job name.                 | No       | `{workflow}/{job}` |
 | `target-step`  | Optional step ID to focus the comment on (e.g., `plan`, `apply`). Highlights this step's status and outputs. | No       | -                  |
-| `github-token` | GitHub token for posting comments                                                                            | Yes      | -                  |
+| `github-token` | GitHub token for posting comments/issues                                                                     | Yes      | -                  |
+
+## How It Works
+
+### Pull Request Context
+
+1. The action receives all workflow steps as JSON input
+1. Analyzes step outcomes to determine which steps failed
+1. If a `target-step` is specified, focuses the comment on that step's status
+   and outputs
+1. For failed steps (or successful target steps), extracts stdout/stderr from
+   step outputs (populated by retailnext/exec-action)
+1. Generates a formatted comment with the workspace/step status and outputs
+1. Posts the comment to the pull request
+1. Deletes any previous comments for the same workspace (identified by HTML
+   comment marker with quoted workspace name)
+
+### Non-PR Context (Status Issues)
+
+1. The action follows the same analysis as PR context
+1. Searches for an existing status issue with the workspace marker
+1. If found, updates the issue title and body with the new status
+1. If not found, creates a new issue with a title matching the status (e.g.,
+   `✅ production Succeeded`)
+1. Each workspace maintains its own status issue, automatically updated on each
+   run
 
 ## Target Step Feature
 
@@ -285,23 +372,10 @@ jobs:
           github-token: ${{ github.token }}
 ```
 
-## How It Works
+## Comment/Issue Format
 
-1. The action receives all workflow steps as JSON input
-1. Analyzes step outcomes to determine which steps failed
-1. If a `target-step` is specified, focuses the comment on that step's status
-   and outputs
-1. For failed steps (or successful target steps), extracts stdout/stderr from
-   step outputs (populated by retailnext/exec-action)
-1. Generates a formatted comment with the workspace/step status and outputs
-1. Posts the comment to the pull request
-1. Deletes any previous comments for the same workspace (identified by HTML
-   comment marker with quoted workspace name)
-
-## Comment Format
-
-The action posts comments in different formats depending on whether a target
-step is specified.
+The action posts comments (in PRs) or issues (on main) in different formats
+depending on whether a target step is specified.
 
 ### Without Target Step
 
