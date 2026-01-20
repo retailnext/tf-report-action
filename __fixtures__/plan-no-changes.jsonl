@@ -1,0 +1,2 @@
+{"@level":"info","@message":"OpenTofu 1.6.0","@module":"tofu.ui","@timestamp":"2024-01-15T10:30:00.000000Z","type":"version","tofu":"1.6.0","ui":"1.0"}
+{"@level":"info","@message":"No changes. Your infrastructure matches the configuration.","@module":"tofu.ui","@timestamp":"2024-01-15T10:30:01.000000Z","type":"change_summary","changes":{"add":0,"change":0,"remove":0,"import":0,"operation":"plan"}}
