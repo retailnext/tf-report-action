@@ -307,6 +307,67 @@ async function postComment(token, repo, owner, issueNumber, body) {
     const payload = JSON.stringify({ body });
     await httpsRequest(options, payload);
 }
+async function searchIssues(token, repo, owner, query) {
+    const encodedQuery = encodeURIComponent(query);
+    const options = {
+        hostname: 'api.github.com',
+        path: `/search/issues?q=${encodedQuery}`,
+        method: 'GET',
+        headers: {
+            Authorization: `Bearer ${token}`,
+            'User-Agent': 'tf-report-action',
+            Accept: 'application/vnd.github+json'
+        }
+    };
+    const response = await httpsRequest(options);
+    try {
+        const result = JSON.parse(response);
+        return result.items || [];
+    }
+    catch (error) {
+        throw new Error(`Failed to parse search issues response: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
+}
+async function createIssue(token, repo, owner, title, body) {
+    const options = {
+        hostname: 'api.github.com',
+        path: `/repos/${owner}/${repo}/issues`,
+        method: 'POST',
+        headers: {
+            Authorization: `Bearer ${token}`,
+            'User-Agent': 'tf-report-action',
+            Accept: 'application/vnd.github+json',
+            'Content-Type': 'application/json'
+        }
+    };
+    const payload = JSON.stringify({ title, body });
+    const response = await httpsRequest(options, payload);
+    try {
+        const issue = JSON.parse(response);
+        if (!issue.number) {
+            throw new Error('API response missing issue number');
+        }
+        return issue.number;
+    }
+    catch (error) {
+        throw new Error(`Failed to parse create issue response: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
+}
+async function updateIssue(token, repo, owner, issueNumber, title, body) {
+    const options = {
+        hostname: 'api.github.com',
+        path: `/repos/${owner}/${repo}/issues/${issueNumber}`,
+        method: 'PATCH',
+        headers: {
+            Authorization: `Bearer ${token}`,
+            'User-Agent': 'tf-report-action',
+            Accept: 'application/vnd.github+json',
+            'Content-Type': 'application/json'
+        }
+    };
+    const payload = JSON.stringify({ title, body });
+    await httpsRequest(options, payload);
+}
 /**
  * Get the GitHub job logs URL
  */
@@ -386,24 +447,8 @@ function analyzeSteps(steps, targetStep) {
 function generateCommentBody(workspace, analysis) {
     const { success, failedSteps, totalSteps, targetStepResult } = analysis;
     const marker = `<!-- tf-report-action:"${workspace}" -->`;
-    let title = '';
-    let statusIcon = '';
-    let statusText = '';
-    if (targetStepResult) {
-        // Target step mode
-        // Show as failure if target step didn't run or overall workflow failed
-        const showAsFailure = !targetStepResult.found || !success;
-        statusIcon = showAsFailure ? '❌' : '✅';
-        statusText = showAsFailure ? 'Failed' : 'Succeeded';
-        title = `## ${statusIcon} \`${workspace}\` \`${targetStepResult.name}\` ${statusText}`;
-    }
-    else {
-        // Normal mode
-        statusIcon = success ? '✅' : '❌';
-        statusText = success ? 'Succeeded' : 'Failed';
-        title = `## ${statusIcon} \`${workspace}\` ${statusText}`;
-    }
-    let comment = `${marker}\n\n${title}\n\n`;
+    const title = generateTitle(workspace, analysis);
+    let comment = `${marker}\n\n## ${title}\n\n`;
     if (targetStepResult) {
         // Target step focused comment
         if (!targetStepResult.found) {
@@ -483,7 +528,35 @@ function generateCommentBody(workspace, analysis) {
     return comment;
 }
 function getWorkspaceMarker(workspace) {
-    return `<!-- tf-report-action:"${workspace}" -->`;
+    // Escape characters that could break HTML comments or search queries
+    // Replace: double quotes, HTML comment end sequences (both --> and --!>), and backslashes
+    const escapedWorkspace = workspace
+        .replace(/\\/g, '\\\\') // Escape backslashes first
+        .replace(/"/g, '\\"') // Escape double quotes
+        .replace(/--[!>]/g, (match) => `--\\${match.charAt(2)}`); // Escape HTML comment end sequences
+    return `<!-- tf-report-action:"${escapedWorkspace}" -->`;
+}
+/**
+ * Generate title for the comment/issue
+ */
+function generateTitle(workspace, analysis) {
+    const { success, targetStepResult } = analysis;
+    let statusIcon = '';
+    let statusText = '';
+    if (targetStepResult) {
+        // Target step mode
+        // Show as failure if target step didn't run or overall workflow failed
+        const showAsFailure = !targetStepResult.found || !success;
+        statusIcon = showAsFailure ? '❌' : '✅';
+        statusText = showAsFailure ? 'Failed' : 'Succeeded';
+        return `${statusIcon} \`${workspace}\` \`${targetStepResult.name}\` ${statusText}`;
+    }
+    else {
+        // Normal mode
+        statusIcon = success ? '✅' : '❌';
+        statusText = success ? 'Succeeded' : 'Failed';
+        return `${statusIcon} \`${workspace}\` ${statusText}`;
+    }
 }
 /**
  * Format output, detecting and handling JSON Lines format
@@ -546,16 +619,26 @@ async function run() {
             eventName: process.env.GITHUB_EVENT_NAME || ''
         };
         if (!context.repo) {
-            info('GITHUB_REPOSITORY not set, skipping comment');
+            info('GITHUB_REPOSITORY not set, skipping comment/issue');
             return;
         }
         const repoParts = context.repo.split('/');
         if (repoParts.length !== 2) {
-            info(`Invalid GITHUB_REPOSITORY format: ${context.repo}, skipping comment`);
+            info(`Invalid GITHUB_REPOSITORY format: ${context.repo}, skipping comment/issue`);
             return;
         }
         const [owner, repo] = repoParts;
+        const token = getInput('github-token');
+        if (!token) {
+            setFailed('github-token input is required to post comments/issues. Use: github-token: ${{ github.token }}');
+            return;
+        }
+        const commentBody = generateCommentBody(workspace, analysis);
+        const marker = getWorkspaceMarker(workspace);
+        const title = generateTitle(workspace, analysis);
+        info(`Comment/Issue body length: ${commentBody.length} characters`);
         let issueNumber;
+        // Check if this is a pull request event
         if (context.eventName === 'pull_request' ||
             context.eventName === 'pull_request_target') {
             const eventPath = process.env.GITHUB_EVENT_PATH;
@@ -569,28 +652,49 @@ async function run() {
                 }
             }
         }
-        if (!issueNumber) {
-            setFailed('Not a pull request event - cannot post comment. This action must run in a pull_request event.');
-            return;
+        if (issueNumber) {
+            // PR context: post as comment
+            info('Running in PR context - posting as comment');
+            const existingComments = await getExistingComments(token, repo, owner, issueNumber);
+            for (const comment of existingComments) {
+                if (comment.body && comment.body.includes(marker)) {
+                    info(`Deleting previous comment for workspace: \`${workspace}\``);
+                    await deleteComment(token, repo, owner, comment.id);
+                }
+            }
+            info(`Posting new comment for workspace: \`${workspace}\``);
+            await postComment(token, repo, owner, issueNumber, commentBody);
+            info('Comment posted successfully');
         }
-        const token = getInput('github-token');
-        if (!token) {
-            setFailed('github-token input is required to post comments. Use: github-token: ${{ github.token }}');
-            return;
-        }
-        const commentBody = generateCommentBody(workspace, analysis);
-        const marker = getWorkspaceMarker(workspace);
-        info(`Comment body length: ${commentBody.length} characters`);
-        const existingComments = await getExistingComments(token, repo, owner, issueNumber);
-        for (const comment of existingComments) {
-            if (comment.body && comment.body.includes(marker)) {
-                info(`Deleting previous comment for workspace: \`${workspace}\``);
-                await deleteComment(token, repo, owner, comment.id);
+        else {
+            // Non-PR context: use status issue
+            info('Not in PR context - using status issue');
+            info(`Status issue title: "${title}"`);
+            // Search for existing status issue with the marker in body
+            const query = `repo:${owner}/${repo} is:issue in:body "${marker}"`;
+            const existingIssues = await searchIssues(token, repo, owner, query);
+            let statusIssueNumber;
+            // Find the issue that matches our workspace marker
+            for (const issue of existingIssues) {
+                if (issue.body && issue.body.includes(marker)) {
+                    statusIssueNumber = issue.number;
+                    info(`Found existing status issue #${statusIssueNumber} for workspace: \`${workspace}\``);
+                    break;
+                }
+            }
+            if (statusIssueNumber) {
+                // Update existing issue
+                info(`Updating status issue #${statusIssueNumber}`);
+                await updateIssue(token, repo, owner, statusIssueNumber, title, commentBody);
+                info('Status issue updated successfully');
+            }
+            else {
+                // Create new issue
+                info(`Creating new status issue for workspace: \`${workspace}\``);
+                statusIssueNumber = await createIssue(token, repo, owner, title, commentBody);
+                info(`Status issue #${statusIssueNumber} created successfully`);
             }
         }
-        info(`Posting new comment for workspace: \`${workspace}\``);
-        await postComment(token, repo, owner, issueNumber, commentBody);
-        info('Comment posted successfully');
     }
     catch (error) {
         if (error instanceof Error) {
@@ -607,5 +711,5 @@ if (import.meta.url === `file://${process.argv[1]}` ||
     run();
 }
 
-export { analyzeSteps, formatJsonLines, generateCommentBody, getInput, getJobLogsUrl, getWorkspaceMarker, isJsonLines, parseJsonLines, setFailed, truncateOutput };
+export { analyzeSteps, formatJsonLines, generateCommentBody, generateTitle, getInput, getJobLogsUrl, getWorkspaceMarker, isJsonLines, parseJsonLines, setFailed, truncateOutput };
 //# sourceMappingURL=index.js.map
