@@ -614,14 +614,16 @@ Plan: 1 to add, 0 to change, 0 to destroy.
     const analysis = analyzeSteps(steps, 'plan')
     const comment = generateCommentBody('test-workspace', analysis)
 
-    // Change summary should appear before any <details> tags
+    // Change summary should always be present
     const summaryIndex = comment.indexOf('**Plan:**')
-    const detailsIndex = comment.indexOf('<details>')
-
     expect(summaryIndex).toBeGreaterThan(-1)
-    // If there are details tags, summary should come first, otherwise it's fine
-    if (detailsIndex > -1) {
-      expect(summaryIndex).toBeLessThan(detailsIndex)
-    }
+
+    // If details section exists, verify summary comes first
+    const detailsIndex = comment.indexOf('<details>')
+    const hasSummary = summaryIndex !== -1
+    const hasDetails = detailsIndex !== -1
+
+    // Either no details, or summary comes before details
+    expect(hasDetails ? summaryIndex < detailsIndex : hasSummary).toBe(true)
   })
 })
