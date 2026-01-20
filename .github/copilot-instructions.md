@@ -112,6 +112,25 @@ npm run bundle
      NATURAL_LANGUAGE (textlint using textlint-rule-terminology) and
      MARKDOWN_PRETTIER check. Configuration files: `.markdownlint.yml`,
      `.textlintrc` to ensure consistency.
+- After updating any shell scripts, run the shell formatter:
+  `docker run --rm -v "$(pwd)":/mnt mvdan/shfmt:v3.12.0 -w /mnt/scripts/*.sh`
+- To run linters exactly as the CI workflow does, use the super-linter Docker
+  image:
+
+  ```bash
+  docker run --rm \
+    -e RUN_LOCAL=true \
+    -e USE_FIND_ALGORITHM=true \
+    -e VALIDATE_MARKDOWN=true \
+    -e VALIDATE_SHELL_SHFMT=true \
+    -e VALIDATE_ALL_CODE_BASE=false \
+    -v "$(pwd)":/tmp/lint:ro \
+    --workdir=/tmp/lint \
+    ghcr.io/super-linter/super-linter:slim-v8
+  ```
+
+  This ensures linting is performed using the same versions and configurations
+  as the CI workflow.
 
 ### Versioning
 
