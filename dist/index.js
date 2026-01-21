@@ -1,5 +1,5 @@
-import * as https from 'https';
 import * as fs from 'fs';
+import * as https from 'https';
 
 /**
  * OpenTofu/Terraform JSON Lines Output Parser
@@ -219,30 +219,9 @@ function formatJsonLines(parsed) {
     return result.trim();
 }
 
-// GitHub comment max size is 65536 characters
-const MAX_COMMENT_SIZE = 60000;
-const MAX_OUTPUT_PER_STEP = 20000;
-const COMMENT_TRUNCATION_BUFFER = 1000;
 /**
- * Get an input value from the environment
+ * Make an HTTPS request to the GitHub API
  */
-function getInput(name) {
-    const val = process.env[`INPUT_${name.replace(/ /g, '_').toUpperCase()}`] || '';
-    return val.trim();
-}
-/**
- * Log an informational message
- */
-function info(message) {
-    console.log(message);
-}
-/**
- * Set the action as failed and exit
- */
-function setFailed(message) {
-    console.error(`::error::${message}`);
-    process.exit(1);
-}
 async function httpsRequest(options, data) {
     return new Promise((resolve, reject) => {
         const req = https.request(options, (res) => {
@@ -265,6 +244,9 @@ async function httpsRequest(options, data) {
         req.end();
     });
 }
+/**
+ * Get existing comments on an issue or pull request
+ */
 async function getExistingComments(token, repo, owner, issueNumber) {
     const options = {
         hostname: 'api.github.com',
@@ -279,6 +261,9 @@ async function getExistingComments(token, repo, owner, issueNumber) {
     const response = await httpsRequest(options);
     return JSON.parse(response);
 }
+/**
+ * Delete a comment from an issue or pull request
+ */
 async function deleteComment(token, repo, owner, commentId) {
     const options = {
         hostname: 'api.github.com',
@@ -292,6 +277,9 @@ async function deleteComment(token, repo, owner, commentId) {
     };
     await httpsRequest(options);
 }
+/**
+ * Post a comment to an issue or pull request
+ */
 async function postComment(token, repo, owner, issueNumber, body) {
     const options = {
         hostname: 'api.github.com',
@@ -307,6 +295,9 @@ async function postComment(token, repo, owner, issueNumber, body) {
     const payload = JSON.stringify({ body });
     await httpsRequest(options, payload);
 }
+/**
+ * Search for issues in a repository
+ */
 async function searchIssues(token, repo, owner, query) {
     const encodedQuery = encodeURIComponent(query);
     const options = {
@@ -328,6 +319,9 @@ async function searchIssues(token, repo, owner, query) {
         throw new Error(`Failed to parse search issues response: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
 }
+/**
+ * Create a new issue
+ */
 async function createIssue(token, repo, owner, title, body) {
     const options = {
         hostname: 'api.github.com',
@@ -353,6 +347,9 @@ async function createIssue(token, repo, owner, title, body) {
         throw new Error(`Failed to parse create issue response: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
 }
+/**
+ * Update an existing issue
+ */
 async function updateIssue(token, repo, owner, issueNumber, title, body) {
     const options = {
         hostname: 'api.github.com',
@@ -367,6 +364,31 @@ async function updateIssue(token, repo, owner, issueNumber, title, body) {
     };
     const payload = JSON.stringify({ title, body });
     await httpsRequest(options, payload);
+}
+
+// GitHub comment max size is 65536 characters
+const MAX_COMMENT_SIZE = 60000;
+const MAX_OUTPUT_PER_STEP = 20000;
+const COMMENT_TRUNCATION_BUFFER = 1000;
+/**
+ * Get an input value from the environment
+ */
+function getInput(name) {
+    const val = process.env[`INPUT_${name.replace(/ /g, '_').toUpperCase()}`] || '';
+    return val.trim();
+}
+/**
+ * Log an informational message
+ */
+function info(message) {
+    console.log(message);
+}
+/**
+ * Set the action as failed and exit
+ */
+function setFailed(message) {
+    console.error(`::error::${message}`);
+    process.exit(1);
 }
 /**
  * Get the GitHub job logs URL
