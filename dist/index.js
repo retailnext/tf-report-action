@@ -444,7 +444,7 @@ function analyzeSteps(steps, targetStep) {
         targetStepResult
     };
 }
-function generateCommentBody(workspace, analysis) {
+function generateCommentBody(workspace, analysis, includeLogLink = false) {
     const { success, failedSteps, totalSteps, targetStepResult } = analysis;
     const marker = `<!-- tf-report-action:"${workspace}" -->`;
     const title = generateTitle(workspace, analysis);
@@ -519,6 +519,13 @@ function generateCommentBody(workspace, analysis) {
             }
         }
     }
+    // Add log link for status issues (non-PR context)
+    if (includeLogLink) {
+        const logUrl = getJobLogsUrl();
+        if (logUrl) {
+            comment += `\n---\n\n**Run Logs:** ${logUrl}\n`;
+        }
+    }
     // Final safety check
     if (comment.length > MAX_COMMENT_SIZE) {
         const availableSpace = MAX_COMMENT_SIZE - COMMENT_TRUNCATION_BUFFER;
@@ -537,7 +544,7 @@ function getWorkspaceMarker(workspace) {
     return `<!-- tf-report-action:"${escapedWorkspace}" -->`;
 }
 /**
- * Generate title for the comment/issue
+ * Generate title for PR comments (dynamic with status icons)
  */
 function generateTitle(workspace, analysis) {
     const { success, targetStepResult } = analysis;
@@ -557,6 +564,12 @@ function generateTitle(workspace, analysis) {
         statusText = success ? 'Succeeded' : 'Failed';
         return `${statusIcon} \`${workspace}\` ${statusText}`;
     }
+}
+/**
+ * Generate static title for status issues (fixed format)
+ */
+function generateStatusIssueTitle(workspace) {
+    return `:bar_chart: \`${workspace}\` Status`;
 }
 /**
  * Format output, detecting and handling JSON Lines format
@@ -633,10 +646,8 @@ async function run() {
             setFailed('github-token input is required to post comments/issues. Use: github-token: ${{ github.token }}');
             return;
         }
-        const commentBody = generateCommentBody(workspace, analysis);
         const marker = getWorkspaceMarker(workspace);
-        const title = generateTitle(workspace, analysis);
-        info(`Comment/Issue body length: ${commentBody.length} characters`);
+        info(`Comment/Issue body length calculation in progress...`);
         let issueNumber;
         // Check if this is a pull request event
         if (context.eventName === 'pull_request' ||
@@ -653,8 +664,10 @@ async function run() {
             }
         }
         if (issueNumber) {
-            // PR context: post as comment
+            // PR context: post as comment (don't include log link)
             info('Running in PR context - posting as comment');
+            const commentBody = generateCommentBody(workspace, analysis, false);
+            info(`Comment body length: ${commentBody.length} characters`);
             const existingComments = await getExistingComments(token, repo, owner, issueNumber);
             for (const comment of existingComments) {
                 if (comment.body && comment.body.includes(marker)) {
@@ -667,9 +680,12 @@ async function run() {
             info('Comment posted successfully');
         }
         else {
-            // Non-PR context: use status issue
+            // Non-PR context: use status issue (include log link)
             info('Not in PR context - using status issue');
-            info(`Status issue title: "${title}"`);
+            const statusIssueBody = generateCommentBody(workspace, analysis, true);
+            const statusIssueTitle = generateStatusIssueTitle(workspace);
+            info(`Status issue title: "${statusIssueTitle}"`);
+            info(`Status issue body length: ${statusIssueBody.length} characters`);
             // Search for existing status issue with the marker in body
             const query = `repo:${owner}/${repo} is:issue in:body "${marker}"`;
             const existingIssues = await searchIssues(token, repo, owner, query);
@@ -685,13 +701,13 @@ async function run() {
             if (statusIssueNumber) {
                 // Update existing issue
                 info(`Updating status issue #${statusIssueNumber}`);
-                await updateIssue(token, repo, owner, statusIssueNumber, title, commentBody);
+                await updateIssue(token, repo, owner, statusIssueNumber, statusIssueTitle, statusIssueBody);
                 info('Status issue updated successfully');
             }
             else {
                 // Create new issue
                 info(`Creating new status issue for workspace: \`${workspace}\``);
-                statusIssueNumber = await createIssue(token, repo, owner, title, commentBody);
+                statusIssueNumber = await createIssue(token, repo, owner, statusIssueTitle, statusIssueBody);
                 info(`Status issue #${statusIssueNumber} created successfully`);
             }
         }
@@ -711,5 +727,5 @@ if (import.meta.url === `file://${process.argv[1]}` ||
     run();
 }
 
-export { analyzeSteps, formatJsonLines, generateCommentBody, generateTitle, getInput, getJobLogsUrl, getWorkspaceMarker, isJsonLines, parseJsonLines, setFailed, truncateOutput };
+export { analyzeSteps, formatJsonLines, generateCommentBody, generateStatusIssueTitle, generateTitle, getInput, getJobLogsUrl, getWorkspaceMarker, isJsonLines, parseJsonLines, setFailed, truncateOutput };
 //# sourceMappingURL=index.js.map

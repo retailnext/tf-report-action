@@ -347,7 +347,8 @@ export function analyzeSteps(
 
 export function generateCommentBody(
   workspace: string,
-  analysis: AnalysisResult
+  analysis: AnalysisResult,
+  includeLogLink = false
 ): string {
   const { success, failedSteps, totalSteps, targetStepResult } = analysis
   const marker = `<!-- tf-report-action:"${workspace}" -->`
@@ -428,6 +429,14 @@ export function generateCommentBody(
     }
   }
 
+  // Add log link for status issues (non-PR context)
+  if (includeLogLink) {
+    const logUrl = getJobLogsUrl()
+    if (logUrl) {
+      comment += `\n---\n\n**Run Logs:** ${logUrl}\n`
+    }
+  }
+
   // Final safety check
   if (comment.length > MAX_COMMENT_SIZE) {
     const availableSpace = MAX_COMMENT_SIZE - COMMENT_TRUNCATION_BUFFER
@@ -449,7 +458,7 @@ export function getWorkspaceMarker(workspace: string): string {
 }
 
 /**
- * Generate title for the comment/issue
+ * Generate title for PR comments (dynamic with status icons)
  */
 export function generateTitle(
   workspace: string,
@@ -473,6 +482,13 @@ export function generateTitle(
     statusText = success ? 'Succeeded' : 'Failed'
     return `${statusIcon} \`${workspace}\` ${statusText}`
   }
+}
+
+/**
+ * Generate static title for status issues (fixed format)
+ */
+export function generateStatusIssueTitle(workspace: string): string {
+  return `:bar_chart: \`${workspace}\` Status`
 }
 
 /**
@@ -582,11 +598,9 @@ async function run(): Promise<void> {
       return
     }
 
-    const commentBody = generateCommentBody(workspace, analysis)
     const marker = getWorkspaceMarker(workspace)
-    const title = generateTitle(workspace, analysis)
 
-    info(`Comment/Issue body length: ${commentBody.length} characters`)
+    info(`Comment/Issue body length calculation in progress...`)
 
     let issueNumber: number | undefined
 
@@ -609,8 +623,12 @@ async function run(): Promise<void> {
     }
 
     if (issueNumber) {
-      // PR context: post as comment
+      // PR context: post as comment (don't include log link)
       info('Running in PR context - posting as comment')
+
+      const commentBody = generateCommentBody(workspace, analysis, false)
+
+      info(`Comment body length: ${commentBody.length} characters`)
 
       const existingComments = await getExistingComments(
         token,
@@ -631,9 +649,14 @@ async function run(): Promise<void> {
 
       info('Comment posted successfully')
     } else {
-      // Non-PR context: use status issue
+      // Non-PR context: use status issue (include log link)
       info('Not in PR context - using status issue')
-      info(`Status issue title: "${title}"`)
+
+      const statusIssueBody = generateCommentBody(workspace, analysis, true)
+      const statusIssueTitle = generateStatusIssueTitle(workspace)
+
+      info(`Status issue title: "${statusIssueTitle}"`)
+      info(`Status issue body length: ${statusIssueBody.length} characters`)
 
       // Search for existing status issue with the marker in body
       const query = `repo:${owner}/${repo} is:issue in:body "${marker}"`
@@ -660,8 +683,8 @@ async function run(): Promise<void> {
           repo,
           owner,
           statusIssueNumber,
-          title,
-          commentBody
+          statusIssueTitle,
+          statusIssueBody
         )
         info('Status issue updated successfully')
       } else {
@@ -671,8 +694,8 @@ async function run(): Promise<void> {
           token,
           repo,
           owner,
-          title,
-          commentBody
+          statusIssueTitle,
+          statusIssueBody
         )
         info(`Status issue #${statusIssueNumber} created successfully`)
       }
