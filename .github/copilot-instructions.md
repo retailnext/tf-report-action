@@ -66,6 +66,18 @@ command to bundle the TypeScript code into JavaScript:
 npm run bundle
 ```
 
+## Linting
+
+**Any time TypeScript (`.ts`) or JavaScript (`.js`) files are modified, you must
+run the linter to check for errors:**
+
+```bash
+npm run lint
+```
+
+Fix all linting errors before committing changes. The linter enforces code style
+and catches common errors.
+
 ## General Coding Guidelines
 
 - Follow standard TypeScript and JavaScript coding conventions and best

@@ -1,11 +1,4 @@
-import {
-  describe,
-  expect,
-  test,
-  beforeEach,
-  afterEach,
-  jest
-} from '@jest/globals'
+import { describe, expect, test, afterEach, jest } from '@jest/globals'
 import type { IncomingMessage, ClientRequest } from 'https'
 import {
   httpsRequest,
@@ -38,7 +31,7 @@ function createMockResponse(statusCode: number, data: string): IncomingMessage {
 // Helper to create a mock request
 function createMockRequest(): ClientRequest {
   const request = {
-    on: (event: string, handler: (error?: Error) => void) => {
+    on: () => {
       // Don't trigger error by default
       return request
     },
