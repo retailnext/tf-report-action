@@ -1,4 +1,4 @@
-import { describe, expect, test } from '@jest/globals'
+import { describe, expect, test, beforeEach, afterEach } from '@jest/globals'
 import {
   analyzeSteps,
   generateCommentBody,
@@ -6,7 +6,8 @@ import {
   getInput,
   truncateOutput,
   getJobLogsUrl,
-  generateTitle
+  generateTitle,
+  generateStatusIssueTitle
 } from '../src/index'
 
 describe('analyzeSteps', () => {
@@ -718,5 +719,94 @@ describe('generateTitle', () => {
     const title = generateTitle('workspace', analysis)
 
     expect(title).toBe('❌ `workspace` `plan` Failed')
+  })
+})
+
+describe('generateStatusIssueTitle', () => {
+  test('generates fixed format title', () => {
+    const title = generateStatusIssueTitle('production')
+    expect(title).toBe(':bar_chart: `production` Status')
+  })
+
+  test('preserves workspace name', () => {
+    const title = generateStatusIssueTitle('my-workspace')
+    expect(title).toBe(':bar_chart: `my-workspace` Status')
+  })
+
+  test('handles special characters in workspace name', () => {
+    const title = generateStatusIssueTitle('prod/us-east-1')
+    expect(title).toBe(':bar_chart: `prod/us-east-1` Status')
+  })
+})
+
+describe('generateCommentBody with log link', () => {
+  // Set up environment for getJobLogsUrl
+  const originalEnv = process.env
+
+  beforeEach(() => {
+    process.env = {
+      ...originalEnv,
+      GITHUB_REPOSITORY: 'owner/repo',
+      GITHUB_RUN_ID: '12345',
+      GITHUB_RUN_ATTEMPT: '1'
+    }
+  })
+
+  afterEach(() => {
+    process.env = originalEnv
+  })
+
+  test('includes log link when includeLogLink is true', () => {
+    const workspace = 'production'
+    const analysis = {
+      success: true,
+      failedSteps: [],
+      totalSteps: 3
+    }
+
+    const comment = generateCommentBody(workspace, analysis, true)
+
+    // Should still include dynamic title in body
+    expect(comment).toContain('## ✅ `production` Succeeded')
+    // Should include log link
+    expect(comment).toContain('**Run Logs:**')
+    expect(comment).toContain(
+      'https://github.com/owner/repo/actions/runs/12345/attempts/1'
+    )
+  })
+
+  test('does not include log link when includeLogLink is false', () => {
+    const workspace = 'production'
+    const analysis = {
+      success: true,
+      failedSteps: [],
+      totalSteps: 3
+    }
+
+    const comment = generateCommentBody(workspace, analysis, false)
+
+    // Should still include dynamic title in body
+    expect(comment).toContain('## ✅ `production` Succeeded')
+    // Should NOT include log link
+    expect(comment).not.toContain('**Run Logs:**')
+  })
+
+  test('includes log link with failure status', () => {
+    const workspace = 'staging'
+    const analysis = {
+      success: false,
+      failedSteps: [{ name: 'build', conclusion: 'failure' }],
+      totalSteps: 2
+    }
+
+    const comment = generateCommentBody(workspace, analysis, true)
+
+    // Should include dynamic failure title in body
+    expect(comment).toContain('## ❌ `staging` Failed')
+    // Should include log link
+    expect(comment).toContain('**Run Logs:**')
+    expect(comment).toContain(
+      'https://github.com/owner/repo/actions/runs/12345/attempts/1'
+    )
   })
 })
