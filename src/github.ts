@@ -1,5 +1,27 @@
 import * as https from 'https'
 
+// Type for the request function to allow dependency injection
+export type HttpsRequestFn = typeof https.request
+
+// Default implementation using the real https module
+let requestImpl: HttpsRequestFn = https.request
+
+/**
+ * Set a custom request implementation (for testing)
+ * @internal
+ */
+export function _setRequestImpl(impl: HttpsRequestFn): void {
+  requestImpl = impl
+}
+
+/**
+ * Reset to the default request implementation
+ * @internal
+ */
+export function _resetRequestImpl(): void {
+  requestImpl = https.request
+}
+
 /**
  * Make an HTTPS request to the GitHub API
  */
@@ -8,7 +30,7 @@ export async function httpsRequest(
   data?: string
 ): Promise<string> {
   return new Promise((resolve, reject) => {
-    const req = https.request(options, (res) => {
+    const req = requestImpl(options, (res) => {
       const chunks: Buffer[] = []
       res.on('data', (chunk) => chunks.push(chunk))
       res.on('end', () => {
@@ -128,7 +150,7 @@ export async function searchIssues(
     return result.items || []
   } catch (error) {
     throw new Error(
-      `Failed to parse search issues response: ${error instanceof Error ? error.message : 'Unknown error'}`
+      `Failed to parse search issues response: ${(error as Error).message}`
     )
   }
 }
@@ -165,7 +187,7 @@ export async function createIssue(
     return issue.number
   } catch (error) {
     throw new Error(
-      `Failed to parse create issue response: ${error instanceof Error ? error.message : 'Unknown error'}`
+      `Failed to parse create issue response: ${(error as Error).message}`
     )
   }
 }

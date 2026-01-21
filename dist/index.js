@@ -219,12 +219,14 @@ function formatJsonLines(parsed) {
     return result.trim();
 }
 
+// Default implementation using the real https module
+let requestImpl = https.request;
 /**
  * Make an HTTPS request to the GitHub API
  */
 async function httpsRequest(options, data) {
     return new Promise((resolve, reject) => {
-        const req = https.request(options, (res) => {
+        const req = requestImpl(options, (res) => {
             const chunks = [];
             res.on('data', (chunk) => chunks.push(chunk));
             res.on('end', () => {
@@ -316,7 +318,7 @@ async function searchIssues(token, repo, owner, query) {
         return result.items || [];
     }
     catch (error) {
-        throw new Error(`Failed to parse search issues response: ${error instanceof Error ? error.message : 'Unknown error'}`);
+        throw new Error(`Failed to parse search issues response: ${error.message}`);
     }
 }
 /**
@@ -344,7 +346,7 @@ async function createIssue(token, repo, owner, title, body) {
         return issue.number;
     }
     catch (error) {
-        throw new Error(`Failed to parse create issue response: ${error instanceof Error ? error.message : 'Unknown error'}`);
+        throw new Error(`Failed to parse create issue response: ${error.message}`);
     }
 }
 /**
