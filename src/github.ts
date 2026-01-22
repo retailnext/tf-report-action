@@ -221,6 +221,8 @@ export async function updateIssue(
 
 /**
  * Get the current job ID by finding the running job for this run
+ * Note: This function matches jobs by name from GITHUB_JOB environment variable.
+ * If multiple jobs have the same name in a workflow, this will return the first match.
  */
 export async function getCurrentJobId(
   token: string,

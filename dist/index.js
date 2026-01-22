@@ -369,6 +369,8 @@ async function updateIssue(token, repo, owner, issueNumber, title, body) {
 }
 /**
  * Get the current job ID by finding the running job for this run
+ * Note: This function matches jobs by name from GITHUB_JOB environment variable.
+ * If multiple jobs have the same name in a workflow, this will return the first match.
  */
 async function getCurrentJobId(token, repo, owner, runId) {
     const options = {
@@ -401,6 +403,21 @@ async function getCurrentJobId(token, repo, owner, runId) {
     }
 }
 
+// Month names for timestamp formatting
+const MONTH_NAMES = [
+    'January',
+    'February',
+    'March',
+    'April',
+    'May',
+    'June',
+    'July',
+    'August',
+    'September',
+    'October',
+    'November',
+    'December'
+];
 // GitHub comment max size is 65536 characters
 const MAX_COMMENT_SIZE = 60000;
 const MAX_OUTPUT_PER_STEP = 20000;
@@ -446,21 +463,7 @@ function getJobLogsUrl(jobId) {
  * Example: "January 22, 2026 at 7:05 PM UTC"
  */
 function formatTimestamp(date) {
-    const months = [
-        'January',
-        'February',
-        'March',
-        'April',
-        'May',
-        'June',
-        'July',
-        'August',
-        'September',
-        'October',
-        'November',
-        'December'
-    ];
-    const month = months[date.getUTCMonth()];
+    const month = MONTH_NAMES[date.getUTCMonth()];
     const day = date.getUTCDate();
     const year = date.getUTCFullYear();
     let hours = date.getUTCHours();
@@ -598,7 +601,7 @@ function generateCommentBody(workspace, analysis, includeLogLink = false, jobId,
         // Normal mode - show all failed steps or success summary
         if (success) {
             // Check if all steps were skipped
-            if (skippedSteps === totalSteps && totalSteps > 0) {
+            if (skippedSteps === totalSteps) {
                 comment += `All ${totalSteps} step(s) were skipped.\n`;
             }
             else {

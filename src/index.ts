@@ -13,6 +13,22 @@ import {
 // Re-export jsonlines functions for use by scripts and tests
 export { isJsonLines, parseJsonLines, formatJsonLines }
 
+// Month names for timestamp formatting
+const MONTH_NAMES = [
+  'January',
+  'February',
+  'March',
+  'April',
+  'May',
+  'June',
+  'July',
+  'August',
+  'September',
+  'October',
+  'November',
+  'December'
+]
+
 interface StepData {
   conclusion?: string
   outcome?: string
@@ -104,22 +120,7 @@ export function getJobLogsUrl(jobId?: string): string {
  * Example: "January 22, 2026 at 7:05 PM UTC"
  */
 export function formatTimestamp(date: Date): string {
-  const months = [
-    'January',
-    'February',
-    'March',
-    'April',
-    'May',
-    'June',
-    'July',
-    'August',
-    'September',
-    'October',
-    'November',
-    'December'
-  ]
-
-  const month = months[date.getUTCMonth()]
+  const month = MONTH_NAMES[date.getUTCMonth()]
   const day = date.getUTCDate()
   const year = date.getUTCFullYear()
 
@@ -292,7 +293,7 @@ export function generateCommentBody(
     // Normal mode - show all failed steps or success summary
     if (success) {
       // Check if all steps were skipped
-      if (skippedSteps === totalSteps && totalSteps > 0) {
+      if (skippedSteps === totalSteps) {
         comment += `All ${totalSteps} step(s) were skipped.\n`
       } else {
         // Generate summary based on step counts
