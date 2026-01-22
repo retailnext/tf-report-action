@@ -938,63 +938,32 @@ describe('skipped steps handling', () => {
 })
 
 describe('formatTimestamp', () => {
-  test('formats timestamp in human-friendly format in UTC', () => {
+  test('formats timestamp in human-friendly format in UTC with 24-hour time', () => {
     const date = new Date('2026-01-22T19:05:47.590Z')
     const formatted = formatTimestamp(date)
 
-    expect(formatted).toBe('January 22, 2026 at 7:05 PM UTC')
+    expect(formatted).toBe('January 22, 2026 at 19:05 UTC')
   })
 
   test('formats midnight correctly', () => {
     const date = new Date('2026-01-01T00:00:00.000Z')
     const formatted = formatTimestamp(date)
 
-    expect(formatted).toBe('January 1, 2026 at 12:00 AM UTC')
+    expect(formatted).toBe('January 1, 2026 at 00:00 UTC')
   })
 
   test('formats noon correctly', () => {
     const date = new Date('2026-06-15T12:30:00.000Z')
     const formatted = formatTimestamp(date)
 
-    expect(formatted).toBe('June 15, 2026 at 12:30 PM UTC')
+    expect(formatted).toBe('June 15, 2026 at 12:30 UTC')
   })
 
-  test('pads single-digit minutes', () => {
-    const date = new Date('2026-12-31T23:05:00.000Z')
+  test('pads single-digit hours and minutes', () => {
+    const date = new Date('2026-12-31T03:05:00.000Z')
     const formatted = formatTimestamp(date)
 
-    expect(formatted).toBe('December 31, 2026 at 11:05 PM UTC')
-  })
-})
-
-describe('getJobLogsUrl with job ID', () => {
-  const originalEnv = process.env
-
-  beforeEach(() => {
-    process.env = {
-      ...originalEnv,
-      GITHUB_REPOSITORY: 'owner/repo',
-      GITHUB_RUN_ID: '12345',
-      GITHUB_RUN_ATTEMPT: '1'
-    }
-  })
-
-  afterEach(() => {
-    process.env = originalEnv
-  })
-
-  test('uses job ID when provided', () => {
-    const url = getJobLogsUrl('67890')
-    expect(url).toBe(
-      'https://github.com/owner/repo/actions/runs/12345/job/67890'
-    )
-  })
-
-  test('falls back to run attempt when job ID not provided', () => {
-    const url = getJobLogsUrl()
-    expect(url).toBe(
-      'https://github.com/owner/repo/actions/runs/12345/attempts/1'
-    )
+    expect(formatted).toBe('December 31, 2026 at 03:05 UTC')
   })
 })
 
@@ -1025,19 +994,13 @@ describe('generateCommentBody with timestamp', () => {
     }
     const timestamp = new Date('2026-01-22T19:05:47.590Z')
 
-    const comment = generateCommentBody(
-      workspace,
-      analysis,
-      true,
-      undefined,
-      timestamp
-    )
+    const comment = generateCommentBody(workspace, analysis, true, timestamp)
 
     expect(comment).toContain('[View logs](')
-    expect(comment).toContain('Last updated: January 22, 2026 at 7:05 PM UTC')
+    expect(comment).toContain('Last updated: January 22, 2026 at 19:05 UTC')
   })
 
-  test('includes both job ID and timestamp', () => {
+  test('includes logs link and timestamp', () => {
     const workspace = 'production'
     const analysis = {
       success: true,
@@ -1046,21 +1009,14 @@ describe('generateCommentBody with timestamp', () => {
       successfulSteps: 3,
       skippedSteps: 0
     }
-    const jobId = '67890'
     const timestamp = new Date('2026-01-22T19:05:47.590Z')
 
-    const comment = generateCommentBody(
-      workspace,
-      analysis,
-      true,
-      jobId,
-      timestamp
-    )
+    const comment = generateCommentBody(workspace, analysis, true, timestamp)
 
     expect(comment).toContain(
-      '[View logs](https://github.com/owner/repo/actions/runs/12345/job/67890)'
+      '[View logs](https://github.com/owner/repo/actions/runs/12345/attempts/1)'
     )
     expect(comment).toContain(' • ')
-    expect(comment).toContain('Last updated: January 22, 2026 at 7:05 PM UTC')
+    expect(comment).toContain('Last updated: January 22, 2026 at 19:05 UTC')
   })
 })
