@@ -367,7 +367,57 @@ async function updateIssue(token, repo, owner, issueNumber, title, body) {
     const payload = JSON.stringify({ title, body });
     await httpsRequest(options, payload);
 }
+/**
+ * Get the current job ID by finding the running job for this run
+ * Note: This function matches jobs by name from GITHUB_JOB environment variable.
+ * If multiple jobs have the same name in a workflow, this will return the first match.
+ */
+async function getCurrentJobId(token, repo, owner, runId) {
+    const options = {
+        hostname: 'api.github.com',
+        path: `/repos/${owner}/${repo}/actions/runs/${runId}/jobs`,
+        method: 'GET',
+        headers: {
+            Authorization: `Bearer ${token}`,
+            'User-Agent': 'tf-report-action',
+            Accept: 'application/vnd.github+json'
+        }
+    };
+    try {
+        const response = await httpsRequest(options);
+        const result = JSON.parse(response);
+        const jobs = result.jobs || [];
+        // Find the job that matches the current job name
+        const currentJobName = process.env.GITHUB_JOB || '';
+        const currentJob = jobs.find((job) => job.name === currentJobName &&
+            (job.status === 'in_progress' || job.status === 'completed'));
+        if (currentJob && currentJob.id) {
+            return String(currentJob.id);
+        }
+        return null;
+    }
+    catch (error) {
+        // If we can't get the job ID, return null and fall back to run attempt URL
+        console.error(`Failed to get job ID: ${error.message}`);
+        return null;
+    }
+}
 
+// Month names for timestamp formatting
+const MONTH_NAMES = [
+    'January',
+    'February',
+    'March',
+    'April',
+    'May',
+    'June',
+    'July',
+    'August',
+    'September',
+    'October',
+    'November',
+    'December'
+];
 // GitHub comment max size is 65536 characters
 const MAX_COMMENT_SIZE = 60000;
 const MAX_OUTPUT_PER_STEP = 20000;
@@ -394,20 +444,40 @@ function setFailed(message) {
 }
 /**
  * Get the GitHub job logs URL
+ * @param jobId Optional job ID for more specific URL
  */
-function getJobLogsUrl() {
+function getJobLogsUrl(jobId) {
     const repo = process.env.GITHUB_REPOSITORY || '';
     const runId = process.env.GITHUB_RUN_ID || '';
-    const runAttempt = process.env.GITHUB_RUN_ATTEMPT || '1';
     if (repo && runId) {
+        if (jobId) {
+            return `https://github.com/${repo}/actions/runs/${runId}/job/${jobId}`;
+        }
+        const runAttempt = process.env.GITHUB_RUN_ATTEMPT || '1';
         return `https://github.com/${repo}/actions/runs/${runId}/attempts/${runAttempt}`;
     }
     return '';
 }
-function truncateOutput(text, maxLength, includeLogLink = false) {
+/**
+ * Format a date in a human-friendly format in UTC
+ * Example: "January 22, 2026 at 7:05 PM UTC"
+ */
+function formatTimestamp(date) {
+    const month = MONTH_NAMES[date.getUTCMonth()];
+    const day = date.getUTCDate();
+    const year = date.getUTCFullYear();
+    let hours = date.getUTCHours();
+    const minutes = date.getUTCMinutes();
+    const ampm = hours >= 12 ? 'PM' : 'AM';
+    hours = hours % 12;
+    hours = hours ? hours : 12; // 0 should be 12
+    const minutesStr = minutes < 10 ? `0${minutes}` : `${minutes}`;
+    return `${month} ${day}, ${year} at ${hours}:${minutesStr} ${ampm} UTC`;
+}
+function truncateOutput(text, maxLength, includeLogLink = false, jobId) {
     if (text.length <= maxLength)
         return text;
-    const logLink = includeLogLink ? getJobLogsUrl() : '';
+    const logLink = includeLogLink ? getJobLogsUrl(jobId) : '';
     const truncationMessage = logLink
         ? `\n\n... [output truncated - [view full logs](${logLink})] ...\n\n`
         : '\n\n... [output truncated] ...\n\n';
@@ -424,29 +494,35 @@ function analyzeSteps(steps, targetStep) {
     const stepEntries = Object.entries(steps);
     const totalSteps = stepEntries.length;
     const failedSteps = [];
+    let successfulSteps = 0;
+    let skippedSteps = 0;
     let targetStepResult;
     for (const [stepName, stepData] of stepEntries) {
-        const conclusion = stepData.conclusion || stepData.outcome || '';
+        // Use outcome instead of conclusion as per requirements
+        const outcome = stepData.outcome || stepData.conclusion || '';
         // Check if this is the target step
         if (targetStep && stepName === targetStep) {
             targetStepResult = {
                 name: stepName,
                 found: true,
-                conclusion,
+                conclusion: outcome,
                 stdout: stepData.outputs?.stdout,
                 stderr: stepData.outputs?.stderr,
                 exitCode: stepData.outputs?.exit_code
             };
         }
-        // Treat as failure if not success, skipped, cancelled, or neutral
-        if (conclusion &&
-            conclusion !== 'success' &&
-            conclusion !== 'skipped' &&
-            conclusion !== 'cancelled' &&
-            conclusion !== 'neutral') {
+        // Count step outcomes
+        if (outcome === 'success') {
+            successfulSteps++;
+        }
+        else if (outcome === 'skipped') {
+            skippedSteps++;
+        }
+        else if (outcome && outcome !== 'cancelled' && outcome !== 'neutral') {
+            // Treat as failure if not success, skipped, cancelled, or neutral
             const failure = {
                 name: stepName,
-                conclusion,
+                conclusion: outcome,
                 stdout: stepData.outputs?.stdout,
                 stderr: stepData.outputs?.stderr,
                 exitCode: stepData.outputs?.exit_code
@@ -465,11 +541,13 @@ function analyzeSteps(steps, targetStep) {
         success: failedSteps.length === 0,
         failedSteps,
         totalSteps,
+        successfulSteps,
+        skippedSteps,
         targetStepResult
     };
 }
-function generateCommentBody(workspace, analysis, includeLogLink = false) {
-    const { success, failedSteps, totalSteps, targetStepResult } = analysis;
+function generateCommentBody(workspace, analysis, includeLogLink = false, jobId, timestamp) {
+    const { success, failedSteps, totalSteps, successfulSteps, skippedSteps, targetStepResult } = analysis;
     const marker = `<!-- tf-report-action:"${workspace}" -->`;
     const title = generateTitle(workspace, analysis);
     let comment = `${marker}\n\n## ${title}\n\n`;
@@ -493,7 +571,7 @@ function generateCommentBody(workspace, analysis, includeLogLink = false) {
             // Success case - show stdout/stderr if available
             const stdout = targetStepResult.stdout;
             const stderr = targetStepResult.stderr;
-            const { formattedContent } = formatOutput(stdout, stderr);
+            const { formattedContent } = formatOutput(stdout, stderr, jobId);
             if (!formattedContent) {
                 comment += `> [!NOTE]\n> Completed successfully with no output.\n\n`;
             }
@@ -510,7 +588,7 @@ function generateCommentBody(workspace, analysis, includeLogLink = false) {
             comment += '\n';
             const stdout = targetStepResult.stdout;
             const stderr = targetStepResult.stderr;
-            const { formattedContent } = formatOutput(stdout, stderr);
+            const { formattedContent } = formatOutput(stdout, stderr, jobId);
             if (!formattedContent) {
                 comment += `> [!NOTE]\n> Failed with no output.\n\n`;
             }
@@ -520,11 +598,31 @@ function generateCommentBody(workspace, analysis, includeLogLink = false) {
         }
     }
     else {
-        // Normal mode - show all failed steps
+        // Normal mode - show all failed steps or success summary
         if (success) {
-            comment += `All ${totalSteps} step(s) completed successfully.\n`;
+            // Check if all steps were skipped
+            if (skippedSteps === totalSteps) {
+                comment += `All ${totalSteps} step(s) were skipped.\n`;
+            }
+            else {
+                // Generate summary based on step counts
+                const parts = [];
+                if (successfulSteps > 0) {
+                    parts.push(`${successfulSteps} succeeded`);
+                }
+                if (skippedSteps > 0) {
+                    parts.push(`${skippedSteps} skipped`);
+                }
+                if (parts.length > 0) {
+                    comment += `${parts.join(', ')} (${totalSteps} total)\n`;
+                }
+                else {
+                    comment += `${totalSteps} step(s) completed\n`;
+                }
+            }
         }
         else {
+            // Focus on failures
             comment += `${failedSteps.length} of ${totalSteps} step(s) failed:\n\n`;
             for (const step of failedSteps) {
                 comment += `#### ❌ Step: \`${step.name}\`\n\n`;
@@ -533,7 +631,7 @@ function generateCommentBody(workspace, analysis, includeLogLink = false) {
                     comment += `**Exit Code:** ${step.exitCode}\n`;
                 }
                 comment += '\n';
-                const { formattedContent } = formatOutput(step.stdout, step.stderr);
+                const { formattedContent } = formatOutput(step.stdout, step.stderr, jobId);
                 if (!formattedContent) {
                     comment += `> [!NOTE]\n> Failed with no output.\n\n`;
                 }
@@ -543,12 +641,21 @@ function generateCommentBody(workspace, analysis, includeLogLink = false) {
             }
         }
     }
-    // Add log link for status issues (non-PR context)
+    // Add footer for status issues (non-PR context)
     if (includeLogLink) {
-        const logUrl = getJobLogsUrl();
+        const logUrl = getJobLogsUrl(jobId);
+        const formattedTime = timestamp ? formatTimestamp(timestamp) : '';
+        comment += `\n---\n\n`;
         if (logUrl) {
-            comment += `\n---\n\n**Run Logs:** ${logUrl}\n`;
+            comment += `[View logs](${logUrl})`;
         }
+        if (formattedTime) {
+            if (logUrl) {
+                comment += ` • `;
+            }
+            comment += `Last updated: ${formattedTime}`;
+        }
+        comment += `\n`;
     }
     // Final safety check
     if (comment.length > MAX_COMMENT_SIZE) {
@@ -598,7 +705,7 @@ function generateStatusIssueTitle(workspace) {
 /**
  * Format output, detecting and handling JSON Lines format
  */
-function formatOutput(stdout, stderr) {
+function formatOutput(stdout, stderr, jobId) {
     const hasStdout = stdout && stdout.trim().length > 0;
     const hasStderr = stderr && stderr.trim().length > 0;
     // Check if stdout is JSON Lines format
@@ -615,11 +722,11 @@ function formatOutput(stdout, stderr) {
         return { formattedContent: '', isJsonLines: false };
     }
     if (hasStdout && stdout) {
-        const truncated = truncateOutput(stdout, MAX_OUTPUT_PER_STEP, true);
+        const truncated = truncateOutput(stdout, MAX_OUTPUT_PER_STEP, true, jobId);
         content += `<details>\n<summary>📄 Output</summary>\n\n\`\`\`\n${truncated}\n\`\`\`\n</details>\n\n`;
     }
     if (hasStderr && stderr) {
-        const truncated = truncateOutput(stderr, MAX_OUTPUT_PER_STEP, true);
+        const truncated = truncateOutput(stderr, MAX_OUTPUT_PER_STEP, true, jobId);
         content += `<details>\n<summary>⚠️ Errors</summary>\n\n\`\`\`\n${truncated}\n\`\`\`\n</details>\n\n`;
     }
     return { formattedContent: content, isJsonLines: false };
@@ -704,9 +811,23 @@ async function run() {
             info('Comment posted successfully');
         }
         else {
-            // Non-PR context: use status issue (include log link)
+            // Non-PR context: use status issue (include log link and timestamp)
             info('Not in PR context - using status issue');
-            const statusIssueBody = generateCommentBody(workspace, analysis, true);
+            // Try to get the job ID for more specific log URLs
+            const runId = process.env.GITHUB_RUN_ID || '';
+            let jobId;
+            if (runId) {
+                info('Attempting to fetch job ID...');
+                jobId = (await getCurrentJobId(token, repo, owner, runId)) || undefined;
+                if (jobId) {
+                    info(`Job ID found: ${jobId}`);
+                }
+                else {
+                    info('Job ID not found, using run attempt URL');
+                }
+            }
+            const timestamp = new Date();
+            const statusIssueBody = generateCommentBody(workspace, analysis, true, jobId, timestamp);
             const statusIssueTitle = generateStatusIssueTitle(workspace);
             info(`Status issue title: "${statusIssueTitle}"`);
             info(`Status issue body length: ${statusIssueBody.length} characters`);
@@ -751,5 +872,5 @@ if (import.meta.url === `file://${process.argv[1]}` ||
     run();
 }
 
-export { analyzeSteps, formatJsonLines, generateCommentBody, generateStatusIssueTitle, generateTitle, getInput, getJobLogsUrl, getWorkspaceMarker, isJsonLines, parseJsonLines, setFailed, truncateOutput };
+export { analyzeSteps, formatJsonLines, formatTimestamp, generateCommentBody, generateStatusIssueTitle, generateTitle, getInput, getJobLogsUrl, getWorkspaceMarker, isJsonLines, parseJsonLines, setFailed, truncateOutput };
 //# sourceMappingURL=index.js.map
