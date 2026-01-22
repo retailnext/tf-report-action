@@ -597,22 +597,29 @@ function generateCommentBody(workspace, analysis, includeLogLink = false, jobId,
     else {
         // Normal mode - show all failed steps or success summary
         if (success) {
-            // Generate summary based on step counts
-            const parts = [];
-            if (successfulSteps > 0) {
-                parts.push(`${successfulSteps} succeeded`);
-            }
-            if (skippedSteps > 0) {
-                parts.push(`${skippedSteps} skipped`);
-            }
-            if (parts.length > 0) {
-                comment += `${parts.join(', ')} (${totalSteps} total)\n`;
+            // Check if all steps were skipped
+            if (skippedSteps === totalSteps && totalSteps > 0) {
+                comment += `All ${totalSteps} step(s) were skipped.\n`;
             }
             else {
-                comment += `${totalSteps} step(s) completed\n`;
+                // Generate summary based on step counts
+                const parts = [];
+                if (successfulSteps > 0) {
+                    parts.push(`${successfulSteps} succeeded`);
+                }
+                if (skippedSteps > 0) {
+                    parts.push(`${skippedSteps} skipped`);
+                }
+                if (parts.length > 0) {
+                    comment += `${parts.join(', ')} (${totalSteps} total)\n`;
+                }
+                else {
+                    comment += `${totalSteps} step(s) completed\n`;
+                }
             }
         }
         else {
+            // Focus on failures
             comment += `${failedSteps.length} of ${totalSteps} step(s) failed:\n\n`;
             for (const step of failedSteps) {
                 comment += `#### ❌ Step: \`${step.name}\`\n\n`;

@@ -878,7 +878,7 @@ describe('skipped steps handling', () => {
 
     const comment = generateCommentBody(workspace, analysis)
 
-    expect(comment).toContain('3 skipped (3 total)')
+    expect(comment).toContain('All 3 step(s) were skipped.')
     expect(comment).not.toContain('succeeded')
   })
 
@@ -911,6 +911,29 @@ describe('skipped steps handling', () => {
 
     expect(comment).toContain('3 succeeded (3 total)')
     expect(comment).not.toContain('skipped')
+  })
+
+  test('with failures and successes, report focuses on failures', () => {
+    const workspace = 'test'
+    const analysis = {
+      success: false,
+      failedSteps: [
+        { name: 'build', conclusion: 'failure' },
+        { name: 'test', conclusion: 'failure' }
+      ],
+      totalSteps: 5,
+      successfulSteps: 3,
+      skippedSteps: 0
+    }
+
+    const comment = generateCommentBody(workspace, analysis)
+
+    // Should focus on failures, not mention successes in the summary
+    expect(comment).toContain('2 of 5 step(s) failed:')
+    expect(comment).toContain('#### ❌ Step: `build`')
+    expect(comment).toContain('#### ❌ Step: `test`')
+    // Should NOT show success count in the summary line
+    expect(comment).not.toMatch(/3 succeeded/)
   })
 })
 
