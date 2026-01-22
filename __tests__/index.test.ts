@@ -7,7 +7,8 @@ import {
   truncateOutput,
   getJobLogsUrl,
   generateTitle,
-  generateStatusIssueTitle
+  generateStatusIssueTitle,
+  formatTimestamp
 } from '../src/index'
 
 describe('analyzeSteps', () => {
@@ -186,14 +187,16 @@ describe('generateCommentBody', () => {
     const analysis = {
       success: true,
       failedSteps: [],
-      totalSteps: 3
+      totalSteps: 3,
+      successfulSteps: 3,
+      skippedSteps: 0
     }
 
     const comment = generateCommentBody(workspace, analysis)
 
     expect(comment).toContain('<!-- tf-report-action:"production" -->')
     expect(comment).toContain('## ✅ `production` Succeeded')
-    expect(comment).toContain('All 3 step(s) completed successfully')
+    expect(comment).toContain('3 succeeded (3 total)')
   })
 
   test('failure case without target step', () => {
@@ -204,7 +207,9 @@ describe('generateCommentBody', () => {
         { name: 'build', conclusion: 'failure' },
         { name: 'test', conclusion: 'failure' }
       ],
-      totalSteps: 5
+      totalSteps: 5,
+      successfulSteps: 3,
+      skippedSteps: 0
     }
 
     const comment = generateCommentBody(workspace, analysis)
@@ -229,7 +234,9 @@ describe('generateCommentBody', () => {
           exitCode: '1'
         }
       ],
-      totalSteps: 2
+      totalSteps: 2,
+      successfulSteps: 1,
+      skippedSteps: 0
     }
 
     const comment = generateCommentBody(workspace, analysis)
@@ -254,7 +261,9 @@ describe('generateCommentBody', () => {
           stderr: ''
         }
       ],
-      totalSteps: 1
+      totalSteps: 1,
+      successfulSteps: 0,
+      skippedSteps: 0
     }
 
     const comment = generateCommentBody(workspace, analysis)
@@ -272,6 +281,8 @@ describe('generateCommentBody', () => {
       success: true,
       failedSteps: [],
       totalSteps: 3,
+      successfulSteps: 3,
+      skippedSteps: 0,
       targetStepResult: {
         name: 'plan',
         found: true,
@@ -297,6 +308,8 @@ describe('generateCommentBody', () => {
       success: true,
       failedSteps: [],
       totalSteps: 2,
+      successfulSteps: 2,
+      skippedSteps: 0,
       targetStepResult: {
         name: 'apply',
         found: true,
@@ -319,6 +332,8 @@ describe('generateCommentBody', () => {
       success: false,
       failedSteps: [{ name: 'apply', conclusion: 'failure' }],
       totalSteps: 2,
+      successfulSteps: 1,
+      skippedSteps: 0,
       targetStepResult: {
         name: 'apply',
         found: true,
@@ -342,6 +357,8 @@ describe('generateCommentBody', () => {
       success: true,
       failedSteps: [],
       totalSteps: 2,
+      successfulSteps: 2,
+      skippedSteps: 0,
       targetStepResult: {
         name: 'plan',
         found: false
@@ -364,6 +381,8 @@ describe('generateCommentBody', () => {
         { name: 'validate', conclusion: 'failure' }
       ],
       totalSteps: 3,
+      successfulSteps: 1,
+      skippedSteps: 0,
       targetStepResult: {
         name: 'plan',
         found: false
@@ -500,7 +519,9 @@ describe('comment formatting', () => {
           stderr: 'Some errors'
         }
       ],
-      totalSteps: 1
+      totalSteps: 1,
+      successfulSteps: 0,
+      skippedSteps: 0
     }
 
     const comment = generateCommentBody('test', analysis)
@@ -761,15 +782,17 @@ describe('generateCommentBody with log link', () => {
     const analysis = {
       success: true,
       failedSteps: [],
-      totalSteps: 3
+      totalSteps: 3,
+      successfulSteps: 3,
+      skippedSteps: 0
     }
 
     const comment = generateCommentBody(workspace, analysis, true)
 
     // Should still include dynamic title in body
     expect(comment).toContain('## ✅ `production` Succeeded')
-    // Should include log link
-    expect(comment).toContain('**Run Logs:**')
+    // Should include log link in markdown format
+    expect(comment).toContain('[View logs](')
     expect(comment).toContain(
       'https://github.com/owner/repo/actions/runs/12345/attempts/1'
     )
@@ -780,7 +803,9 @@ describe('generateCommentBody with log link', () => {
     const analysis = {
       success: true,
       failedSteps: [],
-      totalSteps: 3
+      totalSteps: 3,
+      successfulSteps: 3,
+      skippedSteps: 0
     }
 
     const comment = generateCommentBody(workspace, analysis, false)
@@ -788,7 +813,7 @@ describe('generateCommentBody with log link', () => {
     // Should still include dynamic title in body
     expect(comment).toContain('## ✅ `production` Succeeded')
     // Should NOT include log link
-    expect(comment).not.toContain('**Run Logs:**')
+    expect(comment).not.toContain('[View logs](')
   })
 
   test('includes log link with failure status', () => {
@@ -796,17 +821,223 @@ describe('generateCommentBody with log link', () => {
     const analysis = {
       success: false,
       failedSteps: [{ name: 'build', conclusion: 'failure' }],
-      totalSteps: 2
+      totalSteps: 2,
+      successfulSteps: 1,
+      skippedSteps: 0
     }
 
     const comment = generateCommentBody(workspace, analysis, true)
 
     // Should include dynamic failure title in body
     expect(comment).toContain('## ❌ `staging` Failed')
-    // Should include log link
-    expect(comment).toContain('**Run Logs:**')
+    // Should include log link in markdown format
+    expect(comment).toContain('[View logs](')
     expect(comment).toContain(
       'https://github.com/owner/repo/actions/runs/12345/attempts/1'
     )
+  })
+})
+
+describe('skipped steps handling', () => {
+  test('all skipped steps should not report as success', () => {
+    const steps = {
+      test: {
+        outputs: {},
+        outcome: 'skipped',
+        conclusion: 'skipped'
+      },
+      package: {
+        outputs: {},
+        outcome: 'skipped',
+        conclusion: 'skipped'
+      },
+      'check-dist': {
+        outputs: {},
+        outcome: 'skipped',
+        conclusion: 'skipped'
+      }
+    }
+
+    const analysis = analyzeSteps(steps)
+
+    expect(analysis.success).toBe(true) // No failures
+    expect(analysis.successfulSteps).toBe(0)
+    expect(analysis.skippedSteps).toBe(3)
+    expect(analysis.failedSteps.length).toBe(0)
+  })
+
+  test('comment for all skipped steps shows correct counts', () => {
+    const workspace = 'test'
+    const analysis = {
+      success: true,
+      failedSteps: [],
+      totalSteps: 3,
+      successfulSteps: 0,
+      skippedSteps: 3
+    }
+
+    const comment = generateCommentBody(workspace, analysis)
+
+    expect(comment).toContain('3 skipped (3 total)')
+    expect(comment).not.toContain('succeeded')
+  })
+
+  test('mixed steps show correct counts', () => {
+    const workspace = 'test'
+    const analysis = {
+      success: true,
+      failedSteps: [],
+      totalSteps: 5,
+      successfulSteps: 3,
+      skippedSteps: 2
+    }
+
+    const comment = generateCommentBody(workspace, analysis)
+
+    expect(comment).toContain('3 succeeded, 2 skipped (5 total)')
+  })
+
+  test('only successful steps omit skipped count', () => {
+    const workspace = 'test'
+    const analysis = {
+      success: true,
+      failedSteps: [],
+      totalSteps: 3,
+      successfulSteps: 3,
+      skippedSteps: 0
+    }
+
+    const comment = generateCommentBody(workspace, analysis)
+
+    expect(comment).toContain('3 succeeded (3 total)')
+    expect(comment).not.toContain('skipped')
+  })
+})
+
+describe('formatTimestamp', () => {
+  test('formats timestamp in human-friendly format in UTC', () => {
+    const date = new Date('2026-01-22T19:05:47.590Z')
+    const formatted = formatTimestamp(date)
+
+    expect(formatted).toBe('January 22, 2026 at 7:05 PM UTC')
+  })
+
+  test('formats midnight correctly', () => {
+    const date = new Date('2026-01-01T00:00:00.000Z')
+    const formatted = formatTimestamp(date)
+
+    expect(formatted).toBe('January 1, 2026 at 12:00 AM UTC')
+  })
+
+  test('formats noon correctly', () => {
+    const date = new Date('2026-06-15T12:30:00.000Z')
+    const formatted = formatTimestamp(date)
+
+    expect(formatted).toBe('June 15, 2026 at 12:30 PM UTC')
+  })
+
+  test('pads single-digit minutes', () => {
+    const date = new Date('2026-12-31T23:05:00.000Z')
+    const formatted = formatTimestamp(date)
+
+    expect(formatted).toBe('December 31, 2026 at 11:05 PM UTC')
+  })
+})
+
+describe('getJobLogsUrl with job ID', () => {
+  const originalEnv = process.env
+
+  beforeEach(() => {
+    process.env = {
+      ...originalEnv,
+      GITHUB_REPOSITORY: 'owner/repo',
+      GITHUB_RUN_ID: '12345',
+      GITHUB_RUN_ATTEMPT: '1'
+    }
+  })
+
+  afterEach(() => {
+    process.env = originalEnv
+  })
+
+  test('uses job ID when provided', () => {
+    const url = getJobLogsUrl('67890')
+    expect(url).toBe(
+      'https://github.com/owner/repo/actions/runs/12345/job/67890'
+    )
+  })
+
+  test('falls back to run attempt when job ID not provided', () => {
+    const url = getJobLogsUrl()
+    expect(url).toBe(
+      'https://github.com/owner/repo/actions/runs/12345/attempts/1'
+    )
+  })
+})
+
+describe('generateCommentBody with timestamp', () => {
+  const originalEnv = process.env
+
+  beforeEach(() => {
+    process.env = {
+      ...originalEnv,
+      GITHUB_REPOSITORY: 'owner/repo',
+      GITHUB_RUN_ID: '12345',
+      GITHUB_RUN_ATTEMPT: '1'
+    }
+  })
+
+  afterEach(() => {
+    process.env = originalEnv
+  })
+
+  test('includes timestamp in status issue footer', () => {
+    const workspace = 'production'
+    const analysis = {
+      success: true,
+      failedSteps: [],
+      totalSteps: 3,
+      successfulSteps: 3,
+      skippedSteps: 0
+    }
+    const timestamp = new Date('2026-01-22T19:05:47.590Z')
+
+    const comment = generateCommentBody(
+      workspace,
+      analysis,
+      true,
+      undefined,
+      timestamp
+    )
+
+    expect(comment).toContain('[View logs](')
+    expect(comment).toContain('Last updated: January 22, 2026 at 7:05 PM UTC')
+  })
+
+  test('includes both job ID and timestamp', () => {
+    const workspace = 'production'
+    const analysis = {
+      success: true,
+      failedSteps: [],
+      totalSteps: 3,
+      successfulSteps: 3,
+      skippedSteps: 0
+    }
+    const jobId = '67890'
+    const timestamp = new Date('2026-01-22T19:05:47.590Z')
+
+    const comment = generateCommentBody(
+      workspace,
+      analysis,
+      true,
+      jobId,
+      timestamp
+    )
+
+    expect(comment).toContain(
+      '[View logs](https://github.com/owner/repo/actions/runs/12345/job/67890)'
+    )
+    expect(comment).toContain(' • ')
+    expect(comment).toContain('Last updated: January 22, 2026 at 7:05 PM UTC')
   })
 })

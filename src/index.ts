@@ -6,7 +6,8 @@ import {
   postComment,
   searchIssues,
   createIssue,
-  updateIssue
+  updateIssue,
+  getCurrentJobId
 } from './github.js'
 
 // Re-export jsonlines functions for use by scripts and tests
@@ -39,6 +40,8 @@ interface AnalysisResult {
   success: boolean
   failedSteps: StepFailure[]
   totalSteps: number
+  successfulSteps: number
+  skippedSteps: number
   targetStepResult?: {
     name: string
     found: boolean
@@ -80,26 +83,66 @@ export function setFailed(message: string): void {
 
 /**
  * Get the GitHub job logs URL
+ * @param jobId Optional job ID for more specific URL
  */
-export function getJobLogsUrl(): string {
+export function getJobLogsUrl(jobId?: string): string {
   const repo = process.env.GITHUB_REPOSITORY || ''
   const runId = process.env.GITHUB_RUN_ID || ''
-  const runAttempt = process.env.GITHUB_RUN_ATTEMPT || '1'
 
   if (repo && runId) {
+    if (jobId) {
+      return `https://github.com/${repo}/actions/runs/${runId}/job/${jobId}`
+    }
+    const runAttempt = process.env.GITHUB_RUN_ATTEMPT || '1'
     return `https://github.com/${repo}/actions/runs/${runId}/attempts/${runAttempt}`
   }
   return ''
 }
 
+/**
+ * Format a date in a human-friendly format in UTC
+ * Example: "January 22, 2026 at 7:05 PM UTC"
+ */
+export function formatTimestamp(date: Date): string {
+  const months = [
+    'January',
+    'February',
+    'March',
+    'April',
+    'May',
+    'June',
+    'July',
+    'August',
+    'September',
+    'October',
+    'November',
+    'December'
+  ]
+
+  const month = months[date.getUTCMonth()]
+  const day = date.getUTCDate()
+  const year = date.getUTCFullYear()
+
+  let hours = date.getUTCHours()
+  const minutes = date.getUTCMinutes()
+  const ampm = hours >= 12 ? 'PM' : 'AM'
+  hours = hours % 12
+  hours = hours ? hours : 12 // 0 should be 12
+
+  const minutesStr = minutes < 10 ? `0${minutes}` : `${minutes}`
+
+  return `${month} ${day}, ${year} at ${hours}:${minutesStr} ${ampm} UTC`
+}
+
 export function truncateOutput(
   text: string,
   maxLength: number,
-  includeLogLink = false
+  includeLogLink = false,
+  jobId?: string
 ): string {
   if (text.length <= maxLength) return text
 
-  const logLink = includeLogLink ? getJobLogsUrl() : ''
+  const logLink = includeLogLink ? getJobLogsUrl(jobId) : ''
   const truncationMessage = logLink
     ? `\n\n... [output truncated - [view full logs](${logLink})] ...\n\n`
     : '\n\n... [output truncated] ...\n\n'
@@ -124,34 +167,36 @@ export function analyzeSteps(
   const stepEntries = Object.entries(steps)
   const totalSteps = stepEntries.length
   const failedSteps: StepFailure[] = []
+  let successfulSteps = 0
+  let skippedSteps = 0
   let targetStepResult
 
   for (const [stepName, stepData] of stepEntries) {
-    const conclusion = stepData.conclusion || stepData.outcome || ''
+    // Use outcome instead of conclusion as per requirements
+    const outcome = stepData.outcome || stepData.conclusion || ''
 
     // Check if this is the target step
     if (targetStep && stepName === targetStep) {
       targetStepResult = {
         name: stepName,
         found: true,
-        conclusion,
+        conclusion: outcome,
         stdout: stepData.outputs?.stdout as string | undefined,
         stderr: stepData.outputs?.stderr as string | undefined,
         exitCode: stepData.outputs?.exit_code as string | undefined
       }
     }
 
-    // Treat as failure if not success, skipped, cancelled, or neutral
-    if (
-      conclusion &&
-      conclusion !== 'success' &&
-      conclusion !== 'skipped' &&
-      conclusion !== 'cancelled' &&
-      conclusion !== 'neutral'
-    ) {
+    // Count step outcomes
+    if (outcome === 'success') {
+      successfulSteps++
+    } else if (outcome === 'skipped') {
+      skippedSteps++
+    } else if (outcome && outcome !== 'cancelled' && outcome !== 'neutral') {
+      // Treat as failure if not success, skipped, cancelled, or neutral
       const failure: StepFailure = {
         name: stepName,
-        conclusion,
+        conclusion: outcome,
         stdout: stepData.outputs?.stdout as string | undefined,
         stderr: stepData.outputs?.stderr as string | undefined,
         exitCode: stepData.outputs?.exit_code as string | undefined
@@ -172,6 +217,8 @@ export function analyzeSteps(
     success: failedSteps.length === 0,
     failedSteps,
     totalSteps,
+    successfulSteps,
+    skippedSteps,
     targetStepResult
   }
 }
@@ -179,9 +226,18 @@ export function analyzeSteps(
 export function generateCommentBody(
   workspace: string,
   analysis: AnalysisResult,
-  includeLogLink = false
+  includeLogLink = false,
+  jobId?: string,
+  timestamp?: Date
 ): string {
-  const { success, failedSteps, totalSteps, targetStepResult } = analysis
+  const {
+    success,
+    failedSteps,
+    totalSteps,
+    successfulSteps,
+    skippedSteps,
+    targetStepResult
+  } = analysis
   const marker = `<!-- tf-report-action:"${workspace}" -->`
   const title = generateTitle(workspace, analysis)
 
@@ -205,7 +261,7 @@ export function generateCommentBody(
       // Success case - show stdout/stderr if available
       const stdout = targetStepResult.stdout
       const stderr = targetStepResult.stderr
-      const { formattedContent } = formatOutput(stdout, stderr)
+      const { formattedContent } = formatOutput(stdout, stderr, jobId)
 
       if (!formattedContent) {
         comment += `> [!NOTE]\n> Completed successfully with no output.\n\n`
@@ -224,7 +280,7 @@ export function generateCommentBody(
 
       const stdout = targetStepResult.stdout
       const stderr = targetStepResult.stderr
-      const { formattedContent } = formatOutput(stdout, stderr)
+      const { formattedContent } = formatOutput(stdout, stderr, jobId)
 
       if (!formattedContent) {
         comment += `> [!NOTE]\n> Failed with no output.\n\n`
@@ -233,9 +289,22 @@ export function generateCommentBody(
       }
     }
   } else {
-    // Normal mode - show all failed steps
+    // Normal mode - show all failed steps or success summary
     if (success) {
-      comment += `All ${totalSteps} step(s) completed successfully.\n`
+      // Generate summary based on step counts
+      const parts: string[] = []
+      if (successfulSteps > 0) {
+        parts.push(`${successfulSteps} succeeded`)
+      }
+      if (skippedSteps > 0) {
+        parts.push(`${skippedSteps} skipped`)
+      }
+
+      if (parts.length > 0) {
+        comment += `${parts.join(', ')} (${totalSteps} total)\n`
+      } else {
+        comment += `${totalSteps} step(s) completed\n`
+      }
     } else {
       comment += `${failedSteps.length} of ${totalSteps} step(s) failed:\n\n`
 
@@ -249,7 +318,11 @@ export function generateCommentBody(
 
         comment += '\n'
 
-        const { formattedContent } = formatOutput(step.stdout, step.stderr)
+        const { formattedContent } = formatOutput(
+          step.stdout,
+          step.stderr,
+          jobId
+        )
 
         if (!formattedContent) {
           comment += `> [!NOTE]\n> Failed with no output.\n\n`
@@ -260,12 +333,25 @@ export function generateCommentBody(
     }
   }
 
-  // Add log link for status issues (non-PR context)
+  // Add footer for status issues (non-PR context)
   if (includeLogLink) {
-    const logUrl = getJobLogsUrl()
+    const logUrl = getJobLogsUrl(jobId)
+    const formattedTime = timestamp ? formatTimestamp(timestamp) : ''
+
+    comment += `\n---\n\n`
+
     if (logUrl) {
-      comment += `\n---\n\n**Run Logs:** ${logUrl}\n`
+      comment += `[View logs](${logUrl})`
     }
+
+    if (formattedTime) {
+      if (logUrl) {
+        comment += ` • `
+      }
+      comment += `Last updated: ${formattedTime}`
+    }
+
+    comment += `\n`
   }
 
   // Final safety check
@@ -327,7 +413,8 @@ export function generateStatusIssueTitle(workspace: string): string {
  */
 function formatOutput(
   stdout: string | undefined,
-  stderr: string | undefined
+  stderr: string | undefined,
+  jobId?: string
 ): { formattedContent: string; isJsonLines: boolean } {
   const hasStdout = stdout && stdout.trim().length > 0
   const hasStderr = stderr && stderr.trim().length > 0
@@ -350,12 +437,12 @@ function formatOutput(
   }
 
   if (hasStdout && stdout) {
-    const truncated = truncateOutput(stdout, MAX_OUTPUT_PER_STEP, true)
+    const truncated = truncateOutput(stdout, MAX_OUTPUT_PER_STEP, true, jobId)
     content += `<details>\n<summary>📄 Output</summary>\n\n\`\`\`\n${truncated}\n\`\`\`\n</details>\n\n`
   }
 
   if (hasStderr && stderr) {
-    const truncated = truncateOutput(stderr, MAX_OUTPUT_PER_STEP, true)
+    const truncated = truncateOutput(stderr, MAX_OUTPUT_PER_STEP, true, jobId)
     content += `<details>\n<summary>⚠️ Errors</summary>\n\n\`\`\`\n${truncated}\n\`\`\`\n</details>\n\n`
   }
 
@@ -480,10 +567,30 @@ async function run(): Promise<void> {
 
       info('Comment posted successfully')
     } else {
-      // Non-PR context: use status issue (include log link)
+      // Non-PR context: use status issue (include log link and timestamp)
       info('Not in PR context - using status issue')
 
-      const statusIssueBody = generateCommentBody(workspace, analysis, true)
+      // Try to get the job ID for more specific log URLs
+      const runId = process.env.GITHUB_RUN_ID || ''
+      let jobId: string | undefined
+      if (runId) {
+        info('Attempting to fetch job ID...')
+        jobId = (await getCurrentJobId(token, repo, owner, runId)) || undefined
+        if (jobId) {
+          info(`Job ID found: ${jobId}`)
+        } else {
+          info('Job ID not found, using run attempt URL')
+        }
+      }
+
+      const timestamp = new Date()
+      const statusIssueBody = generateCommentBody(
+        workspace,
+        analysis,
+        true,
+        jobId,
+        timestamp
+      )
       const statusIssueTitle = generateStatusIssueTitle(workspace)
 
       info(`Status issue title: "${statusIssueTitle}"`)
