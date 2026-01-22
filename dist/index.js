@@ -367,41 +367,6 @@ async function updateIssue(token, repo, owner, issueNumber, title, body) {
     const payload = JSON.stringify({ title, body });
     await httpsRequest(options, payload);
 }
-/**
- * Get the current job ID by finding the running job for this run
- * Note: This function matches jobs by name from GITHUB_JOB environment variable.
- * If multiple jobs have the same name in a workflow, this will return the first match.
- */
-async function getCurrentJobId(token, repo, owner, runId) {
-    const options = {
-        hostname: 'api.github.com',
-        path: `/repos/${owner}/${repo}/actions/runs/${runId}/jobs`,
-        method: 'GET',
-        headers: {
-            Authorization: `Bearer ${token}`,
-            'User-Agent': 'tf-report-action',
-            Accept: 'application/vnd.github+json'
-        }
-    };
-    try {
-        const response = await httpsRequest(options);
-        const result = JSON.parse(response);
-        const jobs = result.jobs || [];
-        // Find the job that matches the current job name
-        const currentJobName = process.env.GITHUB_JOB || '';
-        const currentJob = jobs.find((job) => job.name === currentJobName &&
-            (job.status === 'in_progress' || job.status === 'completed'));
-        if (currentJob && currentJob.id) {
-            return String(currentJob.id);
-        }
-        return null;
-    }
-    catch (error) {
-        // If we can't get the job ID, return null and fall back to run attempt URL
-        console.error(`Failed to get job ID: ${error.message}`);
-        return null;
-    }
-}
 
 // Month names for timestamp formatting
 const MONTH_NAMES = [
@@ -443,41 +408,35 @@ function setFailed(message) {
     process.exit(1);
 }
 /**
- * Get the GitHub job logs URL
- * @param jobId Optional job ID for more specific URL
+ * Get the GitHub workflow run logs URL
  */
-function getJobLogsUrl(jobId) {
+function getJobLogsUrl() {
     const repo = process.env.GITHUB_REPOSITORY || '';
     const runId = process.env.GITHUB_RUN_ID || '';
     if (repo && runId) {
-        if (jobId) {
-            return `https://github.com/${repo}/actions/runs/${runId}/job/${jobId}`;
-        }
         const runAttempt = process.env.GITHUB_RUN_ATTEMPT || '1';
         return `https://github.com/${repo}/actions/runs/${runId}/attempts/${runAttempt}`;
     }
     return '';
 }
 /**
- * Format a date in a human-friendly format in UTC
- * Example: "January 22, 2026 at 7:05 PM UTC"
+ * Format a date in a human-friendly format in UTC with 24-hour time
+ * Example: "January 22, 2026 at 19:05 UTC"
  */
 function formatTimestamp(date) {
     const month = MONTH_NAMES[date.getUTCMonth()];
     const day = date.getUTCDate();
     const year = date.getUTCFullYear();
-    let hours = date.getUTCHours();
+    const hours = date.getUTCHours();
     const minutes = date.getUTCMinutes();
-    const ampm = hours >= 12 ? 'PM' : 'AM';
-    hours = hours % 12;
-    hours = hours ? hours : 12; // 0 should be 12
+    const hoursStr = hours < 10 ? `0${hours}` : `${hours}`;
     const minutesStr = minutes < 10 ? `0${minutes}` : `${minutes}`;
-    return `${month} ${day}, ${year} at ${hours}:${minutesStr} ${ampm} UTC`;
+    return `${month} ${day}, ${year} at ${hoursStr}:${minutesStr} UTC`;
 }
-function truncateOutput(text, maxLength, includeLogLink = false, jobId) {
+function truncateOutput(text, maxLength, includeLogLink = false) {
     if (text.length <= maxLength)
         return text;
-    const logLink = includeLogLink ? getJobLogsUrl(jobId) : '';
+    const logLink = includeLogLink ? getJobLogsUrl() : '';
     const truncationMessage = logLink
         ? `\n\n... [output truncated - [view full logs](${logLink})] ...\n\n`
         : '\n\n... [output truncated] ...\n\n';
@@ -546,7 +505,7 @@ function analyzeSteps(steps, targetStep) {
         targetStepResult
     };
 }
-function generateCommentBody(workspace, analysis, includeLogLink = false, jobId, timestamp) {
+function generateCommentBody(workspace, analysis, includeLogLink = false, timestamp) {
     const { success, failedSteps, totalSteps, successfulSteps, skippedSteps, targetStepResult } = analysis;
     const marker = `<!-- tf-report-action:"${workspace}" -->`;
     const title = generateTitle(workspace, analysis);
@@ -571,7 +530,7 @@ function generateCommentBody(workspace, analysis, includeLogLink = false, jobId,
             // Success case - show stdout/stderr if available
             const stdout = targetStepResult.stdout;
             const stderr = targetStepResult.stderr;
-            const { formattedContent } = formatOutput(stdout, stderr, jobId);
+            const { formattedContent } = formatOutput(stdout, stderr);
             if (!formattedContent) {
                 comment += `> [!NOTE]\n> Completed successfully with no output.\n\n`;
             }
@@ -588,7 +547,7 @@ function generateCommentBody(workspace, analysis, includeLogLink = false, jobId,
             comment += '\n';
             const stdout = targetStepResult.stdout;
             const stderr = targetStepResult.stderr;
-            const { formattedContent } = formatOutput(stdout, stderr, jobId);
+            const { formattedContent } = formatOutput(stdout, stderr);
             if (!formattedContent) {
                 comment += `> [!NOTE]\n> Failed with no output.\n\n`;
             }
@@ -631,7 +590,7 @@ function generateCommentBody(workspace, analysis, includeLogLink = false, jobId,
                     comment += `**Exit Code:** ${step.exitCode}\n`;
                 }
                 comment += '\n';
-                const { formattedContent } = formatOutput(step.stdout, step.stderr, jobId);
+                const { formattedContent } = formatOutput(step.stdout, step.stderr);
                 if (!formattedContent) {
                     comment += `> [!NOTE]\n> Failed with no output.\n\n`;
                 }
@@ -643,7 +602,7 @@ function generateCommentBody(workspace, analysis, includeLogLink = false, jobId,
     }
     // Add footer for status issues (non-PR context)
     if (includeLogLink) {
-        const logUrl = getJobLogsUrl(jobId);
+        const logUrl = getJobLogsUrl();
         const formattedTime = timestamp ? formatTimestamp(timestamp) : '';
         comment += `\n---\n\n`;
         if (logUrl) {
@@ -705,7 +664,7 @@ function generateStatusIssueTitle(workspace) {
 /**
  * Format output, detecting and handling JSON Lines format
  */
-function formatOutput(stdout, stderr, jobId) {
+function formatOutput(stdout, stderr) {
     const hasStdout = stdout && stdout.trim().length > 0;
     const hasStderr = stderr && stderr.trim().length > 0;
     // Check if stdout is JSON Lines format
@@ -722,11 +681,11 @@ function formatOutput(stdout, stderr, jobId) {
         return { formattedContent: '', isJsonLines: false };
     }
     if (hasStdout && stdout) {
-        const truncated = truncateOutput(stdout, MAX_OUTPUT_PER_STEP, true, jobId);
+        const truncated = truncateOutput(stdout, MAX_OUTPUT_PER_STEP, true);
         content += `<details>\n<summary>📄 Output</summary>\n\n\`\`\`\n${truncated}\n\`\`\`\n</details>\n\n`;
     }
     if (hasStderr && stderr) {
-        const truncated = truncateOutput(stderr, MAX_OUTPUT_PER_STEP, true, jobId);
+        const truncated = truncateOutput(stderr, MAX_OUTPUT_PER_STEP, true);
         content += `<details>\n<summary>⚠️ Errors</summary>\n\n\`\`\`\n${truncated}\n\`\`\`\n</details>\n\n`;
     }
     return { formattedContent: content, isJsonLines: false };
@@ -813,21 +772,8 @@ async function run() {
         else {
             // Non-PR context: use status issue (include log link and timestamp)
             info('Not in PR context - using status issue');
-            // Try to get the job ID for more specific log URLs
-            const runId = process.env.GITHUB_RUN_ID || '';
-            let jobId;
-            if (runId) {
-                info('Attempting to fetch job ID...');
-                jobId = (await getCurrentJobId(token, repo, owner, runId)) || undefined;
-                if (jobId) {
-                    info(`Job ID found: ${jobId}`);
-                }
-                else {
-                    info('Job ID not found, using run attempt URL');
-                }
-            }
             const timestamp = new Date();
-            const statusIssueBody = generateCommentBody(workspace, analysis, true, jobId, timestamp);
+            const statusIssueBody = generateCommentBody(workspace, analysis, true, timestamp);
             const statusIssueTitle = generateStatusIssueTitle(workspace);
             info(`Status issue title: "${statusIssueTitle}"`);
             info(`Status issue body length: ${statusIssueBody.length} characters`);

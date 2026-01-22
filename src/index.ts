@@ -6,8 +6,7 @@ import {
   postComment,
   searchIssues,
   createIssue,
-  updateIssue,
-  getCurrentJobId
+  updateIssue
 } from './github.js'
 
 // Re-export jsonlines functions for use by scripts and tests
@@ -98,17 +97,13 @@ export function setFailed(message: string): void {
 }
 
 /**
- * Get the GitHub job logs URL
- * @param jobId Optional job ID for more specific URL
+ * Get the GitHub workflow run logs URL
  */
-export function getJobLogsUrl(jobId?: string): string {
+export function getJobLogsUrl(): string {
   const repo = process.env.GITHUB_REPOSITORY || ''
   const runId = process.env.GITHUB_RUN_ID || ''
 
   if (repo && runId) {
-    if (jobId) {
-      return `https://github.com/${repo}/actions/runs/${runId}/job/${jobId}`
-    }
     const runAttempt = process.env.GITHUB_RUN_ATTEMPT || '1'
     return `https://github.com/${repo}/actions/runs/${runId}/attempts/${runAttempt}`
   }
@@ -116,34 +111,31 @@ export function getJobLogsUrl(jobId?: string): string {
 }
 
 /**
- * Format a date in a human-friendly format in UTC
- * Example: "January 22, 2026 at 7:05 PM UTC"
+ * Format a date in a human-friendly format in UTC with 24-hour time
+ * Example: "January 22, 2026 at 19:05 UTC"
  */
 export function formatTimestamp(date: Date): string {
   const month = MONTH_NAMES[date.getUTCMonth()]
   const day = date.getUTCDate()
   const year = date.getUTCFullYear()
 
-  let hours = date.getUTCHours()
+  const hours = date.getUTCHours()
   const minutes = date.getUTCMinutes()
-  const ampm = hours >= 12 ? 'PM' : 'AM'
-  hours = hours % 12
-  hours = hours ? hours : 12 // 0 should be 12
 
+  const hoursStr = hours < 10 ? `0${hours}` : `${hours}`
   const minutesStr = minutes < 10 ? `0${minutes}` : `${minutes}`
 
-  return `${month} ${day}, ${year} at ${hours}:${minutesStr} ${ampm} UTC`
+  return `${month} ${day}, ${year} at ${hoursStr}:${minutesStr} UTC`
 }
 
 export function truncateOutput(
   text: string,
   maxLength: number,
-  includeLogLink = false,
-  jobId?: string
+  includeLogLink = false
 ): string {
   if (text.length <= maxLength) return text
 
-  const logLink = includeLogLink ? getJobLogsUrl(jobId) : ''
+  const logLink = includeLogLink ? getJobLogsUrl() : ''
   const truncationMessage = logLink
     ? `\n\n... [output truncated - [view full logs](${logLink})] ...\n\n`
     : '\n\n... [output truncated] ...\n\n'
@@ -228,7 +220,6 @@ export function generateCommentBody(
   workspace: string,
   analysis: AnalysisResult,
   includeLogLink = false,
-  jobId?: string,
   timestamp?: Date
 ): string {
   const {
@@ -262,7 +253,7 @@ export function generateCommentBody(
       // Success case - show stdout/stderr if available
       const stdout = targetStepResult.stdout
       const stderr = targetStepResult.stderr
-      const { formattedContent } = formatOutput(stdout, stderr, jobId)
+      const { formattedContent } = formatOutput(stdout, stderr)
 
       if (!formattedContent) {
         comment += `> [!NOTE]\n> Completed successfully with no output.\n\n`
@@ -281,7 +272,7 @@ export function generateCommentBody(
 
       const stdout = targetStepResult.stdout
       const stderr = targetStepResult.stderr
-      const { formattedContent } = formatOutput(stdout, stderr, jobId)
+      const { formattedContent } = formatOutput(stdout, stderr)
 
       if (!formattedContent) {
         comment += `> [!NOTE]\n> Failed with no output.\n\n`
@@ -325,11 +316,7 @@ export function generateCommentBody(
 
         comment += '\n'
 
-        const { formattedContent } = formatOutput(
-          step.stdout,
-          step.stderr,
-          jobId
-        )
+        const { formattedContent } = formatOutput(step.stdout, step.stderr)
 
         if (!formattedContent) {
           comment += `> [!NOTE]\n> Failed with no output.\n\n`
@@ -342,7 +329,7 @@ export function generateCommentBody(
 
   // Add footer for status issues (non-PR context)
   if (includeLogLink) {
-    const logUrl = getJobLogsUrl(jobId)
+    const logUrl = getJobLogsUrl()
     const formattedTime = timestamp ? formatTimestamp(timestamp) : ''
 
     comment += `\n---\n\n`
@@ -420,8 +407,7 @@ export function generateStatusIssueTitle(workspace: string): string {
  */
 function formatOutput(
   stdout: string | undefined,
-  stderr: string | undefined,
-  jobId?: string
+  stderr: string | undefined
 ): { formattedContent: string; isJsonLines: boolean } {
   const hasStdout = stdout && stdout.trim().length > 0
   const hasStderr = stderr && stderr.trim().length > 0
@@ -444,12 +430,12 @@ function formatOutput(
   }
 
   if (hasStdout && stdout) {
-    const truncated = truncateOutput(stdout, MAX_OUTPUT_PER_STEP, true, jobId)
+    const truncated = truncateOutput(stdout, MAX_OUTPUT_PER_STEP, true)
     content += `<details>\n<summary>📄 Output</summary>\n\n\`\`\`\n${truncated}\n\`\`\`\n</details>\n\n`
   }
 
   if (hasStderr && stderr) {
-    const truncated = truncateOutput(stderr, MAX_OUTPUT_PER_STEP, true, jobId)
+    const truncated = truncateOutput(stderr, MAX_OUTPUT_PER_STEP, true)
     content += `<details>\n<summary>⚠️ Errors</summary>\n\n\`\`\`\n${truncated}\n\`\`\`\n</details>\n\n`
   }
 
@@ -577,25 +563,11 @@ async function run(): Promise<void> {
       // Non-PR context: use status issue (include log link and timestamp)
       info('Not in PR context - using status issue')
 
-      // Try to get the job ID for more specific log URLs
-      const runId = process.env.GITHUB_RUN_ID || ''
-      let jobId: string | undefined
-      if (runId) {
-        info('Attempting to fetch job ID...')
-        jobId = (await getCurrentJobId(token, repo, owner, runId)) || undefined
-        if (jobId) {
-          info(`Job ID found: ${jobId}`)
-        } else {
-          info('Job ID not found, using run attempt URL')
-        }
-      }
-
       const timestamp = new Date()
       const statusIssueBody = generateCommentBody(
         workspace,
         analysis,
         true,
-        jobId,
         timestamp
       )
       const statusIssueTitle = generateStatusIssueTitle(workspace)
