@@ -775,6 +775,30 @@ describe('generateTitle', () => {
         isJsonLines: true,
         operationType: 'plan' as const,
         hasChanges: true,
+        hasErrors: false,
+        changeSummaryMessage: 'Plan: 3 to add, 0 to change, 0 to destroy.'
+      }
+    }
+
+    const title = generateTitle('production', analysis)
+
+    expect(title).toBe(
+      '✅ `production` `plan`: 3 to add, 0 to change, 0 to destroy'
+    )
+  })
+
+  test('plan with changes without change summary shows Succeeded', () => {
+    const analysis = {
+      success: true,
+      failedSteps: [],
+      totalSteps: 2,
+      targetStepResult: {
+        name: 'plan',
+        found: true,
+        conclusion: 'success',
+        isJsonLines: true,
+        operationType: 'plan' as const,
+        hasChanges: true,
         hasErrors: false
       }
     }
@@ -817,13 +841,42 @@ describe('generateTitle', () => {
         isJsonLines: true,
         operationType: 'apply' as const,
         hasChanges: false,
-        hasErrors: false
+        hasErrors: false,
+        changeSummaryMessage:
+          'Apply complete! Resources: 0 added, 0 changed, 0 destroyed.'
       }
     }
 
     const title = generateTitle('production', analysis)
 
-    expect(title).toBe('✅ `production` `apply` Succeeded')
+    expect(title).toBe(
+      '✅ `production` `apply`: 0 added, 0 changed, 0 destroyed'
+    )
+  })
+
+  test('apply with changes shows change summary', () => {
+    const analysis = {
+      success: true,
+      failedSteps: [],
+      totalSteps: 2,
+      targetStepResult: {
+        name: 'apply',
+        found: true,
+        conclusion: 'success',
+        isJsonLines: true,
+        operationType: 'apply' as const,
+        hasChanges: true,
+        hasErrors: false,
+        changeSummaryMessage:
+          'Apply complete! Resources: 3 added, 0 changed, 0 destroyed.'
+      }
+    }
+
+    const title = generateTitle('production', analysis)
+
+    expect(title).toBe(
+      '✅ `production` `apply`: 3 added, 0 changed, 0 destroyed'
+    )
   })
 })
 

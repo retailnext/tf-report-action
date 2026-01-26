@@ -68,6 +68,7 @@ interface AnalysisResult {
     operationType?: 'plan' | 'apply' | 'destroy' | 'unknown'
     hasChanges?: boolean
     hasErrors?: boolean
+    changeSummaryMessage?: string
   }
 }
 
@@ -181,6 +182,7 @@ export function analyzeSteps(
       let operationType: 'plan' | 'apply' | 'destroy' | 'unknown' = 'unknown'
       let hasChangesValue = false
       let hasErrorsValue = false
+      let changeSummaryMsg: string | undefined
 
       if (stdout && isJsonLines(stdout)) {
         isJsonLinesOutput = true
@@ -189,6 +191,7 @@ export function analyzeSteps(
 
         if (parsed.changeSummary) {
           operationType = parsed.changeSummary.changes.operation
+          changeSummaryMsg = parsed.changeSummary['@message']
           const {
             add,
             change,
@@ -210,7 +213,8 @@ export function analyzeSteps(
         isJsonLines: isJsonLinesOutput,
         operationType,
         hasChanges: hasChangesValue,
-        hasErrors: hasErrorsValue
+        hasErrors: hasErrorsValue,
+        changeSummaryMessage: changeSummaryMsg
       }
     }
 
@@ -429,6 +433,29 @@ export function generateTitle(
       statusIcon = '✅'
       statusText = 'No Changes'
       return `${statusIcon} \`${workspace}\` \`${targetStepResult.name}\` ${statusText}`
+    }
+
+    // For successful plan/apply with changes, use the change summary
+    if (
+      !showAsFailure &&
+      targetStepResult.isJsonLines &&
+      targetStepResult.changeSummaryMessage &&
+      (targetStepResult.operationType === 'plan' ||
+        targetStepResult.operationType === 'apply')
+    ) {
+      statusIcon = '✅'
+      // Strip the prefix from the change summary message
+      let summary = targetStepResult.changeSummaryMessage
+      if (summary.startsWith('Plan: ')) {
+        summary = summary.substring(6) // Remove "Plan: "
+      } else if (summary.startsWith('Apply complete! Resources: ')) {
+        summary = summary.substring(27) // Remove "Apply complete! Resources: "
+      }
+      // Remove trailing period if present
+      if (summary.endsWith('.')) {
+        summary = summary.slice(0, -1)
+      }
+      return `${statusIcon} \`${workspace}\` \`${targetStepResult.name}\`: ${summary}`
     }
 
     statusIcon = showAsFailure ? '❌' : '✅'

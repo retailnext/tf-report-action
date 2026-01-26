@@ -502,12 +502,14 @@ function analyzeSteps(steps, targetStep) {
             let operationType = 'unknown';
             let hasChangesValue = false;
             let hasErrorsValue = false;
+            let changeSummaryMsg;
             if (stdout && isJsonLines(stdout)) {
                 isJsonLinesOutput = true;
                 const parsed = parseJsonLines(stdout);
                 hasErrorsValue = parsed.hasErrors;
                 if (parsed.changeSummary) {
                     operationType = parsed.changeSummary.changes.operation;
+                    changeSummaryMsg = parsed.changeSummary['@message'];
                     const { add, change, remove, import: importCount } = parsed.changeSummary.changes;
                     hasChangesValue =
                         add > 0 || change > 0 || remove > 0 || importCount > 0;
@@ -523,7 +525,8 @@ function analyzeSteps(steps, targetStep) {
                 isJsonLines: isJsonLinesOutput,
                 operationType,
                 hasChanges: hasChangesValue,
-                hasErrors: hasErrorsValue
+                hasErrors: hasErrorsValue,
+                changeSummaryMessage: changeSummaryMsg
             };
         }
         // Count step outcomes
@@ -709,6 +712,27 @@ function generateTitle(workspace, analysis) {
             statusIcon = '✅';
             statusText = 'No Changes';
             return `${statusIcon} \`${workspace}\` \`${targetStepResult.name}\` ${statusText}`;
+        }
+        // For successful plan/apply with changes, use the change summary
+        if (!showAsFailure &&
+            targetStepResult.isJsonLines &&
+            targetStepResult.changeSummaryMessage &&
+            (targetStepResult.operationType === 'plan' ||
+                targetStepResult.operationType === 'apply')) {
+            statusIcon = '✅';
+            // Strip the prefix from the change summary message
+            let summary = targetStepResult.changeSummaryMessage;
+            if (summary.startsWith('Plan: ')) {
+                summary = summary.substring(6); // Remove "Plan: "
+            }
+            else if (summary.startsWith('Apply complete! Resources: ')) {
+                summary = summary.substring(27); // Remove "Apply complete! Resources: "
+            }
+            // Remove trailing period if present
+            if (summary.endsWith('.')) {
+                summary = summary.slice(0, -1);
+            }
+            return `${statusIcon} \`${workspace}\` \`${targetStepResult.name}\`: ${summary}`;
         }
         statusIcon = showAsFailure ? '❌' : '✅';
         statusText = showAsFailure ? 'Failed' : 'Succeeded';
