@@ -55,6 +55,7 @@ function parseJsonLines(text) {
     const messages = [];
     const diagnostics = [];
     const plannedChanges = [];
+    const applyComplete = [];
     const resourceDrifts = [];
     let changeSummary;
     let outputs;
@@ -73,6 +74,9 @@ function parseJsonLines(text) {
                     break;
                 case 'planned_change':
                     plannedChanges.push(parsed);
+                    break;
+                case 'apply_complete':
+                    applyComplete.push(parsed);
                     break;
                 case 'change_summary':
                     changeSummary = parsed;
@@ -93,6 +97,7 @@ function parseJsonLines(text) {
         messages,
         diagnostics,
         plannedChanges,
+        applyComplete,
         changeSummary,
         resourceDrifts,
         outputs,
@@ -123,6 +128,22 @@ function getActionEmoji(action) {
     }
 }
 /**
+ * Determine the operation type from parsed JSON Lines
+ */
+function getOperationType(parsed) {
+    if (parsed.changeSummary) {
+        return parsed.changeSummary.changes.operation;
+    }
+    return 'unknown';
+}
+/**
+ * Check if a change summary has any changes
+ */
+function hasChanges(changeSummary) {
+    const { add, change, remove, import: importCount } = changeSummary.changes;
+    return add > 0 || change > 0 || remove > 0 || importCount > 0;
+}
+/**
  * Format a planned change for display
  */
 function formatPlannedChange(change) {
@@ -130,6 +151,15 @@ function formatPlannedChange(change) {
     const resource = change.change.resource;
     const addr = resource.addr || `${resource.resource_type}.${resource.resource_name}`;
     return `${emoji} **${addr}** (${change.change.action})`;
+}
+/**
+ * Format an apply complete message for display
+ */
+function formatApplyComplete(message) {
+    const emoji = getActionEmoji(message.hook.action);
+    const resource = message.hook.resource;
+    const addr = resource.addr || `${resource.resource_type}.${resource.resource_name}`;
+    return `${emoji} **${addr}** (${message.hook.action})`;
 }
 /**
  * Format a diagnostic message for display
@@ -153,57 +183,62 @@ function formatDiagnostic(diag) {
     return result;
 }
 /**
- * Format change summary for display
- */
-function formatChangeSummary(summary) {
-    const { add, change, remove } = summary.changes;
-    const operation = summary.changes.operation.charAt(0).toUpperCase() +
-        summary.changes.operation.slice(1);
-    const parts = [];
-    if (add > 0)
-        parts.push(`**${add}** to add :heavy_plus_sign:`);
-    if (change > 0)
-        parts.push(`**${change}** to change 🔄`);
-    if (remove > 0)
-        parts.push(`**${remove}** to remove :heavy_minus_sign:`);
-    if (parts.length === 0) {
-        return `**${operation}:** No changes.`;
-    }
-    return `**${operation}:** ${parts.join(', ')}`;
-}
-/**
  * Format parsed JSON Lines into a markdown comment
  */
 function formatJsonLines(parsed) {
     let result = '';
-    // Show change summary first (outside of any collapsing)
+    // Determine operation type
+    const operation = getOperationType(parsed);
+    const hasAnyChanges = parsed.changeSummary
+        ? hasChanges(parsed.changeSummary)
+        : parsed.plannedChanges.length > 0 || parsed.applyComplete.length > 0;
+    // Show change summary first (prominently, outside of collapsing)
     if (parsed.changeSummary) {
-        result += formatChangeSummary(parsed.changeSummary) + '\n\n';
+        result += `${parsed.changeSummary['@message']}\n\n`;
     }
-    // Show diagnostics (errors and warnings)
+    // Show diagnostics (errors and warnings) in separate collapsible sections
     if (parsed.diagnostics.length > 0) {
         const errors = parsed.diagnostics.filter((d) => d.diagnostic.severity === 'error');
         const warnings = parsed.diagnostics.filter((d) => d.diagnostic.severity === 'warning');
         if (errors.length > 0) {
-            result += '### ❌ Errors\n\n';
+            result += '<details>\n<summary>❌ Errors</summary>\n\n';
             for (const error of errors) {
                 result += formatDiagnostic(error) + '\n\n';
             }
+            result += '</details>\n\n';
         }
         if (warnings.length > 0) {
-            result += '### ⚠️ Warnings\n\n';
+            result += '<details>\n<summary>⚠️ Warnings</summary>\n\n';
             for (const warning of warnings) {
                 result += formatDiagnostic(warning) + '\n\n';
             }
+            result += '</details>\n\n';
         }
     }
-    // Show planned changes in a collapsible section
-    if (parsed.plannedChanges.length > 0) {
-        result += '<details>\n<summary>📋 Planned Changes</summary>\n\n';
-        for (const change of parsed.plannedChanges) {
-            result += formatPlannedChange(change) + '\n';
+    // Show changes in a collapsible section only if there are changes
+    if (hasAnyChanges) {
+        if (operation === 'plan' && parsed.plannedChanges.length > 0) {
+            result += '<details>\n<summary>📋 Planned Changes</summary>\n\n';
+            for (const change of parsed.plannedChanges) {
+                result += formatPlannedChange(change) + '\n';
+            }
+            result += '\n</details>\n\n';
         }
-        result += '\n</details>\n\n';
+        else if (operation === 'apply' && parsed.applyComplete.length > 0) {
+            result += '<details>\n<summary>✅ Applied Changes</summary>\n\n';
+            for (const message of parsed.applyComplete) {
+                result += formatApplyComplete(message) + '\n';
+            }
+            result += '\n</details>\n\n';
+        }
+        else if (operation === 'unknown' && parsed.plannedChanges.length > 0) {
+            // Fallback for when there's no change_summary but there are planned_changes
+            result += '<details>\n<summary>📋 Planned Changes</summary>\n\n';
+            for (const change of parsed.plannedChanges) {
+                result += formatPlannedChange(change) + '\n';
+            }
+            result += '\n</details>\n\n';
+        }
     }
     // Show resource drifts if any
     if (parsed.resourceDrifts.length > 0) {
@@ -461,13 +496,37 @@ function analyzeSteps(steps, targetStep) {
         const outcome = stepData.outcome || stepData.conclusion || '';
         // Check if this is the target step
         if (targetStep && stepName === targetStep) {
+            const stdout = stepData.outputs?.stdout;
+            // Analyze JSON Lines output if present
+            let isJsonLinesOutput = false;
+            let operationType = 'unknown';
+            let hasChangesValue = false;
+            let hasErrorsValue = false;
+            let changeSummaryMsg;
+            if (stdout && isJsonLines(stdout)) {
+                isJsonLinesOutput = true;
+                const parsed = parseJsonLines(stdout);
+                hasErrorsValue = parsed.hasErrors;
+                if (parsed.changeSummary) {
+                    operationType = parsed.changeSummary.changes.operation;
+                    changeSummaryMsg = parsed.changeSummary['@message'];
+                    const { add, change, remove, import: importCount } = parsed.changeSummary.changes;
+                    hasChangesValue =
+                        add > 0 || change > 0 || remove > 0 || importCount > 0;
+                }
+            }
             targetStepResult = {
                 name: stepName,
                 found: true,
                 conclusion: outcome,
-                stdout: stepData.outputs?.stdout,
+                stdout,
                 stderr: stepData.outputs?.stderr,
-                exitCode: stepData.outputs?.exit_code
+                exitCode: stepData.outputs?.exit_code,
+                isJsonLines: isJsonLinesOutput,
+                operationType,
+                hasChanges: hasChangesValue,
+                hasErrors: hasErrorsValue,
+                changeSummaryMessage: changeSummaryMsg
             };
         }
         // Count step outcomes
@@ -644,6 +703,37 @@ function generateTitle(workspace, analysis) {
         // Target step mode
         // Show as failure if target step didn't run or overall workflow failed
         const showAsFailure = !targetStepResult.found || !success;
+        // Check for "No Changes" case for successful plan with no changes
+        if (!showAsFailure &&
+            targetStepResult.isJsonLines &&
+            targetStepResult.operationType === 'plan' &&
+            !targetStepResult.hasChanges &&
+            !targetStepResult.hasErrors) {
+            statusIcon = '✅';
+            statusText = 'No Changes';
+            return `${statusIcon} \`${workspace}\` \`${targetStepResult.name}\` ${statusText}`;
+        }
+        // For successful plan/apply with changes, use the change summary
+        if (!showAsFailure &&
+            targetStepResult.isJsonLines &&
+            targetStepResult.changeSummaryMessage &&
+            (targetStepResult.operationType === 'plan' ||
+                targetStepResult.operationType === 'apply')) {
+            statusIcon = '✅';
+            // Strip the prefix from the change summary message
+            let summary = targetStepResult.changeSummaryMessage;
+            if (summary.startsWith('Plan: ')) {
+                summary = summary.substring('Plan: '.length);
+            }
+            else if (summary.startsWith('Apply complete! Resources: ')) {
+                summary = summary.substring('Apply complete! Resources: '.length);
+            }
+            // Remove trailing period if present
+            if (summary.endsWith('.')) {
+                summary = summary.slice(0, -1);
+            }
+            return `${statusIcon} \`${workspace}\` \`${targetStepResult.name}\`: ${summary}`;
+        }
         statusIcon = showAsFailure ? '❌' : '✅';
         statusText = showAsFailure ? 'Failed' : 'Succeeded';
         return `${statusIcon} \`${workspace}\` \`${targetStepResult.name}\` ${statusText}`;

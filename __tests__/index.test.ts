@@ -553,8 +553,7 @@ describe('JSON Lines integration', () => {
     const comment = generateCommentBody('test-workspace', analysis)
 
     // Should contain formatted JSON Lines output
-    expect(comment).toContain('**Plan:**')
-    expect(comment).toContain('**1** to add :heavy_plus_sign:')
+    expect(comment).toContain('Plan: 1 to add, 0 to change, 0 to destroy.')
     expect(comment).toContain(
       ':heavy_plus_sign: **aws_instance.example** (create)'
     )
@@ -613,8 +612,9 @@ Plan: 1 to add, 0 to change, 0 to destroy.
     const analysis = analyzeSteps(steps, 'plan')
     const comment = generateCommentBody('test-workspace', analysis)
 
-    // Should contain error formatting
-    expect(comment).toContain('### ❌ Errors')
+    // Should contain error formatting in collapsible section
+    expect(comment).toContain('<details>')
+    expect(comment).toContain('❌ Errors')
     expect(comment).toContain('**Invalid resource type**')
 
     // Should NOT contain raw JSON
@@ -638,7 +638,7 @@ Plan: 1 to add, 0 to change, 0 to destroy.
     const comment = generateCommentBody('test-workspace', analysis)
 
     // Change summary should always be present
-    const summaryIndex = comment.indexOf('**Plan:**')
+    const summaryIndex = comment.indexOf('Plan:')
     expect(summaryIndex).toBeGreaterThan(-1)
 
     // If details section exists, verify summary comes first
@@ -740,6 +740,143 @@ describe('generateTitle', () => {
     const title = generateTitle('workspace', analysis)
 
     expect(title).toBe('❌ `workspace` `plan` Failed')
+  })
+
+  test('plan with no changes shows No Changes', () => {
+    const analysis = {
+      success: true,
+      failedSteps: [],
+      totalSteps: 2,
+      targetStepResult: {
+        name: 'plan',
+        found: true,
+        conclusion: 'success',
+        isJsonLines: true,
+        operationType: 'plan' as const,
+        hasChanges: false,
+        hasErrors: false
+      }
+    }
+
+    const title = generateTitle('production', analysis)
+
+    expect(title).toBe('✅ `production` `plan` No Changes')
+  })
+
+  test('plan with changes shows change summary', () => {
+    const analysis = {
+      success: true,
+      failedSteps: [],
+      totalSteps: 2,
+      targetStepResult: {
+        name: 'plan',
+        found: true,
+        conclusion: 'success',
+        isJsonLines: true,
+        operationType: 'plan' as const,
+        hasChanges: true,
+        hasErrors: false,
+        changeSummaryMessage: 'Plan: 3 to add, 0 to change, 0 to destroy.'
+      }
+    }
+
+    const title = generateTitle('production', analysis)
+
+    expect(title).toBe(
+      '✅ `production` `plan`: 3 to add, 0 to change, 0 to destroy'
+    )
+  })
+
+  test('plan with changes without change summary shows Succeeded', () => {
+    const analysis = {
+      success: true,
+      failedSteps: [],
+      totalSteps: 2,
+      targetStepResult: {
+        name: 'plan',
+        found: true,
+        conclusion: 'success',
+        isJsonLines: true,
+        operationType: 'plan' as const,
+        hasChanges: true,
+        hasErrors: false
+      }
+    }
+
+    const title = generateTitle('production', analysis)
+
+    expect(title).toBe('✅ `production` `plan` Succeeded')
+  })
+
+  test('plan with no changes but errors shows Failed', () => {
+    const analysis = {
+      success: false,
+      failedSteps: [{ name: 'plan', conclusion: 'failure' }],
+      totalSteps: 2,
+      targetStepResult: {
+        name: 'plan',
+        found: true,
+        conclusion: 'failure',
+        isJsonLines: true,
+        operationType: 'plan' as const,
+        hasChanges: false,
+        hasErrors: true
+      }
+    }
+
+    const title = generateTitle('production', analysis)
+
+    expect(title).toBe('❌ `production` `plan` Failed')
+  })
+
+  test('apply with no changes shows change summary', () => {
+    const analysis = {
+      success: true,
+      failedSteps: [],
+      totalSteps: 2,
+      targetStepResult: {
+        name: 'apply',
+        found: true,
+        conclusion: 'success',
+        isJsonLines: true,
+        operationType: 'apply' as const,
+        hasChanges: false,
+        hasErrors: false,
+        changeSummaryMessage:
+          'Apply complete! Resources: 0 added, 0 changed, 0 destroyed.'
+      }
+    }
+
+    const title = generateTitle('production', analysis)
+
+    expect(title).toBe(
+      '✅ `production` `apply`: 0 added, 0 changed, 0 destroyed'
+    )
+  })
+
+  test('apply with changes shows change summary', () => {
+    const analysis = {
+      success: true,
+      failedSteps: [],
+      totalSteps: 2,
+      targetStepResult: {
+        name: 'apply',
+        found: true,
+        conclusion: 'success',
+        isJsonLines: true,
+        operationType: 'apply' as const,
+        hasChanges: true,
+        hasErrors: false,
+        changeSummaryMessage:
+          'Apply complete! Resources: 3 added, 0 changed, 0 destroyed.'
+      }
+    }
+
+    const title = generateTitle('production', analysis)
+
+    expect(title).toBe(
+      '✅ `production` `apply`: 3 added, 0 changed, 0 destroyed'
+    )
   })
 })
 

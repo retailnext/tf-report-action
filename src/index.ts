@@ -64,6 +64,11 @@ interface AnalysisResult {
     stdout?: string
     stderr?: string
     exitCode?: string
+    isJsonLines?: boolean
+    operationType?: 'plan' | 'apply' | 'destroy' | 'unknown'
+    hasChanges?: boolean
+    hasErrors?: boolean
+    changeSummaryMessage?: string
   }
 }
 
@@ -170,13 +175,46 @@ export function analyzeSteps(
 
     // Check if this is the target step
     if (targetStep && stepName === targetStep) {
+      const stdout = stepData.outputs?.stdout as string | undefined
+
+      // Analyze JSON Lines output if present
+      let isJsonLinesOutput = false
+      let operationType: 'plan' | 'apply' | 'destroy' | 'unknown' = 'unknown'
+      let hasChangesValue = false
+      let hasErrorsValue = false
+      let changeSummaryMsg: string | undefined
+
+      if (stdout && isJsonLines(stdout)) {
+        isJsonLinesOutput = true
+        const parsed = parseJsonLines(stdout)
+        hasErrorsValue = parsed.hasErrors
+
+        if (parsed.changeSummary) {
+          operationType = parsed.changeSummary.changes.operation
+          changeSummaryMsg = parsed.changeSummary['@message']
+          const {
+            add,
+            change,
+            remove,
+            import: importCount
+          } = parsed.changeSummary.changes
+          hasChangesValue =
+            add > 0 || change > 0 || remove > 0 || importCount > 0
+        }
+      }
+
       targetStepResult = {
         name: stepName,
         found: true,
         conclusion: outcome,
-        stdout: stepData.outputs?.stdout as string | undefined,
+        stdout,
         stderr: stepData.outputs?.stderr as string | undefined,
-        exitCode: stepData.outputs?.exit_code as string | undefined
+        exitCode: stepData.outputs?.exit_code as string | undefined,
+        isJsonLines: isJsonLinesOutput,
+        operationType,
+        hasChanges: hasChangesValue,
+        hasErrors: hasErrorsValue,
+        changeSummaryMessage: changeSummaryMsg
       }
     }
 
@@ -383,6 +421,42 @@ export function generateTitle(
     // Target step mode
     // Show as failure if target step didn't run or overall workflow failed
     const showAsFailure = !targetStepResult.found || !success
+
+    // Check for "No Changes" case for successful plan with no changes
+    if (
+      !showAsFailure &&
+      targetStepResult.isJsonLines &&
+      targetStepResult.operationType === 'plan' &&
+      !targetStepResult.hasChanges &&
+      !targetStepResult.hasErrors
+    ) {
+      statusIcon = '✅'
+      statusText = 'No Changes'
+      return `${statusIcon} \`${workspace}\` \`${targetStepResult.name}\` ${statusText}`
+    }
+
+    // For successful plan/apply with changes, use the change summary
+    if (
+      !showAsFailure &&
+      targetStepResult.isJsonLines &&
+      targetStepResult.changeSummaryMessage &&
+      (targetStepResult.operationType === 'plan' ||
+        targetStepResult.operationType === 'apply')
+    ) {
+      statusIcon = '✅'
+      // Strip the prefix from the change summary message
+      let summary = targetStepResult.changeSummaryMessage
+      if (summary.startsWith('Plan: ')) {
+        summary = summary.substring('Plan: '.length)
+      } else if (summary.startsWith('Apply complete! Resources: ')) {
+        summary = summary.substring('Apply complete! Resources: '.length)
+      }
+      // Remove trailing period if present
+      if (summary.endsWith('.')) {
+        summary = summary.slice(0, -1)
+      }
+      return `${statusIcon} \`${workspace}\` \`${targetStepResult.name}\`: ${summary}`
+    }
 
     statusIcon = showAsFailure ? '❌' : '✅'
     statusText = showAsFailure ? 'Failed' : 'Succeeded'
