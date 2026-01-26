@@ -60,7 +60,6 @@ jobs:
         uses: retailnext/exec-action@main
         with:
           command: tofu plan -no-color
-        continue-on-error: true
 
       - name: Report Status
         if: always()
@@ -111,7 +110,6 @@ jobs:
         uses: retailnext/exec-action@main
         with:
           command: tofu plan -no-color
-        continue-on-error: true
 
       - name: Report Status
         if: always()
@@ -192,7 +190,6 @@ jobs:
         uses: retailnext/exec-action@main
         with:
           command: tofu plan -no-color
-        continue-on-error: true
 
       - name: Report Plan Status
         if: always()
@@ -237,7 +234,6 @@ jobs:
         uses: retailnext/exec-action@main
         with:
           command: tofu apply -auto-approve -no-color
-        continue-on-error: true
 
       - name: Report Apply Status
         if: always()
@@ -266,7 +262,6 @@ structured formatting of plan and apply operations.
   uses: retailnext/exec-action@main
   with:
     command: tofu plan -json
-  continue-on-error: true
 
 - name: Report Plan Status
   if: always()
@@ -335,8 +330,7 @@ jobs:
         uses: retailnext/exec-action@main
         with:
           command: tofu plan -no-color
-        working-directory: ./environments/dev
-        continue-on-error: true
+          working-directory: ./environments/dev
 
       - name: Report Dev Status
         if: always()
@@ -360,8 +354,7 @@ jobs:
         uses: retailnext/exec-action@main
         with:
           command: tofu plan -no-color
-        working-directory: ./environments/prod
-        continue-on-error: true
+          working-directory: ./environments/prod
 
       - name: Report Prod Status
         if: always()
