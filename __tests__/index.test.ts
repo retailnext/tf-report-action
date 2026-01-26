@@ -763,7 +763,7 @@ describe('generateTitle', () => {
     expect(title).toBe('✅ `production` `plan` No Changes')
   })
 
-  test('plan with changes shows Succeeded', () => {
+  test('plan with changes shows change summary', () => {
     const analysis = {
       success: true,
       failedSteps: [],
@@ -829,7 +829,7 @@ describe('generateTitle', () => {
     expect(title).toBe('❌ `production` `plan` Failed')
   })
 
-  test('apply with no changes shows Succeeded', () => {
+  test('apply with no changes shows change summary', () => {
     const analysis = {
       success: true,
       failedSteps: [],
