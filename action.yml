@@ -1,7 +1,7 @@
 name: 'OpenTofu Report Action'
 description:
   'Reports OpenTofu workflow execution status with step outputs as PR comments'
-author: 'eriksw'
+author: 'retailnext'
 inputs:
   steps:
     description: 'JSON string of workflow steps (e.g., toJSON(steps))'

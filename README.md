@@ -64,7 +64,7 @@ jobs:
 
       - name: Report Status
         if: always()
-        uses: eriksw/tf-report-action@v1
+        uses: retailnext/tf-report-action@main
         with:
           steps: ${{ toJSON(steps) }}
           workspace: 'production'
@@ -115,7 +115,7 @@ jobs:
 
       - name: Report Status
         if: always()
-        uses: eriksw/tf-report-action@v1
+        uses: retailnext/tf-report-action@main
         with:
           steps: ${{ toJSON(steps) }}
           workspace: 'production'
@@ -196,7 +196,7 @@ jobs:
 
       - name: Report Plan Status
         if: always()
-        uses: eriksw/tf-report-action@v1
+        uses: retailnext/tf-report-action@main
         with:
           steps: ${{ toJSON(steps) }}
           workspace: 'production'
@@ -241,7 +241,7 @@ jobs:
 
       - name: Report Apply Status
         if: always()
-        uses: eriksw/tf-report-action@v1
+        uses: retailnext/tf-report-action@main
         with:
           steps: ${{ toJSON(steps) }}
           target-step: 'apply'
@@ -270,7 +270,7 @@ structured formatting of plan and apply operations.
 
 - name: Report Plan Status
   if: always()
-  uses: eriksw/tf-report-action@v1
+  uses: retailnext/tf-report-action@main
   with:
     steps: ${{ toJSON(steps) }}
     target-step: 'plan'
@@ -340,7 +340,7 @@ jobs:
 
       - name: Report Dev Status
         if: always()
-        uses: eriksw/tf-report-action@v1
+        uses: retailnext/tf-report-action@main
         with:
           steps: ${{ toJSON(steps) }}
           workspace: 'dev'
@@ -365,7 +365,7 @@ jobs:
 
       - name: Report Prod Status
         if: always()
-        uses: eriksw/tf-report-action@v1
+        uses: retailnext/tf-report-action@main
         with:
           steps: ${{ toJSON(steps) }}
           workspace: 'production'
