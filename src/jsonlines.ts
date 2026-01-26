@@ -436,6 +436,7 @@ export interface ParsedJsonLines {
   messages: JsonLineMessage[]
   diagnostics: DiagnosticMessage[]
   plannedChanges: PlannedChangeMessage[]
+  applyComplete: ApplyCompleteMessage[]
   changeSummary?: ChangeSummaryMessage
   resourceDrifts: ResourceDriftMessage[]
   outputs?: OutputsMessage
@@ -491,6 +492,7 @@ export function parseJsonLines(text: string): ParsedJsonLines {
   const messages: JsonLineMessage[] = []
   const diagnostics: DiagnosticMessage[] = []
   const plannedChanges: PlannedChangeMessage[] = []
+  const applyComplete: ApplyCompleteMessage[] = []
   const resourceDrifts: ResourceDriftMessage[] = []
   let changeSummary: ChangeSummaryMessage | undefined
   let outputs: OutputsMessage | undefined
@@ -513,6 +515,9 @@ export function parseJsonLines(text: string): ParsedJsonLines {
         case 'planned_change':
           plannedChanges.push(parsed as PlannedChangeMessage)
           break
+        case 'apply_complete':
+          applyComplete.push(parsed as ApplyCompleteMessage)
+          break
         case 'change_summary':
           changeSummary = parsed as ChangeSummaryMessage
           break
@@ -532,6 +537,7 @@ export function parseJsonLines(text: string): ParsedJsonLines {
     messages,
     diagnostics,
     plannedChanges,
+    applyComplete,
     changeSummary,
     resourceDrifts,
     outputs,
@@ -573,6 +579,26 @@ function getActionEmoji(
 }
 
 /**
+ * Determine the operation type from parsed JSON Lines
+ */
+function getOperationType(
+  parsed: ParsedJsonLines
+): 'plan' | 'apply' | 'destroy' | 'unknown' {
+  if (parsed.changeSummary) {
+    return parsed.changeSummary.changes.operation
+  }
+  return 'unknown'
+}
+
+/**
+ * Check if a change summary has any changes
+ */
+function hasChanges(changeSummary: ChangeSummaryMessage): boolean {
+  const { add, change, remove, import: importCount } = changeSummary.changes
+  return add > 0 || change > 0 || remove > 0 || importCount > 0
+}
+
+/**
  * Format a planned change for display
  */
 function formatPlannedChange(change: PlannedChangeMessage): string {
@@ -582,6 +608,18 @@ function formatPlannedChange(change: PlannedChangeMessage): string {
     resource.addr || `${resource.resource_type}.${resource.resource_name}`
 
   return `${emoji} **${addr}** (${change.change.action})`
+}
+
+/**
+ * Format an apply complete message for display
+ */
+function formatApplyComplete(message: ApplyCompleteMessage): string {
+  const emoji = getActionEmoji(message.hook.action)
+  const resource = message.hook.resource
+  const addr =
+    resource.addr || `${resource.resource_type}.${resource.resource_name}`
+
+  return `${emoji} **${addr}** (${message.hook.action})`
 }
 
 /**
@@ -613,38 +651,23 @@ function formatDiagnostic(diag: DiagnosticMessage): string {
 }
 
 /**
- * Format change summary for display
- */
-function formatChangeSummary(summary: ChangeSummaryMessage): string {
-  const { add, change, remove } = summary.changes
-  const operation =
-    summary.changes.operation.charAt(0).toUpperCase() +
-    summary.changes.operation.slice(1)
-
-  const parts: string[] = []
-  if (add > 0) parts.push(`**${add}** to add :heavy_plus_sign:`)
-  if (change > 0) parts.push(`**${change}** to change 🔄`)
-  if (remove > 0) parts.push(`**${remove}** to remove :heavy_minus_sign:`)
-
-  if (parts.length === 0) {
-    return `**${operation}:** No changes.`
-  }
-
-  return `**${operation}:** ${parts.join(', ')}`
-}
-
-/**
  * Format parsed JSON Lines into a markdown comment
  */
 export function formatJsonLines(parsed: ParsedJsonLines): string {
   let result = ''
 
-  // Show change summary first (outside of any collapsing)
+  // Determine operation type
+  const operation = getOperationType(parsed)
+  const hasAnyChanges = parsed.changeSummary
+    ? hasChanges(parsed.changeSummary)
+    : parsed.plannedChanges.length > 0 || parsed.applyComplete.length > 0
+
+  // Show change summary first (prominently, outside of collapsing)
   if (parsed.changeSummary) {
-    result += formatChangeSummary(parsed.changeSummary) + '\n\n'
+    result += `${parsed.changeSummary['@message']}\n\n`
   }
 
-  // Show diagnostics (errors and warnings)
+  // Show diagnostics (errors and warnings) in separate collapsible sections
   if (parsed.diagnostics.length > 0) {
     const errors = parsed.diagnostics.filter(
       (d) => d.diagnostic.severity === 'error'
@@ -654,27 +677,44 @@ export function formatJsonLines(parsed: ParsedJsonLines): string {
     )
 
     if (errors.length > 0) {
-      result += '### ❌ Errors\n\n'
+      result += '<details>\n<summary>❌ Errors</summary>\n\n'
       for (const error of errors) {
         result += formatDiagnostic(error) + '\n\n'
       }
+      result += '</details>\n\n'
     }
 
     if (warnings.length > 0) {
-      result += '### ⚠️ Warnings\n\n'
+      result += '<details>\n<summary>⚠️ Warnings</summary>\n\n'
       for (const warning of warnings) {
         result += formatDiagnostic(warning) + '\n\n'
       }
+      result += '</details>\n\n'
     }
   }
 
-  // Show planned changes in a collapsible section
-  if (parsed.plannedChanges.length > 0) {
-    result += '<details>\n<summary>📋 Planned Changes</summary>\n\n'
-    for (const change of parsed.plannedChanges) {
-      result += formatPlannedChange(change) + '\n'
+  // Show changes in a collapsible section only if there are changes
+  if (hasAnyChanges) {
+    if (operation === 'plan' && parsed.plannedChanges.length > 0) {
+      result += '<details>\n<summary>📋 Planned Changes</summary>\n\n'
+      for (const change of parsed.plannedChanges) {
+        result += formatPlannedChange(change) + '\n'
+      }
+      result += '\n</details>\n\n'
+    } else if (operation === 'apply' && parsed.applyComplete.length > 0) {
+      result += '<details>\n<summary>✅ Applied Changes</summary>\n\n'
+      for (const message of parsed.applyComplete) {
+        result += formatApplyComplete(message) + '\n'
+      }
+      result += '\n</details>\n\n'
+    } else if (operation === 'unknown' && parsed.plannedChanges.length > 0) {
+      // Fallback for when there's no change_summary but there are planned_changes
+      result += '<details>\n<summary>📋 Planned Changes</summary>\n\n'
+      for (const change of parsed.plannedChanges) {
+        result += formatPlannedChange(change) + '\n'
+      }
+      result += '\n</details>\n\n'
     }
-    result += '\n</details>\n\n'
   }
 
   // Show resource drifts if any

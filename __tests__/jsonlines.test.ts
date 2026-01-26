@@ -153,10 +153,8 @@ describe('formatJsonLines', () => {
     const parsed = parseJsonLines(fixture)
     const formatted = formatJsonLines(parsed)
 
-    expect(formatted).toContain('**Plan:**')
-    expect(formatted).toContain('**1** to add :heavy_plus_sign:')
-    expect(formatted).toContain('**1** to change 🔄')
-    expect(formatted).toContain('**1** to remove :heavy_minus_sign:')
+    // Check for the @message from change_summary
+    expect(formatted).toContain('Plan: 1 to add, 1 to change, 1 to destroy.')
     expect(formatted).toContain('📋 Planned Changes')
     expect(formatted).toContain(
       ':heavy_plus_sign: **aws_instance.example** (create)'
@@ -172,7 +170,9 @@ describe('formatJsonLines', () => {
     const parsed = parseJsonLines(fixture)
     const formatted = formatJsonLines(parsed)
 
-    expect(formatted).toContain('### ❌ Errors')
+    // Errors should be in collapsible section
+    expect(formatted).toContain('<details>')
+    expect(formatted).toContain('❌ Errors')
     expect(formatted).toContain('**Invalid resource type**')
     expect(formatted).toContain('**Missing required argument**')
     expect(formatted).toContain('📄 `main.tf:10`')
@@ -183,9 +183,7 @@ describe('formatJsonLines', () => {
     const parsed = parseJsonLines(fixture)
     const formatted = formatJsonLines(parsed)
 
-    expect(formatted).toContain('**Plan:**')
-    expect(formatted).toContain('**1** to add :heavy_plus_sign:')
-    expect(formatted).toContain('**1** to remove :heavy_minus_sign:')
+    expect(formatted).toContain('Plan: 1 to add, 0 to change, 1 to destroy.')
     expect(formatted).toContain('± **aws_instance.web** (replace)')
   })
 
@@ -194,7 +192,11 @@ describe('formatJsonLines', () => {
     const parsed = parseJsonLines(fixture)
     const formatted = formatJsonLines(parsed)
 
-    expect(formatted).toContain('**Plan:** No changes.')
+    expect(formatted).toContain(
+      'No changes. Your infrastructure matches the configuration.'
+    )
+    // Should not have collapsible details when there are no changes
+    expect(formatted).not.toContain('<details>')
   })
 
   test('formats apply success', () => {
@@ -202,8 +204,14 @@ describe('formatJsonLines', () => {
     const parsed = parseJsonLines(fixture)
     const formatted = formatJsonLines(parsed)
 
-    expect(formatted).toContain('**Apply:**')
-    expect(formatted).toContain('**1** to add :heavy_plus_sign:')
+    expect(formatted).toContain(
+      'Apply complete! Resources: 1 added, 0 changed, 0 destroyed.'
+    )
+    // Should show applied changes in collapsible section
+    expect(formatted).toContain('✅ Applied Changes')
+    expect(formatted).toContain(
+      ':heavy_plus_sign: **aws_instance.example** (create)'
+    )
   })
 
   test('formats resource drift', () => {
@@ -221,7 +229,7 @@ describe('formatJsonLines', () => {
     const formatted = formatJsonLines(parsed)
 
     // Change summary should appear before any <details> tags
-    const summaryIndex = formatted.indexOf('**Plan:**')
+    const summaryIndex = formatted.indexOf('Plan:')
     const detailsIndex = formatted.indexOf('<details>')
 
     expect(summaryIndex).toBeGreaterThan(-1)
@@ -234,6 +242,33 @@ describe('formatJsonLines', () => {
     const formatted = formatJsonLines(parsed)
 
     expect(formatted).toBe('')
+  })
+})
+
+describe('apply_complete messages', () => {
+  test('parses apply_complete messages', () => {
+    const fixture = readFixture('apply-success.jsonl')
+    const parsed = parseJsonLines(fixture)
+
+    expect(parsed.applyComplete.length).toBe(1)
+    expect(parsed.applyComplete[0].hook.action).toBe('create')
+    expect(parsed.applyComplete[0].hook.resource.addr).toBe(
+      'aws_instance.example'
+    )
+  })
+
+  test('formats apply with apply_complete messages', () => {
+    const fixture = readFixture('apply-success.jsonl')
+    const parsed = parseJsonLines(fixture)
+    const formatted = formatJsonLines(parsed)
+
+    expect(formatted).toContain(
+      'Apply complete! Resources: 1 added, 0 changed, 0 destroyed.'
+    )
+    expect(formatted).toContain('✅ Applied Changes')
+    expect(formatted).toContain(
+      ':heavy_plus_sign: **aws_instance.example** (create)'
+    )
   })
 })
 

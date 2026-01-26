@@ -64,6 +64,10 @@ interface AnalysisResult {
     stdout?: string
     stderr?: string
     exitCode?: string
+    isJsonLines?: boolean
+    operationType?: 'plan' | 'apply' | 'destroy' | 'unknown'
+    hasChanges?: boolean
+    hasErrors?: boolean
   }
 }
 
@@ -170,13 +174,43 @@ export function analyzeSteps(
 
     // Check if this is the target step
     if (targetStep && stepName === targetStep) {
+      const stdout = stepData.outputs?.stdout as string | undefined
+
+      // Analyze JSON Lines output if present
+      let isJsonLinesOutput = false
+      let operationType: 'plan' | 'apply' | 'destroy' | 'unknown' = 'unknown'
+      let hasChangesValue = false
+      let hasErrorsValue = false
+
+      if (stdout && isJsonLines(stdout)) {
+        isJsonLinesOutput = true
+        const parsed = parseJsonLines(stdout)
+        hasErrorsValue = parsed.hasErrors
+
+        if (parsed.changeSummary) {
+          operationType = parsed.changeSummary.changes.operation
+          const {
+            add,
+            change,
+            remove,
+            import: importCount
+          } = parsed.changeSummary.changes
+          hasChangesValue =
+            add > 0 || change > 0 || remove > 0 || importCount > 0
+        }
+      }
+
       targetStepResult = {
         name: stepName,
         found: true,
         conclusion: outcome,
-        stdout: stepData.outputs?.stdout as string | undefined,
+        stdout,
         stderr: stepData.outputs?.stderr as string | undefined,
-        exitCode: stepData.outputs?.exit_code as string | undefined
+        exitCode: stepData.outputs?.exit_code as string | undefined,
+        isJsonLines: isJsonLinesOutput,
+        operationType,
+        hasChanges: hasChangesValue,
+        hasErrors: hasErrorsValue
       }
     }
 
@@ -383,6 +417,19 @@ export function generateTitle(
     // Target step mode
     // Show as failure if target step didn't run or overall workflow failed
     const showAsFailure = !targetStepResult.found || !success
+
+    // Check for "No Changes" case for successful plan with no changes
+    if (
+      !showAsFailure &&
+      targetStepResult.isJsonLines &&
+      targetStepResult.operationType === 'plan' &&
+      !targetStepResult.hasChanges &&
+      !targetStepResult.hasErrors
+    ) {
+      statusIcon = '✅'
+      statusText = 'No Changes'
+      return `${statusIcon} \`${workspace}\` \`${targetStepResult.name}\` ${statusText}`
+    }
 
     statusIcon = showAsFailure ? '❌' : '✅'
     statusText = showAsFailure ? 'Failed' : 'Succeeded'
