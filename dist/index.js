@@ -723,10 +723,10 @@ function generateTitle(workspace, analysis) {
             // Strip the prefix from the change summary message
             let summary = targetStepResult.changeSummaryMessage;
             if (summary.startsWith('Plan: ')) {
-                summary = summary.substring(6); // Remove "Plan: "
+                summary = summary.substring('Plan: '.length);
             }
             else if (summary.startsWith('Apply complete! Resources: ')) {
-                summary = summary.substring(27); // Remove "Apply complete! Resources: "
+                summary = summary.substring('Apply complete! Resources: '.length);
             }
             // Remove trailing period if present
             if (summary.endsWith('.')) {
