@@ -973,6 +973,83 @@ describe('generateCommentBody with log link', () => {
       'https://github.com/owner/repo/actions/runs/12345/attempts/1'
     )
   })
+
+  test('includes log link when target step has changes (plan)', () => {
+    const workspace = 'production'
+    const analysis = {
+      success: true,
+      failedSteps: [],
+      totalSteps: 3,
+      successfulSteps: 3,
+      skippedSteps: 0,
+      targetStepResult: {
+        name: 'plan',
+        found: true,
+        conclusion: 'success',
+        hasChanges: true,
+        isJsonLines: true,
+        operationType: 'plan' as const
+      }
+    }
+
+    const comment = generateCommentBody(workspace, analysis, true)
+
+    expect(comment).toContain('[View logs](')
+    expect(comment).toContain(
+      'https://github.com/owner/repo/actions/runs/12345/attempts/1'
+    )
+  })
+
+  test('includes log link when target step is apply operation', () => {
+    const workspace = 'production'
+    const analysis = {
+      success: true,
+      failedSteps: [],
+      totalSteps: 3,
+      successfulSteps: 3,
+      skippedSteps: 0,
+      targetStepResult: {
+        name: 'apply',
+        found: true,
+        conclusion: 'success',
+        hasChanges: false,
+        isJsonLines: true,
+        operationType: 'apply' as const
+      }
+    }
+
+    const comment = generateCommentBody(workspace, analysis, true)
+
+    expect(comment).toContain('[View logs](')
+    expect(comment).toContain(
+      'https://github.com/owner/repo/actions/runs/12345/attempts/1'
+    )
+  })
+
+  test('does not include timestamp in PR context when includeLogLink is true', () => {
+    const workspace = 'production'
+    const analysis = {
+      success: true,
+      failedSteps: [],
+      totalSteps: 3,
+      successfulSteps: 3,
+      skippedSteps: 0,
+      targetStepResult: {
+        name: 'plan',
+        found: true,
+        conclusion: 'success',
+        hasChanges: true,
+        isJsonLines: true,
+        operationType: 'plan' as const
+      }
+    }
+
+    // Without timestamp (PR context with changes)
+    const comment = generateCommentBody(workspace, analysis, true)
+
+    expect(comment).toContain('[View logs](')
+    expect(comment).not.toContain('Last updated:')
+  })
 })
 
 describe('skipped steps handling', () => {
