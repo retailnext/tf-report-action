@@ -365,7 +365,7 @@ export function generateCommentBody(
     }
   }
 
-  // Add footer for status issues (non-PR context)
+  // Add footer with logs link and optional timestamp
   if (includeLogLink) {
     const logUrl = getJobLogsUrl()
     const formattedTime = timestamp ? formatTimestamp(timestamp) : ''
@@ -608,10 +608,22 @@ async function run(): Promise<void> {
     }
 
     if (issueNumber) {
-      // PR context: post as comment (don't include log link)
-      info('Running in PR context - posting as comment')
+      // PR context: post as comment
+      // Include log link when there are changes planned or applied
+      const hasChanges =
+        analysis.targetStepResult?.hasChanges ||
+        analysis.targetStepResult?.operationType === 'apply'
+      const includeLogLink = !!hasChanges
 
-      const commentBody = generateCommentBody(workspace, analysis, false)
+      info(
+        `Running in PR context - posting as comment${includeLogLink ? ' with logs link' : ''}`
+      )
+
+      const commentBody = generateCommentBody(
+        workspace,
+        analysis,
+        includeLogLink
+      )
 
       info(`Comment body length: ${commentBody.length} characters`)
 
