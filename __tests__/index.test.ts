@@ -1,4 +1,6 @@
 import { describe, expect, test, beforeEach, afterEach } from '@jest/globals'
+import * as fs from 'fs'
+import * as path from 'path'
 import {
   analyzeSteps,
   generateCommentBody,
@@ -8,7 +10,8 @@ import {
   getJobLogsUrl,
   generateTitle,
   generateStatusIssueTitle,
-  formatTimestamp
+  formatTimestamp,
+  readStepOutput
 } from '../src/index'
 
 describe('analyzeSteps', () => {
@@ -1232,5 +1235,221 @@ describe('generateCommentBody with timestamp', () => {
     )
     expect(comment).toContain(' • ')
     expect(comment).toContain('Last updated: January 22, 2026 at 19:05 UTC')
+  })
+})
+
+describe('readStepOutput', () => {
+  const testDir = '/tmp/test-outputs'
+
+  beforeEach(() => {
+    // Create test directory
+    if (!fs.existsSync(testDir)) {
+      fs.mkdirSync(testDir, { recursive: true })
+    }
+  })
+
+  afterEach(() => {
+    // Clean up test files
+    if (fs.existsSync(testDir)) {
+      const files = fs.readdirSync(testDir)
+      for (const file of files) {
+        fs.unlinkSync(path.join(testDir, file))
+      }
+      fs.rmdirSync(testDir)
+    }
+  })
+
+  test('reads direct stdout output', () => {
+    const outputs = {
+      stdout: 'Direct stdout content',
+      stderr: 'Direct stderr content'
+    }
+
+    const stdout = readStepOutput(outputs, 'stdout')
+    const stderr = readStepOutput(outputs, 'stderr')
+
+    expect(stdout).toBe('Direct stdout content')
+    expect(stderr).toBe('Direct stderr content')
+  })
+
+  test('reads file-based stdout output', () => {
+    const stdoutFile = path.join(testDir, 'stdout.txt')
+    const stderrFile = path.join(testDir, 'stderr.txt')
+
+    fs.writeFileSync(stdoutFile, 'File-based stdout content')
+    fs.writeFileSync(stderrFile, 'File-based stderr content')
+
+    const outputs = {
+      stdout_file: stdoutFile,
+      stderr_file: stderrFile
+    }
+
+    const stdout = readStepOutput(outputs, 'stdout')
+    const stderr = readStepOutput(outputs, 'stderr')
+
+    expect(stdout).toBe('File-based stdout content')
+    expect(stderr).toBe('File-based stderr content')
+  })
+
+  test('prefers direct output over file-based output', () => {
+    const stdoutFile = path.join(testDir, 'stdout.txt')
+    fs.writeFileSync(stdoutFile, 'File content')
+
+    const outputs = {
+      stdout: 'Direct content',
+      stdout_file: stdoutFile
+    }
+
+    const stdout = readStepOutput(outputs, 'stdout')
+
+    expect(stdout).toBe('Direct content')
+  })
+
+  test('returns undefined when no output is available', () => {
+    const outputs = {}
+
+    const stdout = readStepOutput(outputs, 'stdout')
+    const stderr = readStepOutput(outputs, 'stderr')
+
+    expect(stdout).toBeUndefined()
+    expect(stderr).toBeUndefined()
+  })
+
+  test('returns undefined when outputs is undefined', () => {
+    const stdout = readStepOutput(undefined, 'stdout')
+    const stderr = readStepOutput(undefined, 'stderr')
+
+    expect(stdout).toBeUndefined()
+    expect(stderr).toBeUndefined()
+  })
+
+  test('handles file read errors gracefully', () => {
+    const outputs = {
+      stdout_file: '/nonexistent/path/file.txt'
+    }
+
+    // Mock console.error to suppress error output
+    const originalError = console.error
+    const mockError = (() => {
+      // Do nothing
+    }) as typeof console.error
+    console.error = mockError
+
+    const stdout = readStepOutput(outputs, 'stdout')
+
+    expect(stdout).toBeUndefined()
+
+    // Restore console.error
+    console.error = originalError
+  })
+
+  test('handles empty file content', () => {
+    const stdoutFile = path.join(testDir, 'empty.txt')
+    fs.writeFileSync(stdoutFile, '')
+
+    const outputs = {
+      stdout_file: stdoutFile
+    }
+
+    const stdout = readStepOutput(outputs, 'stdout')
+
+    expect(stdout).toBe('')
+  })
+})
+
+describe('analyzeSteps with file-based outputs', () => {
+  const testDir = '/tmp/test-outputs'
+
+  beforeEach(() => {
+    if (!fs.existsSync(testDir)) {
+      fs.mkdirSync(testDir, { recursive: true })
+    }
+  })
+
+  afterEach(() => {
+    if (fs.existsSync(testDir)) {
+      const files = fs.readdirSync(testDir)
+      for (const file of files) {
+        fs.unlinkSync(path.join(testDir, file))
+      }
+      fs.rmdirSync(testDir)
+    }
+  })
+
+  test('analyzes steps with file-based outputs', () => {
+    const stdoutFile = path.join(testDir, 'step-stdout.txt')
+    const stderrFile = path.join(testDir, 'step-stderr.txt')
+
+    fs.writeFileSync(stdoutFile, 'Step output from file')
+    fs.writeFileSync(stderrFile, 'Step error from file')
+
+    const steps = {
+      step1: {
+        conclusion: 'failure',
+        outputs: {
+          stdout_file: stdoutFile,
+          stderr_file: stderrFile,
+          exit_code: '1'
+        }
+      }
+    }
+
+    const result = analyzeSteps(steps)
+
+    expect(result.success).toBe(false)
+    expect(result.failedSteps.length).toBe(1)
+    expect(result.failedSteps[0].stdout).toBe('Step output from file')
+    expect(result.failedSteps[0].stderr).toBe('Step error from file')
+    expect(result.failedSteps[0].exitCode).toBe('1')
+  })
+
+  test('analyzes target step with file-based outputs', () => {
+    const planFile = path.join(testDir, 'plan-output.txt')
+    fs.writeFileSync(planFile, 'Plan output from file')
+
+    const steps = {
+      init: { conclusion: 'success' },
+      plan: {
+        conclusion: 'success',
+        outputs: {
+          stdout_file: planFile
+        }
+      }
+    }
+
+    const result = analyzeSteps(steps, 'plan')
+
+    expect(result.success).toBe(true)
+    expect(result.targetStepResult).toBeDefined()
+    expect(result.targetStepResult?.name).toBe('plan')
+    expect(result.targetStepResult?.found).toBe(true)
+    expect(result.targetStepResult?.stdout).toBe('Plan output from file')
+  })
+
+  test('handles mix of direct and file-based outputs in different steps', () => {
+    const stdoutFile = path.join(testDir, 'step2-stdout.txt')
+    fs.writeFileSync(stdoutFile, 'File-based output')
+
+    const steps = {
+      step1: {
+        conclusion: 'success',
+        outputs: {
+          stdout: 'Direct output'
+        }
+      },
+      step2: {
+        conclusion: 'failure',
+        outputs: {
+          stdout_file: stdoutFile,
+          exit_code: '1'
+        }
+      }
+    }
+
+    const result = analyzeSteps(steps)
+
+    expect(result.success).toBe(false)
+    expect(result.failedSteps.length).toBe(1)
+    expect(result.failedSteps[0].stdout).toBe('File-based output')
   })
 })

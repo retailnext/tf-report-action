@@ -423,6 +423,34 @@ const MAX_COMMENT_SIZE = 60000;
 const MAX_OUTPUT_PER_STEP = 20000;
 const COMMENT_TRUNCATION_BUFFER = 1000;
 /**
+ * Read output from step data, supporting both direct output and file-based output
+ */
+function readStepOutput(stepOutputs, outputType) {
+    if (!stepOutputs) {
+        return undefined;
+    }
+    // Check for direct output first (current behavior)
+    const directOutput = stepOutputs[outputType];
+    if (directOutput !== undefined) {
+        return directOutput;
+    }
+    // Check for file-based output (new behavior)
+    const fileOutputKey = `${outputType}_file`;
+    const filePath = stepOutputs[fileOutputKey];
+    if (!filePath) {
+        return undefined;
+    }
+    // Read content from file
+    try {
+        return fs.readFileSync(filePath, 'utf8');
+    }
+    catch (error) {
+        // If file cannot be read, log error and return undefined
+        console.error(`Failed to read ${outputType} from file ${filePath}: ${error instanceof Error ? error.message : 'Unknown error'}`);
+        return undefined;
+    }
+}
+/**
  * Get an input value from the environment
  */
 function getInput(name) {
@@ -496,7 +524,7 @@ function analyzeSteps(steps, targetStep) {
         const outcome = stepData.outcome || stepData.conclusion || '';
         // Check if this is the target step
         if (targetStep && stepName === targetStep) {
-            const stdout = stepData.outputs?.stdout;
+            const stdout = readStepOutput(stepData.outputs, 'stdout');
             // Analyze JSON Lines output if present
             let isJsonLinesOutput = false;
             let operationType = 'unknown';
@@ -520,7 +548,7 @@ function analyzeSteps(steps, targetStep) {
                 found: true,
                 conclusion: outcome,
                 stdout,
-                stderr: stepData.outputs?.stderr,
+                stderr: readStepOutput(stepData.outputs, 'stderr'),
                 exitCode: stepData.outputs?.exit_code,
                 isJsonLines: isJsonLinesOutput,
                 operationType,
@@ -541,8 +569,8 @@ function analyzeSteps(steps, targetStep) {
             const failure = {
                 name: stepName,
                 conclusion: outcome,
-                stdout: stepData.outputs?.stdout,
-                stderr: stepData.outputs?.stderr,
+                stdout: readStepOutput(stepData.outputs, 'stdout'),
+                stderr: readStepOutput(stepData.outputs, 'stderr'),
                 exitCode: stepData.outputs?.exit_code
             };
             failedSteps.push(failure);
@@ -912,5 +940,5 @@ if (import.meta.url === `file://${process.argv[1]}` ||
     run();
 }
 
-export { analyzeSteps, formatJsonLines, formatTimestamp, generateCommentBody, generateStatusIssueTitle, generateTitle, getInput, getJobLogsUrl, getWorkspaceMarker, isJsonLines, parseJsonLines, setFailed, truncateOutput };
+export { analyzeSteps, formatJsonLines, formatTimestamp, generateCommentBody, generateStatusIssueTitle, generateTitle, getInput, getJobLogsUrl, getWorkspaceMarker, isJsonLines, parseJsonLines, readStepOutput, setFailed, truncateOutput };
 //# sourceMappingURL=index.js.map

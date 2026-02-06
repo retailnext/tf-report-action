@@ -34,6 +34,8 @@ interface StepData {
   outputs?: {
     stdout?: string
     stderr?: string
+    stdout_file?: string
+    stderr_file?: string
     exit_code?: string
     [key: string]: unknown
   }
@@ -76,6 +78,43 @@ interface AnalysisResult {
 const MAX_COMMENT_SIZE = 60000
 const MAX_OUTPUT_PER_STEP = 20000
 const COMMENT_TRUNCATION_BUFFER = 1000
+
+/**
+ * Read output from step data, supporting both direct output and file-based output
+ */
+export function readStepOutput(
+  stepOutputs: StepData['outputs'],
+  outputType: 'stdout' | 'stderr'
+): string | undefined {
+  if (!stepOutputs) {
+    return undefined
+  }
+
+  // Check for direct output first (current behavior)
+  const directOutput = stepOutputs[outputType] as string | undefined
+  if (directOutput !== undefined) {
+    return directOutput
+  }
+
+  // Check for file-based output (new behavior)
+  const fileOutputKey = `${outputType}_file` as 'stdout_file' | 'stderr_file'
+  const filePath = stepOutputs[fileOutputKey] as string | undefined
+
+  if (!filePath) {
+    return undefined
+  }
+
+  // Read content from file
+  try {
+    return fs.readFileSync(filePath, 'utf8')
+  } catch (error) {
+    // If file cannot be read, log error and return undefined
+    console.error(
+      `Failed to read ${outputType} from file ${filePath}: ${error instanceof Error ? error.message : 'Unknown error'}`
+    )
+    return undefined
+  }
+}
 
 /**
  * Get an input value from the environment
@@ -175,7 +214,7 @@ export function analyzeSteps(
 
     // Check if this is the target step
     if (targetStep && stepName === targetStep) {
-      const stdout = stepData.outputs?.stdout as string | undefined
+      const stdout = readStepOutput(stepData.outputs, 'stdout')
 
       // Analyze JSON Lines output if present
       let isJsonLinesOutput = false
@@ -208,7 +247,7 @@ export function analyzeSteps(
         found: true,
         conclusion: outcome,
         stdout,
-        stderr: stepData.outputs?.stderr as string | undefined,
+        stderr: readStepOutput(stepData.outputs, 'stderr'),
         exitCode: stepData.outputs?.exit_code as string | undefined,
         isJsonLines: isJsonLinesOutput,
         operationType,
@@ -228,8 +267,8 @@ export function analyzeSteps(
       const failure: StepFailure = {
         name: stepName,
         conclusion: outcome,
-        stdout: stepData.outputs?.stdout as string | undefined,
-        stderr: stepData.outputs?.stderr as string | undefined,
+        stdout: readStepOutput(stepData.outputs, 'stdout'),
+        stderr: readStepOutput(stepData.outputs, 'stderr'),
         exitCode: stepData.outputs?.exit_code as string | undefined
       }
       failedSteps.push(failure)
