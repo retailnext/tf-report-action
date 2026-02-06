@@ -435,7 +435,9 @@ function readStepOutput(stepOutputs, outputType) {
         return directOutput;
     }
     // Check for file-based output (new behavior)
-    const fileOutputKey = `${outputType}_file`;
+    const fileOutputKey = outputType === 'stdout'
+        ? 'stdout_file'
+        : 'stderr_file';
     const filePath = stepOutputs[fileOutputKey];
     if (!filePath) {
         return undefined;

@@ -97,7 +97,10 @@ export function readStepOutput(
   }
 
   // Check for file-based output (new behavior)
-  const fileOutputKey = `${outputType}_file` as 'stdout_file' | 'stderr_file'
+  const fileOutputKey =
+    outputType === 'stdout'
+      ? ('stdout_file' as const)
+      : ('stderr_file' as const)
   const filePath = stepOutputs[fileOutputKey] as string | undefined
 
   if (!filePath) {
