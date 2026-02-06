@@ -1291,7 +1291,7 @@ describe('readStepOutput', () => {
     expect(stderr).toBe('File-based stderr content')
   })
 
-  test('prefers direct output over file-based output', () => {
+  test('prefers file-based output over direct output', () => {
     const stdoutFile = path.join(testDir, 'stdout.txt')
     fs.writeFileSync(stdoutFile, 'File content')
 
@@ -1302,7 +1302,7 @@ describe('readStepOutput', () => {
 
     const stdout = readStepOutput(outputs, 'stdout')
 
-    expect(stdout).toBe('Direct content')
+    expect(stdout).toBe('File content')
   })
 
   test('returns undefined when no output is available', () => {

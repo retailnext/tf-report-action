@@ -1,4 +1,5 @@
 import * as fs from 'fs'
+import { Readable } from 'stream'
 import { isJsonLines, parseJsonLines, formatJsonLines } from './jsonlines.js'
 import {
   getExistingComments,
@@ -80,7 +81,49 @@ const MAX_OUTPUT_PER_STEP = 20000
 const COMMENT_TRUNCATION_BUFFER = 1000
 
 /**
- * Read output from step data, supporting both direct output and file-based output
+ * Get a readable stream for step output data, supporting both file-based and direct outputs.
+ * This is file-centric: file paths are used directly, while direct outputs are wrapped
+ * in a Readable stream shim for consistent handling.
+ */
+export function getStepOutputStream(
+  stepOutputs: StepData['outputs'],
+  outputType: 'stdout' | 'stderr'
+): Readable | undefined {
+  if (!stepOutputs) {
+    return undefined
+  }
+
+  // Check for file-based output first (primary/expected format)
+  const fileOutputKey =
+    outputType === 'stdout'
+      ? ('stdout_file' as const)
+      : ('stderr_file' as const)
+  const filePath = stepOutputs[fileOutputKey] as string | undefined
+
+  if (filePath) {
+    // Return a readable stream from the file
+    try {
+      return fs.createReadStream(filePath, { encoding: 'utf8' })
+    } catch (error) {
+      console.error(
+        `Failed to create read stream for ${outputType} from file ${filePath}: ${error instanceof Error ? error.message : 'Unknown error'}`
+      )
+      return undefined
+    }
+  }
+
+  // Fall back to direct output (legacy format) - wrap in Readable stream
+  const directOutput = stepOutputs[outputType] as string | undefined
+  if (directOutput !== undefined) {
+    return Readable.from([directOutput])
+  }
+
+  return undefined
+}
+
+/**
+ * Read output from step data as a string, supporting both direct output and file-based output.
+ * This is a convenience wrapper around getStepOutputStream for synchronous string access.
  */
 export function readStepOutput(
   stepOutputs: StepData['outputs'],
@@ -90,33 +133,28 @@ export function readStepOutput(
     return undefined
   }
 
-  // Check for direct output first (current behavior)
-  const directOutput = stepOutputs[outputType] as string | undefined
-  if (directOutput !== undefined) {
-    return directOutput
-  }
-
-  // Check for file-based output (new behavior)
+  // Check for file-based output first (primary/expected format)
   const fileOutputKey =
     outputType === 'stdout'
       ? ('stdout_file' as const)
       : ('stderr_file' as const)
   const filePath = stepOutputs[fileOutputKey] as string | undefined
 
-  if (!filePath) {
-    return undefined
+  if (filePath) {
+    // Read content from file
+    try {
+      return fs.readFileSync(filePath, 'utf8')
+    } catch (error) {
+      console.error(
+        `Failed to read ${outputType} from file ${filePath}: ${error instanceof Error ? error.message : 'Unknown error'}`
+      )
+      return undefined
+    }
   }
 
-  // Read content from file
-  try {
-    return fs.readFileSync(filePath, 'utf8')
-  } catch (error) {
-    // If file cannot be read, log error and return undefined
-    console.error(
-      `Failed to read ${outputType} from file ${filePath}: ${error instanceof Error ? error.message : 'Unknown error'}`
-    )
-    return undefined
-  }
+  // Fall back to direct output (legacy format)
+  const directOutput = stepOutputs[outputType] as string | undefined
+  return directOutput
 }
 
 /**
