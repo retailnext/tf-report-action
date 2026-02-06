@@ -486,7 +486,8 @@ function getStepOutputStream(stepOutputs, outputType) {
 }
 /**
  * Analyze a JSON Lines stream incrementally, extracting only metadata.
- * Does not accumulate full content in memory.
+ * Processes messages one at a time without accumulating them.
+ * Continues until stream ends to find all important messages.
  */
 async function analyzeJsonLinesStream(stream) {
     if (!stream) {
@@ -503,7 +504,6 @@ async function analyzeJsonLinesStream(stream) {
     let changeSummaryMessage;
     let buffer = '';
     let foundJsonLine = false;
-    let lineCount = 0;
     return new Promise((resolve) => {
         stream.on('data', (chunk) => {
             buffer += typeof chunk === 'string' ? chunk : chunk.toString('utf8');
@@ -512,13 +512,13 @@ async function analyzeJsonLinesStream(stream) {
             while ((newlineIndex = buffer.indexOf('\n')) !== -1) {
                 const line = buffer.substring(0, newlineIndex).trim();
                 buffer = buffer.substring(newlineIndex + 1);
-                lineCount++;
                 if (!line)
                     continue;
                 try {
                     const parsed = JSON.parse(line);
                     foundJsonLine = true;
                     // Extract metadata from JSON Lines messages
+                    // Process one message at a time without accumulation
                     if (parsed.type === 'diagnostic' && parsed['@level'] === 'error') {
                         hasErrors = true;
                     }
@@ -532,11 +532,6 @@ async function analyzeJsonLinesStream(stream) {
                 }
                 catch {
                     // Not JSON, ignore
-                }
-                // Stop after processing enough lines for metadata
-                if (lineCount > 1000) {
-                    stream.destroy();
-                    break;
                 }
             }
         });

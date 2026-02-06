@@ -151,7 +151,8 @@ export function getStepOutputStream(
 
 /**
  * Analyze a JSON Lines stream incrementally, extracting only metadata.
- * Does not accumulate full content in memory.
+ * Processes messages one at a time without accumulating them.
+ * Continues until stream ends to find all important messages.
  */
 async function analyzeJsonLinesStream(stream: Readable | undefined): Promise<{
   isJsonLines: boolean
@@ -175,7 +176,6 @@ async function analyzeJsonLinesStream(stream: Readable | undefined): Promise<{
   let changeSummaryMessage: string | undefined
   let buffer = ''
   let foundJsonLine = false
-  let lineCount = 0
 
   return new Promise((resolve) => {
     stream.on('data', (chunk) => {
@@ -186,7 +186,6 @@ async function analyzeJsonLinesStream(stream: Readable | undefined): Promise<{
       while ((newlineIndex = buffer.indexOf('\n')) !== -1) {
         const line = buffer.substring(0, newlineIndex).trim()
         buffer = buffer.substring(newlineIndex + 1)
-        lineCount++
 
         if (!line) continue
 
@@ -195,6 +194,7 @@ async function analyzeJsonLinesStream(stream: Readable | undefined): Promise<{
           foundJsonLine = true
 
           // Extract metadata from JSON Lines messages
+          // Process one message at a time without accumulation
           if (parsed.type === 'diagnostic' && parsed['@level'] === 'error') {
             hasErrors = true
           }
@@ -213,12 +213,6 @@ async function analyzeJsonLinesStream(stream: Readable | undefined): Promise<{
           }
         } catch {
           // Not JSON, ignore
-        }
-
-        // Stop after processing enough lines for metadata
-        if (lineCount > 1000) {
-          stream.destroy()
-          break
         }
       }
     })
