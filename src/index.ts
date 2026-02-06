@@ -1,12 +1,6 @@
 import * as fs from 'fs'
 import { Readable } from 'stream'
-import {
-  isJsonLines,
-  parseJsonLines,
-  formatJsonLines,
-  isJsonLinesStream,
-  formatJsonLinesStream
-} from './jsonlines.js'
+import { isJsonLinesStream, formatJsonLinesStream } from './jsonlines.js'
 import {
   getExistingComments,
   deleteComment,
@@ -17,13 +11,7 @@ import {
 } from './github.js'
 
 // Re-export jsonlines functions for use by scripts and tests
-export {
-  isJsonLines,
-  parseJsonLines,
-  formatJsonLines,
-  isJsonLinesStream,
-  formatJsonLinesStream
-}
+export { isJsonLinesStream, formatJsonLinesStream }
 
 // Month names for timestamp formatting
 const MONTH_NAMES = [
