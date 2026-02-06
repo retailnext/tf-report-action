@@ -835,8 +835,8 @@ export async function formatJsonLinesStream(
   }
 
   // Reserves space for important summaries. Always includes change_summary which may appear at end of stream.
-  const SUMMARY_RESERVE = 1000
-  const effectiveLimit = maxOutputSize - SUMMARY_RESERVE
+  const SUMMARY_RESERVE_CHARS = 1000
+  const effectiveLimit = maxOutputSize - SUMMARY_RESERVE_CHARS
 
   let buffer = ''
 
@@ -989,25 +989,11 @@ export async function formatJsonLinesStream(
 function buildFormattedOutput(
   changeSummaryMessage: string | undefined,
   operationType: 'plan' | 'apply' | 'destroy' | 'unknown',
-  errorDetails: Array<{
-    severity: string
-    summary: string
-    detail?: string
-    filename?: string
-    line?: number
-    code?: string
-  }>,
-  warningDetails: Array<{
-    severity: string
-    summary: string
-    detail?: string
-    filename?: string
-    line?: number
-    code?: string
-  }>,
-  plannedChangeDetails: Array<{ action: string; addr: string }>,
-  applyCompleteDetails: Array<{ action: string; addr: string }>,
-  driftDetails: Array<{ action: string; addr: string }>,
+  errorDetails: DiagnosticDetail[],
+  warningDetails: DiagnosticDetail[],
+  plannedChangeDetails: ChangeDetail[],
+  applyCompleteDetails: ChangeDetail[],
+  driftDetails: ChangeDetail[],
   maxSize?: number
 ): string {
   let result = ''

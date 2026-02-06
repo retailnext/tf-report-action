@@ -316,8 +316,8 @@ async function formatJsonLinesStream(stream, maxOutputSize = 20000) {
         return '';
     }
     // Reserves space for important summaries. Always includes change_summary which may appear at end of stream.
-    const SUMMARY_RESERVE = 1000;
-    const effectiveLimit = maxOutputSize - SUMMARY_RESERVE;
+    const SUMMARY_RESERVE_CHARS = 1000;
+    const effectiveLimit = maxOutputSize - SUMMARY_RESERVE_CHARS;
     let buffer = '';
     // Build output incrementally, checking size as we go
     let formattedOutput = '';
