@@ -419,6 +419,50 @@ const MONTH_NAMES = [
     'November',
     'December'
 ];
+/**
+ * Provides lazy access to step output streams.
+ * Avoids eagerly reading large outputs into memory.
+ */
+class StepOutputs {
+    outputs;
+    exitCode;
+    constructor(outputs, exitCode) {
+        this.outputs = outputs;
+        this.exitCode = exitCode;
+    }
+    /**
+     * Get a readable stream for stdout
+     */
+    getStdoutStream() {
+        return getStepOutputStream(this.outputs, 'stdout');
+    }
+    /**
+     * Get a readable stream for stderr
+     */
+    getStderrStream() {
+        return getStepOutputStream(this.outputs, 'stderr');
+    }
+    /**
+     * Read stdout content as a string (for backwards compatibility and small outputs)
+     * Use getStdoutStream() for large outputs
+     */
+    readStdout() {
+        return readStepOutput(this.outputs, 'stdout');
+    }
+    /**
+     * Read stderr content as a string (for backwards compatibility and small outputs)
+     * Use getStderrStream() for large outputs
+     */
+    readStderr() {
+        return readStepOutput(this.outputs, 'stderr');
+    }
+    /**
+     * Get the exit code
+     */
+    getExitCode() {
+        return this.exitCode;
+    }
+}
 // GitHub comment max size is 65536 characters
 const MAX_COMMENT_SIZE = 60000;
 const MAX_OUTPUT_PER_STEP = 20000;
@@ -457,6 +501,8 @@ function getStepOutputStream(stepOutputs, outputType) {
 /**
  * Read output from step data as a string, supporting both direct output and file-based output.
  * This is a convenience wrapper around getStepOutputStream for synchronous string access.
+ * Note: For large outputs, prefer using getStepOutputStream() directly to avoid loading
+ * entire content into memory.
  */
 function readStepOutput(stepOutputs, outputType) {
     if (!stepOutputs) {
@@ -468,7 +514,7 @@ function readStepOutput(stepOutputs, outputType) {
         : 'stderr_file';
     const filePath = stepOutputs[fileOutputKey];
     if (filePath) {
-        // Read content from file
+        // Read content from file synchronously
         try {
             return fs.readFileSync(filePath, 'utf8');
         }
@@ -555,7 +601,8 @@ function analyzeSteps(steps, targetStep) {
         const outcome = stepData.outcome || stepData.conclusion || '';
         // Check if this is the target step
         if (targetStep && stepName === targetStep) {
-            const stdout = readStepOutput(stepData.outputs, 'stdout');
+            const stepOutputs = new StepOutputs(stepData.outputs, stepData.outputs?.exit_code);
+            const stdout = stepOutputs.readStdout();
             // Analyze JSON Lines output if present
             let isJsonLinesOutput = false;
             let operationType = 'unknown';
@@ -578,9 +625,7 @@ function analyzeSteps(steps, targetStep) {
                 name: stepName,
                 found: true,
                 conclusion: outcome,
-                stdout,
-                stderr: readStepOutput(stepData.outputs, 'stderr'),
-                exitCode: stepData.outputs?.exit_code,
+                outputs: stepOutputs,
                 isJsonLines: isJsonLinesOutput,
                 operationType,
                 hasChanges: hasChangesValue,
@@ -600,9 +645,7 @@ function analyzeSteps(steps, targetStep) {
             const failure = {
                 name: stepName,
                 conclusion: outcome,
-                stdout: readStepOutput(stepData.outputs, 'stdout'),
-                stderr: readStepOutput(stepData.outputs, 'stderr'),
-                exitCode: stepData.outputs?.exit_code
+                outputs: new StepOutputs(stepData.outputs, stepData.outputs?.exit_code)
             };
             failedSteps.push(failure);
         }
@@ -646,8 +689,8 @@ function generateCommentBody(workspace, analysis, includeLogLink = false, timest
         }
         else if (targetStepResult.conclusion === 'success') {
             // Success case - show stdout/stderr if available
-            const stdout = targetStepResult.stdout;
-            const stderr = targetStepResult.stderr;
+            const stdout = targetStepResult.outputs?.readStdout();
+            const stderr = targetStepResult.outputs?.readStderr();
             const { formattedContent } = formatOutput(stdout, stderr);
             if (!formattedContent) {
                 comment += `> [!NOTE]\n> Completed successfully with no output.\n\n`;
@@ -659,12 +702,13 @@ function generateCommentBody(workspace, analysis, includeLogLink = false, timest
         else {
             // Target step failed or has other status
             comment += `**Status:** ${targetStepResult.conclusion}\n`;
-            if (targetStepResult.exitCode) {
-                comment += `**Exit Code:** ${targetStepResult.exitCode}\n`;
+            const exitCode = targetStepResult.outputs?.getExitCode();
+            if (exitCode) {
+                comment += `**Exit Code:** ${exitCode}\n`;
             }
             comment += '\n';
-            const stdout = targetStepResult.stdout;
-            const stderr = targetStepResult.stderr;
+            const stdout = targetStepResult.outputs?.readStdout();
+            const stderr = targetStepResult.outputs?.readStderr();
             const { formattedContent } = formatOutput(stdout, stderr);
             if (!formattedContent) {
                 comment += `> [!NOTE]\n> Failed with no output.\n\n`;
@@ -704,11 +748,14 @@ function generateCommentBody(workspace, analysis, includeLogLink = false, timest
             for (const step of failedSteps) {
                 comment += `#### ❌ Step: \`${step.name}\`\n\n`;
                 comment += `**Status:** ${step.conclusion}\n`;
-                if (step.exitCode) {
-                    comment += `**Exit Code:** ${step.exitCode}\n`;
+                const exitCode = step.outputs.getExitCode();
+                if (exitCode) {
+                    comment += `**Exit Code:** ${exitCode}\n`;
                 }
                 comment += '\n';
-                const { formattedContent } = formatOutput(step.stdout, step.stderr);
+                const stdout = step.outputs.readStdout();
+                const stderr = step.outputs.readStderr();
+                const { formattedContent } = formatOutput(stdout, stderr);
                 if (!formattedContent) {
                     comment += `> [!NOTE]\n> Failed with no output.\n\n`;
                 }
@@ -971,5 +1018,5 @@ if (import.meta.url === `file://${process.argv[1]}` ||
     run();
 }
 
-export { analyzeSteps, formatJsonLines, formatTimestamp, generateCommentBody, generateStatusIssueTitle, generateTitle, getInput, getJobLogsUrl, getStepOutputStream, getWorkspaceMarker, isJsonLines, parseJsonLines, readStepOutput, setFailed, truncateOutput };
+export { StepOutputs, analyzeSteps, formatJsonLines, formatTimestamp, generateCommentBody, generateStatusIssueTitle, generateTitle, getInput, getJobLogsUrl, getStepOutputStream, getWorkspaceMarker, isJsonLines, parseJsonLines, readStepOutput, setFailed, truncateOutput };
 //# sourceMappingURL=index.js.map

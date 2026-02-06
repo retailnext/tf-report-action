@@ -11,7 +11,8 @@ import {
   generateTitle,
   generateStatusIssueTitle,
   formatTimestamp,
-  readStepOutput
+  readStepOutput,
+  StepOutputs
 } from '../src/index'
 
 describe('analyzeSteps', () => {
@@ -102,9 +103,9 @@ describe('analyzeSteps', () => {
 
     expect(result.success).toBe(false)
     expect(result.failedSteps.length).toBe(1)
-    expect(result.failedSteps[0].stdout).toBe('Some output')
-    expect(result.failedSteps[0].stderr).toBe('Some error')
-    expect(result.failedSteps[0].exitCode).toBe('1')
+    expect(result.failedSteps[0].outputs.readStdout()).toBe('Some output')
+    expect(result.failedSteps[0].outputs.readStderr()).toBe('Some error')
+    expect(result.failedSteps[0].outputs.getExitCode()).toBe('1')
   })
 
   test('target step found and successful', () => {
@@ -127,8 +128,8 @@ describe('analyzeSteps', () => {
     expect(result.targetStepResult?.name).toBe('plan')
     expect(result.targetStepResult?.found).toBe(true)
     expect(result.targetStepResult?.conclusion).toBe('success')
-    expect(result.targetStepResult?.stdout).toBe('Plan output')
-    expect(result.targetStepResult?.stderr).toBe('Plan warnings')
+    expect(result.targetStepResult?.outputs?.readStdout()).toBe('Plan output')
+    expect(result.targetStepResult?.outputs?.readStderr()).toBe('Plan warnings')
   })
 
   test('target step found and failed', () => {
@@ -151,7 +152,7 @@ describe('analyzeSteps', () => {
     expect(result.targetStepResult?.name).toBe('apply')
     expect(result.targetStepResult?.found).toBe(true)
     expect(result.targetStepResult?.conclusion).toBe('failure')
-    expect(result.targetStepResult?.exitCode).toBe('1')
+    expect(result.targetStepResult?.outputs?.getExitCode()).toBe('1')
   })
 
   test('target step not found', () => {
@@ -207,8 +208,16 @@ describe('generateCommentBody', () => {
     const analysis = {
       success: false,
       failedSteps: [
-        { name: 'build', conclusion: 'failure' },
-        { name: 'test', conclusion: 'failure' }
+        {
+          name: 'build',
+          conclusion: 'failure',
+          outputs: new StepOutputs({}, undefined)
+        },
+        {
+          name: 'test',
+          conclusion: 'failure',
+          outputs: new StepOutputs({}, undefined)
+        }
       ],
       totalSteps: 5,
       successfulSteps: 3,
@@ -226,15 +235,21 @@ describe('generateCommentBody', () => {
 
   test('includes step outputs only when non-empty', () => {
     const workspace = 'staging'
+    const stepOutputs = new StepOutputs(
+      {
+        stdout: 'Plan output here',
+        stderr: 'Error details here',
+        exit_code: '1'
+      },
+      '1'
+    )
     const analysis = {
       success: false,
       failedSteps: [
         {
           name: 'plan',
           conclusion: 'failure',
-          stdout: 'Plan output here',
-          stderr: 'Error details here',
-          exitCode: '1'
+          outputs: stepOutputs
         }
       ],
       totalSteps: 2,
@@ -254,14 +269,20 @@ describe('generateCommentBody', () => {
 
   test('shows notice when outputs are empty', () => {
     const workspace = 'test'
+    const stepOutputs = new StepOutputs(
+      {
+        stdout: '',
+        stderr: ''
+      },
+      undefined
+    )
     const analysis = {
       success: false,
       failedSteps: [
         {
           name: 'step1',
           conclusion: 'failure',
-          stdout: '',
-          stderr: ''
+          outputs: stepOutputs
         }
       ],
       totalSteps: 1,
@@ -280,6 +301,13 @@ describe('generateCommentBody', () => {
 
   test('target step successful with outputs', () => {
     const workspace = 'prod'
+    const stepOutputs = new StepOutputs(
+      {
+        stdout: 'Plan succeeded',
+        stderr: 'Some warnings'
+      },
+      undefined
+    )
     const analysis = {
       success: true,
       failedSteps: [],
@@ -290,8 +318,7 @@ describe('generateCommentBody', () => {
         name: 'plan',
         found: true,
         conclusion: 'success',
-        stdout: 'Plan succeeded',
-        stderr: 'Some warnings'
+        outputs: stepOutputs
       }
     }
 
@@ -307,6 +334,13 @@ describe('generateCommentBody', () => {
 
   test('target step successful with no outputs', () => {
     const workspace = 'dev'
+    const stepOutputs = new StepOutputs(
+      {
+        stdout: '',
+        stderr: ''
+      },
+      undefined
+    )
     const analysis = {
       success: true,
       failedSteps: [],
@@ -317,8 +351,7 @@ describe('generateCommentBody', () => {
         name: 'apply',
         found: true,
         conclusion: 'success',
-        stdout: '',
-        stderr: ''
+        outputs: stepOutputs
       }
     }
 
@@ -331,6 +364,14 @@ describe('generateCommentBody', () => {
 
   test('target step failed', () => {
     const workspace = 'staging'
+    const stepOutputs = new StepOutputs(
+      {
+        stdout: 'Apply output',
+        stderr: 'Apply errors',
+        exit_code: '1'
+      },
+      '1'
+    )
     const analysis = {
       success: false,
       failedSteps: [{ name: 'apply', conclusion: 'failure' }],
@@ -341,9 +382,7 @@ describe('generateCommentBody', () => {
         name: 'apply',
         found: true,
         conclusion: 'failure',
-        stdout: 'Apply output',
-        stderr: 'Apply errors',
-        exitCode: '1'
+        outputs: stepOutputs
       }
     }
 
@@ -380,8 +419,16 @@ describe('generateCommentBody', () => {
     const analysis = {
       success: false,
       failedSteps: [
-        { name: 'init', conclusion: 'failure' },
-        { name: 'validate', conclusion: 'failure' }
+        {
+          name: 'init',
+          conclusion: 'failure',
+          outputs: new StepOutputs({}, undefined)
+        },
+        {
+          name: 'validate',
+          conclusion: 'failure',
+          outputs: new StepOutputs({}, undefined)
+        }
       ],
       totalSteps: 3,
       successfulSteps: 1,
@@ -512,14 +559,20 @@ describe('getInput', () => {
 
 describe('comment formatting', () => {
   test('uses collapsible details for output', () => {
+    const stepOutputs = new StepOutputs(
+      {
+        stdout: 'Some output',
+        stderr: 'Some errors'
+      },
+      '1'
+    )
     const analysis = {
       success: false,
       failedSteps: [
         {
           name: 'test-step',
           conclusion: 'failure',
-          stdout: 'Some output',
-          stderr: 'Some errors'
+          outputs: stepOutputs
         }
       ],
       totalSteps: 1,
@@ -670,7 +723,13 @@ describe('generateTitle', () => {
   test('failure without target step', () => {
     const analysis = {
       success: false,
-      failedSteps: [{ name: 'build', conclusion: 'failure' }],
+      failedSteps: [
+        {
+          name: 'build',
+          conclusion: 'failure',
+          outputs: new StepOutputs({}, undefined)
+        }
+      ],
       totalSteps: 3
     }
 
@@ -699,7 +758,13 @@ describe('generateTitle', () => {
   test('target step failed', () => {
     const analysis = {
       success: false,
-      failedSteps: [{ name: 'apply', conclusion: 'failure' }],
+      failedSteps: [
+        {
+          name: 'apply',
+          conclusion: 'failure',
+          outputs: new StepOutputs({}, undefined)
+        }
+      ],
       totalSteps: 2,
       targetStepResult: {
         name: 'apply',
@@ -732,7 +797,13 @@ describe('generateTitle', () => {
   test('target step not found with overall failure', () => {
     const analysis = {
       success: false,
-      failedSteps: [{ name: 'init', conclusion: 'failure' }],
+      failedSteps: [
+        {
+          name: 'init',
+          conclusion: 'failure',
+          outputs: new StepOutputs({}, undefined)
+        }
+      ],
       totalSteps: 3,
       targetStepResult: {
         name: 'plan',
@@ -814,7 +885,13 @@ describe('generateTitle', () => {
   test('plan with no changes but errors shows Failed', () => {
     const analysis = {
       success: false,
-      failedSteps: [{ name: 'plan', conclusion: 'failure' }],
+      failedSteps: [
+        {
+          name: 'plan',
+          conclusion: 'failure',
+          outputs: new StepOutputs({}, undefined)
+        }
+      ],
       totalSteps: 2,
       targetStepResult: {
         name: 'plan',
@@ -960,7 +1037,13 @@ describe('generateCommentBody with log link', () => {
     const workspace = 'staging'
     const analysis = {
       success: false,
-      failedSteps: [{ name: 'build', conclusion: 'failure' }],
+      failedSteps: [
+        {
+          name: 'build',
+          conclusion: 'failure',
+          outputs: new StepOutputs({}, undefined)
+        }
+      ],
       totalSteps: 2,
       successfulSteps: 1,
       skippedSteps: 0
@@ -1135,8 +1218,16 @@ describe('skipped steps handling', () => {
     const analysis = {
       success: false,
       failedSteps: [
-        { name: 'build', conclusion: 'failure' },
-        { name: 'test', conclusion: 'failure' }
+        {
+          name: 'build',
+          conclusion: 'failure',
+          outputs: new StepOutputs({}, undefined)
+        },
+        {
+          name: 'test',
+          conclusion: 'failure',
+          outputs: new StepOutputs({}, undefined)
+        }
       ],
       totalSteps: 5,
       successfulSteps: 3,
@@ -1398,9 +1489,13 @@ describe('analyzeSteps with file-based outputs', () => {
 
     expect(result.success).toBe(false)
     expect(result.failedSteps.length).toBe(1)
-    expect(result.failedSteps[0].stdout).toBe('Step output from file')
-    expect(result.failedSteps[0].stderr).toBe('Step error from file')
-    expect(result.failedSteps[0].exitCode).toBe('1')
+    expect(result.failedSteps[0].outputs.readStdout()).toBe(
+      'Step output from file'
+    )
+    expect(result.failedSteps[0].outputs.readStderr()).toBe(
+      'Step error from file'
+    )
+    expect(result.failedSteps[0].outputs.getExitCode()).toBe('1')
   })
 
   test('analyzes target step with file-based outputs', () => {
@@ -1423,7 +1518,9 @@ describe('analyzeSteps with file-based outputs', () => {
     expect(result.targetStepResult).toBeDefined()
     expect(result.targetStepResult?.name).toBe('plan')
     expect(result.targetStepResult?.found).toBe(true)
-    expect(result.targetStepResult?.stdout).toBe('Plan output from file')
+    expect(result.targetStepResult?.outputs?.readStdout()).toBe(
+      'Plan output from file'
+    )
   })
 
   test('handles mix of direct and file-based outputs in different steps', () => {
@@ -1450,6 +1547,6 @@ describe('analyzeSteps with file-based outputs', () => {
 
     expect(result.success).toBe(false)
     expect(result.failedSteps.length).toBe(1)
-    expect(result.failedSteps[0].stdout).toBe('File-based output')
+    expect(result.failedSteps[0].outputs.readStdout()).toBe('File-based output')
   })
 })

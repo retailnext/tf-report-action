@@ -46,12 +46,58 @@ interface Steps {
   [key: string]: StepData
 }
 
+/**
+ * Provides lazy access to step output streams.
+ * Avoids eagerly reading large outputs into memory.
+ */
+export class StepOutputs {
+  constructor(
+    private readonly outputs: StepData['outputs'],
+    private readonly exitCode?: string
+  ) {}
+
+  /**
+   * Get a readable stream for stdout
+   */
+  getStdoutStream(): Readable | undefined {
+    return getStepOutputStream(this.outputs, 'stdout')
+  }
+
+  /**
+   * Get a readable stream for stderr
+   */
+  getStderrStream(): Readable | undefined {
+    return getStepOutputStream(this.outputs, 'stderr')
+  }
+
+  /**
+   * Read stdout content as a string (for backwards compatibility and small outputs)
+   * Use getStdoutStream() for large outputs
+   */
+  readStdout(): string | undefined {
+    return readStepOutput(this.outputs, 'stdout')
+  }
+
+  /**
+   * Read stderr content as a string (for backwards compatibility and small outputs)
+   * Use getStderrStream() for large outputs
+   */
+  readStderr(): string | undefined {
+    return readStepOutput(this.outputs, 'stderr')
+  }
+
+  /**
+   * Get the exit code
+   */
+  getExitCode(): string | undefined {
+    return this.exitCode
+  }
+}
+
 interface StepFailure {
   name: string
   conclusion: string
-  stdout?: string
-  stderr?: string
-  exitCode?: string
+  outputs: StepOutputs
 }
 
 interface AnalysisResult {
@@ -64,9 +110,7 @@ interface AnalysisResult {
     name: string
     found: boolean
     conclusion?: string
-    stdout?: string
-    stderr?: string
-    exitCode?: string
+    outputs?: StepOutputs
     isJsonLines?: boolean
     operationType?: 'plan' | 'apply' | 'destroy' | 'unknown'
     hasChanges?: boolean
@@ -124,6 +168,8 @@ export function getStepOutputStream(
 /**
  * Read output from step data as a string, supporting both direct output and file-based output.
  * This is a convenience wrapper around getStepOutputStream for synchronous string access.
+ * Note: For large outputs, prefer using getStepOutputStream() directly to avoid loading
+ * entire content into memory.
  */
 export function readStepOutput(
   stepOutputs: StepData['outputs'],
@@ -141,7 +187,7 @@ export function readStepOutput(
   const filePath = stepOutputs[fileOutputKey] as string | undefined
 
   if (filePath) {
-    // Read content from file
+    // Read content from file synchronously
     try {
       return fs.readFileSync(filePath, 'utf8')
     } catch (error) {
@@ -255,7 +301,11 @@ export function analyzeSteps(
 
     // Check if this is the target step
     if (targetStep && stepName === targetStep) {
-      const stdout = readStepOutput(stepData.outputs, 'stdout')
+      const stepOutputs = new StepOutputs(
+        stepData.outputs,
+        stepData.outputs?.exit_code as string | undefined
+      )
+      const stdout = stepOutputs.readStdout()
 
       // Analyze JSON Lines output if present
       let isJsonLinesOutput = false
@@ -287,9 +337,7 @@ export function analyzeSteps(
         name: stepName,
         found: true,
         conclusion: outcome,
-        stdout,
-        stderr: readStepOutput(stepData.outputs, 'stderr'),
-        exitCode: stepData.outputs?.exit_code as string | undefined,
+        outputs: stepOutputs,
         isJsonLines: isJsonLinesOutput,
         operationType,
         hasChanges: hasChangesValue,
@@ -308,9 +356,10 @@ export function analyzeSteps(
       const failure: StepFailure = {
         name: stepName,
         conclusion: outcome,
-        stdout: readStepOutput(stepData.outputs, 'stdout'),
-        stderr: readStepOutput(stepData.outputs, 'stderr'),
-        exitCode: stepData.outputs?.exit_code as string | undefined
+        outputs: new StepOutputs(
+          stepData.outputs,
+          stepData.outputs?.exit_code as string | undefined
+        )
       }
       failedSteps.push(failure)
     }
@@ -369,8 +418,8 @@ export function generateCommentBody(
       }
     } else if (targetStepResult.conclusion === 'success') {
       // Success case - show stdout/stderr if available
-      const stdout = targetStepResult.stdout
-      const stderr = targetStepResult.stderr
+      const stdout = targetStepResult.outputs?.readStdout()
+      const stderr = targetStepResult.outputs?.readStderr()
       const { formattedContent } = formatOutput(stdout, stderr)
 
       if (!formattedContent) {
@@ -382,14 +431,15 @@ export function generateCommentBody(
       // Target step failed or has other status
       comment += `**Status:** ${targetStepResult.conclusion}\n`
 
-      if (targetStepResult.exitCode) {
-        comment += `**Exit Code:** ${targetStepResult.exitCode}\n`
+      const exitCode = targetStepResult.outputs?.getExitCode()
+      if (exitCode) {
+        comment += `**Exit Code:** ${exitCode}\n`
       }
 
       comment += '\n'
 
-      const stdout = targetStepResult.stdout
-      const stderr = targetStepResult.stderr
+      const stdout = targetStepResult.outputs?.readStdout()
+      const stderr = targetStepResult.outputs?.readStderr()
       const { formattedContent } = formatOutput(stdout, stderr)
 
       if (!formattedContent) {
@@ -428,13 +478,16 @@ export function generateCommentBody(
         comment += `#### ❌ Step: \`${step.name}\`\n\n`
         comment += `**Status:** ${step.conclusion}\n`
 
-        if (step.exitCode) {
-          comment += `**Exit Code:** ${step.exitCode}\n`
+        const exitCode = step.outputs.getExitCode()
+        if (exitCode) {
+          comment += `**Exit Code:** ${exitCode}\n`
         }
 
         comment += '\n'
 
-        const { formattedContent } = formatOutput(step.stdout, step.stderr)
+        const stdout = step.outputs.readStdout()
+        const stderr = step.outputs.readStderr()
+        const { formattedContent } = formatOutput(stdout, stderr)
 
         if (!formattedContent) {
           comment += `> [!NOTE]\n> Failed with no output.\n\n`
