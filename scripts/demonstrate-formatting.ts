@@ -6,8 +6,9 @@
 import { readFileSync } from 'fs'
 import { join, dirname } from 'path'
 import { fileURLToPath } from 'url'
+import { Readable } from 'stream'
 // Import from index which re-exports jsonlines functions
-import { parseJsonLines, formatJsonLines } from '../src/index.js'
+import { formatJsonLinesStream } from '../src/index.js'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = dirname(__filename)
@@ -46,28 +47,16 @@ for (let i = 0; i < examples.length; i++) {
 
   try {
     const content = readFileSync(filePath, 'utf8')
-    const parsed = parseJsonLines(content)
-    const formatted = formatJsonLines(parsed)
+    const lineCount = content.split('\n').filter((l) => l.trim()).length
+
+    // Create a stream from the file content
+    const stream = Readable.from(content)
+    const formatted = await formatJsonLinesStream(stream)
 
     console.log(`## Example ${i + 1}: ${example.name}\n`)
     console.log(`${example.description}\n`)
     console.log(`### Input File ${i + 1}\n`)
-    console.log(
-      `\`${example.file}\` contains ${content.split('\n').filter((l) => l.trim()).length} JSON lines\n`
-    )
-
-    console.log(`### Parsed Statistics ${i + 1}\n`)
-    console.log(`- Total messages: ${parsed.messages.length}`)
-    console.log(`- Planned changes: ${parsed.plannedChanges.length}`)
-    console.log(`- Diagnostics: ${parsed.diagnostics.length}`)
-    console.log(`- Has errors: ${parsed.hasErrors}`)
-    if (parsed.changeSummary) {
-      const cs = parsed.changeSummary.changes
-      console.log(
-        `- Change summary: ${cs.add} to add, ${cs.change} to change, ${cs.remove} to remove`
-      )
-    }
-    console.log()
+    console.log(`\`${example.file}\` contains ${lineCount} JSON lines\n`)
 
     console.log(`### Formatted Output ${i + 1}\n`)
     if (formatted) {

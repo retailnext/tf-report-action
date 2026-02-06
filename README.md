@@ -12,8 +12,8 @@ previous comments/issues for the same workspace.
   status issues on main branch
 - 🎯 Optional target step focus for highlighting specific operations (e.g.,
   `tofu plan`, `tofu apply`)
-- 📄 Displays stdout/stderr from failed steps or successful target steps (using
-  retailnext/exec-action outputs)
+- 📄 Displays command outputs from failed steps or successful target steps
+  (using retailnext/exec-action outputs)
 - 🔍 **Automatically detects and formats OpenTofu JSON Lines output** with rich
   formatting and emoji annotations
 - 🧹 Automatically deletes previous bot comments/updates issues for the same
@@ -143,7 +143,7 @@ jobs:
 1. Analyzes step outcomes to determine which steps failed
 1. If a `target-step` is specified, focuses the comment on that step's status
    and outputs
-1. For failed steps (or successful target steps), extracts stdout/stderr from
+1. For failed steps (or successful target steps), extracts command outputs from
    step outputs (populated by retailnext/exec-action)
 1. Generates a formatted comment with the workspace/step status and outputs
 1. Posts the comment to the pull request
@@ -205,7 +205,7 @@ When `target-step` is specified:
 
 - The comment title includes both workspace and step: `## ✅ \`production\`
   \`plan\` Succeeded`
-- On success, the step's stdout/stderr are displayed
+- On success, the step's output is displayed
 - On failure, the step's error output is highlighted
 - If the step didn't run, other failures are reported
 

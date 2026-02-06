@@ -1,4 +1,6 @@
 import { describe, expect, test, beforeEach, afterEach } from '@jest/globals'
+import * as fs from 'fs'
+import * as path from 'path'
 import {
   analyzeSteps,
   generateCommentBody,
@@ -8,18 +10,19 @@ import {
   getJobLogsUrl,
   generateTitle,
   generateStatusIssueTitle,
-  formatTimestamp
+  formatTimestamp,
+  StepOutputs
 } from '../src/index'
 
 describe('analyzeSteps', () => {
-  test('all steps successful', () => {
+  test('all steps successful', async () => {
     const steps = {
       checkout: { conclusion: 'success' },
       setup: { conclusion: 'success' },
       build: { conclusion: 'success' }
     }
 
-    const result = analyzeSteps(steps)
+    const result = await analyzeSteps(steps)
 
     expect(result.success).toBe(true)
     expect(result.totalSteps).toBe(3)
@@ -27,14 +30,14 @@ describe('analyzeSteps', () => {
     expect(result.targetStepResult).toBeUndefined()
   })
 
-  test('some steps failed', () => {
+  test('some steps failed', async () => {
     const steps = {
       checkout: { conclusion: 'success' },
       build: { conclusion: 'failure' },
       test: { conclusion: 'failure' }
     }
 
-    const result = analyzeSteps(steps)
+    const result = await analyzeSteps(steps)
 
     expect(result.success).toBe(false)
     expect(result.totalSteps).toBe(3)
@@ -43,47 +46,47 @@ describe('analyzeSteps', () => {
     expect(result.failedSteps[1].name).toBe('test')
   })
 
-  test('skipped steps are not failures', () => {
+  test('skipped steps are not failures', async () => {
     const steps = {
       checkout: { conclusion: 'success' },
       optional: { conclusion: 'skipped' },
       build: { conclusion: 'success' }
     }
 
-    const result = analyzeSteps(steps)
+    const result = await analyzeSteps(steps)
 
     expect(result.success).toBe(true)
     expect(result.totalSteps).toBe(3)
     expect(result.failedSteps.length).toBe(0)
   })
 
-  test('cancelled steps are not failures', () => {
+  test('cancelled steps are not failures', async () => {
     const steps = {
       step1: { conclusion: 'success' },
       step2: { conclusion: 'cancelled' },
       step3: { conclusion: 'success' }
     }
 
-    const result = analyzeSteps(steps)
+    const result = await analyzeSteps(steps)
 
     expect(result.success).toBe(true)
     expect(result.failedSteps.length).toBe(0)
   })
 
-  test('neutral steps are not failures', () => {
+  test('neutral steps are not failures', async () => {
     const steps = {
       step1: { conclusion: 'success' },
       step2: { conclusion: 'neutral' },
       step3: { conclusion: 'success' }
     }
 
-    const result = analyzeSteps(steps)
+    const result = await analyzeSteps(steps)
 
     expect(result.success).toBe(true)
     expect(result.failedSteps.length).toBe(0)
   })
 
-  test('captures step outputs', () => {
+  test('captures step outputs', async () => {
     const steps = {
       step1: {
         conclusion: 'failure',
@@ -95,16 +98,17 @@ describe('analyzeSteps', () => {
       }
     }
 
-    const result = analyzeSteps(steps)
+    const result = await analyzeSteps(steps)
 
     expect(result.success).toBe(false)
     expect(result.failedSteps.length).toBe(1)
-    expect(result.failedSteps[0].stdout).toBe('Some output')
-    expect(result.failedSteps[0].stderr).toBe('Some error')
-    expect(result.failedSteps[0].exitCode).toBe('1')
+    expect(result.failedSteps[0].outputs).toBeDefined()
+    expect(result.failedSteps[0].outputs.getStdoutStream()).toBeDefined()
+    expect(result.failedSteps[0].outputs.getStderrStream()).toBeDefined()
+    expect(result.failedSteps[0].outputs.getExitCode()).toBe('1')
   })
 
-  test('target step found and successful', () => {
+  test('target step found and successful', async () => {
     const steps = {
       init: { conclusion: 'success' },
       plan: {
@@ -117,18 +121,19 @@ describe('analyzeSteps', () => {
       validate: { conclusion: 'success' }
     }
 
-    const result = analyzeSteps(steps, 'plan')
+    const result = await analyzeSteps(steps, 'plan')
 
     expect(result.success).toBe(true)
     expect(result.targetStepResult).toBeDefined()
     expect(result.targetStepResult?.name).toBe('plan')
     expect(result.targetStepResult?.found).toBe(true)
     expect(result.targetStepResult?.conclusion).toBe('success')
-    expect(result.targetStepResult?.stdout).toBe('Plan output')
-    expect(result.targetStepResult?.stderr).toBe('Plan warnings')
+    expect(result.targetStepResult?.outputs).toBeDefined()
+    expect(result.targetStepResult?.outputs?.getStdoutStream()).toBeDefined()
+    expect(result.targetStepResult?.outputs?.getStderrStream()).toBeDefined()
   })
 
-  test('target step found and failed', () => {
+  test('target step found and failed', async () => {
     const steps = {
       init: { conclusion: 'success' },
       apply: {
@@ -141,23 +146,23 @@ describe('analyzeSteps', () => {
       }
     }
 
-    const result = analyzeSteps(steps, 'apply')
+    const result = await analyzeSteps(steps, 'apply')
 
     expect(result.success).toBe(false)
     expect(result.targetStepResult).toBeDefined()
     expect(result.targetStepResult?.name).toBe('apply')
     expect(result.targetStepResult?.found).toBe(true)
     expect(result.targetStepResult?.conclusion).toBe('failure')
-    expect(result.targetStepResult?.exitCode).toBe('1')
+    expect(result.targetStepResult?.outputs?.getExitCode()).toBe('1')
   })
 
-  test('target step not found', () => {
+  test('target step not found', async () => {
     const steps = {
       init: { conclusion: 'success' },
       validate: { conclusion: 'success' }
     }
 
-    const result = analyzeSteps(steps, 'plan')
+    const result = await analyzeSteps(steps, 'plan')
 
     expect(result.success).toBe(true)
     expect(result.targetStepResult).toBeDefined()
@@ -165,13 +170,13 @@ describe('analyzeSteps', () => {
     expect(result.targetStepResult?.found).toBe(false)
   })
 
-  test('target step not found with failures', () => {
+  test('target step not found with failures', async () => {
     const steps = {
       init: { conclusion: 'failure' },
       validate: { conclusion: 'success' }
     }
 
-    const result = analyzeSteps(steps, 'plan')
+    const result = await analyzeSteps(steps, 'plan')
 
     expect(result.success).toBe(false)
     expect(result.failedSteps.length).toBe(1)
@@ -182,7 +187,7 @@ describe('analyzeSteps', () => {
 })
 
 describe('generateCommentBody', () => {
-  test('success case without target step', () => {
+  test('success case without target step', async () => {
     const workspace = 'production'
     const analysis = {
       success: true,
@@ -192,27 +197,35 @@ describe('generateCommentBody', () => {
       skippedSteps: 0
     }
 
-    const comment = generateCommentBody(workspace, analysis)
+    const comment = await generateCommentBody(workspace, analysis)
 
     expect(comment).toContain('<!-- tf-report-action:"production" -->')
     expect(comment).toContain('## ✅ `production` Succeeded')
     expect(comment).toContain('3 succeeded (3 total)')
   })
 
-  test('failure case without target step', () => {
+  test('failure case without target step', async () => {
     const workspace = 'dev'
     const analysis = {
       success: false,
       failedSteps: [
-        { name: 'build', conclusion: 'failure' },
-        { name: 'test', conclusion: 'failure' }
+        {
+          name: 'build',
+          conclusion: 'failure',
+          outputs: new StepOutputs({}, undefined)
+        },
+        {
+          name: 'test',
+          conclusion: 'failure',
+          outputs: new StepOutputs({}, undefined)
+        }
       ],
       totalSteps: 5,
       successfulSteps: 3,
       skippedSteps: 0
     }
 
-    const comment = generateCommentBody(workspace, analysis)
+    const comment = await generateCommentBody(workspace, analysis)
 
     expect(comment).toContain('<!-- tf-report-action:"dev" -->')
     expect(comment).toContain('## ❌ `dev` Failed')
@@ -221,17 +234,23 @@ describe('generateCommentBody', () => {
     expect(comment).toContain('#### ❌ Step: `test`')
   })
 
-  test('includes step outputs only when non-empty', () => {
+  test('includes step outputs only when non-empty', async () => {
     const workspace = 'staging'
+    const stepOutputs = new StepOutputs(
+      {
+        stdout: 'Plan output here',
+        stderr: 'Error details here',
+        exit_code: '1'
+      },
+      '1'
+    )
     const analysis = {
       success: false,
       failedSteps: [
         {
           name: 'plan',
           conclusion: 'failure',
-          stdout: 'Plan output here',
-          stderr: 'Error details here',
-          exitCode: '1'
+          outputs: stepOutputs
         }
       ],
       totalSteps: 2,
@@ -239,7 +258,7 @@ describe('generateCommentBody', () => {
       skippedSteps: 0
     }
 
-    const comment = generateCommentBody(workspace, analysis)
+    const comment = await generateCommentBody(workspace, analysis)
 
     expect(comment).toContain('#### ❌ Step: `plan`')
     expect(comment).toContain('**Exit Code:** 1')
@@ -249,16 +268,22 @@ describe('generateCommentBody', () => {
     expect(comment).toContain('Error details here')
   })
 
-  test('shows notice when outputs are empty', () => {
+  test('shows notice when outputs are empty', async () => {
     const workspace = 'test'
+    const stepOutputs = new StepOutputs(
+      {
+        stdout: '',
+        stderr: ''
+      },
+      undefined
+    )
     const analysis = {
       success: false,
       failedSteps: [
         {
           name: 'step1',
           conclusion: 'failure',
-          stdout: '',
-          stderr: ''
+          outputs: stepOutputs
         }
       ],
       totalSteps: 1,
@@ -266,7 +291,7 @@ describe('generateCommentBody', () => {
       skippedSteps: 0
     }
 
-    const comment = generateCommentBody(workspace, analysis)
+    const comment = await generateCommentBody(workspace, analysis)
 
     expect(comment).toContain('#### ❌ Step: `step1`')
     expect(comment).toContain('> [!NOTE]')
@@ -275,8 +300,15 @@ describe('generateCommentBody', () => {
     expect(comment).not.toContain('⚠️ Errors')
   })
 
-  test('target step successful with outputs', () => {
+  test('target step successful with outputs', async () => {
     const workspace = 'prod'
+    const stepOutputs = new StepOutputs(
+      {
+        stdout: 'Plan succeeded',
+        stderr: 'Some warnings'
+      },
+      undefined
+    )
     const analysis = {
       success: true,
       failedSteps: [],
@@ -287,12 +319,11 @@ describe('generateCommentBody', () => {
         name: 'plan',
         found: true,
         conclusion: 'success',
-        stdout: 'Plan succeeded',
-        stderr: 'Some warnings'
+        outputs: stepOutputs
       }
     }
 
-    const comment = generateCommentBody(workspace, analysis)
+    const comment = await generateCommentBody(workspace, analysis)
 
     expect(comment).toContain('<!-- tf-report-action:"prod" -->')
     expect(comment).toContain('## ✅ `prod` `plan` Succeeded')
@@ -302,8 +333,15 @@ describe('generateCommentBody', () => {
     expect(comment).toContain('Some warnings')
   })
 
-  test('target step successful with no outputs', () => {
+  test('target step successful with no outputs', async () => {
     const workspace = 'dev'
+    const stepOutputs = new StepOutputs(
+      {
+        stdout: '',
+        stderr: ''
+      },
+      undefined
+    )
     const analysis = {
       success: true,
       failedSteps: [],
@@ -314,20 +352,27 @@ describe('generateCommentBody', () => {
         name: 'apply',
         found: true,
         conclusion: 'success',
-        stdout: '',
-        stderr: ''
+        outputs: stepOutputs
       }
     }
 
-    const comment = generateCommentBody(workspace, analysis)
+    const comment = await generateCommentBody(workspace, analysis)
 
     expect(comment).toContain('## ✅ `dev` `apply` Succeeded')
     expect(comment).toContain('> [!NOTE]')
     expect(comment).toContain('Completed successfully with no output')
   })
 
-  test('target step failed', () => {
+  test('target step failed', async () => {
     const workspace = 'staging'
+    const stepOutputs = new StepOutputs(
+      {
+        stdout: 'Apply output',
+        stderr: 'Apply errors',
+        exit_code: '1'
+      },
+      '1'
+    )
     const analysis = {
       success: false,
       failedSteps: [{ name: 'apply', conclusion: 'failure' }],
@@ -338,20 +383,18 @@ describe('generateCommentBody', () => {
         name: 'apply',
         found: true,
         conclusion: 'failure',
-        stdout: 'Apply output',
-        stderr: 'Apply errors',
-        exitCode: '1'
+        outputs: stepOutputs
       }
     }
 
-    const comment = generateCommentBody(workspace, analysis)
+    const comment = await generateCommentBody(workspace, analysis)
 
     expect(comment).toContain('## ❌ `staging` `apply` Failed')
     expect(comment).toContain('**Status:** failure')
     expect(comment).toContain('**Exit Code:** 1')
   })
 
-  test('target step not found', () => {
+  test('target step not found', async () => {
     const workspace = 'test'
     const analysis = {
       success: true,
@@ -365,20 +408,28 @@ describe('generateCommentBody', () => {
       }
     }
 
-    const comment = generateCommentBody(workspace, analysis)
+    const comment = await generateCommentBody(workspace, analysis)
 
     expect(comment).toContain('## ❌ `test` `plan` Failed')
     expect(comment).toContain('### Did Not Run')
     expect(comment).toContain('`plan` was not found in the workflow steps')
   })
 
-  test('target step not found with other failures', () => {
+  test('target step not found with other failures', async () => {
     const workspace = 'prod'
     const analysis = {
       success: false,
       failedSteps: [
-        { name: 'init', conclusion: 'failure' },
-        { name: 'validate', conclusion: 'failure' }
+        {
+          name: 'init',
+          conclusion: 'failure',
+          outputs: new StepOutputs({}, undefined)
+        },
+        {
+          name: 'validate',
+          conclusion: 'failure',
+          outputs: new StepOutputs({}, undefined)
+        }
       ],
       totalSteps: 3,
       successfulSteps: 1,
@@ -389,7 +440,7 @@ describe('generateCommentBody', () => {
       }
     }
 
-    const comment = generateCommentBody(workspace, analysis)
+    const comment = await generateCommentBody(workspace, analysis)
 
     expect(comment).toContain('## ❌ `prod` `plan` Failed')
     // Should NOT contain "Did Not Run" when there are other failures
@@ -508,15 +559,21 @@ describe('getInput', () => {
 })
 
 describe('comment formatting', () => {
-  test('uses collapsible details for output', () => {
+  test('uses collapsible details for output', async () => {
+    const stepOutputs = new StepOutputs(
+      {
+        stdout: 'Some output',
+        stderr: 'Some errors'
+      },
+      '1'
+    )
     const analysis = {
       success: false,
       failedSteps: [
         {
           name: 'test-step',
           conclusion: 'failure',
-          stdout: 'Some output',
-          stderr: 'Some errors'
+          outputs: stepOutputs
         }
       ],
       totalSteps: 1,
@@ -524,7 +581,7 @@ describe('comment formatting', () => {
       skippedSteps: 0
     }
 
-    const comment = generateCommentBody('test', analysis)
+    const comment = await generateCommentBody('test', analysis)
 
     expect(comment).toContain('<details>')
     expect(comment).toContain('</details>')
@@ -534,7 +591,7 @@ describe('comment formatting', () => {
 })
 
 describe('JSON Lines integration', () => {
-  test('detects and formats JSON Lines in target step stdout', () => {
+  test('detects and formats JSON Lines in target step stdout', async () => {
     const jsonLinesOutput = `{"@level":"info","@message":"OpenTofu 1.6.0","@module":"tofu.ui","@timestamp":"2024-01-15T10:30:00.000000Z","type":"version","tofu":"1.6.0","ui":"1.0"}
 {"@level":"info","@message":"aws_instance.example: Plan to create","@module":"tofu.ui","@timestamp":"2024-01-15T10:30:01.000000Z","type":"planned_change","change":{"resource":{"addr":"aws_instance.example","module":"","resource":"aws_instance.example","implied_provider":"aws","resource_type":"aws_instance","resource_name":"example","resource_key":null},"action":"create"}}
 {"@level":"info","@message":"Plan: 1 to add, 0 to change, 0 to destroy.","@module":"tofu.ui","@timestamp":"2024-01-15T10:30:02.000000Z","type":"change_summary","changes":{"add":1,"change":0,"remove":0,"import":0,"operation":"plan"}}`
@@ -549,8 +606,8 @@ describe('JSON Lines integration', () => {
       }
     }
 
-    const analysis = analyzeSteps(steps, 'plan')
-    const comment = generateCommentBody('test-workspace', analysis)
+    const analysis = await analyzeSteps(steps, 'plan')
+    const comment = await generateCommentBody('test-workspace', analysis)
 
     // Should contain formatted JSON Lines output
     expect(comment).toContain('Plan: 1 to add, 0 to change, 0 to destroy.')
@@ -563,7 +620,7 @@ describe('JSON Lines integration', () => {
     expect(comment).not.toContain('"type":"version"')
   })
 
-  test('falls back to standard formatting for non-JSON Lines output', () => {
+  test('falls back to standard formatting for non-JSON Lines output', async () => {
     const plainTextOutput = `
 OpenTofu will perform the following actions:
 
@@ -582,8 +639,8 @@ Plan: 1 to add, 0 to change, 0 to destroy.
       }
     }
 
-    const analysis = analyzeSteps(steps, 'plan')
-    const comment = generateCommentBody('test-workspace', analysis)
+    const analysis = await analyzeSteps(steps, 'plan')
+    const comment = await generateCommentBody('test-workspace', analysis)
 
     // Should contain standard formatted output in collapsible
     expect(comment).toContain('<details>')
@@ -595,7 +652,7 @@ Plan: 1 to add, 0 to change, 0 to destroy.
     expect(comment).not.toContain(':heavy_plus_sign:')
   })
 
-  test('formats JSON Lines with errors in target step', () => {
+  test('formats JSON Lines with errors in target step', async () => {
     const jsonLinesWithErrors = `{"@level":"info","@message":"OpenTofu 1.6.0","@module":"tofu.ui","@timestamp":"2024-01-15T10:30:00.000000Z","type":"version","tofu":"1.6.0","ui":"1.0"}
 {"@level":"error","@message":"Error: Invalid resource type","@module":"tofu.ui","@timestamp":"2024-01-15T10:30:01.000000Z","type":"diagnostic","diagnostic":{"severity":"error","summary":"Invalid resource type","detail":"The provider hashicorp/aws does not support resource type."}}`
 
@@ -609,8 +666,8 @@ Plan: 1 to add, 0 to change, 0 to destroy.
       }
     }
 
-    const analysis = analyzeSteps(steps, 'plan')
-    const comment = generateCommentBody('test-workspace', analysis)
+    const analysis = await analyzeSteps(steps, 'plan')
+    const comment = await generateCommentBody('test-workspace', analysis)
 
     // Should contain error formatting in collapsible section
     expect(comment).toContain('<details>')
@@ -621,7 +678,7 @@ Plan: 1 to add, 0 to change, 0 to destroy.
     expect(comment).not.toContain('"@level"')
   })
 
-  test('formats change summary outside of collapsing', () => {
+  test('formats change summary outside of collapsing', async () => {
     const jsonLinesOutput = `{"@level":"info","@message":"OpenTofu 1.6.0","@module":"tofu.ui","@timestamp":"2024-01-15T10:30:00.000000Z","type":"version","tofu":"1.6.0","ui":"1.0"}
 {"@level":"info","@message":"Plan: 2 to add, 1 to change, 1 to destroy.","@module":"tofu.ui","@timestamp":"2024-01-15T10:30:01.000000Z","type":"change_summary","changes":{"add":2,"change":1,"remove":1,"import":0,"operation":"plan"}}`
 
@@ -634,8 +691,8 @@ Plan: 1 to add, 0 to change, 0 to destroy.
       }
     }
 
-    const analysis = analyzeSteps(steps, 'plan')
-    const comment = generateCommentBody('test-workspace', analysis)
+    const analysis = await analyzeSteps(steps, 'plan')
+    const comment = await generateCommentBody('test-workspace', analysis)
 
     // Change summary should always be present
     const summaryIndex = comment.indexOf('Plan:')
@@ -667,7 +724,13 @@ describe('generateTitle', () => {
   test('failure without target step', () => {
     const analysis = {
       success: false,
-      failedSteps: [{ name: 'build', conclusion: 'failure' }],
+      failedSteps: [
+        {
+          name: 'build',
+          conclusion: 'failure',
+          outputs: new StepOutputs({}, undefined)
+        }
+      ],
       totalSteps: 3
     }
 
@@ -696,7 +759,13 @@ describe('generateTitle', () => {
   test('target step failed', () => {
     const analysis = {
       success: false,
-      failedSteps: [{ name: 'apply', conclusion: 'failure' }],
+      failedSteps: [
+        {
+          name: 'apply',
+          conclusion: 'failure',
+          outputs: new StepOutputs({}, undefined)
+        }
+      ],
       totalSteps: 2,
       targetStepResult: {
         name: 'apply',
@@ -729,7 +798,13 @@ describe('generateTitle', () => {
   test('target step not found with overall failure', () => {
     const analysis = {
       success: false,
-      failedSteps: [{ name: 'init', conclusion: 'failure' }],
+      failedSteps: [
+        {
+          name: 'init',
+          conclusion: 'failure',
+          outputs: new StepOutputs({}, undefined)
+        }
+      ],
       totalSteps: 3,
       targetStepResult: {
         name: 'plan',
@@ -811,7 +886,13 @@ describe('generateTitle', () => {
   test('plan with no changes but errors shows Failed', () => {
     const analysis = {
       success: false,
-      failedSteps: [{ name: 'plan', conclusion: 'failure' }],
+      failedSteps: [
+        {
+          name: 'plan',
+          conclusion: 'failure',
+          outputs: new StepOutputs({}, undefined)
+        }
+      ],
       totalSteps: 2,
       targetStepResult: {
         name: 'plan',
@@ -914,7 +995,7 @@ describe('generateCommentBody with log link', () => {
     process.env = originalEnv
   })
 
-  test('includes log link when includeLogLink is true', () => {
+  test('includes log link when includeLogLink is true', async () => {
     const workspace = 'production'
     const analysis = {
       success: true,
@@ -924,7 +1005,7 @@ describe('generateCommentBody with log link', () => {
       skippedSteps: 0
     }
 
-    const comment = generateCommentBody(workspace, analysis, true)
+    const comment = await generateCommentBody(workspace, analysis, true)
 
     // Should still include dynamic title in body
     expect(comment).toContain('## ✅ `production` Succeeded')
@@ -935,7 +1016,7 @@ describe('generateCommentBody with log link', () => {
     )
   })
 
-  test('does not include log link when includeLogLink is false', () => {
+  test('does not include log link when includeLogLink is false', async () => {
     const workspace = 'production'
     const analysis = {
       success: true,
@@ -945,7 +1026,7 @@ describe('generateCommentBody with log link', () => {
       skippedSteps: 0
     }
 
-    const comment = generateCommentBody(workspace, analysis, false)
+    const comment = await generateCommentBody(workspace, analysis, false)
 
     // Should still include dynamic title in body
     expect(comment).toContain('## ✅ `production` Succeeded')
@@ -953,17 +1034,23 @@ describe('generateCommentBody with log link', () => {
     expect(comment).not.toContain('[View logs](')
   })
 
-  test('includes log link with failure status', () => {
+  test('includes log link with failure status', async () => {
     const workspace = 'staging'
     const analysis = {
       success: false,
-      failedSteps: [{ name: 'build', conclusion: 'failure' }],
+      failedSteps: [
+        {
+          name: 'build',
+          conclusion: 'failure',
+          outputs: new StepOutputs({}, undefined)
+        }
+      ],
       totalSteps: 2,
       successfulSteps: 1,
       skippedSteps: 0
     }
 
-    const comment = generateCommentBody(workspace, analysis, true)
+    const comment = await generateCommentBody(workspace, analysis, true)
 
     // Should include dynamic failure title in body
     expect(comment).toContain('## ❌ `staging` Failed')
@@ -974,7 +1061,7 @@ describe('generateCommentBody with log link', () => {
     )
   })
 
-  test('includes log link when target step has changes (plan)', () => {
+  test('includes log link when target step has changes (plan)', async () => {
     const workspace = 'production'
     const analysis = {
       success: true,
@@ -992,7 +1079,7 @@ describe('generateCommentBody with log link', () => {
       }
     }
 
-    const comment = generateCommentBody(workspace, analysis, true)
+    const comment = await generateCommentBody(workspace, analysis, true)
 
     expect(comment).toContain('[View logs](')
     expect(comment).toContain(
@@ -1000,7 +1087,7 @@ describe('generateCommentBody with log link', () => {
     )
   })
 
-  test('includes log link when target step is apply operation', () => {
+  test('includes log link when target step is apply operation', async () => {
     const workspace = 'production'
     const analysis = {
       success: true,
@@ -1018,7 +1105,7 @@ describe('generateCommentBody with log link', () => {
       }
     }
 
-    const comment = generateCommentBody(workspace, analysis, true)
+    const comment = await generateCommentBody(workspace, analysis, true)
 
     expect(comment).toContain('[View logs](')
     expect(comment).toContain(
@@ -1026,7 +1113,7 @@ describe('generateCommentBody with log link', () => {
     )
   })
 
-  test('does not include timestamp in PR context when includeLogLink is true', () => {
+  test('does not include timestamp in PR context when includeLogLink is true', async () => {
     const workspace = 'production'
     const analysis = {
       success: true,
@@ -1045,7 +1132,7 @@ describe('generateCommentBody with log link', () => {
     }
 
     // Without timestamp (PR context with changes)
-    const comment = generateCommentBody(workspace, analysis, true)
+    const comment = await generateCommentBody(workspace, analysis, true)
 
     expect(comment).toContain('[View logs](')
     expect(comment).not.toContain('Last updated:')
@@ -1053,7 +1140,7 @@ describe('generateCommentBody with log link', () => {
 })
 
 describe('skipped steps handling', () => {
-  test('all skipped steps should not report as success', () => {
+  test('all skipped steps should not report as success', async () => {
     const steps = {
       test: {
         outputs: {},
@@ -1072,7 +1159,7 @@ describe('skipped steps handling', () => {
       }
     }
 
-    const analysis = analyzeSteps(steps)
+    const analysis = await analyzeSteps(steps)
 
     expect(analysis.success).toBe(true) // No failures
     expect(analysis.successfulSteps).toBe(0)
@@ -1080,7 +1167,7 @@ describe('skipped steps handling', () => {
     expect(analysis.failedSteps.length).toBe(0)
   })
 
-  test('comment for all skipped steps shows correct counts', () => {
+  test('comment for all skipped steps shows correct counts', async () => {
     const workspace = 'test'
     const analysis = {
       success: true,
@@ -1090,13 +1177,13 @@ describe('skipped steps handling', () => {
       skippedSteps: 3
     }
 
-    const comment = generateCommentBody(workspace, analysis)
+    const comment = await generateCommentBody(workspace, analysis)
 
     expect(comment).toContain('All 3 step(s) were skipped.')
     expect(comment).not.toContain('succeeded')
   })
 
-  test('mixed steps show correct counts', () => {
+  test('mixed steps show correct counts', async () => {
     const workspace = 'test'
     const analysis = {
       success: true,
@@ -1106,12 +1193,12 @@ describe('skipped steps handling', () => {
       skippedSteps: 2
     }
 
-    const comment = generateCommentBody(workspace, analysis)
+    const comment = await generateCommentBody(workspace, analysis)
 
     expect(comment).toContain('3 succeeded, 2 skipped (5 total)')
   })
 
-  test('only successful steps omit skipped count', () => {
+  test('only successful steps omit skipped count', async () => {
     const workspace = 'test'
     const analysis = {
       success: true,
@@ -1121,26 +1208,34 @@ describe('skipped steps handling', () => {
       skippedSteps: 0
     }
 
-    const comment = generateCommentBody(workspace, analysis)
+    const comment = await generateCommentBody(workspace, analysis)
 
     expect(comment).toContain('3 succeeded (3 total)')
     expect(comment).not.toContain('skipped')
   })
 
-  test('with failures and successes, report focuses on failures', () => {
+  test('with failures and successes, report focuses on failures', async () => {
     const workspace = 'test'
     const analysis = {
       success: false,
       failedSteps: [
-        { name: 'build', conclusion: 'failure' },
-        { name: 'test', conclusion: 'failure' }
+        {
+          name: 'build',
+          conclusion: 'failure',
+          outputs: new StepOutputs({}, undefined)
+        },
+        {
+          name: 'test',
+          conclusion: 'failure',
+          outputs: new StepOutputs({}, undefined)
+        }
       ],
       totalSteps: 5,
       successfulSteps: 3,
       skippedSteps: 0
     }
 
-    const comment = generateCommentBody(workspace, analysis)
+    const comment = await generateCommentBody(workspace, analysis)
 
     // Should focus on failures, not mention successes in the summary
     expect(comment).toContain('2 of 5 step(s) failed:')
@@ -1197,7 +1292,7 @@ describe('generateCommentBody with timestamp', () => {
     process.env = originalEnv
   })
 
-  test('includes timestamp in status issue footer', () => {
+  test('includes timestamp in status issue footer', async () => {
     const workspace = 'production'
     const analysis = {
       success: true,
@@ -1208,13 +1303,18 @@ describe('generateCommentBody with timestamp', () => {
     }
     const timestamp = new Date('2026-01-22T19:05:47.590Z')
 
-    const comment = generateCommentBody(workspace, analysis, true, timestamp)
+    const comment = await generateCommentBody(
+      workspace,
+      analysis,
+      true,
+      timestamp
+    )
 
     expect(comment).toContain('[View logs](')
     expect(comment).toContain('Last updated: January 22, 2026 at 19:05 UTC')
   })
 
-  test('includes logs link and timestamp', () => {
+  test('includes logs link and timestamp', async () => {
     const workspace = 'production'
     const analysis = {
       success: true,
@@ -1225,12 +1325,107 @@ describe('generateCommentBody with timestamp', () => {
     }
     const timestamp = new Date('2026-01-22T19:05:47.590Z')
 
-    const comment = generateCommentBody(workspace, analysis, true, timestamp)
+    const comment = await generateCommentBody(
+      workspace,
+      analysis,
+      true,
+      timestamp
+    )
 
     expect(comment).toContain(
       '[View logs](https://github.com/owner/repo/actions/runs/12345/attempts/1)'
     )
     expect(comment).toContain(' • ')
     expect(comment).toContain('Last updated: January 22, 2026 at 19:05 UTC')
+  })
+})
+
+describe('analyzeSteps with file-based outputs', () => {
+  const testDir = '/tmp/test-outputs'
+
+  beforeEach(() => {
+    if (!fs.existsSync(testDir)) {
+      fs.mkdirSync(testDir, { recursive: true })
+    }
+  })
+
+  test('analyzes steps with file-based outputs', async () => {
+    const stdoutFile = path.join(testDir, 'step-stdout.txt')
+    const stderrFile = path.join(testDir, 'step-stderr.txt')
+
+    fs.writeFileSync(stdoutFile, 'Step output from file')
+    fs.writeFileSync(stderrFile, 'Step error from file')
+
+    const steps = {
+      step1: {
+        conclusion: 'failure',
+        outputs: {
+          stdout_file: stdoutFile,
+          stderr_file: stderrFile,
+          exit_code: '1'
+        }
+      }
+    }
+
+    const result = await analyzeSteps(steps)
+
+    expect(result.success).toBe(false)
+    expect(result.failedSteps.length).toBe(1)
+    expect(result.failedSteps[0].outputs).toBeDefined()
+    expect(result.failedSteps[0].outputs.getStdoutStream()).toBeDefined()
+    expect(result.failedSteps[0].outputs.getStderrStream()).toBeDefined()
+    expect(result.failedSteps[0].outputs.getExitCode()).toBe('1')
+  })
+
+  test('analyzes target step with file-based outputs', async () => {
+    const planFile = path.join(testDir, 'plan-output.txt')
+    fs.writeFileSync(planFile, 'Plan output from file')
+
+    const steps = {
+      init: { conclusion: 'success' },
+      plan: {
+        conclusion: 'success',
+        outputs: {
+          stdout_file: planFile
+        }
+      }
+    }
+
+    const result = await analyzeSteps(steps, 'plan')
+
+    expect(result.success).toBe(true)
+    expect(result.targetStepResult).toBeDefined()
+    expect(result.targetStepResult?.name).toBe('plan')
+    expect(result.targetStepResult?.found).toBe(true)
+    expect(result.targetStepResult?.outputs).toBeDefined()
+    expect(result.targetStepResult?.outputs?.getStdoutStream()).toBeDefined()
+  })
+
+  test('handles mix of direct and file-based outputs in different steps', async () => {
+    const stdoutFile = path.join(testDir, 'step2-stdout.txt')
+    fs.writeFileSync(stdoutFile, 'File-based output')
+
+    const steps = {
+      step1: {
+        conclusion: 'success',
+        outputs: {
+          stdout: 'Direct output'
+        }
+      },
+      step2: {
+        conclusion: 'failure',
+        outputs: {
+          stdout_file: stdoutFile,
+          exit_code: '1'
+        }
+      }
+    }
+
+    const result = await analyzeSteps(steps)
+
+    expect(result.success).toBe(false)
+    expect(result.failedSteps.length).toBe(1)
+    expect(result.failedSteps[0].outputs).toBeDefined()
+    expect(result.failedSteps[0].outputs.getStdoutStream()).toBeDefined()
   })
 })
