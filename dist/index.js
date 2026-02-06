@@ -321,6 +321,7 @@ async function formatJsonLinesStream(stream, maxOutputSize = 20000) {
     let buffer = '';
     // Build output incrementally, checking size as we go
     let formattedOutput = '';
+    // Accumulate only important details temporarily for formatting
     const errorDetails = [];
     const warningDetails = [];
     const plannedChangeDetails = [];
@@ -329,6 +330,66 @@ async function formatJsonLinesStream(stream, maxOutputSize = 20000) {
     // Single values
     let changeSummaryMessage;
     let operationType = 'unknown';
+    // Helper function to process a single parsed JSON message
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const processMessage = (parsed) => {
+        switch (parsed.type) {
+            case 'diagnostic':
+                if (parsed.diagnostic) {
+                    const detail = {
+                        severity: parsed.diagnostic.severity,
+                        summary: parsed.diagnostic.summary,
+                        detail: parsed.diagnostic.detail,
+                        filename: parsed.diagnostic.range?.filename,
+                        line: parsed.diagnostic.range?.start?.line,
+                        code: parsed.diagnostic.snippet?.code
+                    };
+                    if (detail.severity === 'error') {
+                        errorDetails.push(detail);
+                    }
+                    else if (detail.severity === 'warning') {
+                        warningDetails.push(detail);
+                    }
+                }
+                break;
+            case 'change_summary':
+                changeSummaryMessage = parsed['@message'];
+                if (parsed.changes) {
+                    operationType = parsed.changes.operation || 'unknown';
+                }
+                break;
+            case 'planned_change':
+                if (parsed.change) {
+                    const resource = parsed.change.resource;
+                    plannedChangeDetails.push({
+                        action: parsed.change.action,
+                        addr: resource?.addr ||
+                            `${resource?.resource_type}.${resource?.resource_name}`
+                    });
+                }
+                break;
+            case 'apply_complete':
+                if (parsed.hook) {
+                    const resource = parsed.hook.resource;
+                    applyCompleteDetails.push({
+                        action: parsed.hook.action,
+                        addr: resource?.addr ||
+                            `${resource?.resource_type}.${resource?.resource_name}`
+                    });
+                }
+                break;
+            case 'resource_drift':
+                if (parsed.change) {
+                    const resource = parsed.change.resource;
+                    driftDetails.push({
+                        action: parsed.change.action,
+                        addr: resource?.addr ||
+                            `${resource?.resource_type}.${resource?.resource_name}`
+                    });
+                }
+                break;
+        }
+    };
     return new Promise((resolve) => {
         stream.on('data', (chunk) => {
             buffer += typeof chunk === 'string' ? chunk : chunk.toString('utf8');
@@ -341,63 +402,7 @@ async function formatJsonLinesStream(stream, maxOutputSize = 20000) {
                     continue;
                 try {
                     const parsed = JSON.parse(line);
-                    // Extract only important details
-                    switch (parsed.type) {
-                        case 'diagnostic':
-                            if (parsed.diagnostic) {
-                                const detail = {
-                                    severity: parsed.diagnostic.severity,
-                                    summary: parsed.diagnostic.summary,
-                                    detail: parsed.diagnostic.detail,
-                                    filename: parsed.diagnostic.range?.filename,
-                                    line: parsed.diagnostic.range?.start?.line,
-                                    code: parsed.diagnostic.snippet?.code
-                                };
-                                if (detail.severity === 'error') {
-                                    errorDetails.push(detail);
-                                }
-                                else if (detail.severity === 'warning') {
-                                    warningDetails.push(detail);
-                                }
-                            }
-                            break;
-                        case 'change_summary':
-                            changeSummaryMessage = parsed['@message'];
-                            if (parsed.changes) {
-                                operationType = parsed.changes.operation || 'unknown';
-                            }
-                            break;
-                        case 'planned_change':
-                            if (parsed.change) {
-                                const resource = parsed.change.resource;
-                                plannedChangeDetails.push({
-                                    action: parsed.change.action,
-                                    addr: resource?.addr ||
-                                        `${resource?.resource_type}.${resource?.resource_name}`
-                                });
-                            }
-                            break;
-                        case 'apply_complete':
-                            if (parsed.hook) {
-                                const resource = parsed.hook.resource;
-                                applyCompleteDetails.push({
-                                    action: parsed.hook.action,
-                                    addr: resource?.addr ||
-                                        `${resource?.resource_type}.${resource?.resource_name}`
-                                });
-                            }
-                            break;
-                        case 'resource_drift':
-                            if (parsed.change) {
-                                const resource = parsed.change.resource;
-                                driftDetails.push({
-                                    action: parsed.change.action,
-                                    addr: resource?.addr ||
-                                        `${resource?.resource_type}.${resource?.resource_name}`
-                                });
-                            }
-                            break;
-                    }
+                    processMessage(parsed);
                 }
                 catch {
                     // Skip lines that aren't valid JSON
@@ -409,63 +414,7 @@ async function formatJsonLinesStream(stream, maxOutputSize = 20000) {
             if (buffer.trim()) {
                 try {
                     const parsed = JSON.parse(buffer);
-                    // Extract only important details from final message
-                    switch (parsed.type) {
-                        case 'diagnostic':
-                            if (parsed.diagnostic) {
-                                const detail = {
-                                    severity: parsed.diagnostic.severity,
-                                    summary: parsed.diagnostic.summary,
-                                    detail: parsed.diagnostic.detail,
-                                    filename: parsed.diagnostic.range?.filename,
-                                    line: parsed.diagnostic.range?.start?.line,
-                                    code: parsed.diagnostic.snippet?.code
-                                };
-                                if (detail.severity === 'error') {
-                                    errorDetails.push(detail);
-                                }
-                                else if (detail.severity === 'warning') {
-                                    warningDetails.push(detail);
-                                }
-                            }
-                            break;
-                        case 'change_summary':
-                            changeSummaryMessage = parsed['@message'];
-                            if (parsed.changes) {
-                                operationType = parsed.changes.operation || 'unknown';
-                            }
-                            break;
-                        case 'planned_change':
-                            if (parsed.change) {
-                                const resource = parsed.change.resource;
-                                plannedChangeDetails.push({
-                                    action: parsed.change.action,
-                                    addr: resource?.addr ||
-                                        `${resource?.resource_type}.${resource?.resource_name}`
-                                });
-                            }
-                            break;
-                        case 'apply_complete':
-                            if (parsed.hook) {
-                                const resource = parsed.hook.resource;
-                                applyCompleteDetails.push({
-                                    action: parsed.hook.action,
-                                    addr: resource?.addr ||
-                                        `${resource?.resource_type}.${resource?.resource_name}`
-                                });
-                            }
-                            break;
-                        case 'resource_drift':
-                            if (parsed.change) {
-                                const resource = parsed.change.resource;
-                                driftDetails.push({
-                                    action: parsed.change.action,
-                                    addr: resource?.addr ||
-                                        `${resource?.resource_type}.${resource?.resource_name}`
-                                });
-                            }
-                            break;
-                    }
+                    processMessage(parsed);
                 }
                 catch {
                     // Skip if final buffer isn't valid JSON
@@ -867,7 +816,6 @@ function getStepOutputStream(stepOutputs, outputType) {
 /**
  * Analyze a JSON Lines stream incrementally, extracting only metadata.
  * Processes messages one at a time without accumulating them.
- * Continues until stream ends to find all important messages.
  */
 async function analyzeJsonLinesStream(stream) {
     if (!stream) {

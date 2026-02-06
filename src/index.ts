@@ -166,7 +166,6 @@ export function getStepOutputStream(
 /**
  * Analyze a JSON Lines stream incrementally, extracting only metadata.
  * Processes messages one at a time without accumulating them.
- * Continues until stream ends to find all important messages.
  */
 async function analyzeJsonLinesStream(stream: Readable | undefined): Promise<{
   isJsonLines: boolean

@@ -15,6 +15,26 @@
 import { Readable } from 'stream'
 
 /**
+ * Diagnostic detail for stream formatting
+ */
+interface DiagnosticDetail {
+  severity: 'error' | 'warning'
+  summary: string
+  detail?: string
+  filename?: string
+  line?: number
+  code?: string
+}
+
+/**
+ * Change detail for stream formatting
+ */
+interface ChangeDetail {
+  action: string
+  addr: string
+}
+
+/**
  * Base interface for all JSON messages
  */
 interface BaseMessage {
@@ -824,20 +844,6 @@ export async function formatJsonLinesStream(
   let formattedOutput = ''
 
   // Accumulate only important details temporarily for formatting
-  interface DiagnosticDetail {
-    severity: 'error' | 'warning'
-    summary: string
-    detail?: string
-    filename?: string
-    line?: number
-    code?: string
-  }
-
-  interface ChangeDetail {
-    action: string
-    addr: string
-  }
-
   const errorDetails: DiagnosticDetail[] = []
   const warningDetails: DiagnosticDetail[] = []
   const plannedChangeDetails: ChangeDetail[] = []
@@ -847,6 +853,74 @@ export async function formatJsonLinesStream(
   // Single values
   let changeSummaryMessage: string | undefined
   let operationType: 'plan' | 'apply' | 'destroy' | 'unknown' = 'unknown'
+
+  // Helper function to process a single parsed JSON message
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const processMessage = (parsed: any) => {
+    switch (parsed.type) {
+      case 'diagnostic':
+        if (parsed.diagnostic) {
+          const detail: DiagnosticDetail = {
+            severity: parsed.diagnostic.severity,
+            summary: parsed.diagnostic.summary,
+            detail: parsed.diagnostic.detail,
+            filename: parsed.diagnostic.range?.filename,
+            line: parsed.diagnostic.range?.start?.line,
+            code: parsed.diagnostic.snippet?.code
+          }
+
+          if (detail.severity === 'error') {
+            errorDetails.push(detail)
+          } else if (detail.severity === 'warning') {
+            warningDetails.push(detail)
+          }
+        }
+        break
+
+      case 'change_summary':
+        changeSummaryMessage = parsed['@message']
+        if (parsed.changes) {
+          operationType = parsed.changes.operation || 'unknown'
+        }
+        break
+
+      case 'planned_change':
+        if (parsed.change) {
+          const resource = parsed.change.resource
+          plannedChangeDetails.push({
+            action: parsed.change.action,
+            addr:
+              resource?.addr ||
+              `${resource?.resource_type}.${resource?.resource_name}`
+          })
+        }
+        break
+
+      case 'apply_complete':
+        if (parsed.hook) {
+          const resource = parsed.hook.resource
+          applyCompleteDetails.push({
+            action: parsed.hook.action,
+            addr:
+              resource?.addr ||
+              `${resource?.resource_type}.${resource?.resource_name}`
+          })
+        }
+        break
+
+      case 'resource_drift':
+        if (parsed.change) {
+          const resource = parsed.change.resource
+          driftDetails.push({
+            action: parsed.change.action,
+            addr:
+              resource?.addr ||
+              `${resource?.resource_type}.${resource?.resource_name}`
+          })
+        }
+        break
+    }
+  }
 
   return new Promise((resolve) => {
     stream.on('data', (chunk) => {
@@ -862,71 +936,7 @@ export async function formatJsonLinesStream(
 
         try {
           const parsed = JSON.parse(line)
-
-          // Extract only important details
-          switch (parsed.type) {
-            case 'diagnostic':
-              if (parsed.diagnostic) {
-                const detail: DiagnosticDetail = {
-                  severity: parsed.diagnostic.severity,
-                  summary: parsed.diagnostic.summary,
-                  detail: parsed.diagnostic.detail,
-                  filename: parsed.diagnostic.range?.filename,
-                  line: parsed.diagnostic.range?.start?.line,
-                  code: parsed.diagnostic.snippet?.code
-                }
-
-                if (detail.severity === 'error') {
-                  errorDetails.push(detail)
-                } else if (detail.severity === 'warning') {
-                  warningDetails.push(detail)
-                }
-              }
-              break
-
-            case 'change_summary':
-              changeSummaryMessage = parsed['@message']
-              if (parsed.changes) {
-                operationType = parsed.changes.operation || 'unknown'
-              }
-              break
-
-            case 'planned_change':
-              if (parsed.change) {
-                const resource = parsed.change.resource
-                plannedChangeDetails.push({
-                  action: parsed.change.action,
-                  addr:
-                    resource?.addr ||
-                    `${resource?.resource_type}.${resource?.resource_name}`
-                })
-              }
-              break
-
-            case 'apply_complete':
-              if (parsed.hook) {
-                const resource = parsed.hook.resource
-                applyCompleteDetails.push({
-                  action: parsed.hook.action,
-                  addr:
-                    resource?.addr ||
-                    `${resource?.resource_type}.${resource?.resource_name}`
-                })
-              }
-              break
-
-            case 'resource_drift':
-              if (parsed.change) {
-                const resource = parsed.change.resource
-                driftDetails.push({
-                  action: parsed.change.action,
-                  addr:
-                    resource?.addr ||
-                    `${resource?.resource_type}.${resource?.resource_name}`
-                })
-              }
-              break
-          }
+          processMessage(parsed)
         } catch {
           // Skip lines that aren't valid JSON
         }
@@ -938,71 +948,7 @@ export async function formatJsonLinesStream(
       if (buffer.trim()) {
         try {
           const parsed = JSON.parse(buffer)
-
-          // Extract only important details from final message
-          switch (parsed.type) {
-            case 'diagnostic':
-              if (parsed.diagnostic) {
-                const detail = {
-                  severity: parsed.diagnostic.severity,
-                  summary: parsed.diagnostic.summary,
-                  detail: parsed.diagnostic.detail,
-                  filename: parsed.diagnostic.range?.filename,
-                  line: parsed.diagnostic.range?.start?.line,
-                  code: parsed.diagnostic.snippet?.code
-                }
-
-                if (detail.severity === 'error') {
-                  errorDetails.push(detail)
-                } else if (detail.severity === 'warning') {
-                  warningDetails.push(detail)
-                }
-              }
-              break
-
-            case 'change_summary':
-              changeSummaryMessage = parsed['@message']
-              if (parsed.changes) {
-                operationType = parsed.changes.operation || 'unknown'
-              }
-              break
-
-            case 'planned_change':
-              if (parsed.change) {
-                const resource = parsed.change.resource
-                plannedChangeDetails.push({
-                  action: parsed.change.action,
-                  addr:
-                    resource?.addr ||
-                    `${resource?.resource_type}.${resource?.resource_name}`
-                })
-              }
-              break
-
-            case 'apply_complete':
-              if (parsed.hook) {
-                const resource = parsed.hook.resource
-                applyCompleteDetails.push({
-                  action: parsed.hook.action,
-                  addr:
-                    resource?.addr ||
-                    `${resource?.resource_type}.${resource?.resource_name}`
-                })
-              }
-              break
-
-            case 'resource_drift':
-              if (parsed.change) {
-                const resource = parsed.change.resource
-                driftDetails.push({
-                  action: parsed.change.action,
-                  addr:
-                    resource?.addr ||
-                    `${resource?.resource_type}.${resource?.resource_name}`
-                })
-              }
-              break
-          }
+          processMessage(parsed)
         } catch {
           // Skip if final buffer isn't valid JSON
         }
