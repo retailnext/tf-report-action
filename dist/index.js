@@ -16,6 +16,58 @@ import * as https from 'https';
  * commands run with the -json flag.
  */
 /**
+ * Check if a stream appears to be JSON Lines format by checking first few lines.
+ * Does not accumulate data beyond what's needed for detection.
+ */
+async function isJsonLinesStream(stream) {
+    if (!stream) {
+        return false;
+    }
+    let buffer = '';
+    let linesChecked = 0;
+    let validJsonCount = 0;
+    const samplesToCheck = 3;
+    return new Promise((resolve) => {
+        stream.on('data', (chunk) => {
+            buffer += typeof chunk === 'string' ? chunk : chunk.toString('utf8');
+            // Process complete lines
+            let newlineIndex;
+            while ((newlineIndex = buffer.indexOf('\n')) !== -1 &&
+                linesChecked < samplesToCheck) {
+                const line = buffer.substring(0, newlineIndex).trim();
+                buffer = buffer.substring(newlineIndex + 1);
+                if (!line)
+                    continue;
+                linesChecked++;
+                try {
+                    const parsed = JSON.parse(line);
+                    // Check for required fields in OpenTofu/Terraform JSON output
+                    if (parsed &&
+                        typeof parsed === 'object' &&
+                        'type' in parsed &&
+                        '@message' in parsed) {
+                        validJsonCount++;
+                    }
+                }
+                catch {
+                    // Not valid JSON, continue checking other lines
+                }
+                if (linesChecked >= samplesToCheck) {
+                    stream.destroy();
+                    resolve(validJsonCount > 0);
+                    return;
+                }
+            }
+        });
+        stream.on('end', () => {
+            resolve(validJsonCount > 0);
+        });
+        stream.on('error', () => {
+            resolve(false);
+        });
+    });
+}
+/**
  * Check if a string appears to be JSON Lines format
  */
 function isJsonLines(text) {
@@ -254,6 +306,332 @@ function formatJsonLines(parsed) {
     }
     return result.trim();
 }
+/**
+ * Format JSON Lines from a stream directly without accumulating messages.
+ * Limits based on formatted output size, not message count.
+ * Stops accumulating when formatted output reaches size limit.
+ */
+async function formatJsonLinesStream(stream, maxOutputSize = 20000) {
+    if (!stream) {
+        return '';
+    }
+    // Reserves space for important summaries. Always includes change_summary which may appear at end of stream.
+    const SUMMARY_RESERVE = 1000;
+    const effectiveLimit = maxOutputSize - SUMMARY_RESERVE;
+    let buffer = '';
+    // Build output incrementally, checking size as we go
+    let formattedOutput = '';
+    const errorDetails = [];
+    const warningDetails = [];
+    const plannedChangeDetails = [];
+    const applyCompleteDetails = [];
+    const driftDetails = [];
+    // Single values
+    let changeSummaryMessage;
+    let operationType = 'unknown';
+    return new Promise((resolve) => {
+        stream.on('data', (chunk) => {
+            buffer += typeof chunk === 'string' ? chunk : chunk.toString('utf8');
+            // Process complete lines
+            let newlineIndex;
+            while ((newlineIndex = buffer.indexOf('\n')) !== -1) {
+                const line = buffer.substring(0, newlineIndex).trim();
+                buffer = buffer.substring(newlineIndex + 1);
+                if (!line)
+                    continue;
+                try {
+                    const parsed = JSON.parse(line);
+                    // Extract only important details
+                    switch (parsed.type) {
+                        case 'diagnostic':
+                            if (parsed.diagnostic) {
+                                const detail = {
+                                    severity: parsed.diagnostic.severity,
+                                    summary: parsed.diagnostic.summary,
+                                    detail: parsed.diagnostic.detail,
+                                    filename: parsed.diagnostic.range?.filename,
+                                    line: parsed.diagnostic.range?.start?.line,
+                                    code: parsed.diagnostic.snippet?.code
+                                };
+                                if (detail.severity === 'error') {
+                                    errorDetails.push(detail);
+                                }
+                                else if (detail.severity === 'warning') {
+                                    warningDetails.push(detail);
+                                }
+                            }
+                            break;
+                        case 'change_summary':
+                            changeSummaryMessage = parsed['@message'];
+                            if (parsed.changes) {
+                                operationType = parsed.changes.operation || 'unknown';
+                            }
+                            break;
+                        case 'planned_change':
+                            if (parsed.change) {
+                                const resource = parsed.change.resource;
+                                plannedChangeDetails.push({
+                                    action: parsed.change.action,
+                                    addr: resource?.addr ||
+                                        `${resource?.resource_type}.${resource?.resource_name}`
+                                });
+                            }
+                            break;
+                        case 'apply_complete':
+                            if (parsed.hook) {
+                                const resource = parsed.hook.resource;
+                                applyCompleteDetails.push({
+                                    action: parsed.hook.action,
+                                    addr: resource?.addr ||
+                                        `${resource?.resource_type}.${resource?.resource_name}`
+                                });
+                            }
+                            break;
+                        case 'resource_drift':
+                            if (parsed.change) {
+                                const resource = parsed.change.resource;
+                                driftDetails.push({
+                                    action: parsed.change.action,
+                                    addr: resource?.addr ||
+                                        `${resource?.resource_type}.${resource?.resource_name}`
+                                });
+                            }
+                            break;
+                    }
+                }
+                catch {
+                    // Skip lines that aren't valid JSON
+                }
+            }
+        });
+        stream.on('end', () => {
+            // Process any remaining buffer content (last line without trailing newline)
+            if (buffer.trim()) {
+                try {
+                    const parsed = JSON.parse(buffer);
+                    // Extract only important details from final message
+                    switch (parsed.type) {
+                        case 'diagnostic':
+                            if (parsed.diagnostic) {
+                                const detail = {
+                                    severity: parsed.diagnostic.severity,
+                                    summary: parsed.diagnostic.summary,
+                                    detail: parsed.diagnostic.detail,
+                                    filename: parsed.diagnostic.range?.filename,
+                                    line: parsed.diagnostic.range?.start?.line,
+                                    code: parsed.diagnostic.snippet?.code
+                                };
+                                if (detail.severity === 'error') {
+                                    errorDetails.push(detail);
+                                }
+                                else if (detail.severity === 'warning') {
+                                    warningDetails.push(detail);
+                                }
+                            }
+                            break;
+                        case 'change_summary':
+                            changeSummaryMessage = parsed['@message'];
+                            if (parsed.changes) {
+                                operationType = parsed.changes.operation || 'unknown';
+                            }
+                            break;
+                        case 'planned_change':
+                            if (parsed.change) {
+                                const resource = parsed.change.resource;
+                                plannedChangeDetails.push({
+                                    action: parsed.change.action,
+                                    addr: resource?.addr ||
+                                        `${resource?.resource_type}.${resource?.resource_name}`
+                                });
+                            }
+                            break;
+                        case 'apply_complete':
+                            if (parsed.hook) {
+                                const resource = parsed.hook.resource;
+                                applyCompleteDetails.push({
+                                    action: parsed.hook.action,
+                                    addr: resource?.addr ||
+                                        `${resource?.resource_type}.${resource?.resource_name}`
+                                });
+                            }
+                            break;
+                        case 'resource_drift':
+                            if (parsed.change) {
+                                const resource = parsed.change.resource;
+                                driftDetails.push({
+                                    action: parsed.change.action,
+                                    addr: resource?.addr ||
+                                        `${resource?.resource_type}.${resource?.resource_name}`
+                                });
+                            }
+                            break;
+                    }
+                }
+                catch {
+                    // Skip if final buffer isn't valid JSON
+                }
+            }
+            formattedOutput = buildFormattedOutput(changeSummaryMessage, operationType, errorDetails, warningDetails, plannedChangeDetails, applyCompleteDetails, driftDetails, effectiveLimit);
+            resolve(formattedOutput);
+        });
+        stream.on('error', () => {
+            formattedOutput = buildFormattedOutput(changeSummaryMessage, operationType, errorDetails, warningDetails, plannedChangeDetails, applyCompleteDetails, driftDetails, effectiveLimit);
+            resolve(formattedOutput);
+        });
+    });
+}
+/**
+ * Build formatted output from accumulated details, limiting by output size
+ */
+function buildFormattedOutput(changeSummaryMessage, operationType, errorDetails, warningDetails, plannedChangeDetails, applyCompleteDetails, driftDetails, maxSize) {
+    let result = '';
+    // Show change summary first
+    if (changeSummaryMessage) {
+        result += `${changeSummaryMessage}\n\n`;
+    }
+    // Format diagnostics, checking size as we add each one
+    if (errorDetails.length > 0) {
+        let diagnosticsSection = '<details>\n<summary>❌ Errors</summary>\n\n';
+        let errorCount = 0;
+        for (const err of errorDetails) {
+            const errorText = `❌ **${err.summary}**` +
+                (err.detail ? `\n\n${err.detail}` : '') +
+                (err.filename && err.line
+                    ? `\n\n📄 \`${err.filename}:${err.line}\``
+                    : '') +
+                (err.code ? '\n\n```hcl\n' + err.code + '\n```' : '') +
+                '\n\n';
+            if (maxSize &&
+                (result + diagnosticsSection + errorText).length > maxSize) {
+                break;
+            }
+            diagnosticsSection += errorText;
+            errorCount++;
+        }
+        if (errorCount < errorDetails.length) {
+            diagnosticsSection += `... (showing ${errorCount} of ${errorDetails.length} errors)\n\n`;
+        }
+        diagnosticsSection += '</details>\n\n';
+        if (!maxSize || (result + diagnosticsSection).length <= maxSize) {
+            result += diagnosticsSection;
+        }
+    }
+    if (warningDetails.length > 0 && (!maxSize || result.length < maxSize)) {
+        let diagnosticsSection = '<details>\n<summary>⚠️ Warnings</summary>\n\n';
+        let warnCount = 0;
+        for (const warn of warningDetails) {
+            const warnText = `⚠️ **${warn.summary}**` +
+                (warn.detail ? `\n\n${warn.detail}` : '') +
+                (warn.filename && warn.line
+                    ? `\n\n📄 \`${warn.filename}:${warn.line}\``
+                    : '') +
+                (warn.code ? '\n\n```hcl\n' + warn.code + '\n```' : '') +
+                '\n\n';
+            if (maxSize &&
+                (result + diagnosticsSection + warnText).length > maxSize) {
+                break;
+            }
+            diagnosticsSection += warnText;
+            warnCount++;
+        }
+        if (warnCount < warningDetails.length) {
+            diagnosticsSection += `... (showing ${warnCount} of ${warningDetails.length} warnings)\n\n`;
+        }
+        diagnosticsSection += '</details>\n\n';
+        if (!maxSize || (result + diagnosticsSection).length <= maxSize) {
+            result += diagnosticsSection;
+        }
+    }
+    // Format changes, checking size
+    const hasChanges = plannedChangeDetails.length > 0 || applyCompleteDetails.length > 0;
+    if (hasChanges && (!maxSize || result.length < maxSize)) {
+        if (operationType === 'plan' && plannedChangeDetails.length > 0) {
+            let changesSection = '<details>\n<summary>📋 Planned Changes</summary>\n\n';
+            let changeCount = 0;
+            for (const change of plannedChangeDetails) {
+                const emoji = getActionEmoji(change.action);
+                const changeText = `${emoji} **${change.addr}** (${change.action})\n`;
+                if (maxSize &&
+                    (result + changesSection + changeText).length > maxSize) {
+                    break;
+                }
+                changesSection += changeText;
+                changeCount++;
+            }
+            if (changeCount < plannedChangeDetails.length) {
+                changesSection += `\n... (showing ${changeCount} of ${plannedChangeDetails.length} changes)\n`;
+            }
+            changesSection += '\n</details>\n\n';
+            if (!maxSize || (result + changesSection).length <= maxSize) {
+                result += changesSection;
+            }
+        }
+        else if (operationType === 'apply' && applyCompleteDetails.length > 0) {
+            let changesSection = '<details>\n<summary>✅ Applied Changes</summary>\n\n';
+            let changeCount = 0;
+            for (const change of applyCompleteDetails) {
+                const emoji = getActionEmoji(change.action);
+                const changeText = `${emoji} **${change.addr}** (${change.action})\n`;
+                if (maxSize &&
+                    (result + changesSection + changeText).length > maxSize) {
+                    break;
+                }
+                changesSection += changeText;
+                changeCount++;
+            }
+            if (changeCount < applyCompleteDetails.length) {
+                changesSection += `\n... (showing ${changeCount} of ${applyCompleteDetails.length} changes)\n`;
+            }
+            changesSection += '\n</details>\n\n';
+            if (!maxSize || (result + changesSection).length <= maxSize) {
+                result += changesSection;
+            }
+        }
+        else if (operationType === 'unknown' && plannedChangeDetails.length > 0) {
+            let changesSection = '<details>\n<summary>📋 Planned Changes</summary>\n\n';
+            let changeCount = 0;
+            for (const change of plannedChangeDetails) {
+                const emoji = getActionEmoji(change.action);
+                const changeText = `${emoji} **${change.addr}** (${change.action})\n`;
+                if (maxSize &&
+                    (result + changesSection + changeText).length > maxSize) {
+                    break;
+                }
+                changesSection += changeText;
+                changeCount++;
+            }
+            if (changeCount < plannedChangeDetails.length) {
+                changesSection += `\n... (showing ${changeCount} of ${plannedChangeDetails.length} changes)\n`;
+            }
+            changesSection += '\n</details>\n\n';
+            if (!maxSize || (result + changesSection).length <= maxSize) {
+                result += changesSection;
+            }
+        }
+    }
+    // Format drifts
+    if (driftDetails.length > 0 && (!maxSize || result.length < maxSize)) {
+        let driftsSection = '<details>\n<summary>🔀 Resource Drift</summary>\n\n';
+        let driftCount = 0;
+        for (const drift of driftDetails) {
+            const emoji = getActionEmoji(drift.action);
+            const driftText = `${emoji} **${drift.addr}** (${drift.action})\n`;
+            if (maxSize && (result + driftsSection + driftText).length > maxSize) {
+                break;
+            }
+            driftsSection += driftText;
+            driftCount++;
+        }
+        if (driftCount < driftDetails.length) {
+            driftsSection += `\n... (showing ${driftCount} of ${driftDetails.length} drifts)\n`;
+        }
+        driftsSection += '\n</details>\n\n';
+        if (!maxSize || (result + driftsSection).length <= maxSize) {
+            result += driftsSection;
+        }
+    }
+    return result.trim();
+}
 
 // Default implementation using the real https module
 let requestImpl = https.request;
@@ -431,13 +809,15 @@ class StepOutputs {
         this.exitCode = exitCode;
     }
     /**
-     * Get a readable stream for stdout
+     * Get a readable stream for stdout.
+     * Returns a fresh stream each time.
      */
     getStdoutStream() {
         return getStepOutputStream(this.outputs, 'stdout');
     }
     /**
-     * Get a readable stream for stderr
+     * Get a readable stream for stderr.
+     * Returns a fresh stream each time.
      */
     getStderrStream() {
         return getStepOutputStream(this.outputs, 'stderr');
@@ -737,12 +1117,12 @@ async function generateCommentBody(workspace, analysis, includeLogLink = false, 
             }
         }
         else if (targetStepResult.conclusion === 'success') {
-            // Success case - show stdout/stderr if available (read limited for comment)
-            const stdoutStream = targetStepResult.outputs?.getStdoutStream();
-            const stderrStream = targetStepResult.outputs?.getStderrStream();
-            const stdout = await readLimitedStreamContent(stdoutStream, MAX_OUTPUT_PER_STEP);
-            const stderr = await readLimitedStreamContent(stderrStream, MAX_OUTPUT_PER_STEP);
-            const { formattedContent } = formatOutput(stdout, stderr);
+            // Success case - show stdout/stderr if available (pass stream getters)
+            const { formattedContent } = await formatOutput(targetStepResult.outputs
+                ? () => targetStepResult.outputs.getStdoutStream()
+                : undefined, targetStepResult.outputs
+                ? () => targetStepResult.outputs.getStderrStream()
+                : undefined, MAX_OUTPUT_PER_STEP);
             if (!formattedContent) {
                 comment += `> [!NOTE]\n> Completed successfully with no output.\n\n`;
             }
@@ -758,11 +1138,11 @@ async function generateCommentBody(workspace, analysis, includeLogLink = false, 
                 comment += `**Exit Code:** ${exitCode}\n`;
             }
             comment += '\n';
-            const stdoutStream = targetStepResult.outputs?.getStdoutStream();
-            const stderrStream = targetStepResult.outputs?.getStderrStream();
-            const stdout = await readLimitedStreamContent(stdoutStream, MAX_OUTPUT_PER_STEP);
-            const stderr = await readLimitedStreamContent(stderrStream, MAX_OUTPUT_PER_STEP);
-            const { formattedContent } = formatOutput(stdout, stderr);
+            const { formattedContent } = await formatOutput(targetStepResult.outputs
+                ? () => targetStepResult.outputs.getStdoutStream()
+                : undefined, targetStepResult.outputs
+                ? () => targetStepResult.outputs.getStderrStream()
+                : undefined, MAX_OUTPUT_PER_STEP);
             if (!formattedContent) {
                 comment += `> [!NOTE]\n> Failed with no output.\n\n`;
             }
@@ -806,11 +1186,7 @@ async function generateCommentBody(workspace, analysis, includeLogLink = false, 
                     comment += `**Exit Code:** ${exitCode}\n`;
                 }
                 comment += '\n';
-                const stdoutStream = step.outputs.getStdoutStream();
-                const stderrStream = step.outputs.getStderrStream();
-                const stdout = await readLimitedStreamContent(stdoutStream, MAX_OUTPUT_PER_STEP);
-                const stderr = await readLimitedStreamContent(stderrStream, MAX_OUTPUT_PER_STEP);
-                const { formattedContent } = formatOutput(stdout, stderr);
+                const { formattedContent } = await formatOutput(() => step.outputs.getStdoutStream(), () => step.outputs.getStderrStream(), MAX_OUTPUT_PER_STEP);
                 if (!formattedContent) {
                     comment += `> [!NOTE]\n> Failed with no output.\n\n`;
                 }
@@ -913,31 +1289,43 @@ function generateStatusIssueTitle(workspace) {
     return `:bar_chart: \`${workspace}\` Status`;
 }
 /**
- * Format output, detecting and handling JSON Lines format
+ * Format output from streams, detecting and handling JSON Lines format.
+ * Limits based on formatted output size.
  */
-function formatOutput(stdout, stderr) {
-    const hasStdout = stdout && stdout.trim().length > 0;
-    const hasStderr = stderr && stderr.trim().length > 0;
-    // Check if stdout is JSON Lines format
-    if (hasStdout && stdout && isJsonLines(stdout)) {
-        const parsed = parseJsonLines(stdout);
-        const formatted = formatJsonLines(parsed);
-        if (formatted.trim().length > 0) {
-            return { formattedContent: formatted, isJsonLines: true };
+async function formatOutput(getStdoutStream, getStderrStream, maxSize = MAX_OUTPUT_PER_STEP) {
+    // Check if stdout is JSON Lines format (with fresh stream for detection)
+    if (getStdoutStream) {
+        const detectionStream = getStdoutStream();
+        const isJsonLinesFormat = await isJsonLinesStream(detectionStream);
+        if (isJsonLinesFormat) {
+            // Get a fresh stream for formatting
+            const formattingStream = getStdoutStream();
+            const formatted = await formatJsonLinesStream(formattingStream, maxSize);
+            if (formatted.trim().length > 0) {
+                return { formattedContent: formatted, isJsonLines: true };
+            }
         }
     }
-    // Fall back to standard output formatting
+    // Fall back to standard output formatting with limited reading
     let content = '';
-    if (!hasStdout && !hasStderr) {
+    if (getStdoutStream) {
+        const stdoutStream = getStdoutStream();
+        const stdout = await readLimitedStreamContent(stdoutStream, maxSize);
+        if (stdout && stdout.trim().length > 0) {
+            const truncated = truncateOutput(stdout, maxSize, true);
+            content += `<details>\n<summary>📄 Output</summary>\n\n\`\`\`\n${truncated}\n\`\`\`\n</details>\n\n`;
+        }
+    }
+    if (getStderrStream) {
+        const stderrStream = getStderrStream();
+        const stderr = await readLimitedStreamContent(stderrStream, maxSize);
+        if (stderr && stderr.trim().length > 0) {
+            const truncated = truncateOutput(stderr, maxSize, true);
+            content += `<details>\n<summary>⚠️ Errors</summary>\n\n\`\`\`\n${truncated}\n\`\`\`\n</details>\n\n`;
+        }
+    }
+    if (!content) {
         return { formattedContent: '', isJsonLines: false };
-    }
-    if (hasStdout && stdout) {
-        const truncated = truncateOutput(stdout, MAX_OUTPUT_PER_STEP, true);
-        content += `<details>\n<summary>📄 Output</summary>\n\n\`\`\`\n${truncated}\n\`\`\`\n</details>\n\n`;
-    }
-    if (hasStderr && stderr) {
-        const truncated = truncateOutput(stderr, MAX_OUTPUT_PER_STEP, true);
-        content += `<details>\n<summary>⚠️ Errors</summary>\n\n\`\`\`\n${truncated}\n\`\`\`\n</details>\n\n`;
     }
     return { formattedContent: content, isJsonLines: false };
 }
@@ -1073,5 +1461,5 @@ if (import.meta.url === `file://${process.argv[1]}` ||
     run();
 }
 
-export { StepOutputs, analyzeSteps, formatJsonLines, formatTimestamp, generateCommentBody, generateStatusIssueTitle, generateTitle, getInput, getJobLogsUrl, getStepOutputStream, getWorkspaceMarker, isJsonLines, parseJsonLines, setFailed, truncateOutput };
+export { StepOutputs, analyzeSteps, formatJsonLines, formatJsonLinesStream, formatTimestamp, generateCommentBody, generateStatusIssueTitle, generateTitle, getInput, getJobLogsUrl, getStepOutputStream, getWorkspaceMarker, isJsonLines, isJsonLinesStream, parseJsonLines, setFailed, truncateOutput };
 //# sourceMappingURL=index.js.map

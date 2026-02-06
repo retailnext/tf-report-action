@@ -12,6 +12,8 @@
  * commands run with the -json flag.
  */
 
+import { Readable } from 'stream'
+
 /**
  * Base interface for all JSON messages
  */
@@ -444,6 +446,72 @@ export interface ParsedJsonLines {
 }
 
 /**
+ * Check if a stream appears to be JSON Lines format by checking first few lines.
+ * Does not accumulate data beyond what's needed for detection.
+ */
+export async function isJsonLinesStream(
+  stream: Readable | undefined
+): Promise<boolean> {
+  if (!stream) {
+    return false
+  }
+
+  let buffer = ''
+  let linesChecked = 0
+  let validJsonCount = 0
+  const samplesToCheck = 3
+
+  return new Promise((resolve) => {
+    stream.on('data', (chunk) => {
+      buffer += typeof chunk === 'string' ? chunk : chunk.toString('utf8')
+
+      // Process complete lines
+      let newlineIndex
+      while (
+        (newlineIndex = buffer.indexOf('\n')) !== -1 &&
+        linesChecked < samplesToCheck
+      ) {
+        const line = buffer.substring(0, newlineIndex).trim()
+        buffer = buffer.substring(newlineIndex + 1)
+
+        if (!line) continue
+
+        linesChecked++
+
+        try {
+          const parsed = JSON.parse(line)
+          // Check for required fields in OpenTofu/Terraform JSON output
+          if (
+            parsed &&
+            typeof parsed === 'object' &&
+            'type' in parsed &&
+            '@message' in parsed
+          ) {
+            validJsonCount++
+          }
+        } catch {
+          // Not valid JSON, continue checking other lines
+        }
+
+        if (linesChecked >= samplesToCheck) {
+          stream.destroy()
+          resolve(validJsonCount > 0)
+          return
+        }
+      }
+    })
+
+    stream.on('end', () => {
+      resolve(validJsonCount > 0)
+    })
+
+    stream.on('error', () => {
+      resolve(false)
+    })
+  })
+}
+
+/**
  * Check if a string appears to be JSON Lines format
  */
 export function isJsonLines(text: string): boolean {
@@ -728,6 +796,463 @@ export function formatJsonLines(parsed: ParsedJsonLines): string {
       result += `${emoji} **${addr}** (${drift.change.action})\n`
     }
     result += '\n</details>\n\n'
+  }
+
+  return result.trim()
+}
+
+/**
+ * Format JSON Lines from a stream directly without accumulating messages.
+ * Limits based on formatted output size, not message count.
+ * Stops accumulating when formatted output reaches size limit.
+ */
+export async function formatJsonLinesStream(
+  stream: Readable | undefined,
+  maxOutputSize: number = 20000
+): Promise<string> {
+  if (!stream) {
+    return ''
+  }
+
+  // Reserves space for important summaries. Always includes change_summary which may appear at end of stream.
+  const SUMMARY_RESERVE = 1000
+  const effectiveLimit = maxOutputSize - SUMMARY_RESERVE
+
+  let buffer = ''
+
+  // Build output incrementally, checking size as we go
+  let formattedOutput = ''
+
+  // Accumulate only important details temporarily for formatting
+  interface DiagnosticDetail {
+    severity: 'error' | 'warning'
+    summary: string
+    detail?: string
+    filename?: string
+    line?: number
+    code?: string
+  }
+
+  interface ChangeDetail {
+    action: string
+    addr: string
+  }
+
+  const errorDetails: DiagnosticDetail[] = []
+  const warningDetails: DiagnosticDetail[] = []
+  const plannedChangeDetails: ChangeDetail[] = []
+  const applyCompleteDetails: ChangeDetail[] = []
+  const driftDetails: ChangeDetail[] = []
+
+  // Single values
+  let changeSummaryMessage: string | undefined
+  let operationType: 'plan' | 'apply' | 'destroy' | 'unknown' = 'unknown'
+
+  return new Promise((resolve) => {
+    stream.on('data', (chunk) => {
+      buffer += typeof chunk === 'string' ? chunk : chunk.toString('utf8')
+
+      // Process complete lines
+      let newlineIndex
+      while ((newlineIndex = buffer.indexOf('\n')) !== -1) {
+        const line = buffer.substring(0, newlineIndex).trim()
+        buffer = buffer.substring(newlineIndex + 1)
+
+        if (!line) continue
+
+        try {
+          const parsed = JSON.parse(line)
+
+          // Extract only important details
+          switch (parsed.type) {
+            case 'diagnostic':
+              if (parsed.diagnostic) {
+                const detail: DiagnosticDetail = {
+                  severity: parsed.diagnostic.severity,
+                  summary: parsed.diagnostic.summary,
+                  detail: parsed.diagnostic.detail,
+                  filename: parsed.diagnostic.range?.filename,
+                  line: parsed.diagnostic.range?.start?.line,
+                  code: parsed.diagnostic.snippet?.code
+                }
+
+                if (detail.severity === 'error') {
+                  errorDetails.push(detail)
+                } else if (detail.severity === 'warning') {
+                  warningDetails.push(detail)
+                }
+              }
+              break
+
+            case 'change_summary':
+              changeSummaryMessage = parsed['@message']
+              if (parsed.changes) {
+                operationType = parsed.changes.operation || 'unknown'
+              }
+              break
+
+            case 'planned_change':
+              if (parsed.change) {
+                const resource = parsed.change.resource
+                plannedChangeDetails.push({
+                  action: parsed.change.action,
+                  addr:
+                    resource?.addr ||
+                    `${resource?.resource_type}.${resource?.resource_name}`
+                })
+              }
+              break
+
+            case 'apply_complete':
+              if (parsed.hook) {
+                const resource = parsed.hook.resource
+                applyCompleteDetails.push({
+                  action: parsed.hook.action,
+                  addr:
+                    resource?.addr ||
+                    `${resource?.resource_type}.${resource?.resource_name}`
+                })
+              }
+              break
+
+            case 'resource_drift':
+              if (parsed.change) {
+                const resource = parsed.change.resource
+                driftDetails.push({
+                  action: parsed.change.action,
+                  addr:
+                    resource?.addr ||
+                    `${resource?.resource_type}.${resource?.resource_name}`
+                })
+              }
+              break
+          }
+        } catch {
+          // Skip lines that aren't valid JSON
+        }
+      }
+    })
+
+    stream.on('end', () => {
+      // Process any remaining buffer content (last line without trailing newline)
+      if (buffer.trim()) {
+        try {
+          const parsed = JSON.parse(buffer)
+
+          // Extract only important details from final message
+          switch (parsed.type) {
+            case 'diagnostic':
+              if (parsed.diagnostic) {
+                const detail = {
+                  severity: parsed.diagnostic.severity,
+                  summary: parsed.diagnostic.summary,
+                  detail: parsed.diagnostic.detail,
+                  filename: parsed.diagnostic.range?.filename,
+                  line: parsed.diagnostic.range?.start?.line,
+                  code: parsed.diagnostic.snippet?.code
+                }
+
+                if (detail.severity === 'error') {
+                  errorDetails.push(detail)
+                } else if (detail.severity === 'warning') {
+                  warningDetails.push(detail)
+                }
+              }
+              break
+
+            case 'change_summary':
+              changeSummaryMessage = parsed['@message']
+              if (parsed.changes) {
+                operationType = parsed.changes.operation || 'unknown'
+              }
+              break
+
+            case 'planned_change':
+              if (parsed.change) {
+                const resource = parsed.change.resource
+                plannedChangeDetails.push({
+                  action: parsed.change.action,
+                  addr:
+                    resource?.addr ||
+                    `${resource?.resource_type}.${resource?.resource_name}`
+                })
+              }
+              break
+
+            case 'apply_complete':
+              if (parsed.hook) {
+                const resource = parsed.hook.resource
+                applyCompleteDetails.push({
+                  action: parsed.hook.action,
+                  addr:
+                    resource?.addr ||
+                    `${resource?.resource_type}.${resource?.resource_name}`
+                })
+              }
+              break
+
+            case 'resource_drift':
+              if (parsed.change) {
+                const resource = parsed.change.resource
+                driftDetails.push({
+                  action: parsed.change.action,
+                  addr:
+                    resource?.addr ||
+                    `${resource?.resource_type}.${resource?.resource_name}`
+                })
+              }
+              break
+          }
+        } catch {
+          // Skip if final buffer isn't valid JSON
+        }
+      }
+
+      formattedOutput = buildFormattedOutput(
+        changeSummaryMessage,
+        operationType,
+        errorDetails,
+        warningDetails,
+        plannedChangeDetails,
+        applyCompleteDetails,
+        driftDetails,
+        effectiveLimit
+      )
+      resolve(formattedOutput)
+    })
+
+    stream.on('error', () => {
+      formattedOutput = buildFormattedOutput(
+        changeSummaryMessage,
+        operationType,
+        errorDetails,
+        warningDetails,
+        plannedChangeDetails,
+        applyCompleteDetails,
+        driftDetails,
+        effectiveLimit
+      )
+      resolve(formattedOutput)
+    })
+  })
+}
+
+/**
+ * Build formatted output from accumulated details, limiting by output size
+ */
+function buildFormattedOutput(
+  changeSummaryMessage: string | undefined,
+  operationType: 'plan' | 'apply' | 'destroy' | 'unknown',
+  errorDetails: Array<{
+    severity: string
+    summary: string
+    detail?: string
+    filename?: string
+    line?: number
+    code?: string
+  }>,
+  warningDetails: Array<{
+    severity: string
+    summary: string
+    detail?: string
+    filename?: string
+    line?: number
+    code?: string
+  }>,
+  plannedChangeDetails: Array<{ action: string; addr: string }>,
+  applyCompleteDetails: Array<{ action: string; addr: string }>,
+  driftDetails: Array<{ action: string; addr: string }>,
+  maxSize?: number
+): string {
+  let result = ''
+
+  // Show change summary first
+  if (changeSummaryMessage) {
+    result += `${changeSummaryMessage}\n\n`
+  }
+
+  // Format diagnostics, checking size as we add each one
+  if (errorDetails.length > 0) {
+    let diagnosticsSection = '<details>\n<summary>❌ Errors</summary>\n\n'
+    let errorCount = 0
+
+    for (const err of errorDetails) {
+      const errorText =
+        `❌ **${err.summary}**` +
+        (err.detail ? `\n\n${err.detail}` : '') +
+        (err.filename && err.line
+          ? `\n\n📄 \`${err.filename}:${err.line}\``
+          : '') +
+        (err.code ? '\n\n```hcl\n' + err.code + '\n```' : '') +
+        '\n\n'
+
+      if (
+        maxSize &&
+        (result + diagnosticsSection + errorText).length > maxSize
+      ) {
+        break
+      }
+      diagnosticsSection += errorText
+      errorCount++
+    }
+
+    if (errorCount < errorDetails.length) {
+      diagnosticsSection += `... (showing ${errorCount} of ${errorDetails.length} errors)\n\n`
+    }
+    diagnosticsSection += '</details>\n\n'
+
+    if (!maxSize || (result + diagnosticsSection).length <= maxSize) {
+      result += diagnosticsSection
+    }
+  }
+
+  if (warningDetails.length > 0 && (!maxSize || result.length < maxSize)) {
+    let diagnosticsSection = '<details>\n<summary>⚠️ Warnings</summary>\n\n'
+    let warnCount = 0
+
+    for (const warn of warningDetails) {
+      const warnText =
+        `⚠️ **${warn.summary}**` +
+        (warn.detail ? `\n\n${warn.detail}` : '') +
+        (warn.filename && warn.line
+          ? `\n\n📄 \`${warn.filename}:${warn.line}\``
+          : '') +
+        (warn.code ? '\n\n```hcl\n' + warn.code + '\n```' : '') +
+        '\n\n'
+
+      if (
+        maxSize &&
+        (result + diagnosticsSection + warnText).length > maxSize
+      ) {
+        break
+      }
+      diagnosticsSection += warnText
+      warnCount++
+    }
+
+    if (warnCount < warningDetails.length) {
+      diagnosticsSection += `... (showing ${warnCount} of ${warningDetails.length} warnings)\n\n`
+    }
+    diagnosticsSection += '</details>\n\n'
+
+    if (!maxSize || (result + diagnosticsSection).length <= maxSize) {
+      result += diagnosticsSection
+    }
+  }
+
+  // Format changes, checking size
+  const hasChanges =
+    plannedChangeDetails.length > 0 || applyCompleteDetails.length > 0
+
+  if (hasChanges && (!maxSize || result.length < maxSize)) {
+    if (operationType === 'plan' && plannedChangeDetails.length > 0) {
+      let changesSection =
+        '<details>\n<summary>📋 Planned Changes</summary>\n\n'
+      let changeCount = 0
+
+      for (const change of plannedChangeDetails) {
+        const emoji = getActionEmoji(change.action)
+        const changeText = `${emoji} **${change.addr}** (${change.action})\n`
+
+        if (
+          maxSize &&
+          (result + changesSection + changeText).length > maxSize
+        ) {
+          break
+        }
+        changesSection += changeText
+        changeCount++
+      }
+
+      if (changeCount < plannedChangeDetails.length) {
+        changesSection += `\n... (showing ${changeCount} of ${plannedChangeDetails.length} changes)\n`
+      }
+      changesSection += '\n</details>\n\n'
+
+      if (!maxSize || (result + changesSection).length <= maxSize) {
+        result += changesSection
+      }
+    } else if (operationType === 'apply' && applyCompleteDetails.length > 0) {
+      let changesSection =
+        '<details>\n<summary>✅ Applied Changes</summary>\n\n'
+      let changeCount = 0
+
+      for (const change of applyCompleteDetails) {
+        const emoji = getActionEmoji(change.action)
+        const changeText = `${emoji} **${change.addr}** (${change.action})\n`
+
+        if (
+          maxSize &&
+          (result + changesSection + changeText).length > maxSize
+        ) {
+          break
+        }
+        changesSection += changeText
+        changeCount++
+      }
+
+      if (changeCount < applyCompleteDetails.length) {
+        changesSection += `\n... (showing ${changeCount} of ${applyCompleteDetails.length} changes)\n`
+      }
+      changesSection += '\n</details>\n\n'
+
+      if (!maxSize || (result + changesSection).length <= maxSize) {
+        result += changesSection
+      }
+    } else if (operationType === 'unknown' && plannedChangeDetails.length > 0) {
+      let changesSection =
+        '<details>\n<summary>📋 Planned Changes</summary>\n\n'
+      let changeCount = 0
+
+      for (const change of plannedChangeDetails) {
+        const emoji = getActionEmoji(change.action)
+        const changeText = `${emoji} **${change.addr}** (${change.action})\n`
+
+        if (
+          maxSize &&
+          (result + changesSection + changeText).length > maxSize
+        ) {
+          break
+        }
+        changesSection += changeText
+        changeCount++
+      }
+
+      if (changeCount < plannedChangeDetails.length) {
+        changesSection += `\n... (showing ${changeCount} of ${plannedChangeDetails.length} changes)\n`
+      }
+      changesSection += '\n</details>\n\n'
+
+      if (!maxSize || (result + changesSection).length <= maxSize) {
+        result += changesSection
+      }
+    }
+  }
+
+  // Format drifts
+  if (driftDetails.length > 0 && (!maxSize || result.length < maxSize)) {
+    let driftsSection = '<details>\n<summary>🔀 Resource Drift</summary>\n\n'
+    let driftCount = 0
+
+    for (const drift of driftDetails) {
+      const emoji = getActionEmoji(drift.action)
+      const driftText = `${emoji} **${drift.addr}** (${drift.action})\n`
+
+      if (maxSize && (result + driftsSection + driftText).length > maxSize) {
+        break
+      }
+      driftsSection += driftText
+      driftCount++
+    }
+
+    if (driftCount < driftDetails.length) {
+      driftsSection += `\n... (showing ${driftCount} of ${driftDetails.length} drifts)\n`
+    }
+    driftsSection += '\n</details>\n\n'
+
+    if (!maxSize || (result + driftsSection).length <= maxSize) {
+      result += driftsSection
+    }
   }
 
   return result.trim()

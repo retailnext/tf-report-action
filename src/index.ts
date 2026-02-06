@@ -1,6 +1,12 @@
 import * as fs from 'fs'
 import { Readable } from 'stream'
-import { isJsonLines, parseJsonLines, formatJsonLines } from './jsonlines.js'
+import {
+  isJsonLines,
+  parseJsonLines,
+  formatJsonLines,
+  isJsonLinesStream,
+  formatJsonLinesStream
+} from './jsonlines.js'
 import {
   getExistingComments,
   deleteComment,
@@ -11,7 +17,13 @@ import {
 } from './github.js'
 
 // Re-export jsonlines functions for use by scripts and tests
-export { isJsonLines, parseJsonLines, formatJsonLines }
+export {
+  isJsonLines,
+  parseJsonLines,
+  formatJsonLines,
+  isJsonLinesStream,
+  formatJsonLinesStream
+}
 
 // Month names for timestamp formatting
 const MONTH_NAMES = [
@@ -57,14 +69,16 @@ export class StepOutputs {
   ) {}
 
   /**
-   * Get a readable stream for stdout
+   * Get a readable stream for stdout.
+   * Returns a fresh stream each time.
    */
   getStdoutStream(): Readable | undefined {
     return getStepOutputStream(this.outputs, 'stdout')
   }
 
   /**
-   * Get a readable stream for stderr
+   * Get a readable stream for stderr.
+   * Returns a fresh stream each time.
    */
   getStderrStream(): Readable | undefined {
     return getStepOutputStream(this.outputs, 'stderr')
@@ -476,18 +490,16 @@ export async function generateCommentBody(
         comment += `\`${targetStepResult.name}\` was not found in the workflow steps.\n\n`
       }
     } else if (targetStepResult.conclusion === 'success') {
-      // Success case - show stdout/stderr if available (read limited for comment)
-      const stdoutStream = targetStepResult.outputs?.getStdoutStream()
-      const stderrStream = targetStepResult.outputs?.getStderrStream()
-      const stdout = await readLimitedStreamContent(
-        stdoutStream,
+      // Success case - show stdout/stderr if available (pass stream getters)
+      const { formattedContent } = await formatOutput(
+        targetStepResult.outputs
+          ? () => targetStepResult.outputs!.getStdoutStream()
+          : undefined,
+        targetStepResult.outputs
+          ? () => targetStepResult.outputs!.getStderrStream()
+          : undefined,
         MAX_OUTPUT_PER_STEP
       )
-      const stderr = await readLimitedStreamContent(
-        stderrStream,
-        MAX_OUTPUT_PER_STEP
-      )
-      const { formattedContent } = formatOutput(stdout, stderr)
 
       if (!formattedContent) {
         comment += `> [!NOTE]\n> Completed successfully with no output.\n\n`
@@ -505,17 +517,15 @@ export async function generateCommentBody(
 
       comment += '\n'
 
-      const stdoutStream = targetStepResult.outputs?.getStdoutStream()
-      const stderrStream = targetStepResult.outputs?.getStderrStream()
-      const stdout = await readLimitedStreamContent(
-        stdoutStream,
+      const { formattedContent } = await formatOutput(
+        targetStepResult.outputs
+          ? () => targetStepResult.outputs!.getStdoutStream()
+          : undefined,
+        targetStepResult.outputs
+          ? () => targetStepResult.outputs!.getStderrStream()
+          : undefined,
         MAX_OUTPUT_PER_STEP
       )
-      const stderr = await readLimitedStreamContent(
-        stderrStream,
-        MAX_OUTPUT_PER_STEP
-      )
-      const { formattedContent } = formatOutput(stdout, stderr)
 
       if (!formattedContent) {
         comment += `> [!NOTE]\n> Failed with no output.\n\n`
@@ -560,17 +570,11 @@ export async function generateCommentBody(
 
         comment += '\n'
 
-        const stdoutStream = step.outputs.getStdoutStream()
-        const stderrStream = step.outputs.getStderrStream()
-        const stdout = await readLimitedStreamContent(
-          stdoutStream,
+        const { formattedContent } = await formatOutput(
+          () => step.outputs.getStdoutStream(),
+          () => step.outputs.getStderrStream(),
           MAX_OUTPUT_PER_STEP
         )
-        const stderr = await readLimitedStreamContent(
-          stderrStream,
-          MAX_OUTPUT_PER_STEP
-        )
-        const { formattedContent } = formatOutput(stdout, stderr)
 
         if (!formattedContent) {
           comment += `> [!NOTE]\n> Failed with no output.\n\n`
@@ -693,40 +697,53 @@ export function generateStatusIssueTitle(workspace: string): string {
 }
 
 /**
- * Format output, detecting and handling JSON Lines format
+ * Format output from streams, detecting and handling JSON Lines format.
+ * Limits based on formatted output size.
  */
-function formatOutput(
-  stdout: string | undefined,
-  stderr: string | undefined
-): { formattedContent: string; isJsonLines: boolean } {
-  const hasStdout = stdout && stdout.trim().length > 0
-  const hasStderr = stderr && stderr.trim().length > 0
+async function formatOutput(
+  getStdoutStream: (() => Readable | undefined) | undefined,
+  getStderrStream: (() => Readable | undefined) | undefined,
+  maxSize: number = MAX_OUTPUT_PER_STEP
+): Promise<{ formattedContent: string; isJsonLines: boolean }> {
+  // Check if stdout is JSON Lines format (with fresh stream for detection)
+  if (getStdoutStream) {
+    const detectionStream = getStdoutStream()
+    const isJsonLinesFormat = await isJsonLinesStream(detectionStream)
 
-  // Check if stdout is JSON Lines format
-  if (hasStdout && stdout && isJsonLines(stdout)) {
-    const parsed = parseJsonLines(stdout)
-    const formatted = formatJsonLines(parsed)
+    if (isJsonLinesFormat) {
+      // Get a fresh stream for formatting
+      const formattingStream = getStdoutStream()
+      const formatted = await formatJsonLinesStream(formattingStream, maxSize)
 
-    if (formatted.trim().length > 0) {
-      return { formattedContent: formatted, isJsonLines: true }
+      if (formatted.trim().length > 0) {
+        return { formattedContent: formatted, isJsonLines: true }
+      }
     }
   }
 
-  // Fall back to standard output formatting
+  // Fall back to standard output formatting with limited reading
   let content = ''
 
-  if (!hasStdout && !hasStderr) {
+  if (getStdoutStream) {
+    const stdoutStream = getStdoutStream()
+    const stdout = await readLimitedStreamContent(stdoutStream, maxSize)
+    if (stdout && stdout.trim().length > 0) {
+      const truncated = truncateOutput(stdout, maxSize, true)
+      content += `<details>\n<summary>📄 Output</summary>\n\n\`\`\`\n${truncated}\n\`\`\`\n</details>\n\n`
+    }
+  }
+
+  if (getStderrStream) {
+    const stderrStream = getStderrStream()
+    const stderr = await readLimitedStreamContent(stderrStream, maxSize)
+    if (stderr && stderr.trim().length > 0) {
+      const truncated = truncateOutput(stderr, maxSize, true)
+      content += `<details>\n<summary>⚠️ Errors</summary>\n\n\`\`\`\n${truncated}\n\`\`\`\n</details>\n\n`
+    }
+  }
+
+  if (!content) {
     return { formattedContent: '', isJsonLines: false }
-  }
-
-  if (hasStdout && stdout) {
-    const truncated = truncateOutput(stdout, MAX_OUTPUT_PER_STEP, true)
-    content += `<details>\n<summary>📄 Output</summary>\n\n\`\`\`\n${truncated}\n\`\`\`\n</details>\n\n`
-  }
-
-  if (hasStderr && stderr) {
-    const truncated = truncateOutput(stderr, MAX_OUTPUT_PER_STEP, true)
-    content += `<details>\n<summary>⚠️ Errors</summary>\n\n\`\`\`\n${truncated}\n\`\`\`\n</details>\n\n`
   }
 
   return { formattedContent: content, isJsonLines: false }
