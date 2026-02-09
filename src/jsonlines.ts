@@ -12,6 +12,28 @@
  * commands run with the -json flag.
  */
 
+import { Readable } from 'stream'
+
+/**
+ * Diagnostic detail for stream formatting
+ */
+interface DiagnosticDetail {
+  severity: 'error' | 'warning'
+  summary: string
+  detail?: string
+  filename?: string
+  line?: number
+  code?: string
+}
+
+/**
+ * Change detail for stream formatting
+ */
+interface ChangeDetail {
+  action: string
+  addr: string
+}
+
 /**
  * Base interface for all JSON messages
  */
@@ -430,119 +452,69 @@ export type JsonLineMessage =
   | TestSummaryMessage
 
 /**
- * Parsed result containing all messages
+ * Check if a stream appears to be JSON Lines format by checking first few lines.
+ * Does not accumulate data beyond what's needed for detection.
  */
-export interface ParsedJsonLines {
-  messages: JsonLineMessage[]
-  diagnostics: DiagnosticMessage[]
-  plannedChanges: PlannedChangeMessage[]
-  applyComplete: ApplyCompleteMessage[]
-  changeSummary?: ChangeSummaryMessage
-  resourceDrifts: ResourceDriftMessage[]
-  outputs?: OutputsMessage
-  hasErrors: boolean
-}
-
-/**
- * Check if a string appears to be JSON Lines format
- */
-export function isJsonLines(text: string): boolean {
-  if (!text || text.trim().length === 0) {
+export async function isJsonLines(
+  stream: Readable | undefined
+): Promise<boolean> {
+  if (!stream) {
     return false
   }
 
-  const lines = text.split('\n').filter((line) => line.trim().length > 0)
-
-  // Need at least one line
-  if (lines.length === 0) {
-    return false
-  }
-
-  // Check if first few lines are valid JSON objects with required fields
-  const samplesToCheck = Math.min(lines.length, 3)
+  let buffer = ''
+  let linesChecked = 0
   let validJsonCount = 0
+  const samplesToCheck = 3
 
-  for (let i = 0; i < samplesToCheck; i++) {
-    try {
-      const parsed = JSON.parse(lines[i])
-      // Check for required fields in OpenTofu/Terraform JSON output
-      if (
-        parsed &&
-        typeof parsed === 'object' &&
-        'type' in parsed &&
-        '@message' in parsed
+  return new Promise((resolve) => {
+    stream.on('data', (chunk) => {
+      buffer += typeof chunk === 'string' ? chunk : chunk.toString('utf8')
+
+      // Process complete lines
+      let newlineIndex
+      while (
+        (newlineIndex = buffer.indexOf('\n')) !== -1 &&
+        linesChecked < samplesToCheck
       ) {
-        validJsonCount++
-      }
-    } catch {
-      // Not valid JSON, continue checking other lines
-    }
-  }
+        const line = buffer.substring(0, newlineIndex).trim()
+        buffer = buffer.substring(newlineIndex + 1)
 
-  // If at least one line is valid JSON with required fields, consider it JSON Lines
-  return validJsonCount > 0
-}
+        if (!line) continue
 
-/**
- * Parse JSON Lines output into structured messages
- */
-export function parseJsonLines(text: string): ParsedJsonLines {
-  const lines = text.split('\n').filter((line) => line.trim().length > 0)
+        linesChecked++
 
-  const messages: JsonLineMessage[] = []
-  const diagnostics: DiagnosticMessage[] = []
-  const plannedChanges: PlannedChangeMessage[] = []
-  const applyComplete: ApplyCompleteMessage[] = []
-  const resourceDrifts: ResourceDriftMessage[] = []
-  let changeSummary: ChangeSummaryMessage | undefined
-  let outputs: OutputsMessage | undefined
-  let hasErrors = false
-
-  for (const line of lines) {
-    try {
-      const parsed = JSON.parse(line) as JsonLineMessage
-
-      messages.push(parsed)
-
-      // Categorize by type
-      switch (parsed.type) {
-        case 'diagnostic':
-          diagnostics.push(parsed as DiagnosticMessage)
-          if (parsed.diagnostic.severity === 'error') {
-            hasErrors = true
+        try {
+          const parsed = JSON.parse(line)
+          // Check for required fields in OpenTofu/Terraform JSON output
+          if (
+            parsed &&
+            typeof parsed === 'object' &&
+            'type' in parsed &&
+            '@message' in parsed
+          ) {
+            validJsonCount++
           }
-          break
-        case 'planned_change':
-          plannedChanges.push(parsed as PlannedChangeMessage)
-          break
-        case 'apply_complete':
-          applyComplete.push(parsed as ApplyCompleteMessage)
-          break
-        case 'change_summary':
-          changeSummary = parsed as ChangeSummaryMessage
-          break
-        case 'resource_drift':
-          resourceDrifts.push(parsed as ResourceDriftMessage)
-          break
-        case 'outputs':
-          outputs = parsed as OutputsMessage
-          break
-      }
-    } catch {
-      // Skip lines that aren't valid JSON
-    }
-  }
+        } catch {
+          // Not valid JSON, continue checking other lines
+        }
 
-  return {
-    messages,
-    diagnostics,
-    plannedChanges,
-    applyComplete,
-    changeSummary,
-    resourceDrifts,
-    outputs,
-    hasErrors
-  }
+        if (linesChecked >= samplesToCheck) {
+          stream.destroy()
+          resolve(validJsonCount > 0)
+          return
+        }
+      }
+    })
+
+    stream.on('end', () => {
+      resolve(validJsonCount > 0)
+    })
+
+    stream.on('error', () => {
+      resolve(false)
+    })
+  })
 }
 
 /**
@@ -579,155 +551,369 @@ function getActionEmoji(
 }
 
 /**
- * Determine the operation type from parsed JSON Lines
+ * Format JSON Lines from a stream directly without accumulating messages.
+ * Limits based on formatted output size, not message count.
+ * Stops accumulating when formatted output reaches size limit.
  */
-function getOperationType(
-  parsed: ParsedJsonLines
-): 'plan' | 'apply' | 'destroy' | 'unknown' {
-  if (parsed.changeSummary) {
-    return parsed.changeSummary.changes.operation
-  }
-  return 'unknown'
-}
-
-/**
- * Check if a change summary has any changes
- */
-function hasChanges(changeSummary: ChangeSummaryMessage): boolean {
-  const { add, change, remove, import: importCount } = changeSummary.changes
-  return add > 0 || change > 0 || remove > 0 || importCount > 0
-}
-
-/**
- * Format a planned change for display
- */
-function formatPlannedChange(change: PlannedChangeMessage): string {
-  const emoji = getActionEmoji(change.change.action)
-  const resource = change.change.resource
-  const addr =
-    resource.addr || `${resource.resource_type}.${resource.resource_name}`
-
-  return `${emoji} **${addr}** (${change.change.action})`
-}
-
-/**
- * Format an apply complete message for display
- */
-function formatApplyComplete(message: ApplyCompleteMessage): string {
-  const emoji = getActionEmoji(message.hook.action)
-  const resource = message.hook.resource
-  const addr =
-    resource.addr || `${resource.resource_type}.${resource.resource_name}`
-
-  return `${emoji} **${addr}** (${message.hook.action})`
-}
-
-/**
- * Format a diagnostic message for display
- */
-function formatDiagnostic(diag: DiagnosticMessage): string {
-  const icon =
-    diag.diagnostic.severity === 'error'
-      ? '❌'
-      : diag.diagnostic.severity === 'warning'
-        ? '⚠️'
-        : 'ℹ️'
-
-  let result = `${icon} **${diag.diagnostic.summary}**`
-
-  if (diag.diagnostic.detail) {
-    result += `\n\n${diag.diagnostic.detail}`
+export async function formatJsonLines(
+  stream: Readable | undefined,
+  maxOutputSize: number = 20000
+): Promise<string> {
+  if (!stream) {
+    return ''
   }
 
-  if (diag.diagnostic.range) {
-    result += `\n\n📄 \`${diag.diagnostic.range.filename}:${diag.diagnostic.range.start.line}\``
+  // Reserves space for important summaries. Always includes change_summary which may appear at end of stream.
+  const SUMMARY_RESERVE_CHARS = 1000
+  const effectiveLimit = maxOutputSize - SUMMARY_RESERVE_CHARS
+
+  let buffer = ''
+
+  // Build output incrementally, checking size as we go
+  let formattedOutput = ''
+
+  // Accumulate only important details temporarily for formatting
+  const errorDetails: DiagnosticDetail[] = []
+  const warningDetails: DiagnosticDetail[] = []
+  const plannedChangeDetails: ChangeDetail[] = []
+  const applyCompleteDetails: ChangeDetail[] = []
+  const driftDetails: ChangeDetail[] = []
+
+  // Single values
+  let changeSummaryMessage: string | undefined
+  let operationType: 'plan' | 'apply' | 'destroy' | 'unknown' = 'unknown'
+
+  // Helper function to process a single parsed JSON message
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const processMessage = (parsed: any) => {
+    switch (parsed.type) {
+      case 'diagnostic':
+        if (parsed.diagnostic) {
+          const detail: DiagnosticDetail = {
+            severity: parsed.diagnostic.severity,
+            summary: parsed.diagnostic.summary,
+            detail: parsed.diagnostic.detail,
+            filename: parsed.diagnostic.range?.filename,
+            line: parsed.diagnostic.range?.start?.line,
+            code: parsed.diagnostic.snippet?.code
+          }
+
+          if (detail.severity === 'error') {
+            errorDetails.push(detail)
+          } else if (detail.severity === 'warning') {
+            warningDetails.push(detail)
+          }
+        }
+        break
+
+      case 'change_summary':
+        changeSummaryMessage = parsed['@message']
+        if (parsed.changes) {
+          operationType = parsed.changes.operation || 'unknown'
+        }
+        break
+
+      case 'planned_change':
+        if (parsed.change) {
+          const resource = parsed.change.resource
+          plannedChangeDetails.push({
+            action: parsed.change.action,
+            addr:
+              resource?.addr ||
+              `${resource?.resource_type}.${resource?.resource_name}`
+          })
+        }
+        break
+
+      case 'apply_complete':
+        if (parsed.hook) {
+          const resource = parsed.hook.resource
+          applyCompleteDetails.push({
+            action: parsed.hook.action,
+            addr:
+              resource?.addr ||
+              `${resource?.resource_type}.${resource?.resource_name}`
+          })
+        }
+        break
+
+      case 'resource_drift':
+        if (parsed.change) {
+          const resource = parsed.change.resource
+          driftDetails.push({
+            action: parsed.change.action,
+            addr:
+              resource?.addr ||
+              `${resource?.resource_type}.${resource?.resource_name}`
+          })
+        }
+        break
+    }
   }
 
-  if (diag.diagnostic.snippet?.code) {
-    result += '\n\n```hcl\n' + diag.diagnostic.snippet.code + '\n```'
-  }
+  return new Promise((resolve) => {
+    stream.on('data', (chunk) => {
+      buffer += typeof chunk === 'string' ? chunk : chunk.toString('utf8')
 
-  return result
+      // Process complete lines
+      let newlineIndex
+      while ((newlineIndex = buffer.indexOf('\n')) !== -1) {
+        const line = buffer.substring(0, newlineIndex).trim()
+        buffer = buffer.substring(newlineIndex + 1)
+
+        if (!line) continue
+
+        try {
+          const parsed = JSON.parse(line)
+          processMessage(parsed)
+        } catch {
+          // Skip lines that aren't valid JSON
+        }
+      }
+    })
+
+    stream.on('end', () => {
+      // Process any remaining buffer content (last line without trailing newline)
+      if (buffer.trim()) {
+        try {
+          const parsed = JSON.parse(buffer)
+          processMessage(parsed)
+        } catch {
+          // Skip if final buffer isn't valid JSON
+        }
+      }
+
+      formattedOutput = buildFormattedOutput(
+        changeSummaryMessage,
+        operationType,
+        errorDetails,
+        warningDetails,
+        plannedChangeDetails,
+        applyCompleteDetails,
+        driftDetails,
+        effectiveLimit
+      )
+      resolve(formattedOutput)
+    })
+
+    stream.on('error', () => {
+      formattedOutput = buildFormattedOutput(
+        changeSummaryMessage,
+        operationType,
+        errorDetails,
+        warningDetails,
+        plannedChangeDetails,
+        applyCompleteDetails,
+        driftDetails,
+        effectiveLimit
+      )
+      resolve(formattedOutput)
+    })
+  })
 }
 
 /**
- * Format parsed JSON Lines into a markdown comment
+ * Build formatted output from accumulated details, limiting by output size
  */
-export function formatJsonLines(parsed: ParsedJsonLines): string {
+function buildFormattedOutput(
+  changeSummaryMessage: string | undefined,
+  operationType: 'plan' | 'apply' | 'destroy' | 'unknown',
+  errorDetails: DiagnosticDetail[],
+  warningDetails: DiagnosticDetail[],
+  plannedChangeDetails: ChangeDetail[],
+  applyCompleteDetails: ChangeDetail[],
+  driftDetails: ChangeDetail[],
+  maxSize?: number
+): string {
   let result = ''
 
-  // Determine operation type
-  const operation = getOperationType(parsed)
-  const hasAnyChanges = parsed.changeSummary
-    ? hasChanges(parsed.changeSummary)
-    : parsed.plannedChanges.length > 0 || parsed.applyComplete.length > 0
-
-  // Show change summary first (prominently, outside of collapsing)
-  if (parsed.changeSummary) {
-    result += `${parsed.changeSummary['@message']}\n\n`
+  // Show change summary first
+  if (changeSummaryMessage) {
+    result += `${changeSummaryMessage}\n\n`
   }
 
-  // Show diagnostics (errors and warnings) in separate collapsible sections
-  if (parsed.diagnostics.length > 0) {
-    const errors = parsed.diagnostics.filter(
-      (d) => d.diagnostic.severity === 'error'
-    )
-    const warnings = parsed.diagnostics.filter(
-      (d) => d.diagnostic.severity === 'warning'
-    )
+  // Format diagnostics, checking size as we add each one
+  if (errorDetails.length > 0) {
+    let diagnosticsSection = '<details>\n<summary>❌ Errors</summary>\n\n'
+    let errorCount = 0
 
-    if (errors.length > 0) {
-      result += '<details>\n<summary>❌ Errors</summary>\n\n'
-      for (const error of errors) {
-        result += formatDiagnostic(error) + '\n\n'
+    for (const err of errorDetails) {
+      const errorText =
+        `❌ **${err.summary}**` +
+        (err.detail ? `\n\n${err.detail}` : '') +
+        (err.filename && err.line
+          ? `\n\n📄 \`${err.filename}:${err.line}\``
+          : '') +
+        (err.code ? '\n\n```hcl\n' + err.code + '\n```' : '') +
+        '\n\n'
+
+      if (
+        maxSize &&
+        (result + diagnosticsSection + errorText).length > maxSize
+      ) {
+        break
       }
-      result += '</details>\n\n'
+      diagnosticsSection += errorText
+      errorCount++
     }
 
-    if (warnings.length > 0) {
-      result += '<details>\n<summary>⚠️ Warnings</summary>\n\n'
-      for (const warning of warnings) {
-        result += formatDiagnostic(warning) + '\n\n'
-      }
-      result += '</details>\n\n'
+    if (errorCount < errorDetails.length) {
+      diagnosticsSection += `... (showing ${errorCount} of ${errorDetails.length} errors)\n\n`
     }
-  }
+    diagnosticsSection += '</details>\n\n'
 
-  // Show changes in a collapsible section only if there are changes
-  if (hasAnyChanges) {
-    if (operation === 'plan' && parsed.plannedChanges.length > 0) {
-      result += '<details>\n<summary>📋 Planned Changes</summary>\n\n'
-      for (const change of parsed.plannedChanges) {
-        result += formatPlannedChange(change) + '\n'
-      }
-      result += '\n</details>\n\n'
-    } else if (operation === 'apply' && parsed.applyComplete.length > 0) {
-      result += '<details>\n<summary>✅ Applied Changes</summary>\n\n'
-      for (const message of parsed.applyComplete) {
-        result += formatApplyComplete(message) + '\n'
-      }
-      result += '\n</details>\n\n'
-    } else if (operation === 'unknown' && parsed.plannedChanges.length > 0) {
-      // Fallback for when there's no change_summary but there are planned_changes
-      result += '<details>\n<summary>📋 Planned Changes</summary>\n\n'
-      for (const change of parsed.plannedChanges) {
-        result += formatPlannedChange(change) + '\n'
-      }
-      result += '\n</details>\n\n'
+    if (!maxSize || (result + diagnosticsSection).length <= maxSize) {
+      result += diagnosticsSection
     }
   }
 
-  // Show resource drifts if any
-  if (parsed.resourceDrifts.length > 0) {
-    result += '<details>\n<summary>🔀 Resource Drift</summary>\n\n'
-    for (const drift of parsed.resourceDrifts) {
-      const emoji = getActionEmoji(drift.change.action)
-      const addr =
-        drift.change.resource.addr ||
-        `${drift.change.resource.resource_type}.${drift.change.resource.resource_name}`
-      result += `${emoji} **${addr}** (${drift.change.action})\n`
+  if (warningDetails.length > 0 && (!maxSize || result.length < maxSize)) {
+    let diagnosticsSection = '<details>\n<summary>⚠️ Warnings</summary>\n\n'
+    let warnCount = 0
+
+    for (const warn of warningDetails) {
+      const warnText =
+        `⚠️ **${warn.summary}**` +
+        (warn.detail ? `\n\n${warn.detail}` : '') +
+        (warn.filename && warn.line
+          ? `\n\n📄 \`${warn.filename}:${warn.line}\``
+          : '') +
+        (warn.code ? '\n\n```hcl\n' + warn.code + '\n```' : '') +
+        '\n\n'
+
+      if (
+        maxSize &&
+        (result + diagnosticsSection + warnText).length > maxSize
+      ) {
+        break
+      }
+      diagnosticsSection += warnText
+      warnCount++
     }
-    result += '\n</details>\n\n'
+
+    if (warnCount < warningDetails.length) {
+      diagnosticsSection += `... (showing ${warnCount} of ${warningDetails.length} warnings)\n\n`
+    }
+    diagnosticsSection += '</details>\n\n'
+
+    if (!maxSize || (result + diagnosticsSection).length <= maxSize) {
+      result += diagnosticsSection
+    }
+  }
+
+  // Format changes, checking size
+  const hasChanges =
+    plannedChangeDetails.length > 0 || applyCompleteDetails.length > 0
+
+  if (hasChanges && (!maxSize || result.length < maxSize)) {
+    if (operationType === 'plan' && plannedChangeDetails.length > 0) {
+      let changesSection =
+        '<details>\n<summary>📋 Planned Changes</summary>\n\n'
+      let changeCount = 0
+
+      for (const change of plannedChangeDetails) {
+        const emoji = getActionEmoji(change.action)
+        const changeText = `${emoji} **${change.addr}** (${change.action})\n`
+
+        if (
+          maxSize &&
+          (result + changesSection + changeText).length > maxSize
+        ) {
+          break
+        }
+        changesSection += changeText
+        changeCount++
+      }
+
+      if (changeCount < plannedChangeDetails.length) {
+        changesSection += `\n... (showing ${changeCount} of ${plannedChangeDetails.length} changes)\n`
+      }
+      changesSection += '\n</details>\n\n'
+
+      if (!maxSize || (result + changesSection).length <= maxSize) {
+        result += changesSection
+      }
+    } else if (operationType === 'apply' && applyCompleteDetails.length > 0) {
+      let changesSection =
+        '<details>\n<summary>✅ Applied Changes</summary>\n\n'
+      let changeCount = 0
+
+      for (const change of applyCompleteDetails) {
+        const emoji = getActionEmoji(change.action)
+        const changeText = `${emoji} **${change.addr}** (${change.action})\n`
+
+        if (
+          maxSize &&
+          (result + changesSection + changeText).length > maxSize
+        ) {
+          break
+        }
+        changesSection += changeText
+        changeCount++
+      }
+
+      if (changeCount < applyCompleteDetails.length) {
+        changesSection += `\n... (showing ${changeCount} of ${applyCompleteDetails.length} changes)\n`
+      }
+      changesSection += '\n</details>\n\n'
+
+      if (!maxSize || (result + changesSection).length <= maxSize) {
+        result += changesSection
+      }
+    } else if (operationType === 'unknown' && plannedChangeDetails.length > 0) {
+      let changesSection =
+        '<details>\n<summary>📋 Planned Changes</summary>\n\n'
+      let changeCount = 0
+
+      for (const change of plannedChangeDetails) {
+        const emoji = getActionEmoji(change.action)
+        const changeText = `${emoji} **${change.addr}** (${change.action})\n`
+
+        if (
+          maxSize &&
+          (result + changesSection + changeText).length > maxSize
+        ) {
+          break
+        }
+        changesSection += changeText
+        changeCount++
+      }
+
+      if (changeCount < plannedChangeDetails.length) {
+        changesSection += `\n... (showing ${changeCount} of ${plannedChangeDetails.length} changes)\n`
+      }
+      changesSection += '\n</details>\n\n'
+
+      if (!maxSize || (result + changesSection).length <= maxSize) {
+        result += changesSection
+      }
+    }
+  }
+
+  // Format drifts
+  if (driftDetails.length > 0 && (!maxSize || result.length < maxSize)) {
+    let driftsSection = '<details>\n<summary>🔀 Resource Drift</summary>\n\n'
+    let driftCount = 0
+
+    for (const drift of driftDetails) {
+      const emoji = getActionEmoji(drift.action)
+      const driftText = `${emoji} **${drift.addr}** (${drift.action})\n`
+
+      if (maxSize && (result + driftsSection + driftText).length > maxSize) {
+        break
+      }
+      driftsSection += driftText
+      driftCount++
+    }
+
+    if (driftCount < driftDetails.length) {
+      driftsSection += `\n... (showing ${driftCount} of ${driftDetails.length} drifts)\n`
+    }
+    driftsSection += '\n</details>\n\n'
+
+    if (!maxSize || (result + driftsSection).length <= maxSize) {
+      result += driftsSection
+    }
   }
 
   return result.trim()

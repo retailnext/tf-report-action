@@ -1,5 +1,6 @@
 import * as fs from 'fs'
-import { isJsonLines, parseJsonLines, formatJsonLines } from './jsonlines.js'
+import { Readable } from 'stream'
+import { isJsonLines, formatJsonLines } from './jsonlines.js'
 import {
   getExistingComments,
   deleteComment,
@@ -10,7 +11,7 @@ import {
 } from './github.js'
 
 // Re-export jsonlines functions for use by scripts and tests
-export { isJsonLines, parseJsonLines, formatJsonLines }
+export { isJsonLines, formatJsonLines }
 
 // Month names for timestamp formatting
 const MONTH_NAMES = [
@@ -34,6 +35,8 @@ interface StepData {
   outputs?: {
     stdout?: string
     stderr?: string
+    stdout_file?: string
+    stderr_file?: string
     exit_code?: string
     [key: string]: unknown
   }
@@ -43,12 +46,44 @@ interface Steps {
   [key: string]: StepData
 }
 
+/**
+ * Provides lazy access to step output streams.
+ * Avoids eagerly reading large outputs into memory.
+ */
+export class StepOutputs {
+  constructor(
+    private readonly outputs: StepData['outputs'],
+    private readonly exitCode?: string
+  ) {}
+
+  /**
+   * Get a readable stream for stdout.
+   * Returns a fresh stream each time.
+   */
+  getStdoutStream(): Readable | undefined {
+    return getStepOutputStream(this.outputs, 'stdout')
+  }
+
+  /**
+   * Get a readable stream for stderr.
+   * Returns a fresh stream each time.
+   */
+  getStderrStream(): Readable | undefined {
+    return getStepOutputStream(this.outputs, 'stderr')
+  }
+
+  /**
+   * Get the exit code
+   */
+  getExitCode(): string | undefined {
+    return this.exitCode
+  }
+}
+
 interface StepFailure {
   name: string
   conclusion: string
-  stdout?: string
-  stderr?: string
-  exitCode?: string
+  outputs: StepOutputs
 }
 
 interface AnalysisResult {
@@ -61,9 +96,7 @@ interface AnalysisResult {
     name: string
     found: boolean
     conclusion?: string
-    stdout?: string
-    stderr?: string
-    exitCode?: string
+    outputs?: StepOutputs
     isJsonLines?: boolean
     operationType?: 'plan' | 'apply' | 'destroy' | 'unknown'
     hasChanges?: boolean
@@ -76,6 +109,182 @@ interface AnalysisResult {
 const MAX_COMMENT_SIZE = 60000
 const MAX_OUTPUT_PER_STEP = 20000
 const COMMENT_TRUNCATION_BUFFER = 1000
+
+/**
+ * Get a readable stream for step output data, supporting both file-based and direct outputs.
+ * This is file-centric: file paths are used directly, while direct outputs are wrapped
+ * in a Readable stream shim for consistent handling.
+ */
+export function getStepOutputStream(
+  stepOutputs: StepData['outputs'],
+  outputType: 'stdout' | 'stderr'
+): Readable | undefined {
+  if (!stepOutputs) {
+    return undefined
+  }
+
+  // Check for file-based output first (primary/expected format)
+  const fileOutputKey =
+    outputType === 'stdout'
+      ? ('stdout_file' as const)
+      : ('stderr_file' as const)
+  const filePath = stepOutputs[fileOutputKey] as string | undefined
+
+  if (filePath) {
+    // Return a readable stream from the file
+    try {
+      return fs.createReadStream(filePath, { encoding: 'utf8' })
+    } catch (error) {
+      console.error(
+        `Failed to create read stream for ${outputType} from file ${filePath}: ${error instanceof Error ? error.message : 'Unknown error'}`
+      )
+      return undefined
+    }
+  }
+
+  // Fall back to direct output (legacy format) - wrap in Readable stream
+  const directOutput = stepOutputs[outputType] as string | undefined
+  if (directOutput !== undefined) {
+    return Readable.from([directOutput])
+  }
+
+  return undefined
+}
+
+/**
+ * Analyze a JSON Lines stream incrementally, extracting only metadata.
+ * Processes messages one at a time without accumulating them.
+ */
+async function analyzeJsonLines(stream: Readable | undefined): Promise<{
+  isJsonLines: boolean
+  operationType: 'plan' | 'apply' | 'destroy' | 'unknown'
+  hasChanges: boolean
+  hasErrors: boolean
+  changeSummaryMessage?: string
+}> {
+  if (!stream) {
+    return {
+      isJsonLines: false,
+      operationType: 'unknown',
+      hasChanges: false,
+      hasErrors: false
+    }
+  }
+
+  let operationType: 'plan' | 'apply' | 'destroy' | 'unknown' = 'unknown'
+  let hasChanges = false
+  let hasErrors = false
+  let changeSummaryMessage: string | undefined
+  let buffer = ''
+  let foundJsonLine = false
+
+  return new Promise((resolve) => {
+    stream.on('data', (chunk) => {
+      buffer += typeof chunk === 'string' ? chunk : chunk.toString('utf8')
+
+      // Process complete lines
+      let newlineIndex
+      while ((newlineIndex = buffer.indexOf('\n')) !== -1) {
+        const line = buffer.substring(0, newlineIndex).trim()
+        buffer = buffer.substring(newlineIndex + 1)
+
+        if (!line) continue
+
+        try {
+          const parsed = JSON.parse(line)
+          foundJsonLine = true
+
+          // Extract metadata from JSON Lines messages
+          // Process one message at a time without accumulation
+          if (parsed.type === 'diagnostic' && parsed['@level'] === 'error') {
+            hasErrors = true
+          }
+
+          if (parsed.type === 'change_summary') {
+            const changes = parsed.changes || {}
+            operationType = changes.operation || 'unknown'
+            changeSummaryMessage = parsed['@message']
+            const {
+              add = 0,
+              change: chg = 0,
+              remove = 0,
+              import: imp = 0
+            } = changes
+            hasChanges = add > 0 || chg > 0 || remove > 0 || imp > 0
+          }
+        } catch {
+          // Not JSON, ignore
+        }
+      }
+    })
+
+    stream.on('end', () => {
+      resolve({
+        isJsonLines: foundJsonLine,
+        operationType,
+        hasChanges,
+        hasErrors,
+        changeSummaryMessage
+      })
+    })
+
+    stream.on('error', () => {
+      resolve({
+        isJsonLines: foundJsonLine,
+        operationType,
+        hasChanges,
+        hasErrors,
+        changeSummaryMessage
+      })
+    })
+  })
+}
+
+/**
+ * Read limited content from a stream for comment/status message assembly.
+ * Reads incrementally with size limit to avoid unbounded memory usage.
+ */
+async function readLimitedStreamContent(
+  stream: Readable | undefined,
+  maxBytes: number
+): Promise<string> {
+  if (!stream) {
+    return ''
+  }
+
+  const chunks: string[] = []
+  let totalLength = 0
+
+  return new Promise((resolve) => {
+    stream.on('data', (chunk) => {
+      const chunkStr =
+        typeof chunk === 'string' ? chunk : chunk.toString('utf8')
+      const chunkLength = Buffer.byteLength(chunkStr, 'utf8')
+
+      if (totalLength + chunkLength <= maxBytes) {
+        chunks.push(chunkStr)
+        totalLength += chunkLength
+      } else {
+        // Reached limit, take only what fits
+        const remaining = maxBytes - totalLength
+        if (remaining > 0) {
+          chunks.push(chunkStr.substring(0, remaining))
+        }
+        stream.destroy() // Stop reading
+        resolve(chunks.join(''))
+      }
+    })
+
+    stream.on('end', () => {
+      resolve(chunks.join(''))
+    })
+
+    stream.on('error', (error) => {
+      console.error(`Error reading stream: ${error.message}`)
+      resolve(chunks.join('')) // Return what we have
+    })
+  })
+}
 
 /**
  * Get an input value from the environment
@@ -158,10 +367,10 @@ export function truncateOutput(
   )
 }
 
-export function analyzeSteps(
+export async function analyzeSteps(
   steps: Steps,
   targetStep?: string
-): AnalysisResult {
+): Promise<AnalysisResult> {
   const stepEntries = Object.entries(steps)
   const totalSteps = stepEntries.length
   const failedSteps: StepFailure[] = []
@@ -175,46 +384,25 @@ export function analyzeSteps(
 
     // Check if this is the target step
     if (targetStep && stepName === targetStep) {
-      const stdout = stepData.outputs?.stdout as string | undefined
+      const stepOutputs = new StepOutputs(
+        stepData.outputs,
+        stepData.outputs?.exit_code as string | undefined
+      )
 
-      // Analyze JSON Lines output if present
-      let isJsonLinesOutput = false
-      let operationType: 'plan' | 'apply' | 'destroy' | 'unknown' = 'unknown'
-      let hasChangesValue = false
-      let hasErrorsValue = false
-      let changeSummaryMsg: string | undefined
-
-      if (stdout && isJsonLines(stdout)) {
-        isJsonLinesOutput = true
-        const parsed = parseJsonLines(stdout)
-        hasErrorsValue = parsed.hasErrors
-
-        if (parsed.changeSummary) {
-          operationType = parsed.changeSummary.changes.operation
-          changeSummaryMsg = parsed.changeSummary['@message']
-          const {
-            add,
-            change,
-            remove,
-            import: importCount
-          } = parsed.changeSummary.changes
-          hasChangesValue =
-            add > 0 || change > 0 || remove > 0 || importCount > 0
-        }
-      }
+      // Analyze stdout stream incrementally for metadata only
+      const stdoutStream = stepOutputs.getStdoutStream()
+      const analysis = await analyzeJsonLines(stdoutStream)
 
       targetStepResult = {
         name: stepName,
         found: true,
         conclusion: outcome,
-        stdout,
-        stderr: stepData.outputs?.stderr as string | undefined,
-        exitCode: stepData.outputs?.exit_code as string | undefined,
-        isJsonLines: isJsonLinesOutput,
-        operationType,
-        hasChanges: hasChangesValue,
-        hasErrors: hasErrorsValue,
-        changeSummaryMessage: changeSummaryMsg
+        outputs: stepOutputs,
+        isJsonLines: analysis.isJsonLines,
+        operationType: analysis.operationType,
+        hasChanges: analysis.hasChanges,
+        hasErrors: analysis.hasErrors,
+        changeSummaryMessage: analysis.changeSummaryMessage
       }
     }
 
@@ -228,9 +416,10 @@ export function analyzeSteps(
       const failure: StepFailure = {
         name: stepName,
         conclusion: outcome,
-        stdout: stepData.outputs?.stdout as string | undefined,
-        stderr: stepData.outputs?.stderr as string | undefined,
-        exitCode: stepData.outputs?.exit_code as string | undefined
+        outputs: new StepOutputs(
+          stepData.outputs,
+          stepData.outputs?.exit_code as string | undefined
+        )
       }
       failedSteps.push(failure)
     }
@@ -254,12 +443,12 @@ export function analyzeSteps(
   }
 }
 
-export function generateCommentBody(
+export async function generateCommentBody(
   workspace: string,
   analysis: AnalysisResult,
   includeLogLink = false,
   timestamp?: Date
-): string {
+): Promise<string> {
   const {
     success,
     failedSteps,
@@ -288,10 +477,16 @@ export function generateCommentBody(
         comment += `\`${targetStepResult.name}\` was not found in the workflow steps.\n\n`
       }
     } else if (targetStepResult.conclusion === 'success') {
-      // Success case - show stdout/stderr if available
-      const stdout = targetStepResult.stdout
-      const stderr = targetStepResult.stderr
-      const { formattedContent } = formatOutput(stdout, stderr)
+      // Success case - show stdout/stderr if available (pass stream getters)
+      const { formattedContent } = await formatOutput(
+        targetStepResult.outputs
+          ? () => targetStepResult.outputs!.getStdoutStream()
+          : undefined,
+        targetStepResult.outputs
+          ? () => targetStepResult.outputs!.getStderrStream()
+          : undefined,
+        MAX_OUTPUT_PER_STEP
+      )
 
       if (!formattedContent) {
         comment += `> [!NOTE]\n> Completed successfully with no output.\n\n`
@@ -302,15 +497,22 @@ export function generateCommentBody(
       // Target step failed or has other status
       comment += `**Status:** ${targetStepResult.conclusion}\n`
 
-      if (targetStepResult.exitCode) {
-        comment += `**Exit Code:** ${targetStepResult.exitCode}\n`
+      const exitCode = targetStepResult.outputs?.getExitCode()
+      if (exitCode) {
+        comment += `**Exit Code:** ${exitCode}\n`
       }
 
       comment += '\n'
 
-      const stdout = targetStepResult.stdout
-      const stderr = targetStepResult.stderr
-      const { formattedContent } = formatOutput(stdout, stderr)
+      const { formattedContent } = await formatOutput(
+        targetStepResult.outputs
+          ? () => targetStepResult.outputs!.getStdoutStream()
+          : undefined,
+        targetStepResult.outputs
+          ? () => targetStepResult.outputs!.getStderrStream()
+          : undefined,
+        MAX_OUTPUT_PER_STEP
+      )
 
       if (!formattedContent) {
         comment += `> [!NOTE]\n> Failed with no output.\n\n`
@@ -348,13 +550,18 @@ export function generateCommentBody(
         comment += `#### ❌ Step: \`${step.name}\`\n\n`
         comment += `**Status:** ${step.conclusion}\n`
 
-        if (step.exitCode) {
-          comment += `**Exit Code:** ${step.exitCode}\n`
+        const exitCode = step.outputs.getExitCode()
+        if (exitCode) {
+          comment += `**Exit Code:** ${exitCode}\n`
         }
 
         comment += '\n'
 
-        const { formattedContent } = formatOutput(step.stdout, step.stderr)
+        const { formattedContent } = await formatOutput(
+          () => step.outputs.getStdoutStream(),
+          () => step.outputs.getStderrStream(),
+          MAX_OUTPUT_PER_STEP
+        )
 
         if (!formattedContent) {
           comment += `> [!NOTE]\n> Failed with no output.\n\n`
@@ -477,40 +684,53 @@ export function generateStatusIssueTitle(workspace: string): string {
 }
 
 /**
- * Format output, detecting and handling JSON Lines format
+ * Format output from streams, detecting and handling JSON Lines format.
+ * Limits based on formatted output size.
  */
-function formatOutput(
-  stdout: string | undefined,
-  stderr: string | undefined
-): { formattedContent: string; isJsonLines: boolean } {
-  const hasStdout = stdout && stdout.trim().length > 0
-  const hasStderr = stderr && stderr.trim().length > 0
+async function formatOutput(
+  getStdoutStream: (() => Readable | undefined) | undefined,
+  getStderrStream: (() => Readable | undefined) | undefined,
+  maxSize: number = MAX_OUTPUT_PER_STEP
+): Promise<{ formattedContent: string; isJsonLines: boolean }> {
+  // Check if stdout is JSON Lines format (with fresh stream for detection)
+  if (getStdoutStream) {
+    const detectionStream = getStdoutStream()
+    const isJsonLinesFormat = await isJsonLines(detectionStream)
 
-  // Check if stdout is JSON Lines format
-  if (hasStdout && stdout && isJsonLines(stdout)) {
-    const parsed = parseJsonLines(stdout)
-    const formatted = formatJsonLines(parsed)
+    if (isJsonLinesFormat) {
+      // Get a fresh stream for formatting
+      const formattingStream = getStdoutStream()
+      const formatted = await formatJsonLines(formattingStream, maxSize)
 
-    if (formatted.trim().length > 0) {
-      return { formattedContent: formatted, isJsonLines: true }
+      if (formatted.trim().length > 0) {
+        return { formattedContent: formatted, isJsonLines: true }
+      }
     }
   }
 
-  // Fall back to standard output formatting
+  // Fall back to standard output formatting with limited reading
   let content = ''
 
-  if (!hasStdout && !hasStderr) {
+  if (getStdoutStream) {
+    const stdoutStream = getStdoutStream()
+    const stdout = await readLimitedStreamContent(stdoutStream, maxSize)
+    if (stdout && stdout.trim().length > 0) {
+      const truncated = truncateOutput(stdout, maxSize, true)
+      content += `<details>\n<summary>📄 Output</summary>\n\n\`\`\`\n${truncated}\n\`\`\`\n</details>\n\n`
+    }
+  }
+
+  if (getStderrStream) {
+    const stderrStream = getStderrStream()
+    const stderr = await readLimitedStreamContent(stderrStream, maxSize)
+    if (stderr && stderr.trim().length > 0) {
+      const truncated = truncateOutput(stderr, maxSize, true)
+      content += `<details>\n<summary>⚠️ Errors</summary>\n\n\`\`\`\n${truncated}\n\`\`\`\n</details>\n\n`
+    }
+  }
+
+  if (!content) {
     return { formattedContent: '', isJsonLines: false }
-  }
-
-  if (hasStdout && stdout) {
-    const truncated = truncateOutput(stdout, MAX_OUTPUT_PER_STEP, true)
-    content += `<details>\n<summary>📄 Output</summary>\n\n\`\`\`\n${truncated}\n\`\`\`\n</details>\n\n`
-  }
-
-  if (hasStderr && stderr) {
-    const truncated = truncateOutput(stderr, MAX_OUTPUT_PER_STEP, true)
-    content += `<details>\n<summary>⚠️ Errors</summary>\n\n\`\`\`\n${truncated}\n\`\`\`\n</details>\n\n`
   }
 
   return { formattedContent: content, isJsonLines: false }
@@ -549,7 +769,7 @@ async function run(): Promise<void> {
       `Analyzing ${Object.keys(steps).length} steps for workspace: \`${workspace}\`${targetStep ? ` (target: \`${targetStep}\`)` : ''}`
     )
 
-    const analysis = analyzeSteps(steps, targetStep)
+    const analysis = await analyzeSteps(steps, targetStep)
 
     info(
       `Analysis complete: ${analysis.success ? 'Success' : `Failed (${analysis.failedSteps.length} failures)`}`
@@ -619,7 +839,7 @@ async function run(): Promise<void> {
         `Running in PR context - posting as comment${includeLogLink ? ' with logs link' : ''}`
       )
 
-      const commentBody = generateCommentBody(
+      const commentBody = await generateCommentBody(
         workspace,
         analysis,
         includeLogLink
@@ -650,7 +870,7 @@ async function run(): Promise<void> {
       info('Not in PR context - using status issue')
 
       const timestamp = new Date()
-      const statusIssueBody = generateCommentBody(
+      const statusIssueBody = await generateCommentBody(
         workspace,
         analysis,
         true,

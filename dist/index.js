@@ -1,4 +1,5 @@
 import * as fs from 'fs';
+import { Readable } from 'stream';
 import * as https from 'https';
 
 /**
@@ -15,94 +16,56 @@ import * as https from 'https';
  * commands run with the -json flag.
  */
 /**
- * Check if a string appears to be JSON Lines format
+ * Check if a stream appears to be JSON Lines format by checking first few lines.
+ * Does not accumulate data beyond what's needed for detection.
  */
-function isJsonLines(text) {
-    if (!text || text.trim().length === 0) {
+async function isJsonLines(stream) {
+    if (!stream) {
         return false;
     }
-    const lines = text.split('\n').filter((line) => line.trim().length > 0);
-    // Need at least one line
-    if (lines.length === 0) {
-        return false;
-    }
-    // Check if first few lines are valid JSON objects with required fields
-    const samplesToCheck = Math.min(lines.length, 3);
+    let buffer = '';
+    let linesChecked = 0;
     let validJsonCount = 0;
-    for (let i = 0; i < samplesToCheck; i++) {
-        try {
-            const parsed = JSON.parse(lines[i]);
-            // Check for required fields in OpenTofu/Terraform JSON output
-            if (parsed &&
-                typeof parsed === 'object' &&
-                'type' in parsed &&
-                '@message' in parsed) {
-                validJsonCount++;
-            }
-        }
-        catch {
-            // Not valid JSON, continue checking other lines
-        }
-    }
-    // If at least one line is valid JSON with required fields, consider it JSON Lines
-    return validJsonCount > 0;
-}
-/**
- * Parse JSON Lines output into structured messages
- */
-function parseJsonLines(text) {
-    const lines = text.split('\n').filter((line) => line.trim().length > 0);
-    const messages = [];
-    const diagnostics = [];
-    const plannedChanges = [];
-    const applyComplete = [];
-    const resourceDrifts = [];
-    let changeSummary;
-    let outputs;
-    let hasErrors = false;
-    for (const line of lines) {
-        try {
-            const parsed = JSON.parse(line);
-            messages.push(parsed);
-            // Categorize by type
-            switch (parsed.type) {
-                case 'diagnostic':
-                    diagnostics.push(parsed);
-                    if (parsed.diagnostic.severity === 'error') {
-                        hasErrors = true;
+    const samplesToCheck = 3;
+    return new Promise((resolve) => {
+        stream.on('data', (chunk) => {
+            buffer += typeof chunk === 'string' ? chunk : chunk.toString('utf8');
+            // Process complete lines
+            let newlineIndex;
+            while ((newlineIndex = buffer.indexOf('\n')) !== -1 &&
+                linesChecked < samplesToCheck) {
+                const line = buffer.substring(0, newlineIndex).trim();
+                buffer = buffer.substring(newlineIndex + 1);
+                if (!line)
+                    continue;
+                linesChecked++;
+                try {
+                    const parsed = JSON.parse(line);
+                    // Check for required fields in OpenTofu/Terraform JSON output
+                    if (parsed &&
+                        typeof parsed === 'object' &&
+                        'type' in parsed &&
+                        '@message' in parsed) {
+                        validJsonCount++;
                     }
-                    break;
-                case 'planned_change':
-                    plannedChanges.push(parsed);
-                    break;
-                case 'apply_complete':
-                    applyComplete.push(parsed);
-                    break;
-                case 'change_summary':
-                    changeSummary = parsed;
-                    break;
-                case 'resource_drift':
-                    resourceDrifts.push(parsed);
-                    break;
-                case 'outputs':
-                    outputs = parsed;
-                    break;
+                }
+                catch {
+                    // Not valid JSON, continue checking other lines
+                }
+                if (linesChecked >= samplesToCheck) {
+                    stream.destroy();
+                    resolve(validJsonCount > 0);
+                    return;
+                }
             }
-        }
-        catch {
-            // Skip lines that aren't valid JSON
-        }
-    }
-    return {
-        messages,
-        diagnostics,
-        plannedChanges,
-        applyComplete,
-        changeSummary,
-        resourceDrifts,
-        outputs,
-        hasErrors
-    };
+        });
+        stream.on('end', () => {
+            resolve(validJsonCount > 0);
+        });
+        stream.on('error', () => {
+            resolve(false);
+        });
+    });
 }
 /**
  * Get emoji for a change action
@@ -128,128 +91,277 @@ function getActionEmoji(action) {
     }
 }
 /**
- * Determine the operation type from parsed JSON Lines
+ * Format JSON Lines from a stream directly without accumulating messages.
+ * Limits based on formatted output size, not message count.
+ * Stops accumulating when formatted output reaches size limit.
  */
-function getOperationType(parsed) {
-    if (parsed.changeSummary) {
-        return parsed.changeSummary.changes.operation;
+async function formatJsonLines(stream, maxOutputSize = 20000) {
+    if (!stream) {
+        return '';
     }
-    return 'unknown';
+    // Reserves space for important summaries. Always includes change_summary which may appear at end of stream.
+    const SUMMARY_RESERVE_CHARS = 1000;
+    const effectiveLimit = maxOutputSize - SUMMARY_RESERVE_CHARS;
+    let buffer = '';
+    // Build output incrementally, checking size as we go
+    let formattedOutput = '';
+    // Accumulate only important details temporarily for formatting
+    const errorDetails = [];
+    const warningDetails = [];
+    const plannedChangeDetails = [];
+    const applyCompleteDetails = [];
+    const driftDetails = [];
+    // Single values
+    let changeSummaryMessage;
+    let operationType = 'unknown';
+    // Helper function to process a single parsed JSON message
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const processMessage = (parsed) => {
+        switch (parsed.type) {
+            case 'diagnostic':
+                if (parsed.diagnostic) {
+                    const detail = {
+                        severity: parsed.diagnostic.severity,
+                        summary: parsed.diagnostic.summary,
+                        detail: parsed.diagnostic.detail,
+                        filename: parsed.diagnostic.range?.filename,
+                        line: parsed.diagnostic.range?.start?.line,
+                        code: parsed.diagnostic.snippet?.code
+                    };
+                    if (detail.severity === 'error') {
+                        errorDetails.push(detail);
+                    }
+                    else if (detail.severity === 'warning') {
+                        warningDetails.push(detail);
+                    }
+                }
+                break;
+            case 'change_summary':
+                changeSummaryMessage = parsed['@message'];
+                if (parsed.changes) {
+                    operationType = parsed.changes.operation || 'unknown';
+                }
+                break;
+            case 'planned_change':
+                if (parsed.change) {
+                    const resource = parsed.change.resource;
+                    plannedChangeDetails.push({
+                        action: parsed.change.action,
+                        addr: resource?.addr ||
+                            `${resource?.resource_type}.${resource?.resource_name}`
+                    });
+                }
+                break;
+            case 'apply_complete':
+                if (parsed.hook) {
+                    const resource = parsed.hook.resource;
+                    applyCompleteDetails.push({
+                        action: parsed.hook.action,
+                        addr: resource?.addr ||
+                            `${resource?.resource_type}.${resource?.resource_name}`
+                    });
+                }
+                break;
+            case 'resource_drift':
+                if (parsed.change) {
+                    const resource = parsed.change.resource;
+                    driftDetails.push({
+                        action: parsed.change.action,
+                        addr: resource?.addr ||
+                            `${resource?.resource_type}.${resource?.resource_name}`
+                    });
+                }
+                break;
+        }
+    };
+    return new Promise((resolve) => {
+        stream.on('data', (chunk) => {
+            buffer += typeof chunk === 'string' ? chunk : chunk.toString('utf8');
+            // Process complete lines
+            let newlineIndex;
+            while ((newlineIndex = buffer.indexOf('\n')) !== -1) {
+                const line = buffer.substring(0, newlineIndex).trim();
+                buffer = buffer.substring(newlineIndex + 1);
+                if (!line)
+                    continue;
+                try {
+                    const parsed = JSON.parse(line);
+                    processMessage(parsed);
+                }
+                catch {
+                    // Skip lines that aren't valid JSON
+                }
+            }
+        });
+        stream.on('end', () => {
+            // Process any remaining buffer content (last line without trailing newline)
+            if (buffer.trim()) {
+                try {
+                    const parsed = JSON.parse(buffer);
+                    processMessage(parsed);
+                }
+                catch {
+                    // Skip if final buffer isn't valid JSON
+                }
+            }
+            formattedOutput = buildFormattedOutput(changeSummaryMessage, operationType, errorDetails, warningDetails, plannedChangeDetails, applyCompleteDetails, driftDetails, effectiveLimit);
+            resolve(formattedOutput);
+        });
+        stream.on('error', () => {
+            formattedOutput = buildFormattedOutput(changeSummaryMessage, operationType, errorDetails, warningDetails, plannedChangeDetails, applyCompleteDetails, driftDetails, effectiveLimit);
+            resolve(formattedOutput);
+        });
+    });
 }
 /**
- * Check if a change summary has any changes
+ * Build formatted output from accumulated details, limiting by output size
  */
-function hasChanges(changeSummary) {
-    const { add, change, remove, import: importCount } = changeSummary.changes;
-    return add > 0 || change > 0 || remove > 0 || importCount > 0;
-}
-/**
- * Format a planned change for display
- */
-function formatPlannedChange(change) {
-    const emoji = getActionEmoji(change.change.action);
-    const resource = change.change.resource;
-    const addr = resource.addr || `${resource.resource_type}.${resource.resource_name}`;
-    return `${emoji} **${addr}** (${change.change.action})`;
-}
-/**
- * Format an apply complete message for display
- */
-function formatApplyComplete(message) {
-    const emoji = getActionEmoji(message.hook.action);
-    const resource = message.hook.resource;
-    const addr = resource.addr || `${resource.resource_type}.${resource.resource_name}`;
-    return `${emoji} **${addr}** (${message.hook.action})`;
-}
-/**
- * Format a diagnostic message for display
- */
-function formatDiagnostic(diag) {
-    const icon = diag.diagnostic.severity === 'error'
-        ? '❌'
-        : diag.diagnostic.severity === 'warning'
-            ? '⚠️'
-            : 'ℹ️';
-    let result = `${icon} **${diag.diagnostic.summary}**`;
-    if (diag.diagnostic.detail) {
-        result += `\n\n${diag.diagnostic.detail}`;
-    }
-    if (diag.diagnostic.range) {
-        result += `\n\n📄 \`${diag.diagnostic.range.filename}:${diag.diagnostic.range.start.line}\``;
-    }
-    if (diag.diagnostic.snippet?.code) {
-        result += '\n\n```hcl\n' + diag.diagnostic.snippet.code + '\n```';
-    }
-    return result;
-}
-/**
- * Format parsed JSON Lines into a markdown comment
- */
-function formatJsonLines(parsed) {
+function buildFormattedOutput(changeSummaryMessage, operationType, errorDetails, warningDetails, plannedChangeDetails, applyCompleteDetails, driftDetails, maxSize) {
     let result = '';
-    // Determine operation type
-    const operation = getOperationType(parsed);
-    const hasAnyChanges = parsed.changeSummary
-        ? hasChanges(parsed.changeSummary)
-        : parsed.plannedChanges.length > 0 || parsed.applyComplete.length > 0;
-    // Show change summary first (prominently, outside of collapsing)
-    if (parsed.changeSummary) {
-        result += `${parsed.changeSummary['@message']}\n\n`;
+    // Show change summary first
+    if (changeSummaryMessage) {
+        result += `${changeSummaryMessage}\n\n`;
     }
-    // Show diagnostics (errors and warnings) in separate collapsible sections
-    if (parsed.diagnostics.length > 0) {
-        const errors = parsed.diagnostics.filter((d) => d.diagnostic.severity === 'error');
-        const warnings = parsed.diagnostics.filter((d) => d.diagnostic.severity === 'warning');
-        if (errors.length > 0) {
-            result += '<details>\n<summary>❌ Errors</summary>\n\n';
-            for (const error of errors) {
-                result += formatDiagnostic(error) + '\n\n';
+    // Format diagnostics, checking size as we add each one
+    if (errorDetails.length > 0) {
+        let diagnosticsSection = '<details>\n<summary>❌ Errors</summary>\n\n';
+        let errorCount = 0;
+        for (const err of errorDetails) {
+            const errorText = `❌ **${err.summary}**` +
+                (err.detail ? `\n\n${err.detail}` : '') +
+                (err.filename && err.line
+                    ? `\n\n📄 \`${err.filename}:${err.line}\``
+                    : '') +
+                (err.code ? '\n\n```hcl\n' + err.code + '\n```' : '') +
+                '\n\n';
+            if (maxSize &&
+                (result + diagnosticsSection + errorText).length > maxSize) {
+                break;
             }
-            result += '</details>\n\n';
+            diagnosticsSection += errorText;
+            errorCount++;
         }
-        if (warnings.length > 0) {
-            result += '<details>\n<summary>⚠️ Warnings</summary>\n\n';
-            for (const warning of warnings) {
-                result += formatDiagnostic(warning) + '\n\n';
-            }
-            result += '</details>\n\n';
+        if (errorCount < errorDetails.length) {
+            diagnosticsSection += `... (showing ${errorCount} of ${errorDetails.length} errors)\n\n`;
         }
-    }
-    // Show changes in a collapsible section only if there are changes
-    if (hasAnyChanges) {
-        if (operation === 'plan' && parsed.plannedChanges.length > 0) {
-            result += '<details>\n<summary>📋 Planned Changes</summary>\n\n';
-            for (const change of parsed.plannedChanges) {
-                result += formatPlannedChange(change) + '\n';
-            }
-            result += '\n</details>\n\n';
-        }
-        else if (operation === 'apply' && parsed.applyComplete.length > 0) {
-            result += '<details>\n<summary>✅ Applied Changes</summary>\n\n';
-            for (const message of parsed.applyComplete) {
-                result += formatApplyComplete(message) + '\n';
-            }
-            result += '\n</details>\n\n';
-        }
-        else if (operation === 'unknown' && parsed.plannedChanges.length > 0) {
-            // Fallback for when there's no change_summary but there are planned_changes
-            result += '<details>\n<summary>📋 Planned Changes</summary>\n\n';
-            for (const change of parsed.plannedChanges) {
-                result += formatPlannedChange(change) + '\n';
-            }
-            result += '\n</details>\n\n';
+        diagnosticsSection += '</details>\n\n';
+        if (!maxSize || (result + diagnosticsSection).length <= maxSize) {
+            result += diagnosticsSection;
         }
     }
-    // Show resource drifts if any
-    if (parsed.resourceDrifts.length > 0) {
-        result += '<details>\n<summary>🔀 Resource Drift</summary>\n\n';
-        for (const drift of parsed.resourceDrifts) {
-            const emoji = getActionEmoji(drift.change.action);
-            const addr = drift.change.resource.addr ||
-                `${drift.change.resource.resource_type}.${drift.change.resource.resource_name}`;
-            result += `${emoji} **${addr}** (${drift.change.action})\n`;
+    if (warningDetails.length > 0 && (!maxSize || result.length < maxSize)) {
+        let diagnosticsSection = '<details>\n<summary>⚠️ Warnings</summary>\n\n';
+        let warnCount = 0;
+        for (const warn of warningDetails) {
+            const warnText = `⚠️ **${warn.summary}**` +
+                (warn.detail ? `\n\n${warn.detail}` : '') +
+                (warn.filename && warn.line
+                    ? `\n\n📄 \`${warn.filename}:${warn.line}\``
+                    : '') +
+                (warn.code ? '\n\n```hcl\n' + warn.code + '\n```' : '') +
+                '\n\n';
+            if (maxSize &&
+                (result + diagnosticsSection + warnText).length > maxSize) {
+                break;
+            }
+            diagnosticsSection += warnText;
+            warnCount++;
         }
-        result += '\n</details>\n\n';
+        if (warnCount < warningDetails.length) {
+            diagnosticsSection += `... (showing ${warnCount} of ${warningDetails.length} warnings)\n\n`;
+        }
+        diagnosticsSection += '</details>\n\n';
+        if (!maxSize || (result + diagnosticsSection).length <= maxSize) {
+            result += diagnosticsSection;
+        }
+    }
+    // Format changes, checking size
+    const hasChanges = plannedChangeDetails.length > 0 || applyCompleteDetails.length > 0;
+    if (hasChanges && (!maxSize || result.length < maxSize)) {
+        if (operationType === 'plan' && plannedChangeDetails.length > 0) {
+            let changesSection = '<details>\n<summary>📋 Planned Changes</summary>\n\n';
+            let changeCount = 0;
+            for (const change of plannedChangeDetails) {
+                const emoji = getActionEmoji(change.action);
+                const changeText = `${emoji} **${change.addr}** (${change.action})\n`;
+                if (maxSize &&
+                    (result + changesSection + changeText).length > maxSize) {
+                    break;
+                }
+                changesSection += changeText;
+                changeCount++;
+            }
+            if (changeCount < plannedChangeDetails.length) {
+                changesSection += `\n... (showing ${changeCount} of ${plannedChangeDetails.length} changes)\n`;
+            }
+            changesSection += '\n</details>\n\n';
+            if (!maxSize || (result + changesSection).length <= maxSize) {
+                result += changesSection;
+            }
+        }
+        else if (operationType === 'apply' && applyCompleteDetails.length > 0) {
+            let changesSection = '<details>\n<summary>✅ Applied Changes</summary>\n\n';
+            let changeCount = 0;
+            for (const change of applyCompleteDetails) {
+                const emoji = getActionEmoji(change.action);
+                const changeText = `${emoji} **${change.addr}** (${change.action})\n`;
+                if (maxSize &&
+                    (result + changesSection + changeText).length > maxSize) {
+                    break;
+                }
+                changesSection += changeText;
+                changeCount++;
+            }
+            if (changeCount < applyCompleteDetails.length) {
+                changesSection += `\n... (showing ${changeCount} of ${applyCompleteDetails.length} changes)\n`;
+            }
+            changesSection += '\n</details>\n\n';
+            if (!maxSize || (result + changesSection).length <= maxSize) {
+                result += changesSection;
+            }
+        }
+        else if (operationType === 'unknown' && plannedChangeDetails.length > 0) {
+            let changesSection = '<details>\n<summary>📋 Planned Changes</summary>\n\n';
+            let changeCount = 0;
+            for (const change of plannedChangeDetails) {
+                const emoji = getActionEmoji(change.action);
+                const changeText = `${emoji} **${change.addr}** (${change.action})\n`;
+                if (maxSize &&
+                    (result + changesSection + changeText).length > maxSize) {
+                    break;
+                }
+                changesSection += changeText;
+                changeCount++;
+            }
+            if (changeCount < plannedChangeDetails.length) {
+                changesSection += `\n... (showing ${changeCount} of ${plannedChangeDetails.length} changes)\n`;
+            }
+            changesSection += '\n</details>\n\n';
+            if (!maxSize || (result + changesSection).length <= maxSize) {
+                result += changesSection;
+            }
+        }
+    }
+    // Format drifts
+    if (driftDetails.length > 0 && (!maxSize || result.length < maxSize)) {
+        let driftsSection = '<details>\n<summary>🔀 Resource Drift</summary>\n\n';
+        let driftCount = 0;
+        for (const drift of driftDetails) {
+            const emoji = getActionEmoji(drift.action);
+            const driftText = `${emoji} **${drift.addr}** (${drift.action})\n`;
+            if (maxSize && (result + driftsSection + driftText).length > maxSize) {
+                break;
+            }
+            driftsSection += driftText;
+            driftCount++;
+        }
+        if (driftCount < driftDetails.length) {
+            driftsSection += `\n... (showing ${driftCount} of ${driftDetails.length} drifts)\n`;
+        }
+        driftsSection += '\n</details>\n\n';
+        if (!maxSize || (result + driftsSection).length <= maxSize) {
+            result += driftsSection;
+        }
     }
     return result.trim();
 }
@@ -418,10 +530,180 @@ const MONTH_NAMES = [
     'November',
     'December'
 ];
+/**
+ * Provides lazy access to step output streams.
+ * Avoids eagerly reading large outputs into memory.
+ */
+class StepOutputs {
+    outputs;
+    exitCode;
+    constructor(outputs, exitCode) {
+        this.outputs = outputs;
+        this.exitCode = exitCode;
+    }
+    /**
+     * Get a readable stream for stdout.
+     * Returns a fresh stream each time.
+     */
+    getStdoutStream() {
+        return getStepOutputStream(this.outputs, 'stdout');
+    }
+    /**
+     * Get a readable stream for stderr.
+     * Returns a fresh stream each time.
+     */
+    getStderrStream() {
+        return getStepOutputStream(this.outputs, 'stderr');
+    }
+    /**
+     * Get the exit code
+     */
+    getExitCode() {
+        return this.exitCode;
+    }
+}
 // GitHub comment max size is 65536 characters
 const MAX_COMMENT_SIZE = 60000;
 const MAX_OUTPUT_PER_STEP = 20000;
 const COMMENT_TRUNCATION_BUFFER = 1000;
+/**
+ * Get a readable stream for step output data, supporting both file-based and direct outputs.
+ * This is file-centric: file paths are used directly, while direct outputs are wrapped
+ * in a Readable stream shim for consistent handling.
+ */
+function getStepOutputStream(stepOutputs, outputType) {
+    if (!stepOutputs) {
+        return undefined;
+    }
+    // Check for file-based output first (primary/expected format)
+    const fileOutputKey = outputType === 'stdout'
+        ? 'stdout_file'
+        : 'stderr_file';
+    const filePath = stepOutputs[fileOutputKey];
+    if (filePath) {
+        // Return a readable stream from the file
+        try {
+            return fs.createReadStream(filePath, { encoding: 'utf8' });
+        }
+        catch (error) {
+            console.error(`Failed to create read stream for ${outputType} from file ${filePath}: ${error instanceof Error ? error.message : 'Unknown error'}`);
+            return undefined;
+        }
+    }
+    // Fall back to direct output (legacy format) - wrap in Readable stream
+    const directOutput = stepOutputs[outputType];
+    if (directOutput !== undefined) {
+        return Readable.from([directOutput]);
+    }
+    return undefined;
+}
+/**
+ * Analyze a JSON Lines stream incrementally, extracting only metadata.
+ * Processes messages one at a time without accumulating them.
+ */
+async function analyzeJsonLines(stream) {
+    if (!stream) {
+        return {
+            isJsonLines: false,
+            operationType: 'unknown',
+            hasChanges: false,
+            hasErrors: false
+        };
+    }
+    let operationType = 'unknown';
+    let hasChanges = false;
+    let hasErrors = false;
+    let changeSummaryMessage;
+    let buffer = '';
+    let foundJsonLine = false;
+    return new Promise((resolve) => {
+        stream.on('data', (chunk) => {
+            buffer += typeof chunk === 'string' ? chunk : chunk.toString('utf8');
+            // Process complete lines
+            let newlineIndex;
+            while ((newlineIndex = buffer.indexOf('\n')) !== -1) {
+                const line = buffer.substring(0, newlineIndex).trim();
+                buffer = buffer.substring(newlineIndex + 1);
+                if (!line)
+                    continue;
+                try {
+                    const parsed = JSON.parse(line);
+                    foundJsonLine = true;
+                    // Extract metadata from JSON Lines messages
+                    // Process one message at a time without accumulation
+                    if (parsed.type === 'diagnostic' && parsed['@level'] === 'error') {
+                        hasErrors = true;
+                    }
+                    if (parsed.type === 'change_summary') {
+                        const changes = parsed.changes || {};
+                        operationType = changes.operation || 'unknown';
+                        changeSummaryMessage = parsed['@message'];
+                        const { add = 0, change: chg = 0, remove = 0, import: imp = 0 } = changes;
+                        hasChanges = add > 0 || chg > 0 || remove > 0 || imp > 0;
+                    }
+                }
+                catch {
+                    // Not JSON, ignore
+                }
+            }
+        });
+        stream.on('end', () => {
+            resolve({
+                isJsonLines: foundJsonLine,
+                operationType,
+                hasChanges,
+                hasErrors,
+                changeSummaryMessage
+            });
+        });
+        stream.on('error', () => {
+            resolve({
+                isJsonLines: foundJsonLine,
+                operationType,
+                hasChanges,
+                hasErrors,
+                changeSummaryMessage
+            });
+        });
+    });
+}
+/**
+ * Read limited content from a stream for comment/status message assembly.
+ * Reads incrementally with size limit to avoid unbounded memory usage.
+ */
+async function readLimitedStreamContent(stream, maxBytes) {
+    if (!stream) {
+        return '';
+    }
+    const chunks = [];
+    let totalLength = 0;
+    return new Promise((resolve) => {
+        stream.on('data', (chunk) => {
+            const chunkStr = typeof chunk === 'string' ? chunk : chunk.toString('utf8');
+            const chunkLength = Buffer.byteLength(chunkStr, 'utf8');
+            if (totalLength + chunkLength <= maxBytes) {
+                chunks.push(chunkStr);
+                totalLength += chunkLength;
+            }
+            else {
+                // Reached limit, take only what fits
+                const remaining = maxBytes - totalLength;
+                if (remaining > 0) {
+                    chunks.push(chunkStr.substring(0, remaining));
+                }
+                stream.destroy(); // Stop reading
+                resolve(chunks.join(''));
+            }
+        });
+        stream.on('end', () => {
+            resolve(chunks.join(''));
+        });
+        stream.on('error', (error) => {
+            console.error(`Error reading stream: ${error.message}`);
+            resolve(chunks.join('')); // Return what we have
+        });
+    });
+}
 /**
  * Get an input value from the environment
  */
@@ -484,7 +766,7 @@ function truncateOutput(text, maxLength, includeLogLink = false) {
         truncationMessage +
         text.substring(text.length - halfLength));
 }
-function analyzeSteps(steps, targetStep) {
+async function analyzeSteps(steps, targetStep) {
     const stepEntries = Object.entries(steps);
     const totalSteps = stepEntries.length;
     const failedSteps = [];
@@ -496,37 +778,20 @@ function analyzeSteps(steps, targetStep) {
         const outcome = stepData.outcome || stepData.conclusion || '';
         // Check if this is the target step
         if (targetStep && stepName === targetStep) {
-            const stdout = stepData.outputs?.stdout;
-            // Analyze JSON Lines output if present
-            let isJsonLinesOutput = false;
-            let operationType = 'unknown';
-            let hasChangesValue = false;
-            let hasErrorsValue = false;
-            let changeSummaryMsg;
-            if (stdout && isJsonLines(stdout)) {
-                isJsonLinesOutput = true;
-                const parsed = parseJsonLines(stdout);
-                hasErrorsValue = parsed.hasErrors;
-                if (parsed.changeSummary) {
-                    operationType = parsed.changeSummary.changes.operation;
-                    changeSummaryMsg = parsed.changeSummary['@message'];
-                    const { add, change, remove, import: importCount } = parsed.changeSummary.changes;
-                    hasChangesValue =
-                        add > 0 || change > 0 || remove > 0 || importCount > 0;
-                }
-            }
+            const stepOutputs = new StepOutputs(stepData.outputs, stepData.outputs?.exit_code);
+            // Analyze stdout stream incrementally for metadata only
+            const stdoutStream = stepOutputs.getStdoutStream();
+            const analysis = await analyzeJsonLines(stdoutStream);
             targetStepResult = {
                 name: stepName,
                 found: true,
                 conclusion: outcome,
-                stdout,
-                stderr: stepData.outputs?.stderr,
-                exitCode: stepData.outputs?.exit_code,
-                isJsonLines: isJsonLinesOutput,
-                operationType,
-                hasChanges: hasChangesValue,
-                hasErrors: hasErrorsValue,
-                changeSummaryMessage: changeSummaryMsg
+                outputs: stepOutputs,
+                isJsonLines: analysis.isJsonLines,
+                operationType: analysis.operationType,
+                hasChanges: analysis.hasChanges,
+                hasErrors: analysis.hasErrors,
+                changeSummaryMessage: analysis.changeSummaryMessage
             };
         }
         // Count step outcomes
@@ -541,9 +806,7 @@ function analyzeSteps(steps, targetStep) {
             const failure = {
                 name: stepName,
                 conclusion: outcome,
-                stdout: stepData.outputs?.stdout,
-                stderr: stepData.outputs?.stderr,
-                exitCode: stepData.outputs?.exit_code
+                outputs: new StepOutputs(stepData.outputs, stepData.outputs?.exit_code)
             };
             failedSteps.push(failure);
         }
@@ -564,7 +827,7 @@ function analyzeSteps(steps, targetStep) {
         targetStepResult
     };
 }
-function generateCommentBody(workspace, analysis, includeLogLink = false, timestamp) {
+async function generateCommentBody(workspace, analysis, includeLogLink = false, timestamp) {
     const { success, failedSteps, totalSteps, successfulSteps, skippedSteps, targetStepResult } = analysis;
     const marker = `<!-- tf-report-action:"${workspace}" -->`;
     const title = generateTitle(workspace, analysis);
@@ -586,10 +849,12 @@ function generateCommentBody(workspace, analysis, includeLogLink = false, timest
             }
         }
         else if (targetStepResult.conclusion === 'success') {
-            // Success case - show stdout/stderr if available
-            const stdout = targetStepResult.stdout;
-            const stderr = targetStepResult.stderr;
-            const { formattedContent } = formatOutput(stdout, stderr);
+            // Success case - show stdout/stderr if available (pass stream getters)
+            const { formattedContent } = await formatOutput(targetStepResult.outputs
+                ? () => targetStepResult.outputs.getStdoutStream()
+                : undefined, targetStepResult.outputs
+                ? () => targetStepResult.outputs.getStderrStream()
+                : undefined, MAX_OUTPUT_PER_STEP);
             if (!formattedContent) {
                 comment += `> [!NOTE]\n> Completed successfully with no output.\n\n`;
             }
@@ -600,13 +865,16 @@ function generateCommentBody(workspace, analysis, includeLogLink = false, timest
         else {
             // Target step failed or has other status
             comment += `**Status:** ${targetStepResult.conclusion}\n`;
-            if (targetStepResult.exitCode) {
-                comment += `**Exit Code:** ${targetStepResult.exitCode}\n`;
+            const exitCode = targetStepResult.outputs?.getExitCode();
+            if (exitCode) {
+                comment += `**Exit Code:** ${exitCode}\n`;
             }
             comment += '\n';
-            const stdout = targetStepResult.stdout;
-            const stderr = targetStepResult.stderr;
-            const { formattedContent } = formatOutput(stdout, stderr);
+            const { formattedContent } = await formatOutput(targetStepResult.outputs
+                ? () => targetStepResult.outputs.getStdoutStream()
+                : undefined, targetStepResult.outputs
+                ? () => targetStepResult.outputs.getStderrStream()
+                : undefined, MAX_OUTPUT_PER_STEP);
             if (!formattedContent) {
                 comment += `> [!NOTE]\n> Failed with no output.\n\n`;
             }
@@ -645,11 +913,12 @@ function generateCommentBody(workspace, analysis, includeLogLink = false, timest
             for (const step of failedSteps) {
                 comment += `#### ❌ Step: \`${step.name}\`\n\n`;
                 comment += `**Status:** ${step.conclusion}\n`;
-                if (step.exitCode) {
-                    comment += `**Exit Code:** ${step.exitCode}\n`;
+                const exitCode = step.outputs.getExitCode();
+                if (exitCode) {
+                    comment += `**Exit Code:** ${exitCode}\n`;
                 }
                 comment += '\n';
-                const { formattedContent } = formatOutput(step.stdout, step.stderr);
+                const { formattedContent } = await formatOutput(() => step.outputs.getStdoutStream(), () => step.outputs.getStderrStream(), MAX_OUTPUT_PER_STEP);
                 if (!formattedContent) {
                     comment += `> [!NOTE]\n> Failed with no output.\n\n`;
                 }
@@ -752,31 +1021,43 @@ function generateStatusIssueTitle(workspace) {
     return `:bar_chart: \`${workspace}\` Status`;
 }
 /**
- * Format output, detecting and handling JSON Lines format
+ * Format output from streams, detecting and handling JSON Lines format.
+ * Limits based on formatted output size.
  */
-function formatOutput(stdout, stderr) {
-    const hasStdout = stdout && stdout.trim().length > 0;
-    const hasStderr = stderr && stderr.trim().length > 0;
-    // Check if stdout is JSON Lines format
-    if (hasStdout && stdout && isJsonLines(stdout)) {
-        const parsed = parseJsonLines(stdout);
-        const formatted = formatJsonLines(parsed);
-        if (formatted.trim().length > 0) {
-            return { formattedContent: formatted, isJsonLines: true };
+async function formatOutput(getStdoutStream, getStderrStream, maxSize = MAX_OUTPUT_PER_STEP) {
+    // Check if stdout is JSON Lines format (with fresh stream for detection)
+    if (getStdoutStream) {
+        const detectionStream = getStdoutStream();
+        const isJsonLinesFormat = await isJsonLines(detectionStream);
+        if (isJsonLinesFormat) {
+            // Get a fresh stream for formatting
+            const formattingStream = getStdoutStream();
+            const formatted = await formatJsonLines(formattingStream, maxSize);
+            if (formatted.trim().length > 0) {
+                return { formattedContent: formatted, isJsonLines: true };
+            }
         }
     }
-    // Fall back to standard output formatting
+    // Fall back to standard output formatting with limited reading
     let content = '';
-    if (!hasStdout && !hasStderr) {
+    if (getStdoutStream) {
+        const stdoutStream = getStdoutStream();
+        const stdout = await readLimitedStreamContent(stdoutStream, maxSize);
+        if (stdout && stdout.trim().length > 0) {
+            const truncated = truncateOutput(stdout, maxSize, true);
+            content += `<details>\n<summary>📄 Output</summary>\n\n\`\`\`\n${truncated}\n\`\`\`\n</details>\n\n`;
+        }
+    }
+    if (getStderrStream) {
+        const stderrStream = getStderrStream();
+        const stderr = await readLimitedStreamContent(stderrStream, maxSize);
+        if (stderr && stderr.trim().length > 0) {
+            const truncated = truncateOutput(stderr, maxSize, true);
+            content += `<details>\n<summary>⚠️ Errors</summary>\n\n\`\`\`\n${truncated}\n\`\`\`\n</details>\n\n`;
+        }
+    }
+    if (!content) {
         return { formattedContent: '', isJsonLines: false };
-    }
-    if (hasStdout && stdout) {
-        const truncated = truncateOutput(stdout, MAX_OUTPUT_PER_STEP, true);
-        content += `<details>\n<summary>📄 Output</summary>\n\n\`\`\`\n${truncated}\n\`\`\`\n</details>\n\n`;
-    }
-    if (hasStderr && stderr) {
-        const truncated = truncateOutput(stderr, MAX_OUTPUT_PER_STEP, true);
-        content += `<details>\n<summary>⚠️ Errors</summary>\n\n\`\`\`\n${truncated}\n\`\`\`\n</details>\n\n`;
     }
     return { formattedContent: content, isJsonLines: false };
 }
@@ -805,7 +1086,7 @@ async function run() {
             return;
         }
         info(`Analyzing ${Object.keys(steps).length} steps for workspace: \`${workspace}\`${targetStep ? ` (target: \`${targetStep}\`)` : ''}`);
-        const analysis = analyzeSteps(steps, targetStep);
+        const analysis = await analyzeSteps(steps, targetStep);
         info(`Analysis complete: ${analysis.success ? 'Success' : `Failed (${analysis.failedSteps.length} failures)`}`);
         const context = {
             repo: process.env.GITHUB_REPOSITORY || '',
@@ -850,7 +1131,7 @@ async function run() {
                 analysis.targetStepResult?.operationType === 'apply';
             const includeLogLink = !!hasChanges;
             info(`Running in PR context - posting as comment${includeLogLink ? ' with logs link' : ''}`);
-            const commentBody = generateCommentBody(workspace, analysis, includeLogLink);
+            const commentBody = await generateCommentBody(workspace, analysis, includeLogLink);
             info(`Comment body length: ${commentBody.length} characters`);
             const existingComments = await getExistingComments(token, repo, owner, issueNumber);
             for (const comment of existingComments) {
@@ -867,7 +1148,7 @@ async function run() {
             // Non-PR context: use status issue (include log link and timestamp)
             info('Not in PR context - using status issue');
             const timestamp = new Date();
-            const statusIssueBody = generateCommentBody(workspace, analysis, true, timestamp);
+            const statusIssueBody = await generateCommentBody(workspace, analysis, true, timestamp);
             const statusIssueTitle = generateStatusIssueTitle(workspace);
             info(`Status issue title: "${statusIssueTitle}"`);
             info(`Status issue body length: ${statusIssueBody.length} characters`);
@@ -912,5 +1193,5 @@ if (import.meta.url === `file://${process.argv[1]}` ||
     run();
 }
 
-export { analyzeSteps, formatJsonLines, formatTimestamp, generateCommentBody, generateStatusIssueTitle, generateTitle, getInput, getJobLogsUrl, getWorkspaceMarker, isJsonLines, parseJsonLines, setFailed, truncateOutput };
+export { StepOutputs, analyzeSteps, formatJsonLines, formatTimestamp, generateCommentBody, generateStatusIssueTitle, generateTitle, getInput, getJobLogsUrl, getStepOutputStream, getWorkspaceMarker, isJsonLines, setFailed, truncateOutput };
 //# sourceMappingURL=index.js.map
