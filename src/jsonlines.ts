@@ -455,7 +455,7 @@ export type JsonLineMessage =
  * Check if a stream appears to be JSON Lines format by checking first few lines.
  * Does not accumulate data beyond what's needed for detection.
  */
-export async function isJsonLinesStream(
+export async function isJsonLines(
   stream: Readable | undefined
 ): Promise<boolean> {
   if (!stream) {
@@ -555,7 +555,7 @@ function getActionEmoji(
  * Limits based on formatted output size, not message count.
  * Stops accumulating when formatted output reaches size limit.
  */
-export async function formatJsonLinesStream(
+export async function formatJsonLines(
   stream: Readable | undefined,
   maxOutputSize: number = 20000
 ): Promise<string> {

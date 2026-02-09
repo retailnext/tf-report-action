@@ -1,6 +1,6 @@
 import * as fs from 'fs'
 import { Readable } from 'stream'
-import { isJsonLinesStream, formatJsonLinesStream } from './jsonlines.js'
+import { isJsonLines, formatJsonLines } from './jsonlines.js'
 import {
   getExistingComments,
   deleteComment,
@@ -11,7 +11,7 @@ import {
 } from './github.js'
 
 // Re-export jsonlines functions for use by scripts and tests
-export { isJsonLinesStream, formatJsonLinesStream }
+export { isJsonLines, formatJsonLines }
 
 // Month names for timestamp formatting
 const MONTH_NAMES = [
@@ -155,7 +155,7 @@ export function getStepOutputStream(
  * Analyze a JSON Lines stream incrementally, extracting only metadata.
  * Processes messages one at a time without accumulating them.
  */
-async function analyzeJsonLinesStream(stream: Readable | undefined): Promise<{
+async function analyzeJsonLines(stream: Readable | undefined): Promise<{
   isJsonLines: boolean
   operationType: 'plan' | 'apply' | 'destroy' | 'unknown'
   hasChanges: boolean
@@ -391,7 +391,7 @@ export async function analyzeSteps(
 
       // Analyze stdout stream incrementally for metadata only
       const stdoutStream = stepOutputs.getStdoutStream()
-      const analysis = await analyzeJsonLinesStream(stdoutStream)
+      const analysis = await analyzeJsonLines(stdoutStream)
 
       targetStepResult = {
         name: stepName,
@@ -695,12 +695,12 @@ async function formatOutput(
   // Check if stdout is JSON Lines format (with fresh stream for detection)
   if (getStdoutStream) {
     const detectionStream = getStdoutStream()
-    const isJsonLinesFormat = await isJsonLinesStream(detectionStream)
+    const isJsonLinesFormat = await isJsonLines(detectionStream)
 
     if (isJsonLinesFormat) {
       // Get a fresh stream for formatting
       const formattingStream = getStdoutStream()
-      const formatted = await formatJsonLinesStream(formattingStream, maxSize)
+      const formatted = await formatJsonLines(formattingStream, maxSize)
 
       if (formatted.trim().length > 0) {
         return { formattedContent: formatted, isJsonLines: true }

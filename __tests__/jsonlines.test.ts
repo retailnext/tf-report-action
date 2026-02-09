@@ -10,7 +10,7 @@ import * as fs from 'fs'
 import * as path from 'path'
 import { fileURLToPath } from 'url'
 import { Readable } from 'stream'
-import { isJsonLinesStream, formatJsonLinesStream } from '../src/jsonlines.js'
+import { isJsonLines, formatJsonLines } from '../src/jsonlines.js'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
@@ -24,54 +24,54 @@ function createStream(content: string): Readable {
   return Readable.from(content)
 }
 
-describe('isJsonLinesStream', () => {
+describe('isJsonLines', () => {
   test('detects valid JSON Lines from stream', async () => {
     const fixture = readFixture('plan-with-changes.jsonl')
     const stream = createStream(fixture)
-    expect(await isJsonLinesStream(stream)).toBe(true)
+    expect(await isJsonLines(stream)).toBe(true)
   })
 
   test('detects JSON Lines with errors from stream', async () => {
     const fixture = readFixture('plan-with-errors.jsonl')
     const stream = createStream(fixture)
-    expect(await isJsonLinesStream(stream)).toBe(true)
+    expect(await isJsonLines(stream)).toBe(true)
   })
 
   test('rejects empty stream', async () => {
     const stream = createStream('')
-    expect(await isJsonLinesStream(stream)).toBe(false)
+    expect(await isJsonLines(stream)).toBe(false)
   })
 
   test('rejects whitespace only stream', async () => {
     const stream = createStream('   \n  \n  ')
-    expect(await isJsonLinesStream(stream)).toBe(false)
+    expect(await isJsonLines(stream)).toBe(false)
   })
 
   test('rejects plain text stream', async () => {
     const stream = createStream('This is just plain text\nNot JSON at all')
-    expect(await isJsonLinesStream(stream)).toBe(false)
+    expect(await isJsonLines(stream)).toBe(false)
   })
 
   test('rejects invalid JSON stream', async () => {
     const stream = createStream('{ invalid json }\n{ more invalid }')
-    expect(await isJsonLinesStream(stream)).toBe(false)
+    expect(await isJsonLines(stream)).toBe(false)
   })
 
   test('rejects JSON without required fields stream', async () => {
     const stream = createStream('{"foo":"bar"}\n{"baz":"qux"}')
-    expect(await isJsonLinesStream(stream)).toBe(false)
+    expect(await isJsonLines(stream)).toBe(false)
   })
 
   test('handles undefined stream', async () => {
-    expect(await isJsonLinesStream(undefined)).toBe(false)
+    expect(await isJsonLines(undefined)).toBe(false)
   })
 })
 
-describe('formatJsonLinesStream', () => {
+describe('formatJsonLines', () => {
   test('formats plan with changes from stream', async () => {
     const fixture = readFixture('plan-with-changes.jsonl')
     const stream = createStream(fixture)
-    const formatted = await formatJsonLinesStream(stream)
+    const formatted = await formatJsonLines(stream)
 
     expect(formatted).toContain('Plan: 1 to add')
     expect(formatted).toContain('Planned Changes')
@@ -81,7 +81,7 @@ describe('formatJsonLinesStream', () => {
   test('formats plan with errors from stream', async () => {
     const fixture = readFixture('plan-with-errors.jsonl')
     const stream = createStream(fixture)
-    const formatted = await formatJsonLinesStream(stream)
+    const formatted = await formatJsonLines(stream)
 
     expect(formatted).toContain('Errors')
     expect(formatted).toContain('❌')
@@ -90,7 +90,7 @@ describe('formatJsonLinesStream', () => {
   test('formats plan with replace from stream', async () => {
     const fixture = readFixture('plan-with-replace.jsonl')
     const stream = createStream(fixture)
-    const formatted = await formatJsonLinesStream(stream)
+    const formatted = await formatJsonLines(stream)
 
     expect(formatted).toContain('Plan')
     expect(formatted).toContain('Planned Changes')
@@ -99,7 +99,7 @@ describe('formatJsonLinesStream', () => {
   test('formats plan with no changes from stream', async () => {
     const fixture = readFixture('plan-no-changes.jsonl')
     const stream = createStream(fixture)
-    const formatted = await formatJsonLinesStream(stream)
+    const formatted = await formatJsonLines(stream)
 
     expect(formatted).toContain('No changes')
   })
@@ -107,7 +107,7 @@ describe('formatJsonLinesStream', () => {
   test('formats apply success from stream', async () => {
     const fixture = readFixture('apply-success.jsonl')
     const stream = createStream(fixture)
-    const formatted = await formatJsonLinesStream(stream)
+    const formatted = await formatJsonLines(stream)
 
     expect(formatted).toContain('Apply complete')
     expect(formatted).toContain('Applied Changes')
@@ -116,7 +116,7 @@ describe('formatJsonLinesStream', () => {
   test('formats resource drift from stream', async () => {
     const fixture = readFixture('resource-drift.jsonl')
     const stream = createStream(fixture)
-    const formatted = await formatJsonLinesStream(stream)
+    const formatted = await formatJsonLines(stream)
 
     expect(formatted).toContain('Resource Drift')
   })
@@ -124,7 +124,7 @@ describe('formatJsonLinesStream', () => {
   test('change summary appears outside collapsing from stream', async () => {
     const fixture = readFixture('plan-with-changes.jsonl')
     const stream = createStream(fixture)
-    const formatted = await formatJsonLinesStream(stream)
+    const formatted = await formatJsonLines(stream)
 
     // Change summary should appear before any <details> tags
     const summaryIndex = formatted.indexOf('Plan: 1 to add')
@@ -137,20 +137,20 @@ describe('formatJsonLinesStream', () => {
 
   test('handles empty stream', async () => {
     const stream = createStream('')
-    const formatted = await formatJsonLinesStream(stream)
+    const formatted = await formatJsonLines(stream)
 
     expect(formatted).toBe('')
   })
 
   test('handles undefined stream', async () => {
-    const formatted = await formatJsonLinesStream(undefined)
+    const formatted = await formatJsonLines(undefined)
     expect(formatted).toBe('')
   })
 
   test('respects size limits', async () => {
     const fixture = readFixture('plan-with-changes.jsonl')
     const stream = createStream(fixture)
-    const formatted = await formatJsonLinesStream(stream, 100)
+    const formatted = await formatJsonLines(stream, 100)
 
     // Should be limited in size
     expect(formatted.length).toBeLessThan(1100) // 100 + 1000 reserve
@@ -162,7 +162,7 @@ describe('action emojis in stream formatting', () => {
     const input = `{"@level":"info","@message":"random_pet.server: Creation complete","@module":"opentofu.ui","@timestamp":"2024-01-01T00:00:00.000000Z","type":"apply_complete","hook":{"resource":{"addr":"random_pet.server","module":"","resource":"random_pet.server","implied_provider":"random","resource_type":"random_pet","resource_name":"server","resource_key":null},"action":"create","id_key":"id","id_value":""}}
 {"@level":"info","@message":"Apply complete! Resources: 1 added, 0 changed, 0 destroyed.","@module":"opentofu.ui","@timestamp":"2024-01-01T00:00:01.000000Z","type":"change_summary","changes":{"add":1,"change":0,"import":0,"remove":0,"operation":"apply"}}`
     const stream = createStream(input)
-    const formatted = await formatJsonLinesStream(stream)
+    const formatted = await formatJsonLines(stream)
 
     expect(formatted).toContain(':heavy_plus_sign:')
   })
@@ -171,7 +171,7 @@ describe('action emojis in stream formatting', () => {
     const input = `{"@level":"info","@message":"random_pet.server: Modifying...","@module":"opentofu.ui","@timestamp":"2024-01-01T00:00:00.000000Z","type":"planned_change","change":{"resource":{"addr":"random_pet.server","module":"","resource":"random_pet.server","implied_provider":"random","resource_type":"random_pet","resource_name":"server","resource_key":null},"action":"update","reason":"user"}}
 {"@level":"info","@message":"Plan: 0 to add, 1 to change, 0 to destroy.","@module":"opentofu.ui","@timestamp":"2024-01-01T00:00:01.000000Z","type":"change_summary","changes":{"add":0,"change":1,"import":0,"remove":0,"operation":"plan"}}`
     const stream = createStream(input)
-    const formatted = await formatJsonLinesStream(stream)
+    const formatted = await formatJsonLines(stream)
 
     expect(formatted).toContain('🔄')
   })
@@ -180,7 +180,7 @@ describe('action emojis in stream formatting', () => {
     const input = `{"@level":"info","@message":"random_pet.server: Destroying...","@module":"opentofu.ui","@timestamp":"2024-01-01T00:00:00.000000Z","type":"planned_change","change":{"resource":{"addr":"random_pet.server","module":"","resource":"random_pet.server","implied_provider":"random","resource_type":"random_pet","resource_name":"server","resource_key":null},"action":"delete","reason":"user"}}
 {"@level":"info","@message":"Plan: 0 to add, 0 to change, 1 to destroy.","@module":"opentofu.ui","@timestamp":"2024-01-01T00:00:01.000000Z","type":"change_summary","changes":{"add":0,"change":0,"import":0,"remove":1,"operation":"plan"}}`
     const stream = createStream(input)
-    const formatted = await formatJsonLinesStream(stream)
+    const formatted = await formatJsonLines(stream)
 
     expect(formatted).toContain(':heavy_minus_sign:')
   })
@@ -189,7 +189,7 @@ describe('action emojis in stream formatting', () => {
     const input = `{"@level":"info","@message":"random_pet.server: Replacing...","@module":"opentofu.ui","@timestamp":"2024-01-01T00:00:00.000000Z","type":"planned_change","change":{"resource":{"addr":"random_pet.server","module":"","resource":"random_pet.server","implied_provider":"random","resource_type":"random_pet","resource_name":"server","resource_key":null},"action":"replace","reason":"user"}}
 {"@level":"info","@message":"Plan: 1 to add, 0 to change, 1 to destroy.","@module":"opentofu.ui","@timestamp":"2024-01-01T00:00:01.000000Z","type":"change_summary","changes":{"add":1,"change":0,"import":0,"remove":1,"operation":"plan"}}`
     const stream = createStream(input)
-    const formatted = await formatJsonLinesStream(stream)
+    const formatted = await formatJsonLines(stream)
 
     expect(formatted).toContain('±')
   })
@@ -200,7 +200,7 @@ describe('diagnostic formatting from stream', () => {
     const input = `{"@level":"error","@message":"Error: Invalid value","@module":"opentofu.ui","@timestamp":"2024-01-01T00:00:00.000000Z","type":"diagnostic","diagnostic":{"severity":"error","summary":"Invalid value","detail":"The value provided is not valid.","range":{"filename":"main.tf","start":{"line":10,"column":5,"byte":100},"end":{"line":10,"column":20,"byte":115}}}}
 {"@level":"info","@message":"Plan: 0 to add, 0 to change, 0 to destroy.","@module":"opentofu.ui","@timestamp":"2024-01-01T00:00:01.000000Z","type":"change_summary","changes":{"add":0,"change":0,"import":0,"remove":0,"operation":"plan"}}`
     const stream = createStream(input)
-    const formatted = await formatJsonLinesStream(stream)
+    const formatted = await formatJsonLines(stream)
 
     expect(formatted).toContain('❌')
     expect(formatted).toContain('Invalid value')
@@ -212,7 +212,7 @@ describe('diagnostic formatting from stream', () => {
     const input = `{"@level":"warn","@message":"Warning: Deprecated","@module":"opentofu.ui","@timestamp":"2024-01-01T00:00:00.000000Z","type":"diagnostic","diagnostic":{"severity":"warning","summary":"Deprecated","detail":"This feature is deprecated."}}
 {"@level":"info","@message":"Plan: 0 to add, 0 to change, 0 to destroy.","@module":"opentofu.ui","@timestamp":"2024-01-01T00:00:01.000000Z","type":"change_summary","changes":{"add":0,"change":0,"import":0,"remove":0,"operation":"plan"}}`
     const stream = createStream(input)
-    const formatted = await formatJsonLinesStream(stream)
+    const formatted = await formatJsonLines(stream)
 
     expect(formatted).toContain('⚠️')
     expect(formatted).toContain('Deprecated')
@@ -251,7 +251,7 @@ describe('stream processing behavior', () => {
     )
 
     const stream = createStream(messages.join('\n'))
-    const formatted = await formatJsonLinesStream(stream)
+    const formatted = await formatJsonLines(stream)
 
     // Should find and include the change_summary even though it's at the end
     expect(formatted).toContain('Plan: 5 to add, 3 to change, 2 to destroy')
@@ -306,7 +306,7 @@ describe('stream processing behavior', () => {
     ]
 
     const stream = createStream(messages.join('\n'))
-    const formatted = await formatJsonLinesStream(stream)
+    const formatted = await formatJsonLines(stream)
 
     expect(formatted).toContain('Plan: 1 to add')
     expect(formatted).toContain('Test warning')
@@ -356,7 +356,7 @@ describe('stream processing behavior', () => {
 
     const stream = createStream(messages.join('\n'))
     const startTime = Date.now()
-    const formatted = await formatJsonLinesStream(stream, 10000)
+    const formatted = await formatJsonLines(stream, 10000)
     const endTime = Date.now()
 
     // Should complete in reasonable time (less than 5 seconds)

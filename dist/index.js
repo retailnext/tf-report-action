@@ -19,7 +19,7 @@ import * as https from 'https';
  * Check if a stream appears to be JSON Lines format by checking first few lines.
  * Does not accumulate data beyond what's needed for detection.
  */
-async function isJsonLinesStream(stream) {
+async function isJsonLines(stream) {
     if (!stream) {
         return false;
     }
@@ -95,7 +95,7 @@ function getActionEmoji(action) {
  * Limits based on formatted output size, not message count.
  * Stops accumulating when formatted output reaches size limit.
  */
-async function formatJsonLinesStream(stream, maxOutputSize = 20000) {
+async function formatJsonLines(stream, maxOutputSize = 20000) {
     if (!stream) {
         return '';
     }
@@ -601,7 +601,7 @@ function getStepOutputStream(stepOutputs, outputType) {
  * Analyze a JSON Lines stream incrementally, extracting only metadata.
  * Processes messages one at a time without accumulating them.
  */
-async function analyzeJsonLinesStream(stream) {
+async function analyzeJsonLines(stream) {
     if (!stream) {
         return {
             isJsonLines: false,
@@ -781,7 +781,7 @@ async function analyzeSteps(steps, targetStep) {
             const stepOutputs = new StepOutputs(stepData.outputs, stepData.outputs?.exit_code);
             // Analyze stdout stream incrementally for metadata only
             const stdoutStream = stepOutputs.getStdoutStream();
-            const analysis = await analyzeJsonLinesStream(stdoutStream);
+            const analysis = await analyzeJsonLines(stdoutStream);
             targetStepResult = {
                 name: stepName,
                 found: true,
@@ -1028,11 +1028,11 @@ async function formatOutput(getStdoutStream, getStderrStream, maxSize = MAX_OUTP
     // Check if stdout is JSON Lines format (with fresh stream for detection)
     if (getStdoutStream) {
         const detectionStream = getStdoutStream();
-        const isJsonLinesFormat = await isJsonLinesStream(detectionStream);
+        const isJsonLinesFormat = await isJsonLines(detectionStream);
         if (isJsonLinesFormat) {
             // Get a fresh stream for formatting
             const formattingStream = getStdoutStream();
-            const formatted = await formatJsonLinesStream(formattingStream, maxSize);
+            const formatted = await formatJsonLines(formattingStream, maxSize);
             if (formatted.trim().length > 0) {
                 return { formattedContent: formatted, isJsonLines: true };
             }
@@ -1193,5 +1193,5 @@ if (import.meta.url === `file://${process.argv[1]}` ||
     run();
 }
 
-export { StepOutputs, analyzeSteps, formatJsonLinesStream, formatTimestamp, generateCommentBody, generateStatusIssueTitle, generateTitle, getInput, getJobLogsUrl, getStepOutputStream, getWorkspaceMarker, isJsonLinesStream, setFailed, truncateOutput };
+export { StepOutputs, analyzeSteps, formatJsonLines, formatTimestamp, generateCommentBody, generateStatusIssueTitle, generateTitle, getInput, getJobLogsUrl, getStepOutputStream, getWorkspaceMarker, isJsonLines, setFailed, truncateOutput };
 //# sourceMappingURL=index.js.map

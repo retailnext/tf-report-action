@@ -8,7 +8,7 @@ import { join, dirname } from 'path'
 import { fileURLToPath } from 'url'
 import { Readable } from 'stream'
 // Import from index which re-exports jsonlines functions
-import { formatJsonLinesStream } from '../src/index.js'
+import { formatJsonLines } from '../src/index.js'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = dirname(__filename)
@@ -51,7 +51,7 @@ for (let i = 0; i < examples.length; i++) {
 
     // Create a stream from the file content
     const stream = Readable.from(content)
-    const formatted = await formatJsonLinesStream(stream)
+    const formatted = await formatJsonLines(stream)
 
     console.log(`## Example ${i + 1}: ${example.name}\n`)
     console.log(`${example.description}\n`)
