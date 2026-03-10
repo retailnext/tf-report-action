@@ -393,6 +393,166 @@ exports[`planToMarkdown integration > terraform/local-files/1 > renders without 
 "
 `;
 
+exports[`planToMarkdown integration > terraform/moved-resource/0 > renders without error and matches snapshot [default] 1`] = `
+"## Plan Summary
+
+| Action | Count |
+| --- | --- |
+| ➕ Add | 1 |
+| **Total** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>➕ <strong>null_resource</strong> original</summary>
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id |  | <code><ins style="background:#dfd">(known after apply)</ins></code> |
+| triggers.version |  | <code><ins style="background:#dfd">1</ins></code> |
+
+</details>
+"
+`;
+
+exports[`planToMarkdown integration > terraform/moved-resource/0 > renders without error and matches snapshot [diffFormat-simple] 1`] = `
+"## Plan Summary
+
+| Action | Count |
+| --- | --- |
+| ➕ Add | 1 |
+| **Total** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>➕ <strong>null_resource</strong> original</summary>
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id |  | + (known after apply) |
+| triggers.version |  | + 1 |
+
+</details>
+"
+`;
+
+exports[`planToMarkdown integration > terraform/moved-resource/0 > renders without error and matches snapshot [showUnchangedAttributes] 1`] = `
+"## Plan Summary
+
+| Action | Count |
+| --- | --- |
+| ➕ Add | 1 |
+| **Total** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>➕ <strong>null_resource</strong> original</summary>
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id |  | <code><ins style="background:#dfd">(known after apply)</ins></code> |
+| triggers.version |  | <code><ins style="background:#dfd">1</ins></code> |
+
+</details>
+"
+`;
+
+exports[`planToMarkdown integration > terraform/moved-resource/0 > renders without error and matches snapshot [summary-template] 1`] = `
+"## Plan Summary
+
+| Action | Count |
+| --- | --- |
+| ➕ Add | 1 |
+| **Total** | **1** |
+"
+`;
+
+exports[`planToMarkdown integration > terraform/moved-resource/1 > renders without error and matches snapshot [default] 1`] = `
+"## Plan Summary
+
+| Action | Count |
+| --- | --- |
+| **Total** | **0** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>⬜ <strong>null_resource</strong> renamed</summary>
+
+**Moved from:** \`null_resource.original\`
+
+_No attribute changes._
+
+</details>
+"
+`;
+
+exports[`planToMarkdown integration > terraform/moved-resource/1 > renders without error and matches snapshot [diffFormat-simple] 1`] = `
+"## Plan Summary
+
+| Action | Count |
+| --- | --- |
+| **Total** | **0** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>⬜ <strong>null_resource</strong> renamed</summary>
+
+**Moved from:** \`null_resource.original\`
+
+_No attribute changes._
+
+</details>
+"
+`;
+
+exports[`planToMarkdown integration > terraform/moved-resource/1 > renders without error and matches snapshot [showUnchangedAttributes] 1`] = `
+"## Plan Summary
+
+| Action | Count |
+| --- | --- |
+| **Total** | **0** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>⬜ <strong>null_resource</strong> renamed</summary>
+
+**Moved from:** \`null_resource.original\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | 4798146188282696481 | <code>4798146188282696481</code> |
+| triggers.version | 1 | <code>1</code> |
+
+</details>
+"
+`;
+
+exports[`planToMarkdown integration > terraform/moved-resource/1 > renders without error and matches snapshot [summary-template] 1`] = `
+"## Plan Summary
+
+| Action | Count |
+| --- | --- |
+| **Total** | **0** |
+"
+`;
+
 exports[`planToMarkdown integration > terraform/no-op/0 > renders without error and matches snapshot [default] 1`] = `
 "## Plan Summary
 
@@ -2117,6 +2277,166 @@ exports[`planToMarkdown integration > tofu/local-files/1 > renders without error
 | --- | --- |
 | ♻️ Replace | 1 |
 | **Total** | **1** |
+"
+`;
+
+exports[`planToMarkdown integration > tofu/moved-resource/0 > renders without error and matches snapshot [default] 1`] = `
+"## Plan Summary
+
+| Action | Count |
+| --- | --- |
+| ➕ Add | 1 |
+| **Total** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>➕ <strong>null_resource</strong> original</summary>
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id |  | <code><ins style="background:#dfd">(known after apply)</ins></code> |
+| triggers.version |  | <code><ins style="background:#dfd">1</ins></code> |
+
+</details>
+"
+`;
+
+exports[`planToMarkdown integration > tofu/moved-resource/0 > renders without error and matches snapshot [diffFormat-simple] 1`] = `
+"## Plan Summary
+
+| Action | Count |
+| --- | --- |
+| ➕ Add | 1 |
+| **Total** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>➕ <strong>null_resource</strong> original</summary>
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id |  | + (known after apply) |
+| triggers.version |  | + 1 |
+
+</details>
+"
+`;
+
+exports[`planToMarkdown integration > tofu/moved-resource/0 > renders without error and matches snapshot [showUnchangedAttributes] 1`] = `
+"## Plan Summary
+
+| Action | Count |
+| --- | --- |
+| ➕ Add | 1 |
+| **Total** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>➕ <strong>null_resource</strong> original</summary>
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id |  | <code><ins style="background:#dfd">(known after apply)</ins></code> |
+| triggers.version |  | <code><ins style="background:#dfd">1</ins></code> |
+
+</details>
+"
+`;
+
+exports[`planToMarkdown integration > tofu/moved-resource/0 > renders without error and matches snapshot [summary-template] 1`] = `
+"## Plan Summary
+
+| Action | Count |
+| --- | --- |
+| ➕ Add | 1 |
+| **Total** | **1** |
+"
+`;
+
+exports[`planToMarkdown integration > tofu/moved-resource/1 > renders without error and matches snapshot [default] 1`] = `
+"## Plan Summary
+
+| Action | Count |
+| --- | --- |
+| **Total** | **0** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>⬜ <strong>null_resource</strong> renamed</summary>
+
+**Moved from:** \`null_resource.original\`
+
+_No attribute changes._
+
+</details>
+"
+`;
+
+exports[`planToMarkdown integration > tofu/moved-resource/1 > renders without error and matches snapshot [diffFormat-simple] 1`] = `
+"## Plan Summary
+
+| Action | Count |
+| --- | --- |
+| **Total** | **0** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>⬜ <strong>null_resource</strong> renamed</summary>
+
+**Moved from:** \`null_resource.original\`
+
+_No attribute changes._
+
+</details>
+"
+`;
+
+exports[`planToMarkdown integration > tofu/moved-resource/1 > renders without error and matches snapshot [showUnchangedAttributes] 1`] = `
+"## Plan Summary
+
+| Action | Count |
+| --- | --- |
+| **Total** | **0** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>⬜ <strong>null_resource</strong> renamed</summary>
+
+**Moved from:** \`null_resource.original\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | 61031004238965706 | <code>61031004238965706</code> |
+| triggers.version | 1 | <code>1</code> |
+
+</details>
+"
+`;
+
+exports[`planToMarkdown integration > tofu/moved-resource/1 > renders without error and matches snapshot [summary-template] 1`] = `
+"## Plan Summary
+
+| Action | Count |
+| --- | --- |
+| **Total** | **0** |
 "
 `;
 
