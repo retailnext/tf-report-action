@@ -24,7 +24,8 @@
     "test": "vitest run",
     "test:coverage": "vitest run --coverage",
     "test:coverage:ci": "vitest run --coverage --reporter=verbose",
-    "ci": "npm run lint && npm run typecheck && npm run test:coverage:ci"
+    "test:integration:coverage": "vitest run --config vitest.integration.config.ts --coverage",
+    "ci": "npm run lint && npm run typecheck && npm run test:coverage:ci && npm run test:integration:coverage"
   },
   "devDependencies": {
     "@eslint/js": "^9.0.0",

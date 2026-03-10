@@ -5,12 +5,13 @@ import { MarkdownWriter } from "./writer.js";
 import { renderSummary } from "./summary.js";
 import { renderResource } from "./resource.js";
 import { ACTION_SYMBOLS } from "../model/plan-action.js";
+import { resolveTemplate } from "../template/index.js";
 
 /**
  * Renders a Report model to a markdown string.
  */
 export function renderReport(report: Report, options: RenderOptions = {}): string {
-  const template = options.template ?? "default";
+  const template = resolveTemplate(options.template ?? "default");
   const writer = new MarkdownWriter();
   const diffCache = new Map<string, DiffEntry[]>();
 
@@ -18,7 +19,7 @@ export function renderReport(report: Report, options: RenderOptions = {}): strin
     writer.heading(options.title, 2);
   }
 
-  if (template === "summary") {
+  if (template.name === "summary") {
     writer.heading("Plan Summary", 2);
     renderSummary(report.summary, writer);
     return writer.build();

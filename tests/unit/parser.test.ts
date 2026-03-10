@@ -85,10 +85,10 @@ describe("parsePlan", () => {
     ).toThrowError(/format_version/);
   });
 
-  it("throws when resource_changes is missing", () => {
-    expect(() =>
-      parsePlan(JSON.stringify({ format_version: "1.0" })),
-    ).toThrowError(/resource_changes/);
+  it("succeeds when resource_changes is absent (empty workspace)", () => {
+    // resource_changes is optional per the plan JSON schema — absent when no resources exist
+    const plan = parsePlan(JSON.stringify({ format_version: "1.0" }));
+    expect(plan.resource_changes).toBeUndefined();
   });
 
   it("returns the terraform_version when present", () => {

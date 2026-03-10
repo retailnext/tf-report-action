@@ -106,11 +106,26 @@ These are all listed in `.gitignore`.
 
 ## After Adding or Updating Fixtures
 
-If the integration snapshot tests fail after regenerating fixtures, update the snapshots:
+After regenerating fixtures, run the integration coverage report to confirm the new
+fixtures contribute to meeting the coverage thresholds:
 
 ```bash
-npm run test -- --update-snapshots
+npm run test:integration:coverage
+```
+
+If integration snapshot tests fail, update the snapshots:
+
+```bash
+npm run test:integration:coverage -- --update-snapshots
 ```
 
 Review the snapshot diffs carefully before committing to confirm the output changes
 are intentional.
+
+## Integration Test Input Rule
+
+Integration tests may **only** load plan JSON that was produced by actually running
+`terraform` or `tofu` against a fixture workspace. Any plan JSON used in
+`tests/integration/` must come from `tests/fixtures/generated/`. No inline-constructed
+or manually-crafted plan objects are permitted in integration tests — those belong in
+`tests/unit/` instead. See `.github/copilot-instructions.md` for the full reviewer rule.

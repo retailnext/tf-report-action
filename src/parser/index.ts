@@ -5,7 +5,9 @@ import type { Plan } from "../tfjson/plan.js";
  * into a typed Plan object. Throws a descriptive Error if:
  * - The string is not valid JSON (error message will not contain plan content)
  * - The format_version major component is greater than 1
- * - resource_changes is missing
+ *
+ * Note: `resource_changes` is optional per the plan JSON schema — it may be
+ * absent when the workspace has no resources (e.g., an empty configuration).
  */
 export function parsePlan(json: string): Plan {
   let parsed: unknown;
@@ -36,10 +38,6 @@ export function parsePlan(json: string): Plan {
     throw new Error(
       `Unsupported plan format_version: ${formatVersion} (major version ${String(major)} > 1)`,
     );
-  }
-
-  if (!("resource_changes" in obj)) {
-    throw new Error("Plan JSON is missing required field: resource_changes");
   }
 
   return parsed as Plan;
