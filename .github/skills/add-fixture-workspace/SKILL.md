@@ -26,7 +26,7 @@ tests/fixtures/
       <workspace-name>/
         0/
           plan.json
-          apply.json
+          apply.jsonl
         1/
           ...
     tofu/

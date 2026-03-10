@@ -46,7 +46,7 @@ For each workspace × each tool (`terraform` and `tofu`):
    d. Runs `<tool> show -json tfplan` → writes to
       `tests/fixtures/generated/<tool>/<workspace>/<N>/plan.json`
    e. Runs `<tool> apply -json -auto-approve tfplan` → writes to
-      `tests/fixtures/generated/<tool>/<workspace>/<N>/apply.json`
+      `tests/fixtures/generated/<tool>/<workspace>/<N>/apply.jsonl`
    f. Deletes everything in the temporary directory **except** `.terraform/`,
       `.terraform.lock.hcl`, and `*.tfstate` (so state carries forward to the next stage)
 3. Removes the temporary directory
@@ -60,12 +60,12 @@ tests/fixtures/generated/
     <workspace>/
       <stage>/
         plan.json
-        apply.json
+        apply.jsonl
   tofu/
     <workspace>/
       <stage>/
         plan.json
-        apply.json
+        apply.jsonl
 ```
 
 These JSON files **are** committed to the repository.

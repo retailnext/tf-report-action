@@ -14,7 +14,7 @@
 #
 # Output:
 #   tests/fixtures/generated/<tool>/<workspace>/<stage>/plan.json
-#   tests/fixtures/generated/<tool>/<workspace>/<stage>/apply.json
+#   tests/fixtures/generated/<tool>/<workspace>/<stage>/apply.jsonl
 
 set -euo pipefail
 
@@ -126,8 +126,8 @@ run_tool_workspace() {
     # show → plan.json
     "$tool" -chdir="$tool_tmp" show -json tfplan > "$out_dir/plan.json"
 
-    # apply → apply.json (carry state forward to next stage)
-    "$tool" -chdir="$tool_tmp" apply -json -auto-approve tfplan > "$out_dir/apply.json"
+    # apply → apply.jsonl (carry state forward to next stage)
+    "$tool" -chdir="$tool_tmp" apply -json -auto-approve tfplan > "$out_dir/apply.jsonl"
 
     # Remove the binary plan file (not committed)
     rm -f "$tool_tmp/tfplan"
