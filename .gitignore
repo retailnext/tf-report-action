@@ -1,0 +1,10 @@
+node_modules/
+dist/
+coverage/
+
+# Fixture generation temp dirs and Terraform artifacts
+tests/fixtures/tmp/
+**/.terraform/
+**/*.tfstate
+**/*.tfstate.backup
+**/*.tfplan

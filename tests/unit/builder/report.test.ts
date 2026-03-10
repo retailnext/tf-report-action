@@ -1,0 +1,185 @@
+import { describe, it, expect } from "vitest";
+import { buildReport } from "../../../src/builder/index.js";
+import type { Plan } from "../../../src/tfjson/plan.js";
+
+function basePlan(overrides: Partial<Plan> = {}): Plan {
+  return {
+    format_version: "1.2",
+    resource_changes: [],
+    ...overrides,
+  } as Plan;
+}
+
+describe("buildReport", () => {
+  it("builds a report from an empty plan", () => {
+    const report = buildReport(basePlan());
+    expect(report.summary.total).toBe(0);
+    expect(report.modules).toEqual([]);
+    expect(report.outputs).toEqual([]);
+  });
+
+  it("includes terraform_version in report", () => {
+    const report = buildReport(basePlan({ terraform_version: "1.9.0" }));
+    expect(report.toolVersion).toBe("1.9.0");
+  });
+
+  it("reports null toolVersion when terraform_version is absent", () => {
+    const report = buildReport(basePlan());
+    expect(report.toolVersion).toBe(null);
+  });
+
+  it("includes format_version in report", () => {
+    const report = buildReport(basePlan());
+    expect(report.formatVersion).toBe("1.2");
+  });
+
+  it("groups resources by module address", () => {
+    const plan = basePlan({
+      resource_changes: [
+        {
+          address: "null_resource.root",
+          module_address: undefined,
+          mode: "managed",
+          type: "null_resource",
+          name: "root",
+          change: { actions: ["create"], before: null, after: {}, before_sensitive: false, after_sensitive: false, after_unknown: false },
+        },
+        {
+          address: "module.child.null_resource.nested",
+          module_address: "module.child",
+          mode: "managed",
+          type: "null_resource",
+          name: "nested",
+          change: { actions: ["create"], before: null, after: {}, before_sensitive: false, after_sensitive: false, after_unknown: false },
+        },
+      ],
+    });
+
+    const report = buildReport(plan);
+    expect(report.modules).toHaveLength(2);
+
+    const root = report.modules.find((m) => m.moduleAddress === "");
+    const child = report.modules.find((m) => m.moduleAddress === "module.child");
+    expect(root).toBeDefined();
+    expect(child).toBeDefined();
+    expect(root!.resources).toHaveLength(1);
+    expect(child!.resources).toHaveLength(1);
+  });
+
+  it("puts root module first when sorting", () => {
+    const plan = basePlan({
+      resource_changes: [
+        {
+          address: "module.child.null_resource.nested",
+          module_address: "module.child",
+          mode: "managed",
+          type: "null_resource",
+          name: "nested",
+          change: { actions: ["create"], before: null, after: {}, before_sensitive: false, after_sensitive: false, after_unknown: false },
+        },
+        {
+          address: "null_resource.root",
+          module_address: undefined,
+          mode: "managed",
+          type: "null_resource",
+          name: "root",
+          change: { actions: ["create"], before: null, after: {}, before_sensitive: false, after_sensitive: false, after_unknown: false },
+        },
+      ],
+    });
+
+    const report = buildReport(plan);
+    expect(report.modules[0]!.moduleAddress).toBe("");
+  });
+
+  it("builds summary counts from resource changes", () => {
+    const plan = basePlan({
+      resource_changes: [
+        {
+          address: "null_resource.a",
+          mode: "managed",
+          type: "null_resource",
+          name: "a",
+          change: { actions: ["create"], before: null, after: {}, before_sensitive: false, after_sensitive: false, after_unknown: false },
+        },
+        {
+          address: "null_resource.b",
+          mode: "managed",
+          type: "null_resource",
+          name: "b",
+          change: { actions: ["delete"], before: {}, after: null, before_sensitive: false, after_sensitive: false, after_unknown: false },
+        },
+      ],
+    });
+
+    const report = buildReport(plan);
+    expect(report.summary.add).toBe(1);
+    expect(report.summary.destroy).toBe(1);
+    expect(report.summary.total).toBe(2);
+  });
+
+  it("skips data source read-only changes", () => {
+    const plan = basePlan({
+      resource_changes: [
+        {
+          address: "data.null_data_source.test",
+          mode: "data",
+          type: "null_data_source",
+          name: "test",
+          change: { actions: ["read"], before: null, after: {}, before_sensitive: false, after_sensitive: false, after_unknown: false },
+        },
+      ],
+    });
+
+    const report = buildReport(plan);
+    expect(report.modules).toHaveLength(0);
+    expect(report.summary.total).toBe(0);
+  });
+
+  it("includes output changes in report outputs", () => {
+    const plan = basePlan({
+      output_changes: {
+        my_output: {
+          actions: ["create"],
+          before: null,
+          after: "result",
+          before_sensitive: false,
+          after_sensitive: false,
+        },
+      },
+    });
+
+    const report = buildReport(plan);
+    expect(report.outputs).toHaveLength(1);
+    expect(report.outputs[0]!.name).toBe("my_output");
+  });
+
+  it("passes showUnchangedAttributes option to attribute builder", () => {
+    const plan = basePlan({
+      resource_changes: [
+        {
+          address: "null_resource.test",
+          mode: "managed",
+          type: "null_resource",
+          name: "test",
+          change: {
+            actions: ["update"],
+            before: { tag: "same" },
+            after: { tag: "same" },
+            before_sensitive: false,
+            after_sensitive: false,
+            after_unknown: false,
+          },
+        },
+      ],
+    });
+
+    const reportWithout = buildReport(plan, { showUnchangedAttributes: false });
+    const reportWith = buildReport(plan, { showUnchangedAttributes: true });
+
+    const resWithout = reportWithout.modules[0]!.resources[0]!;
+    const resWith = reportWith.modules[0]!.resources[0]!;
+
+    expect(resWithout.attributes.length).toBeLessThan(resWith.attributes.length);
+  });
+});
