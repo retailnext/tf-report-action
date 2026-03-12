@@ -1,5 +1,896 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
+exports[`planToMarkdown integration > terraform/deferred-data-source/0 > renders without error and matches snapshot [default] 1`] = `
+"## Plan Summary
+
+| Action | Count |
+| --- | --- |
+| ➕ Add | 5 |
+| **Total** | **5** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>➕ <strong>local_file</strong> config</summary>
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| content_base64sha256 |  | <code><ins style="background:#dfd">(known after apply)</ins></code> |
+| content_base64sha512 |  | <code><ins style="background:#dfd">(known after apply)</ins></code> |
+| content_md5 |  | <code><ins style="background:#dfd">(known after apply)</ins></code> |
+| content_sha1 |  | <code><ins style="background:#dfd">(known after apply)</ins></code> |
+| content_sha256 |  | <code><ins style="background:#dfd">(known after apply)</ins></code> |
+| content_sha512 |  | <code><ins style="background:#dfd">(known after apply)</ins></code> |
+| directory_permission |  | <code><ins style="background:#dfd">0777</ins></code> |
+| file_permission |  | <code><ins style="background:#dfd">0777</ins></code> |
+| filename |  | <code><ins style="background:#dfd">./config.json</ins></code> |
+| id |  | <code><ins style="background:#dfd">(known after apply)</ins></code> |
+| sensitive_content | <code>(sensitive)</code> | <code>(sensitive)</code> |
+
+<details>
+<summary>Large value: content</summary>
+
+\`\`\`
+{
+  "worker_a": "alpha",
+  "worker_b": "bravo",
+  "worker_c": "charlie"
+}
+\`\`\`
+
+</details>
+
+</details>
+
+<details>
+<summary>➕ <strong>terraform_data</strong> independent</summary>
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id |  | <code><ins style="background:#dfd">(known after apply)</ins></code> |
+| input |  | <code><ins style="background:#dfd">v1</ins></code> |
+| output |  | <code><ins style="background:#dfd">(known after apply)</ins></code> |
+
+</details>
+
+<details>
+<summary>➕ <strong>terraform_data</strong> worker_a</summary>
+
+_(all values known after apply)_
+
+</details>
+
+<details>
+<summary>➕ <strong>terraform_data</strong> worker_b</summary>
+
+_(all values known after apply)_
+
+</details>
+
+<details>
+<summary>➕ <strong>terraform_data</strong> worker_c</summary>
+
+_(all values known after apply)_
+
+</details>
+
+## Outputs
+
+| Output | Action | Before | After |
+| --- | --- | --- | --- |
+| config_value | ➕ |  | _(known after apply)_ |
+"
+`;
+
+exports[`planToMarkdown integration > terraform/deferred-data-source/0 > renders without error and matches snapshot [diffFormat-simple] 1`] = `
+"## Plan Summary
+
+| Action | Count |
+| --- | --- |
+| ➕ Add | 5 |
+| **Total** | **5** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>➕ <strong>local_file</strong> config</summary>
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| content_base64sha256 |  | + (known after apply) |
+| content_base64sha512 |  | + (known after apply) |
+| content_md5 |  | + (known after apply) |
+| content_sha1 |  | + (known after apply) |
+| content_sha256 |  | + (known after apply) |
+| content_sha512 |  | + (known after apply) |
+| directory_permission |  | + 0777 |
+| file_permission |  | + 0777 |
+| filename |  | + ./config.json |
+| id |  | + (known after apply) |
+| sensitive_content | <code>(sensitive)</code> | <code>(sensitive)</code> |
+
+<details>
+<summary>Large value: content</summary>
+
+\`\`\`
+{
+  "worker_a": "alpha",
+  "worker_b": "bravo",
+  "worker_c": "charlie"
+}
+\`\`\`
+
+</details>
+
+</details>
+
+<details>
+<summary>➕ <strong>terraform_data</strong> independent</summary>
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id |  | + (known after apply) |
+| input |  | + v1 |
+| output |  | + (known after apply) |
+
+</details>
+
+<details>
+<summary>➕ <strong>terraform_data</strong> worker_a</summary>
+
+_(all values known after apply)_
+
+</details>
+
+<details>
+<summary>➕ <strong>terraform_data</strong> worker_b</summary>
+
+_(all values known after apply)_
+
+</details>
+
+<details>
+<summary>➕ <strong>terraform_data</strong> worker_c</summary>
+
+_(all values known after apply)_
+
+</details>
+
+## Outputs
+
+| Output | Action | Before | After |
+| --- | --- | --- | --- |
+| config_value | ➕ |  | _(known after apply)_ |
+"
+`;
+
+exports[`planToMarkdown integration > terraform/deferred-data-source/0 > renders without error and matches snapshot [showUnchangedAttributes] 1`] = `
+"## Plan Summary
+
+| Action | Count |
+| --- | --- |
+| ➕ Add | 5 |
+| **Total** | **5** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>➕ <strong>local_file</strong> config</summary>
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| content_base64 |  |  |
+| content_base64sha256 |  | <code><ins style="background:#dfd">(known after apply)</ins></code> |
+| content_base64sha512 |  | <code><ins style="background:#dfd">(known after apply)</ins></code> |
+| content_md5 |  | <code><ins style="background:#dfd">(known after apply)</ins></code> |
+| content_sha1 |  | <code><ins style="background:#dfd">(known after apply)</ins></code> |
+| content_sha256 |  | <code><ins style="background:#dfd">(known after apply)</ins></code> |
+| content_sha512 |  | <code><ins style="background:#dfd">(known after apply)</ins></code> |
+| directory_permission |  | <code><ins style="background:#dfd">0777</ins></code> |
+| file_permission |  | <code><ins style="background:#dfd">0777</ins></code> |
+| filename |  | <code><ins style="background:#dfd">./config.json</ins></code> |
+| id |  | <code><ins style="background:#dfd">(known after apply)</ins></code> |
+| sensitive_content | <code>(sensitive)</code> | <code>(sensitive)</code> |
+| source |  |  |
+
+<details>
+<summary>Large value: content</summary>
+
+\`\`\`
+{
+  "worker_a": "alpha",
+  "worker_b": "bravo",
+  "worker_c": "charlie"
+}
+\`\`\`
+
+</details>
+
+</details>
+
+<details>
+<summary>➕ <strong>terraform_data</strong> independent</summary>
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id |  | <code><ins style="background:#dfd">(known after apply)</ins></code> |
+| input |  | <code><ins style="background:#dfd">v1</ins></code> |
+| output |  | <code><ins style="background:#dfd">(known after apply)</ins></code> |
+| triggers_replace |  |  |
+
+</details>
+
+<details>
+<summary>➕ <strong>terraform_data</strong> worker_a</summary>
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id |  | <code><ins style="background:#dfd">(known after apply)</ins></code> |
+| input |  | <code><ins style="background:#dfd">(known after apply)</ins></code> |
+| output |  | <code><ins style="background:#dfd">(known after apply)</ins></code> |
+| triggers_replace |  |  |
+
+</details>
+
+<details>
+<summary>➕ <strong>terraform_data</strong> worker_b</summary>
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id |  | <code><ins style="background:#dfd">(known after apply)</ins></code> |
+| input |  | <code><ins style="background:#dfd">(known after apply)</ins></code> |
+| output |  | <code><ins style="background:#dfd">(known after apply)</ins></code> |
+| triggers_replace |  |  |
+
+</details>
+
+<details>
+<summary>➕ <strong>terraform_data</strong> worker_c</summary>
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id |  | <code><ins style="background:#dfd">(known after apply)</ins></code> |
+| input |  | <code><ins style="background:#dfd">(known after apply)</ins></code> |
+| output |  | <code><ins style="background:#dfd">(known after apply)</ins></code> |
+| triggers_replace |  |  |
+
+</details>
+
+## Outputs
+
+| Output | Action | Before | After |
+| --- | --- | --- | --- |
+| config_value | ➕ |  | _(known after apply)_ |
+"
+`;
+
+exports[`planToMarkdown integration > terraform/deferred-data-source/0 > renders without error and matches snapshot [summary-template] 1`] = `
+"## Plan Summary
+
+| Action | Count |
+| --- | --- |
+| ➕ Add | 5 |
+| **Total** | **5** |
+"
+`;
+
+exports[`planToMarkdown integration > terraform/deferred-data-source/1 > renders without error and matches snapshot [default] 1`] = `
+"## Plan Summary
+
+| Action | Count |
+| --- | --- |
+| ➕ Add | 1 |
+| 🔧 Change | 4 |
+| **Total** | **5** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>⬜ <strong>local_file</strong> config</summary>
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| sensitive_content | <code>(sensitive)</code> | <code>(sensitive)</code> |
+
+</details>
+
+<details>
+<summary>➕ <strong>local_file</strong> metadata</summary>
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| content |  | <code><ins style="background:#dfd">metadata-v1</ins></code> |
+| content_base64sha256 |  | <code><ins style="background:#dfd">(known after apply)</ins></code> |
+| content_base64sha512 |  | <code><ins style="background:#dfd">(known after apply)</ins></code> |
+| content_md5 |  | <code><ins style="background:#dfd">(known after apply)</ins></code> |
+| content_sha1 |  | <code><ins style="background:#dfd">(known after apply)</ins></code> |
+| content_sha256 |  | <code><ins style="background:#dfd">(known after apply)</ins></code> |
+| content_sha512 |  | <code><ins style="background:#dfd">(known after apply)</ins></code> |
+| directory_permission |  | <code><ins style="background:#dfd">0777</ins></code> |
+| file_permission |  | <code><ins style="background:#dfd">0777</ins></code> |
+| filename |  | <code><ins style="background:#dfd">./metadata.txt</ins></code> |
+| id |  | <code><ins style="background:#dfd">(known after apply)</ins></code> |
+| sensitive_content | <code>(sensitive)</code> | <code>(sensitive)</code> |
+
+</details>
+
+<details>
+<summary>🔧 <strong>terraform_data</strong> independent — changed: input, output</summary>
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| input | v1 | <code>v<ins style="background:#dfd">2</ins><del style="background:#fdd">1</del></code> |
+| output | v1 | <code><ins style="background:#dfd">(known after apply)</ins><del style="background:#fdd">v1</del></code> |
+
+</details>
+
+<details>
+<summary>🔧 <strong>terraform_data</strong> worker_a — changed: input, output</summary>
+
+_(all values known after apply)_
+
+</details>
+
+<details>
+<summary>🔧 <strong>terraform_data</strong> worker_b — changed: input, output</summary>
+
+_(all values known after apply)_
+
+</details>
+
+<details>
+<summary>🔧 <strong>terraform_data</strong> worker_c — changed: input, output</summary>
+
+_(all values known after apply)_
+
+</details>
+
+## Outputs
+
+| Output | Action | Before | After |
+| --- | --- | --- | --- |
+| config_value | 🔧 | <code>{"worker_a":"alpha","worker_b":"bravo","worker_c":"charlie"}</code> | _(known after apply)_ |
+"
+`;
+
+exports[`planToMarkdown integration > terraform/deferred-data-source/1 > renders without error and matches snapshot [diffFormat-simple] 1`] = `
+"## Plan Summary
+
+| Action | Count |
+| --- | --- |
+| ➕ Add | 1 |
+| 🔧 Change | 4 |
+| **Total** | **5** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>⬜ <strong>local_file</strong> config</summary>
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| sensitive_content | <code>(sensitive)</code> | <code>(sensitive)</code> |
+
+</details>
+
+<details>
+<summary>➕ <strong>local_file</strong> metadata</summary>
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| content |  | + metadata-v1 |
+| content_base64sha256 |  | + (known after apply) |
+| content_base64sha512 |  | + (known after apply) |
+| content_md5 |  | + (known after apply) |
+| content_sha1 |  | + (known after apply) |
+| content_sha256 |  | + (known after apply) |
+| content_sha512 |  | + (known after apply) |
+| directory_permission |  | + 0777 |
+| file_permission |  | + 0777 |
+| filename |  | + ./metadata.txt |
+| id |  | + (known after apply) |
+| sensitive_content | <code>(sensitive)</code> | <code>(sensitive)</code> |
+
+</details>
+
+<details>
+<summary>🔧 <strong>terraform_data</strong> independent — changed: input, output</summary>
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| input | v1 | - v1<br>+ v2 |
+| output | v1 | - v1<br>+ (known after apply) |
+
+</details>
+
+<details>
+<summary>🔧 <strong>terraform_data</strong> worker_a — changed: input, output</summary>
+
+_(all values known after apply)_
+
+</details>
+
+<details>
+<summary>🔧 <strong>terraform_data</strong> worker_b — changed: input, output</summary>
+
+_(all values known after apply)_
+
+</details>
+
+<details>
+<summary>🔧 <strong>terraform_data</strong> worker_c — changed: input, output</summary>
+
+_(all values known after apply)_
+
+</details>
+
+## Outputs
+
+| Output | Action | Before | After |
+| --- | --- | --- | --- |
+| config_value | 🔧 | <code>{"worker_a":"alpha","worker_b":"bravo","worker_c":"charlie"}</code> | _(known after apply)_ |
+"
+`;
+
+exports[`planToMarkdown integration > terraform/deferred-data-source/1 > renders without error and matches snapshot [showUnchangedAttributes] 1`] = `
+"## Plan Summary
+
+| Action | Count |
+| --- | --- |
+| ➕ Add | 1 |
+| 🔧 Change | 4 |
+| **Total** | **5** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>⬜ <strong>local_file</strong> config</summary>
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| content_base64 |  |  |
+| content_base64sha256 | BCZAB46RhMIHCDOD2wpy52CggN8HCuE2r+O9OQMaoFg= | <code>BCZAB46RhMIHCDOD2wpy52CggN8HCuE2r+O9OQMaoFg=</code> |
+| content_base64sha512 | SpHAEiR6BfvlF6vlTa1H+TRQidZGWJGkabpZCmP8dZp6l33CeZzLjVSVrhHJwMmOgKa2U2G6HttLqi+hX4JXVA== | <code>SpHAEiR6BfvlF6vlTa1H+TRQidZGWJGkabpZCmP8dZp6l33CeZzLjVSVrhHJwMmOgKa2U2G6HttLqi+hX4JXVA==</code> |
+| content_md5 | 25c6ea643fb6d100efbd0631aea3d0e1 | <code>25c6ea643fb6d100efbd0631aea3d0e1</code> |
+| content_sha1 | 575f062d4b9fc3bf93d0ac0d9de725cf1bcdc3c9 | <code>575f062d4b9fc3bf93d0ac0d9de725cf1bcdc3c9</code> |
+| content_sha256 | 042640078e9184c207083383db0a72e760a080df070ae136afe3bd39031aa058 | <code>042640078e9184c207083383db0a72e760a080df070ae136afe3bd39031aa058</code> |
+| content_sha512 | 4a91c012247a05fbe517abe54dad47f9345089d6465891a469ba590a63fc759a7a977dc2799ccb8d5495ae11c9c0c98e80a6b65361ba1edb4baa2fa15f825754 | <code>4a91c012247a05fbe517abe54dad47f9345089d6465891a469ba590a63fc759a7a977dc2799ccb8d5495ae11c9c0c98e80a6b65361ba1edb4baa2fa15f825754</code> |
+| directory_permission | 0777 | <code>0777</code> |
+| file_permission | 0777 | <code>0777</code> |
+| filename | ./config.json | <code>./config.json</code> |
+| id | 575f062d4b9fc3bf93d0ac0d9de725cf1bcdc3c9 | <code>575f062d4b9fc3bf93d0ac0d9de725cf1bcdc3c9</code> |
+| sensitive_content | <code>(sensitive)</code> | <code>(sensitive)</code> |
+| source |  |  |
+
+<details>
+<summary>Large value: content (5 lines, 0 changes)</summary>
+
+\`\`\`diff
+  {
+    "worker_a": "alpha",
+    "worker_b": "bravo",
+    "worker_c": "charlie"
+  }
+\`\`\`
+
+</details>
+
+</details>
+
+<details>
+<summary>➕ <strong>local_file</strong> metadata</summary>
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| content |  | <code><ins style="background:#dfd">metadata-v1</ins></code> |
+| content_base64 |  |  |
+| content_base64sha256 |  | <code><ins style="background:#dfd">(known after apply)</ins></code> |
+| content_base64sha512 |  | <code><ins style="background:#dfd">(known after apply)</ins></code> |
+| content_md5 |  | <code><ins style="background:#dfd">(known after apply)</ins></code> |
+| content_sha1 |  | <code><ins style="background:#dfd">(known after apply)</ins></code> |
+| content_sha256 |  | <code><ins style="background:#dfd">(known after apply)</ins></code> |
+| content_sha512 |  | <code><ins style="background:#dfd">(known after apply)</ins></code> |
+| directory_permission |  | <code><ins style="background:#dfd">0777</ins></code> |
+| file_permission |  | <code><ins style="background:#dfd">0777</ins></code> |
+| filename |  | <code><ins style="background:#dfd">./metadata.txt</ins></code> |
+| id |  | <code><ins style="background:#dfd">(known after apply)</ins></code> |
+| sensitive_content | <code>(sensitive)</code> | <code>(sensitive)</code> |
+| source |  |  |
+
+</details>
+
+<details>
+<summary>🔧 <strong>terraform_data</strong> independent — changed: input, output</summary>
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | b648222d-6228-3d67-29bd-0d13ee995092 | <code>b648222d-6228-3d67-29bd-0d13ee995092</code> |
+| input | v1 | <code>v<ins style="background:#dfd">2</ins><del style="background:#fdd">1</del></code> |
+| output | v1 | <code><ins style="background:#dfd">(known after apply)</ins><del style="background:#fdd">v1</del></code> |
+| triggers_replace |  |  |
+
+</details>
+
+<details>
+<summary>🔧 <strong>terraform_data</strong> worker_a — changed: input, output</summary>
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | 9b1b6f78-ae63-f513-0622-83102c327005 | <code>9b1b6f78-ae63-f513-0622-83102c327005</code> |
+| input | alpha | <code><ins style="background:#dfd">(known after </ins>a<ins style="background:#dfd">pp</ins>l<ins style="background:#dfd">y)</ins><del style="background:#fdd">pha</del></code> |
+| output | alpha | <code><ins style="background:#dfd">(known after </ins>a<ins style="background:#dfd">pp</ins>l<ins style="background:#dfd">y)</ins><del style="background:#fdd">pha</del></code> |
+| triggers_replace |  |  |
+
+</details>
+
+<details>
+<summary>🔧 <strong>terraform_data</strong> worker_b — changed: input, output</summary>
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | f2caf0b4-5495-85ac-9ea6-9bd74dc1aad2 | <code>f2caf0b4-5495-85ac-9ea6-9bd74dc1aad2</code> |
+| input | bravo | <code><del style="background:#fdd">b</del><ins style="background:#dfd">(known afte</ins>r<ins style="background:#dfd"> </ins>a<ins style="background:#dfd">pply)</ins><del style="background:#fdd">vo</del></code> |
+| output | bravo | <code><del style="background:#fdd">b</del><ins style="background:#dfd">(known afte</ins>r<ins style="background:#dfd"> </ins>a<ins style="background:#dfd">pply)</ins><del style="background:#fdd">vo</del></code> |
+| triggers_replace |  |  |
+
+</details>
+
+<details>
+<summary>🔧 <strong>terraform_data</strong> worker_c — changed: input, output</summary>
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | 32a3fed2-6abc-0421-9cb0-6d297a1d2b8b | <code>32a3fed2-6abc-0421-9cb0-6d297a1d2b8b</code> |
+| input | charlie | <code><del style="background:#fdd">ch</del><ins style="background:#dfd">(known </ins>a<ins style="background:#dfd">fte</ins>r<ins style="background:#dfd"> app</ins>l<ins style="background:#dfd">y)</ins><del style="background:#fdd">ie</del></code> |
+| output | charlie | <code><del style="background:#fdd">ch</del><ins style="background:#dfd">(known </ins>a<ins style="background:#dfd">fte</ins>r<ins style="background:#dfd"> app</ins>l<ins style="background:#dfd">y)</ins><del style="background:#fdd">ie</del></code> |
+| triggers_replace |  |  |
+
+</details>
+
+## Outputs
+
+| Output | Action | Before | After |
+| --- | --- | --- | --- |
+| config_value | 🔧 | <code>{"worker_a":"alpha","worker_b":"bravo","worker_c":"charlie"}</code> | _(known after apply)_ |
+"
+`;
+
+exports[`planToMarkdown integration > terraform/deferred-data-source/1 > renders without error and matches snapshot [summary-template] 1`] = `
+"## Plan Summary
+
+| Action | Count |
+| --- | --- |
+| ➕ Add | 1 |
+| 🔧 Change | 4 |
+| **Total** | **5** |
+"
+`;
+
+exports[`planToMarkdown integration > terraform/deferred-data-source/2 > renders without error and matches snapshot [default] 1`] = `
+"## Plan Summary
+
+| Action | Count |
+| --- | --- |
+| 🔧 Change | 3 |
+| ♻️ Replace | 1 |
+| **Total** | **4** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>♻️ <strong>local_file</strong> config</summary>
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| content_base64sha256 | BCZAB46RhMIHCDOD2wpy52CggN8HCuE2r+O9OQMaoFg= | <code><del style="background:#fdd">BCZAB46RhMIHCDOD2</del><ins style="background:#dfd">(kno</ins>w<ins style="background:#dfd">n after ap</ins>p<ins style="background:#dfd">l</ins>y<ins style="background:#dfd">)</ins><del style="background:#fdd">52CggN8HCuE2r+O9OQMaoFg=</del></code> |
+| content_base64sha512 | SpHAEiR6BfvlF6vlTa1H+TRQidZGWJGkabpZCmP8dZp6l33CeZzLjVSVrhHJwMmOgKa2U2G6HttLqi+hX4JXVA== | <code><del style="background:#fdd">SpHAEiR6B</del><ins style="background:#dfd">(known a</ins>f<del style="background:#fdd">vlF6vlTa1H+TRQidZGWJGk</del><ins style="background:#dfd">ter </ins>a<del style="background:#fdd">b</del>p<del style="background:#fdd">ZCmP8dZ</del>p<del style="background:#fdd">6</del>l<ins style="background:#dfd">y)</ins><del style="background:#fdd">33CeZzLjVSVrhHJwMmOgKa2U2G6HttLqi+hX4JXVA==</del></code> |
+| content_md5 | 25c6ea643fb6d100efbd0631aea3d0e1 | <code><del style="background:#fdd">25c6e</del><ins style="background:#dfd">(known </ins>a<del style="background:#fdd">643</del>f<del style="background:#fdd">b6d100</del><ins style="background:#dfd">t</ins>e<del style="background:#fdd">fbd0631</del><ins style="background:#dfd">r </ins>a<ins style="background:#dfd">pply)</ins><del style="background:#fdd">ea3d0e1</del></code> |
+| content_sha1 | 575f062d4b9fc3bf93d0ac0d9de725cf1bcdc3c9 | <code><del style="background:#fdd">575</del><ins style="background:#dfd">(known a</ins>f<del style="background:#fdd">062d4b9fc3bf93d0</del><ins style="background:#dfd">ter </ins>a<ins style="background:#dfd">pply)</ins><del style="background:#fdd">c0d9de725cf1bcdc3c9</del></code> |
+| content_sha256 | 042640078e9184c207083383db0a72e760a080df070ae136afe3bd39031aa058 | <code><del style="background:#fdd">042640078e9184c207083383db0a72e760</del><ins style="background:#dfd">(known </ins>a<del style="background:#fdd">080d</del>f<del style="background:#fdd">070a</del><ins style="background:#dfd">t</ins>e<del style="background:#fdd">136</del><ins style="background:#dfd">r </ins>a<ins style="background:#dfd">pply)</ins><del style="background:#fdd">fe3bd39031aa058</del></code> |
+| content_sha512 | 4a91c012247a05fbe517abe54dad47f9345089d6465891a469ba590a63fc759a7a977dc2799ccb8d5495ae11c9c0c98e80a6b65361ba1edb4baa2fa15f825754 | <code><del style="background:#fdd">4a91c012247</del><ins style="background:#dfd">(known </ins>a<del style="background:#fdd">05</del>f<del style="background:#fdd">b</del><ins style="background:#dfd">t</ins>e<del style="background:#fdd">517</del><ins style="background:#dfd">r </ins>a<ins style="background:#dfd">pply)</ins><del style="background:#fdd">be54dad47f9345089d6465891a469ba590a63fc759a7a977dc2799ccb8d5495ae11c9c0c98e80a6b65361ba1edb4baa2fa15f825754</del></code> |
+| id | 575f062d4b9fc3bf93d0ac0d9de725cf1bcdc3c9 | <code><del style="background:#fdd">575</del><ins style="background:#dfd">(known a</ins>f<del style="background:#fdd">062d4b9fc3bf93d0</del><ins style="background:#dfd">ter </ins>a<ins style="background:#dfd">pply)</ins><del style="background:#fdd">c0d9de725cf1bcdc3c9</del></code> |
+| sensitive_content | <code>(sensitive)</code> | <code>(sensitive)</code> |
+
+<details>
+<summary>Large value: content (6 lines, 2 changes)</summary>
+
+\`\`\`diff
+  {
+-   "worker_a": "alpha",
++   "worker_a": "ALPHA",
+    "worker_b": "bravo",
+    "worker_c": "charlie"
+  }
+\`\`\`
+
+</details>
+
+</details>
+
+<details>
+<summary>⬜ <strong>local_file</strong> metadata</summary>
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| sensitive_content | <code>(sensitive)</code> | <code>(sensitive)</code> |
+
+</details>
+
+<details>
+<summary>⬜ <strong>terraform_data</strong> independent</summary>
+
+_No attribute changes._
+
+</details>
+
+<details>
+<summary>🔧 <strong>terraform_data</strong> worker_a — changed: input, output</summary>
+
+_(all values known after apply)_
+
+</details>
+
+<details>
+<summary>🔧 <strong>terraform_data</strong> worker_b — changed: input, output</summary>
+
+_(all values known after apply)_
+
+</details>
+
+<details>
+<summary>🔧 <strong>terraform_data</strong> worker_c — changed: input, output</summary>
+
+_(all values known after apply)_
+
+</details>
+
+## Outputs
+
+| Output | Action | Before | After |
+| --- | --- | --- | --- |
+| config_value | 🔧 | <code>{"worker_a":"alpha","worker_b":"bravo","worker_c":"charlie"}</code> | _(known after apply)_ |
+"
+`;
+
+exports[`planToMarkdown integration > terraform/deferred-data-source/2 > renders without error and matches snapshot [diffFormat-simple] 1`] = `
+"## Plan Summary
+
+| Action | Count |
+| --- | --- |
+| 🔧 Change | 3 |
+| ♻️ Replace | 1 |
+| **Total** | **4** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>♻️ <strong>local_file</strong> config</summary>
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| content_base64sha256 | BCZAB46RhMIHCDOD2wpy52CggN8HCuE2r+O9OQMaoFg= | - BCZAB46RhMIHCDOD2wpy52CggN8HCuE2r+O9OQMaoFg=<br>+ (known after apply) |
+| content_base64sha512 | SpHAEiR6BfvlF6vlTa1H+TRQidZGWJGkabpZCmP8dZp6l33CeZzLjVSVrhHJwMmOgKa2U2G6HttLqi+hX4JXVA== | - SpHAEiR6BfvlF6vlTa1H+TRQidZGWJGkabpZCmP8dZp6l33CeZzLjVSVrhHJwMmOgKa2U2G6HttLqi+hX4JXVA==<br>+ (known after apply) |
+| content_md5 | 25c6ea643fb6d100efbd0631aea3d0e1 | - 25c6ea643fb6d100efbd0631aea3d0e1<br>+ (known after apply) |
+| content_sha1 | 575f062d4b9fc3bf93d0ac0d9de725cf1bcdc3c9 | - 575f062d4b9fc3bf93d0ac0d9de725cf1bcdc3c9<br>+ (known after apply) |
+| content_sha256 | 042640078e9184c207083383db0a72e760a080df070ae136afe3bd39031aa058 | - 042640078e9184c207083383db0a72e760a080df070ae136afe3bd39031aa058<br>+ (known after apply) |
+| content_sha512 | 4a91c012247a05fbe517abe54dad47f9345089d6465891a469ba590a63fc759a7a977dc2799ccb8d5495ae11c9c0c98e80a6b65361ba1edb4baa2fa15f825754 | - 4a91c012247a05fbe517abe54dad47f9345089d6465891a469ba590a63fc759a7a977dc2799ccb8d5495ae11c9c0c98e80a6b65361ba1edb4baa2fa15f825754<br>+ (known after apply) |
+| id | 575f062d4b9fc3bf93d0ac0d9de725cf1bcdc3c9 | - 575f062d4b9fc3bf93d0ac0d9de725cf1bcdc3c9<br>+ (known after apply) |
+| sensitive_content | <code>(sensitive)</code> | <code>(sensitive)</code> |
+
+<details>
+<summary>Large value: content (6 lines, 2 changes)</summary>
+
+\`\`\`diff
+  {
+-   "worker_a": "alpha",
++   "worker_a": "ALPHA",
+    "worker_b": "bravo",
+    "worker_c": "charlie"
+  }
+\`\`\`
+
+</details>
+
+</details>
+
+<details>
+<summary>⬜ <strong>local_file</strong> metadata</summary>
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| sensitive_content | <code>(sensitive)</code> | <code>(sensitive)</code> |
+
+</details>
+
+<details>
+<summary>⬜ <strong>terraform_data</strong> independent</summary>
+
+_No attribute changes._
+
+</details>
+
+<details>
+<summary>🔧 <strong>terraform_data</strong> worker_a — changed: input, output</summary>
+
+_(all values known after apply)_
+
+</details>
+
+<details>
+<summary>🔧 <strong>terraform_data</strong> worker_b — changed: input, output</summary>
+
+_(all values known after apply)_
+
+</details>
+
+<details>
+<summary>🔧 <strong>terraform_data</strong> worker_c — changed: input, output</summary>
+
+_(all values known after apply)_
+
+</details>
+
+## Outputs
+
+| Output | Action | Before | After |
+| --- | --- | --- | --- |
+| config_value | 🔧 | <code>{"worker_a":"alpha","worker_b":"bravo","worker_c":"charlie"}</code> | _(known after apply)_ |
+"
+`;
+
+exports[`planToMarkdown integration > terraform/deferred-data-source/2 > renders without error and matches snapshot [showUnchangedAttributes] 1`] = `
+"## Plan Summary
+
+| Action | Count |
+| --- | --- |
+| 🔧 Change | 3 |
+| ♻️ Replace | 1 |
+| **Total** | **4** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>♻️ <strong>local_file</strong> config</summary>
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| content_base64 |  |  |
+| content_base64sha256 | BCZAB46RhMIHCDOD2wpy52CggN8HCuE2r+O9OQMaoFg= | <code><del style="background:#fdd">BCZAB46RhMIHCDOD2</del><ins style="background:#dfd">(kno</ins>w<ins style="background:#dfd">n after ap</ins>p<ins style="background:#dfd">l</ins>y<ins style="background:#dfd">)</ins><del style="background:#fdd">52CggN8HCuE2r+O9OQMaoFg=</del></code> |
+| content_base64sha512 | SpHAEiR6BfvlF6vlTa1H+TRQidZGWJGkabpZCmP8dZp6l33CeZzLjVSVrhHJwMmOgKa2U2G6HttLqi+hX4JXVA== | <code><del style="background:#fdd">SpHAEiR6B</del><ins style="background:#dfd">(known a</ins>f<del style="background:#fdd">vlF6vlTa1H+TRQidZGWJGk</del><ins style="background:#dfd">ter </ins>a<del style="background:#fdd">b</del>p<del style="background:#fdd">ZCmP8dZ</del>p<del style="background:#fdd">6</del>l<ins style="background:#dfd">y)</ins><del style="background:#fdd">33CeZzLjVSVrhHJwMmOgKa2U2G6HttLqi+hX4JXVA==</del></code> |
+| content_md5 | 25c6ea643fb6d100efbd0631aea3d0e1 | <code><del style="background:#fdd">25c6e</del><ins style="background:#dfd">(known </ins>a<del style="background:#fdd">643</del>f<del style="background:#fdd">b6d100</del><ins style="background:#dfd">t</ins>e<del style="background:#fdd">fbd0631</del><ins style="background:#dfd">r </ins>a<ins style="background:#dfd">pply)</ins><del style="background:#fdd">ea3d0e1</del></code> |
+| content_sha1 | 575f062d4b9fc3bf93d0ac0d9de725cf1bcdc3c9 | <code><del style="background:#fdd">575</del><ins style="background:#dfd">(known a</ins>f<del style="background:#fdd">062d4b9fc3bf93d0</del><ins style="background:#dfd">ter </ins>a<ins style="background:#dfd">pply)</ins><del style="background:#fdd">c0d9de725cf1bcdc3c9</del></code> |
+| content_sha256 | 042640078e9184c207083383db0a72e760a080df070ae136afe3bd39031aa058 | <code><del style="background:#fdd">042640078e9184c207083383db0a72e760</del><ins style="background:#dfd">(known </ins>a<del style="background:#fdd">080d</del>f<del style="background:#fdd">070a</del><ins style="background:#dfd">t</ins>e<del style="background:#fdd">136</del><ins style="background:#dfd">r </ins>a<ins style="background:#dfd">pply)</ins><del style="background:#fdd">fe3bd39031aa058</del></code> |
+| content_sha512 | 4a91c012247a05fbe517abe54dad47f9345089d6465891a469ba590a63fc759a7a977dc2799ccb8d5495ae11c9c0c98e80a6b65361ba1edb4baa2fa15f825754 | <code><del style="background:#fdd">4a91c012247</del><ins style="background:#dfd">(known </ins>a<del style="background:#fdd">05</del>f<del style="background:#fdd">b</del><ins style="background:#dfd">t</ins>e<del style="background:#fdd">517</del><ins style="background:#dfd">r </ins>a<ins style="background:#dfd">pply)</ins><del style="background:#fdd">be54dad47f9345089d6465891a469ba590a63fc759a7a977dc2799ccb8d5495ae11c9c0c98e80a6b65361ba1edb4baa2fa15f825754</del></code> |
+| directory_permission | 0777 | <code>0777</code> |
+| file_permission | 0777 | <code>0777</code> |
+| filename | ./config.json | <code>./config.json</code> |
+| id | 575f062d4b9fc3bf93d0ac0d9de725cf1bcdc3c9 | <code><del style="background:#fdd">575</del><ins style="background:#dfd">(known a</ins>f<del style="background:#fdd">062d4b9fc3bf93d0</del><ins style="background:#dfd">ter </ins>a<ins style="background:#dfd">pply)</ins><del style="background:#fdd">c0d9de725cf1bcdc3c9</del></code> |
+| sensitive_content | <code>(sensitive)</code> | <code>(sensitive)</code> |
+| source |  |  |
+
+<details>
+<summary>Large value: content (6 lines, 2 changes)</summary>
+
+\`\`\`diff
+  {
+-   "worker_a": "alpha",
++   "worker_a": "ALPHA",
+    "worker_b": "bravo",
+    "worker_c": "charlie"
+  }
+\`\`\`
+
+</details>
+
+</details>
+
+<details>
+<summary>⬜ <strong>local_file</strong> metadata</summary>
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| content | metadata-v1 | <code>metadata-v1</code> |
+| content_base64 |  |  |
+| content_base64sha256 | jGQrlYWPzyUuhDtEvX/rAiW3dFFqg6iF9u8ejOHO61U= | <code>jGQrlYWPzyUuhDtEvX/rAiW3dFFqg6iF9u8ejOHO61U=</code> |
+| content_base64sha512 | 3aWEXxinGJ7yTx4FwAtd2k1zuszr9Az5Hj8X4qyPVoraKjerVPuUWskpaDzy90JjWwZD20HIR4alu7Xqv+ulNQ== | <code>3aWEXxinGJ7yTx4FwAtd2k1zuszr9Az5Hj8X4qyPVoraKjerVPuUWskpaDzy90JjWwZD20HIR4alu7Xqv+ulNQ==</code> |
+| content_md5 | e5bb5bd2cffa161046d51e1cee55584c | <code>e5bb5bd2cffa161046d51e1cee55584c</code> |
+| content_sha1 | 93df9ef40895b13abbbfc8ae636c46e6af242e9d | <code>93df9ef40895b13abbbfc8ae636c46e6af242e9d</code> |
+| content_sha256 | 8c642b95858fcf252e843b44bd7feb0225b774516a83a885f6ef1e8ce1ceeb55 | <code>8c642b95858fcf252e843b44bd7feb0225b774516a83a885f6ef1e8ce1ceeb55</code> |
+| content_sha512 | dda5845f18a7189ef24f1e05c00b5dda4d73baccebf40cf91e3f17e2ac8f568ada2a37ab54fb945ac929683cf2f742635b0643db41c84786a5bbb5eabfeba535 | <code>dda5845f18a7189ef24f1e05c00b5dda4d73baccebf40cf91e3f17e2ac8f568ada2a37ab54fb945ac929683cf2f742635b0643db41c84786a5bbb5eabfeba535</code> |
+| directory_permission | 0777 | <code>0777</code> |
+| file_permission | 0777 | <code>0777</code> |
+| filename | ./metadata.txt | <code>./metadata.txt</code> |
+| id | 93df9ef40895b13abbbfc8ae636c46e6af242e9d | <code>93df9ef40895b13abbbfc8ae636c46e6af242e9d</code> |
+| sensitive_content | <code>(sensitive)</code> | <code>(sensitive)</code> |
+| source |  |  |
+
+</details>
+
+<details>
+<summary>⬜ <strong>terraform_data</strong> independent</summary>
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | b648222d-6228-3d67-29bd-0d13ee995092 | <code>b648222d-6228-3d67-29bd-0d13ee995092</code> |
+| input | v2 | <code>v2</code> |
+| output | v2 | <code>v2</code> |
+| triggers_replace |  |  |
+
+</details>
+
+<details>
+<summary>🔧 <strong>terraform_data</strong> worker_a — changed: input, output</summary>
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | 9b1b6f78-ae63-f513-0622-83102c327005 | <code>9b1b6f78-ae63-f513-0622-83102c327005</code> |
+| input | alpha | <code><ins style="background:#dfd">(known after </ins>a<ins style="background:#dfd">pp</ins>l<ins style="background:#dfd">y)</ins><del style="background:#fdd">pha</del></code> |
+| output | alpha | <code><ins style="background:#dfd">(known after </ins>a<ins style="background:#dfd">pp</ins>l<ins style="background:#dfd">y)</ins><del style="background:#fdd">pha</del></code> |
+| triggers_replace |  |  |
+
+</details>
+
+<details>
+<summary>🔧 <strong>terraform_data</strong> worker_b — changed: input, output</summary>
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | f2caf0b4-5495-85ac-9ea6-9bd74dc1aad2 | <code>f2caf0b4-5495-85ac-9ea6-9bd74dc1aad2</code> |
+| input | bravo | <code><del style="background:#fdd">b</del><ins style="background:#dfd">(known afte</ins>r<ins style="background:#dfd"> </ins>a<ins style="background:#dfd">pply)</ins><del style="background:#fdd">vo</del></code> |
+| output | bravo | <code><del style="background:#fdd">b</del><ins style="background:#dfd">(known afte</ins>r<ins style="background:#dfd"> </ins>a<ins style="background:#dfd">pply)</ins><del style="background:#fdd">vo</del></code> |
+| triggers_replace |  |  |
+
+</details>
+
+<details>
+<summary>🔧 <strong>terraform_data</strong> worker_c — changed: input, output</summary>
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | 32a3fed2-6abc-0421-9cb0-6d297a1d2b8b | <code>32a3fed2-6abc-0421-9cb0-6d297a1d2b8b</code> |
+| input | charlie | <code><del style="background:#fdd">ch</del><ins style="background:#dfd">(known </ins>a<ins style="background:#dfd">fte</ins>r<ins style="background:#dfd"> app</ins>l<ins style="background:#dfd">y)</ins><del style="background:#fdd">ie</del></code> |
+| output | charlie | <code><del style="background:#fdd">ch</del><ins style="background:#dfd">(known </ins>a<ins style="background:#dfd">fte</ins>r<ins style="background:#dfd"> app</ins>l<ins style="background:#dfd">y)</ins><del style="background:#fdd">ie</del></code> |
+| triggers_replace |  |  |
+
+</details>
+
+## Outputs
+
+| Output | Action | Before | After |
+| --- | --- | --- | --- |
+| config_value | 🔧 | <code>{"worker_a":"alpha","worker_b":"bravo","worker_c":"charlie"}</code> | _(known after apply)_ |
+"
+`;
+
+exports[`planToMarkdown integration > terraform/deferred-data-source/2 > renders without error and matches snapshot [summary-template] 1`] = `
+"## Plan Summary
+
+| Action | Count |
+| --- | --- |
+| 🔧 Change | 3 |
+| ♻️ Replace | 1 |
+| **Total** | **4** |
+"
+`;
+
 exports[`planToMarkdown integration > terraform/local-files/0 > renders without error and matches snapshot [default] 1`] = `
 "## Plan Summary
 
@@ -1884,6 +2775,897 @@ exports[`planToMarkdown integration > terraform/with-modules/1 > renders without
 | --- | --- |
 | ♻️ Replace | 2 |
 | **Total** | **2** |
+"
+`;
+
+exports[`planToMarkdown integration > tofu/deferred-data-source/0 > renders without error and matches snapshot [default] 1`] = `
+"## Plan Summary
+
+| Action | Count |
+| --- | --- |
+| ➕ Add | 5 |
+| **Total** | **5** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>➕ <strong>local_file</strong> config</summary>
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| content_base64sha256 |  | <code><ins style="background:#dfd">(known after apply)</ins></code> |
+| content_base64sha512 |  | <code><ins style="background:#dfd">(known after apply)</ins></code> |
+| content_md5 |  | <code><ins style="background:#dfd">(known after apply)</ins></code> |
+| content_sha1 |  | <code><ins style="background:#dfd">(known after apply)</ins></code> |
+| content_sha256 |  | <code><ins style="background:#dfd">(known after apply)</ins></code> |
+| content_sha512 |  | <code><ins style="background:#dfd">(known after apply)</ins></code> |
+| directory_permission |  | <code><ins style="background:#dfd">0777</ins></code> |
+| file_permission |  | <code><ins style="background:#dfd">0777</ins></code> |
+| filename |  | <code><ins style="background:#dfd">./config.json</ins></code> |
+| id |  | <code><ins style="background:#dfd">(known after apply)</ins></code> |
+| sensitive_content | <code>(sensitive)</code> | <code>(sensitive)</code> |
+
+<details>
+<summary>Large value: content</summary>
+
+\`\`\`
+{
+  "worker_a": "alpha",
+  "worker_b": "bravo",
+  "worker_c": "charlie"
+}
+\`\`\`
+
+</details>
+
+</details>
+
+<details>
+<summary>➕ <strong>terraform_data</strong> independent</summary>
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id |  | <code><ins style="background:#dfd">(known after apply)</ins></code> |
+| input |  | <code><ins style="background:#dfd">v1</ins></code> |
+| output |  | <code><ins style="background:#dfd">(known after apply)</ins></code> |
+
+</details>
+
+<details>
+<summary>➕ <strong>terraform_data</strong> worker_a</summary>
+
+_(all values known after apply)_
+
+</details>
+
+<details>
+<summary>➕ <strong>terraform_data</strong> worker_b</summary>
+
+_(all values known after apply)_
+
+</details>
+
+<details>
+<summary>➕ <strong>terraform_data</strong> worker_c</summary>
+
+_(all values known after apply)_
+
+</details>
+
+## Outputs
+
+| Output | Action | Before | After |
+| --- | --- | --- | --- |
+| config_value | ➕ |  | _(known after apply)_ |
+"
+`;
+
+exports[`planToMarkdown integration > tofu/deferred-data-source/0 > renders without error and matches snapshot [diffFormat-simple] 1`] = `
+"## Plan Summary
+
+| Action | Count |
+| --- | --- |
+| ➕ Add | 5 |
+| **Total** | **5** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>➕ <strong>local_file</strong> config</summary>
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| content_base64sha256 |  | + (known after apply) |
+| content_base64sha512 |  | + (known after apply) |
+| content_md5 |  | + (known after apply) |
+| content_sha1 |  | + (known after apply) |
+| content_sha256 |  | + (known after apply) |
+| content_sha512 |  | + (known after apply) |
+| directory_permission |  | + 0777 |
+| file_permission |  | + 0777 |
+| filename |  | + ./config.json |
+| id |  | + (known after apply) |
+| sensitive_content | <code>(sensitive)</code> | <code>(sensitive)</code> |
+
+<details>
+<summary>Large value: content</summary>
+
+\`\`\`
+{
+  "worker_a": "alpha",
+  "worker_b": "bravo",
+  "worker_c": "charlie"
+}
+\`\`\`
+
+</details>
+
+</details>
+
+<details>
+<summary>➕ <strong>terraform_data</strong> independent</summary>
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id |  | + (known after apply) |
+| input |  | + v1 |
+| output |  | + (known after apply) |
+
+</details>
+
+<details>
+<summary>➕ <strong>terraform_data</strong> worker_a</summary>
+
+_(all values known after apply)_
+
+</details>
+
+<details>
+<summary>➕ <strong>terraform_data</strong> worker_b</summary>
+
+_(all values known after apply)_
+
+</details>
+
+<details>
+<summary>➕ <strong>terraform_data</strong> worker_c</summary>
+
+_(all values known after apply)_
+
+</details>
+
+## Outputs
+
+| Output | Action | Before | After |
+| --- | --- | --- | --- |
+| config_value | ➕ |  | _(known after apply)_ |
+"
+`;
+
+exports[`planToMarkdown integration > tofu/deferred-data-source/0 > renders without error and matches snapshot [showUnchangedAttributes] 1`] = `
+"## Plan Summary
+
+| Action | Count |
+| --- | --- |
+| ➕ Add | 5 |
+| **Total** | **5** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>➕ <strong>local_file</strong> config</summary>
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| content_base64 |  |  |
+| content_base64sha256 |  | <code><ins style="background:#dfd">(known after apply)</ins></code> |
+| content_base64sha512 |  | <code><ins style="background:#dfd">(known after apply)</ins></code> |
+| content_md5 |  | <code><ins style="background:#dfd">(known after apply)</ins></code> |
+| content_sha1 |  | <code><ins style="background:#dfd">(known after apply)</ins></code> |
+| content_sha256 |  | <code><ins style="background:#dfd">(known after apply)</ins></code> |
+| content_sha512 |  | <code><ins style="background:#dfd">(known after apply)</ins></code> |
+| directory_permission |  | <code><ins style="background:#dfd">0777</ins></code> |
+| file_permission |  | <code><ins style="background:#dfd">0777</ins></code> |
+| filename |  | <code><ins style="background:#dfd">./config.json</ins></code> |
+| id |  | <code><ins style="background:#dfd">(known after apply)</ins></code> |
+| sensitive_content | <code>(sensitive)</code> | <code>(sensitive)</code> |
+| source |  |  |
+
+<details>
+<summary>Large value: content</summary>
+
+\`\`\`
+{
+  "worker_a": "alpha",
+  "worker_b": "bravo",
+  "worker_c": "charlie"
+}
+\`\`\`
+
+</details>
+
+</details>
+
+<details>
+<summary>➕ <strong>terraform_data</strong> independent</summary>
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id |  | <code><ins style="background:#dfd">(known after apply)</ins></code> |
+| input |  | <code><ins style="background:#dfd">v1</ins></code> |
+| output |  | <code><ins style="background:#dfd">(known after apply)</ins></code> |
+| triggers_replace |  |  |
+
+</details>
+
+<details>
+<summary>➕ <strong>terraform_data</strong> worker_a</summary>
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id |  | <code><ins style="background:#dfd">(known after apply)</ins></code> |
+| input |  | <code><ins style="background:#dfd">(known after apply)</ins></code> |
+| output |  | <code><ins style="background:#dfd">(known after apply)</ins></code> |
+| triggers_replace |  |  |
+
+</details>
+
+<details>
+<summary>➕ <strong>terraform_data</strong> worker_b</summary>
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id |  | <code><ins style="background:#dfd">(known after apply)</ins></code> |
+| input |  | <code><ins style="background:#dfd">(known after apply)</ins></code> |
+| output |  | <code><ins style="background:#dfd">(known after apply)</ins></code> |
+| triggers_replace |  |  |
+
+</details>
+
+<details>
+<summary>➕ <strong>terraform_data</strong> worker_c</summary>
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id |  | <code><ins style="background:#dfd">(known after apply)</ins></code> |
+| input |  | <code><ins style="background:#dfd">(known after apply)</ins></code> |
+| output |  | <code><ins style="background:#dfd">(known after apply)</ins></code> |
+| triggers_replace |  |  |
+
+</details>
+
+## Outputs
+
+| Output | Action | Before | After |
+| --- | --- | --- | --- |
+| config_value | ➕ |  | _(known after apply)_ |
+"
+`;
+
+exports[`planToMarkdown integration > tofu/deferred-data-source/0 > renders without error and matches snapshot [summary-template] 1`] = `
+"## Plan Summary
+
+| Action | Count |
+| --- | --- |
+| ➕ Add | 5 |
+| **Total** | **5** |
+"
+`;
+
+exports[`planToMarkdown integration > tofu/deferred-data-source/1 > renders without error and matches snapshot [default] 1`] = `
+"## Plan Summary
+
+| Action | Count |
+| --- | --- |
+| ➕ Add | 1 |
+| 🔧 Change | 4 |
+| **Total** | **5** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>⬜ <strong>local_file</strong> config</summary>
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| sensitive_content | <code>(sensitive)</code> | <code>(sensitive)</code> |
+
+</details>
+
+<details>
+<summary>➕ <strong>local_file</strong> metadata</summary>
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| content |  | <code><ins style="background:#dfd">metadata-v1</ins></code> |
+| content_base64sha256 |  | <code><ins style="background:#dfd">(known after apply)</ins></code> |
+| content_base64sha512 |  | <code><ins style="background:#dfd">(known after apply)</ins></code> |
+| content_md5 |  | <code><ins style="background:#dfd">(known after apply)</ins></code> |
+| content_sha1 |  | <code><ins style="background:#dfd">(known after apply)</ins></code> |
+| content_sha256 |  | <code><ins style="background:#dfd">(known after apply)</ins></code> |
+| content_sha512 |  | <code><ins style="background:#dfd">(known after apply)</ins></code> |
+| directory_permission |  | <code><ins style="background:#dfd">0777</ins></code> |
+| file_permission |  | <code><ins style="background:#dfd">0777</ins></code> |
+| filename |  | <code><ins style="background:#dfd">./metadata.txt</ins></code> |
+| id |  | <code><ins style="background:#dfd">(known after apply)</ins></code> |
+| sensitive_content | <code>(sensitive)</code> | <code>(sensitive)</code> |
+
+</details>
+
+<details>
+<summary>🔧 <strong>terraform_data</strong> independent — changed: input, output</summary>
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| input | v1 | <code>v<ins style="background:#dfd">2</ins><del style="background:#fdd">1</del></code> |
+| output | v1 | <code><ins style="background:#dfd">(known after apply)</ins><del style="background:#fdd">v1</del></code> |
+
+</details>
+
+<details>
+<summary>🔧 <strong>terraform_data</strong> worker_a — changed: input, output</summary>
+
+_(all values known after apply)_
+
+</details>
+
+<details>
+<summary>🔧 <strong>terraform_data</strong> worker_b — changed: input, output</summary>
+
+_(all values known after apply)_
+
+</details>
+
+<details>
+<summary>🔧 <strong>terraform_data</strong> worker_c — changed: input, output</summary>
+
+_(all values known after apply)_
+
+</details>
+
+## Outputs
+
+| Output | Action | Before | After |
+| --- | --- | --- | --- |
+| config_value | 🔧 | <code>{"worker_a":"alpha","worker_b":"bravo","worker_c":"charlie"}</code> | _(known after apply)_ |
+"
+`;
+
+exports[`planToMarkdown integration > tofu/deferred-data-source/1 > renders without error and matches snapshot [diffFormat-simple] 1`] = `
+"## Plan Summary
+
+| Action | Count |
+| --- | --- |
+| ➕ Add | 1 |
+| 🔧 Change | 4 |
+| **Total** | **5** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>⬜ <strong>local_file</strong> config</summary>
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| sensitive_content | <code>(sensitive)</code> | <code>(sensitive)</code> |
+
+</details>
+
+<details>
+<summary>➕ <strong>local_file</strong> metadata</summary>
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| content |  | + metadata-v1 |
+| content_base64sha256 |  | + (known after apply) |
+| content_base64sha512 |  | + (known after apply) |
+| content_md5 |  | + (known after apply) |
+| content_sha1 |  | + (known after apply) |
+| content_sha256 |  | + (known after apply) |
+| content_sha512 |  | + (known after apply) |
+| directory_permission |  | + 0777 |
+| file_permission |  | + 0777 |
+| filename |  | + ./metadata.txt |
+| id |  | + (known after apply) |
+| sensitive_content | <code>(sensitive)</code> | <code>(sensitive)</code> |
+
+</details>
+
+<details>
+<summary>🔧 <strong>terraform_data</strong> independent — changed: input, output</summary>
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| input | v1 | - v1<br>+ v2 |
+| output | v1 | - v1<br>+ (known after apply) |
+
+</details>
+
+<details>
+<summary>🔧 <strong>terraform_data</strong> worker_a — changed: input, output</summary>
+
+_(all values known after apply)_
+
+</details>
+
+<details>
+<summary>🔧 <strong>terraform_data</strong> worker_b — changed: input, output</summary>
+
+_(all values known after apply)_
+
+</details>
+
+<details>
+<summary>🔧 <strong>terraform_data</strong> worker_c — changed: input, output</summary>
+
+_(all values known after apply)_
+
+</details>
+
+## Outputs
+
+| Output | Action | Before | After |
+| --- | --- | --- | --- |
+| config_value | 🔧 | <code>{"worker_a":"alpha","worker_b":"bravo","worker_c":"charlie"}</code> | _(known after apply)_ |
+"
+`;
+
+exports[`planToMarkdown integration > tofu/deferred-data-source/1 > renders without error and matches snapshot [showUnchangedAttributes] 1`] = `
+"## Plan Summary
+
+| Action | Count |
+| --- | --- |
+| ➕ Add | 1 |
+| 🔧 Change | 4 |
+| **Total** | **5** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>⬜ <strong>local_file</strong> config</summary>
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| content_base64 |  |  |
+| content_base64sha256 | BCZAB46RhMIHCDOD2wpy52CggN8HCuE2r+O9OQMaoFg= | <code>BCZAB46RhMIHCDOD2wpy52CggN8HCuE2r+O9OQMaoFg=</code> |
+| content_base64sha512 | SpHAEiR6BfvlF6vlTa1H+TRQidZGWJGkabpZCmP8dZp6l33CeZzLjVSVrhHJwMmOgKa2U2G6HttLqi+hX4JXVA== | <code>SpHAEiR6BfvlF6vlTa1H+TRQidZGWJGkabpZCmP8dZp6l33CeZzLjVSVrhHJwMmOgKa2U2G6HttLqi+hX4JXVA==</code> |
+| content_md5 | 25c6ea643fb6d100efbd0631aea3d0e1 | <code>25c6ea643fb6d100efbd0631aea3d0e1</code> |
+| content_sha1 | 575f062d4b9fc3bf93d0ac0d9de725cf1bcdc3c9 | <code>575f062d4b9fc3bf93d0ac0d9de725cf1bcdc3c9</code> |
+| content_sha256 | 042640078e9184c207083383db0a72e760a080df070ae136afe3bd39031aa058 | <code>042640078e9184c207083383db0a72e760a080df070ae136afe3bd39031aa058</code> |
+| content_sha512 | 4a91c012247a05fbe517abe54dad47f9345089d6465891a469ba590a63fc759a7a977dc2799ccb8d5495ae11c9c0c98e80a6b65361ba1edb4baa2fa15f825754 | <code>4a91c012247a05fbe517abe54dad47f9345089d6465891a469ba590a63fc759a7a977dc2799ccb8d5495ae11c9c0c98e80a6b65361ba1edb4baa2fa15f825754</code> |
+| directory_permission | 0777 | <code>0777</code> |
+| file_permission | 0777 | <code>0777</code> |
+| filename | ./config.json | <code>./config.json</code> |
+| id | 575f062d4b9fc3bf93d0ac0d9de725cf1bcdc3c9 | <code>575f062d4b9fc3bf93d0ac0d9de725cf1bcdc3c9</code> |
+| sensitive_content | <code>(sensitive)</code> | <code>(sensitive)</code> |
+| source |  |  |
+
+<details>
+<summary>Large value: content (5 lines, 0 changes)</summary>
+
+\`\`\`diff
+  {
+    "worker_a": "alpha",
+    "worker_b": "bravo",
+    "worker_c": "charlie"
+  }
+\`\`\`
+
+</details>
+
+</details>
+
+<details>
+<summary>➕ <strong>local_file</strong> metadata</summary>
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| content |  | <code><ins style="background:#dfd">metadata-v1</ins></code> |
+| content_base64 |  |  |
+| content_base64sha256 |  | <code><ins style="background:#dfd">(known after apply)</ins></code> |
+| content_base64sha512 |  | <code><ins style="background:#dfd">(known after apply)</ins></code> |
+| content_md5 |  | <code><ins style="background:#dfd">(known after apply)</ins></code> |
+| content_sha1 |  | <code><ins style="background:#dfd">(known after apply)</ins></code> |
+| content_sha256 |  | <code><ins style="background:#dfd">(known after apply)</ins></code> |
+| content_sha512 |  | <code><ins style="background:#dfd">(known after apply)</ins></code> |
+| directory_permission |  | <code><ins style="background:#dfd">0777</ins></code> |
+| file_permission |  | <code><ins style="background:#dfd">0777</ins></code> |
+| filename |  | <code><ins style="background:#dfd">./metadata.txt</ins></code> |
+| id |  | <code><ins style="background:#dfd">(known after apply)</ins></code> |
+| sensitive_content | <code>(sensitive)</code> | <code>(sensitive)</code> |
+| source |  |  |
+
+</details>
+
+<details>
+<summary>🔧 <strong>terraform_data</strong> independent — changed: input, output</summary>
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | 20c2b21a-6f1e-1090-19da-82e3b280b7bb | <code>20c2b21a-6f1e-1090-19da-82e3b280b7bb</code> |
+| input | v1 | <code>v<ins style="background:#dfd">2</ins><del style="background:#fdd">1</del></code> |
+| output | v1 | <code><ins style="background:#dfd">(known after apply)</ins><del style="background:#fdd">v1</del></code> |
+| triggers_replace |  |  |
+
+</details>
+
+<details>
+<summary>🔧 <strong>terraform_data</strong> worker_a — changed: input, output</summary>
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | ace0ebd5-48de-d27b-6d94-f19a86be0a00 | <code>ace0ebd5-48de-d27b-6d94-f19a86be0a00</code> |
+| input | alpha | <code><ins style="background:#dfd">(known after </ins>a<ins style="background:#dfd">pp</ins>l<ins style="background:#dfd">y)</ins><del style="background:#fdd">pha</del></code> |
+| output | alpha | <code><ins style="background:#dfd">(known after </ins>a<ins style="background:#dfd">pp</ins>l<ins style="background:#dfd">y)</ins><del style="background:#fdd">pha</del></code> |
+| triggers_replace |  |  |
+
+</details>
+
+<details>
+<summary>🔧 <strong>terraform_data</strong> worker_b — changed: input, output</summary>
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | 01c4beeb-a87a-e41f-9621-ff99a490ca12 | <code>01c4beeb-a87a-e41f-9621-ff99a490ca12</code> |
+| input | bravo | <code><del style="background:#fdd">b</del><ins style="background:#dfd">(known afte</ins>r<ins style="background:#dfd"> </ins>a<ins style="background:#dfd">pply)</ins><del style="background:#fdd">vo</del></code> |
+| output | bravo | <code><del style="background:#fdd">b</del><ins style="background:#dfd">(known afte</ins>r<ins style="background:#dfd"> </ins>a<ins style="background:#dfd">pply)</ins><del style="background:#fdd">vo</del></code> |
+| triggers_replace |  |  |
+
+</details>
+
+<details>
+<summary>🔧 <strong>terraform_data</strong> worker_c — changed: input, output</summary>
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | c2d0504e-52a4-39b3-e6ff-853bf2919413 | <code>c2d0504e-52a4-39b3-e6ff-853bf2919413</code> |
+| input | charlie | <code><del style="background:#fdd">ch</del><ins style="background:#dfd">(known </ins>a<ins style="background:#dfd">fte</ins>r<ins style="background:#dfd"> app</ins>l<ins style="background:#dfd">y)</ins><del style="background:#fdd">ie</del></code> |
+| output | charlie | <code><del style="background:#fdd">ch</del><ins style="background:#dfd">(known </ins>a<ins style="background:#dfd">fte</ins>r<ins style="background:#dfd"> app</ins>l<ins style="background:#dfd">y)</ins><del style="background:#fdd">ie</del></code> |
+| triggers_replace |  |  |
+
+</details>
+
+## Outputs
+
+| Output | Action | Before | After |
+| --- | --- | --- | --- |
+| config_value | 🔧 | <code>{"worker_a":"alpha","worker_b":"bravo","worker_c":"charlie"}</code> | _(known after apply)_ |
+"
+`;
+
+exports[`planToMarkdown integration > tofu/deferred-data-source/1 > renders without error and matches snapshot [summary-template] 1`] = `
+"## Plan Summary
+
+| Action | Count |
+| --- | --- |
+| ➕ Add | 1 |
+| 🔧 Change | 4 |
+| **Total** | **5** |
+"
+`;
+
+exports[`planToMarkdown integration > tofu/deferred-data-source/2 > renders without error and matches snapshot [default] 1`] = `
+"## Plan Summary
+
+| Action | Count |
+| --- | --- |
+| 🔧 Change | 3 |
+| ♻️ Replace | 1 |
+| **Total** | **4** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>♻️ <strong>local_file</strong> config</summary>
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| content_base64sha256 | BCZAB46RhMIHCDOD2wpy52CggN8HCuE2r+O9OQMaoFg= | <code><del style="background:#fdd">BCZAB46RhMIHCDOD2</del><ins style="background:#dfd">(kno</ins>w<ins style="background:#dfd">n after ap</ins>p<ins style="background:#dfd">l</ins>y<ins style="background:#dfd">)</ins><del style="background:#fdd">52CggN8HCuE2r+O9OQMaoFg=</del></code> |
+| content_base64sha512 | SpHAEiR6BfvlF6vlTa1H+TRQidZGWJGkabpZCmP8dZp6l33CeZzLjVSVrhHJwMmOgKa2U2G6HttLqi+hX4JXVA== | <code><del style="background:#fdd">SpHAEiR6B</del><ins style="background:#dfd">(known a</ins>f<del style="background:#fdd">vlF6vlTa1H+TRQidZGWJGk</del><ins style="background:#dfd">ter </ins>a<del style="background:#fdd">b</del>p<del style="background:#fdd">ZCmP8dZ</del>p<del style="background:#fdd">6</del>l<ins style="background:#dfd">y)</ins><del style="background:#fdd">33CeZzLjVSVrhHJwMmOgKa2U2G6HttLqi+hX4JXVA==</del></code> |
+| content_md5 | 25c6ea643fb6d100efbd0631aea3d0e1 | <code><del style="background:#fdd">25c6e</del><ins style="background:#dfd">(known </ins>a<del style="background:#fdd">643</del>f<del style="background:#fdd">b6d100</del><ins style="background:#dfd">t</ins>e<del style="background:#fdd">fbd0631</del><ins style="background:#dfd">r </ins>a<ins style="background:#dfd">pply)</ins><del style="background:#fdd">ea3d0e1</del></code> |
+| content_sha1 | 575f062d4b9fc3bf93d0ac0d9de725cf1bcdc3c9 | <code><del style="background:#fdd">575</del><ins style="background:#dfd">(known a</ins>f<del style="background:#fdd">062d4b9fc3bf93d0</del><ins style="background:#dfd">ter </ins>a<ins style="background:#dfd">pply)</ins><del style="background:#fdd">c0d9de725cf1bcdc3c9</del></code> |
+| content_sha256 | 042640078e9184c207083383db0a72e760a080df070ae136afe3bd39031aa058 | <code><del style="background:#fdd">042640078e9184c207083383db0a72e760</del><ins style="background:#dfd">(known </ins>a<del style="background:#fdd">080d</del>f<del style="background:#fdd">070a</del><ins style="background:#dfd">t</ins>e<del style="background:#fdd">136</del><ins style="background:#dfd">r </ins>a<ins style="background:#dfd">pply)</ins><del style="background:#fdd">fe3bd39031aa058</del></code> |
+| content_sha512 | 4a91c012247a05fbe517abe54dad47f9345089d6465891a469ba590a63fc759a7a977dc2799ccb8d5495ae11c9c0c98e80a6b65361ba1edb4baa2fa15f825754 | <code><del style="background:#fdd">4a91c012247</del><ins style="background:#dfd">(known </ins>a<del style="background:#fdd">05</del>f<del style="background:#fdd">b</del><ins style="background:#dfd">t</ins>e<del style="background:#fdd">517</del><ins style="background:#dfd">r </ins>a<ins style="background:#dfd">pply)</ins><del style="background:#fdd">be54dad47f9345089d6465891a469ba590a63fc759a7a977dc2799ccb8d5495ae11c9c0c98e80a6b65361ba1edb4baa2fa15f825754</del></code> |
+| id | 575f062d4b9fc3bf93d0ac0d9de725cf1bcdc3c9 | <code><del style="background:#fdd">575</del><ins style="background:#dfd">(known a</ins>f<del style="background:#fdd">062d4b9fc3bf93d0</del><ins style="background:#dfd">ter </ins>a<ins style="background:#dfd">pply)</ins><del style="background:#fdd">c0d9de725cf1bcdc3c9</del></code> |
+| sensitive_content | <code>(sensitive)</code> | <code>(sensitive)</code> |
+
+<details>
+<summary>Large value: content (6 lines, 2 changes)</summary>
+
+\`\`\`diff
+  {
+-   "worker_a": "alpha",
++   "worker_a": "ALPHA",
+    "worker_b": "bravo",
+    "worker_c": "charlie"
+  }
+\`\`\`
+
+</details>
+
+</details>
+
+<details>
+<summary>⬜ <strong>local_file</strong> metadata</summary>
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| sensitive_content | <code>(sensitive)</code> | <code>(sensitive)</code> |
+
+</details>
+
+<details>
+<summary>⬜ <strong>terraform_data</strong> independent</summary>
+
+_No attribute changes._
+
+</details>
+
+<details>
+<summary>🔧 <strong>terraform_data</strong> worker_a — changed: input, output</summary>
+
+_(all values known after apply)_
+
+</details>
+
+<details>
+<summary>🔧 <strong>terraform_data</strong> worker_b — changed: input, output</summary>
+
+_(all values known after apply)_
+
+</details>
+
+<details>
+<summary>🔧 <strong>terraform_data</strong> worker_c — changed: input, output</summary>
+
+_(all values known after apply)_
+
+</details>
+
+## Outputs
+
+| Output | Action | Before | After |
+| --- | --- | --- | --- |
+| config_value | 🔧 | <code>{"worker_a":"alpha","worker_b":"bravo","worker_c":"charlie"}</code> | _(known after apply)_ |
+"
+`;
+
+exports[`planToMarkdown integration > tofu/deferred-data-source/2 > renders without error and matches snapshot [diffFormat-simple] 1`] = `
+"## Plan Summary
+
+| Action | Count |
+| --- | --- |
+| 🔧 Change | 3 |
+| ♻️ Replace | 1 |
+| **Total** | **4** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>♻️ <strong>local_file</strong> config</summary>
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| content_base64sha256 | BCZAB46RhMIHCDOD2wpy52CggN8HCuE2r+O9OQMaoFg= | - BCZAB46RhMIHCDOD2wpy52CggN8HCuE2r+O9OQMaoFg=<br>+ (known after apply) |
+| content_base64sha512 | SpHAEiR6BfvlF6vlTa1H+TRQidZGWJGkabpZCmP8dZp6l33CeZzLjVSVrhHJwMmOgKa2U2G6HttLqi+hX4JXVA== | - SpHAEiR6BfvlF6vlTa1H+TRQidZGWJGkabpZCmP8dZp6l33CeZzLjVSVrhHJwMmOgKa2U2G6HttLqi+hX4JXVA==<br>+ (known after apply) |
+| content_md5 | 25c6ea643fb6d100efbd0631aea3d0e1 | - 25c6ea643fb6d100efbd0631aea3d0e1<br>+ (known after apply) |
+| content_sha1 | 575f062d4b9fc3bf93d0ac0d9de725cf1bcdc3c9 | - 575f062d4b9fc3bf93d0ac0d9de725cf1bcdc3c9<br>+ (known after apply) |
+| content_sha256 | 042640078e9184c207083383db0a72e760a080df070ae136afe3bd39031aa058 | - 042640078e9184c207083383db0a72e760a080df070ae136afe3bd39031aa058<br>+ (known after apply) |
+| content_sha512 | 4a91c012247a05fbe517abe54dad47f9345089d6465891a469ba590a63fc759a7a977dc2799ccb8d5495ae11c9c0c98e80a6b65361ba1edb4baa2fa15f825754 | - 4a91c012247a05fbe517abe54dad47f9345089d6465891a469ba590a63fc759a7a977dc2799ccb8d5495ae11c9c0c98e80a6b65361ba1edb4baa2fa15f825754<br>+ (known after apply) |
+| id | 575f062d4b9fc3bf93d0ac0d9de725cf1bcdc3c9 | - 575f062d4b9fc3bf93d0ac0d9de725cf1bcdc3c9<br>+ (known after apply) |
+| sensitive_content | <code>(sensitive)</code> | <code>(sensitive)</code> |
+
+<details>
+<summary>Large value: content (6 lines, 2 changes)</summary>
+
+\`\`\`diff
+  {
+-   "worker_a": "alpha",
++   "worker_a": "ALPHA",
+    "worker_b": "bravo",
+    "worker_c": "charlie"
+  }
+\`\`\`
+
+</details>
+
+</details>
+
+<details>
+<summary>⬜ <strong>local_file</strong> metadata</summary>
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| sensitive_content | <code>(sensitive)</code> | <code>(sensitive)</code> |
+
+</details>
+
+<details>
+<summary>⬜ <strong>terraform_data</strong> independent</summary>
+
+_No attribute changes._
+
+</details>
+
+<details>
+<summary>🔧 <strong>terraform_data</strong> worker_a — changed: input, output</summary>
+
+_(all values known after apply)_
+
+</details>
+
+<details>
+<summary>🔧 <strong>terraform_data</strong> worker_b — changed: input, output</summary>
+
+_(all values known after apply)_
+
+</details>
+
+<details>
+<summary>🔧 <strong>terraform_data</strong> worker_c — changed: input, output</summary>
+
+_(all values known after apply)_
+
+</details>
+
+## Outputs
+
+| Output | Action | Before | After |
+| --- | --- | --- | --- |
+| config_value | 🔧 | <code>{"worker_a":"alpha","worker_b":"bravo","worker_c":"charlie"}</code> | _(known after apply)_ |
+"
+`;
+
+exports[`planToMarkdown integration > tofu/deferred-data-source/2 > renders without error and matches snapshot [showUnchangedAttributes] 1`] = `
+"## Plan Summary
+
+| Action | Count |
+| --- | --- |
+| 🔧 Change | 3 |
+| ♻️ Replace | 1 |
+| **Total** | **4** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>♻️ <strong>local_file</strong> config</summary>
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| content_base64 |  |  |
+| content_base64sha256 | BCZAB46RhMIHCDOD2wpy52CggN8HCuE2r+O9OQMaoFg= | <code><del style="background:#fdd">BCZAB46RhMIHCDOD2</del><ins style="background:#dfd">(kno</ins>w<ins style="background:#dfd">n after ap</ins>p<ins style="background:#dfd">l</ins>y<ins style="background:#dfd">)</ins><del style="background:#fdd">52CggN8HCuE2r+O9OQMaoFg=</del></code> |
+| content_base64sha512 | SpHAEiR6BfvlF6vlTa1H+TRQidZGWJGkabpZCmP8dZp6l33CeZzLjVSVrhHJwMmOgKa2U2G6HttLqi+hX4JXVA== | <code><del style="background:#fdd">SpHAEiR6B</del><ins style="background:#dfd">(known a</ins>f<del style="background:#fdd">vlF6vlTa1H+TRQidZGWJGk</del><ins style="background:#dfd">ter </ins>a<del style="background:#fdd">b</del>p<del style="background:#fdd">ZCmP8dZ</del>p<del style="background:#fdd">6</del>l<ins style="background:#dfd">y)</ins><del style="background:#fdd">33CeZzLjVSVrhHJwMmOgKa2U2G6HttLqi+hX4JXVA==</del></code> |
+| content_md5 | 25c6ea643fb6d100efbd0631aea3d0e1 | <code><del style="background:#fdd">25c6e</del><ins style="background:#dfd">(known </ins>a<del style="background:#fdd">643</del>f<del style="background:#fdd">b6d100</del><ins style="background:#dfd">t</ins>e<del style="background:#fdd">fbd0631</del><ins style="background:#dfd">r </ins>a<ins style="background:#dfd">pply)</ins><del style="background:#fdd">ea3d0e1</del></code> |
+| content_sha1 | 575f062d4b9fc3bf93d0ac0d9de725cf1bcdc3c9 | <code><del style="background:#fdd">575</del><ins style="background:#dfd">(known a</ins>f<del style="background:#fdd">062d4b9fc3bf93d0</del><ins style="background:#dfd">ter </ins>a<ins style="background:#dfd">pply)</ins><del style="background:#fdd">c0d9de725cf1bcdc3c9</del></code> |
+| content_sha256 | 042640078e9184c207083383db0a72e760a080df070ae136afe3bd39031aa058 | <code><del style="background:#fdd">042640078e9184c207083383db0a72e760</del><ins style="background:#dfd">(known </ins>a<del style="background:#fdd">080d</del>f<del style="background:#fdd">070a</del><ins style="background:#dfd">t</ins>e<del style="background:#fdd">136</del><ins style="background:#dfd">r </ins>a<ins style="background:#dfd">pply)</ins><del style="background:#fdd">fe3bd39031aa058</del></code> |
+| content_sha512 | 4a91c012247a05fbe517abe54dad47f9345089d6465891a469ba590a63fc759a7a977dc2799ccb8d5495ae11c9c0c98e80a6b65361ba1edb4baa2fa15f825754 | <code><del style="background:#fdd">4a91c012247</del><ins style="background:#dfd">(known </ins>a<del style="background:#fdd">05</del>f<del style="background:#fdd">b</del><ins style="background:#dfd">t</ins>e<del style="background:#fdd">517</del><ins style="background:#dfd">r </ins>a<ins style="background:#dfd">pply)</ins><del style="background:#fdd">be54dad47f9345089d6465891a469ba590a63fc759a7a977dc2799ccb8d5495ae11c9c0c98e80a6b65361ba1edb4baa2fa15f825754</del></code> |
+| directory_permission | 0777 | <code>0777</code> |
+| file_permission | 0777 | <code>0777</code> |
+| filename | ./config.json | <code>./config.json</code> |
+| id | 575f062d4b9fc3bf93d0ac0d9de725cf1bcdc3c9 | <code><del style="background:#fdd">575</del><ins style="background:#dfd">(known a</ins>f<del style="background:#fdd">062d4b9fc3bf93d0</del><ins style="background:#dfd">ter </ins>a<ins style="background:#dfd">pply)</ins><del style="background:#fdd">c0d9de725cf1bcdc3c9</del></code> |
+| sensitive_content | <code>(sensitive)</code> | <code>(sensitive)</code> |
+| source |  |  |
+
+<details>
+<summary>Large value: content (6 lines, 2 changes)</summary>
+
+\`\`\`diff
+  {
+-   "worker_a": "alpha",
++   "worker_a": "ALPHA",
+    "worker_b": "bravo",
+    "worker_c": "charlie"
+  }
+\`\`\`
+
+</details>
+
+</details>
+
+<details>
+<summary>⬜ <strong>local_file</strong> metadata</summary>
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| content | metadata-v1 | <code>metadata-v1</code> |
+| content_base64 |  |  |
+| content_base64sha256 | jGQrlYWPzyUuhDtEvX/rAiW3dFFqg6iF9u8ejOHO61U= | <code>jGQrlYWPzyUuhDtEvX/rAiW3dFFqg6iF9u8ejOHO61U=</code> |
+| content_base64sha512 | 3aWEXxinGJ7yTx4FwAtd2k1zuszr9Az5Hj8X4qyPVoraKjerVPuUWskpaDzy90JjWwZD20HIR4alu7Xqv+ulNQ== | <code>3aWEXxinGJ7yTx4FwAtd2k1zuszr9Az5Hj8X4qyPVoraKjerVPuUWskpaDzy90JjWwZD20HIR4alu7Xqv+ulNQ==</code> |
+| content_md5 | e5bb5bd2cffa161046d51e1cee55584c | <code>e5bb5bd2cffa161046d51e1cee55584c</code> |
+| content_sha1 | 93df9ef40895b13abbbfc8ae636c46e6af242e9d | <code>93df9ef40895b13abbbfc8ae636c46e6af242e9d</code> |
+| content_sha256 | 8c642b95858fcf252e843b44bd7feb0225b774516a83a885f6ef1e8ce1ceeb55 | <code>8c642b95858fcf252e843b44bd7feb0225b774516a83a885f6ef1e8ce1ceeb55</code> |
+| content_sha512 | dda5845f18a7189ef24f1e05c00b5dda4d73baccebf40cf91e3f17e2ac8f568ada2a37ab54fb945ac929683cf2f742635b0643db41c84786a5bbb5eabfeba535 | <code>dda5845f18a7189ef24f1e05c00b5dda4d73baccebf40cf91e3f17e2ac8f568ada2a37ab54fb945ac929683cf2f742635b0643db41c84786a5bbb5eabfeba535</code> |
+| directory_permission | 0777 | <code>0777</code> |
+| file_permission | 0777 | <code>0777</code> |
+| filename | ./metadata.txt | <code>./metadata.txt</code> |
+| id | 93df9ef40895b13abbbfc8ae636c46e6af242e9d | <code>93df9ef40895b13abbbfc8ae636c46e6af242e9d</code> |
+| sensitive_content | <code>(sensitive)</code> | <code>(sensitive)</code> |
+| source |  |  |
+
+</details>
+
+<details>
+<summary>⬜ <strong>terraform_data</strong> independent</summary>
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | 20c2b21a-6f1e-1090-19da-82e3b280b7bb | <code>20c2b21a-6f1e-1090-19da-82e3b280b7bb</code> |
+| input | v2 | <code>v2</code> |
+| output | v2 | <code>v2</code> |
+| triggers_replace |  |  |
+
+</details>
+
+<details>
+<summary>🔧 <strong>terraform_data</strong> worker_a — changed: input, output</summary>
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | ace0ebd5-48de-d27b-6d94-f19a86be0a00 | <code>ace0ebd5-48de-d27b-6d94-f19a86be0a00</code> |
+| input | alpha | <code><ins style="background:#dfd">(known after </ins>a<ins style="background:#dfd">pp</ins>l<ins style="background:#dfd">y)</ins><del style="background:#fdd">pha</del></code> |
+| output | alpha | <code><ins style="background:#dfd">(known after </ins>a<ins style="background:#dfd">pp</ins>l<ins style="background:#dfd">y)</ins><del style="background:#fdd">pha</del></code> |
+| triggers_replace |  |  |
+
+</details>
+
+<details>
+<summary>🔧 <strong>terraform_data</strong> worker_b — changed: input, output</summary>
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | 01c4beeb-a87a-e41f-9621-ff99a490ca12 | <code>01c4beeb-a87a-e41f-9621-ff99a490ca12</code> |
+| input | bravo | <code><del style="background:#fdd">b</del><ins style="background:#dfd">(known afte</ins>r<ins style="background:#dfd"> </ins>a<ins style="background:#dfd">pply)</ins><del style="background:#fdd">vo</del></code> |
+| output | bravo | <code><del style="background:#fdd">b</del><ins style="background:#dfd">(known afte</ins>r<ins style="background:#dfd"> </ins>a<ins style="background:#dfd">pply)</ins><del style="background:#fdd">vo</del></code> |
+| triggers_replace |  |  |
+
+</details>
+
+<details>
+<summary>🔧 <strong>terraform_data</strong> worker_c — changed: input, output</summary>
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | c2d0504e-52a4-39b3-e6ff-853bf2919413 | <code>c2d0504e-52a4-39b3-e6ff-853bf2919413</code> |
+| input | charlie | <code><del style="background:#fdd">ch</del><ins style="background:#dfd">(known </ins>a<ins style="background:#dfd">fte</ins>r<ins style="background:#dfd"> app</ins>l<ins style="background:#dfd">y)</ins><del style="background:#fdd">ie</del></code> |
+| output | charlie | <code><del style="background:#fdd">ch</del><ins style="background:#dfd">(known </ins>a<ins style="background:#dfd">fte</ins>r<ins style="background:#dfd"> app</ins>l<ins style="background:#dfd">y)</ins><del style="background:#fdd">ie</del></code> |
+| triggers_replace |  |  |
+
+</details>
+
+## Outputs
+
+| Output | Action | Before | After |
+| --- | --- | --- | --- |
+| config_value | 🔧 | <code>{"worker_a":"alpha","worker_b":"bravo","worker_c":"charlie"}</code> | _(known after apply)_ |
+"
+`;
+
+exports[`planToMarkdown integration > tofu/deferred-data-source/2 > renders without error and matches snapshot [summary-template] 1`] = `
+"## Plan Summary
+
+| Action | Count |
+| --- | --- |
+| 🔧 Change | 3 |
+| ♻️ Replace | 1 |
+| **Total** | **4** |
 "
 `;
 
