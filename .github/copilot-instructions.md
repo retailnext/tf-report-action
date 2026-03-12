@@ -144,9 +144,6 @@ and opens the file in the default browser.
 # Render a fixture plan
 npm run render -- tests/fixtures/generated/terraform/null-lifecycle/2/plan.json
 
-# Render an apply report (plan + apply output)
-npm run render -- plan.json --apply apply.jsonl --title "PR #42"
-
 # With options
 npm run render -- plan.json --title "PR #42" --template summary
 npm run render -- plan.json --show-unchanged --diff-format simple
@@ -159,7 +156,6 @@ cat plan.json | npm run render --
 
 | Flag | `Options` field / behaviour | Default |
 |---|---|---|
-| `--apply <file>` | Reads apply JSON Lines; calls `applyToMarkdown` instead of `planToMarkdown` | _(plan-only mode)_ |
 | `--title <text>` | `title` | _(none)_ |
 | `--template <default\|summary>` | `template` | `"default"` |
 | `--show-unchanged` | `showUnchangedAttributes` | `false` |
