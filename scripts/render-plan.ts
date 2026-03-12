@@ -2,27 +2,30 @@
 /**
  * scripts/render-plan.ts
  *
- * Renders a Terraform/OpenTofu plan JSON file to a browser-viewable HTML
- * preview. Writes to /tmp/tf-plan-preview.html and opens it in the default
- * browser.
+ * Renders a Terraform/OpenTofu plan JSON file (or apply JSON Lines output) to
+ * a browser-viewable HTML preview. Writes to /tmp/tf-plan-preview.html and
+ * opens it in the default browser.
  *
  * Usage:
  *   npm run render -- path/to/plan.json
+ *   npm run render -- path/to/plan.json --apply path/to/apply.jsonl
  *   npm run render -- path/to/plan.json --template summary --title "My PR"
  *   cat plan.json | npm run render --
  *
  * Flags:
+ *   --apply <file>              Path to apply JSON Lines file (enables apply report mode)
  *   --title <text>              Heading title for the report
  *   --template <default|summary>  Output template (default: "default")
  *   --show-unchanged            Show unchanged attributes
  *   --diff-format <inline|simple> Diff style (default: "inline")
+ *   --no-open                   Write the HTML file but do not open a browser
  *   --help                      Show this help text
  */
 
 import { readFileSync } from "node:fs";
 import { writeFile } from "node:fs/promises";
 import { execSync } from "node:child_process";
-import { planToMarkdown } from "../src/index.js";
+import { planToMarkdown, applyToMarkdown } from "../src/index.js";
 import type { Options } from "../src/index.js";
 
 // ---------------------------------------------------------------------------
@@ -35,30 +38,41 @@ if (args.includes("--help") || args.includes("-h")) {
   console.log(`Usage: npm run render -- [plan.json] [options]
 
 Renders a Terraform/OpenTofu plan JSON file to a browser HTML preview.
-Reads from the given file path, or from stdin if the path is "-" or omitted.
+Reads the plan from the given file path, or from stdin if the path is "-" or omitted.
+
+When --apply is provided, renders an apply report showing what was actually changed,
+with resolved output values, per-resource success/failure, and any errors.
 
 Options:
+  --apply <file>                  Path to apply JSON Lines file (apply report mode)
   --title <text>                  Heading title for the report
   --template <default|summary>    Output template (default: "default")
   --show-unchanged                Show unchanged resource attributes
   --diff-format <inline|simple>   Diff format for attribute changes (default: "inline")
+  --no-open                       Write the HTML file but do not open a browser
   --help                          Show this help text
 
 Examples:
   npm run render -- tests/fixtures/generated/terraform/null-lifecycle/2/plan.json
+  npm run render -- plan.json --apply apply.jsonl --title "PR #42"
   npm run render -- plan.json --template summary --title "PR #42"
   cat plan.json | npm run render --
 `);
   process.exit(0);
 }
 
-function parseArgs(argv: string[]): { file: string | null; options: Options } {
+function parseArgs(argv: string[]): { file: string | null; applyFile: string | null; noOpen: boolean; options: Options } {
   const options: Options = {};
   let file: string | null = null;
+  let applyFile: string | null = null;
+  let noOpen = false;
 
   for (let i = 0; i < argv.length; i++) {
     const arg = argv[i];
     switch (arg) {
+      case "--apply":
+        applyFile = argv[++i];
+        break;
       case "--title":
         options.title = argv[++i];
         break;
@@ -71,6 +85,9 @@ function parseArgs(argv: string[]): { file: string | null; options: Options } {
       case "--diff-format":
         options.diffFormat = argv[++i] as "inline" | "simple";
         break;
+      case "--no-open":
+        noOpen = true;
+        break;
       default:
         if (!arg.startsWith("--") && file === null) {
           file = arg;
@@ -78,10 +95,10 @@ function parseArgs(argv: string[]): { file: string | null; options: Options } {
     }
   }
 
-  return { file, options };
+  return { file, applyFile, noOpen, options };
 }
 
-const { file, options } = parseArgs(args);
+const { file, applyFile, noOpen, options } = parseArgs(args);
 
 // ---------------------------------------------------------------------------
 // Read plan JSON
@@ -106,7 +123,12 @@ try {
 
 let markdown: string;
 try {
-  markdown = planToMarkdown(planJson, options);
+  if (applyFile !== null) {
+    const applyJsonl = readFileSync(applyFile, "utf-8");
+    markdown = applyToMarkdown(planJson, applyJsonl, options);
+  } else {
+    markdown = planToMarkdown(planJson, options);
+  }
 } catch (err) {
   const msg = err instanceof Error ? err.message : String(err);
   process.stderr.write(`Error rendering plan: ${msg}\n`);
@@ -186,21 +208,23 @@ try {
 }
 
 // ---------------------------------------------------------------------------
-// Open in browser
+// Open in browser (suppressed by --no-open)
 // ---------------------------------------------------------------------------
 
-try {
-  // macOS: open, Linux: xdg-open, Windows: start
-  const opener =
-    process.platform === "darwin"
-      ? "open"
-      : process.platform === "win32"
-        ? "start"
-        : "xdg-open";
-  execSync(`${opener} ${outPath}`);
-} catch {
-  // Opening the browser is best-effort; tell the user the path instead
-  process.stderr.write(`Could not open browser automatically. Open: file://${outPath}\n`);
+if (!noOpen) {
+  try {
+    // macOS: open, Linux: xdg-open, Windows: start
+    const opener =
+      process.platform === "darwin"
+        ? "open"
+        : process.platform === "win32"
+          ? "start"
+          : "xdg-open";
+    execSync(`${opener} ${outPath}`);
+  } catch {
+    // Opening the browser is best-effort; tell the user the path instead
+    process.stderr.write(`Could not open browser automatically. Open: file://${outPath}\n`);
+  }
 }
 
 console.log(`Preview written to ${outPath}`);

@@ -144,6 +144,9 @@ and opens the file in the default browser.
 # Render a fixture plan
 npm run render -- tests/fixtures/generated/terraform/null-lifecycle/2/plan.json
 
+# Render an apply report (plan + apply output)
+npm run render -- plan.json --apply apply.jsonl --title "PR #42"
+
 # With options
 npm run render -- plan.json --title "PR #42" --template summary
 npm run render -- plan.json --show-unchanged --diff-format simple
@@ -152,16 +155,29 @@ npm run render -- plan.json --show-unchanged --diff-format simple
 cat plan.json | npm run render --
 ```
 
-**Supported flags** (each maps 1:1 to an `Options` field):
+**Supported flags** (each maps 1:1 to an `Options` field or a render-script behaviour):
 
-| Flag | `Options` field | Default |
+| Flag | `Options` field / behaviour | Default |
 |---|---|---|
+| `--apply <file>` | Reads apply JSON Lines; calls `applyToMarkdown` instead of `planToMarkdown` | _(plan-only mode)_ |
 | `--title <text>` | `title` | _(none)_ |
 | `--template <default\|summary>` | `template` | `"default"` |
 | `--show-unchanged` | `showUnchangedAttributes` | `false` |
 | `--diff-format <inline\|simple>` | `diffFormat` | `"inline"` |
+| `--no-open` | Suppress browser opening (write HTML only) | _(browser opens by default)_ |
 
 **Maintenance rule:** When `Options` (defined across `src/renderer/options.ts` and
 `src/builder/options.ts`) gains, loses, or renames a field, update `parseArgs()` in
 `scripts/render-plan.ts` to keep the CLI flags in sync. The flag table above must
 also be kept current.
+
+**Agent constraint — browser opening is forbidden:** Agents must **never** run any
+command that causes the user's browser to open. This includes:
+- `npm run render` (without `--no-open`) — always pass `--no-open` when running this script
+- Any shell command invoking `open`, `xdg-open`, or `start` with a file or URL
+- Any other script or tool that has a side effect of opening a browser window
+
+When running `npm run render` as part of any task, always append `--no-open`:
+```bash
+npm run render -- plan.json --no-open
+```
