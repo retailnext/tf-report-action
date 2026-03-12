@@ -128,3 +128,40 @@ them, because attribute values may be sensitive. This means:
 
 The only permitted pattern for obtaining plan input in `tests/integration/` is
 reading a file from `tests/fixtures/generated/<tool>/<workspace>/<N>/plan.json`.
+
+---
+
+## Development Tools
+
+### `scripts/render-plan.ts` — local HTML preview
+
+`scripts/render-plan.ts` is a developer tool that renders a plan JSON file to a
+browser-viewable HTML page. It calls `planToMarkdown()`, writes the result to
+`/tmp/tf-plan-preview.html` (using **marked** and **DOMPurify** from jsDelivr CDN),
+and opens the file in the default browser.
+
+```bash
+# Render a fixture plan
+npm run render -- tests/fixtures/generated/terraform/null-lifecycle/2/plan.json
+
+# With options
+npm run render -- plan.json --title "PR #42" --template summary
+npm run render -- plan.json --show-unchanged --diff-format simple
+
+# From stdin
+cat plan.json | npm run render --
+```
+
+**Supported flags** (each maps 1:1 to an `Options` field):
+
+| Flag | `Options` field | Default |
+|---|---|---|
+| `--title <text>` | `title` | _(none)_ |
+| `--template <default\|summary>` | `template` | `"default"` |
+| `--show-unchanged` | `showUnchangedAttributes` | `false` |
+| `--diff-format <inline\|simple>` | `diffFormat` | `"inline"` |
+
+**Maintenance rule:** When `Options` (defined across `src/renderer/options.ts` and
+`src/builder/options.ts`) gains, loses, or renames a field, update `parseArgs()` in
+`scripts/render-plan.ts` to keep the CLI flags in sync. The flag table above must
+also be kept current.
