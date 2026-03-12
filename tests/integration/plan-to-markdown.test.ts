@@ -48,7 +48,7 @@ beforeAll(() => {
   if (fixtures.length === 0) {
     throw new Error(
       "No fixture plan JSON files found under tests/fixtures/generated/. " +
-        "Run: bash scripts/generate-fixture-plans.sh",
+        "Run: bash scripts/generate-fixtures.sh",
     );
   }
 });

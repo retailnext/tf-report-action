@@ -101,7 +101,7 @@ them, because attribute values may be sensitive. This means:
 - Coverage thresholds: 90% lines/functions/statements, 85% branches.
 - Run `npm run test:coverage` locally; CI runs `npm run test:coverage:ci`.
 - Use the `/add-fixture-workspace` skill to add fixture workspaces.
-- Use the `/generate-fixture-plans` skill to regenerate fixture plan JSON files.
+- Use the `/generate-fixtures` skill to regenerate fixture JSON files.
 
 ### Integration Test Rule (non-negotiable)
 

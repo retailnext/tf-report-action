@@ -1,20 +1,23 @@
 #!/usr/bin/env bash
-# scripts/generate-fixture-plans.sh
+# scripts/generate-fixtures.sh
 #
-# Generates Terraform/OpenTofu plan JSON for every fixture workspace under
-# tests/fixtures/, for both terraform and tofu. Both tools are always run —
-# there is no option to generate output for only one tool.
+# Generates Terraform/OpenTofu plan and apply outputs for every fixture
+# workspace under tests/fixtures/, for both terraform and tofu. Both tools
+# are always run — there is no option to generate output for only one tool.
 #
 # Usage:
-#   bash scripts/generate-fixture-plans.sh                     # all workspaces
-#   bash scripts/generate-fixture-plans.sh --workspace <name>  # single workspace
+#   bash scripts/generate-fixtures.sh                     # all workspaces
+#   bash scripts/generate-fixtures.sh --workspace <name>  # single workspace
 #
 # Prerequisites:
 #   Both `terraform` and `tofu` must be on PATH.
 #
-# Output:
-#   tests/fixtures/generated/<tool>/<workspace>/<stage>/plan.json
-#   tests/fixtures/generated/<tool>/<workspace>/<stage>/apply.jsonl
+# Output (per stage):
+#   tests/fixtures/generated/<tool>/<workspace>/<stage>/init.jsonl       — init -json (JSON Lines)
+#   tests/fixtures/generated/<tool>/<workspace>/<stage>/validate.json    — validate -json (single JSON object)
+#   tests/fixtures/generated/<tool>/<workspace>/<stage>/plan-log.jsonl   — plan -json (JSON Lines)
+#   tests/fixtures/generated/<tool>/<workspace>/<stage>/plan.json        — show -json tfplan (single JSON object)
+#   tests/fixtures/generated/<tool>/<workspace>/<stage>/apply.jsonl      — apply -json (JSON Lines)
 
 set -euo pipefail
 
@@ -112,16 +115,19 @@ run_tool_workspace() {
 
     mkdir -p "$out_dir"
 
-    # init (only needed once; subsequent stages reuse .terraform/)
+    # init → init.jsonl
     if [[ ! -d "$tool_tmp/.terraform" ]]; then
-      "$tool" -chdir="$tool_tmp" init -input=false -no-color >/dev/null
+      "$tool" -chdir="$tool_tmp" init -json -input=false -no-color > "$out_dir/init.jsonl"
     else
       # Re-init to pick up any provider changes (idempotent)
-      "$tool" -chdir="$tool_tmp" init -upgrade -input=false -no-color >/dev/null
+      "$tool" -chdir="$tool_tmp" init -json -upgrade -input=false -no-color > "$out_dir/init.jsonl"
     fi
 
-    # plan
-    "$tool" -chdir="$tool_tmp" plan -out=tfplan -input=false -no-color >/dev/null
+    # validate → validate.json
+    "$tool" -chdir="$tool_tmp" validate -json > "$out_dir/validate.json"
+
+    # plan → plan-log.jsonl (JSON Lines) + tfplan binary
+    "$tool" -chdir="$tool_tmp" plan -json -out=tfplan -input=false -no-color > "$out_dir/plan-log.jsonl"
 
     # show → plan.json
     "$tool" -chdir="$tool_tmp" show -json tfplan > "$out_dir/plan.json"

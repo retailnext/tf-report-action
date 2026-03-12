@@ -1,10 +1,10 @@
 ---
-name: generate-fixture-plans
-description: Run the fixture plan generation script to produce or refresh the Terraform/OpenTofu plan JSON files used by integration tests. Use this when asked to regenerate fixture plans, refresh test data, or update fixture JSON files.
+name: generate-fixtures
+description: Run the fixture generation script to produce or refresh the Terraform/OpenTofu output files used by integration tests. Use this when asked to regenerate fixtures, refresh test data, or update fixture JSON files.
 ---
 
-The fixture plan generation script runs `terraform` and `tofu` against every fixture
-workspace and captures their plan and apply JSON outputs. Both tools are **always** run
+The fixture generation script runs `terraform` and `tofu` against every fixture
+workspace and captures their machine-readable outputs. Both tools are **always** run
 together — there is no option to generate output for only one tool.
 
 ## Prerequisites
@@ -22,12 +22,12 @@ If either is missing, install it before proceeding.
 
 **Regenerate all fixtures (both tools, all workspaces):**
 ```bash
-bash scripts/generate-fixture-plans.sh
+bash scripts/generate-fixtures.sh
 ```
 
 **Regenerate a single workspace (still runs both tools):**
 ```bash
-bash scripts/generate-fixture-plans.sh --workspace <name>
+bash scripts/generate-fixtures.sh --workspace <name>
 ```
 
 The script is idempotent — safe to re-run at any time.
@@ -41,14 +41,12 @@ For each workspace × each tool (`terraform` and `tofu`):
    a. Copies `.tf` files and supporting HCL from `tests/fixtures/<workspace>/<N>/`
       into the temporary directory (files not present in stage N are carried forward
       from the previous stage)
-   b. Runs `<tool> init`
-   c. Runs `<tool> plan -out=tfplan`
-   d. Runs `<tool> show -json tfplan` → writes to
-      `tests/fixtures/generated/<tool>/<workspace>/<N>/plan.json`
-   e. Runs `<tool> apply -json -auto-approve tfplan` → writes to
-      `tests/fixtures/generated/<tool>/<workspace>/<N>/apply.jsonl`
-   f. Deletes everything in the temporary directory **except** `.terraform/`,
-      `.terraform.lock.hcl`, and `*.tfstate` (so state carries forward to the next stage)
+   b. Runs `<tool> init -json` → writes to `init.jsonl`
+   c. Runs `<tool> validate -json` → writes to `validate.json`
+   d. Runs `<tool> plan -json -out=tfplan` → writes to `plan-log.jsonl`
+   e. Runs `<tool> show -json tfplan` → writes to `plan.json`
+   f. Runs `<tool> apply -json -auto-approve tfplan` → writes to `apply.jsonl`
+   g. State carries forward to the next stage
 3. Removes the temporary directory
 
 ## Output Location
@@ -56,19 +54,17 @@ For each workspace × each tool (`terraform` and `tofu`):
 Generated files land at:
 ```
 tests/fixtures/generated/
-  terraform/
+  <tool>/
     <workspace>/
       <stage>/
-        plan.json
-        apply.jsonl
-  tofu/
-    <workspace>/
-      <stage>/
-        plan.json
-        apply.jsonl
+        init.jsonl        ← init -json (JSON Lines)
+        validate.json     ← validate -json (single JSON object)
+        plan-log.jsonl    ← plan -json (JSON Lines)
+        plan.json         ← show -json (single JSON object)
+        apply.jsonl       ← apply -json (JSON Lines)
 ```
 
-These JSON files **are** committed to the repository.
+These files **are** committed to the repository.
 
 ## After Running
 
@@ -87,12 +83,12 @@ These JSON files **are** committed to the repository.
 4. Review the snapshot diffs carefully — they show the exact markdown output that
    changed. Confirm every change is intentional.
 
-5. Commit the updated JSON files, any updated snapshot files, and any updated
+5. Commit the updated fixture files, any updated snapshot files, and any updated
    `vitest.integration.config.ts` thresholds together in one commit.
 
 ## Integration Test Input Rule
 
-Integration tests may **only** load plan JSON that was produced by actually running
+Integration tests may **only** load inputs that were produced by actually running
 `terraform` or `tofu` against a fixture workspace. No inline-constructed or
 manually-crafted plan objects are permitted in `tests/integration/` — those belong in
 `tests/unit/` instead. See `.github/copilot-instructions.md` for the full reviewer rule.
