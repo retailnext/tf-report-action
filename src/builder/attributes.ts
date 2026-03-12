@@ -10,10 +10,9 @@ import type { BuildOptions } from "./options.js";
 import type { ConfigRefIndex } from "./config-refs.js";
 import { flatten } from "../flattener/index.js";
 import { isSensitive } from "../sensitivity/index.js";
+import { SENSITIVE_MASK, KNOWN_AFTER_APPLY } from "../model/sentinels.js";
 
 const LARGE_LINE_THRESHOLD = 3;
-const SENSITIVE_MASK = "(sensitive)";
-const KNOWN_AFTER_APPLY = "(known after apply)";
 
 /**
  * Converts an AttributeShadow value to a flat map suitable for sensitivity/unknown checks.
@@ -171,4 +170,4 @@ export function buildAttributeChanges(
   return result;
 }
 
-export { SENSITIVE_MASK, KNOWN_AFTER_APPLY };
+export { SENSITIVE_MASK, KNOWN_AFTER_APPLY } from "../model/sentinels.js";

@@ -6,6 +6,7 @@ import { renderSummary } from "./summary.js";
 import { renderResource } from "./resource.js";
 import { ACTION_SYMBOLS } from "../model/plan-action.js";
 import { resolveTemplate } from "../template/index.js";
+import { KNOWN_AFTER_APPLY } from "../model/sentinels.js";
 
 /**
  * Renders a Report model to a markdown string.
@@ -73,9 +74,11 @@ function renderOutputTable(
         : "";
     const after = output.isSensitive
       ? MarkdownWriter.inlineCode("(sensitive)")
-      : output.after !== null
-        ? MarkdownWriter.inlineCode(MarkdownWriter.escapeCell(output.after))
-        : "";
+      : output.after === KNOWN_AFTER_APPLY
+        ? `_${KNOWN_AFTER_APPLY}_`
+        : output.after !== null
+          ? MarkdownWriter.inlineCode(MarkdownWriter.escapeCell(output.after))
+          : "";
     writer.tableRow([
       MarkdownWriter.escapeCell(output.name),
       symbol,

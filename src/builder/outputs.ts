@@ -1,9 +1,13 @@
 import type { Plan } from "../tfjson/plan.js";
 import type { OutputChange } from "../model/output.js";
 import { determineAction } from "./action.js";
+import { KNOWN_AFTER_APPLY } from "../model/sentinels.js";
 
 /**
  * Maps plan.output_changes to OutputChange[]. Masks sensitive outputs.
+ * Outputs whose value is not yet known (after_unknown === true) use the
+ * KNOWN_AFTER_APPLY sentinel so the renderer can display it appropriately
+ * rather than leaving the After cell blank.
  */
 export function buildOutputChanges(plan: Plan): OutputChange[] {
   const outputChanges = plan.output_changes;
@@ -23,9 +27,16 @@ export function buildOutputChanges(plan: Plan): OutputChange[] {
       ? null
       : valueToString(change.before ?? null);
 
-    const after = isSensitive
-      ? null
-      : valueToString(change.after ?? null);
+    let after: string | null;
+    if (isSensitive) {
+      after = null;
+    } else if (change.after_unknown === true) {
+      // The output value will only be known after apply — show the sentinel
+      // rather than leaving the cell blank.
+      after = KNOWN_AFTER_APPLY;
+    } else {
+      after = valueToString(change.after ?? null);
+    }
 
     result.push({
       name,
