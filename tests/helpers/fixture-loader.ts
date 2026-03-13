@@ -174,6 +174,48 @@ export function discoverNoShowStepsFixtures(): StepsFixture[] {
 }
 
 /**
+ * Discovers fixtures with `apply-no-show-steps.json` — has apply but no
+ * show-plan. Forces "apply present but no structured plan" path.
+ */
+export function discoverApplyNoShowStepsFixtures(): StepsFixture[] {
+  const fixtures: StepsFixture[] = [];
+
+  walkGeneratedStages((stageDir, label) => {
+    const stepsPath = join(stageDir, "apply-no-show-steps.json");
+    if (existsSync(stepsPath)) {
+      fixtures.push({
+        label: `${label}/apply-no-show`,
+        stepsJson: readFileSync(stepsPath, "utf-8"),
+        fixtureDir: resolve(stageDir),
+      });
+    }
+  });
+
+  return fixtures;
+}
+
+/**
+ * Discovers fixtures with `apply-only-steps.json` — only init, validate,
+ * and apply (no plan, no show-plan). Exercises Tier 3 with only apply output.
+ */
+export function discoverApplyOnlyStepsFixtures(): StepsFixture[] {
+  const fixtures: StepsFixture[] = [];
+
+  walkGeneratedStages((stageDir, label) => {
+    const stepsPath = join(stageDir, "apply-only-steps.json");
+    if (existsSync(stepsPath)) {
+      fixtures.push({
+        label: `${label}/apply-only`,
+        stepsJson: readFileSync(stepsPath, "utf-8"),
+        fixtureDir: resolve(stageDir),
+      });
+    }
+  });
+
+  return fixtures;
+}
+
+/**
  * Discovers manual fixtures (hand-crafted `steps.json` under `tests/fixtures/manual/`).
  */
 export function discoverManualStepsFixtures(): StepsFixture[] {

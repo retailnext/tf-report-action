@@ -207,6 +207,46 @@ build_steps_json() {
   noshow_json+="}"
   echo "$noshow_json" > "$out_dir/no-show-steps.json"
 
+  # Generate apply-no-show-steps.json — omits show-plan but keeps apply.
+  # Exercises "apply available but no structured plan" path.
+  local ans_json="{"
+  local afirst=true
+  while IFS='|' read -r step_id outcome conclusion exit_code_val stdout_file stderr_file; do
+    [[ -z "$step_id" ]] && continue
+    [[ "$step_id" == "show-plan" ]] && continue
+    if $afirst; then afirst=false; else ans_json+=","; fi
+    ans_json+="\"${step_id}\":{\"outcome\":\"${outcome}\",\"conclusion\":\"${conclusion}\",\"outputs\":{\"exit_code\":\"${exit_code_val}\""
+    if [[ -n "$stdout_file" && -s "$out_dir/$stdout_file" ]]; then
+      ans_json+=",\"stdout_file\":\"${stdout_file}\""
+    fi
+    if [[ -n "$stderr_file" && -s "$out_dir/$stderr_file" ]]; then
+      ans_json+=",\"stderr_file\":\"${stderr_file}\""
+    fi
+    ans_json+="}}"
+  done < "$tmp_file"
+  ans_json+="}"
+  echo "$ans_json" > "$out_dir/apply-no-show-steps.json"
+
+  # Generate apply-only-steps.json — only init, validate, and apply.
+  # Exercises "no plan, no show-plan, only apply" path (Tier 3 apply-only).
+  local ao_json="{"
+  local ofirst=true
+  while IFS='|' read -r step_id outcome conclusion exit_code_val stdout_file stderr_file; do
+    [[ -z "$step_id" ]] && continue
+    [[ "$step_id" == "plan" || "$step_id" == "show-plan" ]] && continue
+    if $ofirst; then ofirst=false; else ao_json+=","; fi
+    ao_json+="\"${step_id}\":{\"outcome\":\"${outcome}\",\"conclusion\":\"${conclusion}\",\"outputs\":{\"exit_code\":\"${exit_code_val}\""
+    if [[ -n "$stdout_file" && -s "$out_dir/$stdout_file" ]]; then
+      ao_json+=",\"stdout_file\":\"${stdout_file}\""
+    fi
+    if [[ -n "$stderr_file" && -s "$out_dir/$stderr_file" ]]; then
+      ao_json+=",\"stderr_file\":\"${stderr_file}\""
+    fi
+    ao_json+="}}"
+  done < "$tmp_file"
+  ao_json+="}"
+  echo "$ao_json" > "$out_dir/apply-only-steps.json"
+
   rm -f "$tmp_file"
 }
 

@@ -131,8 +131,15 @@ function reportFromStepsInner(
 
   // Collect workflow issues (failed init/validate)
   const workflowIssues: Section[] = [];
-  collectFailedStepIssue(initStep, initStepId, readerOpts, workflowIssues);
-  collectFailedStepIssue(validateStep, validateStepId, readerOpts, workflowIssues);
+  let hasStepFailures = false;
+  if (initStep && getStepOutcome(initStep) === "failure") {
+    collectStepIssue(initStep, initStepId, readerOpts, workflowIssues);
+    hasStepFailures = true;
+  }
+  if (validateStep && getStepOutcome(validateStep) === "failure") {
+    collectStepIssue(validateStep, validateStepId, readerOpts, workflowIssues);
+    hasStepFailures = true;
+  }
 
   // Determine report tier
   const tier = detectTier(showPlanStep, planStep, applyStep, readerOpts);
@@ -143,25 +150,58 @@ function reportFromStepsInner(
 
   switch (tier.kind) {
     case "tier1": {
-      // Full structured report from show-plan JSON
+      // Step 1: Parse the plan JSON (required for any structured report)
+      let plan: ReturnType<typeof parsePlan>;
       try {
-        const plan = parsePlan(tier.showPlanJson);
-        if (applyStep && getStepOutcome(applyStep) !== "skipped") {
-          // Apply mode
-          const applyRead = readStepStdout(applyStep, readerOpts);
-          if (applyRead.content !== undefined) {
+        plan = parsePlan(tier.showPlanJson);
+      } catch (planErr: unknown) {
+        // Plan parse failed — show-plan step produced unreadable output.
+        // Treat show-plan as a generic step with a diagnostic, then check
+        // whether we can fall back to Tier 3 with apply/plan text output.
+        if (showPlanStep) {
+          collectStepIssue(
+            showPlanStep,
+            showPlanStepId,
+            readerOpts,
+            workflowIssues,
+            `Plan output could not be parsed: ${planErr instanceof Error ? planErr.message : "unknown error"}`,
+          );
+        }
+        // Fall through to Tier 3 if plan or apply steps have raw output
+        if (planStep || applyStep) {
+          const fallbackTier = detectTier(undefined, planStep, applyStep, readerOpts);
+          if (fallbackTier.kind === "tier3") {
+            return renderTextFallback(fallbackTier, workspace, env, knownStepIds, steps, workflowIssues, maxOutputLength);
+          }
+        }
+        return renderErrorReport("Plan Processing Error", "Plan output could not be parsed", workspace, maxOutputLength, steps);
+      }
+
+      // Step 2: If apply step is present, try to parse its JSONL output
+      if (applyStep && getStepOutcome(applyStep) !== "skipped") {
+        isApplyMode = true;
+        const applyRead = readStepStdout(applyStep, readerOpts);
+        if (applyRead.content !== undefined) {
+          try {
             const messages = parseUILog(applyRead.content);
             report = buildApplyReport(plan, messages, options);
-            isApplyMode = true;
-          } else {
+          } catch (applyErr: unknown) {
+            // Apply output couldn't be parsed — fall back to plan-only report
+            // and show the apply step as a generic IaC step with its raw output
             report = buildReport(plan, options);
+            collectStepIssue(
+              applyStep,
+              applyStepId,
+              readerOpts,
+              workflowIssues,
+              `Apply output could not be parsed as structured data: ${applyErr instanceof Error ? applyErr.message : "unknown error"}`,
+            );
           }
         } else {
           report = buildReport(plan, options);
         }
-      } catch (err: unknown) {
-        const msg = err instanceof Error ? err.message : "Failed to parse plan";
-        return renderErrorReport("Plan Processing Error", msg, workspace, maxOutputLength);
+      } else {
+        report = buildReport(plan, options);
       }
       break;
     }
@@ -188,7 +228,7 @@ function reportFromStepsInner(
   }
 
   // Title
-  const title = buildTitle(report, isApplyMode, workspace, workflowIssues);
+  const title = buildTitle(report, isApplyMode, workspace, hasStepFailures);
   sections.push({ id: "title", full: `## ${title}\n\n`, fixed: true });
 
   // Workflow issues
@@ -277,11 +317,10 @@ function buildTitle(
   report: Report,
   isApply: boolean,
   workspace: string | undefined,
-  issues: Section[],
+  hasStepFailures: boolean,
 ): string {
   const hasFailures = report.summary.failures.length > 0;
-  const hasIssues = issues.length > 0;
-  const icon = hasFailures || hasIssues ? STATUS_FAILURE : STATUS_SUCCESS;
+  const icon = hasFailures || hasStepFailures ? STATUS_FAILURE : STATUS_SUCCESS;
   const wsPrefix = workspace ? `\`${workspace}\` ` : "";
 
   if (isApply) {
@@ -298,11 +337,11 @@ function buildTitle(
 
   // Plan mode
   const totalActions = report.summary.actions.reduce((sum, g) => sum + g.total, 0);
-  if (totalActions === 0 && !hasFailures && !hasIssues) {
+  if (totalActions === 0 && !hasFailures && !hasStepFailures) {
     return `${icon} ${wsPrefix}No Changes`;
   }
 
-  if (hasFailures || hasIssues) {
+  if (hasFailures || hasStepFailures) {
     return `${icon} ${wsPrefix}Plan Failed`;
   }
 
@@ -434,20 +473,31 @@ function readStepStderrForDisplay(step: StepData, readerOpts: ReaderOptions): St
   return readStepFile(step, OUTPUT_STDERR_FILE, readerOpts, true);
 }
 
-function collectFailedStepIssue(
-  step: StepData | undefined,
+/**
+ * Collects a step's status and raw output into an issue section. Works for
+ * any step outcome (not just failures). An optional `diagnostic` message is
+ * rendered as a blockquote note explaining why this step appears here
+ * (e.g., "Apply output could not be parsed as structured data").
+ */
+function collectStepIssue(
+  step: StepData,
   stepId: string,
   readerOpts: ReaderOptions,
   issues: Section[],
+  diagnostic?: string,
 ): void {
-  if (!step) return;
   const outcome = getStepOutcome(step);
-  if (outcome !== "failure") return;
+  const icon = outcome === "failure" ? STATUS_FAILURE : DIAGNOSTIC_WARNING;
+  const verb = outcome === "failure" ? "failed" : outcome;
+
+  let content = `### ${icon} \`${stepId}\` ${verb}\n\n`;
+  if (diagnostic) {
+    content += `> ${diagnostic}\n\n`;
+  }
 
   const stdoutRead = readStepStdoutForDisplay(step, readerOpts);
   const stderrRead = readStepStderrForDisplay(step, readerOpts);
 
-  let content = `### ${STATUS_FAILURE} \`${stepId}\` failed\n\n`;
   if (stdoutRead.content) {
     const displayContent = stdoutRead.truncated ? stdoutRead.content + "\n… (truncated)" : stdoutRead.content;
     content += `<details open>\n<summary>stdout</summary>\n\n\`\`\`\n${displayContent}\n\`\`\`\n\n</details>\n\n`;
@@ -467,7 +517,7 @@ function collectFailedStepIssue(
   issues.push({
     id: `issue-${stepId}`,
     full: content,
-    compact: `### ${STATUS_FAILURE} \`${stepId}\` failed\n\n`,
+    compact: `### ${icon} \`${stepId}\` ${verb}\n\n`,
   });
 }
 
@@ -478,6 +528,7 @@ function renderErrorReport(
   message: string,
   workspace: string | undefined,
   maxOutputLength: number,
+  steps?: Steps,
 ): string {
   const sections: Section[] = [];
   if (workspace) {
@@ -490,6 +541,14 @@ function renderErrorReport(
   const wsPrefix = workspace ? `\`${workspace}\` ` : "";
   sections.push({ id: "title", full: `## ${STATUS_FAILURE} ${wsPrefix}${heading}\n\n`, fixed: true });
   sections.push({ id: "message", full: `${message}\n\n` });
+
+  if (steps) {
+    const stepLines = renderStepStatusList(steps, new Set());
+    if (stepLines.length > 0) {
+      sections.push({ id: "step-statuses", full: `### Steps\n\n${stepLines}\n` });
+    }
+  }
+
   return composeSections(sections, maxOutputLength).output;
 }
 

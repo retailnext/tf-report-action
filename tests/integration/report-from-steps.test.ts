@@ -5,6 +5,8 @@ import {
   discoverStepsFixtures,
   discoverPlanStepsFixtures,
   discoverNoShowStepsFixtures,
+  discoverApplyNoShowStepsFixtures,
+  discoverApplyOnlyStepsFixtures,
   discoverManualStepsFixtures,
   resolveStepFilePaths,
 } from "../helpers/fixture-loader.js";
@@ -14,6 +16,8 @@ import {
 const generatedFixtures = discoverStepsFixtures();
 const planOnlyFixtures = discoverPlanStepsFixtures();
 const noShowFixtures = discoverNoShowStepsFixtures();
+const applyNoShowFixtures = discoverApplyNoShowStepsFixtures();
+const applyOnlyFixtures = discoverApplyOnlyStepsFixtures();
 
 beforeAll(() => {
   if (generatedFixtures.length === 0) {
@@ -31,6 +35,18 @@ beforeAll(() => {
   if (noShowFixtures.length === 0) {
     throw new Error(
       "No no-show-steps.json fixtures found under tests/fixtures/generated/. " +
+        "Run: bash scripts/generate-fixtures.sh",
+    );
+  }
+  if (applyNoShowFixtures.length === 0) {
+    throw new Error(
+      "No apply-no-show-steps.json fixtures found under tests/fixtures/generated/. " +
+        "Run: bash scripts/generate-fixtures.sh",
+    );
+  }
+  if (applyOnlyFixtures.length === 0) {
+    throw new Error(
+      "No apply-only-steps.json fixtures found under tests/fixtures/generated/. " +
         "Run: bash scripts/generate-fixtures.sh",
     );
   }
@@ -124,6 +140,66 @@ describe("reportFromSteps integration — no-show fixtures (Tier 3)", () => {
         expect(result).not.toContain("Plan Summary");
         // Should have either raw command output or a note about unavailable output
         expect(result).toMatch(/raw command output|No readable output/);
+      });
+    });
+  }
+});
+
+// ---------- Apply-no-show fixtures (apply present, no show-plan → Tier 3 with apply) ----------
+
+describe("reportFromSteps integration — apply-no-show fixtures", () => {
+  for (const { label, stepsJson, fixtureDir } of applyNoShowFixtures) {
+    describe(label, () => {
+      it("renders without error and matches snapshot", () => {
+        const resolved = resolveStepFilePaths(stepsJson, fixtureDir);
+        const options: ReportOptions = {
+          allowedDirs: [fixtureDir],
+          env: NO_GITHUB_ENV,
+        };
+        const result = reportFromSteps(resolved, options);
+        expect(result).toMatchSnapshot();
+      });
+
+      it("includes output in Tier 3", () => {
+        const resolved = resolveStepFilePaths(stepsJson, fixtureDir);
+        const options: ReportOptions = {
+          allowedDirs: [fixtureDir],
+          env: NO_GITHUB_ENV,
+        };
+        const result = reportFromSteps(resolved, options);
+        // Should have plan output, apply output, or a note about unavailable output
+        expect(result).toMatch(/Plan Output|Apply Output|No readable output|raw command output/);
+      });
+    });
+  }
+});
+
+// ---------- Apply-only fixtures (init+validate+apply, no plan/show → Tier 3 apply-only) ----------
+
+describe("reportFromSteps integration — apply-only fixtures", () => {
+  for (const { label, stepsJson, fixtureDir } of applyOnlyFixtures) {
+    describe(label, () => {
+      it("renders without error and matches snapshot", () => {
+        const resolved = resolveStepFilePaths(stepsJson, fixtureDir);
+        const options: ReportOptions = {
+          allowedDirs: [fixtureDir],
+          env: NO_GITHUB_ENV,
+        };
+        const result = reportFromSteps(resolved, options);
+        expect(result).toMatchSnapshot();
+      });
+
+      it("produces Tier 3 output with apply content", () => {
+        const resolved = resolveStepFilePaths(stepsJson, fixtureDir);
+        const options: ReportOptions = {
+          allowedDirs: [fixtureDir],
+          env: NO_GITHUB_ENV,
+        };
+        const result = reportFromSteps(resolved, options);
+        // No plan step means no Plan Output section
+        expect(result).not.toContain("Plan Output");
+        // Should have either apply output or note about unavailable output
+        expect(result).toMatch(/Apply Output|No readable output|Apply/);
       });
     });
   }
@@ -275,6 +351,58 @@ describe("reportFromSteps integration — error fixture scenarios", () => {
       },
     });
     expect(result).toContain("https://github.com/owner/repo/actions/runs/99999/attempts/2");
+  });
+
+  it("no-json-flags: shows structured plan + apply as generic step on parse failure", () => {
+    const fixture = generatedFixtures.find((f) =>
+      f.label.includes("no-json-flags/0"),
+    );
+    expect(fixture).toBeDefined();
+    const resolved = resolveStepFilePaths(fixture!.stepsJson, fixture!.fixtureDir);
+    const result = reportFromSteps(resolved, {
+      allowedDirs: [fixture!.fixtureDir],
+      env: NO_GITHUB_ENV,
+    });
+    // Should show structured plan (Tier 1 plan-only fallback)
+    expect(result).toContain("Plan Summary");
+    // Apply should be shown as a generic step with diagnostic
+    expect(result).toContain("could not be parsed");
+    expect(result).toContain("`apply`");
+    // Title should reflect apply (not plan) since apply ran
+    expect(result).toContain("Apply:");
+    // Title should NOT be failure since apply succeeded
+    expect(result).toContain("✅");
+  });
+
+  it("apply-no-show: shows apply raw output in Tier 3 (no structured plan)", () => {
+    const fixture = applyNoShowFixtures.find((f) =>
+      f.label.includes("null-lifecycle") && f.label.includes("/2/"),
+    );
+    expect(fixture).toBeDefined();
+    const resolved = resolveStepFilePaths(fixture!.stepsJson, fixture!.fixtureDir);
+    const result = reportFromSteps(resolved, {
+      allowedDirs: [fixture!.fixtureDir],
+      env: NO_GITHUB_ENV,
+    });
+    // Should show Tier 3 with apply content
+    expect(result).toContain("Apply Output");
+    expect(result).toContain("raw command output");
+  });
+
+  it("apply-only: shows only apply output with no plan section", () => {
+    const fixture = applyOnlyFixtures.find((f) =>
+      f.label.includes("null-lifecycle") && f.label.includes("/2/"),
+    );
+    expect(fixture).toBeDefined();
+    const resolved = resolveStepFilePaths(fixture!.stepsJson, fixture!.fixtureDir);
+    const result = reportFromSteps(resolved, {
+      allowedDirs: [fixture!.fixtureDir],
+      env: NO_GITHUB_ENV,
+    });
+    // No plan step, so no Plan Output section
+    expect(result).not.toContain("Plan Output");
+    // Should have apply content
+    expect(result).toContain("Apply");
   });
 });
 
