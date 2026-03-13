@@ -1,0 +1,37 @@
+{
+  "init": {
+    "outcome": "success",
+    "conclusion": "success",
+    "outputs": {
+      "exit_code": "0"
+    }
+  },
+  "validate": {
+    "outcome": "success",
+    "conclusion": "success",
+    "outputs": {
+      "exit_code": "0"
+    }
+  },
+  "plan": {
+    "outcome": "success",
+    "conclusion": "success",
+    "outputs": {
+      "exit_code": "2"
+    }
+  },
+  "show-plan": {
+    "outcome": "success",
+    "conclusion": "success",
+    "outputs": {
+      "exit_code": "0"
+    }
+  },
+  "apply": {
+    "outcome": "success",
+    "conclusion": "success",
+    "outputs": {
+      "exit_code": "0"
+    }
+  }
+}

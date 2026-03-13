@@ -148,9 +148,9 @@ function reportFromStepsInner(
         const plan = parsePlan(tier.showPlanJson);
         if (applyStep && getStepOutcome(applyStep) !== "skipped") {
           // Apply mode
-          const applyJsonl = readStepStdout(applyStep, readerOpts);
-          if (applyJsonl !== undefined) {
-            const messages = parseUILog(applyJsonl);
+          const applyRead = readStepStdout(applyStep, readerOpts);
+          if (applyRead.content !== undefined) {
+            const messages = parseUILog(applyRead.content);
             report = buildApplyReport(plan, messages, options);
             isApplyMode = true;
           } else {
@@ -197,7 +197,8 @@ function reportFromStepsInner(
   }
 
   // Render the report body (without title — we handle title separately)
-  const { title: _title, ...renderOptsNoTitle } = renderOpts ?? {};
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const { title: _discardTitle, ...renderOptsNoTitle } = renderOpts ?? {};
   const reportMarkdown = renderReport(report, renderOptsNoTitle);
   sections.push({ id: "report-body", full: reportMarkdown });
 
@@ -219,7 +220,7 @@ function reportFromStepsInner(
 
 type Tier =
   | { kind: "tier1"; showPlanJson: string }
-  | { kind: "tier3"; planStdout?: string; applyStdout?: string }
+  | { kind: "tier3"; planRead?: StepFileRead; applyRead?: StepFileRead; readErrors: string[] }
   | { kind: "tier4" };
 
 function detectTier(
@@ -228,28 +229,41 @@ function detectTier(
   applyStep: StepData | undefined,
   readerOpts: ReaderOptions,
 ): Tier {
+  const readErrors: string[] = [];
+
   // Tier 1: show-plan JSON available
   if (showPlanStep) {
     const outcome = getStepOutcome(showPlanStep);
     if (outcome === "success") {
-      const content = readStepStdout(showPlanStep, readerOpts);
-      if (content !== undefined) {
-        return { kind: "tier1", showPlanJson: content };
+      const read = readStepStdout(showPlanStep, readerOpts);
+      if (read.content !== undefined) {
+        return { kind: "tier1", showPlanJson: read.content };
+      }
+      if (read.error) {
+        readErrors.push(`show-plan stdout: ${read.error}`);
+      } else if (read.noFile) {
+        readErrors.push("show-plan: no stdout_file output configured");
       }
     }
   }
 
   // Tier 3: Raw text fallback (plan or apply step present but no structured data)
   if (planStep || applyStep) {
-    const result: { kind: "tier3"; planStdout?: string; applyStdout?: string } = { kind: "tier3" };
+    let planRead: StepFileRead | undefined;
+    let applyRead: StepFileRead | undefined;
     if (planStep) {
-      const stdout = readStepStdout(planStep, readerOpts);
-      if (stdout !== undefined) result.planStdout = stdout;
+      planRead = readStepStdout(planStep, readerOpts);
+      if (planRead.error) readErrors.push(`plan stdout: ${planRead.error}`);
+      else if (planRead.noFile) readErrors.push("plan: no stdout_file output configured");
     }
     if (applyStep) {
-      const stdout = readStepStdout(applyStep, readerOpts);
-      if (stdout !== undefined) result.applyStdout = stdout;
+      applyRead = readStepStdout(applyStep, readerOpts);
+      if (applyRead.error) readErrors.push(`apply stdout: ${applyRead.error}`);
+      else if (applyRead.noFile) readErrors.push("apply: no stdout_file output configured");
     }
+    const result: Tier = { kind: "tier3", readErrors };
+    if (planRead) (result as { planRead?: StepFileRead }).planRead = planRead;
+    if (applyRead) (result as { applyRead?: StepFileRead }).applyRead = applyRead;
     return result;
   }
 
@@ -385,28 +399,39 @@ function getStepOutcome(step: StepData): string {
   return step.outcome ?? step.conclusion ?? "unknown";
 }
 
-function readStepStdout(step: StepData, readerOpts: ReaderOptions): string | undefined {
-  const filePath = step.outputs?.[OUTPUT_STDOUT_FILE];
-  if (!filePath) return undefined;
-  const result = readForParse(filePath, readerOpts);
-  if (isReadError(result)) return undefined;
-  return result.content;
+/** Result of attempting to read a step's stdout/stderr file. */
+interface StepFileRead {
+  /** The file content, if successfully read. */
+  content?: string;
+  /** Whether the content was truncated. */
+  truncated?: boolean;
+  /** Error message if the read failed. */
+  error?: string;
+  /** True when the step had no file path configured. */
+  noFile?: boolean;
 }
 
-function readStepStdoutForDisplay(step: StepData, readerOpts: ReaderOptions): string | undefined {
-  const filePath = step.outputs?.[OUTPUT_STDOUT_FILE];
-  if (!filePath) return undefined;
-  const result = readForDisplay(filePath, readerOpts);
-  if (isReadError(result)) return undefined;
-  return result.truncated ? result.content + "\n… (truncated)" : result.content;
+function readStepFile(step: StepData, outputKey: string, readerOpts: ReaderOptions, forDisplay: boolean): StepFileRead {
+  const filePath = step.outputs?.[outputKey];
+  if (!filePath) return { noFile: true };
+  const result = forDisplay ? readForDisplay(filePath, readerOpts) : readForParse(filePath, readerOpts);
+  if (isReadError(result)) return { error: result.error };
+  if (result.truncated) {
+    return { content: result.content, truncated: true };
+  }
+  return { content: result.content };
 }
 
-function readStepStderrForDisplay(step: StepData, readerOpts: ReaderOptions): string | undefined {
-  const filePath = step.outputs?.[OUTPUT_STDERR_FILE];
-  if (!filePath) return undefined;
-  const result = readForDisplay(filePath, readerOpts);
-  if (isReadError(result)) return undefined;
-  return result.truncated ? result.content + "\n… (truncated)" : result.content;
+function readStepStdout(step: StepData, readerOpts: ReaderOptions): StepFileRead {
+  return readStepFile(step, OUTPUT_STDOUT_FILE, readerOpts, false);
+}
+
+function readStepStdoutForDisplay(step: StepData, readerOpts: ReaderOptions): StepFileRead {
+  return readStepFile(step, OUTPUT_STDOUT_FILE, readerOpts, true);
+}
+
+function readStepStderrForDisplay(step: StepData, readerOpts: ReaderOptions): StepFileRead {
+  return readStepFile(step, OUTPUT_STDERR_FILE, readerOpts, true);
 }
 
 function collectFailedStepIssue(
@@ -419,17 +444,23 @@ function collectFailedStepIssue(
   const outcome = getStepOutcome(step);
   if (outcome !== "failure") return;
 
-  const stdout = readStepStdoutForDisplay(step, readerOpts);
-  const stderr = readStepStderrForDisplay(step, readerOpts);
+  const stdoutRead = readStepStdoutForDisplay(step, readerOpts);
+  const stderrRead = readStepStderrForDisplay(step, readerOpts);
 
   let content = `### ${STATUS_FAILURE} \`${stepId}\` failed\n\n`;
-  if (stdout) {
-    content += `<details open>\n<summary>stdout</summary>\n\n\`\`\`\n${stdout}\n\`\`\`\n\n</details>\n\n`;
+  if (stdoutRead.content) {
+    const displayContent = stdoutRead.truncated ? stdoutRead.content + "\n… (truncated)" : stdoutRead.content;
+    content += `<details open>\n<summary>stdout</summary>\n\n\`\`\`\n${displayContent}\n\`\`\`\n\n</details>\n\n`;
+  } else if (stdoutRead.error) {
+    content += `> stdout not available: ${stdoutRead.error}\n\n`;
   }
-  if (stderr) {
-    content += `<details open>\n<summary>stderr</summary>\n\n\`\`\`\n${stderr}\n\`\`\`\n\n</details>\n\n`;
+  if (stderrRead.content) {
+    const displayContent = stderrRead.truncated ? stderrRead.content + "\n… (truncated)" : stderrRead.content;
+    content += `<details open>\n<summary>stderr</summary>\n\n\`\`\`\n${displayContent}\n\`\`\`\n\n</details>\n\n`;
+  } else if (stderrRead.error) {
+    content += `> stderr not available: ${stderrRead.error}\n\n`;
   }
-  if (!stdout && !stderr) {
+  if (!stdoutRead.content && !stderrRead.content && !stdoutRead.error && !stderrRead.error) {
     content += "No output captured.\n\n";
   }
 
@@ -463,7 +494,7 @@ function renderErrorReport(
 }
 
 function renderTextFallback(
-  tier: { kind: "tier3"; planStdout?: string; applyStdout?: string },
+  tier: { kind: "tier3"; planRead?: StepFileRead; applyRead?: StepFileRead; readErrors: string[] },
   workspace: string | undefined,
   env: Env,
   knownStepIds: Set<string>,
@@ -483,33 +514,59 @@ function renderTextFallback(
   const hasFailure = [...issues].length > 0 || hasAnyFailedStep(steps, knownStepIds);
   const icon = hasFailure ? STATUS_FAILURE : STATUS_SUCCESS;
   const wsPrefix = workspace ? `\`${workspace}\` ` : "";
-  const label = tier.applyStdout !== undefined ? "Apply" : "Plan";
+  const label = tier.applyRead?.content !== undefined ? "Apply" : "Plan";
   sections.push({ id: "title", full: `## ${icon} ${wsPrefix}${label}\n\n`, fixed: true });
 
   for (const issue of issues) {
     sections.push(issue);
   }
 
-  sections.push({
-    id: "note",
-    full: "> **Note:** Structured plan output was not available. Showing raw command output.\n\n",
-    fixed: true,
-  });
+  const hasOutput = tier.planRead?.content !== undefined || tier.applyRead?.content !== undefined;
 
-  if (tier.planStdout) {
+  if (hasOutput) {
+    sections.push({
+      id: "note",
+      full: "> **Note:** Structured plan output was not available. Showing raw command output.\n\n",
+      fixed: true,
+    });
+  } else {
+    let noteLines = "> **Note:** No readable output was available for this run.\n";
+    for (const err of tier.readErrors) {
+      noteLines += `> - ${err}\n`;
+    }
+    noteLines += "\n";
+    sections.push({ id: "note", full: noteLines, fixed: true });
+  }
+
+  if (tier.planRead?.content) {
+    const displayContent = tier.planRead.truncated ? tier.planRead.content + "\n… (truncated)" : tier.planRead.content;
     sections.push({
       id: "plan-output",
-      full: `### Plan Output\n\n\`\`\`\n${tier.planStdout}\n\`\`\`\n\n`,
+      full: `### Plan Output\n\n\`\`\`\n${displayContent}\n\`\`\`\n\n`,
       compact: "### Plan Output\n\n_(omitted due to size)_\n\n",
     });
   }
 
-  if (tier.applyStdout) {
+  if (tier.applyRead?.content) {
+    const displayContent = tier.applyRead.truncated ? tier.applyRead.content + "\n… (truncated)" : tier.applyRead.content;
     sections.push({
       id: "apply-output",
-      full: `### Apply Output\n\n\`\`\`\n${tier.applyStdout}\n\`\`\`\n\n`,
+      full: `### Apply Output\n\n\`\`\`\n${displayContent}\n\`\`\`\n\n`,
       compact: "### Apply Output\n\n_(omitted due to size)_\n\n",
     });
+  }
+
+  // When no output was readable, show step statuses so the user gets something useful
+  if (!hasOutput) {
+    // Show all steps (don't exclude known IDs — in this fallback, the user needs
+    // to see everything since we couldn't read the actual output)
+    const stepLines = renderStepStatusList(steps, new Set());
+    if (stepLines.length > 0) {
+      sections.push({
+        id: "step-statuses",
+        full: `### Steps\n\n${stepLines}\n`,
+      });
+    }
   }
 
   const logsUrl = buildLogsUrl(env);
@@ -548,13 +605,7 @@ function renderGeneralWorkflow(
   // Step list
   const stepEntries = Object.entries(steps);
   if (stepEntries.length > 0) {
-    let table = "| Step | Outcome |\n|------|--------|\n";
-    for (const [id, step] of stepEntries) {
-      const outcome = getStepOutcome(step);
-      table += `| \`${id}\` | ${outcome} |\n`;
-    }
-    table += "\n";
-    sections.push({ id: "step-table", full: table });
+    sections.push({ id: "step-table", full: renderStepStatusList(steps, new Set()) });
   } else {
     sections.push({ id: "no-steps", full: "No steps were found in the workflow context.\n\n" });
   }
@@ -574,6 +625,22 @@ function hasAnyFailedStep(steps: Steps, knownStepIds: Set<string>): boolean {
   return Object.entries(steps).some(
     ([id, step]) => !knownStepIds.has(id) && getStepOutcome(step) === "failure",
   );
+}
+
+/**
+ * Render a markdown table of step statuses. When `excludeIds` is provided,
+ * those step IDs are excluded from the table (they're typically rendered
+ * inline elsewhere in the report).
+ */
+function renderStepStatusList(steps: Steps, excludeIds: Set<string>): string {
+  const entries = Object.entries(steps).filter(([id]) => !excludeIds.has(id));
+  if (entries.length === 0) return "";
+  let table = "| Step | Outcome |\n|------|--------|\n";
+  for (const [id, step] of entries) {
+    const outcome = getStepOutcome(step);
+    table += `| \`${id}\` | ${outcome} |\n`;
+  }
+  return table + "\n";
 }
 
 

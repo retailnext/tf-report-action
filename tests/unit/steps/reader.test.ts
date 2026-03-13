@@ -100,6 +100,15 @@ describe("readForParse", () => {
     }
   });
 
+  it("rejects relative file paths", () => {
+    writeFixture("plan.json", '{"format_version":"1.2"}');
+    const result = readForParse("plan.json", options);
+    expect(isReadError(result)).toBe(true);
+    if (isReadError(result)) {
+      expect(result.error).toBe("Relative file paths are not allowed");
+    }
+  });
+
   it("rejects directory path", () => {
     const subDir = join(tempDir, "dir");
     mkdirSync(subDir);
@@ -212,6 +221,15 @@ describe("readForDisplay", () => {
   it("applies same security checks as readForParse", () => {
     const result = readForDisplay(join(tempDir, "nope.txt"), options);
     expect(isReadError(result)).toBe(true);
+  });
+
+  it("rejects relative file paths", () => {
+    writeFixture("output.txt", "hello");
+    const result = readForDisplay("output.txt", options);
+    expect(isReadError(result)).toBe(true);
+    if (isReadError(result)) {
+      expect(result.error).toBe("Relative file paths are not allowed");
+    }
   });
 
   it("reads empty file", () => {

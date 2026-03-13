@@ -3734,6 +3734,58 @@ exports[`reportFromSteps integration — generated fixtures > tofu/with-modules/
 "
 `;
 
+exports[`reportFromSteps integration — manual fixtures > manual/missing-outputs > renders without error and matches snapshot 1`] = `
+"## ✅ Plan
+
+> **Note:** No readable output was available for this run.
+> - show-plan: no stdout_file output configured
+> - plan: no stdout_file output configured
+> - apply: no stdout_file output configured
+
+### Steps
+
+| Step | Outcome |
+|------|--------|
+| \`init\` | success |
+| \`validate\` | success |
+| \`plan\` | success |
+| \`show-plan\` | success |
+| \`apply\` | success |
+
+
+"
+`;
+
+exports[`reportFromSteps integration — manual fixtures > manual/parse-failure > renders without error and matches snapshot 1`] = `
+"## ❌ Plan Processing Error
+
+Failed to parse plan JSON: input is not valid JSON
+
+"
+`;
+
+exports[`reportFromSteps integration — manual fixtures > manual/read-errors > renders without error and matches snapshot 1`] = `
+"## ✅ Plan
+
+> **Note:** No readable output was available for this run.
+> - show-plan stdout: File not found or not accessible
+> - plan stdout: File not found or not accessible
+> - apply stdout: File not found or not accessible
+
+### Steps
+
+| Step | Outcome |
+|------|--------|
+| \`init\` | success |
+| \`validate\` | success |
+| \`plan\` | success |
+| \`show-plan\` | success |
+| \`apply\` | success |
+
+
+"
+`;
+
 exports[`reportFromSteps integration — manual fixtures > manual/unrelated-workflow > renders without error and matches snapshot 1`] = `
 "## ❌ Failed
 

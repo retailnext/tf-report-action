@@ -15,7 +15,7 @@
  */
 
 import { realpathSync, statSync, readFileSync, openSync, readSync, closeSync } from "node:fs";
-import { dirname, resolve } from "node:path";
+import { dirname, isAbsolute, resolve } from "node:path";
 import type { ReaderOptions } from "./types.js";
 
 /**
@@ -131,6 +131,13 @@ function validateFile(
   filePath: string,
   options: ReaderOptions,
 ): ValidatedFile | ReadError {
+  // Reject relative paths — in production, stdout_file/stderr_file must be
+  // absolute paths (under RUNNER_TEMP). Callers that need relative path support
+  // (render script, tests) must resolve them before calling the reader.
+  if (!isAbsolute(filePath)) {
+    return { error: "Relative file paths are not allowed" };
+  }
+
   // Resolve to absolute path
   const absolutePath = resolve(filePath);
 

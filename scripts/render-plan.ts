@@ -254,7 +254,7 @@ if (stepsFile !== null) {
     process.exit(1);
   }
 
-  const { dirname, resolve } = await import("node:path");
+  const { dirname, resolve, join, isAbsolute } = await import("node:path");
 
   const stepsOpts: ReportOptions = {
     ...options,
@@ -262,13 +262,42 @@ if (stepsFile !== null) {
   };
 
   // Default allowed-dirs to the directory containing the steps file
+  const stepsDir = resolve(dirname(stepsFile));
   if (!stepsOpts.allowedDirs) {
-    stepsOpts.allowedDirs = [resolve(dirname(stepsFile))];
+    stepsOpts.allowedDirs = [stepsDir];
   }
+
+  // Resolve relative stdout_file/stderr_file paths against the steps file
+  // directory. The reader rejects relative paths for security, so callers
+  // that deal with local fixture files must resolve them first.
+  stepsJson = resolveRelativeFilePaths(stepsJson, stepsDir, join, isAbsolute);
 
   const markdown = reportFromSteps(stepsJson, stepsOpts);
   await renderAndWrite(markdown, options.title, noOpen);
   process.exit(0);
+}
+
+/**
+ * Resolve relative stdout_file/stderr_file paths in a steps JSON string.
+ * Paths are resolved against `baseDir`. Absolute paths are left unchanged.
+ */
+function resolveRelativeFilePaths(
+  json: string,
+  baseDir: string,
+  joinFn: (...segments: string[]) => string,
+  isAbsoluteFn: (p: string) => boolean,
+): string {
+  const steps = JSON.parse(json) as Record<string, { outputs?: Record<string, string> }>;
+  for (const stepData of Object.values(steps)) {
+    if (stepData.outputs == null) continue;
+    for (const key of ["stdout_file", "stderr_file"]) {
+      const val = stepData.outputs[key];
+      if (typeof val === "string" && val.length > 0 && !isAbsoluteFn(val)) {
+        stepData.outputs[key] = joinFn(baseDir, val);
+      }
+    }
+  }
+  return JSON.stringify(steps);
 }
 
 // ---------------------------------------------------------------------------
