@@ -4,8 +4,8 @@ import type { PlanAction } from "./plan-action.js";
  * Tracks the apply outcome for a single resource. Built from
  * `apply_start` / `apply_complete` / `apply_errored` UI messages.
  *
- * Used by the renderer to show ✅ or ❌ status per resource and
- * to include error details for failed resources.
+ * Used by the renderer to show success or failure status per resource
+ * and to include error details for failed resources.
  */
 export interface ApplyStatus {
   /** Full resource address (e.g. "module.child.aws_instance.web[0]"). */

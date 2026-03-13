@@ -7,6 +7,7 @@ import { renderResource } from "./resource.js";
 import { renderDiagnostics } from "./diagnostics.js";
 import { renderApplyStatuses } from "./apply-status.js";
 import { ACTION_SYMBOLS } from "../model/plan-action.js";
+import { MODULE_ICON } from "../model/status-icons.js";
 import { resolveTemplate } from "../template/index.js";
 import { KNOWN_AFTER_APPLY, VALUE_NOT_IN_PLAN } from "../model/sentinels.js";
 
@@ -52,7 +53,7 @@ export function renderReport(report: Report, options: RenderOptions = {}): strin
           ? "root"
           : `\`${moduleGroup.moduleAddress}\``;
 
-      writer.heading(`📦 Module: ${moduleLabel}`, 3);
+      writer.heading(`${MODULE_ICON} Module: ${moduleLabel}`, 3);
 
       for (const resource of moduleGroup.resources) {
         renderResource(resource, writer, options, diffCache);

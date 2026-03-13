@@ -4,8 +4,8 @@ import { ACTION_SYMBOLS } from "../model/plan-action.js";
 import { STATUS_SUCCESS, STATUS_FAILURE } from "../model/status-icons.js";
 
 /**
- * Renders a table of per-resource apply outcomes showing success (✅)
- * or failure (❌) status, the action taken, and elapsed time.
+ * Renders a table of per-resource apply outcomes showing success or
+ * failure status, the action taken, and elapsed time.
  */
 export function renderApplyStatuses(
   statuses: readonly ApplyStatus[],

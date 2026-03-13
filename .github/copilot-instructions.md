@@ -94,18 +94,23 @@ diagnostics section of apply reports only.
 ## Emoji / Symbol Uniqueness
 
 **No emoji or symbol may be used to mean two different things.** Every visual indicator
-in the rendered output must be unambiguous. This is enforced by the test in
+in the rendered output must be unambiguous. This is enforced by the tests in
 `tests/unit/model/emoji-uniqueness.test.ts`.
 
-All emojis used in the output **must** be defined in one of two constant sources so
-the uniqueness test can check them:
+All emojis and symbols used in the output **must** be defined in one of two constant
+sources so the governance tests can check them:
 
 - **Action symbols**: `ACTION_SYMBOLS` in `src/model/plan-action.ts`
-- **Status indicators**: named exports in `src/model/status-icons.ts`
+- **All other icons**: named exports in `src/model/status-icons.ts`
+
+A **source lint test** scans every `.ts` file under `src/` (excluding the two table
+files above) for hardcoded emoji (`\p{Extended_Pictographic}`) and non-ASCII math
+symbols (`\p{Sm}`). Comments are stripped before scanning, so documentation may use
+arrows (`→`) or similar, but code and string literals must import from the constants.
 
 When adding a new emoji or changing an existing one, update the appropriate constant
-source and run the uniqueness test. Do not hardcode emoji literals in renderer code —
-import from the constant sources above.
+source. Do not hardcode emoji or math-symbol literals in renderer code — always import
+from the constant sources above.
 
 ## Error Messages
 

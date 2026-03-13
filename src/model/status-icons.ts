@@ -1,7 +1,9 @@
 /**
- * Named constants for status indicator emojis used in apply reports
- * and diagnostics. Centralised here so the emoji-uniqueness test can
- * verify no symbol is reused across action symbols and status indicators.
+ * Named constants for every emoji and symbol used in rendered output
+ * that is not an action symbol (those live in `ACTION_SYMBOLS`).
+ *
+ * All non-action emoji/symbols **must** be defined here so the
+ * emoji-uniqueness and emoji-lint tests can verify consistency.
  */
 
 /** Shown next to a resource that was successfully applied. */
@@ -15,3 +17,6 @@ export const DIAGNOSTIC_ERROR = "🚨";
 
 /** Prefix for warning-severity diagnostics. */
 export const DIAGNOSTIC_WARNING = "⚠️";
+
+/** Prefix for module group headings. */
+export const MODULE_ICON = "📦";

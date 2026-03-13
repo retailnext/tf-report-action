@@ -1,76 +1,174 @@
+import { readdirSync, readFileSync } from "node:fs";
+import { join, relative } from "node:path";
+import { fileURLToPath } from "node:url";
 import { describe, it, expect } from "vitest";
 import { ACTION_SYMBOLS } from "../../../src/model/plan-action.js";
-import {
-  STATUS_SUCCESS,
-  STATUS_FAILURE,
-  DIAGNOSTIC_ERROR,
-  DIAGNOSTIC_WARNING,
-} from "../../../src/model/status-icons.js";
+import * as StatusIcons from "../../../src/model/status-icons.js";
+
+const SRC_DIR = join(fileURLToPath(import.meta.url), "../../../../src");
 
 /**
- * Enforces that no emoji/symbol is reused to mean two different things.
- *
- * This is a design invariant: every visual indicator in the rendered output
- * must be unambiguous. For example, the same emoji must not represent both
- * "delete action" and "apply failure".
+ * Files that are allowed to define emoji/symbol constants.
+ * Every other source file must import from one of these.
  */
-describe("emoji uniqueness", () => {
-  it("no emoji appears more than once across action symbols and status indicators", () => {
-    const allSymbols = new Map<string, string>();
+const EMOJI_TABLE_FILES = new Set([
+  "model/plan-action.ts",
+  "model/status-icons.ts",
+]);
 
-    // Collect action symbols
-    for (const [action, symbol] of Object.entries(ACTION_SYMBOLS)) {
-      const normalized = normalizeEmoji(symbol);
-      if (allSymbols.has(normalized)) {
-        // fail with a clear message showing which two uses collide
-        expect.fail(
-          `Emoji "${symbol}" is used for both action "${allSymbols.get(normalized)}" ` +
-            `and action "${action}"`,
-        );
-      }
-      allSymbols.set(normalized, `action:${action}`);
+/**
+ * Collect every exported string value from the status-icons module.
+ * Using `import *` means new exports are automatically included.
+ */
+function collectStatusIcons(): Record<string, string> {
+  const icons: Record<string, string> = {};
+  for (const [key, value] of Object.entries(StatusIcons)) {
+    if (typeof value === "string") {
+      icons[key] = value;
     }
+  }
+  return icons;
+}
 
-    // Collect status indicators
-    const statusIcons: Record<string, string> = {
-      STATUS_SUCCESS,
-      STATUS_FAILURE,
-      DIAGNOSTIC_ERROR,
-      DIAGNOSTIC_WARNING,
-    };
+/**
+ * Enforces that no emoji/symbol is reused to mean two different things
+ * and that no source file outside the canonical table files contains
+ * hardcoded emoji or math symbols.
+ */
+describe("emoji governance", () => {
+  const statusIcons = collectStatusIcons();
 
-    for (const [name, symbol] of Object.entries(statusIcons)) {
-      const normalized = normalizeEmoji(symbol);
-      if (allSymbols.has(normalized)) {
-        expect.fail(
-          `Emoji "${symbol}" is used for both "${allSymbols.get(normalized)}" ` +
-            `and status indicator "${name}"`,
-        );
+  describe("uniqueness", () => {
+    it("no symbol appears in both ACTION_SYMBOLS and status icons", () => {
+      const actionSet = new Map<string, string>();
+      for (const [action, symbol] of Object.entries(ACTION_SYMBOLS)) {
+        actionSet.set(normalizeEmoji(symbol), action);
       }
-      allSymbols.set(normalized, `status:${name}`);
-    }
+
+      for (const [name, symbol] of Object.entries(statusIcons)) {
+        const normalized = normalizeEmoji(symbol);
+        if (actionSet.has(normalized)) {
+          expect.fail(
+            `"${symbol}" is used for both action "${actionSet.get(normalized)}" ` +
+              `and status icon "${name}"`,
+          );
+        }
+      }
+    });
+
+    it("action symbols have no duplicates among themselves", () => {
+      const seen = new Map<string, string>();
+      for (const [action, symbol] of Object.entries(ACTION_SYMBOLS)) {
+        const normalized = normalizeEmoji(symbol);
+        if (seen.has(normalized)) {
+          expect.fail(
+            `"${symbol}" is used for both action "${seen.get(normalized)}" ` +
+              `and action "${action}"`,
+          );
+        }
+        seen.set(normalized, action);
+      }
+    });
+
+    it("status icons have no duplicates among themselves", () => {
+      const seen = new Map<string, string>();
+      for (const [name, symbol] of Object.entries(statusIcons)) {
+        const normalized = normalizeEmoji(symbol);
+        if (seen.has(normalized)) {
+          expect.fail(
+            `"${symbol}" is used for both "${seen.get(normalized)}" ` +
+              `and "${name}"`,
+          );
+        }
+        seen.set(normalized, name);
+      }
+    });
   });
 
-  it("action symbols have no duplicates among themselves", () => {
-    const seen = new Map<string, string>();
-    for (const [action, symbol] of Object.entries(ACTION_SYMBOLS)) {
-      const normalized = normalizeEmoji(symbol);
-      if (seen.has(normalized)) {
+  describe("source lint", () => {
+    it("no hardcoded emoji or math symbols in source files outside emoji tables", () => {
+      const violations: string[] = [];
+
+      for (const file of walkTs(SRC_DIR)) {
+        const rel = relative(SRC_DIR, file);
+        if (EMOJI_TABLE_FILES.has(rel)) continue;
+
+        const raw = readFileSync(file, "utf-8");
+        const stripped = stripComments(raw);
+        const lines = stripped.split("\n");
+
+        for (let i = 0; i < lines.length; i++) {
+          const line = lines[i]!;
+          for (const m of findSymbols(line)) {
+            const cp = [...m]
+              .map(
+                (c) =>
+                  "U+" + c.codePointAt(0)!.toString(16).toUpperCase().padStart(4, "0"),
+              )
+              .join(" ");
+            violations.push(`${rel}:${i + 1}: ${m} (${cp})`);
+          }
+        }
+      }
+
+      if (violations.length > 0) {
         expect.fail(
-          `Emoji "${symbol}" is used for both action "${seen.get(normalized)}" ` +
-            `and action "${action}"`,
+          "Found hardcoded emoji/symbols in source files outside emoji table definitions.\n" +
+            "All emoji and symbols must be defined in ACTION_SYMBOLS (plan-action.ts)\n" +
+            "or as named exports in status-icons.ts.\n\n" +
+            violations.join("\n"),
         );
       }
-      seen.set(normalized, action);
-    }
+    });
   });
 });
 
-/**
- * Normalize emoji by stripping variation selectors (U+FE0E, U+FE0F) so
- * visually-identical emoji like 🗑 (U+1F5D1) and 🗑️ (U+1F5D1 U+FE0F)
- * are treated as the same symbol.
- */
+// ---------------------------------------------------------------------------
+// Helpers
+// ---------------------------------------------------------------------------
+
+/** Strip variation selectors so visually-identical emoji compare equal. */
 function normalizeEmoji(s: string): string {
   return s.replace(/[\uFE0E\uFE0F]/g, "");
+}
+
+/** Recursively find all .ts files under a directory. */
+function walkTs(dir: string): string[] {
+  const results: string[] = [];
+  for (const entry of readdirSync(dir, { withFileTypes: true })) {
+    const full = join(dir, entry.name);
+    if (entry.isDirectory()) {
+      results.push(...walkTs(full));
+    } else if (entry.name.endsWith(".ts")) {
+      results.push(full);
+    }
+  }
+  return results;
+}
+
+/**
+ * Remove single-line (`// ...`) and block (`/* ... *​/`) comments so the
+ * lint only flags symbols in executable code and string literals.
+ */
+function stripComments(source: string): string {
+  let result = source.replace(/\/\/.*$/gm, "");
+  result = result.replace(/\/\*[\s\S]*?\*\//g, "");
+  return result;
+}
+
+/**
+ * Yield every emoji (Extended_Pictographic, excluding ASCII digits/#/*)
+ * and non-ASCII math symbol found in a line.
+ */
+function* findSymbols(line: string): Generator<string> {
+  // eslint-disable-next-line no-restricted-syntax -- v-flag regex for Unicode set subtraction
+  const emojiRe = /[\p{Extended_Pictographic}--[\x23\x2a\x30-\x39]]/vg;
+  for (const m of line.matchAll(emojiRe)) {
+    yield m[0];
+  }
+  for (const ch of line) {
+    if (ch.codePointAt(0)! > 0x7f && /\p{Sm}/u.test(ch)) {
+      yield ch;
+    }
+  }
 }
