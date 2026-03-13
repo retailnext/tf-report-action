@@ -96,14 +96,16 @@ describe("planToMarkdown", () => {
       expect(planToMarkdown(EMPTY_PLAN)).toContain("Plan Summary");
     });
 
-    it("includes a summary table", () => {
-      expect(planToMarkdown(EMPTY_PLAN)).toContain("| Action | Count |");
+    it("shows no changes for empty plan", () => {
+      const result = planToMarkdown(EMPTY_PLAN);
+      expect(result).toContain("No changes");
     });
 
-    it("shows Total row even for empty plan", () => {
-      const result = planToMarkdown(EMPTY_PLAN);
-      expect(result).toContain("Total");
-      expect(result).toContain("**0**");
+    it("renders 3-column summary table for non-empty plan", () => {
+      const result = planToMarkdown(CREATE_PLAN);
+      expect(result).toContain("| Action | Resource | Count |");
+      expect(result).toContain("| ➕ Add | null_resource | 1 |");
+      expect(result).toContain("|  | **Add** | **1** |");
     });
   });
 

@@ -72,4 +72,23 @@ describe("renderDiagnostics", () => {
     const md = render([]);
     expect(md.trim()).toBe("");
   });
+
+  it("uses H2 headings when headingLevel is 2", () => {
+    const writer = new MarkdownWriter();
+    renderDiagnostics(
+      [{ severity: "error", summary: "Fail", detail: "" }],
+      writer,
+      2,
+    );
+    const md = writer.build();
+    expect(md).toContain("## Errors");
+    expect(md).not.toContain("### Errors");
+  });
+
+  it("uses H3 headings by default", () => {
+    const md = render([
+      { severity: "warning", summary: "Warn", detail: "" },
+    ]);
+    expect(md).toContain("### Warnings");
+  });
 });

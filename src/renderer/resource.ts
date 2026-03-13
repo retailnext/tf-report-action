@@ -4,21 +4,35 @@
  */
 
 import type { ResourceChange } from "../model/resource.js";
+import type { Diagnostic } from "../model/diagnostic.js";
 import { MarkdownWriter } from "./writer.js";
 import type { RenderOptions } from "./options.js";
 import type { DiffEntry } from "../diff/types.js";
 import { ACTION_SYMBOLS } from "../model/plan-action.js";
+import { STATUS_FAILURE, DIAGNOSTIC_ERROR, DIAGNOSTIC_WARNING } from "../model/status-icons.js";
 import { formatDiff } from "./diff-format.js";
 import { renderLargeValue } from "./large-value.js";
 
 /**
+ * Per-resource apply context passed when rendering apply reports.
+ * Provides the failure status and any resource-specific diagnostics.
+ */
+export interface ApplyContext {
+  readonly failed: boolean;
+  readonly diagnostics: readonly Diagnostic[];
+}
+
+/**
  * Renders a single resource change as a collapsible details block.
+ * When `applyContext` is provided, failed resources get `<details open>`
+ * and a ❌ indicator; diagnostics are rendered inline after attributes.
  */
 export function renderResource(
   resource: ResourceChange,
   writer: MarkdownWriter,
   options: RenderOptions,
   diffCache: Map<string, DiffEntry[]>,
+  applyContext?: ApplyContext,
 ): void {
   const symbol = ACTION_SYMBOLS[resource.action];
   const diffFormat = options.diffFormat ?? "inline";
@@ -35,7 +49,13 @@ export function renderResource(
     summaryText += ` — changed: ${MarkdownWriter.escapeCell(hint)}`;
   }
 
-  writer.detailsOpen(summaryText);
+  if (applyContext?.failed) {
+    summaryText += ` ${STATUS_FAILURE}`;
+  }
+
+  const shouldOpen = applyContext !== undefined &&
+    (applyContext.failed || applyContext.diagnostics.length > 0);
+  writer.detailsOpen(summaryText, shouldOpen);
 
   // Show import/moved-from metadata
   if (resource.importId !== null) {
@@ -78,6 +98,19 @@ export function renderResource(
       const block = renderLargeValue(attr.name, attr.before, attr.after, diffCache);
       if (block) {
         writer.raw(block);
+      }
+    }
+  }
+
+  // Render inline diagnostics (errors then warnings)
+  if (applyContext && applyContext.diagnostics.length > 0) {
+    const errors = applyContext.diagnostics.filter((d) => d.severity === "error");
+    const warnings = applyContext.diagnostics.filter((d) => d.severity === "warning");
+    for (const diag of [...errors, ...warnings]) {
+      const prefix = diag.severity === "error" ? DIAGNOSTIC_ERROR : DIAGNOSTIC_WARNING;
+      writer.paragraph(`${prefix} **${diag.summary}**`);
+      if (diag.detail) {
+        writer.codeFence(diag.detail);
       }
     }
   }

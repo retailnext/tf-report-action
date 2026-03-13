@@ -13,7 +13,7 @@ function basePlan(overrides: Partial<Plan> = {}): Plan {
 describe("buildReport", () => {
   it("builds a report from an empty plan", () => {
     const report = buildReport(basePlan());
-    expect(report.summary.total).toBe(0);
+    expect(report.summary).toEqual({ actions: [], failures: [] });
     expect(report.modules).toEqual([]);
     expect(report.outputs).toEqual([]);
   });
@@ -113,9 +113,11 @@ describe("buildReport", () => {
     });
 
     const report = buildReport(plan);
-    expect(report.summary.add).toBe(1);
-    expect(report.summary.destroy).toBe(1);
-    expect(report.summary.total).toBe(2);
+    const createGroup = report.summary.actions.find((g) => g.action === "create");
+    const deleteGroup = report.summary.actions.find((g) => g.action === "delete");
+    expect(createGroup?.total).toBe(1);
+    expect(deleteGroup?.total).toBe(1);
+    expect(report.summary.failures).toEqual([]);
   });
 
   it("skips data source read-only changes", () => {
@@ -133,7 +135,7 @@ describe("buildReport", () => {
 
     const report = buildReport(plan);
     expect(report.modules).toHaveLength(0);
-    expect(report.summary.total).toBe(0);
+    expect(report.summary).toEqual({ actions: [], failures: [] });
   });
 
   it("includes output changes in report outputs", () => {

@@ -3,7 +3,7 @@ export type { AttributeChange } from "./attribute.js";
 export type { ResourceChange } from "./resource.js";
 export type { OutputChange } from "./output.js";
 export type { ModuleGroup } from "./module-group.js";
-export type { Summary } from "./summary.js";
+export type { Summary, SummaryActionGroup, ResourceTypeCount } from "./summary.js";
 export type { Report } from "./report.js";
 export type { Diagnostic } from "./diagnostic.js";
 export type { ApplyStatus } from "./apply-status.js";

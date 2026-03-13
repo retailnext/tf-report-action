@@ -365,9 +365,10 @@ describe("buildApplyReport", () => {
       const report = buildApplyReport(plan, messages);
 
       // Only the applied resource should be counted
-      expect(report.summary.change).toBe(1);
-      expect(report.summary.add).toBe(0);
-      expect(report.summary.total).toBe(1);
+      const updateGroup = report.summary.actions.find((g) => g.action === "update");
+      expect(updateGroup?.total).toBe(1);
+      expect(report.summary.actions.find((g) => g.action === "create")).toBeUndefined();
+      expect(report.summary.failures).toEqual([]);
     });
 
     it("summary is zero for all-phantom apply", () => {
@@ -382,7 +383,7 @@ describe("buildApplyReport", () => {
 
       const messages: UIMessage[] = [versionMsg()];
       const report = buildApplyReport(plan, messages);
-      expect(report.summary.total).toBe(0);
+      expect(report.summary).toEqual({ actions: [], failures: [] });
     });
   });
 
@@ -728,7 +729,7 @@ describe("buildApplyReport", () => {
 
       const report = buildApplyReport(plan, []);
       expect(report.modules).toHaveLength(0);
-      expect(report.summary.total).toBe(0);
+      expect(report.summary).toEqual({ actions: [], failures: [] });
       expect(report.diagnostics).toBeUndefined();
       expect(report.applyStatuses).toBeUndefined();
     });
@@ -738,7 +739,7 @@ describe("buildApplyReport", () => {
       const messages: UIMessage[] = [versionMsg()];
       const report = buildApplyReport(plan, messages);
       expect(report.modules).toHaveLength(0);
-      expect(report.summary.total).toBe(0);
+      expect(report.summary).toEqual({ actions: [], failures: [] });
     });
 
     it("preserves plan metadata", () => {

@@ -1,11 +1,12 @@
 import type { Report } from "../model/report.js";
 import type { RenderOptions } from "./options.js";
+import type { Diagnostic } from "../model/diagnostic.js";
 import type { DiffEntry } from "../diff/types.js";
 import { MarkdownWriter } from "./writer.js";
 import { renderSummary } from "./summary.js";
 import { renderResource } from "./resource.js";
+import type { ApplyContext } from "./resource.js";
 import { renderDiagnostics } from "./diagnostics.js";
-import { renderApplyStatuses } from "./apply-status.js";
 import { ACTION_SYMBOLS } from "../model/plan-action.js";
 import { MODULE_ICON } from "../model/status-icons.js";
 import { resolveTemplate } from "../template/index.js";
@@ -23,25 +24,32 @@ export function renderReport(report: Report, options: RenderOptions = {}): strin
   const isApply = isApplyReport(report);
   const summaryHeading = isApply ? "Apply Summary" : "Plan Summary";
 
+  // Build apply context maps
+  const failedAddresses = buildFailedSet(report);
+  const diagByAddress = buildDiagnosticMap(report);
+  const nonResourceDiags = extractNonResourceDiagnostics(report, diagByAddress);
+
   if (options.title) {
     writer.heading(options.title, 2);
   }
 
   if (template.name === "summary") {
     writer.heading(summaryHeading, 2);
-    renderSummary(report.summary, writer);
-    if (isApply) {
-      renderApplySections(report, writer);
+    renderSummary(report.summary, writer, isApply);
+    // Summary template: all diagnostics go in top-level section
+    if (report.diagnostics !== undefined && report.diagnostics.length > 0) {
+      renderDiagnostics(report.diagnostics, writer, 2);
     }
     return writer.build();
   }
 
   // Default template
   writer.heading(summaryHeading, 2);
-  renderSummary(report.summary, writer);
+  renderSummary(report.summary, writer, isApply);
 
-  if (isApply) {
-    renderApplySections(report, writer);
+  // Non-resource diagnostics between summary and resource changes
+  if (nonResourceDiags.length > 0) {
+    renderDiagnostics(nonResourceDiags, writer, 2);
   }
 
   if (report.modules.length > 0 || report.outputs.length > 0) {
@@ -56,7 +64,10 @@ export function renderReport(report: Report, options: RenderOptions = {}): strin
       writer.heading(`${MODULE_ICON} Module: ${moduleLabel}`, 3);
 
       for (const resource of moduleGroup.resources) {
-        renderResource(resource, writer, options, diffCache);
+        const applyContext = isApply
+          ? buildApplyContext(resource.address, failedAddresses, diagByAddress)
+          : undefined;
+        renderResource(resource, writer, options, diffCache, applyContext);
       }
 
       if (moduleGroup.outputs.length > 0) {
@@ -81,17 +92,66 @@ function isApplyReport(report: Report): boolean {
   );
 }
 
+/** Builds a Set of resource addresses that failed during apply. */
+function buildFailedSet(report: Report): Set<string> {
+  const failed = new Set<string>();
+  if (report.applyStatuses) {
+    for (const s of report.applyStatuses) {
+      if (!s.success) {
+        failed.add(s.address);
+      }
+    }
+  }
+  return failed;
+}
+
+/** Builds a Map of resource address → diagnostics for that resource. */
+function buildDiagnosticMap(report: Report): Map<string, Diagnostic[]> {
+  const map = new Map<string, Diagnostic[]>();
+  if (report.diagnostics) {
+    for (const diag of report.diagnostics) {
+      if (diag.address !== undefined) {
+        let list = map.get(diag.address);
+        if (!list) {
+          list = [];
+          map.set(diag.address, list);
+        }
+        list.push(diag);
+      }
+    }
+  }
+  return map;
+}
+
 /**
- * Renders the apply-specific sections: resource outcomes and diagnostics.
+ * Extracts diagnostics that are not resource-specific: those without
+ * an address, or whose address doesn't match any resource in the report.
  */
-function renderApplySections(report: Report, writer: MarkdownWriter): void {
-  if (report.applyStatuses !== undefined && report.applyStatuses.length > 0) {
-    renderApplyStatuses(report.applyStatuses, writer);
-  }
-  if (report.diagnostics !== undefined && report.diagnostics.length > 0) {
-    writer.heading("Diagnostics", 2);
-    renderDiagnostics(report.diagnostics, writer);
-  }
+function extractNonResourceDiagnostics(
+  report: Report,
+  diagByAddress: Map<string, Diagnostic[]>,
+): Diagnostic[] {
+  if (!report.diagnostics) return [];
+
+  const resourceAddresses = new Set(
+    report.modules.flatMap((m) => m.resources.map((r) => r.address)),
+  );
+
+  return report.diagnostics.filter(
+    (d) => d.address === undefined || !resourceAddresses.has(d.address),
+  );
+}
+
+/** Builds an ApplyContext for a given resource address. */
+function buildApplyContext(
+  address: string,
+  failedAddresses: Set<string>,
+  diagByAddress: Map<string, Diagnostic[]>,
+): ApplyContext {
+  return {
+    failed: failedAddresses.has(address),
+    diagnostics: diagByAddress.get(address) ?? [],
+  };
 }
 
 function renderOutputTable(

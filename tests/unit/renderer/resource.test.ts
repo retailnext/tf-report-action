@@ -1,5 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { renderResource } from "../../../src/renderer/resource.js";
+import type { ApplyContext } from "../../../src/renderer/resource.js";
 import { MarkdownWriter } from "../../../src/renderer/writer.js";
 import type { ResourceChange } from "../../../src/model/resource.js";
 import type { DiffEntry } from "../../../src/diff/types.js";
@@ -23,10 +24,11 @@ function makeResource(overrides: Partial<ResourceChange> = {}): ResourceChange {
 function render(
   resource: ResourceChange,
   options: Parameters<typeof renderResource>[2] = {},
+  applyContext?: ApplyContext,
 ): string {
   const writer = new MarkdownWriter();
   const cache = new Map<string, DiffEntry[]>();
-  renderResource(resource, writer, options, cache);
+  renderResource(resource, writer, options, cache, applyContext);
   return writer.build();
 }
 
@@ -178,5 +180,73 @@ describe("renderResource", () => {
     );
     expect(output).toContain("- old");
     expect(output).toContain("+ new");
+  });
+});
+
+describe("renderResource — apply context", () => {
+  it("renders <details open> and ❌ indicator when failed", () => {
+    const output = render(makeResource(), {}, { failed: true, diagnostics: [] });
+    expect(output).toContain("<details open>");
+    expect(output).toContain("❌");
+  });
+
+  it("renders <details open> when resource has diagnostics (not failed)", () => {
+    const output = render(makeResource(), {}, {
+      failed: false,
+      diagnostics: [{ severity: "warning", summary: "Deprecated", detail: "" }],
+    });
+    expect(output).toContain("<details open>");
+    expect(output).not.toContain("❌");
+  });
+
+  it("renders <details> (closed) when no apply context", () => {
+    const output = render(makeResource());
+    expect(output).toContain("<details>");
+    expect(output).not.toContain("<details open>");
+  });
+
+  it("renders inline error diagnostics after attributes", () => {
+    const output = render(makeResource(), {}, {
+      failed: true,
+      diagnostics: [{
+        severity: "error",
+        summary: "Invalid AMI ID",
+        detail: "The image id does not exist",
+      }],
+    });
+    expect(output).toContain("🚨 **Invalid AMI ID**");
+    expect(output).toContain("The image id does not exist");
+  });
+
+  it("renders inline warning diagnostics after attributes", () => {
+    const output = render(makeResource(), {}, {
+      failed: false,
+      diagnostics: [{
+        severity: "warning",
+        summary: "Argument is deprecated",
+        detail: "Use new_arg instead",
+      }],
+    });
+    expect(output).toContain("⚠️ **Argument is deprecated**");
+    expect(output).toContain("Use new_arg instead");
+  });
+
+  it("renders errors before warnings in inline diagnostics", () => {
+    const output = render(makeResource(), {}, {
+      failed: true,
+      diagnostics: [
+        { severity: "warning", summary: "warn1", detail: "" },
+        { severity: "error", summary: "err1", detail: "" },
+      ],
+    });
+    const errIdx = output.indexOf("err1");
+    const warnIdx = output.indexOf("warn1");
+    expect(errIdx).toBeLessThan(warnIdx);
+  });
+
+  it("does not render diagnostics section when apply context has empty diagnostics", () => {
+    const output = render(makeResource(), {}, { failed: false, diagnostics: [] });
+    expect(output).not.toContain("🚨");
+    expect(output).not.toContain("⚠️");
   });
 });

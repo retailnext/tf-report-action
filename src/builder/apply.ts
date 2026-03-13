@@ -23,7 +23,7 @@ import type { ApplyStatus } from "../model/apply-status.js";
 import type { BuildOptions } from "./options.js";
 import type { PlanAction } from "../model/plan-action.js";
 import { buildReport } from "./index.js";
-import { buildSummary } from "./summary.js";
+import { buildApplySummary } from "./summary.js";
 import { KNOWN_AFTER_APPLY, VALUE_NOT_IN_PLAN } from "../model/sentinels.js";
 
 // ─── Type Guards ────────────────────────────────────────────────────────────
@@ -77,8 +77,13 @@ export function buildApplyReport(
     resolveOutputValues(report, outputsMessage);
   }
 
-  report.summary = buildSummary(
+  const failedAddresses = new Set(
+    applyStatuses.filter((s) => !s.success).map((s) => s.address),
+  );
+
+  report.summary = buildApplySummary(
     report.modules.flatMap((m) => m.resources),
+    failedAddresses,
   );
 
   if (diagnostics.length > 0) {

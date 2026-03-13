@@ -1,6 +1,9 @@
 import { describe, it, expect } from "vitest";
 import { renderReport } from "../../../src/renderer/index.js";
 import type { Report } from "../../../src/model/report.js";
+import type { Summary } from "../../../src/model/summary.js";
+
+const emptySummary: Summary = { actions: [], failures: [] };
 
 /** Minimal report with no resources or outputs. */
 function emptyReport(overrides: Partial<Report> = {}): Report {
@@ -8,7 +11,7 @@ function emptyReport(overrides: Partial<Report> = {}): Report {
     toolVersion: "1.0.0",
     formatVersion: "1.2",
     timestamp: null,
-    summary: { add: 0, change: 0, destroy: 0, replace: 0, total: 0 },
+    summary: emptySummary,
     modules: [],
     outputs: [],
     ...overrides,
@@ -41,8 +44,39 @@ describe("renderReport — apply-specific rendering", () => {
     expect(md).not.toContain("## Apply Summary");
   });
 
-  it("renders diagnostics section with errors", () => {
+  it("renders non-resource diagnostics in top-level section", () => {
     const report = emptyReport({
+      diagnostics: [
+        {
+          severity: "error",
+          summary: "Provider error",
+          detail: "connection refused",
+        },
+      ],
+    });
+    const md = renderReport(report);
+    expect(md).toContain("## Errors");
+    expect(md).toContain("🚨 **Provider error**");
+  });
+
+  it("renders resource-specific diagnostics inline on the resource", () => {
+    const report = emptyReport({
+      modules: [{
+        moduleAddress: "",
+        resources: [{
+          address: "null_resource.broken",
+          moduleAddress: null,
+          type: "null_resource",
+          name: "broken",
+          action: "create",
+          actionReason: null,
+          attributes: [],
+          importId: null,
+          movedFromAddress: null,
+          allUnknownAfterApply: false,
+        }],
+        outputs: [],
+      }],
       diagnostics: [
         {
           severity: "error",
@@ -51,38 +85,62 @@ describe("renderReport — apply-specific rendering", () => {
           address: "null_resource.broken",
         },
       ],
-    });
-    const md = renderReport(report);
-    expect(md).toContain("## Diagnostics");
-    expect(md).toContain("🚨 **Resource failed**");
-    expect(md).toContain("`null_resource.broken`");
-  });
-
-  it("renders resource outcomes table", () => {
-    const report = emptyReport({
       applyStatuses: [
-        { address: "null_resource.ok", action: "create", success: true, elapsed: 2 },
-        { address: "null_resource.fail", action: "create", success: false },
+        { address: "null_resource.broken", action: "create", success: false },
       ],
     });
     const md = renderReport(report);
-    expect(md).toContain("### Resource Outcomes");
-    expect(md).toContain("✅");
+    // Resource-specific diagnostics should NOT appear in a top-level section
+    expect(md).not.toContain("## Errors");
+    expect(md).not.toContain("## Diagnostics");
+    // Should appear inline in the resource details
+    expect(md).toContain("🚨 **Resource failed**");
+    expect(md).toContain("timeout after 5m");
+  });
+
+  it("opens <details> for failed resources", () => {
+    const report = emptyReport({
+      modules: [{
+        moduleAddress: "",
+        resources: [{
+          address: "null_resource.broken",
+          moduleAddress: null,
+          type: "null_resource",
+          name: "broken",
+          action: "create",
+          actionReason: null,
+          attributes: [],
+          importId: null,
+          movedFromAddress: null,
+          allUnknownAfterApply: false,
+        }],
+        outputs: [],
+      }],
+      applyStatuses: [
+        { address: "null_resource.broken", action: "create", success: false },
+      ],
+    });
+    const md = renderReport(report);
+    expect(md).toContain("<details open>");
     expect(md).toContain("❌");
-    expect(md).toContain("`null_resource.ok`");
-    expect(md).toContain("`null_resource.fail`");
+  });
+
+  it("does not render resource outcomes table (removed)", () => {
+    const report = emptyReport({
+      applyStatuses: [
+        { address: "null_resource.ok", action: "create", success: true },
+      ],
+    });
+    const md = renderReport(report);
+    expect(md).not.toContain("### Resource Outcomes");
   });
 
   it("omits diagnostics section when diagnostics array is empty", () => {
     const report = emptyReport({ diagnostics: [] });
     const md = renderReport(report);
+    expect(md).not.toContain("## Errors");
+    expect(md).not.toContain("## Warnings");
     expect(md).not.toContain("## Diagnostics");
-  });
-
-  it("omits resource outcomes when applyStatuses array is empty", () => {
-    const report = emptyReport({ applyStatuses: [] });
-    const md = renderReport(report);
-    expect(md).not.toContain("### Resource Outcomes");
   });
 
   it("renders VALUE_NOT_IN_PLAN sentinel in outputs as italic", () => {
@@ -99,14 +157,14 @@ describe("renderReport — apply-specific rendering", () => {
     });
     const md = renderReport(report);
     expect(md).toContain("_(value not in plan)_");
-    // Should NOT be wrapped in <code> tags
     expect(md).not.toContain("<code>(value not in plan)</code>");
   });
 
-  it("summary template also shows apply heading and sections", () => {
+  it("summary template renders all diagnostics in top-level section", () => {
     const report = emptyReport({
       diagnostics: [
         { severity: "warning", summary: "Deprecated", detail: "" },
+        { severity: "error", summary: "Something failed", detail: "details", address: "null_resource.x" },
       ],
       applyStatuses: [
         { address: "a.b", action: "update", success: true },
@@ -114,7 +172,36 @@ describe("renderReport — apply-specific rendering", () => {
     });
     const md = renderReport(report, { template: "summary" });
     expect(md).toContain("## Apply Summary");
-    expect(md).toContain("### Resource Outcomes");
-    expect(md).toContain("## Diagnostics");
+    // Summary template puts ALL diagnostics in top-level section
+    expect(md).toContain("⚠️ **Deprecated**");
+    expect(md).toContain("🚨 **Something failed**");
+    // No resource outcomes table
+    expect(md).not.toContain("### Resource Outcomes");
+  });
+
+  it("uses past-tense labels in apply summary", () => {
+    const report = emptyReport({
+      summary: {
+        actions: [{ action: "create", resourceTypes: [{ type: "null_resource", count: 1 }], total: 1 }],
+        failures: [],
+      },
+      applyStatuses: [
+        { address: "null_resource.a", action: "create", success: true },
+      ],
+    });
+    const md = renderReport(report);
+    expect(md).toContain("Added");
+  });
+
+  it("uses present-tense labels in plan summary", () => {
+    const report = emptyReport({
+      summary: {
+        actions: [{ action: "create", resourceTypes: [{ type: "null_resource", count: 1 }], total: 1 }],
+        failures: [],
+      },
+    });
+    const md = renderReport(report);
+    expect(md).toContain("Add");
+    expect(md).not.toContain("Added");
   });
 });

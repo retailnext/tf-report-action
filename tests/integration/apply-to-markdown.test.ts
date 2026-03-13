@@ -113,10 +113,11 @@ describe("applyToMarkdown integration", () => {
       expect(result).not.toContain("(known after apply)");
     });
 
-    it("shows apply status indicators", () => {
+    it("shows resource details with action symbols", () => {
       expect(fixture).toBeDefined();
       const result = applyToMarkdown(fixture!.planJson, fixture!.applyJsonl);
-      expect(result).toContain("✅");
+      expect(result).toContain("<details>");
+      expect(result).toContain("worker_a");
     });
   });
 
@@ -143,10 +144,10 @@ describe("applyToMarkdown integration", () => {
       );
     });
 
-    it("includes diagnostics section with error", () => {
+    it("includes inline error diagnostic for failed resource", () => {
       expect(fixture).toBeDefined();
       const result = applyToMarkdown(fixture!.planJson, fixture!.applyJsonl);
-      expect(result).toContain("## Diagnostics");
+      expect(result).toContain("local-exec provisioner error");
     });
   });
 });

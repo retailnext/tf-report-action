@@ -3,10 +3,11 @@
 exports[`planToMarkdown integration > terraform/apply-error/0 > renders without error and matches snapshot [default] 1`] = `
 "## Plan Summary
 
-| Action | Count |
-| --- | --- |
-| ➕ Add | 3 |
-| **Total** | **3** |
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Add | terraform_data | 2 |
+|  | null_resource | 1 |
+|  | **Add** | **3** |
 
 ## Resource Changes
 
@@ -52,10 +53,11 @@ _(all values known after apply)_
 exports[`planToMarkdown integration > terraform/apply-error/0 > renders without error and matches snapshot [diffFormat-simple] 1`] = `
 "## Plan Summary
 
-| Action | Count |
-| --- | --- |
-| ➕ Add | 3 |
-| **Total** | **3** |
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Add | terraform_data | 2 |
+|  | null_resource | 1 |
+|  | **Add** | **3** |
 
 ## Resource Changes
 
@@ -101,10 +103,11 @@ _(all values known after apply)_
 exports[`planToMarkdown integration > terraform/apply-error/0 > renders without error and matches snapshot [showUnchangedAttributes] 1`] = `
 "## Plan Summary
 
-| Action | Count |
-| --- | --- |
-| ➕ Add | 3 |
-| **Total** | **3** |
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Add | terraform_data | 2 |
+|  | null_resource | 1 |
+|  | **Add** | **3** |
 
 ## Resource Changes
 
@@ -156,21 +159,23 @@ exports[`planToMarkdown integration > terraform/apply-error/0 > renders without 
 exports[`planToMarkdown integration > terraform/apply-error/0 > renders without error and matches snapshot [summary-template] 1`] = `
 "## Plan Summary
 
-| Action | Count |
-| --- | --- |
-| ➕ Add | 3 |
-| **Total** | **3** |
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Add | terraform_data | 2 |
+|  | null_resource | 1 |
+|  | **Add** | **3** |
 "
 `;
 
 exports[`planToMarkdown integration > terraform/apply-error/1 > renders without error and matches snapshot [default] 1`] = `
 "## Plan Summary
 
-| Action | Count |
-| --- | --- |
-| 🔧 Change | 1 |
-| ± Replace | 1 |
-| **Total** | **2** |
+| Action | Resource | Count |
+| --- | --- | --- |
+| 🔧 Change | terraform_data | 1 |
+|  | **Change** | **1** |
+| ± Replace | null_resource | 1 |
+|  | **Replace** | **1** |
 
 ## Resource Changes
 
@@ -212,11 +217,12 @@ _No attribute changes._
 exports[`planToMarkdown integration > terraform/apply-error/1 > renders without error and matches snapshot [diffFormat-simple] 1`] = `
 "## Plan Summary
 
-| Action | Count |
-| --- | --- |
-| 🔧 Change | 1 |
-| ± Replace | 1 |
-| **Total** | **2** |
+| Action | Resource | Count |
+| --- | --- | --- |
+| 🔧 Change | terraform_data | 1 |
+|  | **Change** | **1** |
+| ± Replace | null_resource | 1 |
+|  | **Replace** | **1** |
 
 ## Resource Changes
 
@@ -258,11 +264,12 @@ _No attribute changes._
 exports[`planToMarkdown integration > terraform/apply-error/1 > renders without error and matches snapshot [showUnchangedAttributes] 1`] = `
 "## Plan Summary
 
-| Action | Count |
-| --- | --- |
-| 🔧 Change | 1 |
-| ± Replace | 1 |
-| **Total** | **2** |
+| Action | Resource | Count |
+| --- | --- | --- |
+| 🔧 Change | terraform_data | 1 |
+|  | **Change** | **1** |
+| ± Replace | null_resource | 1 |
+|  | **Replace** | **1** |
 
 ## Resource Changes
 
@@ -314,21 +321,23 @@ exports[`planToMarkdown integration > terraform/apply-error/1 > renders without 
 exports[`planToMarkdown integration > terraform/apply-error/1 > renders without error and matches snapshot [summary-template] 1`] = `
 "## Plan Summary
 
-| Action | Count |
-| --- | --- |
-| 🔧 Change | 1 |
-| ± Replace | 1 |
-| **Total** | **2** |
+| Action | Resource | Count |
+| --- | --- | --- |
+| 🔧 Change | terraform_data | 1 |
+|  | **Change** | **1** |
+| ± Replace | null_resource | 1 |
+|  | **Replace** | **1** |
 "
 `;
 
 exports[`planToMarkdown integration > terraform/deferred-data-source/0 > renders without error and matches snapshot [default] 1`] = `
 "## Plan Summary
 
-| Action | Count |
-| --- | --- |
-| ➕ Add | 5 |
-| **Total** | **5** |
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Add | terraform_data | 4 |
+|  | local_file | 1 |
+|  | **Add** | **5** |
 
 ## Resource Changes
 
@@ -409,10 +418,11 @@ _(all values known after apply)_
 exports[`planToMarkdown integration > terraform/deferred-data-source/0 > renders without error and matches snapshot [diffFormat-simple] 1`] = `
 "## Plan Summary
 
-| Action | Count |
-| --- | --- |
-| ➕ Add | 5 |
-| **Total** | **5** |
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Add | terraform_data | 4 |
+|  | local_file | 1 |
+|  | **Add** | **5** |
 
 ## Resource Changes
 
@@ -493,10 +503,11 @@ _(all values known after apply)_
 exports[`planToMarkdown integration > terraform/deferred-data-source/0 > renders without error and matches snapshot [showUnchangedAttributes] 1`] = `
 "## Plan Summary
 
-| Action | Count |
-| --- | --- |
-| ➕ Add | 5 |
-| **Total** | **5** |
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Add | terraform_data | 4 |
+|  | local_file | 1 |
+|  | **Add** | **5** |
 
 ## Resource Changes
 
@@ -595,21 +606,23 @@ exports[`planToMarkdown integration > terraform/deferred-data-source/0 > renders
 exports[`planToMarkdown integration > terraform/deferred-data-source/0 > renders without error and matches snapshot [summary-template] 1`] = `
 "## Plan Summary
 
-| Action | Count |
-| --- | --- |
-| ➕ Add | 5 |
-| **Total** | **5** |
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Add | terraform_data | 4 |
+|  | local_file | 1 |
+|  | **Add** | **5** |
 "
 `;
 
 exports[`planToMarkdown integration > terraform/deferred-data-source/1 > renders without error and matches snapshot [default] 1`] = `
 "## Plan Summary
 
-| Action | Count |
-| --- | --- |
-| ➕ Add | 1 |
-| 🔧 Change | 4 |
-| **Total** | **5** |
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Add | local_file | 1 |
+|  | **Add** | **1** |
+| 🔧 Change | terraform_data | 4 |
+|  | **Change** | **4** |
 
 ## Resource Changes
 
@@ -686,11 +699,12 @@ _(all values known after apply)_
 exports[`planToMarkdown integration > terraform/deferred-data-source/1 > renders without error and matches snapshot [diffFormat-simple] 1`] = `
 "## Plan Summary
 
-| Action | Count |
-| --- | --- |
-| ➕ Add | 1 |
-| 🔧 Change | 4 |
-| **Total** | **5** |
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Add | local_file | 1 |
+|  | **Add** | **1** |
+| 🔧 Change | terraform_data | 4 |
+|  | **Change** | **4** |
 
 ## Resource Changes
 
@@ -767,11 +781,12 @@ _(all values known after apply)_
 exports[`planToMarkdown integration > terraform/deferred-data-source/1 > renders without error and matches snapshot [showUnchangedAttributes] 1`] = `
 "## Plan Summary
 
-| Action | Count |
-| --- | --- |
-| ➕ Add | 1 |
-| 🔧 Change | 4 |
-| **Total** | **5** |
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Add | local_file | 1 |
+|  | **Add** | **1** |
+| 🔧 Change | terraform_data | 4 |
+|  | **Change** | **4** |
 
 ## Resource Changes
 
@@ -892,22 +907,24 @@ exports[`planToMarkdown integration > terraform/deferred-data-source/1 > renders
 exports[`planToMarkdown integration > terraform/deferred-data-source/1 > renders without error and matches snapshot [summary-template] 1`] = `
 "## Plan Summary
 
-| Action | Count |
-| --- | --- |
-| ➕ Add | 1 |
-| 🔧 Change | 4 |
-| **Total** | **5** |
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Add | local_file | 1 |
+|  | **Add** | **1** |
+| 🔧 Change | terraform_data | 4 |
+|  | **Change** | **4** |
 "
 `;
 
 exports[`planToMarkdown integration > terraform/deferred-data-source/2 > renders without error and matches snapshot [default] 1`] = `
 "## Plan Summary
 
-| Action | Count |
-| --- | --- |
-| 🔧 Change | 3 |
-| ± Replace | 1 |
-| **Total** | **4** |
+| Action | Resource | Count |
+| --- | --- | --- |
+| 🔧 Change | terraform_data | 3 |
+|  | **Change** | **3** |
+| ± Replace | local_file | 1 |
+|  | **Replace** | **1** |
 
 ## Resource Changes
 
@@ -991,11 +1008,12 @@ _(all values known after apply)_
 exports[`planToMarkdown integration > terraform/deferred-data-source/2 > renders without error and matches snapshot [diffFormat-simple] 1`] = `
 "## Plan Summary
 
-| Action | Count |
-| --- | --- |
-| 🔧 Change | 3 |
-| ± Replace | 1 |
-| **Total** | **4** |
+| Action | Resource | Count |
+| --- | --- | --- |
+| 🔧 Change | terraform_data | 3 |
+|  | **Change** | **3** |
+| ± Replace | local_file | 1 |
+|  | **Replace** | **1** |
 
 ## Resource Changes
 
@@ -1079,11 +1097,12 @@ _(all values known after apply)_
 exports[`planToMarkdown integration > terraform/deferred-data-source/2 > renders without error and matches snapshot [showUnchangedAttributes] 1`] = `
 "## Plan Summary
 
-| Action | Count |
-| --- | --- |
-| 🔧 Change | 3 |
-| ± Replace | 1 |
-| **Total** | **4** |
+| Action | Resource | Count |
+| --- | --- | --- |
+| 🔧 Change | terraform_data | 3 |
+|  | **Change** | **3** |
+| ± Replace | local_file | 1 |
+|  | **Replace** | **1** |
 
 ## Resource Changes
 
@@ -1205,21 +1224,22 @@ exports[`planToMarkdown integration > terraform/deferred-data-source/2 > renders
 exports[`planToMarkdown integration > terraform/deferred-data-source/2 > renders without error and matches snapshot [summary-template] 1`] = `
 "## Plan Summary
 
-| Action | Count |
-| --- | --- |
-| 🔧 Change | 3 |
-| ± Replace | 1 |
-| **Total** | **4** |
+| Action | Resource | Count |
+| --- | --- | --- |
+| 🔧 Change | terraform_data | 3 |
+|  | **Change** | **3** |
+| ± Replace | local_file | 1 |
+|  | **Replace** | **1** |
 "
 `;
 
 exports[`planToMarkdown integration > terraform/local-files/0 > renders without error and matches snapshot [default] 1`] = `
 "## Plan Summary
 
-| Action | Count |
-| --- | --- |
-| ➕ Add | 1 |
-| **Total** | **1** |
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Add | local_file | 1 |
+|  | **Add** | **1** |
 
 ## Resource Changes
 
@@ -1276,10 +1296,10 @@ Line 12: end of file
 exports[`planToMarkdown integration > terraform/local-files/0 > renders without error and matches snapshot [diffFormat-simple] 1`] = `
 "## Plan Summary
 
-| Action | Count |
-| --- | --- |
-| ➕ Add | 1 |
-| **Total** | **1** |
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Add | local_file | 1 |
+|  | **Add** | **1** |
 
 ## Resource Changes
 
@@ -1336,10 +1356,10 @@ Line 12: end of file
 exports[`planToMarkdown integration > terraform/local-files/0 > renders without error and matches snapshot [showUnchangedAttributes] 1`] = `
 "## Plan Summary
 
-| Action | Count |
-| --- | --- |
-| ➕ Add | 1 |
-| **Total** | **1** |
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Add | local_file | 1 |
+|  | **Add** | **1** |
 
 ## Resource Changes
 
@@ -1398,20 +1418,20 @@ Line 12: end of file
 exports[`planToMarkdown integration > terraform/local-files/0 > renders without error and matches snapshot [summary-template] 1`] = `
 "## Plan Summary
 
-| Action | Count |
-| --- | --- |
-| ➕ Add | 1 |
-| **Total** | **1** |
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Add | local_file | 1 |
+|  | **Add** | **1** |
 "
 `;
 
 exports[`planToMarkdown integration > terraform/local-files/1 > renders without error and matches snapshot [default] 1`] = `
 "## Plan Summary
 
-| Action | Count |
-| --- | --- |
-| ± Replace | 1 |
-| **Total** | **1** |
+| Action | Resource | Count |
+| --- | --- | --- |
+| ± Replace | local_file | 1 |
+|  | **Replace** | **1** |
 
 ## Resource Changes
 
@@ -1470,10 +1490,10 @@ exports[`planToMarkdown integration > terraform/local-files/1 > renders without 
 exports[`planToMarkdown integration > terraform/local-files/1 > renders without error and matches snapshot [diffFormat-simple] 1`] = `
 "## Plan Summary
 
-| Action | Count |
-| --- | --- |
-| ± Replace | 1 |
-| **Total** | **1** |
+| Action | Resource | Count |
+| --- | --- | --- |
+| ± Replace | local_file | 1 |
+|  | **Replace** | **1** |
 
 ## Resource Changes
 
@@ -1532,10 +1552,10 @@ exports[`planToMarkdown integration > terraform/local-files/1 > renders without 
 exports[`planToMarkdown integration > terraform/local-files/1 > renders without error and matches snapshot [showUnchangedAttributes] 1`] = `
 "## Plan Summary
 
-| Action | Count |
-| --- | --- |
-| ± Replace | 1 |
-| **Total** | **1** |
+| Action | Resource | Count |
+| --- | --- | --- |
+| ± Replace | local_file | 1 |
+|  | **Replace** | **1** |
 
 ## Resource Changes
 
@@ -1599,20 +1619,20 @@ exports[`planToMarkdown integration > terraform/local-files/1 > renders without 
 exports[`planToMarkdown integration > terraform/local-files/1 > renders without error and matches snapshot [summary-template] 1`] = `
 "## Plan Summary
 
-| Action | Count |
-| --- | --- |
-| ± Replace | 1 |
-| **Total** | **1** |
+| Action | Resource | Count |
+| --- | --- | --- |
+| ± Replace | local_file | 1 |
+|  | **Replace** | **1** |
 "
 `;
 
 exports[`planToMarkdown integration > terraform/moved-resource/0 > renders without error and matches snapshot [default] 1`] = `
 "## Plan Summary
 
-| Action | Count |
-| --- | --- |
-| ➕ Add | 1 |
-| **Total** | **1** |
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Add | null_resource | 1 |
+|  | **Add** | **1** |
 
 ## Resource Changes
 
@@ -1633,10 +1653,10 @@ exports[`planToMarkdown integration > terraform/moved-resource/0 > renders witho
 exports[`planToMarkdown integration > terraform/moved-resource/0 > renders without error and matches snapshot [diffFormat-simple] 1`] = `
 "## Plan Summary
 
-| Action | Count |
-| --- | --- |
-| ➕ Add | 1 |
-| **Total** | **1** |
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Add | null_resource | 1 |
+|  | **Add** | **1** |
 
 ## Resource Changes
 
@@ -1657,10 +1677,10 @@ exports[`planToMarkdown integration > terraform/moved-resource/0 > renders witho
 exports[`planToMarkdown integration > terraform/moved-resource/0 > renders without error and matches snapshot [showUnchangedAttributes] 1`] = `
 "## Plan Summary
 
-| Action | Count |
-| --- | --- |
-| ➕ Add | 1 |
-| **Total** | **1** |
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Add | null_resource | 1 |
+|  | **Add** | **1** |
 
 ## Resource Changes
 
@@ -1681,19 +1701,17 @@ exports[`planToMarkdown integration > terraform/moved-resource/0 > renders witho
 exports[`planToMarkdown integration > terraform/moved-resource/0 > renders without error and matches snapshot [summary-template] 1`] = `
 "## Plan Summary
 
-| Action | Count |
-| --- | --- |
-| ➕ Add | 1 |
-| **Total** | **1** |
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Add | null_resource | 1 |
+|  | **Add** | **1** |
 "
 `;
 
 exports[`planToMarkdown integration > terraform/moved-resource/1 > renders without error and matches snapshot [default] 1`] = `
 "## Plan Summary
 
-| Action | Count |
-| --- | --- |
-| **Total** | **0** |
+_No changes._
 
 ## Resource Changes
 
@@ -1713,9 +1731,7 @@ _No attribute changes._
 exports[`planToMarkdown integration > terraform/moved-resource/1 > renders without error and matches snapshot [diffFormat-simple] 1`] = `
 "## Plan Summary
 
-| Action | Count |
-| --- | --- |
-| **Total** | **0** |
+_No changes._
 
 ## Resource Changes
 
@@ -1735,9 +1751,7 @@ _No attribute changes._
 exports[`planToMarkdown integration > terraform/moved-resource/1 > renders without error and matches snapshot [showUnchangedAttributes] 1`] = `
 "## Plan Summary
 
-| Action | Count |
-| --- | --- |
-| **Total** | **0** |
+_No changes._
 
 ## Resource Changes
 
@@ -1760,19 +1774,17 @@ exports[`planToMarkdown integration > terraform/moved-resource/1 > renders witho
 exports[`planToMarkdown integration > terraform/moved-resource/1 > renders without error and matches snapshot [summary-template] 1`] = `
 "## Plan Summary
 
-| Action | Count |
-| --- | --- |
-| **Total** | **0** |
+_No changes._
 "
 `;
 
 exports[`planToMarkdown integration > terraform/no-op/0 > renders without error and matches snapshot [default] 1`] = `
 "## Plan Summary
 
-| Action | Count |
-| --- | --- |
-| ➕ Add | 1 |
-| **Total** | **1** |
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Add | null_resource | 1 |
+|  | **Add** | **1** |
 
 ## Resource Changes
 
@@ -1793,10 +1805,10 @@ exports[`planToMarkdown integration > terraform/no-op/0 > renders without error 
 exports[`planToMarkdown integration > terraform/no-op/0 > renders without error and matches snapshot [diffFormat-simple] 1`] = `
 "## Plan Summary
 
-| Action | Count |
-| --- | --- |
-| ➕ Add | 1 |
-| **Total** | **1** |
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Add | null_resource | 1 |
+|  | **Add** | **1** |
 
 ## Resource Changes
 
@@ -1817,10 +1829,10 @@ exports[`planToMarkdown integration > terraform/no-op/0 > renders without error 
 exports[`planToMarkdown integration > terraform/no-op/0 > renders without error and matches snapshot [showUnchangedAttributes] 1`] = `
 "## Plan Summary
 
-| Action | Count |
-| --- | --- |
-| ➕ Add | 1 |
-| **Total** | **1** |
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Add | null_resource | 1 |
+|  | **Add** | **1** |
 
 ## Resource Changes
 
@@ -1841,19 +1853,17 @@ exports[`planToMarkdown integration > terraform/no-op/0 > renders without error 
 exports[`planToMarkdown integration > terraform/no-op/0 > renders without error and matches snapshot [summary-template] 1`] = `
 "## Plan Summary
 
-| Action | Count |
-| --- | --- |
-| ➕ Add | 1 |
-| **Total** | **1** |
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Add | null_resource | 1 |
+|  | **Add** | **1** |
 "
 `;
 
 exports[`planToMarkdown integration > terraform/no-op/1 > renders without error and matches snapshot [default] 1`] = `
 "## Plan Summary
 
-| Action | Count |
-| --- | --- |
-| **Total** | **0** |
+_No changes._
 
 ## Resource Changes
 
@@ -1871,9 +1881,7 @@ _No attribute changes._
 exports[`planToMarkdown integration > terraform/no-op/1 > renders without error and matches snapshot [diffFormat-simple] 1`] = `
 "## Plan Summary
 
-| Action | Count |
-| --- | --- |
-| **Total** | **0** |
+_No changes._
 
 ## Resource Changes
 
@@ -1891,9 +1899,7 @@ _No attribute changes._
 exports[`planToMarkdown integration > terraform/no-op/1 > renders without error and matches snapshot [showUnchangedAttributes] 1`] = `
 "## Plan Summary
 
-| Action | Count |
-| --- | --- |
-| **Total** | **0** |
+_No changes._
 
 ## Resource Changes
 
@@ -1914,55 +1920,46 @@ exports[`planToMarkdown integration > terraform/no-op/1 > renders without error 
 exports[`planToMarkdown integration > terraform/no-op/1 > renders without error and matches snapshot [summary-template] 1`] = `
 "## Plan Summary
 
-| Action | Count |
-| --- | --- |
-| **Total** | **0** |
+_No changes._
 "
 `;
 
 exports[`planToMarkdown integration > terraform/null-lifecycle/0 > renders without error and matches snapshot [default] 1`] = `
 "## Plan Summary
 
-| Action | Count |
-| --- | --- |
-| **Total** | **0** |
+_No changes._
 "
 `;
 
 exports[`planToMarkdown integration > terraform/null-lifecycle/0 > renders without error and matches snapshot [diffFormat-simple] 1`] = `
 "## Plan Summary
 
-| Action | Count |
-| --- | --- |
-| **Total** | **0** |
+_No changes._
 "
 `;
 
 exports[`planToMarkdown integration > terraform/null-lifecycle/0 > renders without error and matches snapshot [showUnchangedAttributes] 1`] = `
 "## Plan Summary
 
-| Action | Count |
-| --- | --- |
-| **Total** | **0** |
+_No changes._
 "
 `;
 
 exports[`planToMarkdown integration > terraform/null-lifecycle/0 > renders without error and matches snapshot [summary-template] 1`] = `
 "## Plan Summary
 
-| Action | Count |
-| --- | --- |
-| **Total** | **0** |
+_No changes._
 "
 `;
 
 exports[`planToMarkdown integration > terraform/null-lifecycle/1 > renders without error and matches snapshot [default] 1`] = `
 "## Plan Summary
 
-| Action | Count |
-| --- | --- |
-| ➕ Add | 3 |
-| **Total** | **3** |
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Add | null_resource | 2 |
+|  | terraform_data | 1 |
+|  | **Add** | **3** |
 
 ## Resource Changes
 
@@ -2006,10 +2003,11 @@ exports[`planToMarkdown integration > terraform/null-lifecycle/1 > renders witho
 exports[`planToMarkdown integration > terraform/null-lifecycle/1 > renders without error and matches snapshot [diffFormat-simple] 1`] = `
 "## Plan Summary
 
-| Action | Count |
-| --- | --- |
-| ➕ Add | 3 |
-| **Total** | **3** |
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Add | null_resource | 2 |
+|  | terraform_data | 1 |
+|  | **Add** | **3** |
 
 ## Resource Changes
 
@@ -2053,10 +2051,11 @@ exports[`planToMarkdown integration > terraform/null-lifecycle/1 > renders witho
 exports[`planToMarkdown integration > terraform/null-lifecycle/1 > renders without error and matches snapshot [showUnchangedAttributes] 1`] = `
 "## Plan Summary
 
-| Action | Count |
-| --- | --- |
-| ➕ Add | 3 |
-| **Total** | **3** |
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Add | null_resource | 2 |
+|  | terraform_data | 1 |
+|  | **Add** | **3** |
 
 ## Resource Changes
 
@@ -2101,22 +2100,25 @@ exports[`planToMarkdown integration > terraform/null-lifecycle/1 > renders witho
 exports[`planToMarkdown integration > terraform/null-lifecycle/1 > renders without error and matches snapshot [summary-template] 1`] = `
 "## Plan Summary
 
-| Action | Count |
-| --- | --- |
-| ➕ Add | 3 |
-| **Total** | **3** |
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Add | null_resource | 2 |
+|  | terraform_data | 1 |
+|  | **Add** | **3** |
 "
 `;
 
 exports[`planToMarkdown integration > terraform/null-lifecycle/2 > renders without error and matches snapshot [default] 1`] = `
 "## Plan Summary
 
-| Action | Count |
-| --- | --- |
-| 🔧 Change | 1 |
-| 🗑️ Destroy | 1 |
-| ± Replace | 1 |
-| **Total** | **3** |
+| Action | Resource | Count |
+| --- | --- | --- |
+| 🔧 Change | terraform_data | 1 |
+|  | **Change** | **1** |
+| ± Replace | null_resource | 1 |
+|  | **Replace** | **1** |
+| 🗑️ Destroy | null_resource | 1 |
+|  | **Destroy** | **1** |
 
 ## Resource Changes
 
@@ -2158,12 +2160,14 @@ exports[`planToMarkdown integration > terraform/null-lifecycle/2 > renders witho
 exports[`planToMarkdown integration > terraform/null-lifecycle/2 > renders without error and matches snapshot [diffFormat-simple] 1`] = `
 "## Plan Summary
 
-| Action | Count |
-| --- | --- |
-| 🔧 Change | 1 |
-| 🗑️ Destroy | 1 |
-| ± Replace | 1 |
-| **Total** | **3** |
+| Action | Resource | Count |
+| --- | --- | --- |
+| 🔧 Change | terraform_data | 1 |
+|  | **Change** | **1** |
+| ± Replace | null_resource | 1 |
+|  | **Replace** | **1** |
+| 🗑️ Destroy | null_resource | 1 |
+|  | **Destroy** | **1** |
 
 ## Resource Changes
 
@@ -2205,12 +2209,14 @@ exports[`planToMarkdown integration > terraform/null-lifecycle/2 > renders witho
 exports[`planToMarkdown integration > terraform/null-lifecycle/2 > renders without error and matches snapshot [showUnchangedAttributes] 1`] = `
 "## Plan Summary
 
-| Action | Count |
-| --- | --- |
-| 🔧 Change | 1 |
-| 🗑️ Destroy | 1 |
-| ± Replace | 1 |
-| **Total** | **3** |
+| Action | Resource | Count |
+| --- | --- | --- |
+| 🔧 Change | terraform_data | 1 |
+|  | **Change** | **1** |
+| ± Replace | null_resource | 1 |
+|  | **Replace** | **1** |
+| 🗑️ Destroy | null_resource | 1 |
+|  | **Destroy** | **1** |
 
 ## Resource Changes
 
@@ -2255,22 +2261,24 @@ exports[`planToMarkdown integration > terraform/null-lifecycle/2 > renders witho
 exports[`planToMarkdown integration > terraform/null-lifecycle/2 > renders without error and matches snapshot [summary-template] 1`] = `
 "## Plan Summary
 
-| Action | Count |
-| --- | --- |
-| 🔧 Change | 1 |
-| 🗑️ Destroy | 1 |
-| ± Replace | 1 |
-| **Total** | **3** |
+| Action | Resource | Count |
+| --- | --- | --- |
+| 🔧 Change | terraform_data | 1 |
+|  | **Change** | **1** |
+| ± Replace | null_resource | 1 |
+|  | **Replace** | **1** |
+| 🗑️ Destroy | null_resource | 1 |
+|  | **Destroy** | **1** |
 "
 `;
 
 exports[`planToMarkdown integration > terraform/random-replace/0 > renders without error and matches snapshot [default] 1`] = `
 "## Plan Summary
 
-| Action | Count |
-| --- | --- |
-| ➕ Add | 1 |
-| **Total** | **1** |
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Add | random_string | 1 |
+|  | **Add** | **1** |
 
 ## Resource Changes
 
@@ -2308,10 +2316,10 @@ exports[`planToMarkdown integration > terraform/random-replace/0 > renders witho
 exports[`planToMarkdown integration > terraform/random-replace/0 > renders without error and matches snapshot [diffFormat-simple] 1`] = `
 "## Plan Summary
 
-| Action | Count |
-| --- | --- |
-| ➕ Add | 1 |
-| **Total** | **1** |
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Add | random_string | 1 |
+|  | **Add** | **1** |
 
 ## Resource Changes
 
@@ -2349,10 +2357,10 @@ exports[`planToMarkdown integration > terraform/random-replace/0 > renders witho
 exports[`planToMarkdown integration > terraform/random-replace/0 > renders without error and matches snapshot [showUnchangedAttributes] 1`] = `
 "## Plan Summary
 
-| Action | Count |
-| --- | --- |
-| ➕ Add | 1 |
-| **Total** | **1** |
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Add | random_string | 1 |
+|  | **Add** | **1** |
 
 ## Resource Changes
 
@@ -2391,20 +2399,20 @@ exports[`planToMarkdown integration > terraform/random-replace/0 > renders witho
 exports[`planToMarkdown integration > terraform/random-replace/0 > renders without error and matches snapshot [summary-template] 1`] = `
 "## Plan Summary
 
-| Action | Count |
-| --- | --- |
-| ➕ Add | 1 |
-| **Total** | **1** |
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Add | random_string | 1 |
+|  | **Add** | **1** |
 "
 `;
 
 exports[`planToMarkdown integration > terraform/random-replace/1 > renders without error and matches snapshot [default] 1`] = `
 "## Plan Summary
 
-| Action | Count |
-| --- | --- |
-| ± Replace | 1 |
-| **Total** | **1** |
+| Action | Resource | Count |
+| --- | --- | --- |
+| ± Replace | random_string | 1 |
+|  | **Replace** | **1** |
 
 ## Resource Changes
 
@@ -2432,10 +2440,10 @@ exports[`planToMarkdown integration > terraform/random-replace/1 > renders witho
 exports[`planToMarkdown integration > terraform/random-replace/1 > renders without error and matches snapshot [diffFormat-simple] 1`] = `
 "## Plan Summary
 
-| Action | Count |
-| --- | --- |
-| ± Replace | 1 |
-| **Total** | **1** |
+| Action | Resource | Count |
+| --- | --- | --- |
+| ± Replace | random_string | 1 |
+|  | **Replace** | **1** |
 
 ## Resource Changes
 
@@ -2463,10 +2471,10 @@ exports[`planToMarkdown integration > terraform/random-replace/1 > renders witho
 exports[`planToMarkdown integration > terraform/random-replace/1 > renders without error and matches snapshot [showUnchangedAttributes] 1`] = `
 "## Plan Summary
 
-| Action | Count |
-| --- | --- |
-| ± Replace | 1 |
-| **Total** | **1** |
+| Action | Resource | Count |
+| --- | --- | --- |
+| ± Replace | random_string | 1 |
+|  | **Replace** | **1** |
 
 ## Resource Changes
 
@@ -2505,20 +2513,20 @@ exports[`planToMarkdown integration > terraform/random-replace/1 > renders witho
 exports[`planToMarkdown integration > terraform/random-replace/1 > renders without error and matches snapshot [summary-template] 1`] = `
 "## Plan Summary
 
-| Action | Count |
-| --- | --- |
-| ± Replace | 1 |
-| **Total** | **1** |
+| Action | Resource | Count |
+| --- | --- | --- |
+| ± Replace | random_string | 1 |
+|  | **Replace** | **1** |
 "
 `;
 
 exports[`planToMarkdown integration > terraform/sensitive-values/0 > renders without error and matches snapshot [default] 1`] = `
 "## Plan Summary
 
-| Action | Count |
-| --- | --- |
-| ➕ Add | 1 |
-| **Total** | **1** |
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Add | local_sensitive_file | 1 |
+|  | **Add** | **1** |
 
 ## Resource Changes
 
@@ -2556,10 +2564,10 @@ exports[`planToMarkdown integration > terraform/sensitive-values/0 > renders wit
 exports[`planToMarkdown integration > terraform/sensitive-values/0 > renders without error and matches snapshot [diffFormat-simple] 1`] = `
 "## Plan Summary
 
-| Action | Count |
-| --- | --- |
-| ➕ Add | 1 |
-| **Total** | **1** |
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Add | local_sensitive_file | 1 |
+|  | **Add** | **1** |
 
 ## Resource Changes
 
@@ -2597,10 +2605,10 @@ exports[`planToMarkdown integration > terraform/sensitive-values/0 > renders wit
 exports[`planToMarkdown integration > terraform/sensitive-values/0 > renders without error and matches snapshot [showUnchangedAttributes] 1`] = `
 "## Plan Summary
 
-| Action | Count |
-| --- | --- |
-| ➕ Add | 1 |
-| **Total** | **1** |
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Add | local_sensitive_file | 1 |
+|  | **Add** | **1** |
 
 ## Resource Changes
 
@@ -2639,20 +2647,20 @@ exports[`planToMarkdown integration > terraform/sensitive-values/0 > renders wit
 exports[`planToMarkdown integration > terraform/sensitive-values/0 > renders without error and matches snapshot [summary-template] 1`] = `
 "## Plan Summary
 
-| Action | Count |
-| --- | --- |
-| ➕ Add | 1 |
-| **Total** | **1** |
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Add | local_sensitive_file | 1 |
+|  | **Add** | **1** |
 "
 `;
 
 exports[`planToMarkdown integration > terraform/sensitive-values/1 > renders without error and matches snapshot [default] 1`] = `
 "## Plan Summary
 
-| Action | Count |
-| --- | --- |
-| ± Replace | 1 |
-| **Total** | **1** |
+| Action | Resource | Count |
+| --- | --- | --- |
+| ± Replace | local_sensitive_file | 1 |
+|  | **Replace** | **1** |
 
 ## Resource Changes
 
@@ -2687,10 +2695,10 @@ exports[`planToMarkdown integration > terraform/sensitive-values/1 > renders wit
 exports[`planToMarkdown integration > terraform/sensitive-values/1 > renders without error and matches snapshot [diffFormat-simple] 1`] = `
 "## Plan Summary
 
-| Action | Count |
-| --- | --- |
-| ± Replace | 1 |
-| **Total** | **1** |
+| Action | Resource | Count |
+| --- | --- | --- |
+| ± Replace | local_sensitive_file | 1 |
+|  | **Replace** | **1** |
 
 ## Resource Changes
 
@@ -2725,10 +2733,10 @@ exports[`planToMarkdown integration > terraform/sensitive-values/1 > renders wit
 exports[`planToMarkdown integration > terraform/sensitive-values/1 > renders without error and matches snapshot [showUnchangedAttributes] 1`] = `
 "## Plan Summary
 
-| Action | Count |
-| --- | --- |
-| ± Replace | 1 |
-| **Total** | **1** |
+| Action | Resource | Count |
+| --- | --- | --- |
+| ± Replace | local_sensitive_file | 1 |
+|  | **Replace** | **1** |
 
 ## Resource Changes
 
@@ -2767,20 +2775,21 @@ exports[`planToMarkdown integration > terraform/sensitive-values/1 > renders wit
 exports[`planToMarkdown integration > terraform/sensitive-values/1 > renders without error and matches snapshot [summary-template] 1`] = `
 "## Plan Summary
 
-| Action | Count |
-| --- | --- |
-| ± Replace | 1 |
-| **Total** | **1** |
+| Action | Resource | Count |
+| --- | --- | --- |
+| ± Replace | local_sensitive_file | 1 |
+|  | **Replace** | **1** |
 "
 `;
 
 exports[`planToMarkdown integration > terraform/with-modules/0 > renders without error and matches snapshot [default] 1`] = `
 "## Plan Summary
 
-| Action | Count |
-| --- | --- |
-| ➕ Add | 2 |
-| **Total** | **2** |
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Add | null_resource | 1 |
+|  | random_string | 1 |
+|  | **Add** | **2** |
 
 ## Resource Changes
 
@@ -2831,10 +2840,11 @@ exports[`planToMarkdown integration > terraform/with-modules/0 > renders without
 exports[`planToMarkdown integration > terraform/with-modules/0 > renders without error and matches snapshot [diffFormat-simple] 1`] = `
 "## Plan Summary
 
-| Action | Count |
-| --- | --- |
-| ➕ Add | 2 |
-| **Total** | **2** |
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Add | null_resource | 1 |
+|  | random_string | 1 |
+|  | **Add** | **2** |
 
 ## Resource Changes
 
@@ -2885,10 +2895,11 @@ exports[`planToMarkdown integration > terraform/with-modules/0 > renders without
 exports[`planToMarkdown integration > terraform/with-modules/0 > renders without error and matches snapshot [showUnchangedAttributes] 1`] = `
 "## Plan Summary
 
-| Action | Count |
-| --- | --- |
-| ➕ Add | 2 |
-| **Total** | **2** |
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Add | null_resource | 1 |
+|  | random_string | 1 |
+|  | **Add** | **2** |
 
 ## Resource Changes
 
@@ -2940,20 +2951,22 @@ exports[`planToMarkdown integration > terraform/with-modules/0 > renders without
 exports[`planToMarkdown integration > terraform/with-modules/0 > renders without error and matches snapshot [summary-template] 1`] = `
 "## Plan Summary
 
-| Action | Count |
-| --- | --- |
-| ➕ Add | 2 |
-| **Total** | **2** |
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Add | null_resource | 1 |
+|  | random_string | 1 |
+|  | **Add** | **2** |
 "
 `;
 
 exports[`planToMarkdown integration > terraform/with-modules/1 > renders without error and matches snapshot [default] 1`] = `
 "## Plan Summary
 
-| Action | Count |
-| --- | --- |
-| ± Replace | 2 |
-| **Total** | **2** |
+| Action | Resource | Count |
+| --- | --- | --- |
+| ± Replace | null_resource | 1 |
+|  | random_string | 1 |
+|  | **Replace** | **2** |
 
 ## Resource Changes
 
@@ -2994,10 +3007,11 @@ exports[`planToMarkdown integration > terraform/with-modules/1 > renders without
 exports[`planToMarkdown integration > terraform/with-modules/1 > renders without error and matches snapshot [diffFormat-simple] 1`] = `
 "## Plan Summary
 
-| Action | Count |
-| --- | --- |
-| ± Replace | 2 |
-| **Total** | **2** |
+| Action | Resource | Count |
+| --- | --- | --- |
+| ± Replace | null_resource | 1 |
+|  | random_string | 1 |
+|  | **Replace** | **2** |
 
 ## Resource Changes
 
@@ -3038,10 +3052,11 @@ exports[`planToMarkdown integration > terraform/with-modules/1 > renders without
 exports[`planToMarkdown integration > terraform/with-modules/1 > renders without error and matches snapshot [showUnchangedAttributes] 1`] = `
 "## Plan Summary
 
-| Action | Count |
-| --- | --- |
-| ± Replace | 2 |
-| **Total** | **2** |
+| Action | Resource | Count |
+| --- | --- | --- |
+| ± Replace | null_resource | 1 |
+|  | random_string | 1 |
+|  | **Replace** | **2** |
 
 ## Resource Changes
 
@@ -3093,20 +3108,22 @@ exports[`planToMarkdown integration > terraform/with-modules/1 > renders without
 exports[`planToMarkdown integration > terraform/with-modules/1 > renders without error and matches snapshot [summary-template] 1`] = `
 "## Plan Summary
 
-| Action | Count |
-| --- | --- |
-| ± Replace | 2 |
-| **Total** | **2** |
+| Action | Resource | Count |
+| --- | --- | --- |
+| ± Replace | null_resource | 1 |
+|  | random_string | 1 |
+|  | **Replace** | **2** |
 "
 `;
 
 exports[`planToMarkdown integration > tofu/apply-error/0 > renders without error and matches snapshot [default] 1`] = `
 "## Plan Summary
 
-| Action | Count |
-| --- | --- |
-| ➕ Add | 3 |
-| **Total** | **3** |
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Add | terraform_data | 2 |
+|  | null_resource | 1 |
+|  | **Add** | **3** |
 
 ## Resource Changes
 
@@ -3152,10 +3169,11 @@ _(all values known after apply)_
 exports[`planToMarkdown integration > tofu/apply-error/0 > renders without error and matches snapshot [diffFormat-simple] 1`] = `
 "## Plan Summary
 
-| Action | Count |
-| --- | --- |
-| ➕ Add | 3 |
-| **Total** | **3** |
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Add | terraform_data | 2 |
+|  | null_resource | 1 |
+|  | **Add** | **3** |
 
 ## Resource Changes
 
@@ -3201,10 +3219,11 @@ _(all values known after apply)_
 exports[`planToMarkdown integration > tofu/apply-error/0 > renders without error and matches snapshot [showUnchangedAttributes] 1`] = `
 "## Plan Summary
 
-| Action | Count |
-| --- | --- |
-| ➕ Add | 3 |
-| **Total** | **3** |
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Add | terraform_data | 2 |
+|  | null_resource | 1 |
+|  | **Add** | **3** |
 
 ## Resource Changes
 
@@ -3256,21 +3275,23 @@ exports[`planToMarkdown integration > tofu/apply-error/0 > renders without error
 exports[`planToMarkdown integration > tofu/apply-error/0 > renders without error and matches snapshot [summary-template] 1`] = `
 "## Plan Summary
 
-| Action | Count |
-| --- | --- |
-| ➕ Add | 3 |
-| **Total** | **3** |
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Add | terraform_data | 2 |
+|  | null_resource | 1 |
+|  | **Add** | **3** |
 "
 `;
 
 exports[`planToMarkdown integration > tofu/apply-error/1 > renders without error and matches snapshot [default] 1`] = `
 "## Plan Summary
 
-| Action | Count |
-| --- | --- |
-| 🔧 Change | 1 |
-| ± Replace | 1 |
-| **Total** | **2** |
+| Action | Resource | Count |
+| --- | --- | --- |
+| 🔧 Change | terraform_data | 1 |
+|  | **Change** | **1** |
+| ± Replace | null_resource | 1 |
+|  | **Replace** | **1** |
 
 ## Resource Changes
 
@@ -3312,11 +3333,12 @@ _No attribute changes._
 exports[`planToMarkdown integration > tofu/apply-error/1 > renders without error and matches snapshot [diffFormat-simple] 1`] = `
 "## Plan Summary
 
-| Action | Count |
-| --- | --- |
-| 🔧 Change | 1 |
-| ± Replace | 1 |
-| **Total** | **2** |
+| Action | Resource | Count |
+| --- | --- | --- |
+| 🔧 Change | terraform_data | 1 |
+|  | **Change** | **1** |
+| ± Replace | null_resource | 1 |
+|  | **Replace** | **1** |
 
 ## Resource Changes
 
@@ -3358,11 +3380,12 @@ _No attribute changes._
 exports[`planToMarkdown integration > tofu/apply-error/1 > renders without error and matches snapshot [showUnchangedAttributes] 1`] = `
 "## Plan Summary
 
-| Action | Count |
-| --- | --- |
-| 🔧 Change | 1 |
-| ± Replace | 1 |
-| **Total** | **2** |
+| Action | Resource | Count |
+| --- | --- | --- |
+| 🔧 Change | terraform_data | 1 |
+|  | **Change** | **1** |
+| ± Replace | null_resource | 1 |
+|  | **Replace** | **1** |
 
 ## Resource Changes
 
@@ -3414,21 +3437,23 @@ exports[`planToMarkdown integration > tofu/apply-error/1 > renders without error
 exports[`planToMarkdown integration > tofu/apply-error/1 > renders without error and matches snapshot [summary-template] 1`] = `
 "## Plan Summary
 
-| Action | Count |
-| --- | --- |
-| 🔧 Change | 1 |
-| ± Replace | 1 |
-| **Total** | **2** |
+| Action | Resource | Count |
+| --- | --- | --- |
+| 🔧 Change | terraform_data | 1 |
+|  | **Change** | **1** |
+| ± Replace | null_resource | 1 |
+|  | **Replace** | **1** |
 "
 `;
 
 exports[`planToMarkdown integration > tofu/deferred-data-source/0 > renders without error and matches snapshot [default] 1`] = `
 "## Plan Summary
 
-| Action | Count |
-| --- | --- |
-| ➕ Add | 5 |
-| **Total** | **5** |
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Add | terraform_data | 4 |
+|  | local_file | 1 |
+|  | **Add** | **5** |
 
 ## Resource Changes
 
@@ -3509,10 +3534,11 @@ _(all values known after apply)_
 exports[`planToMarkdown integration > tofu/deferred-data-source/0 > renders without error and matches snapshot [diffFormat-simple] 1`] = `
 "## Plan Summary
 
-| Action | Count |
-| --- | --- |
-| ➕ Add | 5 |
-| **Total** | **5** |
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Add | terraform_data | 4 |
+|  | local_file | 1 |
+|  | **Add** | **5** |
 
 ## Resource Changes
 
@@ -3593,10 +3619,11 @@ _(all values known after apply)_
 exports[`planToMarkdown integration > tofu/deferred-data-source/0 > renders without error and matches snapshot [showUnchangedAttributes] 1`] = `
 "## Plan Summary
 
-| Action | Count |
-| --- | --- |
-| ➕ Add | 5 |
-| **Total** | **5** |
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Add | terraform_data | 4 |
+|  | local_file | 1 |
+|  | **Add** | **5** |
 
 ## Resource Changes
 
@@ -3695,21 +3722,23 @@ exports[`planToMarkdown integration > tofu/deferred-data-source/0 > renders with
 exports[`planToMarkdown integration > tofu/deferred-data-source/0 > renders without error and matches snapshot [summary-template] 1`] = `
 "## Plan Summary
 
-| Action | Count |
-| --- | --- |
-| ➕ Add | 5 |
-| **Total** | **5** |
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Add | terraform_data | 4 |
+|  | local_file | 1 |
+|  | **Add** | **5** |
 "
 `;
 
 exports[`planToMarkdown integration > tofu/deferred-data-source/1 > renders without error and matches snapshot [default] 1`] = `
 "## Plan Summary
 
-| Action | Count |
-| --- | --- |
-| ➕ Add | 1 |
-| 🔧 Change | 4 |
-| **Total** | **5** |
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Add | local_file | 1 |
+|  | **Add** | **1** |
+| 🔧 Change | terraform_data | 4 |
+|  | **Change** | **4** |
 
 ## Resource Changes
 
@@ -3786,11 +3815,12 @@ _(all values known after apply)_
 exports[`planToMarkdown integration > tofu/deferred-data-source/1 > renders without error and matches snapshot [diffFormat-simple] 1`] = `
 "## Plan Summary
 
-| Action | Count |
-| --- | --- |
-| ➕ Add | 1 |
-| 🔧 Change | 4 |
-| **Total** | **5** |
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Add | local_file | 1 |
+|  | **Add** | **1** |
+| 🔧 Change | terraform_data | 4 |
+|  | **Change** | **4** |
 
 ## Resource Changes
 
@@ -3867,11 +3897,12 @@ _(all values known after apply)_
 exports[`planToMarkdown integration > tofu/deferred-data-source/1 > renders without error and matches snapshot [showUnchangedAttributes] 1`] = `
 "## Plan Summary
 
-| Action | Count |
-| --- | --- |
-| ➕ Add | 1 |
-| 🔧 Change | 4 |
-| **Total** | **5** |
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Add | local_file | 1 |
+|  | **Add** | **1** |
+| 🔧 Change | terraform_data | 4 |
+|  | **Change** | **4** |
 
 ## Resource Changes
 
@@ -3992,22 +4023,24 @@ exports[`planToMarkdown integration > tofu/deferred-data-source/1 > renders with
 exports[`planToMarkdown integration > tofu/deferred-data-source/1 > renders without error and matches snapshot [summary-template] 1`] = `
 "## Plan Summary
 
-| Action | Count |
-| --- | --- |
-| ➕ Add | 1 |
-| 🔧 Change | 4 |
-| **Total** | **5** |
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Add | local_file | 1 |
+|  | **Add** | **1** |
+| 🔧 Change | terraform_data | 4 |
+|  | **Change** | **4** |
 "
 `;
 
 exports[`planToMarkdown integration > tofu/deferred-data-source/2 > renders without error and matches snapshot [default] 1`] = `
 "## Plan Summary
 
-| Action | Count |
-| --- | --- |
-| 🔧 Change | 3 |
-| ± Replace | 1 |
-| **Total** | **4** |
+| Action | Resource | Count |
+| --- | --- | --- |
+| 🔧 Change | terraform_data | 3 |
+|  | **Change** | **3** |
+| ± Replace | local_file | 1 |
+|  | **Replace** | **1** |
 
 ## Resource Changes
 
@@ -4091,11 +4124,12 @@ _(all values known after apply)_
 exports[`planToMarkdown integration > tofu/deferred-data-source/2 > renders without error and matches snapshot [diffFormat-simple] 1`] = `
 "## Plan Summary
 
-| Action | Count |
-| --- | --- |
-| 🔧 Change | 3 |
-| ± Replace | 1 |
-| **Total** | **4** |
+| Action | Resource | Count |
+| --- | --- | --- |
+| 🔧 Change | terraform_data | 3 |
+|  | **Change** | **3** |
+| ± Replace | local_file | 1 |
+|  | **Replace** | **1** |
 
 ## Resource Changes
 
@@ -4179,11 +4213,12 @@ _(all values known after apply)_
 exports[`planToMarkdown integration > tofu/deferred-data-source/2 > renders without error and matches snapshot [showUnchangedAttributes] 1`] = `
 "## Plan Summary
 
-| Action | Count |
-| --- | --- |
-| 🔧 Change | 3 |
-| ± Replace | 1 |
-| **Total** | **4** |
+| Action | Resource | Count |
+| --- | --- | --- |
+| 🔧 Change | terraform_data | 3 |
+|  | **Change** | **3** |
+| ± Replace | local_file | 1 |
+|  | **Replace** | **1** |
 
 ## Resource Changes
 
@@ -4305,21 +4340,22 @@ exports[`planToMarkdown integration > tofu/deferred-data-source/2 > renders with
 exports[`planToMarkdown integration > tofu/deferred-data-source/2 > renders without error and matches snapshot [summary-template] 1`] = `
 "## Plan Summary
 
-| Action | Count |
-| --- | --- |
-| 🔧 Change | 3 |
-| ± Replace | 1 |
-| **Total** | **4** |
+| Action | Resource | Count |
+| --- | --- | --- |
+| 🔧 Change | terraform_data | 3 |
+|  | **Change** | **3** |
+| ± Replace | local_file | 1 |
+|  | **Replace** | **1** |
 "
 `;
 
 exports[`planToMarkdown integration > tofu/local-files/0 > renders without error and matches snapshot [default] 1`] = `
 "## Plan Summary
 
-| Action | Count |
-| --- | --- |
-| ➕ Add | 1 |
-| **Total** | **1** |
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Add | local_file | 1 |
+|  | **Add** | **1** |
 
 ## Resource Changes
 
@@ -4376,10 +4412,10 @@ Line 12: end of file
 exports[`planToMarkdown integration > tofu/local-files/0 > renders without error and matches snapshot [diffFormat-simple] 1`] = `
 "## Plan Summary
 
-| Action | Count |
-| --- | --- |
-| ➕ Add | 1 |
-| **Total** | **1** |
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Add | local_file | 1 |
+|  | **Add** | **1** |
 
 ## Resource Changes
 
@@ -4436,10 +4472,10 @@ Line 12: end of file
 exports[`planToMarkdown integration > tofu/local-files/0 > renders without error and matches snapshot [showUnchangedAttributes] 1`] = `
 "## Plan Summary
 
-| Action | Count |
-| --- | --- |
-| ➕ Add | 1 |
-| **Total** | **1** |
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Add | local_file | 1 |
+|  | **Add** | **1** |
 
 ## Resource Changes
 
@@ -4498,20 +4534,20 @@ Line 12: end of file
 exports[`planToMarkdown integration > tofu/local-files/0 > renders without error and matches snapshot [summary-template] 1`] = `
 "## Plan Summary
 
-| Action | Count |
-| --- | --- |
-| ➕ Add | 1 |
-| **Total** | **1** |
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Add | local_file | 1 |
+|  | **Add** | **1** |
 "
 `;
 
 exports[`planToMarkdown integration > tofu/local-files/1 > renders without error and matches snapshot [default] 1`] = `
 "## Plan Summary
 
-| Action | Count |
-| --- | --- |
-| ± Replace | 1 |
-| **Total** | **1** |
+| Action | Resource | Count |
+| --- | --- | --- |
+| ± Replace | local_file | 1 |
+|  | **Replace** | **1** |
 
 ## Resource Changes
 
@@ -4570,10 +4606,10 @@ exports[`planToMarkdown integration > tofu/local-files/1 > renders without error
 exports[`planToMarkdown integration > tofu/local-files/1 > renders without error and matches snapshot [diffFormat-simple] 1`] = `
 "## Plan Summary
 
-| Action | Count |
-| --- | --- |
-| ± Replace | 1 |
-| **Total** | **1** |
+| Action | Resource | Count |
+| --- | --- | --- |
+| ± Replace | local_file | 1 |
+|  | **Replace** | **1** |
 
 ## Resource Changes
 
@@ -4632,10 +4668,10 @@ exports[`planToMarkdown integration > tofu/local-files/1 > renders without error
 exports[`planToMarkdown integration > tofu/local-files/1 > renders without error and matches snapshot [showUnchangedAttributes] 1`] = `
 "## Plan Summary
 
-| Action | Count |
-| --- | --- |
-| ± Replace | 1 |
-| **Total** | **1** |
+| Action | Resource | Count |
+| --- | --- | --- |
+| ± Replace | local_file | 1 |
+|  | **Replace** | **1** |
 
 ## Resource Changes
 
@@ -4699,20 +4735,20 @@ exports[`planToMarkdown integration > tofu/local-files/1 > renders without error
 exports[`planToMarkdown integration > tofu/local-files/1 > renders without error and matches snapshot [summary-template] 1`] = `
 "## Plan Summary
 
-| Action | Count |
-| --- | --- |
-| ± Replace | 1 |
-| **Total** | **1** |
+| Action | Resource | Count |
+| --- | --- | --- |
+| ± Replace | local_file | 1 |
+|  | **Replace** | **1** |
 "
 `;
 
 exports[`planToMarkdown integration > tofu/moved-resource/0 > renders without error and matches snapshot [default] 1`] = `
 "## Plan Summary
 
-| Action | Count |
-| --- | --- |
-| ➕ Add | 1 |
-| **Total** | **1** |
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Add | null_resource | 1 |
+|  | **Add** | **1** |
 
 ## Resource Changes
 
@@ -4733,10 +4769,10 @@ exports[`planToMarkdown integration > tofu/moved-resource/0 > renders without er
 exports[`planToMarkdown integration > tofu/moved-resource/0 > renders without error and matches snapshot [diffFormat-simple] 1`] = `
 "## Plan Summary
 
-| Action | Count |
-| --- | --- |
-| ➕ Add | 1 |
-| **Total** | **1** |
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Add | null_resource | 1 |
+|  | **Add** | **1** |
 
 ## Resource Changes
 
@@ -4757,10 +4793,10 @@ exports[`planToMarkdown integration > tofu/moved-resource/0 > renders without er
 exports[`planToMarkdown integration > tofu/moved-resource/0 > renders without error and matches snapshot [showUnchangedAttributes] 1`] = `
 "## Plan Summary
 
-| Action | Count |
-| --- | --- |
-| ➕ Add | 1 |
-| **Total** | **1** |
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Add | null_resource | 1 |
+|  | **Add** | **1** |
 
 ## Resource Changes
 
@@ -4781,19 +4817,17 @@ exports[`planToMarkdown integration > tofu/moved-resource/0 > renders without er
 exports[`planToMarkdown integration > tofu/moved-resource/0 > renders without error and matches snapshot [summary-template] 1`] = `
 "## Plan Summary
 
-| Action | Count |
-| --- | --- |
-| ➕ Add | 1 |
-| **Total** | **1** |
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Add | null_resource | 1 |
+|  | **Add** | **1** |
 "
 `;
 
 exports[`planToMarkdown integration > tofu/moved-resource/1 > renders without error and matches snapshot [default] 1`] = `
 "## Plan Summary
 
-| Action | Count |
-| --- | --- |
-| **Total** | **0** |
+_No changes._
 
 ## Resource Changes
 
@@ -4813,9 +4847,7 @@ _No attribute changes._
 exports[`planToMarkdown integration > tofu/moved-resource/1 > renders without error and matches snapshot [diffFormat-simple] 1`] = `
 "## Plan Summary
 
-| Action | Count |
-| --- | --- |
-| **Total** | **0** |
+_No changes._
 
 ## Resource Changes
 
@@ -4835,9 +4867,7 @@ _No attribute changes._
 exports[`planToMarkdown integration > tofu/moved-resource/1 > renders without error and matches snapshot [showUnchangedAttributes] 1`] = `
 "## Plan Summary
 
-| Action | Count |
-| --- | --- |
-| **Total** | **0** |
+_No changes._
 
 ## Resource Changes
 
@@ -4860,19 +4890,17 @@ exports[`planToMarkdown integration > tofu/moved-resource/1 > renders without er
 exports[`planToMarkdown integration > tofu/moved-resource/1 > renders without error and matches snapshot [summary-template] 1`] = `
 "## Plan Summary
 
-| Action | Count |
-| --- | --- |
-| **Total** | **0** |
+_No changes._
 "
 `;
 
 exports[`planToMarkdown integration > tofu/no-op/0 > renders without error and matches snapshot [default] 1`] = `
 "## Plan Summary
 
-| Action | Count |
-| --- | --- |
-| ➕ Add | 1 |
-| **Total** | **1** |
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Add | null_resource | 1 |
+|  | **Add** | **1** |
 
 ## Resource Changes
 
@@ -4893,10 +4921,10 @@ exports[`planToMarkdown integration > tofu/no-op/0 > renders without error and m
 exports[`planToMarkdown integration > tofu/no-op/0 > renders without error and matches snapshot [diffFormat-simple] 1`] = `
 "## Plan Summary
 
-| Action | Count |
-| --- | --- |
-| ➕ Add | 1 |
-| **Total** | **1** |
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Add | null_resource | 1 |
+|  | **Add** | **1** |
 
 ## Resource Changes
 
@@ -4917,10 +4945,10 @@ exports[`planToMarkdown integration > tofu/no-op/0 > renders without error and m
 exports[`planToMarkdown integration > tofu/no-op/0 > renders without error and matches snapshot [showUnchangedAttributes] 1`] = `
 "## Plan Summary
 
-| Action | Count |
-| --- | --- |
-| ➕ Add | 1 |
-| **Total** | **1** |
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Add | null_resource | 1 |
+|  | **Add** | **1** |
 
 ## Resource Changes
 
@@ -4941,19 +4969,17 @@ exports[`planToMarkdown integration > tofu/no-op/0 > renders without error and m
 exports[`planToMarkdown integration > tofu/no-op/0 > renders without error and matches snapshot [summary-template] 1`] = `
 "## Plan Summary
 
-| Action | Count |
-| --- | --- |
-| ➕ Add | 1 |
-| **Total** | **1** |
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Add | null_resource | 1 |
+|  | **Add** | **1** |
 "
 `;
 
 exports[`planToMarkdown integration > tofu/no-op/1 > renders without error and matches snapshot [default] 1`] = `
 "## Plan Summary
 
-| Action | Count |
-| --- | --- |
-| **Total** | **0** |
+_No changes._
 
 ## Resource Changes
 
@@ -4971,9 +4997,7 @@ _No attribute changes._
 exports[`planToMarkdown integration > tofu/no-op/1 > renders without error and matches snapshot [diffFormat-simple] 1`] = `
 "## Plan Summary
 
-| Action | Count |
-| --- | --- |
-| **Total** | **0** |
+_No changes._
 
 ## Resource Changes
 
@@ -4991,9 +5015,7 @@ _No attribute changes._
 exports[`planToMarkdown integration > tofu/no-op/1 > renders without error and matches snapshot [showUnchangedAttributes] 1`] = `
 "## Plan Summary
 
-| Action | Count |
-| --- | --- |
-| **Total** | **0** |
+_No changes._
 
 ## Resource Changes
 
@@ -5014,55 +5036,46 @@ exports[`planToMarkdown integration > tofu/no-op/1 > renders without error and m
 exports[`planToMarkdown integration > tofu/no-op/1 > renders without error and matches snapshot [summary-template] 1`] = `
 "## Plan Summary
 
-| Action | Count |
-| --- | --- |
-| **Total** | **0** |
+_No changes._
 "
 `;
 
 exports[`planToMarkdown integration > tofu/null-lifecycle/0 > renders without error and matches snapshot [default] 1`] = `
 "## Plan Summary
 
-| Action | Count |
-| --- | --- |
-| **Total** | **0** |
+_No changes._
 "
 `;
 
 exports[`planToMarkdown integration > tofu/null-lifecycle/0 > renders without error and matches snapshot [diffFormat-simple] 1`] = `
 "## Plan Summary
 
-| Action | Count |
-| --- | --- |
-| **Total** | **0** |
+_No changes._
 "
 `;
 
 exports[`planToMarkdown integration > tofu/null-lifecycle/0 > renders without error and matches snapshot [showUnchangedAttributes] 1`] = `
 "## Plan Summary
 
-| Action | Count |
-| --- | --- |
-| **Total** | **0** |
+_No changes._
 "
 `;
 
 exports[`planToMarkdown integration > tofu/null-lifecycle/0 > renders without error and matches snapshot [summary-template] 1`] = `
 "## Plan Summary
 
-| Action | Count |
-| --- | --- |
-| **Total** | **0** |
+_No changes._
 "
 `;
 
 exports[`planToMarkdown integration > tofu/null-lifecycle/1 > renders without error and matches snapshot [default] 1`] = `
 "## Plan Summary
 
-| Action | Count |
-| --- | --- |
-| ➕ Add | 3 |
-| **Total** | **3** |
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Add | null_resource | 2 |
+|  | terraform_data | 1 |
+|  | **Add** | **3** |
 
 ## Resource Changes
 
@@ -5106,10 +5119,11 @@ exports[`planToMarkdown integration > tofu/null-lifecycle/1 > renders without er
 exports[`planToMarkdown integration > tofu/null-lifecycle/1 > renders without error and matches snapshot [diffFormat-simple] 1`] = `
 "## Plan Summary
 
-| Action | Count |
-| --- | --- |
-| ➕ Add | 3 |
-| **Total** | **3** |
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Add | null_resource | 2 |
+|  | terraform_data | 1 |
+|  | **Add** | **3** |
 
 ## Resource Changes
 
@@ -5153,10 +5167,11 @@ exports[`planToMarkdown integration > tofu/null-lifecycle/1 > renders without er
 exports[`planToMarkdown integration > tofu/null-lifecycle/1 > renders without error and matches snapshot [showUnchangedAttributes] 1`] = `
 "## Plan Summary
 
-| Action | Count |
-| --- | --- |
-| ➕ Add | 3 |
-| **Total** | **3** |
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Add | null_resource | 2 |
+|  | terraform_data | 1 |
+|  | **Add** | **3** |
 
 ## Resource Changes
 
@@ -5201,22 +5216,25 @@ exports[`planToMarkdown integration > tofu/null-lifecycle/1 > renders without er
 exports[`planToMarkdown integration > tofu/null-lifecycle/1 > renders without error and matches snapshot [summary-template] 1`] = `
 "## Plan Summary
 
-| Action | Count |
-| --- | --- |
-| ➕ Add | 3 |
-| **Total** | **3** |
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Add | null_resource | 2 |
+|  | terraform_data | 1 |
+|  | **Add** | **3** |
 "
 `;
 
 exports[`planToMarkdown integration > tofu/null-lifecycle/2 > renders without error and matches snapshot [default] 1`] = `
 "## Plan Summary
 
-| Action | Count |
-| --- | --- |
-| 🔧 Change | 1 |
-| 🗑️ Destroy | 1 |
-| ± Replace | 1 |
-| **Total** | **3** |
+| Action | Resource | Count |
+| --- | --- | --- |
+| 🔧 Change | terraform_data | 1 |
+|  | **Change** | **1** |
+| ± Replace | null_resource | 1 |
+|  | **Replace** | **1** |
+| 🗑️ Destroy | null_resource | 1 |
+|  | **Destroy** | **1** |
 
 ## Resource Changes
 
@@ -5258,12 +5276,14 @@ exports[`planToMarkdown integration > tofu/null-lifecycle/2 > renders without er
 exports[`planToMarkdown integration > tofu/null-lifecycle/2 > renders without error and matches snapshot [diffFormat-simple] 1`] = `
 "## Plan Summary
 
-| Action | Count |
-| --- | --- |
-| 🔧 Change | 1 |
-| 🗑️ Destroy | 1 |
-| ± Replace | 1 |
-| **Total** | **3** |
+| Action | Resource | Count |
+| --- | --- | --- |
+| 🔧 Change | terraform_data | 1 |
+|  | **Change** | **1** |
+| ± Replace | null_resource | 1 |
+|  | **Replace** | **1** |
+| 🗑️ Destroy | null_resource | 1 |
+|  | **Destroy** | **1** |
 
 ## Resource Changes
 
@@ -5305,12 +5325,14 @@ exports[`planToMarkdown integration > tofu/null-lifecycle/2 > renders without er
 exports[`planToMarkdown integration > tofu/null-lifecycle/2 > renders without error and matches snapshot [showUnchangedAttributes] 1`] = `
 "## Plan Summary
 
-| Action | Count |
-| --- | --- |
-| 🔧 Change | 1 |
-| 🗑️ Destroy | 1 |
-| ± Replace | 1 |
-| **Total** | **3** |
+| Action | Resource | Count |
+| --- | --- | --- |
+| 🔧 Change | terraform_data | 1 |
+|  | **Change** | **1** |
+| ± Replace | null_resource | 1 |
+|  | **Replace** | **1** |
+| 🗑️ Destroy | null_resource | 1 |
+|  | **Destroy** | **1** |
 
 ## Resource Changes
 
@@ -5355,22 +5377,24 @@ exports[`planToMarkdown integration > tofu/null-lifecycle/2 > renders without er
 exports[`planToMarkdown integration > tofu/null-lifecycle/2 > renders without error and matches snapshot [summary-template] 1`] = `
 "## Plan Summary
 
-| Action | Count |
-| --- | --- |
-| 🔧 Change | 1 |
-| 🗑️ Destroy | 1 |
-| ± Replace | 1 |
-| **Total** | **3** |
+| Action | Resource | Count |
+| --- | --- | --- |
+| 🔧 Change | terraform_data | 1 |
+|  | **Change** | **1** |
+| ± Replace | null_resource | 1 |
+|  | **Replace** | **1** |
+| 🗑️ Destroy | null_resource | 1 |
+|  | **Destroy** | **1** |
 "
 `;
 
 exports[`planToMarkdown integration > tofu/random-replace/0 > renders without error and matches snapshot [default] 1`] = `
 "## Plan Summary
 
-| Action | Count |
-| --- | --- |
-| ➕ Add | 1 |
-| **Total** | **1** |
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Add | random_string | 1 |
+|  | **Add** | **1** |
 
 ## Resource Changes
 
@@ -5408,10 +5432,10 @@ exports[`planToMarkdown integration > tofu/random-replace/0 > renders without er
 exports[`planToMarkdown integration > tofu/random-replace/0 > renders without error and matches snapshot [diffFormat-simple] 1`] = `
 "## Plan Summary
 
-| Action | Count |
-| --- | --- |
-| ➕ Add | 1 |
-| **Total** | **1** |
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Add | random_string | 1 |
+|  | **Add** | **1** |
 
 ## Resource Changes
 
@@ -5449,10 +5473,10 @@ exports[`planToMarkdown integration > tofu/random-replace/0 > renders without er
 exports[`planToMarkdown integration > tofu/random-replace/0 > renders without error and matches snapshot [showUnchangedAttributes] 1`] = `
 "## Plan Summary
 
-| Action | Count |
-| --- | --- |
-| ➕ Add | 1 |
-| **Total** | **1** |
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Add | random_string | 1 |
+|  | **Add** | **1** |
 
 ## Resource Changes
 
@@ -5491,20 +5515,20 @@ exports[`planToMarkdown integration > tofu/random-replace/0 > renders without er
 exports[`planToMarkdown integration > tofu/random-replace/0 > renders without error and matches snapshot [summary-template] 1`] = `
 "## Plan Summary
 
-| Action | Count |
-| --- | --- |
-| ➕ Add | 1 |
-| **Total** | **1** |
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Add | random_string | 1 |
+|  | **Add** | **1** |
 "
 `;
 
 exports[`planToMarkdown integration > tofu/random-replace/1 > renders without error and matches snapshot [default] 1`] = `
 "## Plan Summary
 
-| Action | Count |
-| --- | --- |
-| ± Replace | 1 |
-| **Total** | **1** |
+| Action | Resource | Count |
+| --- | --- | --- |
+| ± Replace | random_string | 1 |
+|  | **Replace** | **1** |
 
 ## Resource Changes
 
@@ -5532,10 +5556,10 @@ exports[`planToMarkdown integration > tofu/random-replace/1 > renders without er
 exports[`planToMarkdown integration > tofu/random-replace/1 > renders without error and matches snapshot [diffFormat-simple] 1`] = `
 "## Plan Summary
 
-| Action | Count |
-| --- | --- |
-| ± Replace | 1 |
-| **Total** | **1** |
+| Action | Resource | Count |
+| --- | --- | --- |
+| ± Replace | random_string | 1 |
+|  | **Replace** | **1** |
 
 ## Resource Changes
 
@@ -5563,10 +5587,10 @@ exports[`planToMarkdown integration > tofu/random-replace/1 > renders without er
 exports[`planToMarkdown integration > tofu/random-replace/1 > renders without error and matches snapshot [showUnchangedAttributes] 1`] = `
 "## Plan Summary
 
-| Action | Count |
-| --- | --- |
-| ± Replace | 1 |
-| **Total** | **1** |
+| Action | Resource | Count |
+| --- | --- | --- |
+| ± Replace | random_string | 1 |
+|  | **Replace** | **1** |
 
 ## Resource Changes
 
@@ -5605,20 +5629,20 @@ exports[`planToMarkdown integration > tofu/random-replace/1 > renders without er
 exports[`planToMarkdown integration > tofu/random-replace/1 > renders without error and matches snapshot [summary-template] 1`] = `
 "## Plan Summary
 
-| Action | Count |
-| --- | --- |
-| ± Replace | 1 |
-| **Total** | **1** |
+| Action | Resource | Count |
+| --- | --- | --- |
+| ± Replace | random_string | 1 |
+|  | **Replace** | **1** |
 "
 `;
 
 exports[`planToMarkdown integration > tofu/sensitive-values/0 > renders without error and matches snapshot [default] 1`] = `
 "## Plan Summary
 
-| Action | Count |
-| --- | --- |
-| ➕ Add | 1 |
-| **Total** | **1** |
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Add | local_sensitive_file | 1 |
+|  | **Add** | **1** |
 
 ## Resource Changes
 
@@ -5656,10 +5680,10 @@ exports[`planToMarkdown integration > tofu/sensitive-values/0 > renders without 
 exports[`planToMarkdown integration > tofu/sensitive-values/0 > renders without error and matches snapshot [diffFormat-simple] 1`] = `
 "## Plan Summary
 
-| Action | Count |
-| --- | --- |
-| ➕ Add | 1 |
-| **Total** | **1** |
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Add | local_sensitive_file | 1 |
+|  | **Add** | **1** |
 
 ## Resource Changes
 
@@ -5697,10 +5721,10 @@ exports[`planToMarkdown integration > tofu/sensitive-values/0 > renders without 
 exports[`planToMarkdown integration > tofu/sensitive-values/0 > renders without error and matches snapshot [showUnchangedAttributes] 1`] = `
 "## Plan Summary
 
-| Action | Count |
-| --- | --- |
-| ➕ Add | 1 |
-| **Total** | **1** |
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Add | local_sensitive_file | 1 |
+|  | **Add** | **1** |
 
 ## Resource Changes
 
@@ -5739,20 +5763,20 @@ exports[`planToMarkdown integration > tofu/sensitive-values/0 > renders without 
 exports[`planToMarkdown integration > tofu/sensitive-values/0 > renders without error and matches snapshot [summary-template] 1`] = `
 "## Plan Summary
 
-| Action | Count |
-| --- | --- |
-| ➕ Add | 1 |
-| **Total** | **1** |
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Add | local_sensitive_file | 1 |
+|  | **Add** | **1** |
 "
 `;
 
 exports[`planToMarkdown integration > tofu/sensitive-values/1 > renders without error and matches snapshot [default] 1`] = `
 "## Plan Summary
 
-| Action | Count |
-| --- | --- |
-| ± Replace | 1 |
-| **Total** | **1** |
+| Action | Resource | Count |
+| --- | --- | --- |
+| ± Replace | local_sensitive_file | 1 |
+|  | **Replace** | **1** |
 
 ## Resource Changes
 
@@ -5787,10 +5811,10 @@ exports[`planToMarkdown integration > tofu/sensitive-values/1 > renders without 
 exports[`planToMarkdown integration > tofu/sensitive-values/1 > renders without error and matches snapshot [diffFormat-simple] 1`] = `
 "## Plan Summary
 
-| Action | Count |
-| --- | --- |
-| ± Replace | 1 |
-| **Total** | **1** |
+| Action | Resource | Count |
+| --- | --- | --- |
+| ± Replace | local_sensitive_file | 1 |
+|  | **Replace** | **1** |
 
 ## Resource Changes
 
@@ -5825,10 +5849,10 @@ exports[`planToMarkdown integration > tofu/sensitive-values/1 > renders without 
 exports[`planToMarkdown integration > tofu/sensitive-values/1 > renders without error and matches snapshot [showUnchangedAttributes] 1`] = `
 "## Plan Summary
 
-| Action | Count |
-| --- | --- |
-| ± Replace | 1 |
-| **Total** | **1** |
+| Action | Resource | Count |
+| --- | --- | --- |
+| ± Replace | local_sensitive_file | 1 |
+|  | **Replace** | **1** |
 
 ## Resource Changes
 
@@ -5867,20 +5891,21 @@ exports[`planToMarkdown integration > tofu/sensitive-values/1 > renders without 
 exports[`planToMarkdown integration > tofu/sensitive-values/1 > renders without error and matches snapshot [summary-template] 1`] = `
 "## Plan Summary
 
-| Action | Count |
-| --- | --- |
-| ± Replace | 1 |
-| **Total** | **1** |
+| Action | Resource | Count |
+| --- | --- | --- |
+| ± Replace | local_sensitive_file | 1 |
+|  | **Replace** | **1** |
 "
 `;
 
 exports[`planToMarkdown integration > tofu/with-modules/0 > renders without error and matches snapshot [default] 1`] = `
 "## Plan Summary
 
-| Action | Count |
-| --- | --- |
-| ➕ Add | 2 |
-| **Total** | **2** |
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Add | null_resource | 1 |
+|  | random_string | 1 |
+|  | **Add** | **2** |
 
 ## Resource Changes
 
@@ -5931,10 +5956,11 @@ exports[`planToMarkdown integration > tofu/with-modules/0 > renders without erro
 exports[`planToMarkdown integration > tofu/with-modules/0 > renders without error and matches snapshot [diffFormat-simple] 1`] = `
 "## Plan Summary
 
-| Action | Count |
-| --- | --- |
-| ➕ Add | 2 |
-| **Total** | **2** |
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Add | null_resource | 1 |
+|  | random_string | 1 |
+|  | **Add** | **2** |
 
 ## Resource Changes
 
@@ -5985,10 +6011,11 @@ exports[`planToMarkdown integration > tofu/with-modules/0 > renders without erro
 exports[`planToMarkdown integration > tofu/with-modules/0 > renders without error and matches snapshot [showUnchangedAttributes] 1`] = `
 "## Plan Summary
 
-| Action | Count |
-| --- | --- |
-| ➕ Add | 2 |
-| **Total** | **2** |
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Add | null_resource | 1 |
+|  | random_string | 1 |
+|  | **Add** | **2** |
 
 ## Resource Changes
 
@@ -6040,20 +6067,22 @@ exports[`planToMarkdown integration > tofu/with-modules/0 > renders without erro
 exports[`planToMarkdown integration > tofu/with-modules/0 > renders without error and matches snapshot [summary-template] 1`] = `
 "## Plan Summary
 
-| Action | Count |
-| --- | --- |
-| ➕ Add | 2 |
-| **Total** | **2** |
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Add | null_resource | 1 |
+|  | random_string | 1 |
+|  | **Add** | **2** |
 "
 `;
 
 exports[`planToMarkdown integration > tofu/with-modules/1 > renders without error and matches snapshot [default] 1`] = `
 "## Plan Summary
 
-| Action | Count |
-| --- | --- |
-| ± Replace | 2 |
-| **Total** | **2** |
+| Action | Resource | Count |
+| --- | --- | --- |
+| ± Replace | null_resource | 1 |
+|  | random_string | 1 |
+|  | **Replace** | **2** |
 
 ## Resource Changes
 
@@ -6094,10 +6123,11 @@ exports[`planToMarkdown integration > tofu/with-modules/1 > renders without erro
 exports[`planToMarkdown integration > tofu/with-modules/1 > renders without error and matches snapshot [diffFormat-simple] 1`] = `
 "## Plan Summary
 
-| Action | Count |
-| --- | --- |
-| ± Replace | 2 |
-| **Total** | **2** |
+| Action | Resource | Count |
+| --- | --- | --- |
+| ± Replace | null_resource | 1 |
+|  | random_string | 1 |
+|  | **Replace** | **2** |
 
 ## Resource Changes
 
@@ -6138,10 +6168,11 @@ exports[`planToMarkdown integration > tofu/with-modules/1 > renders without erro
 exports[`planToMarkdown integration > tofu/with-modules/1 > renders without error and matches snapshot [showUnchangedAttributes] 1`] = `
 "## Plan Summary
 
-| Action | Count |
-| --- | --- |
-| ± Replace | 2 |
-| **Total** | **2** |
+| Action | Resource | Count |
+| --- | --- | --- |
+| ± Replace | null_resource | 1 |
+|  | random_string | 1 |
+|  | **Replace** | **2** |
 
 ## Resource Changes
 
@@ -6193,9 +6224,10 @@ exports[`planToMarkdown integration > tofu/with-modules/1 > renders without erro
 exports[`planToMarkdown integration > tofu/with-modules/1 > renders without error and matches snapshot [summary-template] 1`] = `
 "## Plan Summary
 
-| Action | Count |
-| --- | --- |
-| ± Replace | 2 |
-| **Total** | **2** |
+| Action | Resource | Count |
+| --- | --- | --- |
+| ± Replace | null_resource | 1 |
+|  | random_string | 1 |
+|  | **Replace** | **2** |
 "
 `;
