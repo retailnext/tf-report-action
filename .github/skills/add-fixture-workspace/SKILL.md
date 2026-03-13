@@ -57,19 +57,25 @@ Only use providers that create no real cloud resources:
    (and further stages) with the modified configuration. Each stage should only contain
    the files that differ from the previous stage — or a complete copy with changes applied.
 
-4. Document the scenario at the top of `0/main.tf` in a comment block:
+4. If a stage is expected to have a command fail (e.g. an apply that produces errors),
+   create a `tests/fixtures/<name>/<N>/expect-fail` file listing the commands that should
+   fail (one per line: `init`, `validate`, `plan`, or `apply`). See the
+   [Expected Failures](#expected-failures) section below.
+
+5. Document the scenario at the top of `0/main.tf` in a comment block:
    ```hcl
    # Fixture: <name>
    # Stage 0: <what this stage demonstrates>
    # Stage 1: <what changes in this stage>
    ```
 
-5. Run the generation script to produce fixture outputs:
+6. Run the generation script to produce fixture outputs:
    ```bash
    bash scripts/generate-fixtures.sh --workspace <name>
    ```
 
-6. Commit both the `.tf` files and the generated JSON files.
+7. Commit both the `.tf` files (including any `expect-fail` files) and the generated
+   JSON files.
 
 ## Adding a Stage to an Existing Workspace
 
@@ -94,7 +100,8 @@ Only use providers that create no real cloud resources:
 
 ✅ Commit:
 - `tests/fixtures/<name>/<stage>/*.tf` and any supporting HCL files
-- `tests/fixtures/generated/**/*.json` (plan JSON and apply JSON)
+- `tests/fixtures/<name>/<stage>/expect-fail` (if present)
+- `tests/fixtures/generated/**/*.json` and `**/*.jsonl` (plan JSON, apply JSONL, etc.)
 
 ❌ Do NOT commit:
 - `.terraform/` directories
@@ -103,6 +110,37 @@ Only use providers that create no real cloud resources:
 - `tests/fixtures/tmp/` (temporary working directories used by the script)
 
 These are all listed in `.gitignore`.
+
+## Expected Failures
+
+Some fixture stages intentionally produce command failures (e.g. an apply that errors
+out). To declare this, create a file named `expect-fail` in the stage directory:
+
+```
+tests/fixtures/<workspace>/<stage>/expect-fail
+```
+
+List one command name per line: `init`, `validate`, `plan`, or `apply`. Example:
+
+```
+apply
+```
+
+**Behavior:**
+- If a listed command exits non-zero → the script continues normally and captures
+  the output (including error JSONL). This is the test data for error-handling tests.
+- If a listed command exits zero → the script aborts with an error (the expectation
+  was wrong).
+- If an unlisted command exits non-zero → the script aborts with an error (unexpected
+  failure).
+
+**Command dependency chain when a command fails:**
+- `init` failure → `validate`, `plan`, `show`, and `apply` are all skipped
+- `plan` failure → `show` and `apply` are skipped
+- `validate` failure → does **not** block `plan` or `apply`
+- `apply` failure → terminal (no downstream commands)
+
+Skipped commands produce no output files.
 
 ## After Adding or Updating Fixtures
 

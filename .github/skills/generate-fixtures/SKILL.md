@@ -41,13 +41,33 @@ For each workspace × each tool (`terraform` and `tofu`):
    a. Copies `.tf` files and supporting HCL from `tests/fixtures/<workspace>/<N>/`
       into the temporary directory (files not present in stage N are carried forward
       from the previous stage)
-   b. Runs `<tool> init -json` → writes to `init.jsonl`
-   c. Runs `<tool> validate -json` → writes to `validate.json`
-   d. Runs `<tool> plan -json -out=tfplan` → writes to `plan-log.jsonl`
-   e. Runs `<tool> show -json tfplan` → writes to `plan.json`
-   f. Runs `<tool> apply -json -auto-approve tfplan` → writes to `apply.jsonl`
-   g. State carries forward to the next stage
+   b. Reads the optional `expect-fail` file (see below) to determine which commands
+      are expected to return non-zero exit codes
+   c. Runs `<tool> init -json` → writes to `init.jsonl`
+   d. Runs `<tool> validate -json` → writes to `validate.json`
+   e. Runs `<tool> plan -json -out=tfplan` → writes to `plan-log.jsonl`
+   f. Runs `<tool> show -json tfplan` → writes to `plan.json`
+   g. Runs `<tool> apply -json -auto-approve tfplan` → writes to `apply.jsonl`
+   h. State carries forward to the next stage
 3. Removes the temporary directory
+
+### Expected failures
+
+A stage directory may contain an `expect-fail` file listing commands expected to fail
+(one per line: `init`, `validate`, `plan`, `apply`). When present:
+
+- A listed command that exits non-zero → continues normally (output is captured)
+- A listed command that exits zero → script aborts ("expected to fail but succeeded")
+- An unlisted command that exits non-zero → script aborts (unexpected failure)
+
+When a prerequisite command fails, dependent commands are skipped:
+- `init` failure → skip `validate`, `plan`, `show`, `apply`
+- `plan` failure → skip `show`, `apply`
+- `validate` failure → does NOT block `plan` or `apply`
+- `apply` failure → terminal
+
+Skipped commands produce no output files. The `expect-fail` file itself is NOT copied
+to the generated output directory.
 
 ## Output Location
 
