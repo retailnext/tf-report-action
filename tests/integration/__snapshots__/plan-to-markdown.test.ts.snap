@@ -186,7 +186,7 @@ exports[`planToMarkdown integration > terraform/apply-error/1 > renders without 
 
 | Attribute | Before | After |
 | --- | --- | --- |
-| id | 1333133842861382926 | <code><ins style="background:#dfd">(known after apply)</ins><del style="background:#fdd">1333133842861382926</del></code> |
+| id | 1805070632755613968 | <code><ins style="background:#dfd">(known after apply)</ins><del style="background:#fdd">1805070632755613968</del></code> |
 | triggers.value | v1 | <code>v<ins style="background:#dfd">2</ins><del style="background:#fdd">1</del></code> |
 
 </details>
@@ -209,7 +209,7 @@ _No attribute changes._
 
 | Output | Action | Before | After |
 | --- | --- | --- | --- |
-| depends_on_fail_output | 🔧 | <code>1333133842861382926</code> | _(known after apply)_ |
+| depends_on_fail_output | 🔧 | <code>1805070632755613968</code> | _(known after apply)_ |
 | success_output | ⬜ | <code>stable</code> | <code>stable</code> |
 "
 `;
@@ -233,7 +233,7 @@ exports[`planToMarkdown integration > terraform/apply-error/1 > renders without 
 
 | Attribute | Before | After |
 | --- | --- | --- |
-| id | 1333133842861382926 | - 1333133842861382926<br>+ (known after apply) |
+| id | 1805070632755613968 | - 1805070632755613968<br>+ (known after apply) |
 | triggers.value | v1 | - v1<br>+ v2 |
 
 </details>
@@ -256,7 +256,7 @@ _No attribute changes._
 
 | Output | Action | Before | After |
 | --- | --- | --- | --- |
-| depends_on_fail_output | 🔧 | <code>1333133842861382926</code> | _(known after apply)_ |
+| depends_on_fail_output | 🔧 | <code>1805070632755613968</code> | _(known after apply)_ |
 | success_output | ⬜ | <code>stable</code> | <code>stable</code> |
 "
 `;
@@ -280,7 +280,7 @@ exports[`planToMarkdown integration > terraform/apply-error/1 > renders without 
 
 | Attribute | Before | After |
 | --- | --- | --- |
-| id | 1333133842861382926 | <code><ins style="background:#dfd">(known after apply)</ins><del style="background:#fdd">1333133842861382926</del></code> |
+| id | 1805070632755613968 | <code><ins style="background:#dfd">(known after apply)</ins><del style="background:#fdd">1805070632755613968</del></code> |
 | triggers.value | v1 | <code>v<ins style="background:#dfd">2</ins><del style="background:#fdd">1</del></code> |
 
 </details>
@@ -290,9 +290,9 @@ exports[`planToMarkdown integration > terraform/apply-error/1 > renders without 
 
 | Attribute | Before | After |
 | --- | --- | --- |
-| id | 4b4f48c3-f4de-df95-5b55-35e85f632dfd | <code>4b4f48c3-f4de-df95-5b55-35e85f632dfd</code> |
-| input | 1333133842861382926 | <code><ins style="background:#dfd">(known after apply)</ins><del style="background:#fdd">1333133842861382926</del></code> |
-| output | 1333133842861382926 | <code><ins style="background:#dfd">(known after apply)</ins><del style="background:#fdd">1333133842861382926</del></code> |
+| id | 49ca277c-ea61-a8b9-8ad7-9dc8bdfe75c4 | <code>49ca277c-ea61-a8b9-8ad7-9dc8bdfe75c4</code> |
+| input | 1805070632755613968 | <code><ins style="background:#dfd">(known after apply)</ins><del style="background:#fdd">1805070632755613968</del></code> |
+| output | 1805070632755613968 | <code><ins style="background:#dfd">(known after apply)</ins><del style="background:#fdd">1805070632755613968</del></code> |
 | triggers_replace |  |  |
 
 </details>
@@ -302,7 +302,7 @@ exports[`planToMarkdown integration > terraform/apply-error/1 > renders without 
 
 | Attribute | Before | After |
 | --- | --- | --- |
-| id | fdf145f7-37c7-b343-f942-718a439ccf93 | <code>fdf145f7-37c7-b343-f942-718a439ccf93</code> |
+| id | 0542ce27-9146-f71f-affc-0ea2b447f31c | <code>0542ce27-9146-f71f-affc-0ea2b447f31c</code> |
 | input | stable | <code>stable</code> |
 | output | stable | <code>stable</code> |
 | triggers_replace |  |  |
@@ -313,7 +313,7 @@ exports[`planToMarkdown integration > terraform/apply-error/1 > renders without 
 
 | Output | Action | Before | After |
 | --- | --- | --- | --- |
-| depends_on_fail_output | 🔧 | <code>1333133842861382926</code> | _(known after apply)_ |
+| depends_on_fail_output | 🔧 | <code>1805070632755613968</code> | _(known after apply)_ |
 | success_output | ⬜ | <code>stable</code> | <code>stable</code> |
 "
 `;
@@ -853,7 +853,7 @@ exports[`planToMarkdown integration > terraform/deferred-data-source/1 > renders
 
 | Attribute | Before | After |
 | --- | --- | --- |
-| id | bcdf2012-5cc4-5896-0932-651ebb1acec9 | <code>bcdf2012-5cc4-5896-0932-651ebb1acec9</code> |
+| id | ecc66137-7262-62de-86e0-b1786d058968 | <code>ecc66137-7262-62de-86e0-b1786d058968</code> |
 | input | v1 | <code>v<ins style="background:#dfd">2</ins><del style="background:#fdd">1</del></code> |
 | output | v1 | <code><ins style="background:#dfd">(known after apply)</ins><del style="background:#fdd">v1</del></code> |
 | triggers_replace |  |  |
@@ -865,7 +865,7 @@ exports[`planToMarkdown integration > terraform/deferred-data-source/1 > renders
 
 | Attribute | Before | After |
 | --- | --- | --- |
-| id | 0762ba48-1785-5b28-86b7-02eab31a28b5 | <code>0762ba48-1785-5b28-86b7-02eab31a28b5</code> |
+| id | 454ef825-9c5d-0bf3-53fb-a5b1ba88fd88 | <code>454ef825-9c5d-0bf3-53fb-a5b1ba88fd88</code> |
 | input | alpha | <code><ins style="background:#dfd">(known after </ins>a<ins style="background:#dfd">pp</ins>l<ins style="background:#dfd">y)</ins><del style="background:#fdd">pha</del></code> |
 | output | alpha | <code><ins style="background:#dfd">(known after </ins>a<ins style="background:#dfd">pp</ins>l<ins style="background:#dfd">y)</ins><del style="background:#fdd">pha</del></code> |
 | triggers_replace |  |  |
@@ -877,7 +877,7 @@ exports[`planToMarkdown integration > terraform/deferred-data-source/1 > renders
 
 | Attribute | Before | After |
 | --- | --- | --- |
-| id | 914f4585-6295-58eb-f2bc-bbe51b90ec65 | <code>914f4585-6295-58eb-f2bc-bbe51b90ec65</code> |
+| id | 0f82ddfe-eed8-59fb-b7db-6e876c1877b3 | <code>0f82ddfe-eed8-59fb-b7db-6e876c1877b3</code> |
 | input | bravo | <code><del style="background:#fdd">b</del><ins style="background:#dfd">(known afte</ins>r<ins style="background:#dfd"> </ins>a<ins style="background:#dfd">pply)</ins><del style="background:#fdd">vo</del></code> |
 | output | bravo | <code><del style="background:#fdd">b</del><ins style="background:#dfd">(known afte</ins>r<ins style="background:#dfd"> </ins>a<ins style="background:#dfd">pply)</ins><del style="background:#fdd">vo</del></code> |
 | triggers_replace |  |  |
@@ -889,7 +889,7 @@ exports[`planToMarkdown integration > terraform/deferred-data-source/1 > renders
 
 | Attribute | Before | After |
 | --- | --- | --- |
-| id | 7931a0ef-d00d-9e0f-5e9b-b40ded1923a7 | <code>7931a0ef-d00d-9e0f-5e9b-b40ded1923a7</code> |
+| id | 1d281e67-a20a-b20b-d4ce-077d06601d25 | <code>1d281e67-a20a-b20b-d4ce-077d06601d25</code> |
 | input | charlie | <code><del style="background:#fdd">ch</del><ins style="background:#dfd">(known </ins>a<ins style="background:#dfd">fte</ins>r<ins style="background:#dfd"> app</ins>l<ins style="background:#dfd">y)</ins><del style="background:#fdd">ie</del></code> |
 | output | charlie | <code><del style="background:#fdd">ch</del><ins style="background:#dfd">(known </ins>a<ins style="background:#dfd">fte</ins>r<ins style="background:#dfd"> app</ins>l<ins style="background:#dfd">y)</ins><del style="background:#fdd">ie</del></code> |
 | triggers_replace |  |  |
@@ -1170,7 +1170,7 @@ exports[`planToMarkdown integration > terraform/deferred-data-source/2 > renders
 
 | Attribute | Before | After |
 | --- | --- | --- |
-| id | bcdf2012-5cc4-5896-0932-651ebb1acec9 | <code>bcdf2012-5cc4-5896-0932-651ebb1acec9</code> |
+| id | ecc66137-7262-62de-86e0-b1786d058968 | <code>ecc66137-7262-62de-86e0-b1786d058968</code> |
 | input | v2 | <code>v2</code> |
 | output | v2 | <code>v2</code> |
 | triggers_replace |  |  |
@@ -1182,7 +1182,7 @@ exports[`planToMarkdown integration > terraform/deferred-data-source/2 > renders
 
 | Attribute | Before | After |
 | --- | --- | --- |
-| id | 0762ba48-1785-5b28-86b7-02eab31a28b5 | <code>0762ba48-1785-5b28-86b7-02eab31a28b5</code> |
+| id | 454ef825-9c5d-0bf3-53fb-a5b1ba88fd88 | <code>454ef825-9c5d-0bf3-53fb-a5b1ba88fd88</code> |
 | input | alpha | <code><ins style="background:#dfd">(known after </ins>a<ins style="background:#dfd">pp</ins>l<ins style="background:#dfd">y)</ins><del style="background:#fdd">pha</del></code> |
 | output | alpha | <code><ins style="background:#dfd">(known after </ins>a<ins style="background:#dfd">pp</ins>l<ins style="background:#dfd">y)</ins><del style="background:#fdd">pha</del></code> |
 | triggers_replace |  |  |
@@ -1194,7 +1194,7 @@ exports[`planToMarkdown integration > terraform/deferred-data-source/2 > renders
 
 | Attribute | Before | After |
 | --- | --- | --- |
-| id | 914f4585-6295-58eb-f2bc-bbe51b90ec65 | <code>914f4585-6295-58eb-f2bc-bbe51b90ec65</code> |
+| id | 0f82ddfe-eed8-59fb-b7db-6e876c1877b3 | <code>0f82ddfe-eed8-59fb-b7db-6e876c1877b3</code> |
 | input | bravo | <code><del style="background:#fdd">b</del><ins style="background:#dfd">(known afte</ins>r<ins style="background:#dfd"> </ins>a<ins style="background:#dfd">pply)</ins><del style="background:#fdd">vo</del></code> |
 | output | bravo | <code><del style="background:#fdd">b</del><ins style="background:#dfd">(known afte</ins>r<ins style="background:#dfd"> </ins>a<ins style="background:#dfd">pply)</ins><del style="background:#fdd">vo</del></code> |
 | triggers_replace |  |  |
@@ -1206,7 +1206,7 @@ exports[`planToMarkdown integration > terraform/deferred-data-source/2 > renders
 
 | Attribute | Before | After |
 | --- | --- | --- |
-| id | 7931a0ef-d00d-9e0f-5e9b-b40ded1923a7 | <code>7931a0ef-d00d-9e0f-5e9b-b40ded1923a7</code> |
+| id | 1d281e67-a20a-b20b-d4ce-077d06601d25 | <code>1d281e67-a20a-b20b-d4ce-077d06601d25</code> |
 | input | charlie | <code><del style="background:#fdd">ch</del><ins style="background:#dfd">(known </ins>a<ins style="background:#dfd">fte</ins>r<ins style="background:#dfd"> app</ins>l<ins style="background:#dfd">y)</ins><del style="background:#fdd">ie</del></code> |
 | output | charlie | <code><del style="background:#fdd">ch</del><ins style="background:#dfd">(known </ins>a<ins style="background:#dfd">fte</ins>r<ins style="background:#dfd"> app</ins>l<ins style="background:#dfd">y)</ins><del style="background:#fdd">ie</del></code> |
 | triggers_replace |  |  |
@@ -1764,7 +1764,7 @@ _No changes._
 
 | Attribute | Before | After |
 | --- | --- | --- |
-| id | 2570488903421371712 | <code>2570488903421371712</code> |
+| id | 1262973108280141023 | <code>1262973108280141023</code> |
 | triggers.version | 1 | <code>1</code> |
 
 </details>
@@ -1877,7 +1877,7 @@ exports[`planToMarkdown integration > terraform/no-detailed-exitcode/1 > renders
 
 | Attribute | Before | After |
 | --- | --- | --- |
-| id | 6731693634269766345 | <code><del style="background:#fdd">6731693634269766345</del></code> |
+| id | 3514941842792736714 | <code><del style="background:#fdd">3514941842792736714</del></code> |
 | triggers.value | hello | <code><del style="background:#fdd">hello</del></code> |
 
 </details>
@@ -1901,7 +1901,7 @@ exports[`planToMarkdown integration > terraform/no-detailed-exitcode/1 > renders
 
 | Attribute | Before | After |
 | --- | --- | --- |
-| id | 6731693634269766345 | - 6731693634269766345 |
+| id | 3514941842792736714 | - 3514941842792736714 |
 | triggers.value | hello | - hello |
 
 </details>
@@ -1925,7 +1925,7 @@ exports[`planToMarkdown integration > terraform/no-detailed-exitcode/1 > renders
 
 | Attribute | Before | After |
 | --- | --- | --- |
-| id | 6731693634269766345 | <code><del style="background:#fdd">6731693634269766345</del></code> |
+| id | 3514941842792736714 | <code><del style="background:#fdd">3514941842792736714</del></code> |
 | triggers.value | hello | <code><del style="background:#fdd">hello</del></code> |
 
 </details>
@@ -2156,7 +2156,7 @@ _No changes._
 
 | Attribute | Before | After |
 | --- | --- | --- |
-| id | 4161739619626389731 | <code>4161739619626389731</code> |
+| id | 4183217388815373947 | <code>4183217388815373947</code> |
 | triggers.version | 1 | <code>1</code> |
 
 </details>
@@ -2375,7 +2375,7 @@ exports[`planToMarkdown integration > terraform/null-lifecycle/2 > renders witho
 
 | Attribute | Before | After |
 | --- | --- | --- |
-| id | 7075989991347468682 | <code><ins style="background:#dfd">(known after apply)</ins><del style="background:#fdd">7075989991347468682</del></code> |
+| id | 47772629773805786 | <code><ins style="background:#dfd">(known after apply)</ins><del style="background:#fdd">47772629773805786</del></code> |
 | triggers.version | 1 | <code><ins style="background:#dfd">2</ins><del style="background:#fdd">1</del></code> |
 
 </details>
@@ -2385,7 +2385,7 @@ exports[`planToMarkdown integration > terraform/null-lifecycle/2 > renders witho
 
 | Attribute | Before | After |
 | --- | --- | --- |
-| id | 7764310596128124781 | <code><del style="background:#fdd">7764310596128124781</del></code> |
+| id | 6177403211906000359 | <code><del style="background:#fdd">6177403211906000359</del></code> |
 | triggers.label | beta | <code><del style="background:#fdd">beta</del></code> |
 | triggers.version | 1 | <code><del style="background:#fdd">1</del></code> |
 
@@ -2424,7 +2424,7 @@ exports[`planToMarkdown integration > terraform/null-lifecycle/2 > renders witho
 
 | Attribute | Before | After |
 | --- | --- | --- |
-| id | 7075989991347468682 | - 7075989991347468682<br>+ (known after apply) |
+| id | 47772629773805786 | - 47772629773805786<br>+ (known after apply) |
 | triggers.version | 1 | - 1<br>+ 2 |
 
 </details>
@@ -2434,7 +2434,7 @@ exports[`planToMarkdown integration > terraform/null-lifecycle/2 > renders witho
 
 | Attribute | Before | After |
 | --- | --- | --- |
-| id | 7764310596128124781 | - 7764310596128124781 |
+| id | 6177403211906000359 | - 6177403211906000359 |
 | triggers.label | beta | - beta |
 | triggers.version | 1 | - 1 |
 
@@ -2473,7 +2473,7 @@ exports[`planToMarkdown integration > terraform/null-lifecycle/2 > renders witho
 
 | Attribute | Before | After |
 | --- | --- | --- |
-| id | 7075989991347468682 | <code><ins style="background:#dfd">(known after apply)</ins><del style="background:#fdd">7075989991347468682</del></code> |
+| id | 47772629773805786 | <code><ins style="background:#dfd">(known after apply)</ins><del style="background:#fdd">47772629773805786</del></code> |
 | triggers.label | alpha | <code>alpha</code> |
 | triggers.version | 1 | <code><ins style="background:#dfd">2</ins><del style="background:#fdd">1</del></code> |
 
@@ -2484,7 +2484,7 @@ exports[`planToMarkdown integration > terraform/null-lifecycle/2 > renders witho
 
 | Attribute | Before | After |
 | --- | --- | --- |
-| id | 7764310596128124781 | <code><del style="background:#fdd">7764310596128124781</del></code> |
+| id | 6177403211906000359 | <code><del style="background:#fdd">6177403211906000359</del></code> |
 | triggers.label | beta | <code><del style="background:#fdd">beta</del></code> |
 | triggers.version | 1 | <code><del style="background:#fdd">1</del></code> |
 
@@ -2495,7 +2495,7 @@ exports[`planToMarkdown integration > terraform/null-lifecycle/2 > renders witho
 
 | Attribute | Before | After |
 | --- | --- | --- |
-| id | b1d5351c-3552-9b44-bbf1-9451d2abcda7 | <code>b1d5351c-3552-9b44-bbf1-9451d2abcda7</code> |
+| id | 245143f2-c887-09b8-b3d6-53cef37fe9d4 | <code>245143f2-c887-09b8-b3d6-53cef37fe9d4</code> |
 | input | v1 | <code>v<ins style="background:#dfd">2</ins><del style="background:#fdd">1</del></code> |
 | output | v1 | <code><ins style="background:#dfd">(known after apply)</ins><del style="background:#fdd">v1</del></code> |
 | triggers_replace |  |  |
@@ -2515,6 +2515,88 @@ exports[`planToMarkdown integration > terraform/null-lifecycle/2 > renders witho
 |  | **Replace** | **1** |
 | 🗑️ Destroy | null_resource | 1 |
 |  | **Destroy** | **1** |
+"
+`;
+
+exports[`planToMarkdown integration > terraform/plan-error/0 > renders without error and matches snapshot [default] 1`] = `
+"## Plan Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Add | null_resource | 1 |
+|  | **Add** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>➕ <strong>null_resource</strong> baseline</summary>
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id |  | <code><ins style="background:#dfd">(known after apply)</ins></code> |
+| triggers.value |  | <code><ins style="background:#dfd">v1</ins></code> |
+
+</details>
+"
+`;
+
+exports[`planToMarkdown integration > terraform/plan-error/0 > renders without error and matches snapshot [diffFormat-simple] 1`] = `
+"## Plan Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Add | null_resource | 1 |
+|  | **Add** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>➕ <strong>null_resource</strong> baseline</summary>
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id |  | + (known after apply) |
+| triggers.value |  | + v1 |
+
+</details>
+"
+`;
+
+exports[`planToMarkdown integration > terraform/plan-error/0 > renders without error and matches snapshot [showUnchangedAttributes] 1`] = `
+"## Plan Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Add | null_resource | 1 |
+|  | **Add** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>➕ <strong>null_resource</strong> baseline</summary>
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id |  | <code><ins style="background:#dfd">(known after apply)</ins></code> |
+| triggers.value |  | <code><ins style="background:#dfd">v1</ins></code> |
+
+</details>
+"
+`;
+
+exports[`planToMarkdown integration > terraform/plan-error/0 > renders without error and matches snapshot [summary-template] 1`] = `
+"## Plan Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Add | null_resource | 1 |
+|  | **Add** | **1** |
 "
 `;
 
@@ -2669,9 +2751,9 @@ exports[`planToMarkdown integration > terraform/random-replace/1 > renders witho
 
 | Attribute | Before | After |
 | --- | --- | --- |
-| id | khtIkoRBTQCMY2tr | <code><ins style="background:#dfd">(</ins>k<del style="background:#fdd">htIk</del><ins style="background:#dfd">n</ins>o<del style="background:#fdd">RBTQCMY2</del><ins style="background:#dfd">wn af</ins>t<ins style="background:#dfd">e</ins>r<ins style="background:#dfd"> apply)</ins></code> |
+| id | uKJriLkScD2kIB08 | <code><del style="background:#fdd">uKJ</del><ins style="background:#dfd">(known afte</ins>r<ins style="background:#dfd"> apply)</ins><del style="background:#fdd">iLkScD2kIB08</del></code> |
 | keepers.rotation | v1 | <code>v<ins style="background:#dfd">2</ins><del style="background:#fdd">1</del></code> |
-| result | khtIkoRBTQCMY2tr | <code><ins style="background:#dfd">(</ins>k<del style="background:#fdd">htIk</del><ins style="background:#dfd">n</ins>o<del style="background:#fdd">RBTQCMY2</del><ins style="background:#dfd">wn af</ins>t<ins style="background:#dfd">e</ins>r<ins style="background:#dfd"> apply)</ins></code> |
+| result | uKJriLkScD2kIB08 | <code><del style="background:#fdd">uKJ</del><ins style="background:#dfd">(known afte</ins>r<ins style="background:#dfd"> apply)</ins><del style="background:#fdd">iLkScD2kIB08</del></code> |
 
 </details>
 
@@ -2700,9 +2782,9 @@ exports[`planToMarkdown integration > terraform/random-replace/1 > renders witho
 
 | Attribute | Before | After |
 | --- | --- | --- |
-| id | khtIkoRBTQCMY2tr | - khtIkoRBTQCMY2tr<br>+ (known after apply) |
+| id | uKJriLkScD2kIB08 | - uKJriLkScD2kIB08<br>+ (known after apply) |
 | keepers.rotation | v1 | - v1<br>+ v2 |
-| result | khtIkoRBTQCMY2tr | - khtIkoRBTQCMY2tr<br>+ (known after apply) |
+| result | uKJriLkScD2kIB08 | - uKJriLkScD2kIB08<br>+ (known after apply) |
 
 </details>
 
@@ -2731,7 +2813,7 @@ exports[`planToMarkdown integration > terraform/random-replace/1 > renders witho
 
 | Attribute | Before | After |
 | --- | --- | --- |
-| id | khtIkoRBTQCMY2tr | <code><ins style="background:#dfd">(</ins>k<del style="background:#fdd">htIk</del><ins style="background:#dfd">n</ins>o<del style="background:#fdd">RBTQCMY2</del><ins style="background:#dfd">wn af</ins>t<ins style="background:#dfd">e</ins>r<ins style="background:#dfd"> apply)</ins></code> |
+| id | uKJriLkScD2kIB08 | <code><del style="background:#fdd">uKJ</del><ins style="background:#dfd">(known afte</ins>r<ins style="background:#dfd"> apply)</ins><del style="background:#fdd">iLkScD2kIB08</del></code> |
 | keepers.rotation | v1 | <code>v<ins style="background:#dfd">2</ins><del style="background:#fdd">1</del></code> |
 | length | 16 | <code>16</code> |
 | lower | true | <code>true</code> |
@@ -2742,7 +2824,7 @@ exports[`planToMarkdown integration > terraform/random-replace/1 > renders witho
 | number | true | <code>true</code> |
 | numeric | true | <code>true</code> |
 | override_special |  |  |
-| result | khtIkoRBTQCMY2tr | <code><ins style="background:#dfd">(</ins>k<del style="background:#fdd">htIk</del><ins style="background:#dfd">n</ins>o<del style="background:#fdd">RBTQCMY2</del><ins style="background:#dfd">wn af</ins>t<ins style="background:#dfd">e</ins>r<ins style="background:#dfd"> apply)</ins></code> |
+| result | uKJriLkScD2kIB08 | <code><del style="background:#fdd">uKJ</del><ins style="background:#dfd">(known afte</ins>r<ins style="background:#dfd"> apply)</ins><del style="background:#fdd">iLkScD2kIB08</del></code> |
 | special | false | <code>false</code> |
 | upper | true | <code>true</code> |
 
@@ -3028,6 +3110,88 @@ exports[`planToMarkdown integration > terraform/sensitive-values/1 > renders wit
 "
 `;
 
+exports[`planToMarkdown integration > terraform/validate-error/0 > renders without error and matches snapshot [default] 1`] = `
+"## Plan Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Add | null_resource | 1 |
+|  | **Add** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>➕ <strong>null_resource</strong> baseline</summary>
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id |  | <code><ins style="background:#dfd">(known after apply)</ins></code> |
+| triggers.value |  | <code><ins style="background:#dfd">v1</ins></code> |
+
+</details>
+"
+`;
+
+exports[`planToMarkdown integration > terraform/validate-error/0 > renders without error and matches snapshot [diffFormat-simple] 1`] = `
+"## Plan Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Add | null_resource | 1 |
+|  | **Add** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>➕ <strong>null_resource</strong> baseline</summary>
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id |  | + (known after apply) |
+| triggers.value |  | + v1 |
+
+</details>
+"
+`;
+
+exports[`planToMarkdown integration > terraform/validate-error/0 > renders without error and matches snapshot [showUnchangedAttributes] 1`] = `
+"## Plan Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Add | null_resource | 1 |
+|  | **Add** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>➕ <strong>null_resource</strong> baseline</summary>
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id |  | <code><ins style="background:#dfd">(known after apply)</ins></code> |
+| triggers.value |  | <code><ins style="background:#dfd">v1</ins></code> |
+
+</details>
+"
+`;
+
+exports[`planToMarkdown integration > terraform/validate-error/0 > renders without error and matches snapshot [summary-template] 1`] = `
+"## Plan Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Add | null_resource | 1 |
+|  | **Add** | **1** |
+"
+`;
+
 exports[`planToMarkdown integration > terraform/with-modules/0 > renders without error and matches snapshot [default] 1`] = `
 "## Plan Summary
 
@@ -3223,7 +3387,7 @@ exports[`planToMarkdown integration > terraform/with-modules/1 > renders without
 
 | Attribute | Before | After |
 | --- | --- | --- |
-| id | 3710917372097226226 | <code><ins style="background:#dfd">(known after apply)</ins><del style="background:#fdd">3710917372097226226</del></code> |
+| id | 2220807042775892352 | <code><ins style="background:#dfd">(known after apply)</ins><del style="background:#fdd">2220807042775892352</del></code> |
 | triggers.stage | 0 | <code><ins style="background:#dfd">1</ins><del style="background:#fdd">0</del></code> |
 
 </details>
@@ -3235,9 +3399,9 @@ exports[`planToMarkdown integration > terraform/with-modules/1 > renders without
 
 | Attribute | Before | After |
 | --- | --- | --- |
-| id | 3wbknn0r | <code><del style="background:#fdd">3wb</del><ins style="background:#dfd">(</ins>kn<ins style="background:#dfd">ow</ins>n<del style="background:#fdd">0</del><ins style="background:#dfd"> afte</ins>r<ins style="background:#dfd"> apply)</ins></code> |
+| id | pou61tw0 | <code><del style="background:#fdd">p</del><ins style="background:#dfd">(kn</ins>o<del style="background:#fdd">u61</del><ins style="background:#dfd">wn af</ins>t<ins style="background:#dfd">er apply)</ins><del style="background:#fdd">w0</del></code> |
 | keepers.prefix | fixture | <code>fixtur<ins style="background:#dfd">e-updat</ins>e<ins style="background:#dfd">d</ins></code> |
-| result | 3wbknn0r | <code><del style="background:#fdd">3wb</del><ins style="background:#dfd">(</ins>kn<ins style="background:#dfd">ow</ins>n<del style="background:#fdd">0</del><ins style="background:#dfd"> afte</ins>r<ins style="background:#dfd"> apply)</ins></code> |
+| result | pou61tw0 | <code><del style="background:#fdd">p</del><ins style="background:#dfd">(kn</ins>o<del style="background:#fdd">u61</del><ins style="background:#dfd">wn af</ins>t<ins style="background:#dfd">er apply)</ins><del style="background:#fdd">w0</del></code> |
 
 </details>
 
@@ -3245,8 +3409,8 @@ exports[`planToMarkdown integration > terraform/with-modules/1 > renders without
 
 | Output | Action | Before | After |
 | --- | --- | --- | --- |
-| generated_name | 🔧 | <code>fixture-3wbknn0r</code> | _(known after apply)_ |
-| root_id | 🔧 | <code>3710917372097226226</code> | _(known after apply)_ |
+| generated_name | 🔧 | <code>fixture-pou61tw0</code> | _(known after apply)_ |
+| root_id | 🔧 | <code>2220807042775892352</code> | _(known after apply)_ |
 "
 `;
 
@@ -3268,7 +3432,7 @@ exports[`planToMarkdown integration > terraform/with-modules/1 > renders without
 
 | Attribute | Before | After |
 | --- | --- | --- |
-| id | 3710917372097226226 | - 3710917372097226226<br>+ (known after apply) |
+| id | 2220807042775892352 | - 2220807042775892352<br>+ (known after apply) |
 | triggers.stage | 0 | - 0<br>+ 1 |
 
 </details>
@@ -3280,9 +3444,9 @@ exports[`planToMarkdown integration > terraform/with-modules/1 > renders without
 
 | Attribute | Before | After |
 | --- | --- | --- |
-| id | 3wbknn0r | - 3wbknn0r<br>+ (known after apply) |
+| id | pou61tw0 | - pou61tw0<br>+ (known after apply) |
 | keepers.prefix | fixture | - fixture<br>+ fixture-updated |
-| result | 3wbknn0r | - 3wbknn0r<br>+ (known after apply) |
+| result | pou61tw0 | - pou61tw0<br>+ (known after apply) |
 
 </details>
 
@@ -3290,8 +3454,8 @@ exports[`planToMarkdown integration > terraform/with-modules/1 > renders without
 
 | Output | Action | Before | After |
 | --- | --- | --- | --- |
-| generated_name | 🔧 | <code>fixture-3wbknn0r</code> | _(known after apply)_ |
-| root_id | 🔧 | <code>3710917372097226226</code> | _(known after apply)_ |
+| generated_name | 🔧 | <code>fixture-pou61tw0</code> | _(known after apply)_ |
+| root_id | 🔧 | <code>2220807042775892352</code> | _(known after apply)_ |
 "
 `;
 
@@ -3313,7 +3477,7 @@ exports[`planToMarkdown integration > terraform/with-modules/1 > renders without
 
 | Attribute | Before | After |
 | --- | --- | --- |
-| id | 3710917372097226226 | <code><ins style="background:#dfd">(known after apply)</ins><del style="background:#fdd">3710917372097226226</del></code> |
+| id | 2220807042775892352 | <code><ins style="background:#dfd">(known after apply)</ins><del style="background:#fdd">2220807042775892352</del></code> |
 | triggers.stage | 0 | <code><ins style="background:#dfd">1</ins><del style="background:#fdd">0</del></code> |
 
 </details>
@@ -3325,7 +3489,7 @@ exports[`planToMarkdown integration > terraform/with-modules/1 > renders without
 
 | Attribute | Before | After |
 | --- | --- | --- |
-| id | 3wbknn0r | <code><del style="background:#fdd">3wb</del><ins style="background:#dfd">(</ins>kn<ins style="background:#dfd">ow</ins>n<del style="background:#fdd">0</del><ins style="background:#dfd"> afte</ins>r<ins style="background:#dfd"> apply)</ins></code> |
+| id | pou61tw0 | <code><del style="background:#fdd">p</del><ins style="background:#dfd">(kn</ins>o<del style="background:#fdd">u61</del><ins style="background:#dfd">wn af</ins>t<ins style="background:#dfd">er apply)</ins><del style="background:#fdd">w0</del></code> |
 | keepers.prefix | fixture | <code>fixtur<ins style="background:#dfd">e-updat</ins>e<ins style="background:#dfd">d</ins></code> |
 | length | 8 | <code>8</code> |
 | lower | true | <code>true</code> |
@@ -3336,7 +3500,7 @@ exports[`planToMarkdown integration > terraform/with-modules/1 > renders without
 | number | true | <code>true</code> |
 | numeric | true | <code>true</code> |
 | override_special |  |  |
-| result | 3wbknn0r | <code><del style="background:#fdd">3wb</del><ins style="background:#dfd">(</ins>kn<ins style="background:#dfd">ow</ins>n<del style="background:#fdd">0</del><ins style="background:#dfd"> afte</ins>r<ins style="background:#dfd"> apply)</ins></code> |
+| result | pou61tw0 | <code><del style="background:#fdd">p</del><ins style="background:#dfd">(kn</ins>o<del style="background:#fdd">u61</del><ins style="background:#dfd">wn af</ins>t<ins style="background:#dfd">er apply)</ins><del style="background:#fdd">w0</del></code> |
 | special | false | <code>false</code> |
 | upper | false | <code>false</code> |
 
@@ -3346,8 +3510,8 @@ exports[`planToMarkdown integration > terraform/with-modules/1 > renders without
 
 | Output | Action | Before | After |
 | --- | --- | --- | --- |
-| generated_name | 🔧 | <code>fixture-3wbknn0r</code> | _(known after apply)_ |
-| root_id | 🔧 | <code>3710917372097226226</code> | _(known after apply)_ |
+| generated_name | 🔧 | <code>fixture-pou61tw0</code> | _(known after apply)_ |
+| root_id | 🔧 | <code>2220807042775892352</code> | _(known after apply)_ |
 "
 `;
 
@@ -3548,7 +3712,7 @@ exports[`planToMarkdown integration > tofu/apply-error/1 > renders without error
 
 | Attribute | Before | After |
 | --- | --- | --- |
-| id | 338768219485023028 | <code><ins style="background:#dfd">(known after apply)</ins><del style="background:#fdd">338768219485023028</del></code> |
+| id | 4658900736840827058 | <code><ins style="background:#dfd">(known after apply)</ins><del style="background:#fdd">4658900736840827058</del></code> |
 | triggers.value | v1 | <code>v<ins style="background:#dfd">2</ins><del style="background:#fdd">1</del></code> |
 
 </details>
@@ -3571,7 +3735,7 @@ _No attribute changes._
 
 | Output | Action | Before | After |
 | --- | --- | --- | --- |
-| depends_on_fail_output | 🔧 | <code>338768219485023028</code> | _(known after apply)_ |
+| depends_on_fail_output | 🔧 | <code>4658900736840827058</code> | _(known after apply)_ |
 | success_output | ⬜ | <code>stable</code> | <code>stable</code> |
 "
 `;
@@ -3595,7 +3759,7 @@ exports[`planToMarkdown integration > tofu/apply-error/1 > renders without error
 
 | Attribute | Before | After |
 | --- | --- | --- |
-| id | 338768219485023028 | - 338768219485023028<br>+ (known after apply) |
+| id | 4658900736840827058 | - 4658900736840827058<br>+ (known after apply) |
 | triggers.value | v1 | - v1<br>+ v2 |
 
 </details>
@@ -3618,7 +3782,7 @@ _No attribute changes._
 
 | Output | Action | Before | After |
 | --- | --- | --- | --- |
-| depends_on_fail_output | 🔧 | <code>338768219485023028</code> | _(known after apply)_ |
+| depends_on_fail_output | 🔧 | <code>4658900736840827058</code> | _(known after apply)_ |
 | success_output | ⬜ | <code>stable</code> | <code>stable</code> |
 "
 `;
@@ -3642,7 +3806,7 @@ exports[`planToMarkdown integration > tofu/apply-error/1 > renders without error
 
 | Attribute | Before | After |
 | --- | --- | --- |
-| id | 338768219485023028 | <code><ins style="background:#dfd">(known after apply)</ins><del style="background:#fdd">338768219485023028</del></code> |
+| id | 4658900736840827058 | <code><ins style="background:#dfd">(known after apply)</ins><del style="background:#fdd">4658900736840827058</del></code> |
 | triggers.value | v1 | <code>v<ins style="background:#dfd">2</ins><del style="background:#fdd">1</del></code> |
 
 </details>
@@ -3652,9 +3816,9 @@ exports[`planToMarkdown integration > tofu/apply-error/1 > renders without error
 
 | Attribute | Before | After |
 | --- | --- | --- |
-| id | 22c228eb-4ca7-b87d-8322-fd1485431ede | <code>22c228eb-4ca7-b87d-8322-fd1485431ede</code> |
-| input | 338768219485023028 | <code><ins style="background:#dfd">(known after apply)</ins><del style="background:#fdd">338768219485023028</del></code> |
-| output | 338768219485023028 | <code><ins style="background:#dfd">(known after apply)</ins><del style="background:#fdd">338768219485023028</del></code> |
+| id | 5d612bcd-efd9-3a82-304a-f307447e0be1 | <code>5d612bcd-efd9-3a82-304a-f307447e0be1</code> |
+| input | 4658900736840827058 | <code><ins style="background:#dfd">(known after apply)</ins><del style="background:#fdd">4658900736840827058</del></code> |
+| output | 4658900736840827058 | <code><ins style="background:#dfd">(known after apply)</ins><del style="background:#fdd">4658900736840827058</del></code> |
 | triggers_replace |  |  |
 
 </details>
@@ -3664,7 +3828,7 @@ exports[`planToMarkdown integration > tofu/apply-error/1 > renders without error
 
 | Attribute | Before | After |
 | --- | --- | --- |
-| id | 020574d8-40e0-5c1a-c081-0ff499274881 | <code>020574d8-40e0-5c1a-c081-0ff499274881</code> |
+| id | fa8f5ee9-55ed-76f0-5ee3-b69139d975ce | <code>fa8f5ee9-55ed-76f0-5ee3-b69139d975ce</code> |
 | input | stable | <code>stable</code> |
 | output | stable | <code>stable</code> |
 | triggers_replace |  |  |
@@ -3675,7 +3839,7 @@ exports[`planToMarkdown integration > tofu/apply-error/1 > renders without error
 
 | Output | Action | Before | After |
 | --- | --- | --- | --- |
-| depends_on_fail_output | 🔧 | <code>338768219485023028</code> | _(known after apply)_ |
+| depends_on_fail_output | 🔧 | <code>4658900736840827058</code> | _(known after apply)_ |
 | success_output | ⬜ | <code>stable</code> | <code>stable</code> |
 "
 `;
@@ -4215,7 +4379,7 @@ exports[`planToMarkdown integration > tofu/deferred-data-source/1 > renders with
 
 | Attribute | Before | After |
 | --- | --- | --- |
-| id | 761475f1-9940-052f-e854-37bc7f37790a | <code>761475f1-9940-052f-e854-37bc7f37790a</code> |
+| id | 5f94c811-2c65-1f37-643a-0dfe960bee3f | <code>5f94c811-2c65-1f37-643a-0dfe960bee3f</code> |
 | input | v1 | <code>v<ins style="background:#dfd">2</ins><del style="background:#fdd">1</del></code> |
 | output | v1 | <code><ins style="background:#dfd">(known after apply)</ins><del style="background:#fdd">v1</del></code> |
 | triggers_replace |  |  |
@@ -4227,7 +4391,7 @@ exports[`planToMarkdown integration > tofu/deferred-data-source/1 > renders with
 
 | Attribute | Before | After |
 | --- | --- | --- |
-| id | a04187a7-ca56-b567-7227-dbb0522a6a9d | <code>a04187a7-ca56-b567-7227-dbb0522a6a9d</code> |
+| id | 9c09a2e1-f7ca-5f3c-b2fa-6c12d23e42fe | <code>9c09a2e1-f7ca-5f3c-b2fa-6c12d23e42fe</code> |
 | input | alpha | <code><ins style="background:#dfd">(known after </ins>a<ins style="background:#dfd">pp</ins>l<ins style="background:#dfd">y)</ins><del style="background:#fdd">pha</del></code> |
 | output | alpha | <code><ins style="background:#dfd">(known after </ins>a<ins style="background:#dfd">pp</ins>l<ins style="background:#dfd">y)</ins><del style="background:#fdd">pha</del></code> |
 | triggers_replace |  |  |
@@ -4239,7 +4403,7 @@ exports[`planToMarkdown integration > tofu/deferred-data-source/1 > renders with
 
 | Attribute | Before | After |
 | --- | --- | --- |
-| id | 035850f5-df0f-8cc0-02e9-f834d7ab855f | <code>035850f5-df0f-8cc0-02e9-f834d7ab855f</code> |
+| id | d82dd6ed-61fd-d6b0-4c4d-e479a2a37f7d | <code>d82dd6ed-61fd-d6b0-4c4d-e479a2a37f7d</code> |
 | input | bravo | <code><del style="background:#fdd">b</del><ins style="background:#dfd">(known afte</ins>r<ins style="background:#dfd"> </ins>a<ins style="background:#dfd">pply)</ins><del style="background:#fdd">vo</del></code> |
 | output | bravo | <code><del style="background:#fdd">b</del><ins style="background:#dfd">(known afte</ins>r<ins style="background:#dfd"> </ins>a<ins style="background:#dfd">pply)</ins><del style="background:#fdd">vo</del></code> |
 | triggers_replace |  |  |
@@ -4251,7 +4415,7 @@ exports[`planToMarkdown integration > tofu/deferred-data-source/1 > renders with
 
 | Attribute | Before | After |
 | --- | --- | --- |
-| id | e72b4039-3362-f7b9-b33f-3bc68341627d | <code>e72b4039-3362-f7b9-b33f-3bc68341627d</code> |
+| id | bffffdd3-0159-7995-a866-72afab285220 | <code>bffffdd3-0159-7995-a866-72afab285220</code> |
 | input | charlie | <code><del style="background:#fdd">ch</del><ins style="background:#dfd">(known </ins>a<ins style="background:#dfd">fte</ins>r<ins style="background:#dfd"> app</ins>l<ins style="background:#dfd">y)</ins><del style="background:#fdd">ie</del></code> |
 | output | charlie | <code><del style="background:#fdd">ch</del><ins style="background:#dfd">(known </ins>a<ins style="background:#dfd">fte</ins>r<ins style="background:#dfd"> app</ins>l<ins style="background:#dfd">y)</ins><del style="background:#fdd">ie</del></code> |
 | triggers_replace |  |  |
@@ -4532,7 +4696,7 @@ exports[`planToMarkdown integration > tofu/deferred-data-source/2 > renders with
 
 | Attribute | Before | After |
 | --- | --- | --- |
-| id | 761475f1-9940-052f-e854-37bc7f37790a | <code>761475f1-9940-052f-e854-37bc7f37790a</code> |
+| id | 5f94c811-2c65-1f37-643a-0dfe960bee3f | <code>5f94c811-2c65-1f37-643a-0dfe960bee3f</code> |
 | input | v2 | <code>v2</code> |
 | output | v2 | <code>v2</code> |
 | triggers_replace |  |  |
@@ -4544,7 +4708,7 @@ exports[`planToMarkdown integration > tofu/deferred-data-source/2 > renders with
 
 | Attribute | Before | After |
 | --- | --- | --- |
-| id | a04187a7-ca56-b567-7227-dbb0522a6a9d | <code>a04187a7-ca56-b567-7227-dbb0522a6a9d</code> |
+| id | 9c09a2e1-f7ca-5f3c-b2fa-6c12d23e42fe | <code>9c09a2e1-f7ca-5f3c-b2fa-6c12d23e42fe</code> |
 | input | alpha | <code><ins style="background:#dfd">(known after </ins>a<ins style="background:#dfd">pp</ins>l<ins style="background:#dfd">y)</ins><del style="background:#fdd">pha</del></code> |
 | output | alpha | <code><ins style="background:#dfd">(known after </ins>a<ins style="background:#dfd">pp</ins>l<ins style="background:#dfd">y)</ins><del style="background:#fdd">pha</del></code> |
 | triggers_replace |  |  |
@@ -4556,7 +4720,7 @@ exports[`planToMarkdown integration > tofu/deferred-data-source/2 > renders with
 
 | Attribute | Before | After |
 | --- | --- | --- |
-| id | 035850f5-df0f-8cc0-02e9-f834d7ab855f | <code>035850f5-df0f-8cc0-02e9-f834d7ab855f</code> |
+| id | d82dd6ed-61fd-d6b0-4c4d-e479a2a37f7d | <code>d82dd6ed-61fd-d6b0-4c4d-e479a2a37f7d</code> |
 | input | bravo | <code><del style="background:#fdd">b</del><ins style="background:#dfd">(known afte</ins>r<ins style="background:#dfd"> </ins>a<ins style="background:#dfd">pply)</ins><del style="background:#fdd">vo</del></code> |
 | output | bravo | <code><del style="background:#fdd">b</del><ins style="background:#dfd">(known afte</ins>r<ins style="background:#dfd"> </ins>a<ins style="background:#dfd">pply)</ins><del style="background:#fdd">vo</del></code> |
 | triggers_replace |  |  |
@@ -4568,7 +4732,7 @@ exports[`planToMarkdown integration > tofu/deferred-data-source/2 > renders with
 
 | Attribute | Before | After |
 | --- | --- | --- |
-| id | e72b4039-3362-f7b9-b33f-3bc68341627d | <code>e72b4039-3362-f7b9-b33f-3bc68341627d</code> |
+| id | bffffdd3-0159-7995-a866-72afab285220 | <code>bffffdd3-0159-7995-a866-72afab285220</code> |
 | input | charlie | <code><del style="background:#fdd">ch</del><ins style="background:#dfd">(known </ins>a<ins style="background:#dfd">fte</ins>r<ins style="background:#dfd"> app</ins>l<ins style="background:#dfd">y)</ins><del style="background:#fdd">ie</del></code> |
 | output | charlie | <code><del style="background:#fdd">ch</del><ins style="background:#dfd">(known </ins>a<ins style="background:#dfd">fte</ins>r<ins style="background:#dfd"> app</ins>l<ins style="background:#dfd">y)</ins><del style="background:#fdd">ie</del></code> |
 | triggers_replace |  |  |
@@ -5126,7 +5290,7 @@ _No changes._
 
 | Attribute | Before | After |
 | --- | --- | --- |
-| id | 4496792546611142791 | <code>4496792546611142791</code> |
+| id | 189737491293112801 | <code>189737491293112801</code> |
 | triggers.version | 1 | <code>1</code> |
 
 </details>
@@ -5239,7 +5403,7 @@ exports[`planToMarkdown integration > tofu/no-detailed-exitcode/1 > renders with
 
 | Attribute | Before | After |
 | --- | --- | --- |
-| id | 1738881386286482997 | <code><del style="background:#fdd">1738881386286482997</del></code> |
+| id | 8130498850864889367 | <code><del style="background:#fdd">8130498850864889367</del></code> |
 | triggers.value | hello | <code><del style="background:#fdd">hello</del></code> |
 
 </details>
@@ -5263,7 +5427,7 @@ exports[`planToMarkdown integration > tofu/no-detailed-exitcode/1 > renders with
 
 | Attribute | Before | After |
 | --- | --- | --- |
-| id | 1738881386286482997 | - 1738881386286482997 |
+| id | 8130498850864889367 | - 8130498850864889367 |
 | triggers.value | hello | - hello |
 
 </details>
@@ -5287,7 +5451,7 @@ exports[`planToMarkdown integration > tofu/no-detailed-exitcode/1 > renders with
 
 | Attribute | Before | After |
 | --- | --- | --- |
-| id | 1738881386286482997 | <code><del style="background:#fdd">1738881386286482997</del></code> |
+| id | 8130498850864889367 | <code><del style="background:#fdd">8130498850864889367</del></code> |
 | triggers.value | hello | <code><del style="background:#fdd">hello</del></code> |
 
 </details>
@@ -5518,7 +5682,7 @@ _No changes._
 
 | Attribute | Before | After |
 | --- | --- | --- |
-| id | 750302313217780956 | <code>750302313217780956</code> |
+| id | 4340818089850615489 | <code>4340818089850615489</code> |
 | triggers.version | 1 | <code>1</code> |
 
 </details>
@@ -5737,7 +5901,7 @@ exports[`planToMarkdown integration > tofu/null-lifecycle/2 > renders without er
 
 | Attribute | Before | After |
 | --- | --- | --- |
-| id | 4885286028855289750 | <code><ins style="background:#dfd">(known after apply)</ins><del style="background:#fdd">4885286028855289750</del></code> |
+| id | 4829695785399102406 | <code><ins style="background:#dfd">(known after apply)</ins><del style="background:#fdd">4829695785399102406</del></code> |
 | triggers.version | 1 | <code><ins style="background:#dfd">2</ins><del style="background:#fdd">1</del></code> |
 
 </details>
@@ -5747,7 +5911,7 @@ exports[`planToMarkdown integration > tofu/null-lifecycle/2 > renders without er
 
 | Attribute | Before | After |
 | --- | --- | --- |
-| id | 2499743340329344933 | <code><del style="background:#fdd">2499743340329344933</del></code> |
+| id | 1571102993481265976 | <code><del style="background:#fdd">1571102993481265976</del></code> |
 | triggers.label | beta | <code><del style="background:#fdd">beta</del></code> |
 | triggers.version | 1 | <code><del style="background:#fdd">1</del></code> |
 
@@ -5786,7 +5950,7 @@ exports[`planToMarkdown integration > tofu/null-lifecycle/2 > renders without er
 
 | Attribute | Before | After |
 | --- | --- | --- |
-| id | 4885286028855289750 | - 4885286028855289750<br>+ (known after apply) |
+| id | 4829695785399102406 | - 4829695785399102406<br>+ (known after apply) |
 | triggers.version | 1 | - 1<br>+ 2 |
 
 </details>
@@ -5796,7 +5960,7 @@ exports[`planToMarkdown integration > tofu/null-lifecycle/2 > renders without er
 
 | Attribute | Before | After |
 | --- | --- | --- |
-| id | 2499743340329344933 | - 2499743340329344933 |
+| id | 1571102993481265976 | - 1571102993481265976 |
 | triggers.label | beta | - beta |
 | triggers.version | 1 | - 1 |
 
@@ -5835,7 +5999,7 @@ exports[`planToMarkdown integration > tofu/null-lifecycle/2 > renders without er
 
 | Attribute | Before | After |
 | --- | --- | --- |
-| id | 4885286028855289750 | <code><ins style="background:#dfd">(known after apply)</ins><del style="background:#fdd">4885286028855289750</del></code> |
+| id | 4829695785399102406 | <code><ins style="background:#dfd">(known after apply)</ins><del style="background:#fdd">4829695785399102406</del></code> |
 | triggers.label | alpha | <code>alpha</code> |
 | triggers.version | 1 | <code><ins style="background:#dfd">2</ins><del style="background:#fdd">1</del></code> |
 
@@ -5846,7 +6010,7 @@ exports[`planToMarkdown integration > tofu/null-lifecycle/2 > renders without er
 
 | Attribute | Before | After |
 | --- | --- | --- |
-| id | 2499743340329344933 | <code><del style="background:#fdd">2499743340329344933</del></code> |
+| id | 1571102993481265976 | <code><del style="background:#fdd">1571102993481265976</del></code> |
 | triggers.label | beta | <code><del style="background:#fdd">beta</del></code> |
 | triggers.version | 1 | <code><del style="background:#fdd">1</del></code> |
 
@@ -5857,7 +6021,7 @@ exports[`planToMarkdown integration > tofu/null-lifecycle/2 > renders without er
 
 | Attribute | Before | After |
 | --- | --- | --- |
-| id | 5b7e3a43-779c-fc27-02c3-1d00c819bea8 | <code>5b7e3a43-779c-fc27-02c3-1d00c819bea8</code> |
+| id | c936c010-f8e9-8dd5-8fbb-602014f083f1 | <code>c936c010-f8e9-8dd5-8fbb-602014f083f1</code> |
 | input | v1 | <code>v<ins style="background:#dfd">2</ins><del style="background:#fdd">1</del></code> |
 | output | v1 | <code><ins style="background:#dfd">(known after apply)</ins><del style="background:#fdd">v1</del></code> |
 | triggers_replace |  |  |
@@ -5877,6 +6041,88 @@ exports[`planToMarkdown integration > tofu/null-lifecycle/2 > renders without er
 |  | **Replace** | **1** |
 | 🗑️ Destroy | null_resource | 1 |
 |  | **Destroy** | **1** |
+"
+`;
+
+exports[`planToMarkdown integration > tofu/plan-error/0 > renders without error and matches snapshot [default] 1`] = `
+"## Plan Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Add | null_resource | 1 |
+|  | **Add** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>➕ <strong>null_resource</strong> baseline</summary>
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id |  | <code><ins style="background:#dfd">(known after apply)</ins></code> |
+| triggers.value |  | <code><ins style="background:#dfd">v1</ins></code> |
+
+</details>
+"
+`;
+
+exports[`planToMarkdown integration > tofu/plan-error/0 > renders without error and matches snapshot [diffFormat-simple] 1`] = `
+"## Plan Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Add | null_resource | 1 |
+|  | **Add** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>➕ <strong>null_resource</strong> baseline</summary>
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id |  | + (known after apply) |
+| triggers.value |  | + v1 |
+
+</details>
+"
+`;
+
+exports[`planToMarkdown integration > tofu/plan-error/0 > renders without error and matches snapshot [showUnchangedAttributes] 1`] = `
+"## Plan Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Add | null_resource | 1 |
+|  | **Add** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>➕ <strong>null_resource</strong> baseline</summary>
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id |  | <code><ins style="background:#dfd">(known after apply)</ins></code> |
+| triggers.value |  | <code><ins style="background:#dfd">v1</ins></code> |
+
+</details>
+"
+`;
+
+exports[`planToMarkdown integration > tofu/plan-error/0 > renders without error and matches snapshot [summary-template] 1`] = `
+"## Plan Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Add | null_resource | 1 |
+|  | **Add** | **1** |
 "
 `;
 
@@ -6031,9 +6277,9 @@ exports[`planToMarkdown integration > tofu/random-replace/1 > renders without er
 
 | Attribute | Before | After |
 | --- | --- | --- |
-| id | la38OMFFcW63nwiZ | <code><del style="background:#fdd">la38OMFFcW63</del><ins style="background:#dfd">(k</ins>n<ins style="background:#dfd">o</ins>w<ins style="background:#dfd">n after apply)</ins><del style="background:#fdd">iZ</del></code> |
+| id | 4j1ym62MpbdGMFYo | <code><del style="background:#fdd">4j1</del><ins style="background:#dfd">(known after appl</ins>y<ins style="background:#dfd">)</ins><del style="background:#fdd">m62MpbdGMFYo</del></code> |
 | keepers.rotation | v1 | <code>v<ins style="background:#dfd">2</ins><del style="background:#fdd">1</del></code> |
-| result | la38OMFFcW63nwiZ | <code><del style="background:#fdd">la38OMFFcW63</del><ins style="background:#dfd">(k</ins>n<ins style="background:#dfd">o</ins>w<ins style="background:#dfd">n after apply)</ins><del style="background:#fdd">iZ</del></code> |
+| result | 4j1ym62MpbdGMFYo | <code><del style="background:#fdd">4j1</del><ins style="background:#dfd">(known after appl</ins>y<ins style="background:#dfd">)</ins><del style="background:#fdd">m62MpbdGMFYo</del></code> |
 
 </details>
 
@@ -6062,9 +6308,9 @@ exports[`planToMarkdown integration > tofu/random-replace/1 > renders without er
 
 | Attribute | Before | After |
 | --- | --- | --- |
-| id | la38OMFFcW63nwiZ | - la38OMFFcW63nwiZ<br>+ (known after apply) |
+| id | 4j1ym62MpbdGMFYo | - 4j1ym62MpbdGMFYo<br>+ (known after apply) |
 | keepers.rotation | v1 | - v1<br>+ v2 |
-| result | la38OMFFcW63nwiZ | - la38OMFFcW63nwiZ<br>+ (known after apply) |
+| result | 4j1ym62MpbdGMFYo | - 4j1ym62MpbdGMFYo<br>+ (known after apply) |
 
 </details>
 
@@ -6093,7 +6339,7 @@ exports[`planToMarkdown integration > tofu/random-replace/1 > renders without er
 
 | Attribute | Before | After |
 | --- | --- | --- |
-| id | la38OMFFcW63nwiZ | <code><del style="background:#fdd">la38OMFFcW63</del><ins style="background:#dfd">(k</ins>n<ins style="background:#dfd">o</ins>w<ins style="background:#dfd">n after apply)</ins><del style="background:#fdd">iZ</del></code> |
+| id | 4j1ym62MpbdGMFYo | <code><del style="background:#fdd">4j1</del><ins style="background:#dfd">(known after appl</ins>y<ins style="background:#dfd">)</ins><del style="background:#fdd">m62MpbdGMFYo</del></code> |
 | keepers.rotation | v1 | <code>v<ins style="background:#dfd">2</ins><del style="background:#fdd">1</del></code> |
 | length | 16 | <code>16</code> |
 | lower | true | <code>true</code> |
@@ -6104,7 +6350,7 @@ exports[`planToMarkdown integration > tofu/random-replace/1 > renders without er
 | number | true | <code>true</code> |
 | numeric | true | <code>true</code> |
 | override_special |  |  |
-| result | la38OMFFcW63nwiZ | <code><del style="background:#fdd">la38OMFFcW63</del><ins style="background:#dfd">(k</ins>n<ins style="background:#dfd">o</ins>w<ins style="background:#dfd">n after apply)</ins><del style="background:#fdd">iZ</del></code> |
+| result | 4j1ym62MpbdGMFYo | <code><del style="background:#fdd">4j1</del><ins style="background:#dfd">(known after appl</ins>y<ins style="background:#dfd">)</ins><del style="background:#fdd">m62MpbdGMFYo</del></code> |
 | special | false | <code>false</code> |
 | upper | true | <code>true</code> |
 
@@ -6390,6 +6636,88 @@ exports[`planToMarkdown integration > tofu/sensitive-values/1 > renders without 
 "
 `;
 
+exports[`planToMarkdown integration > tofu/validate-error/0 > renders without error and matches snapshot [default] 1`] = `
+"## Plan Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Add | null_resource | 1 |
+|  | **Add** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>➕ <strong>null_resource</strong> baseline</summary>
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id |  | <code><ins style="background:#dfd">(known after apply)</ins></code> |
+| triggers.value |  | <code><ins style="background:#dfd">v1</ins></code> |
+
+</details>
+"
+`;
+
+exports[`planToMarkdown integration > tofu/validate-error/0 > renders without error and matches snapshot [diffFormat-simple] 1`] = `
+"## Plan Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Add | null_resource | 1 |
+|  | **Add** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>➕ <strong>null_resource</strong> baseline</summary>
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id |  | + (known after apply) |
+| triggers.value |  | + v1 |
+
+</details>
+"
+`;
+
+exports[`planToMarkdown integration > tofu/validate-error/0 > renders without error and matches snapshot [showUnchangedAttributes] 1`] = `
+"## Plan Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Add | null_resource | 1 |
+|  | **Add** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>➕ <strong>null_resource</strong> baseline</summary>
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id |  | <code><ins style="background:#dfd">(known after apply)</ins></code> |
+| triggers.value |  | <code><ins style="background:#dfd">v1</ins></code> |
+
+</details>
+"
+`;
+
+exports[`planToMarkdown integration > tofu/validate-error/0 > renders without error and matches snapshot [summary-template] 1`] = `
+"## Plan Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Add | null_resource | 1 |
+|  | **Add** | **1** |
+"
+`;
+
 exports[`planToMarkdown integration > tofu/with-modules/0 > renders without error and matches snapshot [default] 1`] = `
 "## Plan Summary
 
@@ -6585,7 +6913,7 @@ exports[`planToMarkdown integration > tofu/with-modules/1 > renders without erro
 
 | Attribute | Before | After |
 | --- | --- | --- |
-| id | 1951266549668774856 | <code><ins style="background:#dfd">(known after apply)</ins><del style="background:#fdd">1951266549668774856</del></code> |
+| id | 6383459455842344094 | <code><ins style="background:#dfd">(known after apply)</ins><del style="background:#fdd">6383459455842344094</del></code> |
 | triggers.stage | 0 | <code><ins style="background:#dfd">1</ins><del style="background:#fdd">0</del></code> |
 
 </details>
@@ -6597,9 +6925,9 @@ exports[`planToMarkdown integration > tofu/with-modules/1 > renders without erro
 
 | Attribute | Before | After |
 | --- | --- | --- |
-| id | 27zvhlu0 | <code><del style="background:#fdd">27zvh</del><ins style="background:#dfd">(known after app</ins>l<ins style="background:#dfd">y)</ins><del style="background:#fdd">u0</del></code> |
+| id | yjqc2qr1 | <code><ins style="background:#dfd">(known after appl</ins>y<ins style="background:#dfd">)</ins><del style="background:#fdd">jqc2qr1</del></code> |
 | keepers.prefix | fixture | <code>fixtur<ins style="background:#dfd">e-updat</ins>e<ins style="background:#dfd">d</ins></code> |
-| result | 27zvhlu0 | <code><del style="background:#fdd">27zvh</del><ins style="background:#dfd">(known after app</ins>l<ins style="background:#dfd">y)</ins><del style="background:#fdd">u0</del></code> |
+| result | yjqc2qr1 | <code><ins style="background:#dfd">(known after appl</ins>y<ins style="background:#dfd">)</ins><del style="background:#fdd">jqc2qr1</del></code> |
 
 </details>
 
@@ -6607,8 +6935,8 @@ exports[`planToMarkdown integration > tofu/with-modules/1 > renders without erro
 
 | Output | Action | Before | After |
 | --- | --- | --- | --- |
-| generated_name | 🔧 | <code>fixture-27zvhlu0</code> | _(known after apply)_ |
-| root_id | 🔧 | <code>1951266549668774856</code> | _(known after apply)_ |
+| generated_name | 🔧 | <code>fixture-yjqc2qr1</code> | _(known after apply)_ |
+| root_id | 🔧 | <code>6383459455842344094</code> | _(known after apply)_ |
 "
 `;
 
@@ -6630,7 +6958,7 @@ exports[`planToMarkdown integration > tofu/with-modules/1 > renders without erro
 
 | Attribute | Before | After |
 | --- | --- | --- |
-| id | 1951266549668774856 | - 1951266549668774856<br>+ (known after apply) |
+| id | 6383459455842344094 | - 6383459455842344094<br>+ (known after apply) |
 | triggers.stage | 0 | - 0<br>+ 1 |
 
 </details>
@@ -6642,9 +6970,9 @@ exports[`planToMarkdown integration > tofu/with-modules/1 > renders without erro
 
 | Attribute | Before | After |
 | --- | --- | --- |
-| id | 27zvhlu0 | - 27zvhlu0<br>+ (known after apply) |
+| id | yjqc2qr1 | - yjqc2qr1<br>+ (known after apply) |
 | keepers.prefix | fixture | - fixture<br>+ fixture-updated |
-| result | 27zvhlu0 | - 27zvhlu0<br>+ (known after apply) |
+| result | yjqc2qr1 | - yjqc2qr1<br>+ (known after apply) |
 
 </details>
 
@@ -6652,8 +6980,8 @@ exports[`planToMarkdown integration > tofu/with-modules/1 > renders without erro
 
 | Output | Action | Before | After |
 | --- | --- | --- | --- |
-| generated_name | 🔧 | <code>fixture-27zvhlu0</code> | _(known after apply)_ |
-| root_id | 🔧 | <code>1951266549668774856</code> | _(known after apply)_ |
+| generated_name | 🔧 | <code>fixture-yjqc2qr1</code> | _(known after apply)_ |
+| root_id | 🔧 | <code>6383459455842344094</code> | _(known after apply)_ |
 "
 `;
 
@@ -6675,7 +7003,7 @@ exports[`planToMarkdown integration > tofu/with-modules/1 > renders without erro
 
 | Attribute | Before | After |
 | --- | --- | --- |
-| id | 1951266549668774856 | <code><ins style="background:#dfd">(known after apply)</ins><del style="background:#fdd">1951266549668774856</del></code> |
+| id | 6383459455842344094 | <code><ins style="background:#dfd">(known after apply)</ins><del style="background:#fdd">6383459455842344094</del></code> |
 | triggers.stage | 0 | <code><ins style="background:#dfd">1</ins><del style="background:#fdd">0</del></code> |
 
 </details>
@@ -6687,7 +7015,7 @@ exports[`planToMarkdown integration > tofu/with-modules/1 > renders without erro
 
 | Attribute | Before | After |
 | --- | --- | --- |
-| id | 27zvhlu0 | <code><del style="background:#fdd">27zvh</del><ins style="background:#dfd">(known after app</ins>l<ins style="background:#dfd">y)</ins><del style="background:#fdd">u0</del></code> |
+| id | yjqc2qr1 | <code><ins style="background:#dfd">(known after appl</ins>y<ins style="background:#dfd">)</ins><del style="background:#fdd">jqc2qr1</del></code> |
 | keepers.prefix | fixture | <code>fixtur<ins style="background:#dfd">e-updat</ins>e<ins style="background:#dfd">d</ins></code> |
 | length | 8 | <code>8</code> |
 | lower | true | <code>true</code> |
@@ -6698,7 +7026,7 @@ exports[`planToMarkdown integration > tofu/with-modules/1 > renders without erro
 | number | true | <code>true</code> |
 | numeric | true | <code>true</code> |
 | override_special |  |  |
-| result | 27zvhlu0 | <code><del style="background:#fdd">27zvh</del><ins style="background:#dfd">(known after app</ins>l<ins style="background:#dfd">y)</ins><del style="background:#fdd">u0</del></code> |
+| result | yjqc2qr1 | <code><ins style="background:#dfd">(known after appl</ins>y<ins style="background:#dfd">)</ins><del style="background:#fdd">jqc2qr1</del></code> |
 | special | false | <code>false</code> |
 | upper | false | <code>false</code> |
 
@@ -6708,8 +7036,8 @@ exports[`planToMarkdown integration > tofu/with-modules/1 > renders without erro
 
 | Output | Action | Before | After |
 | --- | --- | --- | --- |
-| generated_name | 🔧 | <code>fixture-27zvhlu0</code> | _(known after apply)_ |
-| root_id | 🔧 | <code>1951266549668774856</code> | _(known after apply)_ |
+| generated_name | 🔧 | <code>fixture-yjqc2qr1</code> | _(known after apply)_ |
+| root_id | 🔧 | <code>6383459455842344094</code> | _(known after apply)_ |
 "
 `;
 

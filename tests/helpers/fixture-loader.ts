@@ -131,6 +131,49 @@ export function discoverStepsFixtures(): StepsFixture[] {
 }
 
 /**
+ * Discovers all fixture stages that have a `plan-steps.json` file.
+ * These are plan-only variants (no apply step) generated for every fixture.
+ */
+export function discoverPlanStepsFixtures(): StepsFixture[] {
+  const fixtures: StepsFixture[] = [];
+
+  walkGeneratedStages((stageDir, label) => {
+    const stepsPath = join(stageDir, "plan-steps.json");
+    if (existsSync(stepsPath)) {
+      fixtures.push({
+        label: `${label}/plan-only`,
+        stepsJson: readFileSync(stepsPath, "utf-8"),
+        fixtureDir: resolve(stageDir),
+      });
+    }
+  });
+
+  return fixtures;
+}
+
+/**
+ * Discovers all fixture stages that have a `no-show-steps.json` file.
+ * These variants omit the show-plan and apply steps, forcing Tier 3
+ * (text fallback) rendering in integration tests.
+ */
+export function discoverNoShowStepsFixtures(): StepsFixture[] {
+  const fixtures: StepsFixture[] = [];
+
+  walkGeneratedStages((stageDir, label) => {
+    const stepsPath = join(stageDir, "no-show-steps.json");
+    if (existsSync(stepsPath)) {
+      fixtures.push({
+        label: `${label}/no-show`,
+        stepsJson: readFileSync(stepsPath, "utf-8"),
+        fixtureDir: resolve(stageDir),
+      });
+    }
+  });
+
+  return fixtures;
+}
+
+/**
  * Discovers manual fixtures (hand-crafted `steps.json` under `tests/fixtures/manual/`).
  */
 export function discoverManualStepsFixtures(): StepsFixture[] {

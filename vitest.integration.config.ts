@@ -38,9 +38,6 @@ export default defineConfig({
         // Steps barrel re-exports are trivially covered by unit tests.
         "src/steps/index.ts",
         "src/compositor/**",
-        // reportFromSteps orchestrator has many fallback tiers and error paths
-        // tested via unit tests. Integration tests cover Tier 1 and Tier 4.
-        "src/report-from-steps.ts",
       ],
       thresholds: {
         lines: 90,

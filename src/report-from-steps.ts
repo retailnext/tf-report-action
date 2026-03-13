@@ -511,7 +511,11 @@ function renderTextFallback(
     });
   }
 
-  const hasFailure = [...issues].length > 0 || hasAnyFailedStep(steps, knownStepIds);
+  // Check for failures: issues (init/validate), any non-terraform step failures,
+  // or failed terraform steps (plan, show-plan, apply) that we're falling back from.
+  const hasFailure = [...issues].length > 0
+    || hasAnyFailedStep(steps, knownStepIds)
+    || hasAnyFailedKnownStep(steps, knownStepIds);
   const icon = hasFailure ? STATUS_FAILURE : STATUS_SUCCESS;
   const wsPrefix = workspace ? `\`${workspace}\` ` : "";
   const label = tier.applyRead?.content !== undefined ? "Apply" : "Plan";
@@ -624,6 +628,13 @@ function renderGeneralWorkflow(
 function hasAnyFailedStep(steps: Steps, knownStepIds: Set<string>): boolean {
   return Object.entries(steps).some(
     ([id, step]) => !knownStepIds.has(id) && getStepOutcome(step) === "failure",
+  );
+}
+
+/** Checks if any known IaC step (init, validate, plan, etc.) has failed. */
+function hasAnyFailedKnownStep(steps: Steps, knownStepIds: Set<string>): boolean {
+  return Object.entries(steps).some(
+    ([id, step]) => knownStepIds.has(id) && getStepOutcome(step) === "failure",
   );
 }
 

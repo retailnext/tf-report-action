@@ -1,12 +1,12 @@
-{"@level":"info","@message":"OpenTofu 1.11.5","@module":"tofu.ui","@timestamp":"2026-03-13T13:35:16.703427-07:00","tofu":"1.11.5","type":"version","ui":"1.2"}
-{"@level":"info","@message":"\nInitializing the backend...","@module":"tofu.ui","@timestamp":"2026-03-13T13:35:16.704315-07:00","type":"output"}
-{"@level":"info","@message":"Upgrading modules...","@module":"tofu.ui","@timestamp":"2026-03-13T13:35:16.723457-07:00","type":"output"}
-{"@level":"info","@message":"- naming in modules/naming","@module":"tofu.ui","@timestamp":"2026-03-13T13:35:16.723946-07:00"}
-{"@level":"info","@message":"\nInitializing provider plugins...","@module":"tofu.ui","@timestamp":"2026-03-13T13:35:16.724691-07:00","type":"output"}
-{"@level":"info","@message":"- Finding hashicorp/null versions matching \"~> 3.0\"...","@module":"tofu.ui","@timestamp":"2026-03-13T13:35:16.724709-07:00"}
-{"@level":"info","@message":"- Finding hashicorp/random versions matching \"~> 3.0\"...","@module":"tofu.ui","@timestamp":"2026-03-13T13:35:16.821428-07:00"}
-{"@level":"info","@message":"- Using previously-installed hashicorp/null v3.2.4","@module":"tofu.ui","@timestamp":"2026-03-13T13:35:16.848045-07:00"}
-{"@level":"info","@message":"- Using previously-installed hashicorp/random v3.8.1","@module":"tofu.ui","@timestamp":"2026-03-13T13:35:16.857063-07:00"}
-{"@level":"info","@message":"","@module":"tofu.ui","@timestamp":"2026-03-13T13:35:16.857114-07:00","type":"output"}
-{"@level":"info","@message":"OpenTofu has been successfully initialized!","@module":"tofu.ui","@timestamp":"2026-03-13T13:35:16.857151-07:00","type":"output"}
-{"@level":"info","@message":"\nYou may now begin working with OpenTofu. Try running \"tofu plan\" to see\nany changes that are required for your infrastructure. All OpenTofu commands\nshould now work.\n\nIf you ever set or change modules or backend configuration for OpenTofu,\nrerun this command to reinitialize your working directory. If you forget, other\ncommands will detect it and remind you to do so if necessary.","@module":"tofu.ui","@timestamp":"2026-03-13T13:35:16.857167-07:00","type":"output"}
+{"@level":"info","@message":"OpenTofu 1.11.5","@module":"tofu.ui","@timestamp":"2026-03-13T14:48:28.459709-07:00","tofu":"1.11.5","type":"version","ui":"1.2"}
+{"@level":"info","@message":"\nInitializing the backend...","@module":"tofu.ui","@timestamp":"2026-03-13T14:48:28.460637-07:00","type":"output"}
+{"@level":"info","@message":"Upgrading modules...","@module":"tofu.ui","@timestamp":"2026-03-13T14:48:28.479780-07:00","type":"output"}
+{"@level":"info","@message":"- naming in modules/naming","@module":"tofu.ui","@timestamp":"2026-03-13T14:48:28.480258-07:00"}
+{"@level":"info","@message":"\nInitializing provider plugins...","@module":"tofu.ui","@timestamp":"2026-03-13T14:48:28.481016-07:00","type":"output"}
+{"@level":"info","@message":"- Finding hashicorp/null versions matching \"~> 3.0\"...","@module":"tofu.ui","@timestamp":"2026-03-13T14:48:28.481038-07:00"}
+{"@level":"info","@message":"- Finding hashicorp/random versions matching \"~> 3.0\"...","@module":"tofu.ui","@timestamp":"2026-03-13T14:48:28.584299-07:00"}
+{"@level":"info","@message":"- Using previously-installed hashicorp/null v3.2.4","@module":"tofu.ui","@timestamp":"2026-03-13T14:48:28.611286-07:00"}
+{"@level":"info","@message":"- Using previously-installed hashicorp/random v3.8.1","@module":"tofu.ui","@timestamp":"2026-03-13T14:48:28.620906-07:00"}
+{"@level":"info","@message":"","@module":"tofu.ui","@timestamp":"2026-03-13T14:48:28.620966-07:00","type":"output"}
+{"@level":"info","@message":"OpenTofu has been successfully initialized!","@module":"tofu.ui","@timestamp":"2026-03-13T14:48:28.621005-07:00","type":"output"}
+{"@level":"info","@message":"\nYou may now begin working with OpenTofu. Try running \"tofu plan\" to see\nany changes that are required for your infrastructure. All OpenTofu commands\nshould now work.\n\nIf you ever set or change modules or backend configuration for OpenTofu,\nrerun this command to reinitialize your working directory. If you forget, other\ncommands will detect it and remind you to do so if necessary.","@module":"tofu.ui","@timestamp":"2026-03-13T14:48:28.621027-07:00","type":"output"}

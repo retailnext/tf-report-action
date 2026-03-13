@@ -38,7 +38,7 @@
 #   prerequisite command fails, dependent commands are skipped:
 #     init failure → skip validate, plan, show, apply
 #     plan failure → skip show, apply
-#     validate failure → does not block plan/apply
+#     validate failure → skip plan, show, apply
 
 set -euo pipefail
 
@@ -166,6 +166,47 @@ build_steps_json() {
   json+="}"
 
   echo "$json" > "$out_dir/steps.json"
+
+  # Also generate plan-steps.json — same as steps.json but without the apply
+  # step. This provides a plan-only fixture for every scenario.
+  local plan_json="{"
+  local pfirst=true
+  while IFS='|' read -r step_id outcome conclusion exit_code_val stdout_file stderr_file; do
+    [[ -z "$step_id" ]] && continue
+    [[ "$step_id" == "apply" ]] && continue
+    if $pfirst; then pfirst=false; else plan_json+=","; fi
+    plan_json+="\"${step_id}\":{\"outcome\":\"${outcome}\",\"conclusion\":\"${conclusion}\",\"outputs\":{\"exit_code\":\"${exit_code_val}\""
+    if [[ -n "$stdout_file" && -s "$out_dir/$stdout_file" ]]; then
+      plan_json+=",\"stdout_file\":\"${stdout_file}\""
+    fi
+    if [[ -n "$stderr_file" && -s "$out_dir/$stderr_file" ]]; then
+      plan_json+=",\"stderr_file\":\"${stderr_file}\""
+    fi
+    plan_json+="}}"
+  done < "$tmp_file"
+  plan_json+="}"
+  echo "$plan_json" > "$out_dir/plan-steps.json"
+
+  # Generate no-show-steps.json — omits show-plan and apply steps.
+  # Forces Tier 3 (text fallback) rendering in integration tests.
+  local noshow_json="{"
+  local nfirst=true
+  while IFS='|' read -r step_id outcome conclusion exit_code_val stdout_file stderr_file; do
+    [[ -z "$step_id" ]] && continue
+    [[ "$step_id" == "show-plan" || "$step_id" == "apply" ]] && continue
+    if $nfirst; then nfirst=false; else noshow_json+=","; fi
+    noshow_json+="\"${step_id}\":{\"outcome\":\"${outcome}\",\"conclusion\":\"${conclusion}\",\"outputs\":{\"exit_code\":\"${exit_code_val}\""
+    if [[ -n "$stdout_file" && -s "$out_dir/$stdout_file" ]]; then
+      noshow_json+=",\"stdout_file\":\"${stdout_file}\""
+    fi
+    if [[ -n "$stderr_file" && -s "$out_dir/$stderr_file" ]]; then
+      noshow_json+=",\"stderr_file\":\"${stderr_file}\""
+    fi
+    noshow_json+="}}"
+  done < "$tmp_file"
+  noshow_json+="}"
+  echo "$noshow_json" > "$out_dir/no-show-steps.json"
+
   rm -f "$tmp_file"
 }
 
@@ -260,7 +301,7 @@ run_tool_workspace() {
       done < "$stage_src/expect-fail"
     fi
 
-    local init_ok=true plan_ok=true
+    local init_ok=true validate_ok=true plan_ok=true
 
     # Clear any previous step data
     rm -f "$out_dir/.steps_tmp"
@@ -293,12 +334,16 @@ run_tool_workspace() {
       check_exit_code "validate" "$exit_code" "$ef" || return 1
       outcome=$(exit_to_outcome "$exit_code")
       record_step "$out_dir" "validate" "$outcome" "$outcome" "$exit_code" "validate.stdout" "validate.stderr"
+      if [[ $exit_code -ne 0 ]]; then
+        validate_ok=false
+        echo "      (skipping plan, show, apply)"
+      fi
     else
       record_step "$out_dir" "validate" "skipped" "skipped" "0" "" ""
     fi
 
     # -- plan --
-    if $init_ok; then
+    if $init_ok && $validate_ok; then
       exit_code=0
       local plan_flags="$json_flag -out=tfplan -input=false -no-color"
       local is_detailed="0"
@@ -323,7 +368,7 @@ run_tool_workspace() {
     fi
 
     # -- show-plan --
-    if $init_ok && $plan_ok; then
+    if $init_ok && $validate_ok && $plan_ok; then
       exit_code=0
       "$tool" -chdir="$tool_tmp" show -json tfplan > "$out_dir/show-plan.stdout" 2> "$out_dir/show-plan.stderr" || exit_code=$?
       outcome=$(exit_to_outcome "$exit_code")
@@ -333,7 +378,7 @@ run_tool_workspace() {
     fi
 
     # -- apply --
-    if $init_ok && $plan_ok; then
+    if $init_ok && $validate_ok && $plan_ok; then
       exit_code=0
       "$tool" -chdir="$tool_tmp" apply $json_flag -auto-approve tfplan > "$out_dir/apply.stdout" 2> "$out_dir/apply.stderr" || exit_code=$?
       ef=""
