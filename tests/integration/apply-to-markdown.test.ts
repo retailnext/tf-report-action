@@ -1,0 +1,152 @@
+import { readFileSync, readdirSync, existsSync } from "node:fs";
+import { join, dirname } from "node:path";
+import { fileURLToPath } from "node:url";
+import { describe, it, expect, beforeAll } from "vitest";
+import { applyToMarkdown } from "../../src/index.js";
+import type { Options } from "../../src/index.js";
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
+const GENERATED_DIR = join(__dirname, "../../tests/fixtures/generated");
+
+/**
+ * Discovers all fixture stages that have both plan.json and apply.jsonl.
+ * Returns an array ready for parameterized tests.
+ */
+function discoverApplyFixtures(): {
+  label: string;
+  planJson: string;
+  applyJsonl: string;
+}[] {
+  if (!existsSync(GENERATED_DIR)) {
+    return [];
+  }
+
+  const fixtures: { label: string; planJson: string; applyJsonl: string }[] = [];
+
+  for (const tool of readdirSync(GENERATED_DIR).sort()) {
+    const toolDir = join(GENERATED_DIR, tool);
+    for (const workspace of readdirSync(toolDir).sort()) {
+      const wsDir = join(toolDir, workspace);
+      for (const stage of readdirSync(wsDir).sort()) {
+        const planPath = join(wsDir, stage, "plan.json");
+        const applyPath = join(wsDir, stage, "apply.jsonl");
+        if (existsSync(planPath) && existsSync(applyPath)) {
+          fixtures.push({
+            label: `${String(tool)}/${String(workspace)}/${String(stage)}`,
+            planJson: readFileSync(planPath, "utf-8"),
+            applyJsonl: readFileSync(applyPath, "utf-8"),
+          });
+        }
+      }
+    }
+  }
+
+  return fixtures;
+}
+
+const fixtures = discoverApplyFixtures();
+
+beforeAll(() => {
+  if (fixtures.length === 0) {
+    throw new Error(
+      "No apply fixture pairs (plan.json + apply.jsonl) found under " +
+        "tests/fixtures/generated/. Run: bash scripts/generate-fixtures.sh",
+    );
+  }
+});
+
+const OPTION_VARIANTS: { name: string; options: Options }[] = [
+  { name: "default", options: {} },
+  { name: "summary-template", options: { template: "summary" } },
+];
+
+describe("applyToMarkdown integration", () => {
+  for (const { label, planJson, applyJsonl } of fixtures) {
+    describe(label, () => {
+      for (const { name, options } of OPTION_VARIANTS) {
+        it(`renders without error and matches snapshot [${name}]`, () => {
+          const result = applyToMarkdown(planJson, applyJsonl, options);
+          expect(result).toMatchSnapshot();
+        });
+      }
+    });
+  }
+
+  // --- Targeted assertions for key scenarios ---
+
+  describe("deferred-data-source/2 phantom filtering", () => {
+    const fixture = fixtures.find(
+      (f) => f.label === "terraform/deferred-data-source/2",
+    );
+
+    it("excludes phantom resources (worker_b, worker_c)", () => {
+      expect(fixture).toBeDefined();
+      const result = applyToMarkdown(fixture!.planJson, fixture!.applyJsonl);
+      // terraform_data.worker_b and worker_c should NOT appear as resource
+      // change summaries. They may appear as data values inside attribute
+      // diffs or output values, which is expected.
+      expect(result).not.toMatch(
+        /terraform_data.*worker_b/,
+      );
+      expect(result).not.toMatch(
+        /terraform_data.*worker_c/,
+      );
+    });
+
+    it("includes actually-applied resources", () => {
+      expect(fixture).toBeDefined();
+      const result = applyToMarkdown(fixture!.planJson, fixture!.applyJsonl);
+      expect(result).toContain("worker_a");
+      expect(result).toContain("local_file");
+    });
+
+    it("uses Apply Summary heading", () => {
+      expect(fixture).toBeDefined();
+      const result = applyToMarkdown(fixture!.planJson, fixture!.applyJsonl);
+      expect(result).toContain("## Apply Summary");
+      expect(result).not.toContain("## Plan Summary");
+    });
+
+    it("does not show (known after apply)", () => {
+      expect(fixture).toBeDefined();
+      const result = applyToMarkdown(fixture!.planJson, fixture!.applyJsonl);
+      expect(result).not.toContain("(known after apply)");
+    });
+
+    it("shows apply status indicators", () => {
+      expect(fixture).toBeDefined();
+      const result = applyToMarkdown(fixture!.planJson, fixture!.applyJsonl);
+      expect(result).toContain("✅");
+    });
+  });
+
+  describe("apply-error/1 error handling", () => {
+    const fixture = fixtures.find(
+      (f) => f.label === "terraform/apply-error/1",
+    );
+
+    it("shows failed resource with error indicator", () => {
+      expect(fixture).toBeDefined();
+      const result = applyToMarkdown(fixture!.planJson, fixture!.applyJsonl);
+      expect(result).toContain("❌");
+      expect(result).toContain("will_fail");
+    });
+
+    it("excludes skipped dependent resource", () => {
+      expect(fixture).toBeDefined();
+      const result = applyToMarkdown(fixture!.planJson, fixture!.applyJsonl);
+      // terraform_data.depends_on_fail is a phantom — planned but never applied.
+      // It should not appear as a resource change (but may appear as part of
+      // output names like "depends_on_fail_output").
+      expect(result).not.toMatch(
+        /terraform_data.*depends_on_fail/,
+      );
+    });
+
+    it("includes diagnostics section with error", () => {
+      expect(fixture).toBeDefined();
+      const result = applyToMarkdown(fixture!.planJson, fixture!.applyJsonl);
+      expect(result).toContain("## Diagnostics");
+    });
+  });
+});

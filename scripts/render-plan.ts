@@ -9,9 +9,11 @@
  * Usage:
  *   npm run render -- path/to/plan.json
  *   npm run render -- path/to/plan.json --template summary --title "My PR"
+ *   npm run render -- plan.json --apply apply.jsonl --title "PR #42"
  *   cat plan.json | npm run render --
  *
  * Flags:
+ *   --apply <file>              Apply JSONL file (renders apply report)
  *   --title <text>              Heading title for the report
  *   --template <default|summary>  Output template (default: "default")
  *   --show-unchanged            Show unchanged attributes
@@ -23,7 +25,7 @@
 import { readFileSync } from "node:fs";
 import { writeFile } from "node:fs/promises";
 import { execSync } from "node:child_process";
-import { planToMarkdown } from "../src/index.js";
+import { planToMarkdown, applyToMarkdown } from "../src/index.js";
 import type { Options } from "../src/index.js";
 
 // ---------------------------------------------------------------------------
@@ -39,6 +41,7 @@ Renders a Terraform/OpenTofu plan JSON file to a browser HTML preview.
 Reads the plan from the given file path, or from stdin if the path is "-" or omitted.
 
 Options:
+  --apply <file>                  Apply JSONL file (renders apply report instead of plan)
   --title <text>                  Heading title for the report
   --template <default|summary>    Output template (default: "default")
   --show-unchanged                Show unchanged resource attributes
@@ -49,19 +52,24 @@ Options:
 Examples:
   npm run render -- tests/fixtures/generated/terraform/null-lifecycle/2/plan.json
   npm run render -- plan.json --template summary --title "PR #42"
+  npm run render -- plan.json --apply apply.jsonl --title "PR #42"
   cat plan.json | npm run render --
 `);
   process.exit(0);
 }
 
-function parseArgs(argv: string[]): { file: string | null; noOpen: boolean; options: Options } {
+function parseArgs(argv: string[]): { file: string | null; applyFile: string | null; noOpen: boolean; options: Options } {
   const options: Options = {};
   let file: string | null = null;
+  let applyFile: string | null = null;
   let noOpen = false;
 
   for (let i = 0; i < argv.length; i++) {
     const arg = argv[i];
     switch (arg) {
+      case "--apply":
+        applyFile = argv[++i] ?? null;
+        break;
       case "--title":
         options.title = argv[++i];
         break;
@@ -84,10 +92,10 @@ function parseArgs(argv: string[]): { file: string | null; noOpen: boolean; opti
     }
   }
 
-  return { file, noOpen, options };
+  return { file, applyFile, noOpen, options };
 }
 
-const { file, noOpen, options } = parseArgs(args);
+const { file, applyFile, noOpen, options } = parseArgs(args);
 
 // ---------------------------------------------------------------------------
 // Read plan JSON
@@ -107,12 +115,31 @@ try {
 }
 
 // ---------------------------------------------------------------------------
+// Read apply JSONL (if provided)
+// ---------------------------------------------------------------------------
+
+let applyJsonl: string | null = null;
+if (applyFile !== null) {
+  try {
+    applyJsonl = readFileSync(applyFile, "utf-8");
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : String(err);
+    process.stderr.write(`Error reading apply file: ${msg}\n`);
+    process.exit(1);
+  }
+}
+
+// ---------------------------------------------------------------------------
 // Render markdown
 // ---------------------------------------------------------------------------
 
 let markdown: string;
 try {
-  markdown = planToMarkdown(planJson, options);
+  if (applyJsonl !== null) {
+    markdown = applyToMarkdown(planJson, applyJsonl, options);
+  } else {
+    markdown = planToMarkdown(planJson, options);
+  }
 } catch (err) {
   const msg = err instanceof Error ? err.message : String(err);
   process.stderr.write(`Error rendering plan: ${msg}\n`);
