@@ -1,6 +1,8 @@
 import type { ModuleGroup } from "./module-group.js";
 import type { Summary } from "./summary.js";
 import type { OutputChange } from "./output.js";
+import type { Diagnostic } from "./diagnostic.js";
+import type { ApplyStatus } from "./apply-status.js";
 
 export interface Report {
   /** terraform_version field from the plan (may be a Terraform or OpenTofu version string). */
@@ -13,4 +15,14 @@ export interface Report {
   modules: ModuleGroup[];
   /** Top-level output changes (not inside any module). */
   outputs: OutputChange[];
+  /**
+   * Diagnostics (errors and warnings) from the apply run.
+   * Only present in apply reports; undefined for plan-only reports.
+   */
+  diagnostics?: Diagnostic[];
+  /**
+   * Per-resource apply outcomes (success/failure, elapsed time).
+   * Only present in apply reports; undefined for plan-only reports.
+   */
+  applyStatuses?: ApplyStatus[];
 }
