@@ -138,8 +138,9 @@ describe("reportFromSteps integration — no-show fixtures (Tier 3)", () => {
         const result = reportFromSteps(resolved, options);
         // Tier 3 does not produce structured "Plan Summary"
         expect(result).not.toContain("Plan Summary");
-        // Should have either raw command output or a note about unavailable output
-        expect(result).toMatch(/raw command output|No readable output/);
+        // Should have either raw command output, a note about unavailable output,
+        // or step failure details with read error warnings
+        expect(result).toMatch(/raw command output|No readable output|stdout_file output missing|failed/);
       });
     });
   }
@@ -167,8 +168,8 @@ describe("reportFromSteps integration — apply-no-show fixtures", () => {
           env: NO_GITHUB_ENV,
         };
         const result = reportFromSteps(resolved, options);
-        // Should have plan output, apply output, or a note about unavailable output
-        expect(result).toMatch(/Plan Output|Apply Output|No readable output|raw command output/);
+        // Should have plan output, apply output, or failure/warning details
+        expect(result).toMatch(/Plan Output|Apply Output|No readable output|raw command output|stdout_file output missing|failed/);
       });
     });
   }
@@ -343,7 +344,7 @@ describe("reportFromSteps integration — error fixture scenarios", () => {
     const resolved = resolveStepFilePaths(fixture!.stepsJson, fixture!.fixtureDir);
     const result = reportFromSteps(resolved, {
       allowedDirs: [fixture!.fixtureDir],
-      maxOutputLength: 500,
+      maxOutputLength: 200,
       env: {
         GITHUB_REPOSITORY: "owner/repo",
         GITHUB_RUN_ID: "99999",
@@ -536,8 +537,8 @@ describe("reportFromSteps integration — rendering quality", () => {
     // Should format diagnostics with severity icons and summary text
     expect(result).toContain("🚨");
     expect(result).toContain("**Reference to undeclared input variable**");
-    // Raw JSON should be in collapsed details, not shown inline
-    expect(result).toContain("Raw JSON output");
+    // Validate output should include collapsed raw JSON
+    expect(result).toContain("Show raw JSON");
     expect(result).toContain("<details>");
   });
 
@@ -553,9 +554,8 @@ describe("reportFromSteps integration — rendering quality", () => {
     });
     // Should extract @message fields as readable text
     expect(result).toMatch(/Plan to replace/);
-    // Raw JSON should be collapsed
-    expect(result).toContain("Raw JSON output");
-    expect(result).toContain("<details>");
+    // JSON Lines uses markdown list format
+    expect(result).toContain("- ");
     // Title should say Apply Succeeded (not bare "Apply")
     expect(result).toContain("Apply Succeeded");
   });

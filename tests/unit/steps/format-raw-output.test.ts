@@ -6,7 +6,7 @@ describe("formatRawOutput", () => {
     const result = formatRawOutput("hello world\nline 2");
     expect(result).toContain("```");
     expect(result).toContain("hello world");
-    expect(result).not.toContain("Raw JSON output");
+    expect(result).not.toContain("Show raw JSON");
   });
 
   it("returns (empty) for empty/whitespace content", () => {
@@ -23,8 +23,8 @@ describe("formatRawOutput", () => {
     const result = formatRawOutput(input);
     expect(result).toContain("Terraform 1.14.6");
     expect(result).toContain("Plan: 1 to add, 0 to change");
-    expect(result).toContain("Raw JSON output");
-    expect(result).toContain("<details>");
+    // Should use markdown list format, not raw JSON
+    expect(result).toContain("- ");
   });
 
   it("shows 🚨 for error-level JSON Lines messages", () => {
@@ -101,7 +101,8 @@ describe("formatRawOutput", () => {
     expect(result).toContain('Variable "foo" has not been declared.');
     expect(result).toContain("`    value = var.foo`");
     expect(result).toContain("line 10");
-    expect(result).toContain("Raw JSON output");
+    // Validate output includes raw JSON in collapsed details
+    expect(result).toContain("Show raw JSON");
   });
 
   it("formats valid validate output", () => {
@@ -130,7 +131,7 @@ describe("formatRawOutput", () => {
     const input = '{"@message":"first"}\nnot json\n{"@message":"third"}';
     const result = formatRawOutput(input);
     expect(result).toContain("```");
-    expect(result).not.toContain("Raw JSON output");
+    expect(result).not.toContain("Show raw JSON");
   });
 
   it("includes diagnostic snippet context and address", () => {

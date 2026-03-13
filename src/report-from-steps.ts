@@ -296,7 +296,7 @@ function detectTier(
       if (planRead.error) readErrors.push(`${DIAGNOSTIC_WARNING} plan stdout: ${planRead.error}`);
       else if (planRead.noFile) readErrors.push(`${DIAGNOSTIC_WARNING} plan: stdout_file output missing in steps`);
     }
-    if (applyStep) {
+    if (applyStep && getStepOutcome(applyStep) !== "skipped") {
       applyRead = readStepStdout(applyStep, readerOpts);
       if (applyRead.error) readErrors.push(`${DIAGNOSTIC_WARNING} apply stdout: ${applyRead.error}`);
       else if (applyRead.noFile) readErrors.push(`${DIAGNOSTIC_WARNING} apply: stdout_file output missing in steps`);
@@ -596,13 +596,23 @@ function renderTextFallback(
   const hasFailure = hasStepFailure || hasIssueFailure;
   const icon = hasFailure ? STATUS_FAILURE : STATUS_SUCCESS;
   const wsPrefix = workspace ? `\`${workspace}\` ` : "";
-  const isApply = tier.applyRead?.content !== undefined;
+  const isApply = tier.applyRead !== undefined;
   const label = isApply ? "Apply" : "Plan";
   const suffix = hasFailure ? "Failed" : "Succeeded";
   sections.push({ id: "title", full: `## ${icon} ${wsPrefix}${label} ${suffix}\n\n`, fixed: true });
 
   for (const issue of issues) {
     sections.push(issue);
+  }
+
+  // Promote read errors to standalone warning sections at the same level as
+  // step issues, rather than nesting them as sub-bullets under a note.
+  for (const err of tier.readErrors) {
+    sections.push({
+      id: `read-error-${err}`,
+      full: `### ${err}\n\n`,
+      fixed: true,
+    });
   }
 
   const hasOutput = tier.planRead?.content !== undefined || tier.applyRead?.content !== undefined;
@@ -613,13 +623,12 @@ function renderTextFallback(
       full: `> ${DIAGNOSTIC_WARNING} **Warning:** Structured plan output was not available. Showing raw command output.\n\n`,
       fixed: true,
     });
-  } else {
-    let noteLines = "> **Note:** No readable output was available for this run.\n";
-    for (const err of tier.readErrors) {
-      noteLines += `> - ${err}\n`;
-    }
-    noteLines += "\n";
-    sections.push({ id: "note", full: noteLines, fixed: true });
+  } else if (tier.readErrors.length === 0) {
+    sections.push({
+      id: "note",
+      full: "> **Note:** No readable output was available for this run.\n\n",
+      fixed: true,
+    });
   }
 
   if (tier.planRead?.content) {
@@ -687,7 +696,8 @@ function renderGeneralWorkflow(
   let label: string;
   if (hasFailure) {
     if (failedSteps.length === 1) {
-      label = `\`${failedSteps[0]![0]}\` Failed`;
+      const stepName = failedSteps[0]?.[0] ?? "unknown";
+      label = `\`${stepName}\` Failed`;
     } else {
       label = "Failed";
     }
@@ -794,6 +804,10 @@ interface JsonLinesMsg {
 /**
  * Try to parse content as Terraform/OpenTofu JSON Lines and format it.
  * Returns undefined if the content is not valid JSON Lines with `@message`.
+ *
+ * Uses markdown throughout. Simple messages render as list items.
+ * Diagnostics with extra detail use `<details>` for expansion (the only
+ * HTML element used, and already standard in GitHub-flavored markdown).
  */
 function tryFormatJsonLines(content: string): string | undefined {
   const lines = content.split("\n").filter((l) => l.trim() !== "");
@@ -818,55 +832,83 @@ function tryFormatJsonLines(content: string): string | undefined {
   }
 
   // Categorize messages by level for display
-  const infoAndAbove: Array<{ msg: JsonLinesMsg; index: number }> = [];
-  const debugTrace: Array<{ msg: JsonLinesMsg; index: number }> = [];
+  const infoAndAbove: JsonLinesMsg[] = [];
+  const debugTrace: JsonLinesMsg[] = [];
 
-  for (let i = 0; i < messages.length; i++) {
-    const msg = messages[i]!;
+  for (const msg of messages) {
     const level = typeof msg["@level"] === "string" ? msg["@level"] : "info";
     if (level === "trace" || level === "debug") {
-      debugTrace.push({ msg, index: i });
+      debugTrace.push(msg);
     } else {
-      infoAndAbove.push({ msg, index: i });
+      infoAndAbove.push(msg);
     }
   }
 
   let output = "";
 
-  // Render info/warn/error messages
-  for (const { msg } of infoAndAbove) {
+  for (const msg of infoAndAbove) {
     const level = typeof msg["@level"] === "string" ? msg["@level"] : "info";
     const message = typeof msg["@message"] === "string" ? msg["@message"] : "(no message)";
     const icon = levelIcon(level);
     const prefix = icon ? `${icon} ` : "";
 
     if (msg.type === "diagnostic" && msg.diagnostic) {
-      output += formatDiagnosticMessage(msg.diagnostic, prefix);
+      output += formatDiagnosticItem(msg.diagnostic, prefix);
     } else {
-      output += `${prefix}${message}\n`;
+      output += `- ${prefix}${message}\n`;
     }
   }
 
   // Show debug/trace summary if any exist
   if (debugTrace.length > 0) {
     const counts = new Map<string, number>();
-    for (const { msg } of debugTrace) {
+    for (const msg of debugTrace) {
       const level = typeof msg["@level"] === "string" ? msg["@level"] : "debug";
       counts.set(level, (counts.get(level) ?? 0) + 1);
     }
     const parts = [...counts.entries()].map(([l, c]) => `${String(c)} ${l}`);
     output += `\n<details>\n<summary>${parts.join(", ")} message(s) omitted</summary>\n\n`;
-    for (const { msg } of debugTrace) {
+    for (const msg of debugTrace) {
       const message = typeof msg["@message"] === "string" ? msg["@message"] : "(no message)";
       output += `- ${message}\n`;
     }
     output += "\n</details>\n";
   }
 
-  // Add collapsed raw JSON
-  output += `\n<details>\n<summary>Raw JSON output</summary>\n\n\`\`\`json\n${content}\n\`\`\`\n\n</details>`;
-
   return output;
+}
+
+/**
+ * Format a diagnostic as a markdown list item with optional expandable detail.
+ * Uses `<details>` only when the diagnostic has detail or snippet beyond the summary.
+ */
+function formatDiagnosticItem(
+  diag: NonNullable<JsonLinesMsg["diagnostic"]>,
+  prefix: string,
+): string {
+  const severity = diag.severity ?? "error";
+  const diagIcon = severity === "warning" ? DIAGNOSTIC_WARNING : DIAGNOSTIC_ERROR;
+  const displayPrefix = prefix || `${diagIcon} `;
+  const summary = diag.summary ?? "(unknown)";
+  const detail = diag.detail ?? "";
+  const address = diag.address ? ` (${diag.address})` : "";
+
+  const hasBody = detail !== "" || diag.snippet?.code !== undefined;
+  if (!hasBody) {
+    return `- ${displayPrefix}**${summary}**${address}\n`;
+  }
+
+  let body = `- ${displayPrefix}**${summary}**${address}\n`;
+  if (detail) {
+    const detailLines = detail.split("\n").map((l) => `  > ${l}`).join("\n");
+    body += `${detailLines}\n`;
+  }
+  if (diag.snippet?.code) {
+    const lineInfo = diag.snippet.start_line !== undefined ? ` (line ${String(diag.snippet.start_line)})` : "";
+    const ctx = diag.snippet.context ? ` in ${diag.snippet.context}` : "";
+    body += `  > \`${diag.snippet.code}\`${ctx}${lineInfo}\n`;
+  }
+  return body;
 }
 
 /** Return the appropriate icon for a JSON Lines @level value. */
@@ -878,30 +920,7 @@ function levelIcon(level: string): string {
   }
 }
 
-/** Format a single diagnostic object into markdown. */
-function formatDiagnosticMessage(
-  diag: NonNullable<JsonLinesMsg["diagnostic"]>,
-  prefix: string,
-): string {
-  const severity = diag.severity ?? "error";
-  const icon = severity === "warning" ? DIAGNOSTIC_WARNING : DIAGNOSTIC_ERROR;
-  const summary = diag.summary ?? "(unknown)";
-  const detail = diag.detail ?? "";
-  const address = diag.address ? ` (${diag.address})` : "";
 
-  let output = `${prefix || `${icon} `}**${summary}**${address}\n`;
-  if (detail) {
-    const detailLines = detail.split("\n").map((l) => `> ${l}`).join("\n");
-    output += `${detailLines}\n`;
-  }
-  if (diag.snippet?.code) {
-    const lineInfo = diag.snippet.start_line !== undefined ? ` (line ${String(diag.snippet.start_line)})` : "";
-    const ctx = diag.snippet.context ? ` in ${diag.snippet.context}` : "";
-    output += `> \`${diag.snippet.code}\`${ctx}${lineInfo}\n`;
-  }
-  output += "\n";
-  return output;
-}
 
 /**
  * Try to parse content as a Terraform validate JSON result and format
@@ -925,7 +944,7 @@ function tryFormatValidateOutput(content: string): string | undefined {
   }
 
   const valid = obj["valid"] as boolean;
-  const diagnostics = obj["diagnostics"] as Array<Record<string, unknown>>;
+  const diagnostics = obj["diagnostics"] as Record<string, unknown>[];
 
   let output = "";
   if (valid) {
@@ -958,7 +977,7 @@ function tryFormatValidateOutput(content: string): string | undefined {
   }
 
   // Add collapsed raw JSON
-  output += `<details>\n<summary>Raw JSON output</summary>\n\n\`\`\`json\n${content}\n\`\`\`\n\n</details>`;
+  output += `<details>\n<summary>Show raw JSON</summary>\n\n\`\`\`json\n${content}\n\`\`\`\n\n</details>`;
 
   return output;
 }

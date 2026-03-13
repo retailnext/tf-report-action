@@ -168,7 +168,8 @@ describe("reportFromSteps — manual error fixtures", () => {
         allowedDirs: [fixture.fixtureDir],
         env: NO_GITHUB_ENV,
       });
-      expect(result).toContain("No readable output");
+      // Read errors are shown as standalone warning sections
+      expect(result).toContain("stdout_file output missing in steps");
     });
   });
 
