@@ -70,7 +70,8 @@ function renderActionGroup(
   const label = labels[group.action] ?? group.action;
 
   for (let i = 0; i < group.resourceTypes.length; i++) {
-    const rt = group.resourceTypes[i]!;
+    const rt = group.resourceTypes[i];
+    if (!rt) continue;
     const actionCell = i === 0 ? `${symbol} ${label}` : "";
     writer.tableRow([actionCell, rt.type, String(rt.count)]);
   }

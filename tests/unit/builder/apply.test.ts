@@ -411,7 +411,8 @@ describe("buildApplyReport", () => {
 
       const idAttr = resource?.attributes.find((a) => a.name === "id");
       expect(idAttr?.after).toBe(VALUE_NOT_IN_PLAN);
-      expect(idAttr?.isKnownAfterApply).toBe(false);
+      // isKnownAfterApply stays true — it's still a placeholder, just with a different label
+      expect(idAttr?.isKnownAfterApply).toBe(true);
     });
 
     it("replaces (known after apply) in outputs", () => {

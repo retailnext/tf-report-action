@@ -28,12 +28,14 @@ export function buildOutputChanges(plan: Plan): OutputChange[] {
       : valueToString(change.before ?? null);
 
     let after: string | null;
+    let isKnownAfterApply = false;
     if (isSensitive) {
       after = null;
     } else if (change.after_unknown === true) {
       // The output value will only be known after apply — show the sentinel
       // rather than leaving the cell blank.
       after = KNOWN_AFTER_APPLY;
+      isKnownAfterApply = true;
     } else {
       after = valueToString(change.after ?? null);
     }
@@ -44,6 +46,7 @@ export function buildOutputChanges(plan: Plan): OutputChange[] {
       before,
       after,
       isSensitive,
+      isKnownAfterApply,
     });
   }
 

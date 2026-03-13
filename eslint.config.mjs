@@ -50,6 +50,20 @@ export default tseslint.config(
     },
   },
   {
+    // Sentinel string constants must only be used in the builder layer (where they
+    // are assigned as display text). The renderer and other modules must use boolean
+    // flags (isSensitive, isKnownAfterApply) for logic, never string comparison.
+    files: ["src/renderer/**/*.ts"],
+    rules: {
+      "no-restricted-imports": ["error", {
+        paths: [{
+          name: "../model/sentinels.js",
+          message: "Renderer must not import sentinel strings. Use boolean flags (isSensitive, isKnownAfterApply) instead of string comparison.",
+        }],
+      }],
+    },
+  },
+  {
     // tfjson/ is copied external code — skip linting it
     files: ["src/tfjson/**/*.ts"],
     rules: {

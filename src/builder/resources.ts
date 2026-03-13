@@ -5,7 +5,6 @@ import type { BuildOptions } from "./options.js";
 import type { ConfigRefIndex } from "./config-refs.js";
 import { determineAction } from "./action.js";
 import { buildAttributeChanges } from "./attributes.js";
-import { KNOWN_AFTER_APPLY } from "./attributes.js";
 
 /**
  * Maps each entry in plan.resource_changes to a ModelResourceChange.
@@ -105,7 +104,7 @@ function isAllUnknownAfterApply(
   if (rc.change.after_unknown === true) return true;
 
   // If there are attributes and all of them are known after apply
-  if (attributes.length > 0 && attributes.every((a) => a.after === KNOWN_AFTER_APPLY)) {
+  if (attributes.length > 0 && attributes.every((a) => a.isKnownAfterApply)) {
     return true;
   }
 

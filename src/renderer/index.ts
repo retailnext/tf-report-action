@@ -10,7 +10,6 @@ import { renderDiagnostics } from "./diagnostics.js";
 import { ACTION_SYMBOLS } from "../model/plan-action.js";
 import { MODULE_ICON, DRIFT_ICON } from "../model/status-icons.js";
 import { resolveTemplate } from "../template/index.js";
-import { KNOWN_AFTER_APPLY, VALUE_NOT_IN_PLAN } from "../model/sentinels.js";
 
 /**
  * Renders a Report model to a markdown string.
@@ -172,13 +171,9 @@ function renderOutputTable(
         : "";
     const after = output.isSensitive
       ? MarkdownWriter.inlineCode("(sensitive)")
-      : output.after === KNOWN_AFTER_APPLY
-        ? `_${KNOWN_AFTER_APPLY}_`
-        : output.after === VALUE_NOT_IN_PLAN
-          ? `_${VALUE_NOT_IN_PLAN}_`
-          : output.after !== null
-            ? MarkdownWriter.inlineCode(MarkdownWriter.escapeCell(output.after))
-            : "";
+      : output.after !== null
+        ? MarkdownWriter.inlineCode(MarkdownWriter.escapeCell(output.after))
+        : "";
     writer.tableRow([
       MarkdownWriter.escapeCell(output.name),
       symbol,

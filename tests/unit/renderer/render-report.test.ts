@@ -144,7 +144,7 @@ describe("renderReport — apply-specific rendering", () => {
     expect(md).not.toContain("## Diagnostics");
   });
 
-  it("renders VALUE_NOT_IN_PLAN sentinel in outputs as italic", () => {
+  it("renders VALUE_NOT_IN_PLAN sentinel in outputs as code (placeholder, not diffed)", () => {
     const report = emptyReport({
       outputs: [
         {
@@ -153,12 +153,13 @@ describe("renderReport — apply-specific rendering", () => {
           before: null,
           after: "(value not in plan)",
           isSensitive: false,
+          isKnownAfterApply: true,
         },
       ],
     });
     const md = renderReport(report);
-    expect(md).toContain("_(value not in plan)_");
-    expect(md).not.toContain("<code>(value not in plan)</code>");
+    // Placeholder values are rendered as inline code, never char-diffed
+    expect(md).toContain("<code>(value not in plan)</code>");
   });
 
   it("summary template renders all diagnostics in top-level section", () => {

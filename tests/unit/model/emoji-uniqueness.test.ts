@@ -48,8 +48,9 @@ describe("emoji governance", () => {
       for (const [name, symbol] of Object.entries(statusIcons)) {
         const normalized = normalizeEmoji(symbol);
         if (actionSet.has(normalized)) {
+          const actionName = actionSet.get(normalized) ?? "unknown";
           expect.fail(
-            `"${symbol}" is used for both action "${actionSet.get(normalized)}" ` +
+            `"${symbol}" is used for both action "${actionName}" ` +
               `and status icon "${name}"`,
           );
         }
@@ -61,8 +62,9 @@ describe("emoji governance", () => {
       for (const [action, symbol] of Object.entries(ACTION_SYMBOLS)) {
         const normalized = normalizeEmoji(symbol);
         if (seen.has(normalized)) {
+          const prevAction = seen.get(normalized) ?? "unknown";
           expect.fail(
-            `"${symbol}" is used for both action "${seen.get(normalized)}" ` +
+            `"${symbol}" is used for both action "${prevAction}" ` +
               `and action "${action}"`,
           );
         }
@@ -75,8 +77,9 @@ describe("emoji governance", () => {
       for (const [name, symbol] of Object.entries(statusIcons)) {
         const normalized = normalizeEmoji(symbol);
         if (seen.has(normalized)) {
+          const prevName = seen.get(normalized) ?? "unknown";
           expect.fail(
-            `"${symbol}" is used for both "${seen.get(normalized)}" ` +
+            `"${symbol}" is used for both "${prevName}" ` +
               `and "${name}"`,
           );
         }
@@ -100,13 +103,15 @@ describe("emoji governance", () => {
         for (let i = 0; i < lines.length; i++) {
           const line = lines[i]!;
           for (const m of findSymbols(line)) {
-            const cp = [...m]
+            const codepoints = Array.from(m)
               .map(
-                (c) =>
-                  "U+" + c.codePointAt(0)!.toString(16).toUpperCase().padStart(4, "0"),
+                (c) => {
+                  const cp = c.codePointAt(0);
+                  return "U+" + (cp !== undefined ? cp.toString(16).toUpperCase().padStart(4, "0") : "0000");
+                },
               )
               .join(" ");
-            violations.push(`${rel}:${i + 1}: ${m} (${cp})`);
+            violations.push(`${rel}:${String(i + 1)}: ${m} (${codepoints})`);
           }
         }
       }
@@ -147,7 +152,7 @@ function walkTs(dir: string): string[] {
 }
 
 /**
- * Remove single-line (`// ...`) and block (`/* ... *​/`) comments so the
+ * Remove single-line (`// ...`) and block comments so the
  * lint only flags symbols in executable code and string literals.
  */
 function stripComments(source: string): string {
@@ -161,13 +166,13 @@ function stripComments(source: string): string {
  * and non-ASCII math symbol found in a line.
  */
 function* findSymbols(line: string): Generator<string> {
-  // eslint-disable-next-line no-restricted-syntax -- v-flag regex for Unicode set subtraction
   const emojiRe = /[\p{Extended_Pictographic}--[\x23\x2a\x30-\x39]]/vg;
   for (const m of line.matchAll(emojiRe)) {
     yield m[0];
   }
   for (const ch of line) {
-    if (ch.codePointAt(0)! > 0x7f && /\p{Sm}/u.test(ch)) {
+    const cp = ch.codePointAt(0);
+    if (cp !== undefined && cp > 0x7f && /\p{Sm}/u.test(ch)) {
       yield ch;
     }
   }

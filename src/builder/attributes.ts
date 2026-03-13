@@ -151,8 +151,8 @@ export function buildAttributeChanges(
       continue;
     }
 
-    const large = isLargeValue(beforeVal === SENSITIVE_MASK ? null : beforeVal) ||
-      isLargeValue(afterVal === SENSITIVE_MASK || afterVal === KNOWN_AFTER_APPLY ? null : afterVal);
+    const large = isLargeValue(sensitive ? null : beforeVal) ||
+      isLargeValue(sensitive || isKnownAfterApply ? null : afterVal);
 
     result.push({
       name: key,
@@ -169,5 +169,3 @@ export function buildAttributeChanges(
 
   return result;
 }
-
-export { SENSITIVE_MASK, KNOWN_AFTER_APPLY } from "../model/sentinels.js";

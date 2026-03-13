@@ -78,11 +78,13 @@ export function renderResource(
     if (smallAttrs.length > 0) {
       writer.tableHeader(["Attribute", "Before", "After"]);
       for (const attr of smallAttrs) {
-        const beforeCell = attr.isSensitive
-          ? MarkdownWriter.inlineCode("(sensitive)")
+        // Sensitive and placeholder values are displayed as-is, never char-diffed
+        const skipDiff = attr.isSensitive || attr.isKnownAfterApply;
+        const beforeCell = skipDiff
+          ? MarkdownWriter.inlineCode(attr.before ?? "")
           : MarkdownWriter.escapeCell(attr.before ?? "");
-        const afterCell = attr.isSensitive
-          ? MarkdownWriter.inlineCode("(sensitive)")
+        const afterCell = skipDiff
+          ? MarkdownWriter.inlineCode(attr.after ?? "")
           : formatDiff(attr.before, attr.after, diffFormat);
         writer.tableRow([
           MarkdownWriter.escapeCell(attr.name),

@@ -181,6 +181,51 @@ describe("renderResource", () => {
     expect(output).toContain("- old");
     expect(output).toContain("+ new");
   });
+
+  it("does not char-diff (known after apply) placeholder", () => {
+    const output = render(
+      makeResource({
+        action: "update",
+        attributes: [
+          {
+            name: "id",
+            before: "i-abc123",
+            after: "(known after apply)",
+            isSensitive: false,
+            isLarge: false,
+            isKnownAfterApply: true,
+          },
+        ],
+      }),
+    );
+    // The placeholder should appear as inline code, not char-diffed
+    expect(output).toContain("<code>(known after apply)</code>");
+    // Must not contain <del>/<ins> diff markup
+    expect(output).not.toMatch(/<del/);
+    expect(output).not.toMatch(/<ins/);
+  });
+
+  it("char-diffs a literal string that happens to equal the placeholder text", () => {
+    const output = render(
+      makeResource({
+        action: "update",
+        attributes: [
+          {
+            name: "description",
+            before: "old description",
+            after: "(known after apply)",
+            isSensitive: false,
+            isLarge: false,
+            isKnownAfterApply: false,
+          },
+        ],
+      }),
+    );
+    // isKnownAfterApply is false, so the value IS char-diffed even though
+    // it looks like the sentinel string
+    expect(output).toMatch(/<del/);
+    expect(output).toMatch(/<ins/);
+  });
 });
 
 describe("renderResource — apply context", () => {

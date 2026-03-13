@@ -25,7 +25,7 @@ import type { BuildOptions } from "./options.js";
 import type { PlanAction } from "../model/plan-action.js";
 import { buildReport } from "./index.js";
 import { buildApplySummary } from "./summary.js";
-import { KNOWN_AFTER_APPLY, VALUE_NOT_IN_PLAN } from "../model/sentinels.js";
+import { VALUE_NOT_IN_PLAN } from "../model/sentinels.js";
 
 // ─── Type Guards ────────────────────────────────────────────────────────────
 
@@ -277,16 +277,15 @@ function replaceKnownAfterApply(report: Report): void {
   for (const group of report.modules) {
     for (const resource of group.resources) {
       for (const attr of resource.attributes) {
-        if (attr.after === KNOWN_AFTER_APPLY) {
+        if (attr.isKnownAfterApply) {
           attr.after = VALUE_NOT_IN_PLAN;
-          attr.isKnownAfterApply = false;
         }
       }
     }
   }
 
   for (const output of report.outputs) {
-    if (output.after === KNOWN_AFTER_APPLY) {
+    if (output.isKnownAfterApply) {
       output.after = VALUE_NOT_IN_PLAN;
     }
   }
@@ -305,7 +304,7 @@ function resolveOutputValues(report: Report, outputsMessage: UIOutputsMessage): 
     // Security invariant: never read values of sensitive outputs
     if (output.isSensitive || resolved.sensitive) continue;
 
-    if (output.after === VALUE_NOT_IN_PLAN || output.after === KNOWN_AFTER_APPLY) {
+    if (output.isKnownAfterApply) {
       const val = resolved.value;
       if (val !== undefined && val !== null) {
         output.after = typeof val === "string"
