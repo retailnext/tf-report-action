@@ -20,3 +20,6 @@ export const DIAGNOSTIC_WARNING = "⚠️";
 
 /** Prefix for module group headings. */
 export const MODULE_ICON = "📦";
+
+/** Prefix for the resource drift section heading. */
+export const DRIFT_ICON = "🔀";

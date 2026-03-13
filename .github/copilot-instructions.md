@@ -30,15 +30,20 @@ Follow these boundaries strictly — do not add cross-cutting logic.
 | `src/builder/` | Translate `Plan` → `Report` model (plan builder), or `Plan` + `UIMessage[]` → `Report` (apply builder). Uses `flattener/`, `sensitivity/`, `tfjson/`. |
 | `src/renderer/` | Translate `Report` → markdown string. Auto-detects plan vs apply reports. Uses `model/`, `diff/`, and `template/`. |
 | `src/template/` | Select and apply rendering templates. Used by `renderer/`. |
-| `src/index.ts` | Public API: `planToMarkdown(json, options?)` and `applyToMarkdown(planJson, applyJsonl, options?)`. Orchestrates parser → builder → renderer. |
+| `src/steps/` | GitHub Actions steps context parsing, validation, and secure file reading. Zero internal project dependencies — only Node.js built-ins. This is the I/O boundary between the external world and the pure transformation pipeline. |
+| `src/compositor/` | Budget-aware section assembly. Composes markdown sections within an output size limit, progressively degrading from full → compact → omit. Zero internal project dependencies (strings only). |
+| `src/index.ts` | Public API: `planToMarkdown(json, options?)`, `applyToMarkdown(planJson, applyJsonl, options?)`, and `reportFromSteps(stepsJson, options?)`. Orchestrates parser → builder → renderer; for `reportFromSteps`, also orchestrates steps/ and compositor/. |
 
 **Dependency rules:**
 - `diff/`, `sensitivity/`, and `flattener/` have zero internal project dependencies.
 - `model/` has zero internal project dependencies.
+- `steps/` has zero internal project dependencies (Node.js built-ins only).
+- `compositor/` has zero internal project dependencies (strings only).
 - `builder/` may import from `tfjson/`, `flattener/`, `sensitivity/`, and `model/`. Nothing else.
 - `builder/apply.ts` additionally imports `buildReport` from `builder/index.ts` (internal to builder module) and `UIMessage` types from `tfjson/`. It must NOT be re-exported from the builder barrel to avoid circular dependencies.
 - `renderer/` may import from `model/`, `diff/`, and `template/`. Nothing else.
-- `index.ts` may import from `parser/`, `builder/`, `builder/apply`, and `renderer/`. Nothing else.
+- `index.ts` may import from `parser/`, `builder/`, `builder/apply`, `renderer/`, `steps/`, and `compositor/`. Nothing else.
+- `report-from-steps.ts` may import from `parser/`, `builder/`, `builder/apply`, `renderer/`, `steps/`, `compositor/`, and `model/`. Nothing else.
 
 ---
 
@@ -90,6 +95,43 @@ Data sources are **never** shown in plan or apply output. They are excluded by
 `shouldSkip()` in `src/builder/resources.ts` which filters out all resources with
 `mode === "data"`. Errors and warnings relating to data sources surface through the
 diagnostics section of apply reports only.
+
+## File Reading Safety
+
+The `src/steps/reader.ts` module enforces security constraints when reading files
+referenced by exec-action step outputs:
+
+- **Allowed directories** — files must reside directly within an allowed directory
+  (no subdirectory traversal). Default: `RUNNER_TEMP` or the OS temp directory.
+- **Regular files only** — rejects symlinks-to-non-regular-files, devices, FIFOs,
+  sockets, and directories.
+- **Two read strategies**: parse reads (full file, bounded by `maxFileSize` = 256 MiB)
+  and display reads (first `maxDisplayRead` = 64 KiB bytes only).
+- **Error messages** must never contain file paths (may reveal runner directory structure).
+
+## Steps Context
+
+The `reportFromSteps(stepsJson, options?)` entry point accepts a JSON-encoded GitHub
+Actions steps context and produces a report. It **never throws** — all errors become
+markdown content. Output is bounded by `maxOutputLength` (default 63 KiB).
+
+**`ReportOptions`** extends `Options` with: `allowedDirs`, `maxOutputLength`, `workspace`,
+`env` (DI for `process.env`), and step ID overrides (`initStep`, `validateStep`,
+`planStep`, `showPlanStep`, `applyStep`).
+
+**Tiered degradation**:
+- **Tier 1**: show-plan JSON available → full structured report
+- **Tier 3**: No show-plan, but plan/apply step present → raw text fallback
+- **Tier 4**: No recognized terraform steps → general workflow table
+
+**Dynamic title generation**: Title includes status icon, optional workspace prefix,
+operation label, and change counts. Determined automatically from report content.
+
+**Workspace marker**: When `workspace` is set, the first line of output is
+`<!-- tf-report-action:"WORKSPACE" -->` for comment deduplication.
+
+**Logs URL**: Auto-derived from `GITHUB_REPOSITORY`, `GITHUB_RUN_ID`, and
+`GITHUB_RUN_ATTEMPT` environment variables via the `env` DI option.
 
 ## Emoji / Symbol Uniqueness
 

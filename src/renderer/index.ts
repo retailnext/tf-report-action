@@ -8,7 +8,7 @@ import { renderResource } from "./resource.js";
 import type { ApplyContext } from "./resource.js";
 import { renderDiagnostics } from "./diagnostics.js";
 import { ACTION_SYMBOLS } from "../model/plan-action.js";
-import { MODULE_ICON } from "../model/status-icons.js";
+import { MODULE_ICON, DRIFT_ICON } from "../model/status-icons.js";
 import { resolveTemplate } from "../template/index.js";
 import { KNOWN_AFTER_APPLY, VALUE_NOT_IN_PLAN } from "../model/sentinels.js";
 
@@ -27,7 +27,7 @@ export function renderReport(report: Report, options: RenderOptions = {}): strin
   // Build apply context maps
   const failedAddresses = buildFailedSet(report);
   const diagByAddress = buildDiagnosticMap(report);
-  const nonResourceDiags = extractNonResourceDiagnostics(report, diagByAddress);
+  const nonResourceDiags = extractNonResourceDiagnostics(report);
 
   if (options.title) {
     writer.heading(options.title, 2);
@@ -50,6 +50,11 @@ export function renderReport(report: Report, options: RenderOptions = {}): strin
   // Non-resource diagnostics between summary and resource changes
   if (nonResourceDiags.length > 0) {
     renderDiagnostics(nonResourceDiags, writer, 2);
+  }
+
+  // Resource drift section (between summary and resource changes)
+  if (report.driftModules.length > 0) {
+    renderDriftSection(report, writer, options, diffCache);
   }
 
   if (report.modules.length > 0 || report.outputs.length > 0) {
@@ -129,7 +134,6 @@ function buildDiagnosticMap(report: Report): Map<string, Diagnostic[]> {
  */
 function extractNonResourceDiagnostics(
   report: Report,
-  diagByAddress: Map<string, Diagnostic[]>,
 ): Diagnostic[] {
   if (!report.diagnostics) return [];
 
@@ -183,4 +187,35 @@ function renderOutputTable(
     ]);
   }
   writer.blankLine();
+}
+
+/**
+ * Renders a drift section showing resources whose real-world state has
+ * drifted from the prior state file. Uses the same resource rendering
+ * as the changes section but under a distinct heading.
+ */
+function renderDriftSection(
+  report: Report,
+  writer: MarkdownWriter,
+  options: RenderOptions,
+  diffCache: Map<string, DiffEntry[]>,
+): void {
+  const driftCount = report.driftModules.reduce(
+    (sum, m) => sum + m.resources.length,
+    0,
+  );
+  writer.heading(`${DRIFT_ICON} Resource Drift (${String(driftCount)} detected)`, 2);
+
+  for (const moduleGroup of report.driftModules) {
+    const moduleLabel =
+      moduleGroup.moduleAddress === ""
+        ? "root"
+        : `\`${moduleGroup.moduleAddress}\``;
+
+    writer.heading(`${MODULE_ICON} Module: ${moduleLabel}`, 3);
+
+    for (const resource of moduleGroup.resources) {
+      renderResource(resource, writer, options, diffCache);
+    }
+  }
 }

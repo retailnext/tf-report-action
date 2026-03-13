@@ -8,6 +8,10 @@ import { renderReport } from "./renderer/index.js";
 
 export type Options = BuildOptions & RenderOptions;
 
+// Re-export the steps-based entry point
+export { reportFromSteps } from "./report-from-steps.js";
+export type { ReportOptions } from "./report-from-steps.js";
+
 /**
  * Converts a Terraform/OpenTofu plan JSON string into a GitHub-comment-ready
  * markdown string.
@@ -58,3 +62,4 @@ export type { ModuleGroup } from "./model/module-group.js";
 export type { PlanAction } from "./model/plan-action.js";
 export type { Diagnostic } from "./model/diagnostic.js";
 export type { ApplyStatus } from "./model/apply-status.js";
+export type { Env } from "./steps/types.js";

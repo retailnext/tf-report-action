@@ -14,6 +14,7 @@ function emptyReport(overrides: Partial<Report> = {}): Report {
     summary: emptySummary,
     modules: [],
     outputs: [],
+    driftModules: [],
     ...overrides,
   };
 }
@@ -203,5 +204,106 @@ describe("renderReport — apply-specific rendering", () => {
     const md = renderReport(report);
     expect(md).toContain("Add");
     expect(md).not.toContain("Added");
+  });
+});
+
+describe("renderReport — drift section", () => {
+  const driftResource = {
+    address: "aws_instance.web",
+    moduleAddress: null,
+    type: "aws_instance",
+    name: "web",
+    action: "update" as const,
+    actionReason: null,
+    attributes: [],
+    importId: null,
+    movedFromAddress: null,
+    allUnknownAfterApply: false,
+  };
+
+  it("does not render drift section when driftModules is empty", () => {
+    const report = emptyReport();
+    const md = renderReport(report);
+    expect(md).not.toContain("Resource Drift");
+    expect(md).not.toContain("🔀");
+  });
+
+  it("renders drift section with correct heading and count", () => {
+    const report = emptyReport({
+      driftModules: [
+        {
+          moduleAddress: "",
+          resources: [driftResource],
+          outputs: [],
+        },
+      ],
+    });
+    const md = renderReport(report);
+    expect(md).toContain("🔀 Resource Drift (1 detected)");
+  });
+
+  it("renders drift resources within module groups", () => {
+    const report = emptyReport({
+      driftModules: [
+        {
+          moduleAddress: "",
+          resources: [driftResource],
+          outputs: [],
+        },
+        {
+          moduleAddress: "module.network",
+          resources: [
+            { ...driftResource, address: "module.network.aws_vpc.main", moduleAddress: "module.network", type: "aws_vpc", name: "main" },
+          ],
+          outputs: [],
+        },
+      ],
+    });
+    const md = renderReport(report);
+    expect(md).toContain("🔀 Resource Drift (2 detected)");
+    expect(md).toContain("Module: root");
+    expect(md).toContain("Module: `module.network`");
+    expect(md).toContain("<strong>aws_instance</strong> web");
+    expect(md).toContain("<strong>aws_vpc</strong> main");
+  });
+
+  it("drift section appears between summary and resource changes", () => {
+    const report = emptyReport({
+      modules: [
+        {
+          moduleAddress: "",
+          resources: [{
+            address: "null_resource.planned",
+            moduleAddress: null,
+            type: "null_resource",
+            name: "planned",
+            action: "create",
+            actionReason: null,
+            attributes: [],
+            importId: null,
+            movedFromAddress: null,
+            allUnknownAfterApply: false,
+          }],
+          outputs: [],
+        },
+      ],
+      driftModules: [
+        {
+          moduleAddress: "",
+          resources: [driftResource],
+          outputs: [],
+        },
+      ],
+    });
+    const md = renderReport(report);
+    const summaryIdx = md.indexOf("Plan Summary");
+    const driftIdx = md.indexOf("Resource Drift");
+    const changesIdx = md.indexOf("Resource Changes");
+
+    expect(summaryIdx).toBeGreaterThan(-1);
+    expect(driftIdx).toBeGreaterThan(-1);
+    expect(changesIdx).toBeGreaterThan(-1);
+    expect(driftIdx).toBeGreaterThan(summaryIdx);
+    expect(driftIdx).toBeLessThan(changesIdx);
   });
 });

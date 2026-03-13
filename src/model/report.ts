@@ -16,6 +16,12 @@ export interface Report {
   /** Top-level output changes (not inside any module). */
   outputs: OutputChange[];
   /**
+   * Resources whose real-world state has drifted from the prior state,
+   * grouped by module. Populated from plan.resource_drift.
+   * Empty array when no drift is detected.
+   */
+  driftModules: ModuleGroup[];
+  /**
    * Diagnostics (errors and warnings) from the apply run.
    * Only present in apply reports; undefined for plan-only reports.
    */

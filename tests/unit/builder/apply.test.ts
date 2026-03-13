@@ -820,4 +820,149 @@ describe("buildApplyReport", () => {
       expect(status?.idValue).toBe("new123");
     });
   });
+
+  describe("planned_change: not-started detection", () => {
+    function plannedChangeMsg(addr: string, action = "create"): UIMessage {
+      return {
+        "@level": "info",
+        "@message": `${addr}: Plan to ${action}`,
+        "@module": "terraform.ui",
+        "@timestamp": "2024-01-01T00:00:00.000Z",
+        type: "planned_change",
+        change: {
+          resource: {
+            addr,
+            module: "",
+            resource: addr,
+            implied_provider: addr.split("_")[0] ?? "",
+            resource_type: addr.split(".")[0] ?? "",
+            resource_name: addr.split(".").slice(1).join("."),
+            resource_key: null,
+          },
+          action,
+        },
+      } as UIMessage;
+    }
+
+    it("creates not-started statuses for resources that were planned but never applied", () => {
+      const plan = makePlan({
+        resource_changes: [
+          resourceChange("null_resource.a", ["create"]),
+          resourceChange("null_resource.b", ["create"]),
+          resourceChange("null_resource.c", ["create"]),
+        ],
+      });
+
+      const messages: UIMessage[] = [
+        versionMsg(),
+        plannedChangeMsg("null_resource.a", "create"),
+        plannedChangeMsg("null_resource.b", "create"),
+        plannedChangeMsg("null_resource.c", "create"),
+        applyStartMsg("null_resource.a", "create"),
+        applyCompleteMsg("null_resource.a", "create"),
+        // b and c never started — interrupted apply
+      ];
+
+      const report = buildApplyReport(plan, messages);
+      const statuses = report.applyStatuses!;
+
+      // a was completed
+      const statusA = statuses.find((s) => s.address === "null_resource.a");
+      expect(statusA?.success).toBe(true);
+
+      // b and c are "not started"
+      const statusB = statuses.find((s) => s.address === "null_resource.b");
+      expect(statusB).toBeDefined();
+      expect(statusB?.success).toBe(false);
+      expect(statusB?.action).toBe("create");
+      expect(statusB?.elapsed).toBeUndefined();
+
+      const statusC = statuses.find((s) => s.address === "null_resource.c");
+      expect(statusC).toBeDefined();
+      expect(statusC?.success).toBe(false);
+    });
+
+    it("does not create not-started statuses when all planned resources were applied", () => {
+      const plan = makePlan({
+        resource_changes: [
+          resourceChange("null_resource.a", ["create"]),
+        ],
+      });
+
+      const messages: UIMessage[] = [
+        versionMsg(),
+        plannedChangeMsg("null_resource.a", "create"),
+        applyStartMsg("null_resource.a", "create"),
+        applyCompleteMsg("null_resource.a", "create"),
+      ];
+
+      const report = buildApplyReport(plan, messages);
+      const statuses = report.applyStatuses!;
+      expect(statuses).toHaveLength(1);
+      expect(statuses[0]!.success).toBe(true);
+    });
+
+    it("does not create not-started for errored resources (they were started)", () => {
+      const plan = makePlan({
+        resource_changes: [
+          resourceChange("null_resource.fail", ["create"]),
+        ],
+      });
+
+      const messages: UIMessage[] = [
+        versionMsg(),
+        plannedChangeMsg("null_resource.fail", "create"),
+        applyStartMsg("null_resource.fail", "create"),
+        applyErroredMsg("null_resource.fail", "create"),
+      ];
+
+      const report = buildApplyReport(plan, messages);
+      const statuses = report.applyStatuses!;
+      expect(statuses).toHaveLength(1);
+      expect(statuses[0]!.address).toBe("null_resource.fail");
+      expect(statuses[0]!.success).toBe(false);
+      // Should have elapsed time (from apply_errored), not a "not started" entry
+      expect(statuses[0]!.elapsed).toBeDefined();
+    });
+
+    it("handles apply with no planned_change messages", () => {
+      const plan = makePlan({
+        resource_changes: [
+          resourceChange("null_resource.a", ["create"]),
+        ],
+      });
+
+      const messages: UIMessage[] = [
+        versionMsg(),
+        applyStartMsg("null_resource.a", "create"),
+        applyCompleteMsg("null_resource.a", "create"),
+      ];
+
+      const report = buildApplyReport(plan, messages);
+      const statuses = report.applyStatuses!;
+      expect(statuses).toHaveLength(1);
+      expect(statuses[0]!.success).toBe(true);
+    });
+
+    it("preserves correct action for not-started resources", () => {
+      const plan = makePlan({
+        resource_changes: [
+          resourceChange("null_resource.del", ["delete"]),
+        ],
+      });
+
+      const messages: UIMessage[] = [
+        versionMsg(),
+        plannedChangeMsg("null_resource.del", "delete"),
+        // Never applied
+      ];
+
+      const report = buildApplyReport(plan, messages);
+      const statuses = report.applyStatuses!;
+      expect(statuses).toHaveLength(1);
+      expect(statuses[0]!.address).toBe("null_resource.del");
+      expect(statuses[0]!.action).toBe("delete");
+      expect(statuses[0]!.success).toBe(false);
+    });
+  });
 });

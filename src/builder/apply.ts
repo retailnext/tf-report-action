@@ -16,6 +16,7 @@ import type {
   UIApplyErroredMessage,
   UIDiagnosticMessage,
   UIOutputsMessage,
+  UIPlannedChangeMessage,
 } from "../tfjson/machine-readable-ui.js";
 import type { Report } from "../model/report.js";
 import type { Diagnostic } from "../model/diagnostic.js";
@@ -48,6 +49,10 @@ function isOutputs(msg: UIMessage): msg is UIOutputsMessage {
   return msg.type === "outputs";
 }
 
+function isPlannedChange(msg: UIMessage): msg is UIPlannedChangeMessage {
+  return msg.type === "planned_change";
+}
+
 // ─── Public API ─────────────────────────────────────────────────────────────
 
 /**
@@ -66,12 +71,17 @@ export function buildApplyReport(
   const report = buildReport(plan, options);
 
   const appliedAddresses = extractAppliedAddresses(messages);
+  const plannedAddresses = extractPlannedAddresses(messages);
   const applyStatuses = extractApplyStatuses(messages);
   const diagnostics = extractDiagnostics(messages);
   const outputsMessage = findOutputsMessage(messages);
 
   filterPhantomResources(report, appliedAddresses);
   replaceKnownAfterApply(report);
+
+  // Detect resources that were planned but never started (interrupted apply)
+  const notStartedStatuses = buildNotStartedStatuses(plannedAddresses, appliedAddresses, messages);
+  const allStatuses = [...applyStatuses, ...notStartedStatuses];
 
   if (outputsMessage) {
     resolveOutputValues(report, outputsMessage);
@@ -89,8 +99,8 @@ export function buildApplyReport(
   if (diagnostics.length > 0) {
     report.diagnostics = diagnostics;
   }
-  if (applyStatuses.length > 0) {
-    report.applyStatuses = applyStatuses;
+  if (allStatuses.length > 0) {
+    report.applyStatuses = allStatuses;
   }
 
   return report;
@@ -111,6 +121,52 @@ function extractAppliedAddresses(messages: UIMessage[]): Set<string> {
     }
   }
   return addresses;
+}
+
+/**
+ * Collects the set of resource addresses that had a `planned_change` message.
+ * These represent all resources the apply was supposed to process.
+ */
+function extractPlannedAddresses(messages: UIMessage[]): Map<string, PlanAction> {
+  const planned = new Map<string, PlanAction>();
+  for (const msg of messages) {
+    if (isPlannedChange(msg)) {
+      planned.set(msg.change.resource.addr, uiActionToPlanAction(msg.change.action));
+    }
+  }
+  return planned;
+}
+
+/**
+ * Builds ApplyStatus entries for resources that were planned but never
+ * started. This happens when an apply is interrupted (timeout, crash,
+ * cancellation) before all resources are processed.
+ */
+function buildNotStartedStatuses(
+  plannedAddresses: Map<string, PlanAction>,
+  appliedAddresses: Set<string>,
+  messages: UIMessage[],
+): ApplyStatus[] {
+  // Also check apply_complete addresses (some resources may have completed
+  // without being in the applied set due to edge cases)
+  const completedAddresses = new Set<string>();
+  for (const msg of messages) {
+    if (isApplyComplete(msg)) {
+      completedAddresses.add(msg.hook.resource.addr);
+    }
+  }
+
+  const notStarted: ApplyStatus[] = [];
+  for (const [addr, action] of plannedAddresses) {
+    if (!appliedAddresses.has(addr) && !completedAddresses.has(addr)) {
+      notStarted.push({
+        address: addr,
+        action,
+        success: false,
+      });
+    }
+  }
+  return notStarted;
 }
 
 /** Maps a UI change action string to the model's PlanAction. */
