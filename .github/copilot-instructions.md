@@ -2,10 +2,15 @@
 
 ## Project Purpose
 
-`tf-plan-md` is a TypeScript library that converts a Terraform/OpenTofu plan JSON
-string (the output of `terraform show -json <planfile>` or `tofu show -json <planfile>`)
-into a GitHub-comment-ready markdown string. It is **not** a GitHub Action; it will
-be incorporated into one separately.
+`tf-plan-md` is a TypeScript library that converts Terraform/OpenTofu plan and apply
+outputs into GitHub-comment-ready markdown strings. It is **not** a GitHub Action; it
+will be incorporated into one separately.
+
+It provides two main entry points:
+- `planToMarkdown(json, options?)` — converts plan JSON (from `show -json <planfile>`)
+  into a plan report
+- `applyToMarkdown(planJson, applyJsonl, options?)` — converts plan JSON plus apply
+  JSONL (from `apply -json`) into an apply report showing only actually-changed resources
 
 ---
 
@@ -16,23 +21,24 @@ Follow these boundaries strictly — do not add cross-cutting logic.
 
 | Module | Responsibility |
 |---|---|
-| `src/tfjson/` | Copied type definitions for the plan JSON wire format. **Never modify.** |
-| `src/parser/` | Parse a raw JSON string → typed `Plan`. Version validation only. |
+| `src/tfjson/` | Type definitions for the plan JSON wire format and machine-readable UI log format. **Never modify** files copied from tfplanjson; new type files may be added. |
+| `src/parser/` | Parse raw input strings → typed objects. Plan JSON, UI log JSONL, validate output. Version validation only. |
 | `src/flattener/` | Flatten nested `JsonValue` → `Map<string, string \| null>` with dotted-path keys. |
 | `src/sensitivity/` | Detect whether a flattened attribute path is sensitive. Pure predicate. |
 | `src/diff/` | Pure LCS, line-diff, and char-diff algorithms. No markdown, no I/O. |
 | `src/model/` | Shared TypeScript interfaces consumed by `builder/` and `renderer/`. **No logic.** |
-| `src/builder/` | Translate `Plan` → `Report` model. Uses `flattener/`, `sensitivity/`, `tfjson/`. |
-| `src/renderer/` | Translate `Report` → markdown string. Uses `model/` and `diff/`. |
+| `src/builder/` | Translate `Plan` → `Report` model (plan builder), or `Plan` + `UIMessage[]` → `Report` (apply builder). Uses `flattener/`, `sensitivity/`, `tfjson/`. |
+| `src/renderer/` | Translate `Report` → markdown string. Auto-detects plan vs apply reports. Uses `model/`, `diff/`, and `template/`. |
 | `src/template/` | Select and apply rendering templates. Used by `renderer/`. |
-| `src/index.ts` | Public API: `planToMarkdown(json, options?)`. Orchestrates parser → builder → renderer. |
+| `src/index.ts` | Public API: `planToMarkdown(json, options?)` and `applyToMarkdown(planJson, applyJsonl, options?)`. Orchestrates parser → builder → renderer. |
 
 **Dependency rules:**
 - `diff/`, `sensitivity/`, and `flattener/` have zero internal project dependencies.
 - `model/` has zero internal project dependencies.
 - `builder/` may import from `tfjson/`, `flattener/`, `sensitivity/`, and `model/`. Nothing else.
+- `builder/apply.ts` additionally imports `buildReport` from `builder/index.ts` (internal to builder module) and `UIMessage` types from `tfjson/`. It must NOT be re-exported from the builder barrel to avoid circular dependencies.
 - `renderer/` may import from `model/`, `diff/`, and `template/`. Nothing else.
-- `index.ts` may import from `parser/`, `builder/`, and `renderer/`. Nothing else.
+- `index.ts` may import from `parser/`, `builder/`, `builder/apply`, and `renderer/`. Nothing else.
 
 ---
 
@@ -78,6 +84,13 @@ Modules most likely to need this: `src/flattener/`, `src/sensitivity/`, `src/dif
 Sensitive attribute values are **always masked** as `(sensitive)`. There is no option
 to reveal them. This is a security invariant — do not add any bypass.
 
+## Data Source Exclusion
+
+Data sources are **never** shown in plan or apply output. They are excluded by
+`shouldSkip()` in `src/builder/resources.ts` which filters out all resources with
+`mode === "data"`. Errors and warnings relating to data sources surface through the
+diagnostics section of apply reports only.
+
 ## Error Messages
 
 Error messages must **never** contain plan attribute values or any data derived from
@@ -97,7 +110,7 @@ them, because attribute values may be sensitive. This means:
 
 - Every module with executable code must have a corresponding test file under `tests/unit/`.
 - Integration tests live under `tests/integration/` and are driven by real plan JSON
-  files generated from fixture Terraform workspaces.
+  and apply JSONL files generated from fixture Terraform workspaces.
 - Coverage thresholds: 90% lines/functions/statements, 85% branches.
 - Run `npm run test:coverage` locally; CI runs `npm run test:coverage:ci`.
 - **After adding or modifying any source code, run `npm run test:coverage` and verify
@@ -113,6 +126,8 @@ them, because attribute values may be sensitive. This means:
 
 - Every plan JSON loaded in `tests/integration/` must come from
   `tests/fixtures/generated/<tool>/<workspace>/<N>/plan.json`.
+- Every apply JSONL loaded in `tests/integration/` must come from
+  `tests/fixtures/generated/<tool>/<workspace>/<N>/apply.jsonl`.
 - No inline-constructed plan objects are permitted in `tests/integration/`.
 - No manually-crafted JSON strings are permitted in `tests/integration/`.
 - Error-path tests (invalid JSON, unsupported format version, etc.) belong in
@@ -139,13 +154,16 @@ reading a file from `tests/fixtures/generated/<tool>/<workspace>/<N>/plan.json`.
 ### `scripts/render-plan.ts` — local HTML preview
 
 `scripts/render-plan.ts` is a developer tool that renders a plan JSON file to a
-browser-viewable HTML page. It calls `planToMarkdown()`, writes the result to
-`/tmp/tf-plan-preview.html` (using **marked** and **DOMPurify** from jsDelivr CDN),
-and opens the file in the default browser.
+browser-viewable HTML page. It calls `planToMarkdown()` (or `applyToMarkdown()` when
+`--apply` is provided), writes the result to `/tmp/tf-plan-preview.html` (using
+**marked** and **DOMPurify** from jsDelivr CDN), and opens the file in the default browser.
 
 ```bash
 # Render a fixture plan
 npm run render -- tests/fixtures/generated/terraform/null-lifecycle/2/plan.json
+
+# Render an apply report (plan + apply output)
+npm run render -- plan.json --apply apply.jsonl --title "PR #42"
 
 # With options
 npm run render -- plan.json --title "PR #42" --template summary
@@ -159,6 +177,7 @@ cat plan.json | npm run render --
 
 | Flag | `Options` field / behaviour | Default |
 |---|---|---|
+| `--apply <file>` | Reads apply JSON Lines; calls `applyToMarkdown` instead of `planToMarkdown` | _(plan-only mode)_ |
 | `--title <text>` | `title` | _(none)_ |
 | `--template <default\|summary>` | `template` | `"default"` |
 | `--show-unchanged` | `showUnchangedAttributes` | `false` |
