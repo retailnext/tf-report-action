@@ -40,8 +40,8 @@ export interface ReadError {
 
 export type FileReadOutcome = ReadResult | ReadError;
 
-/** Type guard to check if a FileReadOutcome is an error. */
-export function isReadError(result: FileReadOutcome): result is ReadError {
+/** Type guard to check if a result is a ReadError. */
+export function isReadError(result: FileReadOutcome | ValidatedFile): result is ReadError {
   return "error" in result;
 }
 

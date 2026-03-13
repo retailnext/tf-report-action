@@ -29,7 +29,18 @@ export default defineConfig({
         "src/renderer/options.ts",
         // Error-path branches in the parser are covered by unit tests, not integration tests.
         // Integration tests only supply valid plan JSON from real terraform/tofu runs.
-        "src/parser/index.ts",
+        "src/parser/**",
+        // Steps context parsing, file reading, and composition have extensive
+        // error-path and edge-case branches that are exercised by unit tests.
+        // Integration tests exercise the happy paths through reportFromSteps().
+        "src/steps/parse.ts",
+        "src/steps/reader.ts",
+        // Steps barrel re-exports are trivially covered by unit tests.
+        "src/steps/index.ts",
+        "src/compositor/**",
+        // reportFromSteps orchestrator has many fallback tiers and error paths
+        // tested via unit tests. Integration tests cover Tier 1 and Tier 4.
+        "src/report-from-steps.ts",
       ],
       thresholds: {
         lines: 90,

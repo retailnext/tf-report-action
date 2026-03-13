@@ -7,17 +7,23 @@
  * browser (unless --no-open is passed).
  *
  * Usage:
- *   npm run render -- path/to/plan.json
- *   npm run render -- path/to/plan.json --template summary --title "My PR"
- *   npm run render -- plan.json --apply apply.jsonl --title "PR #42"
- *   cat plan.json | npm run render --
+ *   npm run render -- path/to/show-plan.stdout
+ *   npm run render -- show-plan.stdout --template summary --title "My PR"
+ *   npm run render -- show-plan.stdout --apply apply.stdout --title "PR #42"
+ *   npm run render -- --steps path/to/steps.json --workspace myws
+ *   cat show-plan.stdout | npm run render --
  *
  * Flags:
+ *   --steps <file>              Steps JSON file (uses reportFromSteps)
  *   --apply <file>              Apply JSONL file (renders apply report)
  *   --title <text>              Heading title for the report
  *   --template <default|summary>  Output template (default: "default")
  *   --show-unchanged            Show unchanged attributes
  *   --diff-format <inline|simple> Diff style (default: "inline")
+ *   --workspace <name>          Workspace name (for title and dedup marker)
+ *   --logs-url <url>            Logs URL for truncation notices
+ *   --allowed-dirs <dirs>       Comma-separated allowed directories for file reading
+ *   --max-output-length <n>     Maximum output length in characters
  *   --no-open                   Write the HTML file but do not open a browser
  *   --help                      Show this help text
  */
@@ -25,8 +31,8 @@
 import { readFileSync } from "node:fs";
 import { writeFile } from "node:fs/promises";
 import { execSync } from "node:child_process";
-import { planToMarkdown, applyToMarkdown } from "../src/index.js";
-import type { Options } from "../src/index.js";
+import { planToMarkdown, applyToMarkdown, reportFromSteps } from "../src/index.js";
+import type { Options, ReportOptions } from "../src/index.js";
 
 // ---------------------------------------------------------------------------
 // Argument parsing
@@ -41,32 +47,53 @@ Renders a Terraform/OpenTofu plan JSON file to a browser HTML preview.
 Reads the plan from the given file path, or from stdin if the path is "-" or omitted.
 
 Options:
+  --steps <file>                  Steps JSON file (uses reportFromSteps instead of low-level API)
   --apply <file>                  Apply JSONL file (renders apply report instead of plan)
   --title <text>                  Heading title for the report
   --template <default|summary>    Output template (default: "default")
   --show-unchanged                Show unchanged resource attributes
   --diff-format <inline|simple>   Diff format for attribute changes (default: "inline")
+  --workspace <name>              Workspace name for title and dedup marker
+  --logs-url <url>                Logs URL for truncation notices (parses into env vars)
+  --allowed-dirs <dirs>           Comma-separated allowed directories for file reading
+  --max-output-length <n>         Maximum output length in characters
   --no-open                       Write the HTML file but do not open a browser
   --help                          Show this help text
 
 Examples:
-  npm run render -- tests/fixtures/generated/terraform/null-lifecycle/2/plan.json
-  npm run render -- plan.json --template summary --title "PR #42"
-  npm run render -- plan.json --apply apply.jsonl --title "PR #42"
-  cat plan.json | npm run render --
+  npm run render -- tests/fixtures/generated/terraform/null-lifecycle/2/show-plan.stdout
+  npm run render -- show-plan.stdout --template summary --title "PR #42"
+  npm run render -- show-plan.stdout --apply apply.stdout --title "PR #42"
+  npm run render -- --steps tests/fixtures/generated/terraform/null-lifecycle/2/steps.json
+  npm run render -- --steps steps.json --workspace myws --no-open
+  cat show-plan.stdout | npm run render --
 `);
   process.exit(0);
 }
 
-function parseArgs(argv: string[]): { file: string | null; applyFile: string | null; noOpen: boolean; options: Options } {
+interface ParsedArgs {
+  file: string | null;
+  applyFile: string | null;
+  stepsFile: string | null;
+  noOpen: boolean;
+  options: Options;
+  reportOptions: Partial<ReportOptions>;
+}
+
+function parseArgs(argv: string[]): ParsedArgs {
   const options: Options = {};
+  const reportOptions: Partial<ReportOptions> = {};
   let file: string | null = null;
   let applyFile: string | null = null;
+  let stepsFile: string | null = null;
   let noOpen = false;
 
   for (let i = 0; i < argv.length; i++) {
     const arg = argv[i];
     switch (arg) {
+      case "--steps":
+        stepsFile = argv[++i] ?? null;
+        break;
       case "--apply":
         applyFile = argv[++i] ?? null;
         break;
@@ -82,72 +109,49 @@ function parseArgs(argv: string[]): { file: string | null; applyFile: string | n
       case "--diff-format":
         options.diffFormat = argv[++i] as "inline" | "simple";
         break;
+      case "--workspace":
+        reportOptions.workspace = argv[++i];
+        break;
+      case "--logs-url": {
+        // Parse a GitHub Actions run URL into env vars for the library
+        const url = argv[++i];
+        if (url) {
+          const match = /github\.com\/([^/]+\/[^/]+)\/actions\/runs\/(\d+)(?:\/attempts\/(\d+))?/.exec(url);
+          if (match) {
+            reportOptions.env = {
+              GITHUB_REPOSITORY: match[1],
+              GITHUB_RUN_ID: match[2],
+              ...(match[3] ? { GITHUB_RUN_ATTEMPT: match[3] } : {}),
+            };
+          }
+        }
+        break;
+      }
+      case "--allowed-dirs":
+        reportOptions.allowedDirs = (argv[++i] ?? "").split(",").filter(Boolean);
+        break;
+      case "--max-output-length": {
+        const val = parseInt(argv[++i] ?? "", 10);
+        if (!isNaN(val)) reportOptions.maxOutputLength = val;
+        break;
+      }
       case "--no-open":
         noOpen = true;
         break;
       default:
-        if (!arg.startsWith("--") && file === null) {
+        if (arg && !arg.startsWith("--") && file === null) {
           file = arg;
         }
     }
   }
 
-  return { file, applyFile, noOpen, options };
+  return { file, applyFile, stepsFile, noOpen, options, reportOptions };
 }
 
-const { file, applyFile, noOpen, options } = parseArgs(args);
+const { file, applyFile, stepsFile, noOpen, options, reportOptions } = parseArgs(args);
 
 // ---------------------------------------------------------------------------
-// Read plan JSON
-// ---------------------------------------------------------------------------
-
-let planJson: string;
-try {
-  if (file === null || file === "-") {
-    planJson = readFileSync(process.stdin.fd, "utf-8");
-  } else {
-    planJson = readFileSync(file, "utf-8");
-  }
-} catch (err) {
-  const msg = err instanceof Error ? err.message : String(err);
-  process.stderr.write(`Error reading input: ${msg}\n`);
-  process.exit(1);
-}
-
-// ---------------------------------------------------------------------------
-// Read apply JSONL (if provided)
-// ---------------------------------------------------------------------------
-
-let applyJsonl: string | null = null;
-if (applyFile !== null) {
-  try {
-    applyJsonl = readFileSync(applyFile, "utf-8");
-  } catch (err) {
-    const msg = err instanceof Error ? err.message : String(err);
-    process.stderr.write(`Error reading apply file: ${msg}\n`);
-    process.exit(1);
-  }
-}
-
-// ---------------------------------------------------------------------------
-// Render markdown
-// ---------------------------------------------------------------------------
-
-let markdown: string;
-try {
-  if (applyJsonl !== null) {
-    markdown = applyToMarkdown(planJson, applyJsonl, options);
-  } else {
-    markdown = planToMarkdown(planJson, options);
-  }
-} catch (err) {
-  const msg = err instanceof Error ? err.message : String(err);
-  process.stderr.write(`Error rendering plan: ${msg}\n`);
-  process.exit(1);
-}
-
-// ---------------------------------------------------------------------------
-// Build HTML and write to /tmp
+// Shared: Build HTML and write to /tmp
 // ---------------------------------------------------------------------------
 
 /** Escape a string for safe embedding in a JS template literal inside HTML. */
@@ -158,14 +162,15 @@ function escapeForTemplateLiteral(s: string): string {
     .replace(/\$\{/g, "\\${");
 }
 
-const escapedMarkdown = escapeForTemplateLiteral(markdown);
+async function renderAndWrite(markdown: string, title: string | undefined, suppressOpen: boolean): Promise<void> {
+  const escapedMarkdown = escapeForTemplateLiteral(markdown);
 
-const html = `<!DOCTYPE html>
+  const html = `<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>${options.title ? options.title + " — " : ""}Plan Preview</title>
+  <title>${title ? title + " — " : ""}Plan Preview</title>
   <style>
     body {
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
@@ -208,34 +213,103 @@ const html = `<!DOCTYPE html>
 </body>
 </html>`;
 
-const outPath = "/tmp/tf-plan-preview.html";
+  const outPath = "/tmp/tf-plan-preview.html";
 
+  try {
+    await writeFile(outPath, html, "utf-8");
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : String(err);
+    process.stderr.write(`Error writing HTML file: ${msg}\n`);
+    process.exit(1);
+  }
+
+  if (!suppressOpen) {
+    try {
+      const opener =
+        process.platform === "darwin"
+          ? "open"
+          : process.platform === "win32"
+            ? "start"
+            : "xdg-open";
+      execSync(`${opener} ${outPath}`);
+    } catch {
+      process.stderr.write(`Could not open browser automatically. Open: file://${outPath}\n`);
+    }
+  }
+
+  console.log(`Preview written to ${outPath}`);
+}
+
+// ---------------------------------------------------------------------------
+// Steps mode (--steps)
+// ---------------------------------------------------------------------------
+
+if (stepsFile !== null) {
+  let stepsJson: string;
+  try {
+    stepsJson = readFileSync(stepsFile, "utf-8");
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : String(err);
+    process.stderr.write(`Error reading steps file: ${msg}\n`);
+    process.exit(1);
+  }
+
+  const { dirname, resolve } = await import("node:path");
+
+  const stepsOpts: ReportOptions = {
+    ...options,
+    ...reportOptions,
+  };
+
+  // Default allowed-dirs to the directory containing the steps file
+  if (!stepsOpts.allowedDirs) {
+    stepsOpts.allowedDirs = [resolve(dirname(stepsFile))];
+  }
+
+  const markdown = reportFromSteps(stepsJson, stepsOpts);
+  await renderAndWrite(markdown, options.title, noOpen);
+  process.exit(0);
+}
+
+// ---------------------------------------------------------------------------
+// Legacy mode: direct plan JSON / apply JSONL
+// ---------------------------------------------------------------------------
+
+let planJson: string;
 try {
-  await writeFile(outPath, html, "utf-8");
+  if (file === null || file === "-") {
+    planJson = readFileSync(process.stdin.fd, "utf-8");
+  } else {
+    planJson = readFileSync(file, "utf-8");
+  }
 } catch (err) {
   const msg = err instanceof Error ? err.message : String(err);
-  process.stderr.write(`Error writing HTML file: ${msg}\n`);
+  process.stderr.write(`Error reading input: ${msg}\n`);
   process.exit(1);
 }
 
-// ---------------------------------------------------------------------------
-// Open in browser (suppressed by --no-open)
-// ---------------------------------------------------------------------------
-
-if (!noOpen) {
+let applyJsonl: string | null = null;
+if (applyFile !== null) {
   try {
-    // macOS: open, Linux: xdg-open, Windows: start
-    const opener =
-      process.platform === "darwin"
-        ? "open"
-        : process.platform === "win32"
-          ? "start"
-          : "xdg-open";
-    execSync(`${opener} ${outPath}`);
-  } catch {
-    // Opening the browser is best-effort; tell the user the path instead
-    process.stderr.write(`Could not open browser automatically. Open: file://${outPath}\n`);
+    applyJsonl = readFileSync(applyFile, "utf-8");
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : String(err);
+    process.stderr.write(`Error reading apply file: ${msg}\n`);
+    process.exit(1);
   }
 }
 
-console.log(`Preview written to ${outPath}`);
+let markdown: string;
+try {
+  if (applyJsonl !== null) {
+    markdown = applyToMarkdown(planJson, applyJsonl, options);
+  } else {
+    markdown = planToMarkdown(planJson, options);
+  }
+} catch (err) {
+  const msg = err instanceof Error ? err.message : String(err);
+  process.stderr.write(`Error rendering plan: ${msg}\n`);
+  process.exit(1);
+}
+
+await renderAndWrite(markdown, options.title, noOpen);

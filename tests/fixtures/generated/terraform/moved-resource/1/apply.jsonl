@@ -1,3 +1,0 @@
-{"@level":"info","@message":"Terraform 1.14.6","@module":"terraform.ui","@timestamp":"2026-03-12T15:49:39.998018-07:00","terraform":"1.14.6","type":"version","ui":"1.2"}
-{"@level":"info","@message":"Apply complete! Resources: 0 added, 0 changed, 0 destroyed.","@module":"terraform.ui","@timestamp":"2026-03-12T15:49:40.073232-07:00","changes":{"add":0,"change":0,"import":0,"remove":0,"action_invocation":0,"operation":"apply"},"type":"change_summary"}
-{"@level":"info","@message":"Outputs: 0","@module":"terraform.ui","@timestamp":"2026-03-12T15:49:40.074121-07:00","outputs":{},"type":"outputs"}

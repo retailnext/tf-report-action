@@ -109,7 +109,7 @@ function reportFromStepsInner(
 
   // Reader options
   const readerOpts: ReaderOptions = {
-    allowedDirs: options?.allowedDirs ?? [env.RUNNER_TEMP ?? tmpdir()],
+    allowedDirs: options?.allowedDirs ?? [env["RUNNER_TEMP"] ?? tmpdir()],
     maxFileSize: DEFAULT_MAX_FILE_SIZE,
     maxDisplayRead: DEFAULT_MAX_DISPLAY_READ,
   };
@@ -197,7 +197,8 @@ function reportFromStepsInner(
   }
 
   // Render the report body (without title — we handle title separately)
-  const reportMarkdown = renderReport(report, { ...renderOpts, title: undefined });
+  const { title: _title, ...renderOptsNoTitle } = renderOpts ?? {};
+  const reportMarkdown = renderReport(report, renderOptsNoTitle);
   sections.push({ id: "report-body", full: reportMarkdown });
 
   // Truncation notice (reserved space)
@@ -240,9 +241,16 @@ function detectTier(
 
   // Tier 3: Raw text fallback (plan or apply step present but no structured data)
   if (planStep || applyStep) {
-    const planStdout = planStep ? readStepStdout(planStep, readerOpts) : undefined;
-    const applyStdout = applyStep ? readStepStdout(applyStep, readerOpts) : undefined;
-    return { kind: "tier3", planStdout, applyStdout };
+    const result: { kind: "tier3"; planStdout?: string; applyStdout?: string } = { kind: "tier3" };
+    if (planStep) {
+      const stdout = readStepStdout(planStep, readerOpts);
+      if (stdout !== undefined) result.planStdout = stdout;
+    }
+    if (applyStep) {
+      const stdout = readStepStdout(applyStep, readerOpts);
+      if (stdout !== undefined) result.applyStdout = stdout;
+    }
+    return result;
   }
 
   // Tier 4: General workflow
@@ -355,10 +363,10 @@ function escapeMarkerWorkspace(workspace: string): string {
 // ─── Logs URL ───────────────────────────────────────────────────────────────
 
 function buildLogsUrl(env: Env): string | undefined {
-  const repo = env.GITHUB_REPOSITORY;
-  const runId = env.GITHUB_RUN_ID;
+  const repo = env["GITHUB_REPOSITORY"];
+  const runId = env["GITHUB_RUN_ID"];
   if (!repo || !runId) return undefined;
-  const attempt = env.GITHUB_RUN_ATTEMPT ?? "1";
+  const attempt = env["GITHUB_RUN_ATTEMPT"] ?? "1";
   return `https://github.com/${repo}/actions/runs/${runId}/attempts/${attempt}`;
 }
 

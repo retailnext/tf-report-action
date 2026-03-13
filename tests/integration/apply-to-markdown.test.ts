@@ -1,55 +1,14 @@
-import { readFileSync, readdirSync, existsSync } from "node:fs";
-import { join, dirname } from "node:path";
-import { fileURLToPath } from "node:url";
 import { describe, it, expect, beforeAll } from "vitest";
 import { applyToMarkdown } from "../../src/index.js";
 import type { Options } from "../../src/index.js";
-
-const __dirname = dirname(fileURLToPath(import.meta.url));
-const GENERATED_DIR = join(__dirname, "../../tests/fixtures/generated");
-
-/**
- * Discovers all fixture stages that have both plan.json and apply.jsonl.
- * Returns an array ready for parameterized tests.
- */
-function discoverApplyFixtures(): {
-  label: string;
-  planJson: string;
-  applyJsonl: string;
-}[] {
-  if (!existsSync(GENERATED_DIR)) {
-    return [];
-  }
-
-  const fixtures: { label: string; planJson: string; applyJsonl: string }[] = [];
-
-  for (const tool of readdirSync(GENERATED_DIR).sort()) {
-    const toolDir = join(GENERATED_DIR, tool);
-    for (const workspace of readdirSync(toolDir).sort()) {
-      const wsDir = join(toolDir, workspace);
-      for (const stage of readdirSync(wsDir).sort()) {
-        const planPath = join(wsDir, stage, "plan.json");
-        const applyPath = join(wsDir, stage, "apply.jsonl");
-        if (existsSync(planPath) && existsSync(applyPath)) {
-          fixtures.push({
-            label: `${String(tool)}/${String(workspace)}/${String(stage)}`,
-            planJson: readFileSync(planPath, "utf-8"),
-            applyJsonl: readFileSync(applyPath, "utf-8"),
-          });
-        }
-      }
-    }
-  }
-
-  return fixtures;
-}
+import { discoverApplyFixtures } from "../helpers/fixture-loader.js";
 
 const fixtures = discoverApplyFixtures();
 
 beforeAll(() => {
   if (fixtures.length === 0) {
     throw new Error(
-      "No apply fixture pairs (plan.json + apply.jsonl) found under " +
+      "No apply fixture pairs (show-plan.stdout + apply.stdout) found under " +
         "tests/fixtures/generated/. Run: bash scripts/generate-fixtures.sh",
     );
   }

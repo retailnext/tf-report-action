@@ -45,7 +45,7 @@ _(all values known after apply)_
 
 | Output | Action | Before | After |
 | --- | --- | --- | --- |
-| depends_on_fail_output | ➕ |  | <code>4087683683299475011</code> |
+| depends_on_fail_output | ➕ |  | <code>1333133842861382926</code> |
 | success_output | ➕ |  | <code>stable</code> |
 "
 `;
@@ -78,7 +78,7 @@ exports[`applyToMarkdown integration > terraform/apply-error/1 > renders without
 
 | Attribute | Before | After |
 | --- | --- | --- |
-| id | 4087683683299475011 | <code><ins style="background:#dfd">(value not in plan)</ins><del style="background:#fdd">4087683683299475011</del></code> |
+| id | 1333133842861382926 | <code><ins style="background:#dfd">(value not in plan)</ins><del style="background:#fdd">1333133842861382926</del></code> |
 | triggers.value | v1 | <code>v<ins style="background:#dfd">2</ins><del style="background:#fdd">1</del></code> |
 
 🚨 **local-exec provisioner error**
@@ -93,7 +93,7 @@ Error running command 'exit 1': exit status 1. Output:
 
 | Output | Action | Before | After |
 | --- | --- | --- | --- |
-| depends_on_fail_output | 🔧 | <code>4087683683299475011</code> | _(value not in plan)_ |
+| depends_on_fail_output | 🔧 | <code>1333133842861382926</code> | _(value not in plan)_ |
 | success_output | ⬜ | <code>stable</code> | <code>stable</code> |
 "
 `;
@@ -537,6 +537,74 @@ _No changes._
 "
 `;
 
+exports[`applyToMarkdown integration > terraform/no-detailed-exitcode/0 > renders without error and matches snapshot [default] 1`] = `
+"## Apply Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Added | null_resource | 1 |
+|  | **Added** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>➕ <strong>null_resource</strong> example</summary>
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id |  | <code><ins style="background:#dfd">(value not in plan)</ins></code> |
+| triggers.value |  | <code><ins style="background:#dfd">hello</ins></code> |
+
+</details>
+"
+`;
+
+exports[`applyToMarkdown integration > terraform/no-detailed-exitcode/0 > renders without error and matches snapshot [summary-template] 1`] = `
+"## Apply Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Added | null_resource | 1 |
+|  | **Added** | **1** |
+"
+`;
+
+exports[`applyToMarkdown integration > terraform/no-detailed-exitcode/1 > renders without error and matches snapshot [default] 1`] = `
+"## Apply Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| 🗑️ Destroyed | null_resource | 1 |
+|  | **Destroyed** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>🗑️ <strong>null_resource</strong> example</summary>
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | 6731693634269766345 | <code><del style="background:#fdd">6731693634269766345</del></code> |
+| triggers.value | hello | <code><del style="background:#fdd">hello</del></code> |
+
+</details>
+"
+`;
+
+exports[`applyToMarkdown integration > terraform/no-detailed-exitcode/1 > renders without error and matches snapshot [summary-template] 1`] = `
+"## Apply Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| 🗑️ Destroyed | null_resource | 1 |
+|  | **Destroyed** | **1** |
+"
+`;
+
 exports[`applyToMarkdown integration > terraform/no-op/0 > renders without error and matches snapshot [default] 1`] = `
 "## Apply Summary
 
@@ -679,7 +747,7 @@ exports[`applyToMarkdown integration > terraform/null-lifecycle/2 > renders with
 
 | Attribute | Before | After |
 | --- | --- | --- |
-| id | 213595770957776808 | <code><ins style="background:#dfd">(value not in plan)</ins><del style="background:#fdd">213595770957776808</del></code> |
+| id | 7075989991347468682 | <code><ins style="background:#dfd">(value not in plan)</ins><del style="background:#fdd">7075989991347468682</del></code> |
 | triggers.version | 1 | <code><ins style="background:#dfd">2</ins><del style="background:#fdd">1</del></code> |
 
 </details>
@@ -689,7 +757,7 @@ exports[`applyToMarkdown integration > terraform/null-lifecycle/2 > renders with
 
 | Attribute | Before | After |
 | --- | --- | --- |
-| id | 1758128641062510369 | <code><del style="background:#fdd">1758128641062510369</del></code> |
+| id | 7764310596128124781 | <code><del style="background:#fdd">7764310596128124781</del></code> |
 | triggers.label | beta | <code><del style="background:#fdd">beta</del></code> |
 | triggers.version | 1 | <code><del style="background:#fdd">1</del></code> |
 
@@ -789,9 +857,9 @@ exports[`applyToMarkdown integration > terraform/random-replace/1 > renders with
 
 | Attribute | Before | After |
 | --- | --- | --- |
-| id | tzMUTVchmp4PvQEV | <code><ins style="background:#dfd">(value no</ins>t<del style="background:#fdd">zMUTVchm</del><ins style="background:#dfd"> in </ins>p<ins style="background:#dfd">lan)</ins><del style="background:#fdd">4PvQEV</del></code> |
+| id | khtIkoRBTQCMY2tr | <code><del style="background:#fdd">khtIk</del><ins style="background:#dfd">(value n</ins>o<del style="background:#fdd">RBTQCMY2</del>t<ins style="background:#dfd"> in plan)</ins><del style="background:#fdd">r</del></code> |
 | keepers.rotation | v1 | <code>v<ins style="background:#dfd">2</ins><del style="background:#fdd">1</del></code> |
-| result | tzMUTVchmp4PvQEV | <code><ins style="background:#dfd">(value no</ins>t<del style="background:#fdd">zMUTVchm</del><ins style="background:#dfd"> in </ins>p<ins style="background:#dfd">lan)</ins><del style="background:#fdd">4PvQEV</del></code> |
+| result | khtIkoRBTQCMY2tr | <code><del style="background:#fdd">khtIk</del><ins style="background:#dfd">(value n</ins>o<del style="background:#fdd">RBTQCMY2</del>t<ins style="background:#dfd"> in plan)</ins><del style="background:#fdd">r</del></code> |
 
 </details>
 
@@ -962,8 +1030,8 @@ exports[`applyToMarkdown integration > terraform/with-modules/0 > renders withou
 
 | Output | Action | Before | After |
 | --- | --- | --- | --- |
-| generated_name | ➕ |  | <code>fixture-j8ew5m0w</code> |
-| root_id | ➕ |  | <code>2144442739604638015</code> |
+| generated_name | ➕ |  | <code>fixture-3wbknn0r</code> |
+| root_id | ➕ |  | <code>3710917372097226226</code> |
 "
 `;
 
@@ -996,7 +1064,7 @@ exports[`applyToMarkdown integration > terraform/with-modules/1 > renders withou
 
 | Attribute | Before | After |
 | --- | --- | --- |
-| id | 2144442739604638015 | <code><ins style="background:#dfd">(value not in plan)</ins><del style="background:#fdd">2144442739604638015</del></code> |
+| id | 3710917372097226226 | <code><ins style="background:#dfd">(value not in plan)</ins><del style="background:#fdd">3710917372097226226</del></code> |
 | triggers.stage | 0 | <code><ins style="background:#dfd">1</ins><del style="background:#fdd">0</del></code> |
 
 </details>
@@ -1008,9 +1076,9 @@ exports[`applyToMarkdown integration > terraform/with-modules/1 > renders withou
 
 | Attribute | Before | After |
 | --- | --- | --- |
-| id | j8ew5m0w | <code><del style="background:#fdd">j8</del><ins style="background:#dfd">(valu</ins>e<ins style="background:#dfd"> not in plan)</ins><del style="background:#fdd">w5m0w</del></code> |
+| id | 3wbknn0r | <code><del style="background:#fdd">3wbk</del><ins style="background:#dfd">(value not i</ins>n<ins style="background:#dfd"> pla</ins>n<ins style="background:#dfd">)</ins><del style="background:#fdd">0r</del></code> |
 | keepers.prefix | fixture | <code>fixtur<ins style="background:#dfd">e-updat</ins>e<ins style="background:#dfd">d</ins></code> |
-| result | j8ew5m0w | <code><del style="background:#fdd">j8</del><ins style="background:#dfd">(valu</ins>e<ins style="background:#dfd"> not in plan)</ins><del style="background:#fdd">w5m0w</del></code> |
+| result | 3wbknn0r | <code><del style="background:#fdd">3wbk</del><ins style="background:#dfd">(value not i</ins>n<ins style="background:#dfd"> pla</ins>n<ins style="background:#dfd">)</ins><del style="background:#fdd">0r</del></code> |
 
 </details>
 
@@ -1018,8 +1086,8 @@ exports[`applyToMarkdown integration > terraform/with-modules/1 > renders withou
 
 | Output | Action | Before | After |
 | --- | --- | --- | --- |
-| generated_name | 🔧 | <code>fixture-j8ew5m0w</code> | <code>fixture-updated-x6r4gtbe</code> |
-| root_id | 🔧 | <code>2144442739604638015</code> | <code>7879698619844557763</code> |
+| generated_name | 🔧 | <code>fixture-3wbknn0r</code> | <code>fixture-updated-5z6zcmjz</code> |
+| root_id | 🔧 | <code>3710917372097226226</code> | <code>625156988634846531</code> |
 "
 `;
 
@@ -1079,7 +1147,7 @@ _(all values known after apply)_
 
 | Output | Action | Before | After |
 | --- | --- | --- | --- |
-| depends_on_fail_output | ➕ |  | <code>3427955069007833543</code> |
+| depends_on_fail_output | ➕ |  | <code>338768219485023028</code> |
 | success_output | ➕ |  | <code>stable</code> |
 "
 `;
@@ -1112,7 +1180,7 @@ exports[`applyToMarkdown integration > tofu/apply-error/1 > renders without erro
 
 | Attribute | Before | After |
 | --- | --- | --- |
-| id | 3427955069007833543 | <code><ins style="background:#dfd">(value not in plan)</ins><del style="background:#fdd">3427955069007833543</del></code> |
+| id | 338768219485023028 | <code><ins style="background:#dfd">(value not in plan)</ins><del style="background:#fdd">338768219485023028</del></code> |
 | triggers.value | v1 | <code>v<ins style="background:#dfd">2</ins><del style="background:#fdd">1</del></code> |
 
 🚨 **local-exec provisioner error**
@@ -1127,7 +1195,7 @@ Error running command 'exit 1': exit status 1. Output:
 
 | Output | Action | Before | After |
 | --- | --- | --- | --- |
-| depends_on_fail_output | 🔧 | <code>3427955069007833543</code> | _(value not in plan)_ |
+| depends_on_fail_output | 🔧 | <code>338768219485023028</code> | _(value not in plan)_ |
 | success_output | ⬜ | <code>stable</code> | <code>stable</code> |
 "
 `;
@@ -1571,6 +1639,74 @@ _No changes._
 "
 `;
 
+exports[`applyToMarkdown integration > tofu/no-detailed-exitcode/0 > renders without error and matches snapshot [default] 1`] = `
+"## Apply Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Added | null_resource | 1 |
+|  | **Added** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>➕ <strong>null_resource</strong> example</summary>
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id |  | <code><ins style="background:#dfd">(value not in plan)</ins></code> |
+| triggers.value |  | <code><ins style="background:#dfd">hello</ins></code> |
+
+</details>
+"
+`;
+
+exports[`applyToMarkdown integration > tofu/no-detailed-exitcode/0 > renders without error and matches snapshot [summary-template] 1`] = `
+"## Apply Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Added | null_resource | 1 |
+|  | **Added** | **1** |
+"
+`;
+
+exports[`applyToMarkdown integration > tofu/no-detailed-exitcode/1 > renders without error and matches snapshot [default] 1`] = `
+"## Apply Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| 🗑️ Destroyed | null_resource | 1 |
+|  | **Destroyed** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>🗑️ <strong>null_resource</strong> example</summary>
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | 1738881386286482997 | <code><del style="background:#fdd">1738881386286482997</del></code> |
+| triggers.value | hello | <code><del style="background:#fdd">hello</del></code> |
+
+</details>
+"
+`;
+
+exports[`applyToMarkdown integration > tofu/no-detailed-exitcode/1 > renders without error and matches snapshot [summary-template] 1`] = `
+"## Apply Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| 🗑️ Destroyed | null_resource | 1 |
+|  | **Destroyed** | **1** |
+"
+`;
+
 exports[`applyToMarkdown integration > tofu/no-op/0 > renders without error and matches snapshot [default] 1`] = `
 "## Apply Summary
 
@@ -1713,7 +1849,7 @@ exports[`applyToMarkdown integration > tofu/null-lifecycle/2 > renders without e
 
 | Attribute | Before | After |
 | --- | --- | --- |
-| id | 853564024198655950 | <code><ins style="background:#dfd">(value not in plan)</ins><del style="background:#fdd">853564024198655950</del></code> |
+| id | 4885286028855289750 | <code><ins style="background:#dfd">(value not in plan)</ins><del style="background:#fdd">4885286028855289750</del></code> |
 | triggers.version | 1 | <code><ins style="background:#dfd">2</ins><del style="background:#fdd">1</del></code> |
 
 </details>
@@ -1723,7 +1859,7 @@ exports[`applyToMarkdown integration > tofu/null-lifecycle/2 > renders without e
 
 | Attribute | Before | After |
 | --- | --- | --- |
-| id | 9151067304205701686 | <code><del style="background:#fdd">9151067304205701686</del></code> |
+| id | 2499743340329344933 | <code><del style="background:#fdd">2499743340329344933</del></code> |
 | triggers.label | beta | <code><del style="background:#fdd">beta</del></code> |
 | triggers.version | 1 | <code><del style="background:#fdd">1</del></code> |
 
@@ -1823,9 +1959,9 @@ exports[`applyToMarkdown integration > tofu/random-replace/1 > renders without e
 
 | Attribute | Before | After |
 | --- | --- | --- |
-| id | R4IESke5pQL3ac2n | <code><del style="background:#fdd">R4IESk</del><ins style="background:#dfd">(valu</ins>e<del style="background:#fdd">5</del><ins style="background:#dfd"> not in </ins>p<del style="background:#fdd">QL3</del><ins style="background:#dfd">l</ins>a<del style="background:#fdd">c2</del>n<ins style="background:#dfd">)</ins></code> |
+| id | la38OMFFcW63nwiZ | <code><ins style="background:#dfd">(value not in p</ins>la<del style="background:#fdd">38OMFFcW63</del>n<ins style="background:#dfd">)</ins><del style="background:#fdd">wiZ</del></code> |
 | keepers.rotation | v1 | <code>v<ins style="background:#dfd">2</ins><del style="background:#fdd">1</del></code> |
-| result | R4IESke5pQL3ac2n | <code><del style="background:#fdd">R4IESk</del><ins style="background:#dfd">(valu</ins>e<del style="background:#fdd">5</del><ins style="background:#dfd"> not in </ins>p<del style="background:#fdd">QL3</del><ins style="background:#dfd">l</ins>a<del style="background:#fdd">c2</del>n<ins style="background:#dfd">)</ins></code> |
+| result | la38OMFFcW63nwiZ | <code><ins style="background:#dfd">(value not in p</ins>la<del style="background:#fdd">38OMFFcW63</del>n<ins style="background:#dfd">)</ins><del style="background:#fdd">wiZ</del></code> |
 
 </details>
 
@@ -1996,8 +2132,8 @@ exports[`applyToMarkdown integration > tofu/with-modules/0 > renders without err
 
 | Output | Action | Before | After |
 | --- | --- | --- | --- |
-| generated_name | ➕ |  | <code>fixture-ciowl5m8</code> |
-| root_id | ➕ |  | <code>6699555983704823768</code> |
+| generated_name | ➕ |  | <code>fixture-27zvhlu0</code> |
+| root_id | ➕ |  | <code>1951266549668774856</code> |
 "
 `;
 
@@ -2030,7 +2166,7 @@ exports[`applyToMarkdown integration > tofu/with-modules/1 > renders without err
 
 | Attribute | Before | After |
 | --- | --- | --- |
-| id | 6699555983704823768 | <code><ins style="background:#dfd">(value not in plan)</ins><del style="background:#fdd">6699555983704823768</del></code> |
+| id | 1951266549668774856 | <code><ins style="background:#dfd">(value not in plan)</ins><del style="background:#fdd">1951266549668774856</del></code> |
 | triggers.stage | 0 | <code><ins style="background:#dfd">1</ins><del style="background:#fdd">0</del></code> |
 
 </details>
@@ -2042,9 +2178,9 @@ exports[`applyToMarkdown integration > tofu/with-modules/1 > renders without err
 
 | Attribute | Before | After |
 | --- | --- | --- |
-| id | ciowl5m8 | <code><del style="background:#fdd">c</del><ins style="background:#dfd">(value not </ins>i<del style="background:#fdd">ow</del><ins style="background:#dfd">n p</ins>l<ins style="background:#dfd">an)</ins><del style="background:#fdd">5m8</del></code> |
+| id | 27zvhlu0 | <code><del style="background:#fdd">27z</del><ins style="background:#dfd">(</ins>v<del style="background:#fdd">h</del><ins style="background:#dfd">a</ins>lu<ins style="background:#dfd">e not in plan)</ins><del style="background:#fdd">0</del></code> |
 | keepers.prefix | fixture | <code>fixtur<ins style="background:#dfd">e-updat</ins>e<ins style="background:#dfd">d</ins></code> |
-| result | ciowl5m8 | <code><del style="background:#fdd">c</del><ins style="background:#dfd">(value not </ins>i<del style="background:#fdd">ow</del><ins style="background:#dfd">n p</ins>l<ins style="background:#dfd">an)</ins><del style="background:#fdd">5m8</del></code> |
+| result | 27zvhlu0 | <code><del style="background:#fdd">27z</del><ins style="background:#dfd">(</ins>v<del style="background:#fdd">h</del><ins style="background:#dfd">a</ins>lu<ins style="background:#dfd">e not in plan)</ins><del style="background:#fdd">0</del></code> |
 
 </details>
 
@@ -2052,8 +2188,8 @@ exports[`applyToMarkdown integration > tofu/with-modules/1 > renders without err
 
 | Output | Action | Before | After |
 | --- | --- | --- | --- |
-| generated_name | 🔧 | <code>fixture-ciowl5m8</code> | <code>fixture-updated-to0e1ocz</code> |
-| root_id | 🔧 | <code>6699555983704823768</code> | <code>743551407105354033</code> |
+| generated_name | 🔧 | <code>fixture-27zvhlu0</code> | <code>fixture-updated-dz1wjz16</code> |
+| root_id | 🔧 | <code>1951266549668774856</code> | <code>5320907188153630714</code> |
 "
 `;
 
