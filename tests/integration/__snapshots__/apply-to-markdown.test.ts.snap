@@ -80,7 +80,7 @@ exports[`applyToMarkdown integration > terraform/apply-error/1 > renders without
 
 | Action | Count |
 | --- | --- |
-| ♻️ Replace | 1 |
+| ± Replace | 1 |
 | **Total** | **1** |
 
 ### Resource Outcomes
@@ -104,7 +104,7 @@ Error running command 'exit 1': exit status 1. Output:
 ### 📦 Module: root
 
 <details>
-<summary>♻️ <strong>null_resource</strong> will_fail</summary>
+<summary>± <strong>null_resource</strong> will_fail</summary>
 
 | Attribute | Before | After |
 | --- | --- | --- |
@@ -127,7 +127,7 @@ exports[`applyToMarkdown integration > terraform/apply-error/1 > renders without
 
 | Action | Count |
 | --- | --- |
-| ♻️ Replace | 1 |
+| ± Replace | 1 |
 | **Total** | **1** |
 
 ### Resource Outcomes
@@ -348,7 +348,7 @@ exports[`applyToMarkdown integration > terraform/deferred-data-source/2 > render
 | Action | Count |
 | --- | --- |
 | 🔧 Change | 1 |
-| ♻️ Replace | 1 |
+| ± Replace | 1 |
 | **Total** | **2** |
 
 ### Resource Outcomes
@@ -364,7 +364,7 @@ exports[`applyToMarkdown integration > terraform/deferred-data-source/2 > render
 ### 📦 Module: root
 
 <details>
-<summary>♻️ <strong>local_file</strong> config</summary>
+<summary>± <strong>local_file</strong> config</summary>
 
 | Attribute | Before | After |
 | --- | --- | --- |
@@ -414,7 +414,7 @@ exports[`applyToMarkdown integration > terraform/deferred-data-source/2 > render
 | Action | Count |
 | --- | --- |
 | 🔧 Change | 1 |
-| ♻️ Replace | 1 |
+| ± Replace | 1 |
 | **Total** | **2** |
 
 ### Resource Outcomes
@@ -514,7 +514,7 @@ exports[`applyToMarkdown integration > terraform/local-files/1 > renders without
 
 | Action | Count |
 | --- | --- |
-| ♻️ Replace | 1 |
+| ± Replace | 1 |
 | **Total** | **1** |
 
 ### Resource Outcomes
@@ -528,7 +528,7 @@ exports[`applyToMarkdown integration > terraform/local-files/1 > renders without
 ### 📦 Module: root
 
 <details>
-<summary>♻️ <strong>local_file</strong> readme</summary>
+<summary>± <strong>local_file</strong> readme</summary>
 
 | Attribute | Before | After |
 | --- | --- | --- |
@@ -582,7 +582,7 @@ exports[`applyToMarkdown integration > terraform/local-files/1 > renders without
 
 | Action | Count |
 | --- | --- |
-| ♻️ Replace | 1 |
+| ± Replace | 1 |
 | **Total** | **1** |
 
 ### Resource Outcomes
@@ -818,8 +818,8 @@ exports[`applyToMarkdown integration > terraform/null-lifecycle/2 > renders with
 | Action | Count |
 | --- | --- |
 | 🔧 Change | 1 |
-| ❌ Destroy | 1 |
-| ♻️ Replace | 1 |
+| 🗑️ Destroy | 1 |
+| ± Replace | 1 |
 | **Total** | **3** |
 
 ### Resource Outcomes
@@ -828,14 +828,14 @@ exports[`applyToMarkdown integration > terraform/null-lifecycle/2 > renders with
 | --- | --- | --- | --- |
 | ✅ | \`terraform_data.meta\` | 🔧 | 0s |
 | ✅ | \`null_resource.alpha\` | ➕ | 0s |
-| ✅ | \`null_resource.beta\` | ❌ | 0s |
+| ✅ | \`null_resource.beta\` | 🗑️ | 0s |
 
 ## Resource Changes
 
 ### 📦 Module: root
 
 <details>
-<summary>♻️ <strong>null_resource</strong> alpha</summary>
+<summary>± <strong>null_resource</strong> alpha</summary>
 
 | Attribute | Before | After |
 | --- | --- | --- |
@@ -845,7 +845,7 @@ exports[`applyToMarkdown integration > terraform/null-lifecycle/2 > renders with
 </details>
 
 <details>
-<summary>❌ <strong>null_resource</strong> beta</summary>
+<summary>🗑️ <strong>null_resource</strong> beta</summary>
 
 | Attribute | Before | After |
 | --- | --- | --- |
@@ -873,8 +873,8 @@ exports[`applyToMarkdown integration > terraform/null-lifecycle/2 > renders with
 | Action | Count |
 | --- | --- |
 | 🔧 Change | 1 |
-| ❌ Destroy | 1 |
-| ♻️ Replace | 1 |
+| 🗑️ Destroy | 1 |
+| ± Replace | 1 |
 | **Total** | **3** |
 
 ### Resource Outcomes
@@ -883,7 +883,7 @@ exports[`applyToMarkdown integration > terraform/null-lifecycle/2 > renders with
 | --- | --- | --- | --- |
 | ✅ | \`terraform_data.meta\` | 🔧 | 0s |
 | ✅ | \`null_resource.alpha\` | ➕ | 0s |
-| ✅ | \`null_resource.beta\` | ❌ | 0s |
+| ✅ | \`null_resource.beta\` | 🗑️ | 0s |
 "
 `;
 
@@ -955,7 +955,7 @@ exports[`applyToMarkdown integration > terraform/random-replace/1 > renders with
 
 | Action | Count |
 | --- | --- |
-| ♻️ Replace | 1 |
+| ± Replace | 1 |
 | **Total** | **1** |
 
 ### Resource Outcomes
@@ -969,7 +969,7 @@ exports[`applyToMarkdown integration > terraform/random-replace/1 > renders with
 ### 📦 Module: root
 
 <details>
-<summary>♻️ <strong>random_string</strong> token</summary>
+<summary>± <strong>random_string</strong> token</summary>
 
 | Attribute | Before | After |
 | --- | --- | --- |
@@ -992,7 +992,7 @@ exports[`applyToMarkdown integration > terraform/random-replace/1 > renders with
 
 | Action | Count |
 | --- | --- |
-| ♻️ Replace | 1 |
+| ± Replace | 1 |
 | **Total** | **1** |
 
 ### Resource Outcomes
@@ -1071,7 +1071,7 @@ exports[`applyToMarkdown integration > terraform/sensitive-values/1 > renders wi
 
 | Action | Count |
 | --- | --- |
-| ♻️ Replace | 1 |
+| ± Replace | 1 |
 | **Total** | **1** |
 
 ### Resource Outcomes
@@ -1085,7 +1085,7 @@ exports[`applyToMarkdown integration > terraform/sensitive-values/1 > renders wi
 ### 📦 Module: root
 
 <details>
-<summary>♻️ <strong>local_sensitive_file</strong> secret</summary>
+<summary>± <strong>local_sensitive_file</strong> secret</summary>
 
 | Attribute | Before | After |
 | --- | --- | --- |
@@ -1115,7 +1115,7 @@ exports[`applyToMarkdown integration > terraform/sensitive-values/1 > renders wi
 
 | Action | Count |
 | --- | --- |
-| ♻️ Replace | 1 |
+| ± Replace | 1 |
 | **Total** | **1** |
 
 ### Resource Outcomes
@@ -1209,7 +1209,7 @@ exports[`applyToMarkdown integration > terraform/with-modules/1 > renders withou
 
 | Action | Count |
 | --- | --- |
-| ♻️ Replace | 2 |
+| ± Replace | 2 |
 | **Total** | **2** |
 
 ### Resource Outcomes
@@ -1224,7 +1224,7 @@ exports[`applyToMarkdown integration > terraform/with-modules/1 > renders withou
 ### 📦 Module: root
 
 <details>
-<summary>♻️ <strong>null_resource</strong> root</summary>
+<summary>± <strong>null_resource</strong> root</summary>
 
 | Attribute | Before | After |
 | --- | --- | --- |
@@ -1236,7 +1236,7 @@ exports[`applyToMarkdown integration > terraform/with-modules/1 > renders withou
 ### 📦 Module: \`module.naming\`
 
 <details>
-<summary>♻️ <strong>random_string</strong> suffix</summary>
+<summary>± <strong>random_string</strong> suffix</summary>
 
 | Attribute | Before | After |
 | --- | --- | --- |
@@ -1260,7 +1260,7 @@ exports[`applyToMarkdown integration > terraform/with-modules/1 > renders withou
 
 | Action | Count |
 | --- | --- |
-| ♻️ Replace | 2 |
+| ± Replace | 2 |
 | **Total** | **2** |
 
 ### Resource Outcomes
@@ -1352,7 +1352,7 @@ exports[`applyToMarkdown integration > tofu/apply-error/1 > renders without erro
 
 | Action | Count |
 | --- | --- |
-| ♻️ Replace | 1 |
+| ± Replace | 1 |
 | **Total** | **1** |
 
 ### Resource Outcomes
@@ -1376,7 +1376,7 @@ Error running command 'exit 1': exit status 1. Output:
 ### 📦 Module: root
 
 <details>
-<summary>♻️ <strong>null_resource</strong> will_fail</summary>
+<summary>± <strong>null_resource</strong> will_fail</summary>
 
 | Attribute | Before | After |
 | --- | --- | --- |
@@ -1399,7 +1399,7 @@ exports[`applyToMarkdown integration > tofu/apply-error/1 > renders without erro
 
 | Action | Count |
 | --- | --- |
-| ♻️ Replace | 1 |
+| ± Replace | 1 |
 | **Total** | **1** |
 
 ### Resource Outcomes
@@ -1620,7 +1620,7 @@ exports[`applyToMarkdown integration > tofu/deferred-data-source/2 > renders wit
 | Action | Count |
 | --- | --- |
 | 🔧 Change | 1 |
-| ♻️ Replace | 1 |
+| ± Replace | 1 |
 | **Total** | **2** |
 
 ### Resource Outcomes
@@ -1636,7 +1636,7 @@ exports[`applyToMarkdown integration > tofu/deferred-data-source/2 > renders wit
 ### 📦 Module: root
 
 <details>
-<summary>♻️ <strong>local_file</strong> config</summary>
+<summary>± <strong>local_file</strong> config</summary>
 
 | Attribute | Before | After |
 | --- | --- | --- |
@@ -1686,7 +1686,7 @@ exports[`applyToMarkdown integration > tofu/deferred-data-source/2 > renders wit
 | Action | Count |
 | --- | --- |
 | 🔧 Change | 1 |
-| ♻️ Replace | 1 |
+| ± Replace | 1 |
 | **Total** | **2** |
 
 ### Resource Outcomes
@@ -1786,7 +1786,7 @@ exports[`applyToMarkdown integration > tofu/local-files/1 > renders without erro
 
 | Action | Count |
 | --- | --- |
-| ♻️ Replace | 1 |
+| ± Replace | 1 |
 | **Total** | **1** |
 
 ### Resource Outcomes
@@ -1800,7 +1800,7 @@ exports[`applyToMarkdown integration > tofu/local-files/1 > renders without erro
 ### 📦 Module: root
 
 <details>
-<summary>♻️ <strong>local_file</strong> readme</summary>
+<summary>± <strong>local_file</strong> readme</summary>
 
 | Attribute | Before | After |
 | --- | --- | --- |
@@ -1854,7 +1854,7 @@ exports[`applyToMarkdown integration > tofu/local-files/1 > renders without erro
 
 | Action | Count |
 | --- | --- |
-| ♻️ Replace | 1 |
+| ± Replace | 1 |
 | **Total** | **1** |
 
 ### Resource Outcomes
@@ -2090,8 +2090,8 @@ exports[`applyToMarkdown integration > tofu/null-lifecycle/2 > renders without e
 | Action | Count |
 | --- | --- |
 | 🔧 Change | 1 |
-| ❌ Destroy | 1 |
-| ♻️ Replace | 1 |
+| 🗑️ Destroy | 1 |
+| ± Replace | 1 |
 | **Total** | **3** |
 
 ### Resource Outcomes
@@ -2099,7 +2099,7 @@ exports[`applyToMarkdown integration > tofu/null-lifecycle/2 > renders without e
 | Status | Resource | Action | Elapsed |
 | --- | --- | --- | --- |
 | ✅ | \`terraform_data.meta\` | 🔧 | 0s |
-| ✅ | \`null_resource.beta\` | ❌ | 0s |
+| ✅ | \`null_resource.beta\` | 🗑️ | 0s |
 | ✅ | \`null_resource.alpha\` | ➕ | 0s |
 
 ## Resource Changes
@@ -2107,7 +2107,7 @@ exports[`applyToMarkdown integration > tofu/null-lifecycle/2 > renders without e
 ### 📦 Module: root
 
 <details>
-<summary>♻️ <strong>null_resource</strong> alpha</summary>
+<summary>± <strong>null_resource</strong> alpha</summary>
 
 | Attribute | Before | After |
 | --- | --- | --- |
@@ -2117,7 +2117,7 @@ exports[`applyToMarkdown integration > tofu/null-lifecycle/2 > renders without e
 </details>
 
 <details>
-<summary>❌ <strong>null_resource</strong> beta</summary>
+<summary>🗑️ <strong>null_resource</strong> beta</summary>
 
 | Attribute | Before | After |
 | --- | --- | --- |
@@ -2145,8 +2145,8 @@ exports[`applyToMarkdown integration > tofu/null-lifecycle/2 > renders without e
 | Action | Count |
 | --- | --- |
 | 🔧 Change | 1 |
-| ❌ Destroy | 1 |
-| ♻️ Replace | 1 |
+| 🗑️ Destroy | 1 |
+| ± Replace | 1 |
 | **Total** | **3** |
 
 ### Resource Outcomes
@@ -2154,7 +2154,7 @@ exports[`applyToMarkdown integration > tofu/null-lifecycle/2 > renders without e
 | Status | Resource | Action | Elapsed |
 | --- | --- | --- | --- |
 | ✅ | \`terraform_data.meta\` | 🔧 | 0s |
-| ✅ | \`null_resource.beta\` | ❌ | 0s |
+| ✅ | \`null_resource.beta\` | 🗑️ | 0s |
 | ✅ | \`null_resource.alpha\` | ➕ | 0s |
 "
 `;
@@ -2227,7 +2227,7 @@ exports[`applyToMarkdown integration > tofu/random-replace/1 > renders without e
 
 | Action | Count |
 | --- | --- |
-| ♻️ Replace | 1 |
+| ± Replace | 1 |
 | **Total** | **1** |
 
 ### Resource Outcomes
@@ -2241,7 +2241,7 @@ exports[`applyToMarkdown integration > tofu/random-replace/1 > renders without e
 ### 📦 Module: root
 
 <details>
-<summary>♻️ <strong>random_string</strong> token</summary>
+<summary>± <strong>random_string</strong> token</summary>
 
 | Attribute | Before | After |
 | --- | --- | --- |
@@ -2264,7 +2264,7 @@ exports[`applyToMarkdown integration > tofu/random-replace/1 > renders without e
 
 | Action | Count |
 | --- | --- |
-| ♻️ Replace | 1 |
+| ± Replace | 1 |
 | **Total** | **1** |
 
 ### Resource Outcomes
@@ -2343,7 +2343,7 @@ exports[`applyToMarkdown integration > tofu/sensitive-values/1 > renders without
 
 | Action | Count |
 | --- | --- |
-| ♻️ Replace | 1 |
+| ± Replace | 1 |
 | **Total** | **1** |
 
 ### Resource Outcomes
@@ -2357,7 +2357,7 @@ exports[`applyToMarkdown integration > tofu/sensitive-values/1 > renders without
 ### 📦 Module: root
 
 <details>
-<summary>♻️ <strong>local_sensitive_file</strong> secret</summary>
+<summary>± <strong>local_sensitive_file</strong> secret</summary>
 
 | Attribute | Before | After |
 | --- | --- | --- |
@@ -2387,7 +2387,7 @@ exports[`applyToMarkdown integration > tofu/sensitive-values/1 > renders without
 
 | Action | Count |
 | --- | --- |
-| ♻️ Replace | 1 |
+| ± Replace | 1 |
 | **Total** | **1** |
 
 ### Resource Outcomes
@@ -2481,7 +2481,7 @@ exports[`applyToMarkdown integration > tofu/with-modules/1 > renders without err
 
 | Action | Count |
 | --- | --- |
-| ♻️ Replace | 2 |
+| ± Replace | 2 |
 | **Total** | **2** |
 
 ### Resource Outcomes
@@ -2496,7 +2496,7 @@ exports[`applyToMarkdown integration > tofu/with-modules/1 > renders without err
 ### 📦 Module: root
 
 <details>
-<summary>♻️ <strong>null_resource</strong> root</summary>
+<summary>± <strong>null_resource</strong> root</summary>
 
 | Attribute | Before | After |
 | --- | --- | --- |
@@ -2508,7 +2508,7 @@ exports[`applyToMarkdown integration > tofu/with-modules/1 > renders without err
 ### 📦 Module: \`module.naming\`
 
 <details>
-<summary>♻️ <strong>random_string</strong> suffix</summary>
+<summary>± <strong>random_string</strong> suffix</summary>
 
 | Attribute | Before | After |
 | --- | --- | --- |
@@ -2532,7 +2532,7 @@ exports[`applyToMarkdown integration > tofu/with-modules/1 > renders without err
 
 | Action | Count |
 | --- | --- |
-| ♻️ Replace | 2 |
+| ± Replace | 2 |
 | **Total** | **2** |
 
 ### Resource Outcomes

@@ -1,5 +1,6 @@
 import type { Diagnostic } from "../model/diagnostic.js";
 import type { MarkdownWriter } from "./writer.js";
+import { DIAGNOSTIC_ERROR, DIAGNOSTIC_WARNING } from "../model/status-icons.js";
 
 /**
  * Renders diagnostics (errors and warnings) as a markdown section.
@@ -29,7 +30,7 @@ export function renderDiagnostics(
 }
 
 function renderDiagnostic(diag: Diagnostic, writer: MarkdownWriter): void {
-  const prefix = diag.severity === "error" ? "🚨" : "⚠️";
+  const prefix = diag.severity === "error" ? DIAGNOSTIC_ERROR : DIAGNOSTIC_WARNING;
   const addressSuffix =
     diag.address !== undefined ? ` — \`${diag.address}\`` : "";
   writer.paragraph(`${prefix} **${diag.summary}**${addressSuffix}`);

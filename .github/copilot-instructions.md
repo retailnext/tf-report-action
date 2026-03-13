@@ -91,6 +91,22 @@ Data sources are **never** shown in plan or apply output. They are excluded by
 `mode === "data"`. Errors and warnings relating to data sources surface through the
 diagnostics section of apply reports only.
 
+## Emoji / Symbol Uniqueness
+
+**No emoji or symbol may be used to mean two different things.** Every visual indicator
+in the rendered output must be unambiguous. This is enforced by the test in
+`tests/unit/model/emoji-uniqueness.test.ts`.
+
+All emojis used in the output **must** be defined in one of two constant sources so
+the uniqueness test can check them:
+
+- **Action symbols**: `ACTION_SYMBOLS` in `src/model/plan-action.ts`
+- **Status indicators**: named exports in `src/model/status-icons.ts`
+
+When adding a new emoji or changing an existing one, update the appropriate constant
+source and run the uniqueness test. Do not hardcode emoji literals in renderer code —
+import from the constant sources above.
+
 ## Error Messages
 
 Error messages must **never** contain plan attribute values or any data derived from

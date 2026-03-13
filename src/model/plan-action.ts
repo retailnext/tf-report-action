@@ -16,11 +16,11 @@ export type PlanAction =
 export const ACTION_SYMBOLS: Record<PlanAction, string> = {
   create: "➕",
   update: "🔧",
-  delete: "❌",
-  replace: "♻️",
+  delete: "🗑️",
+  replace: "±",
   read: "👁",
   "no-op": "⬜",
-  forget: "🗑",
+  forget: "👋",
   open: "📂",
   unknown: "❓",
 };

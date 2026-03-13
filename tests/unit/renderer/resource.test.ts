@@ -50,7 +50,7 @@ describe("renderResource", () => {
 
   it("shows delete symbol for delete action", () => {
     const output = render(makeResource({ action: "delete" }));
-    expect(output).toContain("❌");
+    expect(output).toContain("🗑️");
   });
 
   it("shows import ID when present", () => {

@@ -169,7 +169,7 @@ exports[`planToMarkdown integration > terraform/apply-error/1 > renders without 
 | Action | Count |
 | --- | --- |
 | 🔧 Change | 1 |
-| ♻️ Replace | 1 |
+| ± Replace | 1 |
 | **Total** | **2** |
 
 ## Resource Changes
@@ -177,7 +177,7 @@ exports[`planToMarkdown integration > terraform/apply-error/1 > renders without 
 ### 📦 Module: root
 
 <details>
-<summary>♻️ <strong>null_resource</strong> will_fail</summary>
+<summary>± <strong>null_resource</strong> will_fail</summary>
 
 | Attribute | Before | After |
 | --- | --- | --- |
@@ -215,7 +215,7 @@ exports[`planToMarkdown integration > terraform/apply-error/1 > renders without 
 | Action | Count |
 | --- | --- |
 | 🔧 Change | 1 |
-| ♻️ Replace | 1 |
+| ± Replace | 1 |
 | **Total** | **2** |
 
 ## Resource Changes
@@ -223,7 +223,7 @@ exports[`planToMarkdown integration > terraform/apply-error/1 > renders without 
 ### 📦 Module: root
 
 <details>
-<summary>♻️ <strong>null_resource</strong> will_fail</summary>
+<summary>± <strong>null_resource</strong> will_fail</summary>
 
 | Attribute | Before | After |
 | --- | --- | --- |
@@ -261,7 +261,7 @@ exports[`planToMarkdown integration > terraform/apply-error/1 > renders without 
 | Action | Count |
 | --- | --- |
 | 🔧 Change | 1 |
-| ♻️ Replace | 1 |
+| ± Replace | 1 |
 | **Total** | **2** |
 
 ## Resource Changes
@@ -269,7 +269,7 @@ exports[`planToMarkdown integration > terraform/apply-error/1 > renders without 
 ### 📦 Module: root
 
 <details>
-<summary>♻️ <strong>null_resource</strong> will_fail</summary>
+<summary>± <strong>null_resource</strong> will_fail</summary>
 
 | Attribute | Before | After |
 | --- | --- | --- |
@@ -317,7 +317,7 @@ exports[`planToMarkdown integration > terraform/apply-error/1 > renders without 
 | Action | Count |
 | --- | --- |
 | 🔧 Change | 1 |
-| ♻️ Replace | 1 |
+| ± Replace | 1 |
 | **Total** | **2** |
 "
 `;
@@ -906,7 +906,7 @@ exports[`planToMarkdown integration > terraform/deferred-data-source/2 > renders
 | Action | Count |
 | --- | --- |
 | 🔧 Change | 3 |
-| ♻️ Replace | 1 |
+| ± Replace | 1 |
 | **Total** | **4** |
 
 ## Resource Changes
@@ -914,7 +914,7 @@ exports[`planToMarkdown integration > terraform/deferred-data-source/2 > renders
 ### 📦 Module: root
 
 <details>
-<summary>♻️ <strong>local_file</strong> config</summary>
+<summary>± <strong>local_file</strong> config</summary>
 
 | Attribute | Before | After |
 | --- | --- | --- |
@@ -994,7 +994,7 @@ exports[`planToMarkdown integration > terraform/deferred-data-source/2 > renders
 | Action | Count |
 | --- | --- |
 | 🔧 Change | 3 |
-| ♻️ Replace | 1 |
+| ± Replace | 1 |
 | **Total** | **4** |
 
 ## Resource Changes
@@ -1002,7 +1002,7 @@ exports[`planToMarkdown integration > terraform/deferred-data-source/2 > renders
 ### 📦 Module: root
 
 <details>
-<summary>♻️ <strong>local_file</strong> config</summary>
+<summary>± <strong>local_file</strong> config</summary>
 
 | Attribute | Before | After |
 | --- | --- | --- |
@@ -1082,7 +1082,7 @@ exports[`planToMarkdown integration > terraform/deferred-data-source/2 > renders
 | Action | Count |
 | --- | --- |
 | 🔧 Change | 3 |
-| ♻️ Replace | 1 |
+| ± Replace | 1 |
 | **Total** | **4** |
 
 ## Resource Changes
@@ -1090,7 +1090,7 @@ exports[`planToMarkdown integration > terraform/deferred-data-source/2 > renders
 ### 📦 Module: root
 
 <details>
-<summary>♻️ <strong>local_file</strong> config</summary>
+<summary>± <strong>local_file</strong> config</summary>
 
 | Attribute | Before | After |
 | --- | --- | --- |
@@ -1208,7 +1208,7 @@ exports[`planToMarkdown integration > terraform/deferred-data-source/2 > renders
 | Action | Count |
 | --- | --- |
 | 🔧 Change | 3 |
-| ♻️ Replace | 1 |
+| ± Replace | 1 |
 | **Total** | **4** |
 "
 `;
@@ -1410,7 +1410,7 @@ exports[`planToMarkdown integration > terraform/local-files/1 > renders without 
 
 | Action | Count |
 | --- | --- |
-| ♻️ Replace | 1 |
+| ± Replace | 1 |
 | **Total** | **1** |
 
 ## Resource Changes
@@ -1418,7 +1418,7 @@ exports[`planToMarkdown integration > terraform/local-files/1 > renders without 
 ### 📦 Module: root
 
 <details>
-<summary>♻️ <strong>local_file</strong> readme</summary>
+<summary>± <strong>local_file</strong> readme</summary>
 
 | Attribute | Before | After |
 | --- | --- | --- |
@@ -1472,7 +1472,7 @@ exports[`planToMarkdown integration > terraform/local-files/1 > renders without 
 
 | Action | Count |
 | --- | --- |
-| ♻️ Replace | 1 |
+| ± Replace | 1 |
 | **Total** | **1** |
 
 ## Resource Changes
@@ -1480,7 +1480,7 @@ exports[`planToMarkdown integration > terraform/local-files/1 > renders without 
 ### 📦 Module: root
 
 <details>
-<summary>♻️ <strong>local_file</strong> readme</summary>
+<summary>± <strong>local_file</strong> readme</summary>
 
 | Attribute | Before | After |
 | --- | --- | --- |
@@ -1534,7 +1534,7 @@ exports[`planToMarkdown integration > terraform/local-files/1 > renders without 
 
 | Action | Count |
 | --- | --- |
-| ♻️ Replace | 1 |
+| ± Replace | 1 |
 | **Total** | **1** |
 
 ## Resource Changes
@@ -1542,7 +1542,7 @@ exports[`planToMarkdown integration > terraform/local-files/1 > renders without 
 ### 📦 Module: root
 
 <details>
-<summary>♻️ <strong>local_file</strong> readme</summary>
+<summary>± <strong>local_file</strong> readme</summary>
 
 | Attribute | Before | After |
 | --- | --- | --- |
@@ -1601,7 +1601,7 @@ exports[`planToMarkdown integration > terraform/local-files/1 > renders without 
 
 | Action | Count |
 | --- | --- |
-| ♻️ Replace | 1 |
+| ± Replace | 1 |
 | **Total** | **1** |
 "
 `;
@@ -2114,8 +2114,8 @@ exports[`planToMarkdown integration > terraform/null-lifecycle/2 > renders witho
 | Action | Count |
 | --- | --- |
 | 🔧 Change | 1 |
-| ❌ Destroy | 1 |
-| ♻️ Replace | 1 |
+| 🗑️ Destroy | 1 |
+| ± Replace | 1 |
 | **Total** | **3** |
 
 ## Resource Changes
@@ -2123,7 +2123,7 @@ exports[`planToMarkdown integration > terraform/null-lifecycle/2 > renders witho
 ### 📦 Module: root
 
 <details>
-<summary>♻️ <strong>null_resource</strong> alpha</summary>
+<summary>± <strong>null_resource</strong> alpha</summary>
 
 | Attribute | Before | After |
 | --- | --- | --- |
@@ -2133,7 +2133,7 @@ exports[`planToMarkdown integration > terraform/null-lifecycle/2 > renders witho
 </details>
 
 <details>
-<summary>❌ <strong>null_resource</strong> beta</summary>
+<summary>🗑️ <strong>null_resource</strong> beta</summary>
 
 | Attribute | Before | After |
 | --- | --- | --- |
@@ -2161,8 +2161,8 @@ exports[`planToMarkdown integration > terraform/null-lifecycle/2 > renders witho
 | Action | Count |
 | --- | --- |
 | 🔧 Change | 1 |
-| ❌ Destroy | 1 |
-| ♻️ Replace | 1 |
+| 🗑️ Destroy | 1 |
+| ± Replace | 1 |
 | **Total** | **3** |
 
 ## Resource Changes
@@ -2170,7 +2170,7 @@ exports[`planToMarkdown integration > terraform/null-lifecycle/2 > renders witho
 ### 📦 Module: root
 
 <details>
-<summary>♻️ <strong>null_resource</strong> alpha</summary>
+<summary>± <strong>null_resource</strong> alpha</summary>
 
 | Attribute | Before | After |
 | --- | --- | --- |
@@ -2180,7 +2180,7 @@ exports[`planToMarkdown integration > terraform/null-lifecycle/2 > renders witho
 </details>
 
 <details>
-<summary>❌ <strong>null_resource</strong> beta</summary>
+<summary>🗑️ <strong>null_resource</strong> beta</summary>
 
 | Attribute | Before | After |
 | --- | --- | --- |
@@ -2208,8 +2208,8 @@ exports[`planToMarkdown integration > terraform/null-lifecycle/2 > renders witho
 | Action | Count |
 | --- | --- |
 | 🔧 Change | 1 |
-| ❌ Destroy | 1 |
-| ♻️ Replace | 1 |
+| 🗑️ Destroy | 1 |
+| ± Replace | 1 |
 | **Total** | **3** |
 
 ## Resource Changes
@@ -2217,7 +2217,7 @@ exports[`planToMarkdown integration > terraform/null-lifecycle/2 > renders witho
 ### 📦 Module: root
 
 <details>
-<summary>♻️ <strong>null_resource</strong> alpha</summary>
+<summary>± <strong>null_resource</strong> alpha</summary>
 
 | Attribute | Before | After |
 | --- | --- | --- |
@@ -2228,7 +2228,7 @@ exports[`planToMarkdown integration > terraform/null-lifecycle/2 > renders witho
 </details>
 
 <details>
-<summary>❌ <strong>null_resource</strong> beta</summary>
+<summary>🗑️ <strong>null_resource</strong> beta</summary>
 
 | Attribute | Before | After |
 | --- | --- | --- |
@@ -2258,8 +2258,8 @@ exports[`planToMarkdown integration > terraform/null-lifecycle/2 > renders witho
 | Action | Count |
 | --- | --- |
 | 🔧 Change | 1 |
-| ❌ Destroy | 1 |
-| ♻️ Replace | 1 |
+| 🗑️ Destroy | 1 |
+| ± Replace | 1 |
 | **Total** | **3** |
 "
 `;
@@ -2403,7 +2403,7 @@ exports[`planToMarkdown integration > terraform/random-replace/1 > renders witho
 
 | Action | Count |
 | --- | --- |
-| ♻️ Replace | 1 |
+| ± Replace | 1 |
 | **Total** | **1** |
 
 ## Resource Changes
@@ -2411,7 +2411,7 @@ exports[`planToMarkdown integration > terraform/random-replace/1 > renders witho
 ### 📦 Module: root
 
 <details>
-<summary>♻️ <strong>random_string</strong> token</summary>
+<summary>± <strong>random_string</strong> token</summary>
 
 | Attribute | Before | After |
 | --- | --- | --- |
@@ -2434,7 +2434,7 @@ exports[`planToMarkdown integration > terraform/random-replace/1 > renders witho
 
 | Action | Count |
 | --- | --- |
-| ♻️ Replace | 1 |
+| ± Replace | 1 |
 | **Total** | **1** |
 
 ## Resource Changes
@@ -2442,7 +2442,7 @@ exports[`planToMarkdown integration > terraform/random-replace/1 > renders witho
 ### 📦 Module: root
 
 <details>
-<summary>♻️ <strong>random_string</strong> token</summary>
+<summary>± <strong>random_string</strong> token</summary>
 
 | Attribute | Before | After |
 | --- | --- | --- |
@@ -2465,7 +2465,7 @@ exports[`planToMarkdown integration > terraform/random-replace/1 > renders witho
 
 | Action | Count |
 | --- | --- |
-| ♻️ Replace | 1 |
+| ± Replace | 1 |
 | **Total** | **1** |
 
 ## Resource Changes
@@ -2473,7 +2473,7 @@ exports[`planToMarkdown integration > terraform/random-replace/1 > renders witho
 ### 📦 Module: root
 
 <details>
-<summary>♻️ <strong>random_string</strong> token</summary>
+<summary>± <strong>random_string</strong> token</summary>
 
 | Attribute | Before | After |
 | --- | --- | --- |
@@ -2507,7 +2507,7 @@ exports[`planToMarkdown integration > terraform/random-replace/1 > renders witho
 
 | Action | Count |
 | --- | --- |
-| ♻️ Replace | 1 |
+| ± Replace | 1 |
 | **Total** | **1** |
 "
 `;
@@ -2651,7 +2651,7 @@ exports[`planToMarkdown integration > terraform/sensitive-values/1 > renders wit
 
 | Action | Count |
 | --- | --- |
-| ♻️ Replace | 1 |
+| ± Replace | 1 |
 | **Total** | **1** |
 
 ## Resource Changes
@@ -2659,7 +2659,7 @@ exports[`planToMarkdown integration > terraform/sensitive-values/1 > renders wit
 ### 📦 Module: root
 
 <details>
-<summary>♻️ <strong>local_sensitive_file</strong> secret</summary>
+<summary>± <strong>local_sensitive_file</strong> secret</summary>
 
 | Attribute | Before | After |
 | --- | --- | --- |
@@ -2689,7 +2689,7 @@ exports[`planToMarkdown integration > terraform/sensitive-values/1 > renders wit
 
 | Action | Count |
 | --- | --- |
-| ♻️ Replace | 1 |
+| ± Replace | 1 |
 | **Total** | **1** |
 
 ## Resource Changes
@@ -2697,7 +2697,7 @@ exports[`planToMarkdown integration > terraform/sensitive-values/1 > renders wit
 ### 📦 Module: root
 
 <details>
-<summary>♻️ <strong>local_sensitive_file</strong> secret</summary>
+<summary>± <strong>local_sensitive_file</strong> secret</summary>
 
 | Attribute | Before | After |
 | --- | --- | --- |
@@ -2727,7 +2727,7 @@ exports[`planToMarkdown integration > terraform/sensitive-values/1 > renders wit
 
 | Action | Count |
 | --- | --- |
-| ♻️ Replace | 1 |
+| ± Replace | 1 |
 | **Total** | **1** |
 
 ## Resource Changes
@@ -2735,7 +2735,7 @@ exports[`planToMarkdown integration > terraform/sensitive-values/1 > renders wit
 ### 📦 Module: root
 
 <details>
-<summary>♻️ <strong>local_sensitive_file</strong> secret</summary>
+<summary>± <strong>local_sensitive_file</strong> secret</summary>
 
 | Attribute | Before | After |
 | --- | --- | --- |
@@ -2769,7 +2769,7 @@ exports[`planToMarkdown integration > terraform/sensitive-values/1 > renders wit
 
 | Action | Count |
 | --- | --- |
-| ♻️ Replace | 1 |
+| ± Replace | 1 |
 | **Total** | **1** |
 "
 `;
@@ -2952,7 +2952,7 @@ exports[`planToMarkdown integration > terraform/with-modules/1 > renders without
 
 | Action | Count |
 | --- | --- |
-| ♻️ Replace | 2 |
+| ± Replace | 2 |
 | **Total** | **2** |
 
 ## Resource Changes
@@ -2960,7 +2960,7 @@ exports[`planToMarkdown integration > terraform/with-modules/1 > renders without
 ### 📦 Module: root
 
 <details>
-<summary>♻️ <strong>null_resource</strong> root</summary>
+<summary>± <strong>null_resource</strong> root</summary>
 
 | Attribute | Before | After |
 | --- | --- | --- |
@@ -2972,7 +2972,7 @@ exports[`planToMarkdown integration > terraform/with-modules/1 > renders without
 ### 📦 Module: \`module.naming\`
 
 <details>
-<summary>♻️ <strong>random_string</strong> suffix</summary>
+<summary>± <strong>random_string</strong> suffix</summary>
 
 | Attribute | Before | After |
 | --- | --- | --- |
@@ -2996,7 +2996,7 @@ exports[`planToMarkdown integration > terraform/with-modules/1 > renders without
 
 | Action | Count |
 | --- | --- |
-| ♻️ Replace | 2 |
+| ± Replace | 2 |
 | **Total** | **2** |
 
 ## Resource Changes
@@ -3004,7 +3004,7 @@ exports[`planToMarkdown integration > terraform/with-modules/1 > renders without
 ### 📦 Module: root
 
 <details>
-<summary>♻️ <strong>null_resource</strong> root</summary>
+<summary>± <strong>null_resource</strong> root</summary>
 
 | Attribute | Before | After |
 | --- | --- | --- |
@@ -3016,7 +3016,7 @@ exports[`planToMarkdown integration > terraform/with-modules/1 > renders without
 ### 📦 Module: \`module.naming\`
 
 <details>
-<summary>♻️ <strong>random_string</strong> suffix</summary>
+<summary>± <strong>random_string</strong> suffix</summary>
 
 | Attribute | Before | After |
 | --- | --- | --- |
@@ -3040,7 +3040,7 @@ exports[`planToMarkdown integration > terraform/with-modules/1 > renders without
 
 | Action | Count |
 | --- | --- |
-| ♻️ Replace | 2 |
+| ± Replace | 2 |
 | **Total** | **2** |
 
 ## Resource Changes
@@ -3048,7 +3048,7 @@ exports[`planToMarkdown integration > terraform/with-modules/1 > renders without
 ### 📦 Module: root
 
 <details>
-<summary>♻️ <strong>null_resource</strong> root</summary>
+<summary>± <strong>null_resource</strong> root</summary>
 
 | Attribute | Before | After |
 | --- | --- | --- |
@@ -3060,7 +3060,7 @@ exports[`planToMarkdown integration > terraform/with-modules/1 > renders without
 ### 📦 Module: \`module.naming\`
 
 <details>
-<summary>♻️ <strong>random_string</strong> suffix</summary>
+<summary>± <strong>random_string</strong> suffix</summary>
 
 | Attribute | Before | After |
 | --- | --- | --- |
@@ -3095,7 +3095,7 @@ exports[`planToMarkdown integration > terraform/with-modules/1 > renders without
 
 | Action | Count |
 | --- | --- |
-| ♻️ Replace | 2 |
+| ± Replace | 2 |
 | **Total** | **2** |
 "
 `;
@@ -3269,7 +3269,7 @@ exports[`planToMarkdown integration > tofu/apply-error/1 > renders without error
 | Action | Count |
 | --- | --- |
 | 🔧 Change | 1 |
-| ♻️ Replace | 1 |
+| ± Replace | 1 |
 | **Total** | **2** |
 
 ## Resource Changes
@@ -3277,7 +3277,7 @@ exports[`planToMarkdown integration > tofu/apply-error/1 > renders without error
 ### 📦 Module: root
 
 <details>
-<summary>♻️ <strong>null_resource</strong> will_fail</summary>
+<summary>± <strong>null_resource</strong> will_fail</summary>
 
 | Attribute | Before | After |
 | --- | --- | --- |
@@ -3315,7 +3315,7 @@ exports[`planToMarkdown integration > tofu/apply-error/1 > renders without error
 | Action | Count |
 | --- | --- |
 | 🔧 Change | 1 |
-| ♻️ Replace | 1 |
+| ± Replace | 1 |
 | **Total** | **2** |
 
 ## Resource Changes
@@ -3323,7 +3323,7 @@ exports[`planToMarkdown integration > tofu/apply-error/1 > renders without error
 ### 📦 Module: root
 
 <details>
-<summary>♻️ <strong>null_resource</strong> will_fail</summary>
+<summary>± <strong>null_resource</strong> will_fail</summary>
 
 | Attribute | Before | After |
 | --- | --- | --- |
@@ -3361,7 +3361,7 @@ exports[`planToMarkdown integration > tofu/apply-error/1 > renders without error
 | Action | Count |
 | --- | --- |
 | 🔧 Change | 1 |
-| ♻️ Replace | 1 |
+| ± Replace | 1 |
 | **Total** | **2** |
 
 ## Resource Changes
@@ -3369,7 +3369,7 @@ exports[`planToMarkdown integration > tofu/apply-error/1 > renders without error
 ### 📦 Module: root
 
 <details>
-<summary>♻️ <strong>null_resource</strong> will_fail</summary>
+<summary>± <strong>null_resource</strong> will_fail</summary>
 
 | Attribute | Before | After |
 | --- | --- | --- |
@@ -3417,7 +3417,7 @@ exports[`planToMarkdown integration > tofu/apply-error/1 > renders without error
 | Action | Count |
 | --- | --- |
 | 🔧 Change | 1 |
-| ♻️ Replace | 1 |
+| ± Replace | 1 |
 | **Total** | **2** |
 "
 `;
@@ -4006,7 +4006,7 @@ exports[`planToMarkdown integration > tofu/deferred-data-source/2 > renders with
 | Action | Count |
 | --- | --- |
 | 🔧 Change | 3 |
-| ♻️ Replace | 1 |
+| ± Replace | 1 |
 | **Total** | **4** |
 
 ## Resource Changes
@@ -4014,7 +4014,7 @@ exports[`planToMarkdown integration > tofu/deferred-data-source/2 > renders with
 ### 📦 Module: root
 
 <details>
-<summary>♻️ <strong>local_file</strong> config</summary>
+<summary>± <strong>local_file</strong> config</summary>
 
 | Attribute | Before | After |
 | --- | --- | --- |
@@ -4094,7 +4094,7 @@ exports[`planToMarkdown integration > tofu/deferred-data-source/2 > renders with
 | Action | Count |
 | --- | --- |
 | 🔧 Change | 3 |
-| ♻️ Replace | 1 |
+| ± Replace | 1 |
 | **Total** | **4** |
 
 ## Resource Changes
@@ -4102,7 +4102,7 @@ exports[`planToMarkdown integration > tofu/deferred-data-source/2 > renders with
 ### 📦 Module: root
 
 <details>
-<summary>♻️ <strong>local_file</strong> config</summary>
+<summary>± <strong>local_file</strong> config</summary>
 
 | Attribute | Before | After |
 | --- | --- | --- |
@@ -4182,7 +4182,7 @@ exports[`planToMarkdown integration > tofu/deferred-data-source/2 > renders with
 | Action | Count |
 | --- | --- |
 | 🔧 Change | 3 |
-| ♻️ Replace | 1 |
+| ± Replace | 1 |
 | **Total** | **4** |
 
 ## Resource Changes
@@ -4190,7 +4190,7 @@ exports[`planToMarkdown integration > tofu/deferred-data-source/2 > renders with
 ### 📦 Module: root
 
 <details>
-<summary>♻️ <strong>local_file</strong> config</summary>
+<summary>± <strong>local_file</strong> config</summary>
 
 | Attribute | Before | After |
 | --- | --- | --- |
@@ -4308,7 +4308,7 @@ exports[`planToMarkdown integration > tofu/deferred-data-source/2 > renders with
 | Action | Count |
 | --- | --- |
 | 🔧 Change | 3 |
-| ♻️ Replace | 1 |
+| ± Replace | 1 |
 | **Total** | **4** |
 "
 `;
@@ -4510,7 +4510,7 @@ exports[`planToMarkdown integration > tofu/local-files/1 > renders without error
 
 | Action | Count |
 | --- | --- |
-| ♻️ Replace | 1 |
+| ± Replace | 1 |
 | **Total** | **1** |
 
 ## Resource Changes
@@ -4518,7 +4518,7 @@ exports[`planToMarkdown integration > tofu/local-files/1 > renders without error
 ### 📦 Module: root
 
 <details>
-<summary>♻️ <strong>local_file</strong> readme</summary>
+<summary>± <strong>local_file</strong> readme</summary>
 
 | Attribute | Before | After |
 | --- | --- | --- |
@@ -4572,7 +4572,7 @@ exports[`planToMarkdown integration > tofu/local-files/1 > renders without error
 
 | Action | Count |
 | --- | --- |
-| ♻️ Replace | 1 |
+| ± Replace | 1 |
 | **Total** | **1** |
 
 ## Resource Changes
@@ -4580,7 +4580,7 @@ exports[`planToMarkdown integration > tofu/local-files/1 > renders without error
 ### 📦 Module: root
 
 <details>
-<summary>♻️ <strong>local_file</strong> readme</summary>
+<summary>± <strong>local_file</strong> readme</summary>
 
 | Attribute | Before | After |
 | --- | --- | --- |
@@ -4634,7 +4634,7 @@ exports[`planToMarkdown integration > tofu/local-files/1 > renders without error
 
 | Action | Count |
 | --- | --- |
-| ♻️ Replace | 1 |
+| ± Replace | 1 |
 | **Total** | **1** |
 
 ## Resource Changes
@@ -4642,7 +4642,7 @@ exports[`planToMarkdown integration > tofu/local-files/1 > renders without error
 ### 📦 Module: root
 
 <details>
-<summary>♻️ <strong>local_file</strong> readme</summary>
+<summary>± <strong>local_file</strong> readme</summary>
 
 | Attribute | Before | After |
 | --- | --- | --- |
@@ -4701,7 +4701,7 @@ exports[`planToMarkdown integration > tofu/local-files/1 > renders without error
 
 | Action | Count |
 | --- | --- |
-| ♻️ Replace | 1 |
+| ± Replace | 1 |
 | **Total** | **1** |
 "
 `;
@@ -5214,8 +5214,8 @@ exports[`planToMarkdown integration > tofu/null-lifecycle/2 > renders without er
 | Action | Count |
 | --- | --- |
 | 🔧 Change | 1 |
-| ❌ Destroy | 1 |
-| ♻️ Replace | 1 |
+| 🗑️ Destroy | 1 |
+| ± Replace | 1 |
 | **Total** | **3** |
 
 ## Resource Changes
@@ -5223,7 +5223,7 @@ exports[`planToMarkdown integration > tofu/null-lifecycle/2 > renders without er
 ### 📦 Module: root
 
 <details>
-<summary>♻️ <strong>null_resource</strong> alpha</summary>
+<summary>± <strong>null_resource</strong> alpha</summary>
 
 | Attribute | Before | After |
 | --- | --- | --- |
@@ -5233,7 +5233,7 @@ exports[`planToMarkdown integration > tofu/null-lifecycle/2 > renders without er
 </details>
 
 <details>
-<summary>❌ <strong>null_resource</strong> beta</summary>
+<summary>🗑️ <strong>null_resource</strong> beta</summary>
 
 | Attribute | Before | After |
 | --- | --- | --- |
@@ -5261,8 +5261,8 @@ exports[`planToMarkdown integration > tofu/null-lifecycle/2 > renders without er
 | Action | Count |
 | --- | --- |
 | 🔧 Change | 1 |
-| ❌ Destroy | 1 |
-| ♻️ Replace | 1 |
+| 🗑️ Destroy | 1 |
+| ± Replace | 1 |
 | **Total** | **3** |
 
 ## Resource Changes
@@ -5270,7 +5270,7 @@ exports[`planToMarkdown integration > tofu/null-lifecycle/2 > renders without er
 ### 📦 Module: root
 
 <details>
-<summary>♻️ <strong>null_resource</strong> alpha</summary>
+<summary>± <strong>null_resource</strong> alpha</summary>
 
 | Attribute | Before | After |
 | --- | --- | --- |
@@ -5280,7 +5280,7 @@ exports[`planToMarkdown integration > tofu/null-lifecycle/2 > renders without er
 </details>
 
 <details>
-<summary>❌ <strong>null_resource</strong> beta</summary>
+<summary>🗑️ <strong>null_resource</strong> beta</summary>
 
 | Attribute | Before | After |
 | --- | --- | --- |
@@ -5308,8 +5308,8 @@ exports[`planToMarkdown integration > tofu/null-lifecycle/2 > renders without er
 | Action | Count |
 | --- | --- |
 | 🔧 Change | 1 |
-| ❌ Destroy | 1 |
-| ♻️ Replace | 1 |
+| 🗑️ Destroy | 1 |
+| ± Replace | 1 |
 | **Total** | **3** |
 
 ## Resource Changes
@@ -5317,7 +5317,7 @@ exports[`planToMarkdown integration > tofu/null-lifecycle/2 > renders without er
 ### 📦 Module: root
 
 <details>
-<summary>♻️ <strong>null_resource</strong> alpha</summary>
+<summary>± <strong>null_resource</strong> alpha</summary>
 
 | Attribute | Before | After |
 | --- | --- | --- |
@@ -5328,7 +5328,7 @@ exports[`planToMarkdown integration > tofu/null-lifecycle/2 > renders without er
 </details>
 
 <details>
-<summary>❌ <strong>null_resource</strong> beta</summary>
+<summary>🗑️ <strong>null_resource</strong> beta</summary>
 
 | Attribute | Before | After |
 | --- | --- | --- |
@@ -5358,8 +5358,8 @@ exports[`planToMarkdown integration > tofu/null-lifecycle/2 > renders without er
 | Action | Count |
 | --- | --- |
 | 🔧 Change | 1 |
-| ❌ Destroy | 1 |
-| ♻️ Replace | 1 |
+| 🗑️ Destroy | 1 |
+| ± Replace | 1 |
 | **Total** | **3** |
 "
 `;
@@ -5503,7 +5503,7 @@ exports[`planToMarkdown integration > tofu/random-replace/1 > renders without er
 
 | Action | Count |
 | --- | --- |
-| ♻️ Replace | 1 |
+| ± Replace | 1 |
 | **Total** | **1** |
 
 ## Resource Changes
@@ -5511,7 +5511,7 @@ exports[`planToMarkdown integration > tofu/random-replace/1 > renders without er
 ### 📦 Module: root
 
 <details>
-<summary>♻️ <strong>random_string</strong> token</summary>
+<summary>± <strong>random_string</strong> token</summary>
 
 | Attribute | Before | After |
 | --- | --- | --- |
@@ -5534,7 +5534,7 @@ exports[`planToMarkdown integration > tofu/random-replace/1 > renders without er
 
 | Action | Count |
 | --- | --- |
-| ♻️ Replace | 1 |
+| ± Replace | 1 |
 | **Total** | **1** |
 
 ## Resource Changes
@@ -5542,7 +5542,7 @@ exports[`planToMarkdown integration > tofu/random-replace/1 > renders without er
 ### 📦 Module: root
 
 <details>
-<summary>♻️ <strong>random_string</strong> token</summary>
+<summary>± <strong>random_string</strong> token</summary>
 
 | Attribute | Before | After |
 | --- | --- | --- |
@@ -5565,7 +5565,7 @@ exports[`planToMarkdown integration > tofu/random-replace/1 > renders without er
 
 | Action | Count |
 | --- | --- |
-| ♻️ Replace | 1 |
+| ± Replace | 1 |
 | **Total** | **1** |
 
 ## Resource Changes
@@ -5573,7 +5573,7 @@ exports[`planToMarkdown integration > tofu/random-replace/1 > renders without er
 ### 📦 Module: root
 
 <details>
-<summary>♻️ <strong>random_string</strong> token</summary>
+<summary>± <strong>random_string</strong> token</summary>
 
 | Attribute | Before | After |
 | --- | --- | --- |
@@ -5607,7 +5607,7 @@ exports[`planToMarkdown integration > tofu/random-replace/1 > renders without er
 
 | Action | Count |
 | --- | --- |
-| ♻️ Replace | 1 |
+| ± Replace | 1 |
 | **Total** | **1** |
 "
 `;
@@ -5751,7 +5751,7 @@ exports[`planToMarkdown integration > tofu/sensitive-values/1 > renders without 
 
 | Action | Count |
 | --- | --- |
-| ♻️ Replace | 1 |
+| ± Replace | 1 |
 | **Total** | **1** |
 
 ## Resource Changes
@@ -5759,7 +5759,7 @@ exports[`planToMarkdown integration > tofu/sensitive-values/1 > renders without 
 ### 📦 Module: root
 
 <details>
-<summary>♻️ <strong>local_sensitive_file</strong> secret</summary>
+<summary>± <strong>local_sensitive_file</strong> secret</summary>
 
 | Attribute | Before | After |
 | --- | --- | --- |
@@ -5789,7 +5789,7 @@ exports[`planToMarkdown integration > tofu/sensitive-values/1 > renders without 
 
 | Action | Count |
 | --- | --- |
-| ♻️ Replace | 1 |
+| ± Replace | 1 |
 | **Total** | **1** |
 
 ## Resource Changes
@@ -5797,7 +5797,7 @@ exports[`planToMarkdown integration > tofu/sensitive-values/1 > renders without 
 ### 📦 Module: root
 
 <details>
-<summary>♻️ <strong>local_sensitive_file</strong> secret</summary>
+<summary>± <strong>local_sensitive_file</strong> secret</summary>
 
 | Attribute | Before | After |
 | --- | --- | --- |
@@ -5827,7 +5827,7 @@ exports[`planToMarkdown integration > tofu/sensitive-values/1 > renders without 
 
 | Action | Count |
 | --- | --- |
-| ♻️ Replace | 1 |
+| ± Replace | 1 |
 | **Total** | **1** |
 
 ## Resource Changes
@@ -5835,7 +5835,7 @@ exports[`planToMarkdown integration > tofu/sensitive-values/1 > renders without 
 ### 📦 Module: root
 
 <details>
-<summary>♻️ <strong>local_sensitive_file</strong> secret</summary>
+<summary>± <strong>local_sensitive_file</strong> secret</summary>
 
 | Attribute | Before | After |
 | --- | --- | --- |
@@ -5869,7 +5869,7 @@ exports[`planToMarkdown integration > tofu/sensitive-values/1 > renders without 
 
 | Action | Count |
 | --- | --- |
-| ♻️ Replace | 1 |
+| ± Replace | 1 |
 | **Total** | **1** |
 "
 `;
@@ -6052,7 +6052,7 @@ exports[`planToMarkdown integration > tofu/with-modules/1 > renders without erro
 
 | Action | Count |
 | --- | --- |
-| ♻️ Replace | 2 |
+| ± Replace | 2 |
 | **Total** | **2** |
 
 ## Resource Changes
@@ -6060,7 +6060,7 @@ exports[`planToMarkdown integration > tofu/with-modules/1 > renders without erro
 ### 📦 Module: root
 
 <details>
-<summary>♻️ <strong>null_resource</strong> root</summary>
+<summary>± <strong>null_resource</strong> root</summary>
 
 | Attribute | Before | After |
 | --- | --- | --- |
@@ -6072,7 +6072,7 @@ exports[`planToMarkdown integration > tofu/with-modules/1 > renders without erro
 ### 📦 Module: \`module.naming\`
 
 <details>
-<summary>♻️ <strong>random_string</strong> suffix</summary>
+<summary>± <strong>random_string</strong> suffix</summary>
 
 | Attribute | Before | After |
 | --- | --- | --- |
@@ -6096,7 +6096,7 @@ exports[`planToMarkdown integration > tofu/with-modules/1 > renders without erro
 
 | Action | Count |
 | --- | --- |
-| ♻️ Replace | 2 |
+| ± Replace | 2 |
 | **Total** | **2** |
 
 ## Resource Changes
@@ -6104,7 +6104,7 @@ exports[`planToMarkdown integration > tofu/with-modules/1 > renders without erro
 ### 📦 Module: root
 
 <details>
-<summary>♻️ <strong>null_resource</strong> root</summary>
+<summary>± <strong>null_resource</strong> root</summary>
 
 | Attribute | Before | After |
 | --- | --- | --- |
@@ -6116,7 +6116,7 @@ exports[`planToMarkdown integration > tofu/with-modules/1 > renders without erro
 ### 📦 Module: \`module.naming\`
 
 <details>
-<summary>♻️ <strong>random_string</strong> suffix</summary>
+<summary>± <strong>random_string</strong> suffix</summary>
 
 | Attribute | Before | After |
 | --- | --- | --- |
@@ -6140,7 +6140,7 @@ exports[`planToMarkdown integration > tofu/with-modules/1 > renders without erro
 
 | Action | Count |
 | --- | --- |
-| ♻️ Replace | 2 |
+| ± Replace | 2 |
 | **Total** | **2** |
 
 ## Resource Changes
@@ -6148,7 +6148,7 @@ exports[`planToMarkdown integration > tofu/with-modules/1 > renders without erro
 ### 📦 Module: root
 
 <details>
-<summary>♻️ <strong>null_resource</strong> root</summary>
+<summary>± <strong>null_resource</strong> root</summary>
 
 | Attribute | Before | After |
 | --- | --- | --- |
@@ -6160,7 +6160,7 @@ exports[`planToMarkdown integration > tofu/with-modules/1 > renders without erro
 ### 📦 Module: \`module.naming\`
 
 <details>
-<summary>♻️ <strong>random_string</strong> suffix</summary>
+<summary>± <strong>random_string</strong> suffix</summary>
 
 | Attribute | Before | After |
 | --- | --- | --- |
@@ -6195,7 +6195,7 @@ exports[`planToMarkdown integration > tofu/with-modules/1 > renders without erro
 
 | Action | Count |
 | --- | --- |
-| ♻️ Replace | 2 |
+| ± Replace | 2 |
 | **Total** | **2** |
 "
 `;
