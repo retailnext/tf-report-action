@@ -26,6 +26,7 @@
     "test:coverage:ci": "vitest run --coverage --reporter=verbose",
     "test:integration:coverage": "vitest run --config vitest.integration.config.ts --coverage",
     "render": "tsx scripts/render-plan.ts",
+    "gallery": "tsx scripts/render-plan.ts --gallery",
     "ci": "npm run lint && npm run typecheck && npm run test:coverage:ci && npm run test:integration:coverage"
   },
   "devDependencies": {

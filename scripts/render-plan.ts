@@ -24,6 +24,7 @@
  *   --logs-url <url>            Logs URL for truncation notices
  *   --allowed-dirs <dirs>       Comma-separated allowed directories for file reading
  *   --max-output-length <n>     Maximum output length in characters
+ *   --gallery                    Render all fixture steps JSONs into a gallery HTML page
  *   --no-open                   Write the HTML file but do not open a browser
  *   --help                      Show this help text
  */
@@ -57,6 +58,7 @@ Options:
   --logs-url <url>                Logs URL for truncation notices (parses into env vars)
   --allowed-dirs <dirs>           Comma-separated allowed directories for file reading
   --max-output-length <n>         Maximum output length in characters
+  --gallery                       Render all fixture steps JSONs into a browsable gallery
   --no-open                       Write the HTML file but do not open a browser
   --help                          Show this help text
 
@@ -75,6 +77,7 @@ interface ParsedArgs {
   file: string | null;
   applyFile: string | null;
   stepsFile: string | null;
+  gallery: boolean;
   noOpen: boolean;
   options: Options;
   reportOptions: Partial<ReportOptions>;
@@ -86,6 +89,7 @@ function parseArgs(argv: string[]): ParsedArgs {
   let file: string | null = null;
   let applyFile: string | null = null;
   let stepsFile: string | null = null;
+  let gallery = false;
   let noOpen = false;
 
   for (let i = 0; i < argv.length; i++) {
@@ -138,6 +142,9 @@ function parseArgs(argv: string[]): ParsedArgs {
       case "--no-open":
         noOpen = true;
         break;
+      case "--gallery":
+        gallery = true;
+        break;
       default:
         if (arg && !arg.startsWith("--") && file === null) {
           file = arg;
@@ -145,10 +152,10 @@ function parseArgs(argv: string[]): ParsedArgs {
     }
   }
 
-  return { file, applyFile, stepsFile, noOpen, options, reportOptions };
+  return { file, applyFile, stepsFile, gallery, noOpen, options, reportOptions };
 }
 
-const { file, applyFile, stepsFile, noOpen, options, reportOptions } = parseArgs(args);
+const { file, applyFile, stepsFile, gallery, noOpen, options, reportOptions } = parseArgs(args);
 
 // ---------------------------------------------------------------------------
 // Shared: Build HTML and write to /tmp
@@ -238,6 +245,394 @@ async function renderAndWrite(markdown: string, title: string | undefined, suppr
   }
 
   console.log(`Preview written to ${outPath}`);
+}
+
+// ---------------------------------------------------------------------------
+// Gallery mode (--gallery)
+// ---------------------------------------------------------------------------
+
+if (gallery) {
+  const { resolve, dirname, join, isAbsolute, relative } = await import("node:path");
+  const { readdirSync, statSync } = await import("node:fs");
+
+  const repoRoot = resolve(import.meta.dirname, "..");
+
+  /** Recursively find all *steps*.json files under a directory. */
+  function findStepsFiles(dir: string): string[] {
+    const results: string[] = [];
+    for (const entry of readdirSync(dir, { withFileTypes: true })) {
+      const full = join(dir, entry.name);
+      if (entry.isDirectory()) {
+        results.push(...findStepsFiles(full));
+      } else if (entry.isFile() && entry.name.endsWith(".json") && entry.name.includes("steps")) {
+        results.push(full);
+      }
+    }
+    return results;
+  }
+
+  const fixtureDir = join(repoRoot, "tests", "fixtures");
+  const allStepsFiles = findStepsFiles(fixtureDir).sort();
+
+  if (allStepsFiles.length === 0) {
+    process.stderr.write("No steps JSON files found under tests/fixtures/\n");
+    process.exit(1);
+  }
+
+  console.log(`Found ${allStepsFiles.length} fixture steps files. Rendering...`);
+
+  // Render each fixture and collect { path, markdown }
+  const entries: Array<{ path: string; markdown: string }> = [];
+  for (const absPath of allStepsFiles) {
+    const relPath = relative(repoRoot, absPath);
+    const stepsDir = dirname(absPath);
+    let json: string;
+    try {
+      json = readFileSync(absPath, "utf-8");
+    } catch {
+      entries.push({ path: relPath, markdown: `> ⚠️ Failed to read ${relPath}` });
+      continue;
+    }
+
+    json = resolveRelativeFilePaths(json, stepsDir, join, isAbsolute);
+
+    const opts: ReportOptions = {
+      ...options,
+      ...reportOptions,
+      allowedDirs: reportOptions.allowedDirs ?? [stepsDir],
+    };
+
+    try {
+      const md = reportFromSteps(json, opts);
+      entries.push({ path: relPath, markdown: md });
+    } catch {
+      entries.push({ path: relPath, markdown: `> ⚠️ reportFromSteps threw for ${relPath}` });
+    }
+  }
+
+  console.log(`Rendered ${entries.length} fixtures. Building gallery HTML...`);
+
+  const galleryDataJson = JSON.stringify(entries.map(e => ({
+    path: e.path,
+    markdown: e.markdown,
+  })));
+
+  const galleryHtml = buildGalleryHtml(galleryDataJson);
+  const outPath = "/tmp/tf-plan-gallery.html";
+
+  try {
+    await writeFile(outPath, galleryHtml, "utf-8");
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : String(err);
+    process.stderr.write(`Error writing gallery HTML: ${msg}\n`);
+    process.exit(1);
+  }
+
+  if (!noOpen) {
+    try {
+      const opener =
+        process.platform === "darwin"
+          ? "open"
+          : process.platform === "win32"
+            ? "start"
+            : "xdg-open";
+      execSync(`${opener} ${outPath}`);
+    } catch {
+      process.stderr.write(`Could not open browser automatically. Open: file://${outPath}\n`);
+    }
+  }
+
+  console.log(`Gallery written to ${outPath} (${entries.length} fixtures)`);
+  process.exit(0);
+}
+
+function buildGalleryHtml(entriesJson: string): string {
+  // Escape for embedding in a <script> tag (not template literal — use a
+  // JSON blob assigned to a variable).
+  const escapedJson = entriesJson
+    .replace(/\\/g, "\\\\")
+    .replace(/'/g, "\\'")
+    .replace(/<\//g, "<\\/")
+    .replace(/<!--/g, "<\\!--");
+
+  // We embed the data as a JSON string parsed at runtime to avoid any
+  // escaping issues with template literals or special characters in markdown.
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>tf-plan-md Fixture Gallery</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+      display: flex; height: 100vh; overflow: hidden;
+      color: #1f2328; background: #ffffff;
+    }
+
+    /* Sidebar */
+    #sidebar {
+      width: 360px; min-width: 260px; max-width: 50vw;
+      border-right: 1px solid #d0d7de; display: flex; flex-direction: column;
+      background: #f6f8fa;
+    }
+    #sidebar-header {
+      padding: 12px; border-bottom: 1px solid #d0d7de;
+    }
+    #sidebar-header h2 { font-size: 14px; margin-bottom: 8px; color: #57606a; }
+    #filter-input {
+      width: 100%; padding: 6px 10px; border: 1px solid #d0d7de;
+      border-radius: 6px; font-size: 13px; outline: none;
+    }
+    #filter-input:focus { border-color: #0969da; box-shadow: 0 0 0 3px rgba(9,105,218,0.15); }
+    #count-label { font-size: 11px; color: #57606a; margin-top: 6px; display: block; }
+    #fixture-list {
+      flex: 1; overflow-y: auto; list-style: none;
+    }
+    #fixture-list li {
+      padding: 6px 12px; cursor: pointer; font-size: 12px;
+      font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, monospace;
+      border-bottom: 1px solid #eaeef2; white-space: nowrap;
+      overflow: hidden; text-overflow: ellipsis;
+    }
+    #fixture-list li:hover { background: #ddf4ff; }
+    #fixture-list li.active { background: #0969da; color: #fff; }
+    #fixture-list li.hidden { display: none; }
+
+    /* Main content */
+    #main {
+      flex: 1; display: flex; flex-direction: column; overflow: hidden;
+    }
+    #nav-bar {
+      display: flex; align-items: center; gap: 12px;
+      padding: 8px 16px; border-bottom: 1px solid #d0d7de;
+      background: #f6f8fa; flex-shrink: 0;
+    }
+    #nav-bar button {
+      padding: 4px 12px; border: 1px solid #d0d7de; border-radius: 6px;
+      background: #fff; cursor: pointer; font-size: 13px;
+    }
+    #nav-bar button:hover { background: #f3f4f6; }
+    #nav-bar button:disabled { opacity: 0.4; cursor: default; }
+    #fixture-path {
+      flex: 1; font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, monospace;
+      font-size: 13px; color: #0969da; overflow: hidden;
+      text-overflow: ellipsis; white-space: nowrap;
+    }
+    #position-label { font-size: 12px; color: #57606a; white-space: nowrap; }
+    #content-area {
+      flex: 1; overflow-y: auto; padding: 32px;
+      max-width: 1012px;
+    }
+
+    /* GitHub-flavored markdown styles */
+    #content-area h1, #content-area h2, #content-area h3, #content-area h4 {
+      margin-top: 24px; margin-bottom: 16px; font-weight: 600; line-height: 1.25;
+    }
+    #content-area h2 { font-size: 1.5em; border-bottom: 1px solid #d0d7de; padding-bottom: 0.3em; }
+    #content-area h3 { font-size: 1.25em; }
+    #content-area h4 { font-size: 1em; }
+    #content-area code {
+      font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, monospace;
+      font-size: 0.85em; background: #afb8c133; padding: 0.2em 0.4em; border-radius: 6px;
+    }
+    #content-area pre {
+      background: #f6f8fa; border: 1px solid #d0d7de; border-radius: 6px;
+      padding: 16px; overflow: auto;
+    }
+    #content-area pre code { background: none; padding: 0; font-size: 0.875em; }
+    #content-area table { border-collapse: collapse; width: 100%; margin-bottom: 16px; }
+    #content-area th, #content-area td { border: 1px solid #d0d7de; padding: 6px 13px; }
+    #content-area th { background: #f6f8fa; font-weight: 600; }
+    #content-area tr:nth-child(even) { background: #f6f8fa; }
+    #content-area details {
+      margin-bottom: 8px; border: 1px solid #d0d7de; border-radius: 6px; padding: 8px 12px;
+    }
+    #content-area summary { cursor: pointer; font-weight: 500; }
+    #content-area del {
+      color: #cf222e; text-decoration: none; background: #ffebe9;
+      padding: 0 2px; border-radius: 2px;
+    }
+    #content-area ins {
+      color: #116329; text-decoration: none; background: #dafbe1;
+      padding: 0 2px; border-radius: 2px;
+    }
+    #content-area p { margin-top: 0; margin-bottom: 16px; }
+    #content-area blockquote {
+      margin: 0; padding: 0 1em; color: #57606a;
+      border-left: 4px solid #d0d7de;
+    }
+  </style>
+</head>
+<body>
+  <div id="sidebar">
+    <div id="sidebar-header">
+      <h2>Fixture Gallery</h2>
+      <input id="filter-input" type="text" placeholder="Type to filter fixtures…" autocomplete="off" />
+      <span id="count-label"></span>
+    </div>
+    <ul id="fixture-list"></ul>
+  </div>
+  <div id="main">
+    <div id="nav-bar">
+      <button id="btn-prev" title="Previous (←)">← Prev</button>
+      <button id="btn-next" title="Next (→)">Next →</button>
+      <span id="fixture-path"></span>
+      <span id="position-label"></span>
+    </div>
+    <div id="content-area"></div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/dompurify/dist/purify.min.js"></script>
+  <script>
+  (function() {
+    'use strict';
+
+    var entries = JSON.parse('${escapedJson}');
+
+    var filterInput = document.getElementById('filter-input');
+    var countLabel = document.getElementById('count-label');
+    var fixtureList = document.getElementById('fixture-list');
+    var fixturePath = document.getElementById('fixture-path');
+    var positionLabel = document.getElementById('position-label');
+    var contentArea = document.getElementById('content-area');
+    var btnPrev = document.getElementById('btn-prev');
+    var btnNext = document.getElementById('btn-next');
+
+    // Build the visible (filtered) index list
+    var visibleIndices = [];
+    var currentVisiblePos = 0; // position within visibleIndices
+
+    // Create list items
+    var listItems = [];
+    for (var i = 0; i < entries.length; i++) {
+      var li = document.createElement('li');
+      li.textContent = entries[i].path;
+      li.dataset.index = String(i);
+      li.addEventListener('click', (function(idx) {
+        return function() { selectByGlobalIndex(idx); };
+      })(i));
+      fixtureList.appendChild(li);
+      listItems.push(li);
+    }
+
+    function applyFilter() {
+      var q = filterInput.value.toLowerCase();
+      visibleIndices = [];
+      for (var i = 0; i < entries.length; i++) {
+        var match = !q || entries[i].path.toLowerCase().indexOf(q) !== -1;
+        listItems[i].classList.toggle('hidden', !match);
+        if (match) visibleIndices.push(i);
+      }
+      countLabel.textContent = visibleIndices.length + ' of ' + entries.length + ' fixtures';
+      // If current selection is no longer visible, jump to first visible
+      if (visibleIndices.length > 0) {
+        var globalIdx = visibleIndices[currentVisiblePos];
+        if (globalIdx === undefined || listItems[globalIdx].classList.contains('hidden')) {
+          currentVisiblePos = 0;
+          renderCurrent();
+        }
+      }
+    }
+
+    function renderCurrent() {
+      // Clear active state
+      for (var i = 0; i < listItems.length; i++) {
+        listItems[i].classList.remove('active');
+      }
+
+      if (visibleIndices.length === 0) {
+        fixturePath.textContent = '(no matches)';
+        positionLabel.textContent = '';
+        contentArea.innerHTML = '<p style="color:#57606a;padding:20px;">No fixtures match the filter.</p>';
+        btnPrev.disabled = true;
+        btnNext.disabled = true;
+        return;
+      }
+
+      var globalIdx = visibleIndices[currentVisiblePos];
+      var entry = entries[globalIdx];
+      listItems[globalIdx].classList.add('active');
+      listItems[globalIdx].scrollIntoView({ block: 'nearest' });
+
+      fixturePath.textContent = entry.path;
+      positionLabel.textContent = (currentVisiblePos + 1) + ' / ' + visibleIndices.length;
+
+      var html = DOMPurify.sanitize(marked.parse(entry.markdown));
+      contentArea.innerHTML = html;
+      contentArea.scrollTop = 0;
+
+      btnPrev.disabled = currentVisiblePos === 0;
+      btnNext.disabled = currentVisiblePos === visibleIndices.length - 1;
+    }
+
+    function selectByGlobalIndex(globalIdx) {
+      var pos = visibleIndices.indexOf(globalIdx);
+      if (pos === -1) return;
+      currentVisiblePos = pos;
+      renderCurrent();
+    }
+
+    function goPrev() {
+      if (currentVisiblePos > 0) {
+        currentVisiblePos--;
+        renderCurrent();
+      }
+    }
+
+    function goNext() {
+      if (currentVisiblePos < visibleIndices.length - 1) {
+        currentVisiblePos++;
+        renderCurrent();
+      }
+    }
+
+    btnPrev.addEventListener('click', goPrev);
+    btnNext.addEventListener('click', goNext);
+
+    filterInput.addEventListener('input', function() {
+      applyFilter();
+      if (visibleIndices.length > 0) {
+        currentVisiblePos = 0;
+        renderCurrent();
+      }
+    });
+
+    // Keyboard navigation: ←/→ when filter is not focused
+    document.addEventListener('keydown', function(e) {
+      // Let the filter input handle its own keys
+      if (document.activeElement === filterInput) {
+        // Escape blurs the filter
+        if (e.key === 'Escape') {
+          filterInput.blur();
+          e.preventDefault();
+        }
+        return;
+      }
+
+      if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+        e.preventDefault();
+        goPrev();
+      } else if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+        e.preventDefault();
+        goNext();
+      } else if (e.key === '/' || e.key === 'f' && (e.metaKey || e.ctrlKey)) {
+        // '/' focuses filter (vim-style), Cmd/Ctrl+F also focuses filter
+        e.preventDefault();
+        filterInput.focus();
+        filterInput.select();
+      }
+    });
+
+    // Initial render
+    applyFilter();
+    renderCurrent();
+  })();
+  </script>
+</body>
+</html>`;
 }
 
 // ---------------------------------------------------------------------------
