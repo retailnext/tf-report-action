@@ -1,9 +1,11 @@
 /**
- * tfjson - TypeScript types for Terraform/OpenTofu JSON plan output
+ * tfjson - TypeScript types for Terraform/OpenTofu JSON output
  * 
  * This package provides strongly-typed TypeScript interfaces for parsing JSON
- * plan output from both OpenTofu ("tofu show -json <planfile>") and Terraform
- * ("terraform show -json <planfile>").
+ * output from both OpenTofu and Terraform, covering:
+ *   - Plan JSON output (`show -json <planfile>`)
+ *   - Machine-readable UI output (`-json` flag on init, plan, apply)
+ *   - Validate output (`validate -json`)
  * 
  * The two tools produce very similar output — OpenTofu forked from Terraform and
  * maintains broad compatibility. This package uses a single unified set of
@@ -15,6 +17,7 @@
  *   - Change actions as discriminated tuple unions
  *   - Recursive types for cty type descriptors and shadow structures
  *   - Constants as `as const` objects with derived union types
+ *   - Discriminated unions for machine-readable UI message types
  *   - Comprehensive documentation on every field
  * 
  * Source references (pinned commits):
@@ -127,3 +130,47 @@ export type {
   InvokeActionTrigger,
   DeferredActionInvocation,
 } from "./action_invocations";
+
+// ─── Machine-Readable UI Output ─────────────────────────────────────────────
+
+export {
+  UIChangeAction,
+  UIChangeReason,
+} from "./machine-readable-ui";
+
+export type {
+  UIChangeAction as UIChangeActionType,
+  UIChangeReason as UIChangeReasonType,
+  UIResourceAddr,
+  UIDiagnosticRange,
+  UIDiagnosticPos,
+  UIDiagnosticSnippet,
+  UIDiagnostic,
+  UIChangeSummary,
+  UIOutputValue,
+  UIMessage,
+  UIVersionMessage,
+  UILogMessage,
+  UIDiagnosticMessage,
+  UIPlannedChangeMessage,
+  UIChangeSummaryMessage,
+  UIApplyStartMessage,
+  UIApplyProgressMessage,
+  UIApplyCompleteMessage,
+  UIApplyErroredMessage,
+  UIProvisionStartMessage,
+  UIProvisionProgressMessage,
+  UIProvisionCompleteMessage,
+  UIProvisionErroredMessage,
+  UIRefreshStartMessage,
+  UIRefreshCompleteMessage,
+  UIOutputsMessage,
+  UIInitOutputMessage,
+  UIUnknownMessage,
+} from "./machine-readable-ui";
+
+// ─── Validate Output ────────────────────────────────────────────────────────
+
+export { VALIDATE_FORMAT_VERSION } from "./validate-output";
+
+export type { ValidateOutput } from "./validate-output";
