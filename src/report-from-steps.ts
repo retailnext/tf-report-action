@@ -34,7 +34,7 @@ import { buildReport } from "./builder/index.js";
 import { buildApplyReport } from "./builder/apply.js";
 import { renderReport } from "./renderer/index.js";
 import { composeSections, DEFAULT_MAX_OUTPUT_LENGTH } from "./compositor/index.js";
-import { STATUS_SUCCESS, STATUS_FAILURE, DIAGNOSTIC_WARNING } from "./model/status-icons.js";
+import { STATUS_SUCCESS, STATUS_FAILURE, DIAGNOSTIC_WARNING, DIAGNOSTIC_ERROR } from "./model/status-icons.js";
 import { tmpdir } from "node:os";
 
 // ─── ReportOptions ──────────────────────────────────────────────────────────
@@ -280,9 +280,9 @@ function detectTier(
         return { kind: "tier1", showPlanJson: read.content };
       }
       if (read.error) {
-        readErrors.push(`show-plan stdout: ${read.error}`);
+        readErrors.push(`${DIAGNOSTIC_WARNING} show-plan stdout: ${read.error}`);
       } else if (read.noFile) {
-        readErrors.push("show-plan: no stdout_file output configured");
+        readErrors.push(`${DIAGNOSTIC_WARNING} show-plan: stdout_file output missing in steps`);
       }
     }
   }
@@ -293,13 +293,13 @@ function detectTier(
     let applyRead: StepFileRead | undefined;
     if (planStep) {
       planRead = readStepStdout(planStep, readerOpts);
-      if (planRead.error) readErrors.push(`plan stdout: ${planRead.error}`);
-      else if (planRead.noFile) readErrors.push("plan: no stdout_file output configured");
+      if (planRead.error) readErrors.push(`${DIAGNOSTIC_WARNING} plan stdout: ${planRead.error}`);
+      else if (planRead.noFile) readErrors.push(`${DIAGNOSTIC_WARNING} plan: stdout_file output missing in steps`);
     }
     if (applyStep) {
       applyRead = readStepStdout(applyStep, readerOpts);
-      if (applyRead.error) readErrors.push(`apply stdout: ${applyRead.error}`);
-      else if (applyRead.noFile) readErrors.push("apply: no stdout_file output configured");
+      if (applyRead.error) readErrors.push(`${DIAGNOSTIC_WARNING} apply stdout: ${applyRead.error}`);
+      else if (applyRead.noFile) readErrors.push(`${DIAGNOSTIC_WARNING} apply: stdout_file output missing in steps`);
     }
     const result: Tier = { kind: "tier3", readErrors };
     if (planRead) (result as { planRead?: StepFileRead }).planRead = planRead;
@@ -487,10 +487,22 @@ function collectStepIssue(
   diagnostic?: string,
 ): void {
   const outcome = getStepOutcome(step);
-  const icon = outcome === "failure" ? STATUS_FAILURE : DIAGNOSTIC_WARNING;
-  const verb = outcome === "failure" ? "failed" : outcome;
+  const isFailed = outcome === "failure";
+  const icon = isFailed ? STATUS_FAILURE : DIAGNOSTIC_WARNING;
 
-  let content = `### ${icon} \`${stepId}\` ${verb}\n\n`;
+  // For failures, the heading says "failed". For non-failures with a
+  // diagnostic (e.g. parse error), summarize the problem instead of
+  // showing the confusing "⚠️ show-plan success" pattern.
+  let heading: string;
+  if (isFailed) {
+    heading = `\`${stepId}\` failed`;
+  } else if (diagnostic) {
+    heading = `\`${stepId}\`: output could not be parsed`;
+  } else {
+    heading = `\`${stepId}\` ${outcome}`;
+  }
+
+  let content = `### ${icon} ${heading}\n\n`;
   if (diagnostic) {
     content += `> ${diagnostic}\n\n`;
   }
@@ -500,15 +512,16 @@ function collectStepIssue(
 
   if (stdoutRead.content) {
     const displayContent = stdoutRead.truncated ? stdoutRead.content + "\n… (truncated)" : stdoutRead.content;
-    content += `<details open>\n<summary>stdout</summary>\n\n\`\`\`\n${displayContent}\n\`\`\`\n\n</details>\n\n`;
+    const formatted = formatRawOutput(displayContent);
+    content += `<details open>\n<summary>stdout</summary>\n\n${formatted}\n\n</details>\n\n`;
   } else if (stdoutRead.error) {
-    content += `> stdout not available: ${stdoutRead.error}\n\n`;
+    content += `> ${DIAGNOSTIC_WARNING} stdout not available: ${stdoutRead.error}\n\n`;
   }
   if (stderrRead.content) {
     const displayContent = stderrRead.truncated ? stderrRead.content + "\n… (truncated)" : stderrRead.content;
     content += `<details open>\n<summary>stderr</summary>\n\n\`\`\`\n${displayContent}\n\`\`\`\n\n</details>\n\n`;
   } else if (stderrRead.error) {
-    content += `> stderr not available: ${stderrRead.error}\n\n`;
+    content += `> ${DIAGNOSTIC_WARNING} stderr not available: ${stderrRead.error}\n\n`;
   }
   if (!stdoutRead.content && !stderrRead.content && !stdoutRead.error && !stderrRead.error) {
     content += "No output captured.\n\n";
@@ -517,7 +530,7 @@ function collectStepIssue(
   issues.push({
     id: `issue-${stepId}`,
     full: content,
-    compact: `### ${icon} \`${stepId}\` ${verb}\n\n`,
+    compact: `### ${icon} ${heading}\n\n`,
   });
 }
 
@@ -572,13 +585,21 @@ function renderTextFallback(
 
   // Check for failures: issues (init/validate), any non-terraform step failures,
   // or failed terraform steps (plan, show-plan, apply) that we're falling back from.
-  const hasFailure = [...issues].length > 0
-    || hasAnyFailedStep(steps, knownStepIds)
+  // Note: issues from non-failure steps (e.g. parse warnings) are NOT treated as
+  // failures for the title — only actual step failures trigger ❌.
+  const hasStepFailure =
+    hasAnyFailedStep(steps, knownStepIds)
     || hasAnyFailedKnownStep(steps, knownStepIds);
+  const hasIssueFailure = issues.some(
+    (s) => s.full.startsWith(`### ${STATUS_FAILURE}`),
+  );
+  const hasFailure = hasStepFailure || hasIssueFailure;
   const icon = hasFailure ? STATUS_FAILURE : STATUS_SUCCESS;
   const wsPrefix = workspace ? `\`${workspace}\` ` : "";
-  const label = tier.applyRead?.content !== undefined ? "Apply" : "Plan";
-  sections.push({ id: "title", full: `## ${icon} ${wsPrefix}${label}\n\n`, fixed: true });
+  const isApply = tier.applyRead?.content !== undefined;
+  const label = isApply ? "Apply" : "Plan";
+  const suffix = hasFailure ? "Failed" : "Succeeded";
+  sections.push({ id: "title", full: `## ${icon} ${wsPrefix}${label} ${suffix}\n\n`, fixed: true });
 
   for (const issue of issues) {
     sections.push(issue);
@@ -589,7 +610,7 @@ function renderTextFallback(
   if (hasOutput) {
     sections.push({
       id: "note",
-      full: "> **Note:** Structured plan output was not available. Showing raw command output.\n\n",
+      full: `> ${DIAGNOSTIC_WARNING} **Warning:** Structured plan output was not available. Showing raw command output.\n\n`,
       fixed: true,
     });
   } else {
@@ -605,7 +626,7 @@ function renderTextFallback(
     const displayContent = tier.planRead.truncated ? tier.planRead.content + "\n… (truncated)" : tier.planRead.content;
     sections.push({
       id: "plan-output",
-      full: `### Plan Output\n\n\`\`\`\n${displayContent}\n\`\`\`\n\n`,
+      full: `### Plan Output\n\n${formatRawOutput(displayContent)}\n\n`,
       compact: "### Plan Output\n\n_(omitted due to size)_\n\n",
     });
   }
@@ -614,7 +635,7 @@ function renderTextFallback(
     const displayContent = tier.applyRead.truncated ? tier.applyRead.content + "\n… (truncated)" : tier.applyRead.content;
     sections.push({
       id: "apply-output",
-      full: `### Apply Output\n\n\`\`\`\n${displayContent}\n\`\`\`\n\n`,
+      full: `### Apply Output\n\n${formatRawOutput(displayContent)}\n\n`,
       compact: "### Apply Output\n\n_(omitted due to size)_\n\n",
     });
   }
@@ -657,12 +678,22 @@ function renderGeneralWorkflow(
     });
   }
 
-  const hasFailure = Object.values(steps).some(
-    (s) => getStepOutcome(s) === "failure",
+  const failedSteps = Object.entries(steps).filter(
+    ([, step]) => getStepOutcome(step) === "failure",
   );
+  const hasFailure = failedSteps.length > 0;
   const icon = hasFailure ? STATUS_FAILURE : STATUS_SUCCESS;
   const wsPrefix = workspace ? `\`${workspace}\` ` : "";
-  const label = hasFailure ? "Failed" : "Succeeded";
+  let label: string;
+  if (hasFailure) {
+    if (failedSteps.length === 1) {
+      label = `\`${failedSteps[0]![0]}\` Failed`;
+    } else {
+      label = "Failed";
+    }
+  } else {
+    label = "Succeeded";
+  }
   sections.push({ id: "title", full: `## ${icon} ${wsPrefix}${label}\n\n`, fixed: true });
 
   // Step list
@@ -711,6 +742,225 @@ function renderStepStatusList(steps: Steps, excludeIds: Set<string>): string {
     table += `| \`${id}\` | ${outcome} |\n`;
   }
   return table + "\n";
+}
+
+// ─── Raw Output Formatting ─────────────────────────────────────────────────
+
+/**
+ * Format raw output content for display. If the content appears to be
+ * Terraform/OpenTofu JSON Lines (`@message` envelope), renders it as a
+ * human-friendly structured list with level-based icons. If it appears to
+ * be a validation result (single JSON object with `diagnostics`), formats
+ * the diagnostics. Otherwise falls back to a plain code block.
+ *
+ * Exported for unit testing.
+ */
+export function formatRawOutput(content: string): string {
+  const trimmed = content.trim();
+  if (trimmed === "") return "```\n(empty)\n```";
+
+  // Try single-object validation result first
+  const validateResult = tryFormatValidateOutput(trimmed);
+  if (validateResult !== undefined) return validateResult;
+
+  // Try JSON Lines format
+  const jsonlResult = tryFormatJsonLines(trimmed);
+  if (jsonlResult !== undefined) return jsonlResult;
+
+  // Fallback: raw code block
+  return `\`\`\`\n${content}\n\`\`\``;
+}
+
+/** Parsed JSON Lines message with known envelope fields. */
+interface JsonLinesMsg {
+  "@level"?: string;
+  "@message"?: string;
+  "@module"?: string;
+  type?: string;
+  diagnostic?: {
+    severity?: string;
+    summary?: string;
+    detail?: string;
+    address?: string;
+    snippet?: {
+      context?: string;
+      code?: string;
+      start_line?: number;
+    };
+  };
+  [key: string]: unknown;
+}
+
+/**
+ * Try to parse content as Terraform/OpenTofu JSON Lines and format it.
+ * Returns undefined if the content is not valid JSON Lines with `@message`.
+ */
+function tryFormatJsonLines(content: string): string | undefined {
+  const lines = content.split("\n").filter((l) => l.trim() !== "");
+  if (lines.length === 0) return undefined;
+
+  const messages: JsonLinesMsg[] = [];
+  for (const line of lines) {
+    try {
+      const parsed = JSON.parse(line) as unknown;
+      if (typeof parsed !== "object" || parsed === null || Array.isArray(parsed)) {
+        return undefined;
+      }
+      messages.push(parsed as JsonLinesMsg);
+    } catch {
+      return undefined;
+    }
+  }
+
+  // Require that at least one message has @message to identify as JSON Lines
+  if (!messages.some((m) => typeof m["@message"] === "string")) {
+    return undefined;
+  }
+
+  // Categorize messages by level for display
+  const infoAndAbove: Array<{ msg: JsonLinesMsg; index: number }> = [];
+  const debugTrace: Array<{ msg: JsonLinesMsg; index: number }> = [];
+
+  for (let i = 0; i < messages.length; i++) {
+    const msg = messages[i]!;
+    const level = typeof msg["@level"] === "string" ? msg["@level"] : "info";
+    if (level === "trace" || level === "debug") {
+      debugTrace.push({ msg, index: i });
+    } else {
+      infoAndAbove.push({ msg, index: i });
+    }
+  }
+
+  let output = "";
+
+  // Render info/warn/error messages
+  for (const { msg } of infoAndAbove) {
+    const level = typeof msg["@level"] === "string" ? msg["@level"] : "info";
+    const message = typeof msg["@message"] === "string" ? msg["@message"] : "(no message)";
+    const icon = levelIcon(level);
+    const prefix = icon ? `${icon} ` : "";
+
+    if (msg.type === "diagnostic" && msg.diagnostic) {
+      output += formatDiagnosticMessage(msg.diagnostic, prefix);
+    } else {
+      output += `${prefix}${message}\n`;
+    }
+  }
+
+  // Show debug/trace summary if any exist
+  if (debugTrace.length > 0) {
+    const counts = new Map<string, number>();
+    for (const { msg } of debugTrace) {
+      const level = typeof msg["@level"] === "string" ? msg["@level"] : "debug";
+      counts.set(level, (counts.get(level) ?? 0) + 1);
+    }
+    const parts = [...counts.entries()].map(([l, c]) => `${String(c)} ${l}`);
+    output += `\n<details>\n<summary>${parts.join(", ")} message(s) omitted</summary>\n\n`;
+    for (const { msg } of debugTrace) {
+      const message = typeof msg["@message"] === "string" ? msg["@message"] : "(no message)";
+      output += `- ${message}\n`;
+    }
+    output += "\n</details>\n";
+  }
+
+  // Add collapsed raw JSON
+  output += `\n<details>\n<summary>Raw JSON output</summary>\n\n\`\`\`json\n${content}\n\`\`\`\n\n</details>`;
+
+  return output;
+}
+
+/** Return the appropriate icon for a JSON Lines @level value. */
+function levelIcon(level: string): string {
+  switch (level) {
+    case "error": return DIAGNOSTIC_ERROR;
+    case "warn": return DIAGNOSTIC_WARNING;
+    default: return "";
+  }
+}
+
+/** Format a single diagnostic object into markdown. */
+function formatDiagnosticMessage(
+  diag: NonNullable<JsonLinesMsg["diagnostic"]>,
+  prefix: string,
+): string {
+  const severity = diag.severity ?? "error";
+  const icon = severity === "warning" ? DIAGNOSTIC_WARNING : DIAGNOSTIC_ERROR;
+  const summary = diag.summary ?? "(unknown)";
+  const detail = diag.detail ?? "";
+  const address = diag.address ? ` (${diag.address})` : "";
+
+  let output = `${prefix || `${icon} `}**${summary}**${address}\n`;
+  if (detail) {
+    const detailLines = detail.split("\n").map((l) => `> ${l}`).join("\n");
+    output += `${detailLines}\n`;
+  }
+  if (diag.snippet?.code) {
+    const lineInfo = diag.snippet.start_line !== undefined ? ` (line ${String(diag.snippet.start_line)})` : "";
+    const ctx = diag.snippet.context ? ` in ${diag.snippet.context}` : "";
+    output += `> \`${diag.snippet.code}\`${ctx}${lineInfo}\n`;
+  }
+  output += "\n";
+  return output;
+}
+
+/**
+ * Try to parse content as a Terraform validate JSON result and format
+ * its diagnostics. Returns undefined if the content is not a validate result.
+ */
+function tryFormatValidateOutput(content: string): string | undefined {
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(content);
+  } catch {
+    return undefined;
+  }
+
+  if (typeof parsed !== "object" || parsed === null || Array.isArray(parsed)) {
+    return undefined;
+  }
+
+  const obj = parsed as Record<string, unknown>;
+  if (!("valid" in obj) || !("diagnostics" in obj) || !Array.isArray(obj["diagnostics"])) {
+    return undefined;
+  }
+
+  const valid = obj["valid"] as boolean;
+  const diagnostics = obj["diagnostics"] as Array<Record<string, unknown>>;
+
+  let output = "";
+  if (valid) {
+    output += `${STATUS_SUCCESS} Configuration is valid\n\n`;
+  } else {
+    output += `${STATUS_FAILURE} Configuration is **invalid**\n\n`;
+  }
+
+  if (diagnostics.length > 0) {
+    for (const diag of diagnostics) {
+      const severity = typeof diag["severity"] === "string" ? diag["severity"] : "error";
+      const icon = severity === "warning" ? DIAGNOSTIC_WARNING : DIAGNOSTIC_ERROR;
+      const summary = typeof diag["summary"] === "string" ? diag["summary"] : "(unknown)";
+      const detail = typeof diag["detail"] === "string" ? diag["detail"] : "";
+
+      output += `${icon} **${summary}**\n`;
+      if (detail) {
+        const detailLines = detail.split("\n").map((l) => `> ${l}`).join("\n");
+        output += `${detailLines}\n`;
+      }
+
+      const snippet = diag["snippet"] as Record<string, unknown> | undefined;
+      if (snippet && typeof snippet["code"] === "string") {
+        const lineInfo = typeof snippet["start_line"] === "number" ? ` (line ${String(snippet["start_line"])})` : "";
+        const ctx = typeof snippet["context"] === "string" ? ` in ${snippet["context"]}` : "";
+        output += `> \`${snippet["code"]}\`${ctx}${lineInfo}\n`;
+      }
+      output += "\n";
+    }
+  }
+
+  // Add collapsed raw JSON
+  output += `<details>\n<summary>Raw JSON output</summary>\n\n\`\`\`json\n${content}\n\`\`\`\n\n</details>`;
+
+  return output;
 }
 
 

@@ -509,3 +509,154 @@ describe("reportFromSteps integration — targeted scenarios", () => {
     expect(result.length).toBeGreaterThan(0);
   });
 });
+
+// ---------- Targeted assertions — all called-out rendering cases ----------
+
+describe("reportFromSteps integration — rendering quality", () => {
+  it("plan-error/1: title clearly says Plan Failed", () => {
+    const fixture = generatedFixtures.find((f) => f.label.includes("plan-error/1"));
+    expect(fixture).toBeDefined();
+    const resolved = resolveStepFilePaths(fixture!.stepsJson, fixture!.fixtureDir);
+    const result = reportFromSteps(resolved, {
+      allowedDirs: [fixture!.fixtureDir],
+      env: NO_GITHUB_ENV,
+    });
+    expect(result).toContain("Plan Failed");
+    expect(result).toContain("❌");
+  });
+
+  it("validate-error/1/no-show: shows graphically formatted diagnostics, not raw JSON", () => {
+    const fixture = noShowFixtures.find((f) => f.label.includes("validate-error/1"));
+    expect(fixture).toBeDefined();
+    const resolved = resolveStepFilePaths(fixture!.stepsJson, fixture!.fixtureDir);
+    const result = reportFromSteps(resolved, {
+      allowedDirs: [fixture!.fixtureDir],
+      env: NO_GITHUB_ENV,
+    });
+    // Should format diagnostics with severity icons and summary text
+    expect(result).toContain("🚨");
+    expect(result).toContain("**Reference to undeclared input variable**");
+    // Raw JSON should be in collapsed details, not shown inline
+    expect(result).toContain("Raw JSON output");
+    expect(result).toContain("<details>");
+  });
+
+  it("random-replace/1/apply-no-show: JSON Lines formatted with @message, raw JSON collapsed", () => {
+    const fixture = applyNoShowFixtures.find((f) =>
+      f.label.includes("random-replace/1"),
+    );
+    expect(fixture).toBeDefined();
+    const resolved = resolveStepFilePaths(fixture!.stepsJson, fixture!.fixtureDir);
+    const result = reportFromSteps(resolved, {
+      allowedDirs: [fixture!.fixtureDir],
+      env: NO_GITHUB_ENV,
+    });
+    // Should extract @message fields as readable text
+    expect(result).toMatch(/Plan to replace/);
+    // Raw JSON should be collapsed
+    expect(result).toContain("Raw JSON output");
+    expect(result).toContain("<details>");
+    // Title should say Apply Succeeded (not bare "Apply")
+    expect(result).toContain("Apply Succeeded");
+  });
+
+  it("apply-error/1/apply-no-show: title says Apply Failed", () => {
+    const fixture = applyNoShowFixtures.find((f) =>
+      f.label.includes("apply-error/1"),
+    );
+    expect(fixture).toBeDefined();
+    const resolved = resolveStepFilePaths(fixture!.stepsJson, fixture!.fixtureDir);
+    const result = reportFromSteps(resolved, {
+      allowedDirs: [fixture!.fixtureDir],
+      env: NO_GITHUB_ENV,
+    });
+    expect(result).toContain("❌");
+    expect(result).toContain("Apply Failed");
+  });
+
+  it("deferred-data-source/2/no-show: Plan Succeeded with ⚠️ warning for missing structured output", () => {
+    const fixture = noShowFixtures.find((f) =>
+      f.label.includes("deferred-data-source/2"),
+    );
+    expect(fixture).toBeDefined();
+    const resolved = resolveStepFilePaths(fixture!.stepsJson, fixture!.fixtureDir);
+    const result = reportFromSteps(resolved, {
+      allowedDirs: [fixture!.fixtureDir],
+      env: NO_GITHUB_ENV,
+    });
+    expect(result).toContain("✅");
+    expect(result).toContain("Plan Succeeded");
+    // Warning callout for missing structured output
+    expect(result).toContain("⚠️");
+    expect(result).toContain("Structured plan output was not available");
+  });
+
+  it("parse-failure: title is ✅ (not ❌) when all steps succeeded", () => {
+    const fixture = discoverManualStepsFixtures().find((f) =>
+      f.label.includes("parse-failure"),
+    );
+    expect(fixture).toBeDefined();
+    const resolved = resolveStepFilePaths(fixture!.stepsJson, fixture!.fixtureDir);
+    const result = reportFromSteps(resolved, {
+      allowedDirs: [fixture!.fixtureDir],
+      env: NO_GITHUB_ENV,
+    });
+    // Title should NOT show ❌ — all steps succeeded
+    expect(result).toMatch(/^## ✅/);
+    // Should say "output could not be parsed" not "success"
+    expect(result).toContain("output could not be parsed");
+    expect(result).not.toContain("`show-plan` success");
+    // File read errors should have ⚠️ prefix
+    expect(result).toContain("⚠️ plan stdout:");
+  });
+
+  it("missing-outputs: uses correct wording with ⚠️ bullets", () => {
+    const fixture = discoverManualStepsFixtures().find((f) =>
+      f.label.includes("missing-outputs"),
+    );
+    expect(fixture).toBeDefined();
+    const resolved = resolveStepFilePaths(fixture!.stepsJson, fixture!.fixtureDir);
+    const result = reportFromSteps(resolved, {
+      allowedDirs: [fixture!.fixtureDir],
+      env: NO_GITHUB_ENV,
+    });
+    expect(result).toContain("stdout_file output missing in steps");
+    expect(result).not.toContain("configured");
+    // Each error line should have ⚠️
+    const lines = result.split("\n").filter((l) => l.includes("stdout_file"));
+    expect(lines.length).toBeGreaterThan(0);
+    for (const line of lines) {
+      expect(line).toContain("⚠️");
+    }
+  });
+
+  it("unrelated-workflow: title identifies the failing step", () => {
+    const fixture = discoverManualStepsFixtures().find((f) =>
+      f.label.includes("unrelated-workflow"),
+    );
+    expect(fixture).toBeDefined();
+    const resolved = resolveStepFilePaths(fixture!.stepsJson, fixture!.fixtureDir);
+    const result = reportFromSteps(resolved, {
+      allowedDirs: [fixture!.fixtureDir],
+      env: NO_GITHUB_ENV,
+    });
+    expect(result).toContain("❌");
+    expect(result).toContain("`test` Failed");
+  });
+
+  it("successful-workflow: title is ✅ Succeeded", () => {
+    const fixture = discoverManualStepsFixtures().find((f) =>
+      f.label.includes("successful-workflow"),
+    );
+    expect(fixture).toBeDefined();
+    const resolved = resolveStepFilePaths(fixture!.stepsJson, fixture!.fixtureDir);
+    const result = reportFromSteps(resolved, {
+      allowedDirs: [fixture!.fixtureDir],
+      env: NO_GITHUB_ENV,
+    });
+    expect(result).toContain("✅");
+    expect(result).toContain("Succeeded");
+    expect(result).not.toContain("❌");
+    expect(result).not.toContain("Failed");
+  });
+});

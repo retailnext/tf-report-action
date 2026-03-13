@@ -1,0 +1,22 @@
+{
+  "checkout": {
+    "outcome": "success",
+    "conclusion": "success",
+    "outputs": {}
+  },
+  "build": {
+    "outcome": "success",
+    "conclusion": "success",
+    "outputs": {}
+  },
+  "test": {
+    "outcome": "success",
+    "conclusion": "success",
+    "outputs": {}
+  },
+  "deploy": {
+    "outcome": "success",
+    "conclusion": "success",
+    "outputs": {}
+  }
+}
