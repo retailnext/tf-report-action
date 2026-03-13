@@ -1,5 +1,327 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
+exports[`planToMarkdown integration > terraform/apply-error/0 > renders without error and matches snapshot [default] 1`] = `
+"## Plan Summary
+
+| Action | Count |
+| --- | --- |
+| ➕ Add | 3 |
+| **Total** | **3** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>➕ <strong>null_resource</strong> will_fail</summary>
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id |  | <code><ins style="background:#dfd">(known after apply)</ins></code> |
+| triggers.value |  | <code><ins style="background:#dfd">v1</ins></code> |
+
+</details>
+
+<details>
+<summary>➕ <strong>terraform_data</strong> depends_on_fail</summary>
+
+_(all values known after apply)_
+
+</details>
+
+<details>
+<summary>➕ <strong>terraform_data</strong> success</summary>
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id |  | <code><ins style="background:#dfd">(known after apply)</ins></code> |
+| input |  | <code><ins style="background:#dfd">stable</ins></code> |
+| output |  | <code><ins style="background:#dfd">(known after apply)</ins></code> |
+
+</details>
+
+## Outputs
+
+| Output | Action | Before | After |
+| --- | --- | --- | --- |
+| depends_on_fail_output | ➕ |  | _(known after apply)_ |
+| success_output | ➕ |  | _(known after apply)_ |
+"
+`;
+
+exports[`planToMarkdown integration > terraform/apply-error/0 > renders without error and matches snapshot [diffFormat-simple] 1`] = `
+"## Plan Summary
+
+| Action | Count |
+| --- | --- |
+| ➕ Add | 3 |
+| **Total** | **3** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>➕ <strong>null_resource</strong> will_fail</summary>
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id |  | + (known after apply) |
+| triggers.value |  | + v1 |
+
+</details>
+
+<details>
+<summary>➕ <strong>terraform_data</strong> depends_on_fail</summary>
+
+_(all values known after apply)_
+
+</details>
+
+<details>
+<summary>➕ <strong>terraform_data</strong> success</summary>
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id |  | + (known after apply) |
+| input |  | + stable |
+| output |  | + (known after apply) |
+
+</details>
+
+## Outputs
+
+| Output | Action | Before | After |
+| --- | --- | --- | --- |
+| depends_on_fail_output | ➕ |  | _(known after apply)_ |
+| success_output | ➕ |  | _(known after apply)_ |
+"
+`;
+
+exports[`planToMarkdown integration > terraform/apply-error/0 > renders without error and matches snapshot [showUnchangedAttributes] 1`] = `
+"## Plan Summary
+
+| Action | Count |
+| --- | --- |
+| ➕ Add | 3 |
+| **Total** | **3** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>➕ <strong>null_resource</strong> will_fail</summary>
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id |  | <code><ins style="background:#dfd">(known after apply)</ins></code> |
+| triggers.value |  | <code><ins style="background:#dfd">v1</ins></code> |
+
+</details>
+
+<details>
+<summary>➕ <strong>terraform_data</strong> depends_on_fail</summary>
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id |  | <code><ins style="background:#dfd">(known after apply)</ins></code> |
+| input |  | <code><ins style="background:#dfd">(known after apply)</ins></code> |
+| output |  | <code><ins style="background:#dfd">(known after apply)</ins></code> |
+| triggers_replace |  |  |
+
+</details>
+
+<details>
+<summary>➕ <strong>terraform_data</strong> success</summary>
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id |  | <code><ins style="background:#dfd">(known after apply)</ins></code> |
+| input |  | <code><ins style="background:#dfd">stable</ins></code> |
+| output |  | <code><ins style="background:#dfd">(known after apply)</ins></code> |
+| triggers_replace |  |  |
+
+</details>
+
+## Outputs
+
+| Output | Action | Before | After |
+| --- | --- | --- | --- |
+| depends_on_fail_output | ➕ |  | _(known after apply)_ |
+| success_output | ➕ |  | _(known after apply)_ |
+"
+`;
+
+exports[`planToMarkdown integration > terraform/apply-error/0 > renders without error and matches snapshot [summary-template] 1`] = `
+"## Plan Summary
+
+| Action | Count |
+| --- | --- |
+| ➕ Add | 3 |
+| **Total** | **3** |
+"
+`;
+
+exports[`planToMarkdown integration > terraform/apply-error/1 > renders without error and matches snapshot [default] 1`] = `
+"## Plan Summary
+
+| Action | Count |
+| --- | --- |
+| 🔧 Change | 1 |
+| ♻️ Replace | 1 |
+| **Total** | **2** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>♻️ <strong>null_resource</strong> will_fail</summary>
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | 4087683683299475011 | <code><ins style="background:#dfd">(known after apply)</ins><del style="background:#fdd">4087683683299475011</del></code> |
+| triggers.value | v1 | <code>v<ins style="background:#dfd">2</ins><del style="background:#fdd">1</del></code> |
+
+</details>
+
+<details>
+<summary>🔧 <strong>terraform_data</strong> depends_on_fail — changed: input, output</summary>
+
+_(all values known after apply)_
+
+</details>
+
+<details>
+<summary>⬜ <strong>terraform_data</strong> success</summary>
+
+_No attribute changes._
+
+</details>
+
+## Outputs
+
+| Output | Action | Before | After |
+| --- | --- | --- | --- |
+| depends_on_fail_output | 🔧 | <code>4087683683299475011</code> | _(known after apply)_ |
+| success_output | ⬜ | <code>stable</code> | <code>stable</code> |
+"
+`;
+
+exports[`planToMarkdown integration > terraform/apply-error/1 > renders without error and matches snapshot [diffFormat-simple] 1`] = `
+"## Plan Summary
+
+| Action | Count |
+| --- | --- |
+| 🔧 Change | 1 |
+| ♻️ Replace | 1 |
+| **Total** | **2** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>♻️ <strong>null_resource</strong> will_fail</summary>
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | 4087683683299475011 | - 4087683683299475011<br>+ (known after apply) |
+| triggers.value | v1 | - v1<br>+ v2 |
+
+</details>
+
+<details>
+<summary>🔧 <strong>terraform_data</strong> depends_on_fail — changed: input, output</summary>
+
+_(all values known after apply)_
+
+</details>
+
+<details>
+<summary>⬜ <strong>terraform_data</strong> success</summary>
+
+_No attribute changes._
+
+</details>
+
+## Outputs
+
+| Output | Action | Before | After |
+| --- | --- | --- | --- |
+| depends_on_fail_output | 🔧 | <code>4087683683299475011</code> | _(known after apply)_ |
+| success_output | ⬜ | <code>stable</code> | <code>stable</code> |
+"
+`;
+
+exports[`planToMarkdown integration > terraform/apply-error/1 > renders without error and matches snapshot [showUnchangedAttributes] 1`] = `
+"## Plan Summary
+
+| Action | Count |
+| --- | --- |
+| 🔧 Change | 1 |
+| ♻️ Replace | 1 |
+| **Total** | **2** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>♻️ <strong>null_resource</strong> will_fail</summary>
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | 4087683683299475011 | <code><ins style="background:#dfd">(known after apply)</ins><del style="background:#fdd">4087683683299475011</del></code> |
+| triggers.value | v1 | <code>v<ins style="background:#dfd">2</ins><del style="background:#fdd">1</del></code> |
+
+</details>
+
+<details>
+<summary>🔧 <strong>terraform_data</strong> depends_on_fail — changed: input, output</summary>
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | 5cf0de49-cc06-7059-9be8-bc6c3c5995ca | <code>5cf0de49-cc06-7059-9be8-bc6c3c5995ca</code> |
+| input | 4087683683299475011 | <code><ins style="background:#dfd">(known after apply)</ins><del style="background:#fdd">4087683683299475011</del></code> |
+| output | 4087683683299475011 | <code><ins style="background:#dfd">(known after apply)</ins><del style="background:#fdd">4087683683299475011</del></code> |
+| triggers_replace |  |  |
+
+</details>
+
+<details>
+<summary>⬜ <strong>terraform_data</strong> success</summary>
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | 6cbd3c80-60e5-6c31-d440-15c33d4adb6c | <code>6cbd3c80-60e5-6c31-d440-15c33d4adb6c</code> |
+| input | stable | <code>stable</code> |
+| output | stable | <code>stable</code> |
+| triggers_replace |  |  |
+
+</details>
+
+## Outputs
+
+| Output | Action | Before | After |
+| --- | --- | --- | --- |
+| depends_on_fail_output | 🔧 | <code>4087683683299475011</code> | _(known after apply)_ |
+| success_output | ⬜ | <code>stable</code> | <code>stable</code> |
+"
+`;
+
+exports[`planToMarkdown integration > terraform/apply-error/1 > renders without error and matches snapshot [summary-template] 1`] = `
+"## Plan Summary
+
+| Action | Count |
+| --- | --- |
+| 🔧 Change | 1 |
+| ♻️ Replace | 1 |
+| **Total** | **2** |
+"
+`;
+
 exports[`planToMarkdown integration > terraform/deferred-data-source/0 > renders without error and matches snapshot [default] 1`] = `
 "## Plan Summary
 
@@ -2774,6 +3096,328 @@ exports[`planToMarkdown integration > terraform/with-modules/1 > renders without
 | Action | Count |
 | --- | --- |
 | ♻️ Replace | 2 |
+| **Total** | **2** |
+"
+`;
+
+exports[`planToMarkdown integration > tofu/apply-error/0 > renders without error and matches snapshot [default] 1`] = `
+"## Plan Summary
+
+| Action | Count |
+| --- | --- |
+| ➕ Add | 3 |
+| **Total** | **3** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>➕ <strong>null_resource</strong> will_fail</summary>
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id |  | <code><ins style="background:#dfd">(known after apply)</ins></code> |
+| triggers.value |  | <code><ins style="background:#dfd">v1</ins></code> |
+
+</details>
+
+<details>
+<summary>➕ <strong>terraform_data</strong> depends_on_fail</summary>
+
+_(all values known after apply)_
+
+</details>
+
+<details>
+<summary>➕ <strong>terraform_data</strong> success</summary>
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id |  | <code><ins style="background:#dfd">(known after apply)</ins></code> |
+| input |  | <code><ins style="background:#dfd">stable</ins></code> |
+| output |  | <code><ins style="background:#dfd">(known after apply)</ins></code> |
+
+</details>
+
+## Outputs
+
+| Output | Action | Before | After |
+| --- | --- | --- | --- |
+| depends_on_fail_output | ➕ |  | _(known after apply)_ |
+| success_output | ➕ |  | _(known after apply)_ |
+"
+`;
+
+exports[`planToMarkdown integration > tofu/apply-error/0 > renders without error and matches snapshot [diffFormat-simple] 1`] = `
+"## Plan Summary
+
+| Action | Count |
+| --- | --- |
+| ➕ Add | 3 |
+| **Total** | **3** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>➕ <strong>null_resource</strong> will_fail</summary>
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id |  | + (known after apply) |
+| triggers.value |  | + v1 |
+
+</details>
+
+<details>
+<summary>➕ <strong>terraform_data</strong> depends_on_fail</summary>
+
+_(all values known after apply)_
+
+</details>
+
+<details>
+<summary>➕ <strong>terraform_data</strong> success</summary>
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id |  | + (known after apply) |
+| input |  | + stable |
+| output |  | + (known after apply) |
+
+</details>
+
+## Outputs
+
+| Output | Action | Before | After |
+| --- | --- | --- | --- |
+| depends_on_fail_output | ➕ |  | _(known after apply)_ |
+| success_output | ➕ |  | _(known after apply)_ |
+"
+`;
+
+exports[`planToMarkdown integration > tofu/apply-error/0 > renders without error and matches snapshot [showUnchangedAttributes] 1`] = `
+"## Plan Summary
+
+| Action | Count |
+| --- | --- |
+| ➕ Add | 3 |
+| **Total** | **3** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>➕ <strong>null_resource</strong> will_fail</summary>
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id |  | <code><ins style="background:#dfd">(known after apply)</ins></code> |
+| triggers.value |  | <code><ins style="background:#dfd">v1</ins></code> |
+
+</details>
+
+<details>
+<summary>➕ <strong>terraform_data</strong> depends_on_fail</summary>
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id |  | <code><ins style="background:#dfd">(known after apply)</ins></code> |
+| input |  | <code><ins style="background:#dfd">(known after apply)</ins></code> |
+| output |  | <code><ins style="background:#dfd">(known after apply)</ins></code> |
+| triggers_replace |  |  |
+
+</details>
+
+<details>
+<summary>➕ <strong>terraform_data</strong> success</summary>
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id |  | <code><ins style="background:#dfd">(known after apply)</ins></code> |
+| input |  | <code><ins style="background:#dfd">stable</ins></code> |
+| output |  | <code><ins style="background:#dfd">(known after apply)</ins></code> |
+| triggers_replace |  |  |
+
+</details>
+
+## Outputs
+
+| Output | Action | Before | After |
+| --- | --- | --- | --- |
+| depends_on_fail_output | ➕ |  | _(known after apply)_ |
+| success_output | ➕ |  | _(known after apply)_ |
+"
+`;
+
+exports[`planToMarkdown integration > tofu/apply-error/0 > renders without error and matches snapshot [summary-template] 1`] = `
+"## Plan Summary
+
+| Action | Count |
+| --- | --- |
+| ➕ Add | 3 |
+| **Total** | **3** |
+"
+`;
+
+exports[`planToMarkdown integration > tofu/apply-error/1 > renders without error and matches snapshot [default] 1`] = `
+"## Plan Summary
+
+| Action | Count |
+| --- | --- |
+| 🔧 Change | 1 |
+| ♻️ Replace | 1 |
+| **Total** | **2** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>♻️ <strong>null_resource</strong> will_fail</summary>
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | 3427955069007833543 | <code><ins style="background:#dfd">(known after apply)</ins><del style="background:#fdd">3427955069007833543</del></code> |
+| triggers.value | v1 | <code>v<ins style="background:#dfd">2</ins><del style="background:#fdd">1</del></code> |
+
+</details>
+
+<details>
+<summary>🔧 <strong>terraform_data</strong> depends_on_fail — changed: input, output</summary>
+
+_(all values known after apply)_
+
+</details>
+
+<details>
+<summary>⬜ <strong>terraform_data</strong> success</summary>
+
+_No attribute changes._
+
+</details>
+
+## Outputs
+
+| Output | Action | Before | After |
+| --- | --- | --- | --- |
+| depends_on_fail_output | 🔧 | <code>3427955069007833543</code> | _(known after apply)_ |
+| success_output | ⬜ | <code>stable</code> | <code>stable</code> |
+"
+`;
+
+exports[`planToMarkdown integration > tofu/apply-error/1 > renders without error and matches snapshot [diffFormat-simple] 1`] = `
+"## Plan Summary
+
+| Action | Count |
+| --- | --- |
+| 🔧 Change | 1 |
+| ♻️ Replace | 1 |
+| **Total** | **2** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>♻️ <strong>null_resource</strong> will_fail</summary>
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | 3427955069007833543 | - 3427955069007833543<br>+ (known after apply) |
+| triggers.value | v1 | - v1<br>+ v2 |
+
+</details>
+
+<details>
+<summary>🔧 <strong>terraform_data</strong> depends_on_fail — changed: input, output</summary>
+
+_(all values known after apply)_
+
+</details>
+
+<details>
+<summary>⬜ <strong>terraform_data</strong> success</summary>
+
+_No attribute changes._
+
+</details>
+
+## Outputs
+
+| Output | Action | Before | After |
+| --- | --- | --- | --- |
+| depends_on_fail_output | 🔧 | <code>3427955069007833543</code> | _(known after apply)_ |
+| success_output | ⬜ | <code>stable</code> | <code>stable</code> |
+"
+`;
+
+exports[`planToMarkdown integration > tofu/apply-error/1 > renders without error and matches snapshot [showUnchangedAttributes] 1`] = `
+"## Plan Summary
+
+| Action | Count |
+| --- | --- |
+| 🔧 Change | 1 |
+| ♻️ Replace | 1 |
+| **Total** | **2** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>♻️ <strong>null_resource</strong> will_fail</summary>
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | 3427955069007833543 | <code><ins style="background:#dfd">(known after apply)</ins><del style="background:#fdd">3427955069007833543</del></code> |
+| triggers.value | v1 | <code>v<ins style="background:#dfd">2</ins><del style="background:#fdd">1</del></code> |
+
+</details>
+
+<details>
+<summary>🔧 <strong>terraform_data</strong> depends_on_fail — changed: input, output</summary>
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | 7e1522c1-89bd-d9fe-9ad1-965ffee731c0 | <code>7e1522c1-89bd-d9fe-9ad1-965ffee731c0</code> |
+| input | 3427955069007833543 | <code><ins style="background:#dfd">(known after apply)</ins><del style="background:#fdd">3427955069007833543</del></code> |
+| output | 3427955069007833543 | <code><ins style="background:#dfd">(known after apply)</ins><del style="background:#fdd">3427955069007833543</del></code> |
+| triggers_replace |  |  |
+
+</details>
+
+<details>
+<summary>⬜ <strong>terraform_data</strong> success</summary>
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | 854c694c-5542-2898-e897-ee0ed6db0825 | <code>854c694c-5542-2898-e897-ee0ed6db0825</code> |
+| input | stable | <code>stable</code> |
+| output | stable | <code>stable</code> |
+| triggers_replace |  |  |
+
+</details>
+
+## Outputs
+
+| Output | Action | Before | After |
+| --- | --- | --- | --- |
+| depends_on_fail_output | 🔧 | <code>3427955069007833543</code> | _(known after apply)_ |
+| success_output | ⬜ | <code>stable</code> | <code>stable</code> |
+"
+`;
+
+exports[`planToMarkdown integration > tofu/apply-error/1 > renders without error and matches snapshot [summary-template] 1`] = `
+"## Plan Summary
+
+| Action | Count |
+| --- | --- |
+| 🔧 Change | 1 |
+| ♻️ Replace | 1 |
 | **Total** | **2** |
 "
 `;
