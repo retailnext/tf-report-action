@@ -100,6 +100,9 @@ them, because attribute values may be sensitive. This means:
   files generated from fixture Terraform workspaces.
 - Coverage thresholds: 90% lines/functions/statements, 85% branches.
 - Run `npm run test:coverage` locally; CI runs `npm run test:coverage:ci`.
+- **After adding or modifying any source code, run `npm run test:coverage` and verify
+  that coverage thresholds are still met.** If new code causes coverage to drop below
+  thresholds, add unit tests until thresholds are satisfied before committing.
 - Use the `/add-fixture-workspace` skill to add fixture workspaces.
 - Use the `/generate-fixtures` skill to regenerate fixture JSON files.
 

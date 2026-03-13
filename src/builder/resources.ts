@@ -9,7 +9,8 @@ import { KNOWN_AFTER_APPLY } from "./attributes.js";
 
 /**
  * Maps each entry in plan.resource_changes to a ModelResourceChange.
- * Skips data sources with only a "read" action.
+ * Data sources are always excluded — errors relating to data sources
+ * surface through the diagnostics section instead.
  */
 export function buildResourceChanges(
   plan: Plan,
@@ -48,12 +49,10 @@ export function buildResourceChanges(
 }
 
 function shouldSkip(rc: TFResourceChange): boolean {
-  // Skip data sources that are only being read (no real change)
+  // Data sources are never shown in plan or apply reports. Errors relating
+  // to data sources surface through the diagnostics section instead.
   if (rc.mode === "data") {
-    const actions = rc.change.actions;
-    if (actions.length === 1 && actions[0] === "read") {
-      return true;
-    }
+    return true;
   }
   return false;
 }

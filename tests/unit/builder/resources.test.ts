@@ -167,7 +167,7 @@ describe("buildResourceChanges", () => {
     expect(result).toHaveLength(0);
   });
 
-  it("does NOT skip data sources with non-read actions", () => {
+  it("skips data sources with non-read actions", () => {
     const plan = basePlan([
       {
         address: "data.null_data_source.changing",
@@ -185,6 +185,6 @@ describe("buildResourceChanges", () => {
       },
     ]);
     const result = buildResourceChanges(plan, emptyConfigRefs, {});
-    expect(result).toHaveLength(1);
+    expect(result).toHaveLength(0);
   });
 });
