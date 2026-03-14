@@ -786,28 +786,89 @@ interface JsonLinesMsg {
   "@level"?: string;
   "@message"?: string;
   "@module"?: string;
+  "@timestamp"?: string;
   type?: string;
-  diagnostic?: {
-    severity?: string;
-    summary?: string;
-    detail?: string;
-    address?: string;
-    snippet?: {
-      context?: string;
-      code?: string;
-      start_line?: number;
-    };
-  };
   [key: string]: unknown;
+}
+
+/** Envelope keys excluded when flattening extra fields. */
+const ENVELOPE_KEYS = new Set(["@level", "@message", "@module", "@timestamp", "type"]);
+
+/**
+ * Dot-flatten a JSON value into sorted `key=value` pairs.
+ *
+ * Nested objects produce dotted keys (`hook.resource.addr`).
+ * Arrays produce indexed keys (`items.0`, `items.1`).
+ * Scalar values are stringified; long values (>80 chars) are truncated.
+ */
+function flattenJsonFields(
+  obj: Record<string, unknown>,
+  skipKeys: Set<string>,
+): string[] {
+  const pairs: [string, string][] = [];
+
+  function walk(value: unknown, prefix: string): void {
+    if (value === null || value === undefined) {
+      pairs.push([prefix, String(value)]);
+    } else if (typeof value === "object" && !Array.isArray(value)) {
+      const record = value as Record<string, unknown>;
+      for (const key of Object.keys(record)) {
+        walk(record[key], prefix ? `${prefix}.${key}` : key);
+      }
+    } else if (Array.isArray(value)) {
+      for (let i = 0; i < value.length; i++) {
+        walk(value[i], `${prefix}.${String(i)}`);
+      }
+    } else {
+      let str = typeof value === "string" ? value : JSON.stringify(value);
+      if (str.length > 80) {
+        str = str.slice(0, 77) + "...";
+      }
+      pairs.push([prefix, str]);
+    }
+  }
+
+  for (const [key, value] of Object.entries(obj)) {
+    if (skipKeys.has(key)) continue;
+    walk(value, key);
+  }
+
+  pairs.sort((a, b) => a[0].localeCompare(b[0]));
+  return pairs.map(([k, v]) => `\`${k}=${v}\``);
+}
+
+/**
+ * Format a single JSON Lines message in pretty-json-log style.
+ *
+ * Messages with extra fields beyond the envelope are wrapped in a
+ * `<details>` block so the fields can be expanded. Messages without
+ * extra fields render as a plain backtick-wrapped paragraph.
+ */
+function formatJsonLinesMessage(msg: JsonLinesMsg): string {
+  const level = typeof msg["@level"] === "string" ? msg["@level"] : "info";
+  const message = typeof msg["@message"] === "string" ? msg["@message"] : "(no message)";
+  const icon = levelIcon(level);
+  const prefix = icon ? `${icon} ` : "";
+  const typeStr = typeof msg.type === "string" ? msg.type : "";
+  const typeSuffix = typeStr ? ` \`type=${typeStr}\`` : "";
+
+  const fields = flattenJsonFields(msg as Record<string, unknown>, ENVELOPE_KEYS);
+
+  if (fields.length === 0) {
+    return `${prefix}\`${message}\`${typeSuffix}`;
+  }
+
+  const fieldLines = fields.join("\n\n");
+  return `<details>\n<summary>${prefix}\`${message}\`${typeSuffix}</summary>\n\n${fieldLines}\n\n</details>`;
 }
 
 /**
  * Try to parse content as Terraform/OpenTofu JSON Lines and format it.
  * Returns undefined if the content is not valid JSON Lines with `@message`.
  *
- * Uses markdown throughout. Simple messages render as list items.
- * Diagnostics with extra detail use `<details>` for expansion (the only
- * HTML element used, and already standard in GitHub-flavored markdown).
+ * Each message renders as a backtick-wrapped paragraph with a `type=X` suffix.
+ * Messages with extra fields beyond the envelope are expandable via `<details>`.
+ * Fields are dot-flattened, sorted lexicographically, one per line.
  */
 function tryFormatJsonLines(content: string): string | undefined {
   const lines = content.split("\n").filter((l) => l.trim() !== "");
@@ -844,19 +905,10 @@ function tryFormatJsonLines(content: string): string | undefined {
     }
   }
 
-  let output = "";
+  const parts: string[] = [];
 
   for (const msg of infoAndAbove) {
-    const level = typeof msg["@level"] === "string" ? msg["@level"] : "info";
-    const message = typeof msg["@message"] === "string" ? msg["@message"] : "(no message)";
-    const icon = levelIcon(level);
-    const prefix = icon ? `${icon} ` : "";
-
-    if (msg.type === "diagnostic" && msg.diagnostic) {
-      output += formatDiagnosticItem(msg.diagnostic, prefix);
-    } else {
-      output += `- ${prefix}${message}\n`;
-    }
+    parts.push(formatJsonLinesMessage(msg));
   }
 
   // Show debug/trace summary if any exist
@@ -866,49 +918,17 @@ function tryFormatJsonLines(content: string): string | undefined {
       const level = typeof msg["@level"] === "string" ? msg["@level"] : "debug";
       counts.set(level, (counts.get(level) ?? 0) + 1);
     }
-    const parts = [...counts.entries()].map(([l, c]) => `${String(c)} ${l}`);
-    output += `\n<details>\n<summary>${parts.join(", ")} message(s) omitted</summary>\n\n`;
-    for (const msg of debugTrace) {
-      const message = typeof msg["@message"] === "string" ? msg["@message"] : "(no message)";
-      output += `- ${message}\n`;
-    }
-    output += "\n</details>\n";
+    const countParts = [...counts.entries()].map(([l, c]) => `${String(c)} ${l}`);
+    const inner = debugTrace
+      .map((msg) => {
+        const message = typeof msg["@message"] === "string" ? msg["@message"] : "(no message)";
+        return `\`${message}\``;
+      })
+      .join("\n\n");
+    parts.push(`<details>\n<summary>${countParts.join(", ")} message(s) omitted</summary>\n\n${inner}\n\n</details>`);
   }
 
-  return output;
-}
-
-/**
- * Format a diagnostic as a markdown list item with optional expandable detail.
- * Uses `<details>` only when the diagnostic has detail or snippet beyond the summary.
- */
-function formatDiagnosticItem(
-  diag: NonNullable<JsonLinesMsg["diagnostic"]>,
-  prefix: string,
-): string {
-  const severity = diag.severity ?? "error";
-  const diagIcon = severity === "warning" ? DIAGNOSTIC_WARNING : DIAGNOSTIC_ERROR;
-  const displayPrefix = prefix || `${diagIcon} `;
-  const summary = diag.summary ?? "(unknown)";
-  const detail = diag.detail ?? "";
-  const address = diag.address ? ` (${diag.address})` : "";
-
-  const hasBody = detail !== "" || diag.snippet?.code !== undefined;
-  if (!hasBody) {
-    return `- ${displayPrefix}**${summary}**${address}\n`;
-  }
-
-  let body = `- ${displayPrefix}**${summary}**${address}\n`;
-  if (detail) {
-    const detailLines = detail.split("\n").map((l) => `  > ${l}`).join("\n");
-    body += `${detailLines}\n`;
-  }
-  if (diag.snippet?.code) {
-    const lineInfo = diag.snippet.start_line !== undefined ? ` (line ${String(diag.snippet.start_line)})` : "";
-    const ctx = diag.snippet.context ? ` in ${diag.snippet.context}` : "";
-    body += `  > \`${diag.snippet.code}\`${ctx}${lineInfo}\n`;
-  }
-  return body;
+  return parts.join("\n\n") + "\n";
 }
 
 /** Return the appropriate icon for a JSON Lines @level value. */
