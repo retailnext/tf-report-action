@@ -82,7 +82,7 @@ All entry points accept an optional `Options` object:
 |---|---|---|---|
 | `workspace` | `string` | _(none)_ | Workspace name for title and dedup marker |
 | `allowedDirs` | `string[]` | `[RUNNER_TEMP]` | Allowed directories for file reading |
-| `maxOutputLength` | `number` | `65000` | Maximum output length in characters |
+| `maxOutputLength` | `number` | `64512` (63 KiB) | Maximum output length in characters |
 | `env` | `Record<string, string>` | `process.env` | Environment variables (DI for testing) |
 
 ## Development

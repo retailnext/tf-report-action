@@ -36,7 +36,7 @@ Follow these boundaries strictly — do not add cross-cutting logic.
 | `src/steps/` | GitHub Actions steps context parsing, validation, and secure file reading. Zero internal project dependencies — only Node.js built-ins. This is the I/O boundary between the external world and the pure transformation pipeline. |
 | `src/compositor/` | Budget-aware section assembly. Composes markdown sections within an output size limit, progressively degrading from full → compact → omit. Zero internal project dependencies (strings only). |
 | `src/report-from-steps.ts` | Steps-based report orchestration. Accepts GitHub Actions steps context, reads stdout files, and produces a tiered report (structured → raw text → general workflow). Uses `parser/`, `builder/`, `renderer/`, `steps/`, `compositor/`, and `model/`. |
-| `src/index.ts` | Public API barrel: re-exports `planToMarkdown`, `applyToMarkdown`, and `reportFromSteps`. Orchestrates parser → builder → renderer for `planToMarkdown` and `applyToMarkdown`. |
+| `src/index.ts` | Public API barrel: exports `planToMarkdown`, `applyToMarkdown`, `reportFromSteps`, and all public types (`Options`, `ReportOptions`, `Report`, `PlanAction`, etc.). Orchestrates parser → builder → renderer for `planToMarkdown` and `applyToMarkdown`. |
 
 **Dependency rules:**
 - `diff/`, `sensitivity/`, and `flattener/` have zero internal project dependencies.
@@ -291,7 +291,7 @@ cat show-plan.stdout | npm run render --
 | `--workspace <name>` | `workspace` (for title and dedup marker) | _(none)_ |
 | `--logs-url <url>` | Parses a GitHub Actions run URL into `env` vars | _(none)_ |
 | `--allowed-dirs <dirs>` | Comma-separated allowed directories for file reading | _(runner temp)_ |
-| `--max-output-length <n>` | Maximum output length in characters | `65000` |
+| `--max-output-length <n>` | Maximum output length in characters | `64512` (63 KiB) |
 | `--gallery` | Render all fixture steps JSONs into a navigable gallery HTML page | _(off)_ |
 | `--no-open` | Suppress browser opening (write HTML only) | _(browser opens by default)_ |
 

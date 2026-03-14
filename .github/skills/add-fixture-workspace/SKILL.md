@@ -29,9 +29,16 @@ tests/fixtures/
     terraform/
       <workspace-name>/
         0/
+          init.stdout
+          validate.stdout
+          plan.stdout
           show-plan.stdout
           apply.stdout
           steps.json
+          plan-steps.json
+          no-show-steps.json
+          apply-no-show-steps.json
+          apply-only-steps.json
         1/
           ...
     tofu/
@@ -41,18 +48,20 @@ tests/fixtures/
 
 ## Safe Providers
 
-Only use providers that create no real cloud resources:
+Only use providers and resource types that create no real cloud resources:
 
-| Provider | Use for |
+| Provider / Resource | Use for |
 |---|---|
 | `hashicorp/null` | Resource lifecycle (create/update triggers/destroy) |
 | `hashicorp/random` | Replacement scenarios (changing keepers forces new value) |
 | `hashicorp/local` | Attribute change scenarios (changing file content) |
+| `terraform_data` (built-in) | Deferred data, dependency chains — no provider declaration needed |
 
 ## Adding a New Workspace
 
 1. Choose a descriptive name in `kebab-case` that reflects the scenario
-   (e.g. `null-lifecycle`, `random-replace`, `sensitive-values`).
+   (e.g. `null-lifecycle`, `random-replace`, `sensitive-values`, `moved-resource`,
+   `import-resource`, `removed-resource`).
 
 2. Create `tests/fixtures/<name>/0/main.tf` with the initial Terraform configuration.
    Include a `terraform {}` block with `required_providers` pinned to the safe providers.
@@ -106,7 +115,10 @@ Only use providers that create no real cloud resources:
 ✅ Commit:
 - `tests/fixtures/<name>/<stage>/*.tf` and any supporting HCL files
 - `tests/fixtures/<name>/<stage>/expect-fail` (if present)
-- `tests/fixtures/generated/**/*.json` and `**/*.jsonl` (plan JSON, apply JSONL, etc.)
+- `tests/fixtures/<name>/workspace.conf` (if present)
+- `tests/fixtures/generated/**/*.json` (steps JSON, show-plan stdout)
+- `tests/fixtures/generated/**/*.stdout` (plan, apply, init, validate output)
+- `tests/fixtures/generated/**/*.stderr` (stderr output, when non-empty)
 
 ❌ Do NOT commit:
 - `.terraform/` directories

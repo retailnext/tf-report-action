@@ -101,7 +101,23 @@ tests/fixtures/generated/
         apply.stdout         ← apply stdout (JSONL with -json, plain text without)
         apply.stderr         ← apply stderr (omitted if empty)
         steps.json           ← step outcomes and file references
+        plan-steps.json      ← plan-only variant (no apply step)
+        no-show-steps.json   ← no show-plan variant (forces Tier 3 fallback)
+        apply-no-show-steps.json ← apply present but no show-plan
+        apply-only-steps.json    ← only init/validate/apply (no plan or show-plan)
 ```
+
+### Step variant files
+
+In addition to the canonical `steps.json`, the generation script produces four
+variant files that exercise different rendering tiers by omitting specific steps:
+
+| Variant | Omitted steps | Purpose |
+|---|---|---|
+| `plan-steps.json` | `apply` | Plan-only report (Tier 1 without apply) |
+| `no-show-steps.json` | `show-plan`, `apply` | Forces Tier 3 raw text fallback |
+| `apply-no-show-steps.json` | `show-plan` | Apply present but no structured plan |
+| `apply-only-steps.json` | `plan`, `show-plan` | Only init/validate/apply steps |
 
 ### `steps.json` format
 
