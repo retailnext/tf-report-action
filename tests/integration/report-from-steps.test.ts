@@ -206,6 +206,72 @@ describe("reportFromSteps integration — apply-only fixtures", () => {
   }
 });
 
+// ---------- Targeted assertions for move/import/forget/no-op ----------
+
+describe("reportFromSteps — action classification", () => {
+  it("no-op/1: truly unchanged resource produces 'No Changes' with no resource section", () => {
+    const fixture = planOnlyFixtures.find((f) =>
+      f.label.includes("no-op/1"),
+    );
+    expect(fixture).toBeDefined();
+    const resolved = resolveStepFilePaths(fixture!.stepsJson, fixture!.fixtureDir);
+    const result = reportFromSteps(resolved, {
+      allowedDirs: [fixture!.fixtureDir],
+      env: NO_GITHUB_ENV,
+    });
+    expect(result).toContain("No Changes");
+    expect(result).not.toContain("Resource Changes");
+  });
+
+  it("moved-resource/1: moved resource shows 🚚 Move in summary", () => {
+    const fixture = planOnlyFixtures.find((f) =>
+      f.label.includes("moved-resource/1"),
+    );
+    expect(fixture).toBeDefined();
+    const resolved = resolveStepFilePaths(fixture!.stepsJson, fixture!.fixtureDir);
+    const result = reportFromSteps(resolved, {
+      allowedDirs: [fixture!.fixtureDir],
+      env: NO_GITHUB_ENV,
+    });
+    expect(result).toContain("1 to move");
+    expect(result).toContain("🚚");
+    expect(result).toContain("Move");
+    expect(result).not.toContain("No Changes");
+  });
+
+  it("import-resource/1: imported resource shows 📥 Import in summary", () => {
+    const fixture = planOnlyFixtures.find((f) =>
+      f.label.includes("import-resource/1"),
+    );
+    expect(fixture).toBeDefined();
+    const resolved = resolveStepFilePaths(fixture!.stepsJson, fixture!.fixtureDir);
+    const result = reportFromSteps(resolved, {
+      allowedDirs: [fixture!.fixtureDir],
+      env: NO_GITHUB_ENV,
+    });
+    expect(result).toContain("1 to import");
+    expect(result).toContain("📥");
+    expect(result).toContain("Import");
+    expect(result).not.toContain("No Changes");
+  });
+
+  it("removed-resource/1: forgotten resource shows 👋 Forget in summary", () => {
+    const fixture = planOnlyFixtures.find((f) =>
+      f.label.includes("removed-resource/1"),
+    );
+    expect(fixture).toBeDefined();
+    const resolved = resolveStepFilePaths(fixture!.stepsJson, fixture!.fixtureDir);
+    const result = reportFromSteps(resolved, {
+      allowedDirs: [fixture!.fixtureDir],
+      env: NO_GITHUB_ENV,
+    });
+    expect(result).toContain("1 to forget");
+    expect(result).toContain("👋");
+    expect(result).toContain("Forget");
+    expect(result).not.toContain("No Changes");
+  });
+});
+
 // ---------- Manual fixtures ----------
 
 const manualFixtures = discoverManualStepsFixtures();

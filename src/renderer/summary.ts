@@ -10,6 +10,9 @@ const PLAN_LABELS: Partial<Record<PlanAction, string>> = {
   update: "Change",
   replace: "Replace",
   delete: "Destroy",
+  move: "Move",
+  import: "Import",
+  forget: "Forget",
 };
 
 /** Past-tense labels for apply summaries. */
@@ -18,6 +21,9 @@ const APPLY_LABELS: Partial<Record<PlanAction, string>> = {
   update: "Changed",
   replace: "Replaced",
   delete: "Destroyed",
+  move: "Moved",
+  import: "Imported",
+  forget: "Forgotten",
 };
 
 /** Failure labels (used only for apply reports). */
@@ -26,6 +32,9 @@ const FAILURE_LABELS: Partial<Record<PlanAction, string>> = {
   update: "Change failed",
   replace: "Replace failed",
   delete: "Destroy failed",
+  move: "Move failed",
+  import: "Import failed",
+  forget: "Forget failed",
 };
 
 /**

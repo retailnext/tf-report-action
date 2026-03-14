@@ -3,11 +3,14 @@ import type { PlanAction } from "../model/plan-action.js";
 import type { Summary, SummaryActionGroup, ResourceTypeCount } from "../model/summary.js";
 
 /** Actions that count toward summary totals, in display order. */
-const SUMMARY_ACTIONS: readonly PlanAction[] = ["create", "update", "replace", "delete"];
+const SUMMARY_ACTIONS: readonly PlanAction[] = [
+  "create", "update", "replace", "delete", "move", "import", "forget",
+];
 
 /**
  * Builds a plan summary: groups resources by action and resource type.
- * No-op, read, forget, open, and unknown actions are excluded.
+ * Read, open, and unknown actions are excluded. True no-op resources
+ * should already be filtered out by the builder before reaching here.
  */
 export function buildSummary(resources: readonly ResourceChange[]): Summary {
   return {

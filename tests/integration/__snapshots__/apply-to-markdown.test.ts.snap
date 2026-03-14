@@ -347,6 +347,64 @@ exports[`applyToMarkdown integration > terraform/deferred-data-source/2 > render
 "
 `;
 
+exports[`applyToMarkdown integration > terraform/import-resource/0 > renders without error and matches snapshot [default] 1`] = `
+"## Apply Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Added | random_string | 1 |
+|  | **Added** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>➕ <strong>random_string</strong> existing</summary>
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | <code></code> | <code>(value not in plan)</code> |
+| length |  | <code><ins style="background:#dfd">8</ins></code> |
+| lower |  | <code><ins style="background:#dfd">true</ins></code> |
+| min_lower |  | <code><ins style="background:#dfd">0</ins></code> |
+| min_numeric |  | <code><ins style="background:#dfd">0</ins></code> |
+| min_special |  | <code><ins style="background:#dfd">0</ins></code> |
+| min_upper |  | <code><ins style="background:#dfd">0</ins></code> |
+| number |  | <code><ins style="background:#dfd">true</ins></code> |
+| numeric |  | <code><ins style="background:#dfd">true</ins></code> |
+| result | <code></code> | <code>(value not in plan)</code> |
+| special |  | <code><ins style="background:#dfd">false</ins></code> |
+| upper |  | <code><ins style="background:#dfd">true</ins></code> |
+
+</details>
+"
+`;
+
+exports[`applyToMarkdown integration > terraform/import-resource/0 > renders without error and matches snapshot [summary-template] 1`] = `
+"## Apply Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Added | random_string | 1 |
+|  | **Added** | **1** |
+"
+`;
+
+exports[`applyToMarkdown integration > terraform/import-resource/1 > renders without error and matches snapshot [default] 1`] = `
+"## Plan Summary
+
+_No changes._
+"
+`;
+
+exports[`applyToMarkdown integration > terraform/import-resource/1 > renders without error and matches snapshot [summary-template] 1`] = `
+"## Plan Summary
+
+_No changes._
+"
+`;
+
 exports[`applyToMarkdown integration > terraform/local-files/0 > renders without error and matches snapshot [default] 1`] = `
 "## Apply Summary
 
@@ -912,6 +970,64 @@ exports[`applyToMarkdown integration > terraform/random-replace/1 > renders with
 | --- | --- | --- |
 | ± Replaced | random_string | 1 |
 |  | **Replaced** | **1** |
+"
+`;
+
+exports[`applyToMarkdown integration > terraform/removed-resource/0 > renders without error and matches snapshot [default] 1`] = `
+"## Apply Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Added | null_resource | 2 |
+|  | **Added** | **2** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>➕ <strong>null_resource</strong> ephemeral</summary>
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | <code></code> | <code>(value not in plan)</code> |
+| triggers.version |  | <code><ins style="background:#dfd">1</ins></code> |
+
+</details>
+
+<details>
+<summary>➕ <strong>null_resource</strong> keeper</summary>
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | <code></code> | <code>(value not in plan)</code> |
+| triggers.version |  | <code><ins style="background:#dfd">1</ins></code> |
+
+</details>
+"
+`;
+
+exports[`applyToMarkdown integration > terraform/removed-resource/0 > renders without error and matches snapshot [summary-template] 1`] = `
+"## Apply Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Added | null_resource | 2 |
+|  | **Added** | **2** |
+"
+`;
+
+exports[`applyToMarkdown integration > terraform/removed-resource/1 > renders without error and matches snapshot [default] 1`] = `
+"## Apply Summary
+
+_No changes._
+"
+`;
+
+exports[`applyToMarkdown integration > terraform/removed-resource/1 > renders without error and matches snapshot [summary-template] 1`] = `
+"## Apply Summary
+
+_No changes._
 "
 `;
 
@@ -1517,6 +1633,64 @@ exports[`applyToMarkdown integration > tofu/deferred-data-source/2 > renders wit
 "
 `;
 
+exports[`applyToMarkdown integration > tofu/import-resource/0 > renders without error and matches snapshot [default] 1`] = `
+"## Apply Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Added | random_string | 1 |
+|  | **Added** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>➕ <strong>random_string</strong> existing</summary>
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | <code></code> | <code>(value not in plan)</code> |
+| length |  | <code><ins style="background:#dfd">8</ins></code> |
+| lower |  | <code><ins style="background:#dfd">true</ins></code> |
+| min_lower |  | <code><ins style="background:#dfd">0</ins></code> |
+| min_numeric |  | <code><ins style="background:#dfd">0</ins></code> |
+| min_special |  | <code><ins style="background:#dfd">0</ins></code> |
+| min_upper |  | <code><ins style="background:#dfd">0</ins></code> |
+| number |  | <code><ins style="background:#dfd">true</ins></code> |
+| numeric |  | <code><ins style="background:#dfd">true</ins></code> |
+| result | <code></code> | <code>(value not in plan)</code> |
+| special |  | <code><ins style="background:#dfd">false</ins></code> |
+| upper |  | <code><ins style="background:#dfd">true</ins></code> |
+
+</details>
+"
+`;
+
+exports[`applyToMarkdown integration > tofu/import-resource/0 > renders without error and matches snapshot [summary-template] 1`] = `
+"## Apply Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Added | random_string | 1 |
+|  | **Added** | **1** |
+"
+`;
+
+exports[`applyToMarkdown integration > tofu/import-resource/1 > renders without error and matches snapshot [default] 1`] = `
+"## Plan Summary
+
+_No changes._
+"
+`;
+
+exports[`applyToMarkdown integration > tofu/import-resource/1 > renders without error and matches snapshot [summary-template] 1`] = `
+"## Plan Summary
+
+_No changes._
+"
+`;
+
 exports[`applyToMarkdown integration > tofu/local-files/0 > renders without error and matches snapshot [default] 1`] = `
 "## Apply Summary
 
@@ -2082,6 +2256,64 @@ exports[`applyToMarkdown integration > tofu/random-replace/1 > renders without e
 | --- | --- | --- |
 | ± Replaced | random_string | 1 |
 |  | **Replaced** | **1** |
+"
+`;
+
+exports[`applyToMarkdown integration > tofu/removed-resource/0 > renders without error and matches snapshot [default] 1`] = `
+"## Apply Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Added | null_resource | 2 |
+|  | **Added** | **2** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>➕ <strong>null_resource</strong> ephemeral</summary>
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | <code></code> | <code>(value not in plan)</code> |
+| triggers.version |  | <code><ins style="background:#dfd">1</ins></code> |
+
+</details>
+
+<details>
+<summary>➕ <strong>null_resource</strong> keeper</summary>
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | <code></code> | <code>(value not in plan)</code> |
+| triggers.version |  | <code><ins style="background:#dfd">1</ins></code> |
+
+</details>
+"
+`;
+
+exports[`applyToMarkdown integration > tofu/removed-resource/0 > renders without error and matches snapshot [summary-template] 1`] = `
+"## Apply Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Added | null_resource | 2 |
+|  | **Added** | **2** |
+"
+`;
+
+exports[`applyToMarkdown integration > tofu/removed-resource/1 > renders without error and matches snapshot [default] 1`] = `
+"## Apply Summary
+
+_No changes._
+"
+`;
+
+exports[`applyToMarkdown integration > tofu/removed-resource/1 > renders without error and matches snapshot [summary-template] 1`] = `
+"## Apply Summary
+
+_No changes._
 "
 `;
 

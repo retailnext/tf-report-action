@@ -1,15 +1,35 @@
 import type { ResourceChange as TFResourceChange } from "../tfjson/resource.js";
 import type { Plan } from "../tfjson/plan.js";
 import type { ResourceChange as ModelResourceChange } from "../model/resource.js";
+import type { PlanAction } from "../model/plan-action.js";
 import type { BuildOptions } from "./options.js";
 import type { ConfigRefIndex } from "./config-refs.js";
 import { determineAction } from "./action.js";
 import { buildAttributeChanges } from "./attributes.js";
 
 /**
+ * Refine a base action using resource metadata.
+ *
+ * - `no-op` with `previous_address` → `move` (moved block)
+ * - `no-op` with `importing` → `import` (import block, no other changes)
+ * - Other `no-op` → remains `no-op` (filtered out by caller)
+ */
+function refineAction(
+  base: PlanAction,
+  rc: TFResourceChange,
+): PlanAction {
+  if (base !== "no-op") return base;
+  if (rc.previous_address) return "move";
+  if (rc.change.importing) return "import";
+  return "no-op";
+}
+
+/**
  * Maps each entry in plan.resource_changes to a ModelResourceChange.
  * Data sources are always excluded — errors relating to data sources
  * surface through the diagnostics section instead.
+ * True no-op resources (unchanged, not moved or imported) are excluded —
+ * they provide no useful information in the report.
  */
 export function buildResourceChanges(
   plan: Plan,
@@ -22,7 +42,9 @@ export function buildResourceChanges(
   for (const rc of resourceChanges) {
     if (shouldSkip(rc)) continue;
 
-    const action = determineAction(rc.change.actions);
+    const action = refineAction(determineAction(rc.change.actions), rc);
+    if (action === "no-op") continue;
+
     const address = rc.address ?? `${rc.type ?? "unknown"}.${rc.name ?? "unknown"}`;
 
     const attributes = buildAttributeChanges(rc.change, address, configRefs, options);
@@ -52,6 +74,7 @@ export function buildResourceChanges(
  * Uses the same transformation as buildResourceChanges — drift entries
  * use the same ResourceChange schema, just from a different source field.
  * Data sources are excluded, same as for planned changes.
+ * No-op drift entries are kept (drift detection is always informational).
  */
 export function buildDriftChanges(
   plan: Plan,
@@ -64,7 +87,7 @@ export function buildDriftChanges(
   for (const rc of driftChanges) {
     if (shouldSkip(rc)) continue;
 
-    const action = determineAction(rc.change.actions);
+    const action = refineAction(determineAction(rc.change.actions), rc);
     const address = rc.address ?? `${rc.type ?? "unknown"}.${rc.name ?? "unknown"}`;
 
     const attributes = buildAttributeChanges(rc.change, address, configRefs, options);

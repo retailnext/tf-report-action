@@ -103,7 +103,7 @@ describe("buildResourceChanges", () => {
     expect(result[0]!.actionReason).toBe("replace_because_tainted");
   });
 
-  it("captures movedFromAddress from previous_address", () => {
+  it("captures movedFromAddress and upgrades action to move", () => {
     const plan = basePlan([
       {
         address: "null_resource.new",
@@ -122,7 +122,78 @@ describe("buildResourceChanges", () => {
       },
     ]);
     const result = buildResourceChanges(plan, emptyConfigRefs, {});
+    expect(result).toHaveLength(1);
     expect(result[0]!.movedFromAddress).toBe("null_resource.old");
+    expect(result[0]!.action).toBe("move");
+  });
+
+  it("upgrades no-op with importId to import action", () => {
+    const plan = basePlan([
+      {
+        address: "null_resource.imported",
+        mode: "managed",
+        type: "null_resource",
+        name: "imported",
+        change: {
+          actions: ["no-op"],
+          before: {},
+          after: {},
+          before_sensitive: false,
+          after_sensitive: false,
+          after_unknown: false,
+          importing: { id: "i-abc123" },
+        },
+      },
+    ]);
+    const result = buildResourceChanges(plan, emptyConfigRefs, {});
+    expect(result).toHaveLength(1);
+    expect(result[0]!.action).toBe("import");
+    expect(result[0]!.importId).toBe("i-abc123");
+  });
+
+  it("keeps create action when import is combined with create", () => {
+    const plan = basePlan([
+      {
+        address: "null_resource.imported",
+        mode: "managed",
+        type: "null_resource",
+        name: "imported",
+        change: {
+          actions: ["create"],
+          before: null,
+          after: {},
+          before_sensitive: false,
+          after_sensitive: false,
+          after_unknown: false,
+          importing: { id: "i-abc123" },
+        },
+      },
+    ]);
+    const result = buildResourceChanges(plan, emptyConfigRefs, {});
+    expect(result).toHaveLength(1);
+    expect(result[0]!.action).toBe("create");
+    expect(result[0]!.importId).toBe("i-abc123");
+  });
+
+  it("filters out true no-op resources", () => {
+    const plan = basePlan([
+      {
+        address: "null_resource.unchanged",
+        mode: "managed",
+        type: "null_resource",
+        name: "unchanged",
+        change: {
+          actions: ["no-op"],
+          before: {},
+          after: {},
+          before_sensitive: false,
+          after_sensitive: false,
+          after_unknown: false,
+        },
+      },
+    ]);
+    const result = buildResourceChanges(plan, emptyConfigRefs, {});
+    expect(result).toHaveLength(0);
   });
 
   it("sets allUnknownAfterApply=true when after_unknown is boolean true", () => {

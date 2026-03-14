@@ -56,14 +56,24 @@ describe("buildSummary", () => {
     expect(actions).toEqual(["create", "update", "replace", "delete"]);
   });
 
-  it("does not count no-op, read, forget, or unknown actions", () => {
+  it("does not count no-op, read, open, or unknown actions", () => {
     const summary = buildSummary([
       makeResource("no-op"),
       makeResource("read"),
-      makeResource("forget"),
+      makeResource("open"),
       makeResource("unknown"),
     ]);
     expect(summary.actions).toEqual([]);
+  });
+
+  it("counts move, import, and forget actions", () => {
+    const summary = buildSummary([
+      makeResource("move"),
+      makeResource("import"),
+      makeResource("forget"),
+    ]);
+    expect(summary.actions).toHaveLength(3);
+    expect(summary.actions.map((a) => a.action)).toEqual(["move", "import", "forget"]);
   });
 
   it("sorts resource types by count desc, then alphabetically", () => {

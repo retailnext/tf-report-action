@@ -388,6 +388,8 @@ function planActionLabel(action: string): string {
     case "delete": return "destroy";
     case "replace": return "replace";
     case "import": return "import";
+    case "move": return "move";
+    case "forget": return "forget";
     default: return action;
   }
 }
@@ -399,6 +401,8 @@ function applyActionLabel(action: string): string {
     case "delete": return "destroyed";
     case "replace": return "replaced";
     case "import": return "imported";
+    case "move": return "moved";
+    case "forget": return "forgotten";
     default: return action;
   }
 }

@@ -3050,6 +3050,347 @@ exports[`reportFromSteps integration — apply-no-show fixtures > terraform/defe
 "
 `;
 
+exports[`reportFromSteps integration — apply-no-show fixtures > terraform/import-resource/0/apply-no-show > renders without error and matches snapshot 1`] = `
+"## ✅ Apply Succeeded
+
+> ⚠️ **Warning:** Structured plan output was not available. Showing raw command output.
+
+### Plan Output
+
+<details>
+<summary><code>Terraform 1.14.6</code> <code>type=version</code></summary>
+
+\`terraform=1.14.6\`
+
+\`ui=1.2\`
+
+</details>
+
+<details>
+<summary><code>random_string.existing: Plan to create</code> <code>type=planned_change</code></summary>
+
+\`change.action=create\`
+
+\`change.resource.addr=random_string.existing\`
+
+\`change.resource.implied_provider=random\`
+
+\`change.resource.module=\`
+
+\`change.resource.resource=random_string.existing\`
+
+\`change.resource.resource_key=null\`
+
+\`change.resource.resource_name=existing\`
+
+\`change.resource.resource_type=random_string\`
+
+</details>
+
+<details>
+<summary><code>Plan: 1 to add, 0 to change, 0 to destroy.</code> <code>type=change_summary</code></summary>
+
+\`changes.action_invocation=0\`
+
+\`changes.add=1\`
+
+\`changes.change=0\`
+
+\`changes.import=0\`
+
+\`changes.operation=plan\`
+
+\`changes.remove=0\`
+
+</details>
+
+
+### Apply Output
+
+<details>
+<summary><code>Terraform 1.14.6</code> <code>type=version</code></summary>
+
+\`terraform=1.14.6\`
+
+\`ui=1.2\`
+
+</details>
+
+<details>
+<summary><code>random_string.existing: Plan to create</code> <code>type=planned_change</code></summary>
+
+\`change.action=create\`
+
+\`change.resource.addr=random_string.existing\`
+
+\`change.resource.implied_provider=random\`
+
+\`change.resource.module=\`
+
+\`change.resource.resource=random_string.existing\`
+
+\`change.resource.resource_key=null\`
+
+\`change.resource.resource_name=existing\`
+
+\`change.resource.resource_type=random_string\`
+
+</details>
+
+<details>
+<summary><code>random_string.existing: Creating...</code> <code>type=apply_start</code></summary>
+
+\`hook.action=create\`
+
+\`hook.resource.addr=random_string.existing\`
+
+\`hook.resource.implied_provider=random\`
+
+\`hook.resource.module=\`
+
+\`hook.resource.resource=random_string.existing\`
+
+\`hook.resource.resource_key=null\`
+
+\`hook.resource.resource_name=existing\`
+
+\`hook.resource.resource_type=random_string\`
+
+</details>
+
+<details>
+<summary><code>random_string.existing: Creation complete after 0s [id=FCglareD]</code> <code>type=apply_complete</code></summary>
+
+\`hook.action=create\`
+
+\`hook.elapsed_seconds=0\`
+
+\`hook.id_key=id\`
+
+\`hook.id_value=FCglareD\`
+
+\`hook.resource.addr=random_string.existing\`
+
+\`hook.resource.implied_provider=random\`
+
+\`hook.resource.module=\`
+
+\`hook.resource.resource=random_string.existing\`
+
+\`hook.resource.resource_key=null\`
+
+\`hook.resource.resource_name=existing\`
+
+\`hook.resource.resource_type=random_string\`
+
+</details>
+
+<details>
+<summary><code>Apply complete! Resources: 1 added, 0 changed, 0 destroyed.</code> <code>type=change_summary</code></summary>
+
+\`changes.action_invocation=0\`
+
+\`changes.add=1\`
+
+\`changes.change=0\`
+
+\`changes.import=0\`
+
+\`changes.operation=apply\`
+
+\`changes.remove=0\`
+
+</details>
+
+\`Outputs: 0\` \`type=outputs\`
+
+
+"
+`;
+
+exports[`reportFromSteps integration — apply-no-show fixtures > terraform/import-resource/1/apply-no-show > renders without error and matches snapshot 1`] = `
+"## ✅ Apply Succeeded
+
+> ⚠️ **Warning:** Structured plan output was not available. Showing raw command output.
+
+### Plan Output
+
+<details>
+<summary><code>Terraform 1.14.6</code> <code>type=version</code></summary>
+
+\`terraform=1.14.6\`
+
+\`ui=1.2\`
+
+</details>
+
+<details>
+<summary><code>random_string.imported: Refreshing state... [id=fixedval]</code> <code>type=refresh_start</code></summary>
+
+\`hook.id_key=id\`
+
+\`hook.id_value=fixedval\`
+
+\`hook.resource.addr=random_string.imported\`
+
+\`hook.resource.implied_provider=random\`
+
+\`hook.resource.module=\`
+
+\`hook.resource.resource=random_string.imported\`
+
+\`hook.resource.resource_key=null\`
+
+\`hook.resource.resource_name=imported\`
+
+\`hook.resource.resource_type=random_string\`
+
+</details>
+
+<details>
+<summary><code>random_string.existing: Refreshing state... [id=FCglareD]</code> <code>type=refresh_start</code></summary>
+
+\`hook.id_key=id\`
+
+\`hook.id_value=FCglareD\`
+
+\`hook.resource.addr=random_string.existing\`
+
+\`hook.resource.implied_provider=random\`
+
+\`hook.resource.module=\`
+
+\`hook.resource.resource=random_string.existing\`
+
+\`hook.resource.resource_key=null\`
+
+\`hook.resource.resource_name=existing\`
+
+\`hook.resource.resource_type=random_string\`
+
+</details>
+
+<details>
+<summary><code>random_string.imported: Refresh complete [id=fixedval]</code> <code>type=refresh_complete</code></summary>
+
+\`hook.id_key=id\`
+
+\`hook.id_value=fixedval\`
+
+\`hook.resource.addr=random_string.imported\`
+
+\`hook.resource.implied_provider=random\`
+
+\`hook.resource.module=\`
+
+\`hook.resource.resource=random_string.imported\`
+
+\`hook.resource.resource_key=null\`
+
+\`hook.resource.resource_name=imported\`
+
+\`hook.resource.resource_type=random_string\`
+
+</details>
+
+<details>
+<summary><code>random_string.existing: Refresh complete [id=FCglareD]</code> <code>type=refresh_complete</code></summary>
+
+\`hook.id_key=id\`
+
+\`hook.id_value=FCglareD\`
+
+\`hook.resource.addr=random_string.existing\`
+
+\`hook.resource.implied_provider=random\`
+
+\`hook.resource.module=\`
+
+\`hook.resource.resource=random_string.existing\`
+
+\`hook.resource.resource_key=null\`
+
+\`hook.resource.resource_name=existing\`
+
+\`hook.resource.resource_type=random_string\`
+
+</details>
+
+<details>
+<summary><code>random_string.imported: Plan to import</code> <code>type=planned_change</code></summary>
+
+\`change.action=import\`
+
+\`change.importing.id=fixedval\`
+
+\`change.resource.addr=random_string.imported\`
+
+\`change.resource.implied_provider=random\`
+
+\`change.resource.module=\`
+
+\`change.resource.resource=random_string.imported\`
+
+\`change.resource.resource_key=null\`
+
+\`change.resource.resource_name=imported\`
+
+\`change.resource.resource_type=random_string\`
+
+</details>
+
+<details>
+<summary><code>Plan: 1 to import, 0 to add, 0 to change, 0 to destroy.</code> <code>type=change_summary</code></summary>
+
+\`changes.action_invocation=0\`
+
+\`changes.add=0\`
+
+\`changes.change=0\`
+
+\`changes.import=1\`
+
+\`changes.operation=plan\`
+
+\`changes.remove=0\`
+
+</details>
+
+
+### Apply Output
+
+<details>
+<summary><code>Terraform 1.14.6</code> <code>type=version</code></summary>
+
+\`terraform=1.14.6\`
+
+\`ui=1.2\`
+
+</details>
+
+<details>
+<summary><code>Apply complete! Resources: 1 imported, 0 added, 0 changed, 0 destroyed.</code> <code>type=change_summary</code></summary>
+
+\`changes.action_invocation=0\`
+
+\`changes.add=0\`
+
+\`changes.change=0\`
+
+\`changes.import=1\`
+
+\`changes.operation=apply\`
+
+\`changes.remove=0\`
+
+</details>
+
+\`Outputs: 0\` \`type=outputs\`
+
+
+"
+`;
+
 exports[`reportFromSteps integration — apply-no-show fixtures > terraform/local-files/0/apply-no-show > renders without error and matches snapshot 1`] = `
 "## ✅ Apply Succeeded
 
@@ -6203,6 +6544,425 @@ exports[`reportFromSteps integration — apply-no-show fixtures > terraform/rand
 \`outputs.token_length.value=16\`
 
 </details>
+
+
+"
+`;
+
+exports[`reportFromSteps integration — apply-no-show fixtures > terraform/removed-resource/0/apply-no-show > renders without error and matches snapshot 1`] = `
+"## ✅ Apply Succeeded
+
+> ⚠️ **Warning:** Structured plan output was not available. Showing raw command output.
+
+### Plan Output
+
+<details>
+<summary><code>Terraform 1.14.6</code> <code>type=version</code></summary>
+
+\`terraform=1.14.6\`
+
+\`ui=1.2\`
+
+</details>
+
+<details>
+<summary><code>null_resource.ephemeral: Plan to create</code> <code>type=planned_change</code></summary>
+
+\`change.action=create\`
+
+\`change.resource.addr=null_resource.ephemeral\`
+
+\`change.resource.implied_provider=null\`
+
+\`change.resource.module=\`
+
+\`change.resource.resource=null_resource.ephemeral\`
+
+\`change.resource.resource_key=null\`
+
+\`change.resource.resource_name=ephemeral\`
+
+\`change.resource.resource_type=null_resource\`
+
+</details>
+
+<details>
+<summary><code>null_resource.keeper: Plan to create</code> <code>type=planned_change</code></summary>
+
+\`change.action=create\`
+
+\`change.resource.addr=null_resource.keeper\`
+
+\`change.resource.implied_provider=null\`
+
+\`change.resource.module=\`
+
+\`change.resource.resource=null_resource.keeper\`
+
+\`change.resource.resource_key=null\`
+
+\`change.resource.resource_name=keeper\`
+
+\`change.resource.resource_type=null_resource\`
+
+</details>
+
+<details>
+<summary><code>Plan: 2 to add, 0 to change, 0 to destroy.</code> <code>type=change_summary</code></summary>
+
+\`changes.action_invocation=0\`
+
+\`changes.add=2\`
+
+\`changes.change=0\`
+
+\`changes.import=0\`
+
+\`changes.operation=plan\`
+
+\`changes.remove=0\`
+
+</details>
+
+
+### Apply Output
+
+<details>
+<summary><code>Terraform 1.14.6</code> <code>type=version</code></summary>
+
+\`terraform=1.14.6\`
+
+\`ui=1.2\`
+
+</details>
+
+<details>
+<summary><code>null_resource.ephemeral: Plan to create</code> <code>type=planned_change</code></summary>
+
+\`change.action=create\`
+
+\`change.resource.addr=null_resource.ephemeral\`
+
+\`change.resource.implied_provider=null\`
+
+\`change.resource.module=\`
+
+\`change.resource.resource=null_resource.ephemeral\`
+
+\`change.resource.resource_key=null\`
+
+\`change.resource.resource_name=ephemeral\`
+
+\`change.resource.resource_type=null_resource\`
+
+</details>
+
+<details>
+<summary><code>null_resource.keeper: Plan to create</code> <code>type=planned_change</code></summary>
+
+\`change.action=create\`
+
+\`change.resource.addr=null_resource.keeper\`
+
+\`change.resource.implied_provider=null\`
+
+\`change.resource.module=\`
+
+\`change.resource.resource=null_resource.keeper\`
+
+\`change.resource.resource_key=null\`
+
+\`change.resource.resource_name=keeper\`
+
+\`change.resource.resource_type=null_resource\`
+
+</details>
+
+<details>
+<summary><code>null_resource.keeper: Creating...</code> <code>type=apply_start</code></summary>
+
+\`hook.action=create\`
+
+\`hook.resource.addr=null_resource.keeper\`
+
+\`hook.resource.implied_provider=null\`
+
+\`hook.resource.module=\`
+
+\`hook.resource.resource=null_resource.keeper\`
+
+\`hook.resource.resource_key=null\`
+
+\`hook.resource.resource_name=keeper\`
+
+\`hook.resource.resource_type=null_resource\`
+
+</details>
+
+<details>
+<summary><code>null_resource.ephemeral: Creating...</code> <code>type=apply_start</code></summary>
+
+\`hook.action=create\`
+
+\`hook.resource.addr=null_resource.ephemeral\`
+
+\`hook.resource.implied_provider=null\`
+
+\`hook.resource.module=\`
+
+\`hook.resource.resource=null_resource.ephemeral\`
+
+\`hook.resource.resource_key=null\`
+
+\`hook.resource.resource_name=ephemeral\`
+
+\`hook.resource.resource_type=null_resource\`
+
+</details>
+
+<details>
+<summary><code>null_resource.ephemeral: Creation complete after 0s [id=6679654430280065492]</code> <code>type=apply_complete</code></summary>
+
+\`hook.action=create\`
+
+\`hook.elapsed_seconds=0\`
+
+\`hook.id_key=id\`
+
+\`hook.id_value=6679654430280065492\`
+
+\`hook.resource.addr=null_resource.ephemeral\`
+
+\`hook.resource.implied_provider=null\`
+
+\`hook.resource.module=\`
+
+\`hook.resource.resource=null_resource.ephemeral\`
+
+\`hook.resource.resource_key=null\`
+
+\`hook.resource.resource_name=ephemeral\`
+
+\`hook.resource.resource_type=null_resource\`
+
+</details>
+
+<details>
+<summary><code>null_resource.keeper: Creation complete after 0s [id=5001506899250486925]</code> <code>type=apply_complete</code></summary>
+
+\`hook.action=create\`
+
+\`hook.elapsed_seconds=0\`
+
+\`hook.id_key=id\`
+
+\`hook.id_value=5001506899250486925\`
+
+\`hook.resource.addr=null_resource.keeper\`
+
+\`hook.resource.implied_provider=null\`
+
+\`hook.resource.module=\`
+
+\`hook.resource.resource=null_resource.keeper\`
+
+\`hook.resource.resource_key=null\`
+
+\`hook.resource.resource_name=keeper\`
+
+\`hook.resource.resource_type=null_resource\`
+
+</details>
+
+<details>
+<summary><code>Apply complete! Resources: 2 added, 0 changed, 0 destroyed.</code> <code>type=change_summary</code></summary>
+
+\`changes.action_invocation=0\`
+
+\`changes.add=2\`
+
+\`changes.change=0\`
+
+\`changes.import=0\`
+
+\`changes.operation=apply\`
+
+\`changes.remove=0\`
+
+</details>
+
+\`Outputs: 0\` \`type=outputs\`
+
+
+"
+`;
+
+exports[`reportFromSteps integration — apply-no-show fixtures > terraform/removed-resource/1/apply-no-show > renders without error and matches snapshot 1`] = `
+"## ✅ Apply Succeeded
+
+> ⚠️ **Warning:** Structured plan output was not available. Showing raw command output.
+
+### Plan Output
+
+<details>
+<summary><code>Terraform 1.14.6</code> <code>type=version</code></summary>
+
+\`terraform=1.14.6\`
+
+\`ui=1.2\`
+
+</details>
+
+<details>
+<summary><code>null_resource.keeper: Refreshing state... [id=5001506899250486925]</code> <code>type=refresh_start</code></summary>
+
+\`hook.id_key=id\`
+
+\`hook.id_value=5001506899250486925\`
+
+\`hook.resource.addr=null_resource.keeper\`
+
+\`hook.resource.implied_provider=null\`
+
+\`hook.resource.module=\`
+
+\`hook.resource.resource=null_resource.keeper\`
+
+\`hook.resource.resource_key=null\`
+
+\`hook.resource.resource_name=keeper\`
+
+\`hook.resource.resource_type=null_resource\`
+
+</details>
+
+<details>
+<summary><code>null_resource.keeper: Refresh complete [id=5001506899250486925]</code> <code>type=refresh_complete</code></summary>
+
+\`hook.id_key=id\`
+
+\`hook.id_value=5001506899250486925\`
+
+\`hook.resource.addr=null_resource.keeper\`
+
+\`hook.resource.implied_provider=null\`
+
+\`hook.resource.module=\`
+
+\`hook.resource.resource=null_resource.keeper\`
+
+\`hook.resource.resource_key=null\`
+
+\`hook.resource.resource_name=keeper\`
+
+\`hook.resource.resource_type=null_resource\`
+
+</details>
+
+<details>
+<summary><code>null_resource.ephemeral: Plan to remove</code> <code>type=planned_change</code></summary>
+
+\`change.action=remove\`
+
+\`change.reason=delete_because_no_resource_config\`
+
+\`change.resource.addr=null_resource.ephemeral\`
+
+\`change.resource.implied_provider=null\`
+
+\`change.resource.module=\`
+
+\`change.resource.resource=null_resource.ephemeral\`
+
+\`change.resource.resource_key=null\`
+
+\`change.resource.resource_name=ephemeral\`
+
+\`change.resource.resource_type=null_resource\`
+
+</details>
+
+<details>
+<summary><code>Plan: 0 to add, 0 to change, 0 to destroy.</code> <code>type=change_summary</code></summary>
+
+\`changes.action_invocation=0\`
+
+\`changes.add=0\`
+
+\`changes.change=0\`
+
+\`changes.import=0\`
+
+\`changes.operation=plan\`
+
+\`changes.remove=0\`
+
+</details>
+
+<details>
+<summary>⚠️ <code>Warning: Some objects will no longer be managed by Terraform</code> <code>type=diagnostic</code></summary>
+
+\`diagnostic.detail=If you apply this plan, Terraform will discard its tracking information for t...\`
+
+\`diagnostic.severity=warning\`
+
+\`diagnostic.summary=Some objects will no longer be managed by Terraform\`
+
+</details>
+
+
+### Apply Output
+
+<details>
+<summary><code>Terraform 1.14.6</code> <code>type=version</code></summary>
+
+\`terraform=1.14.6\`
+
+\`ui=1.2\`
+
+</details>
+
+<details>
+<summary><code>null_resource.ephemeral: Plan to remove</code> <code>type=planned_change</code></summary>
+
+\`change.action=remove\`
+
+\`change.reason=delete_because_no_resource_config\`
+
+\`change.resource.addr=null_resource.ephemeral\`
+
+\`change.resource.implied_provider=null\`
+
+\`change.resource.module=\`
+
+\`change.resource.resource=null_resource.ephemeral\`
+
+\`change.resource.resource_key=null\`
+
+\`change.resource.resource_name=ephemeral\`
+
+\`change.resource.resource_type=null_resource\`
+
+</details>
+
+<details>
+<summary><code>Apply complete! Resources: 0 added, 0 changed, 0 destroyed.</code> <code>type=change_summary</code></summary>
+
+\`changes.action_invocation=0\`
+
+\`changes.add=0\`
+
+\`changes.change=0\`
+
+\`changes.import=0\`
+
+\`changes.operation=apply\`
+
+\`changes.remove=0\`
+
+</details>
+
+\`Outputs: 0\` \`type=outputs\`
 
 
 "
@@ -10703,6 +11463,347 @@ exports[`reportFromSteps integration — apply-no-show fixtures > tofu/deferred-
 "
 `;
 
+exports[`reportFromSteps integration — apply-no-show fixtures > tofu/import-resource/0/apply-no-show > renders without error and matches snapshot 1`] = `
+"## ✅ Apply Succeeded
+
+> ⚠️ **Warning:** Structured plan output was not available. Showing raw command output.
+
+### Plan Output
+
+<details>
+<summary><code>OpenTofu 1.11.5</code> <code>type=version</code></summary>
+
+\`tofu=1.11.5\`
+
+\`ui=1.2\`
+
+</details>
+
+<details>
+<summary><code>random_string.existing: Plan to create</code> <code>type=planned_change</code></summary>
+
+\`change.action=create\`
+
+\`change.resource.addr=random_string.existing\`
+
+\`change.resource.implied_provider=random\`
+
+\`change.resource.module=\`
+
+\`change.resource.resource=random_string.existing\`
+
+\`change.resource.resource_key=null\`
+
+\`change.resource.resource_name=existing\`
+
+\`change.resource.resource_type=random_string\`
+
+</details>
+
+<details>
+<summary><code>Plan: 1 to add, 0 to change, 0 to destroy.</code> <code>type=change_summary</code></summary>
+
+\`changes.add=1\`
+
+\`changes.change=0\`
+
+\`changes.forget=0\`
+
+\`changes.import=0\`
+
+\`changes.operation=plan\`
+
+\`changes.remove=0\`
+
+</details>
+
+
+### Apply Output
+
+<details>
+<summary><code>OpenTofu 1.11.5</code> <code>type=version</code></summary>
+
+\`tofu=1.11.5\`
+
+\`ui=1.2\`
+
+</details>
+
+<details>
+<summary><code>random_string.existing: Plan to create</code> <code>type=planned_change</code></summary>
+
+\`change.action=create\`
+
+\`change.resource.addr=random_string.existing\`
+
+\`change.resource.implied_provider=random\`
+
+\`change.resource.module=\`
+
+\`change.resource.resource=random_string.existing\`
+
+\`change.resource.resource_key=null\`
+
+\`change.resource.resource_name=existing\`
+
+\`change.resource.resource_type=random_string\`
+
+</details>
+
+<details>
+<summary><code>random_string.existing: Creating...</code> <code>type=apply_start</code></summary>
+
+\`hook.action=create\`
+
+\`hook.resource.addr=random_string.existing\`
+
+\`hook.resource.implied_provider=random\`
+
+\`hook.resource.module=\`
+
+\`hook.resource.resource=random_string.existing\`
+
+\`hook.resource.resource_key=null\`
+
+\`hook.resource.resource_name=existing\`
+
+\`hook.resource.resource_type=random_string\`
+
+</details>
+
+<details>
+<summary><code>random_string.existing: Creation complete after 0s [id=qy2kyvYF]</code> <code>type=apply_complete</code></summary>
+
+\`hook.action=create\`
+
+\`hook.elapsed_seconds=0\`
+
+\`hook.id_key=id\`
+
+\`hook.id_value=qy2kyvYF\`
+
+\`hook.resource.addr=random_string.existing\`
+
+\`hook.resource.implied_provider=random\`
+
+\`hook.resource.module=\`
+
+\`hook.resource.resource=random_string.existing\`
+
+\`hook.resource.resource_key=null\`
+
+\`hook.resource.resource_name=existing\`
+
+\`hook.resource.resource_type=random_string\`
+
+</details>
+
+<details>
+<summary><code>Apply complete! Resources: 1 added, 0 changed, 0 destroyed.</code> <code>type=change_summary</code></summary>
+
+\`changes.add=1\`
+
+\`changes.change=0\`
+
+\`changes.forget=0\`
+
+\`changes.import=0\`
+
+\`changes.operation=apply\`
+
+\`changes.remove=0\`
+
+</details>
+
+\`Outputs: 0\` \`type=outputs\`
+
+
+"
+`;
+
+exports[`reportFromSteps integration — apply-no-show fixtures > tofu/import-resource/1/apply-no-show > renders without error and matches snapshot 1`] = `
+"## ✅ Apply Succeeded
+
+> ⚠️ **Warning:** Structured plan output was not available. Showing raw command output.
+
+### Plan Output
+
+<details>
+<summary><code>OpenTofu 1.11.5</code> <code>type=version</code></summary>
+
+\`tofu=1.11.5\`
+
+\`ui=1.2\`
+
+</details>
+
+<details>
+<summary><code>random_string.imported: Refreshing state... [id=fixedval]</code> <code>type=refresh_start</code></summary>
+
+\`hook.id_key=id\`
+
+\`hook.id_value=fixedval\`
+
+\`hook.resource.addr=random_string.imported\`
+
+\`hook.resource.implied_provider=random\`
+
+\`hook.resource.module=\`
+
+\`hook.resource.resource=random_string.imported\`
+
+\`hook.resource.resource_key=null\`
+
+\`hook.resource.resource_name=imported\`
+
+\`hook.resource.resource_type=random_string\`
+
+</details>
+
+<details>
+<summary><code>random_string.existing: Refreshing state... [id=qy2kyvYF]</code> <code>type=refresh_start</code></summary>
+
+\`hook.id_key=id\`
+
+\`hook.id_value=qy2kyvYF\`
+
+\`hook.resource.addr=random_string.existing\`
+
+\`hook.resource.implied_provider=random\`
+
+\`hook.resource.module=\`
+
+\`hook.resource.resource=random_string.existing\`
+
+\`hook.resource.resource_key=null\`
+
+\`hook.resource.resource_name=existing\`
+
+\`hook.resource.resource_type=random_string\`
+
+</details>
+
+<details>
+<summary><code>random_string.existing: Refresh complete [id=qy2kyvYF]</code> <code>type=refresh_complete</code></summary>
+
+\`hook.id_key=id\`
+
+\`hook.id_value=qy2kyvYF\`
+
+\`hook.resource.addr=random_string.existing\`
+
+\`hook.resource.implied_provider=random\`
+
+\`hook.resource.module=\`
+
+\`hook.resource.resource=random_string.existing\`
+
+\`hook.resource.resource_key=null\`
+
+\`hook.resource.resource_name=existing\`
+
+\`hook.resource.resource_type=random_string\`
+
+</details>
+
+<details>
+<summary><code>random_string.imported: Refresh complete [id=fixedval]</code> <code>type=refresh_complete</code></summary>
+
+\`hook.id_key=id\`
+
+\`hook.id_value=fixedval\`
+
+\`hook.resource.addr=random_string.imported\`
+
+\`hook.resource.implied_provider=random\`
+
+\`hook.resource.module=\`
+
+\`hook.resource.resource=random_string.imported\`
+
+\`hook.resource.resource_key=null\`
+
+\`hook.resource.resource_name=imported\`
+
+\`hook.resource.resource_type=random_string\`
+
+</details>
+
+<details>
+<summary><code>random_string.imported: Plan to import</code> <code>type=planned_change</code></summary>
+
+\`change.action=import\`
+
+\`change.importing.id=fixedval\`
+
+\`change.resource.addr=random_string.imported\`
+
+\`change.resource.implied_provider=random\`
+
+\`change.resource.module=\`
+
+\`change.resource.resource=random_string.imported\`
+
+\`change.resource.resource_key=null\`
+
+\`change.resource.resource_name=imported\`
+
+\`change.resource.resource_type=random_string\`
+
+</details>
+
+<details>
+<summary><code>Plan: 1 to import, 0 to add, 0 to change, 0 to destroy.</code> <code>type=change_summary</code></summary>
+
+\`changes.add=0\`
+
+\`changes.change=0\`
+
+\`changes.forget=0\`
+
+\`changes.import=1\`
+
+\`changes.operation=plan\`
+
+\`changes.remove=0\`
+
+</details>
+
+
+### Apply Output
+
+<details>
+<summary><code>OpenTofu 1.11.5</code> <code>type=version</code></summary>
+
+\`tofu=1.11.5\`
+
+\`ui=1.2\`
+
+</details>
+
+<details>
+<summary><code>Apply complete! Resources: 1 imported, 0 added, 0 changed, 0 destroyed.</code> <code>type=change_summary</code></summary>
+
+\`changes.add=0\`
+
+\`changes.change=0\`
+
+\`changes.forget=0\`
+
+\`changes.import=1\`
+
+\`changes.operation=apply\`
+
+\`changes.remove=0\`
+
+</details>
+
+\`Outputs: 0\` \`type=outputs\`
+
+
+"
+`;
+
 exports[`reportFromSteps integration — apply-no-show fixtures > tofu/local-files/0/apply-no-show > renders without error and matches snapshot 1`] = `
 "## ✅ Apply Succeeded
 
@@ -13856,6 +14957,471 @@ exports[`reportFromSteps integration — apply-no-show fixtures > tofu/random-re
 \`outputs.token_length.value=16\`
 
 </details>
+
+
+"
+`;
+
+exports[`reportFromSteps integration — apply-no-show fixtures > tofu/removed-resource/0/apply-no-show > renders without error and matches snapshot 1`] = `
+"## ✅ Apply Succeeded
+
+> ⚠️ **Warning:** Structured plan output was not available. Showing raw command output.
+
+### Plan Output
+
+<details>
+<summary><code>OpenTofu 1.11.5</code> <code>type=version</code></summary>
+
+\`tofu=1.11.5\`
+
+\`ui=1.2\`
+
+</details>
+
+<details>
+<summary><code>null_resource.ephemeral: Plan to create</code> <code>type=planned_change</code></summary>
+
+\`change.action=create\`
+
+\`change.resource.addr=null_resource.ephemeral\`
+
+\`change.resource.implied_provider=null\`
+
+\`change.resource.module=\`
+
+\`change.resource.resource=null_resource.ephemeral\`
+
+\`change.resource.resource_key=null\`
+
+\`change.resource.resource_name=ephemeral\`
+
+\`change.resource.resource_type=null_resource\`
+
+</details>
+
+<details>
+<summary><code>null_resource.keeper: Plan to create</code> <code>type=planned_change</code></summary>
+
+\`change.action=create\`
+
+\`change.resource.addr=null_resource.keeper\`
+
+\`change.resource.implied_provider=null\`
+
+\`change.resource.module=\`
+
+\`change.resource.resource=null_resource.keeper\`
+
+\`change.resource.resource_key=null\`
+
+\`change.resource.resource_name=keeper\`
+
+\`change.resource.resource_type=null_resource\`
+
+</details>
+
+<details>
+<summary><code>Plan: 2 to add, 0 to change, 0 to destroy.</code> <code>type=change_summary</code></summary>
+
+\`changes.add=2\`
+
+\`changes.change=0\`
+
+\`changes.forget=0\`
+
+\`changes.import=0\`
+
+\`changes.operation=plan\`
+
+\`changes.remove=0\`
+
+</details>
+
+
+### Apply Output
+
+<details>
+<summary><code>OpenTofu 1.11.5</code> <code>type=version</code></summary>
+
+\`tofu=1.11.5\`
+
+\`ui=1.2\`
+
+</details>
+
+<details>
+<summary><code>null_resource.ephemeral: Plan to create</code> <code>type=planned_change</code></summary>
+
+\`change.action=create\`
+
+\`change.resource.addr=null_resource.ephemeral\`
+
+\`change.resource.implied_provider=null\`
+
+\`change.resource.module=\`
+
+\`change.resource.resource=null_resource.ephemeral\`
+
+\`change.resource.resource_key=null\`
+
+\`change.resource.resource_name=ephemeral\`
+
+\`change.resource.resource_type=null_resource\`
+
+</details>
+
+<details>
+<summary><code>null_resource.keeper: Plan to create</code> <code>type=planned_change</code></summary>
+
+\`change.action=create\`
+
+\`change.resource.addr=null_resource.keeper\`
+
+\`change.resource.implied_provider=null\`
+
+\`change.resource.module=\`
+
+\`change.resource.resource=null_resource.keeper\`
+
+\`change.resource.resource_key=null\`
+
+\`change.resource.resource_name=keeper\`
+
+\`change.resource.resource_type=null_resource\`
+
+</details>
+
+<details>
+<summary><code>null_resource.keeper: Creating...</code> <code>type=apply_start</code></summary>
+
+\`hook.action=create\`
+
+\`hook.resource.addr=null_resource.keeper\`
+
+\`hook.resource.implied_provider=null\`
+
+\`hook.resource.module=\`
+
+\`hook.resource.resource=null_resource.keeper\`
+
+\`hook.resource.resource_key=null\`
+
+\`hook.resource.resource_name=keeper\`
+
+\`hook.resource.resource_type=null_resource\`
+
+</details>
+
+<details>
+<summary><code>null_resource.ephemeral: Creating...</code> <code>type=apply_start</code></summary>
+
+\`hook.action=create\`
+
+\`hook.resource.addr=null_resource.ephemeral\`
+
+\`hook.resource.implied_provider=null\`
+
+\`hook.resource.module=\`
+
+\`hook.resource.resource=null_resource.ephemeral\`
+
+\`hook.resource.resource_key=null\`
+
+\`hook.resource.resource_name=ephemeral\`
+
+\`hook.resource.resource_type=null_resource\`
+
+</details>
+
+<details>
+<summary><code>null_resource.keeper: Creation complete after 0s [id=817345555659374398]</code> <code>type=apply_complete</code></summary>
+
+\`hook.action=create\`
+
+\`hook.elapsed_seconds=0\`
+
+\`hook.id_key=id\`
+
+\`hook.id_value=817345555659374398\`
+
+\`hook.resource.addr=null_resource.keeper\`
+
+\`hook.resource.implied_provider=null\`
+
+\`hook.resource.module=\`
+
+\`hook.resource.resource=null_resource.keeper\`
+
+\`hook.resource.resource_key=null\`
+
+\`hook.resource.resource_name=keeper\`
+
+\`hook.resource.resource_type=null_resource\`
+
+</details>
+
+<details>
+<summary><code>null_resource.ephemeral: Creation complete after 0s [id=2454178591280020709]</code> <code>type=apply_complete</code></summary>
+
+\`hook.action=create\`
+
+\`hook.elapsed_seconds=0\`
+
+\`hook.id_key=id\`
+
+\`hook.id_value=2454178591280020709\`
+
+\`hook.resource.addr=null_resource.ephemeral\`
+
+\`hook.resource.implied_provider=null\`
+
+\`hook.resource.module=\`
+
+\`hook.resource.resource=null_resource.ephemeral\`
+
+\`hook.resource.resource_key=null\`
+
+\`hook.resource.resource_name=ephemeral\`
+
+\`hook.resource.resource_type=null_resource\`
+
+</details>
+
+<details>
+<summary><code>Apply complete! Resources: 2 added, 0 changed, 0 destroyed.</code> <code>type=change_summary</code></summary>
+
+\`changes.add=2\`
+
+\`changes.change=0\`
+
+\`changes.forget=0\`
+
+\`changes.import=0\`
+
+\`changes.operation=apply\`
+
+\`changes.remove=0\`
+
+</details>
+
+\`Outputs: 0\` \`type=outputs\`
+
+
+"
+`;
+
+exports[`reportFromSteps integration — apply-no-show fixtures > tofu/removed-resource/1/apply-no-show > renders without error and matches snapshot 1`] = `
+"## ✅ Apply Succeeded
+
+> ⚠️ **Warning:** Structured plan output was not available. Showing raw command output.
+
+### Plan Output
+
+<details>
+<summary><code>OpenTofu 1.11.5</code> <code>type=version</code></summary>
+
+\`tofu=1.11.5\`
+
+\`ui=1.2\`
+
+</details>
+
+<details>
+<summary><code>null_resource.keeper: Refreshing state... [id=817345555659374398]</code> <code>type=refresh_start</code></summary>
+
+\`hook.id_key=id\`
+
+\`hook.id_value=817345555659374398\`
+
+\`hook.resource.addr=null_resource.keeper\`
+
+\`hook.resource.implied_provider=null\`
+
+\`hook.resource.module=\`
+
+\`hook.resource.resource=null_resource.keeper\`
+
+\`hook.resource.resource_key=null\`
+
+\`hook.resource.resource_name=keeper\`
+
+\`hook.resource.resource_type=null_resource\`
+
+</details>
+
+<details>
+<summary><code>null_resource.ephemeral: Refreshing state... [id=2454178591280020709]</code> <code>type=refresh_start</code></summary>
+
+\`hook.id_key=id\`
+
+\`hook.id_value=2454178591280020709\`
+
+\`hook.resource.addr=null_resource.ephemeral\`
+
+\`hook.resource.implied_provider=null\`
+
+\`hook.resource.module=\`
+
+\`hook.resource.resource=null_resource.ephemeral\`
+
+\`hook.resource.resource_key=null\`
+
+\`hook.resource.resource_name=ephemeral\`
+
+\`hook.resource.resource_type=null_resource\`
+
+</details>
+
+<details>
+<summary><code>null_resource.keeper: Refresh complete [id=817345555659374398]</code> <code>type=refresh_complete</code></summary>
+
+\`hook.id_key=id\`
+
+\`hook.id_value=817345555659374398\`
+
+\`hook.resource.addr=null_resource.keeper\`
+
+\`hook.resource.implied_provider=null\`
+
+\`hook.resource.module=\`
+
+\`hook.resource.resource=null_resource.keeper\`
+
+\`hook.resource.resource_key=null\`
+
+\`hook.resource.resource_name=keeper\`
+
+\`hook.resource.resource_type=null_resource\`
+
+</details>
+
+<details>
+<summary><code>null_resource.ephemeral: Refresh complete [id=2454178591280020709]</code> <code>type=refresh_complete</code></summary>
+
+\`hook.id_key=id\`
+
+\`hook.id_value=2454178591280020709\`
+
+\`hook.resource.addr=null_resource.ephemeral\`
+
+\`hook.resource.implied_provider=null\`
+
+\`hook.resource.module=\`
+
+\`hook.resource.resource=null_resource.ephemeral\`
+
+\`hook.resource.resource_key=null\`
+
+\`hook.resource.resource_name=ephemeral\`
+
+\`hook.resource.resource_type=null_resource\`
+
+</details>
+
+<details>
+<summary><code>null_resource.ephemeral: Plan to remove</code> <code>type=planned_change</code></summary>
+
+\`change.action=remove\`
+
+\`change.reason=delete_because_no_resource_config\`
+
+\`change.resource.addr=null_resource.ephemeral\`
+
+\`change.resource.implied_provider=null\`
+
+\`change.resource.module=\`
+
+\`change.resource.resource=null_resource.ephemeral\`
+
+\`change.resource.resource_key=null\`
+
+\`change.resource.resource_name=ephemeral\`
+
+\`change.resource.resource_type=null_resource\`
+
+</details>
+
+<details>
+<summary><code>Plan: 0 to add, 0 to change, 0 to destroy, 1 to forget.</code> <code>type=change_summary</code></summary>
+
+\`changes.add=0\`
+
+\`changes.change=0\`
+
+\`changes.forget=1\`
+
+\`changes.import=0\`
+
+\`changes.operation=plan\`
+
+\`changes.remove=0\`
+
+</details>
+
+<details>
+<summary>⚠️ <code>Warning: Resource going to be removed from the state</code> <code>type=diagnostic</code></summary>
+
+\`diagnostic.detail=After this plan gets applied, the resource null_resource.ephemeral will not b...\`
+
+\`diagnostic.severity=warning\`
+
+\`diagnostic.summary=Resource going to be removed from the state\`
+
+</details>
+
+
+### Apply Output
+
+<details>
+<summary><code>OpenTofu 1.11.5</code> <code>type=version</code></summary>
+
+\`tofu=1.11.5\`
+
+\`ui=1.2\`
+
+</details>
+
+<details>
+<summary><code>null_resource.ephemeral: Plan to remove</code> <code>type=planned_change</code></summary>
+
+\`change.action=remove\`
+
+\`change.reason=delete_because_no_resource_config\`
+
+\`change.resource.addr=null_resource.ephemeral\`
+
+\`change.resource.implied_provider=null\`
+
+\`change.resource.module=\`
+
+\`change.resource.resource=null_resource.ephemeral\`
+
+\`change.resource.resource_key=null\`
+
+\`change.resource.resource_name=ephemeral\`
+
+\`change.resource.resource_type=null_resource\`
+
+</details>
+
+<details>
+<summary><code>Apply complete! Resources: 0 added, 0 changed, 0 destroyed, 1 forgotten.</code> <code>type=change_summary</code></summary>
+
+\`changes.add=0\`
+
+\`changes.change=0\`
+
+\`changes.forget=1\`
+
+\`changes.import=0\`
+
+\`changes.operation=apply\`
+
+\`changes.remove=0\`
+
+</details>
+
+\`Outputs: 0\` \`type=outputs\`
 
 
 "
@@ -17042,6 +18608,153 @@ exports[`reportFromSteps integration — apply-only fixtures > terraform/deferre
 "
 `;
 
+exports[`reportFromSteps integration — apply-only fixtures > terraform/import-resource/0/apply-only > renders without error and matches snapshot 1`] = `
+"## ✅ Apply Succeeded
+
+> ⚠️ **Warning:** Structured plan output was not available. Showing raw command output.
+
+### Apply Output
+
+<details>
+<summary><code>Terraform 1.14.6</code> <code>type=version</code></summary>
+
+\`terraform=1.14.6\`
+
+\`ui=1.2\`
+
+</details>
+
+<details>
+<summary><code>random_string.existing: Plan to create</code> <code>type=planned_change</code></summary>
+
+\`change.action=create\`
+
+\`change.resource.addr=random_string.existing\`
+
+\`change.resource.implied_provider=random\`
+
+\`change.resource.module=\`
+
+\`change.resource.resource=random_string.existing\`
+
+\`change.resource.resource_key=null\`
+
+\`change.resource.resource_name=existing\`
+
+\`change.resource.resource_type=random_string\`
+
+</details>
+
+<details>
+<summary><code>random_string.existing: Creating...</code> <code>type=apply_start</code></summary>
+
+\`hook.action=create\`
+
+\`hook.resource.addr=random_string.existing\`
+
+\`hook.resource.implied_provider=random\`
+
+\`hook.resource.module=\`
+
+\`hook.resource.resource=random_string.existing\`
+
+\`hook.resource.resource_key=null\`
+
+\`hook.resource.resource_name=existing\`
+
+\`hook.resource.resource_type=random_string\`
+
+</details>
+
+<details>
+<summary><code>random_string.existing: Creation complete after 0s [id=FCglareD]</code> <code>type=apply_complete</code></summary>
+
+\`hook.action=create\`
+
+\`hook.elapsed_seconds=0\`
+
+\`hook.id_key=id\`
+
+\`hook.id_value=FCglareD\`
+
+\`hook.resource.addr=random_string.existing\`
+
+\`hook.resource.implied_provider=random\`
+
+\`hook.resource.module=\`
+
+\`hook.resource.resource=random_string.existing\`
+
+\`hook.resource.resource_key=null\`
+
+\`hook.resource.resource_name=existing\`
+
+\`hook.resource.resource_type=random_string\`
+
+</details>
+
+<details>
+<summary><code>Apply complete! Resources: 1 added, 0 changed, 0 destroyed.</code> <code>type=change_summary</code></summary>
+
+\`changes.action_invocation=0\`
+
+\`changes.add=1\`
+
+\`changes.change=0\`
+
+\`changes.import=0\`
+
+\`changes.operation=apply\`
+
+\`changes.remove=0\`
+
+</details>
+
+\`Outputs: 0\` \`type=outputs\`
+
+
+"
+`;
+
+exports[`reportFromSteps integration — apply-only fixtures > terraform/import-resource/1/apply-only > renders without error and matches snapshot 1`] = `
+"## ✅ Apply Succeeded
+
+> ⚠️ **Warning:** Structured plan output was not available. Showing raw command output.
+
+### Apply Output
+
+<details>
+<summary><code>Terraform 1.14.6</code> <code>type=version</code></summary>
+
+\`terraform=1.14.6\`
+
+\`ui=1.2\`
+
+</details>
+
+<details>
+<summary><code>Apply complete! Resources: 1 imported, 0 added, 0 changed, 0 destroyed.</code> <code>type=change_summary</code></summary>
+
+\`changes.action_invocation=0\`
+
+\`changes.add=0\`
+
+\`changes.change=0\`
+
+\`changes.import=1\`
+
+\`changes.operation=apply\`
+
+\`changes.remove=0\`
+
+</details>
+
+\`Outputs: 0\` \`type=outputs\`
+
+
+"
+`;
+
 exports[`reportFromSteps integration — apply-only fixtures > terraform/local-files/0/apply-only > renders without error and matches snapshot 1`] = `
 "## ✅ Apply Succeeded
 
@@ -18847,6 +20560,245 @@ exports[`reportFromSteps integration — apply-only fixtures > terraform/random-
 \`outputs.token_length.value=16\`
 
 </details>
+
+
+"
+`;
+
+exports[`reportFromSteps integration — apply-only fixtures > terraform/removed-resource/0/apply-only > renders without error and matches snapshot 1`] = `
+"## ✅ Apply Succeeded
+
+> ⚠️ **Warning:** Structured plan output was not available. Showing raw command output.
+
+### Apply Output
+
+<details>
+<summary><code>Terraform 1.14.6</code> <code>type=version</code></summary>
+
+\`terraform=1.14.6\`
+
+\`ui=1.2\`
+
+</details>
+
+<details>
+<summary><code>null_resource.ephemeral: Plan to create</code> <code>type=planned_change</code></summary>
+
+\`change.action=create\`
+
+\`change.resource.addr=null_resource.ephemeral\`
+
+\`change.resource.implied_provider=null\`
+
+\`change.resource.module=\`
+
+\`change.resource.resource=null_resource.ephemeral\`
+
+\`change.resource.resource_key=null\`
+
+\`change.resource.resource_name=ephemeral\`
+
+\`change.resource.resource_type=null_resource\`
+
+</details>
+
+<details>
+<summary><code>null_resource.keeper: Plan to create</code> <code>type=planned_change</code></summary>
+
+\`change.action=create\`
+
+\`change.resource.addr=null_resource.keeper\`
+
+\`change.resource.implied_provider=null\`
+
+\`change.resource.module=\`
+
+\`change.resource.resource=null_resource.keeper\`
+
+\`change.resource.resource_key=null\`
+
+\`change.resource.resource_name=keeper\`
+
+\`change.resource.resource_type=null_resource\`
+
+</details>
+
+<details>
+<summary><code>null_resource.keeper: Creating...</code> <code>type=apply_start</code></summary>
+
+\`hook.action=create\`
+
+\`hook.resource.addr=null_resource.keeper\`
+
+\`hook.resource.implied_provider=null\`
+
+\`hook.resource.module=\`
+
+\`hook.resource.resource=null_resource.keeper\`
+
+\`hook.resource.resource_key=null\`
+
+\`hook.resource.resource_name=keeper\`
+
+\`hook.resource.resource_type=null_resource\`
+
+</details>
+
+<details>
+<summary><code>null_resource.ephemeral: Creating...</code> <code>type=apply_start</code></summary>
+
+\`hook.action=create\`
+
+\`hook.resource.addr=null_resource.ephemeral\`
+
+\`hook.resource.implied_provider=null\`
+
+\`hook.resource.module=\`
+
+\`hook.resource.resource=null_resource.ephemeral\`
+
+\`hook.resource.resource_key=null\`
+
+\`hook.resource.resource_name=ephemeral\`
+
+\`hook.resource.resource_type=null_resource\`
+
+</details>
+
+<details>
+<summary><code>null_resource.ephemeral: Creation complete after 0s [id=6679654430280065492]</code> <code>type=apply_complete</code></summary>
+
+\`hook.action=create\`
+
+\`hook.elapsed_seconds=0\`
+
+\`hook.id_key=id\`
+
+\`hook.id_value=6679654430280065492\`
+
+\`hook.resource.addr=null_resource.ephemeral\`
+
+\`hook.resource.implied_provider=null\`
+
+\`hook.resource.module=\`
+
+\`hook.resource.resource=null_resource.ephemeral\`
+
+\`hook.resource.resource_key=null\`
+
+\`hook.resource.resource_name=ephemeral\`
+
+\`hook.resource.resource_type=null_resource\`
+
+</details>
+
+<details>
+<summary><code>null_resource.keeper: Creation complete after 0s [id=5001506899250486925]</code> <code>type=apply_complete</code></summary>
+
+\`hook.action=create\`
+
+\`hook.elapsed_seconds=0\`
+
+\`hook.id_key=id\`
+
+\`hook.id_value=5001506899250486925\`
+
+\`hook.resource.addr=null_resource.keeper\`
+
+\`hook.resource.implied_provider=null\`
+
+\`hook.resource.module=\`
+
+\`hook.resource.resource=null_resource.keeper\`
+
+\`hook.resource.resource_key=null\`
+
+\`hook.resource.resource_name=keeper\`
+
+\`hook.resource.resource_type=null_resource\`
+
+</details>
+
+<details>
+<summary><code>Apply complete! Resources: 2 added, 0 changed, 0 destroyed.</code> <code>type=change_summary</code></summary>
+
+\`changes.action_invocation=0\`
+
+\`changes.add=2\`
+
+\`changes.change=0\`
+
+\`changes.import=0\`
+
+\`changes.operation=apply\`
+
+\`changes.remove=0\`
+
+</details>
+
+\`Outputs: 0\` \`type=outputs\`
+
+
+"
+`;
+
+exports[`reportFromSteps integration — apply-only fixtures > terraform/removed-resource/1/apply-only > renders without error and matches snapshot 1`] = `
+"## ✅ Apply Succeeded
+
+> ⚠️ **Warning:** Structured plan output was not available. Showing raw command output.
+
+### Apply Output
+
+<details>
+<summary><code>Terraform 1.14.6</code> <code>type=version</code></summary>
+
+\`terraform=1.14.6\`
+
+\`ui=1.2\`
+
+</details>
+
+<details>
+<summary><code>null_resource.ephemeral: Plan to remove</code> <code>type=planned_change</code></summary>
+
+\`change.action=remove\`
+
+\`change.reason=delete_because_no_resource_config\`
+
+\`change.resource.addr=null_resource.ephemeral\`
+
+\`change.resource.implied_provider=null\`
+
+\`change.resource.module=\`
+
+\`change.resource.resource=null_resource.ephemeral\`
+
+\`change.resource.resource_key=null\`
+
+\`change.resource.resource_name=ephemeral\`
+
+\`change.resource.resource_type=null_resource\`
+
+</details>
+
+<details>
+<summary><code>Apply complete! Resources: 0 added, 0 changed, 0 destroyed.</code> <code>type=change_summary</code></summary>
+
+\`changes.action_invocation=0\`
+
+\`changes.add=0\`
+
+\`changes.change=0\`
+
+\`changes.import=0\`
+
+\`changes.operation=apply\`
+
+\`changes.remove=0\`
+
+</details>
+
+\`Outputs: 0\` \`type=outputs\`
 
 
 "
@@ -21544,6 +23496,153 @@ exports[`reportFromSteps integration — apply-only fixtures > tofu/deferred-dat
 "
 `;
 
+exports[`reportFromSteps integration — apply-only fixtures > tofu/import-resource/0/apply-only > renders without error and matches snapshot 1`] = `
+"## ✅ Apply Succeeded
+
+> ⚠️ **Warning:** Structured plan output was not available. Showing raw command output.
+
+### Apply Output
+
+<details>
+<summary><code>OpenTofu 1.11.5</code> <code>type=version</code></summary>
+
+\`tofu=1.11.5\`
+
+\`ui=1.2\`
+
+</details>
+
+<details>
+<summary><code>random_string.existing: Plan to create</code> <code>type=planned_change</code></summary>
+
+\`change.action=create\`
+
+\`change.resource.addr=random_string.existing\`
+
+\`change.resource.implied_provider=random\`
+
+\`change.resource.module=\`
+
+\`change.resource.resource=random_string.existing\`
+
+\`change.resource.resource_key=null\`
+
+\`change.resource.resource_name=existing\`
+
+\`change.resource.resource_type=random_string\`
+
+</details>
+
+<details>
+<summary><code>random_string.existing: Creating...</code> <code>type=apply_start</code></summary>
+
+\`hook.action=create\`
+
+\`hook.resource.addr=random_string.existing\`
+
+\`hook.resource.implied_provider=random\`
+
+\`hook.resource.module=\`
+
+\`hook.resource.resource=random_string.existing\`
+
+\`hook.resource.resource_key=null\`
+
+\`hook.resource.resource_name=existing\`
+
+\`hook.resource.resource_type=random_string\`
+
+</details>
+
+<details>
+<summary><code>random_string.existing: Creation complete after 0s [id=qy2kyvYF]</code> <code>type=apply_complete</code></summary>
+
+\`hook.action=create\`
+
+\`hook.elapsed_seconds=0\`
+
+\`hook.id_key=id\`
+
+\`hook.id_value=qy2kyvYF\`
+
+\`hook.resource.addr=random_string.existing\`
+
+\`hook.resource.implied_provider=random\`
+
+\`hook.resource.module=\`
+
+\`hook.resource.resource=random_string.existing\`
+
+\`hook.resource.resource_key=null\`
+
+\`hook.resource.resource_name=existing\`
+
+\`hook.resource.resource_type=random_string\`
+
+</details>
+
+<details>
+<summary><code>Apply complete! Resources: 1 added, 0 changed, 0 destroyed.</code> <code>type=change_summary</code></summary>
+
+\`changes.add=1\`
+
+\`changes.change=0\`
+
+\`changes.forget=0\`
+
+\`changes.import=0\`
+
+\`changes.operation=apply\`
+
+\`changes.remove=0\`
+
+</details>
+
+\`Outputs: 0\` \`type=outputs\`
+
+
+"
+`;
+
+exports[`reportFromSteps integration — apply-only fixtures > tofu/import-resource/1/apply-only > renders without error and matches snapshot 1`] = `
+"## ✅ Apply Succeeded
+
+> ⚠️ **Warning:** Structured plan output was not available. Showing raw command output.
+
+### Apply Output
+
+<details>
+<summary><code>OpenTofu 1.11.5</code> <code>type=version</code></summary>
+
+\`tofu=1.11.5\`
+
+\`ui=1.2\`
+
+</details>
+
+<details>
+<summary><code>Apply complete! Resources: 1 imported, 0 added, 0 changed, 0 destroyed.</code> <code>type=change_summary</code></summary>
+
+\`changes.add=0\`
+
+\`changes.change=0\`
+
+\`changes.forget=0\`
+
+\`changes.import=1\`
+
+\`changes.operation=apply\`
+
+\`changes.remove=0\`
+
+</details>
+
+\`Outputs: 0\` \`type=outputs\`
+
+
+"
+`;
+
 exports[`reportFromSteps integration — apply-only fixtures > tofu/local-files/0/apply-only > renders without error and matches snapshot 1`] = `
 "## ✅ Apply Succeeded
 
@@ -23354,6 +25453,245 @@ exports[`reportFromSteps integration — apply-only fixtures > tofu/random-repla
 "
 `;
 
+exports[`reportFromSteps integration — apply-only fixtures > tofu/removed-resource/0/apply-only > renders without error and matches snapshot 1`] = `
+"## ✅ Apply Succeeded
+
+> ⚠️ **Warning:** Structured plan output was not available. Showing raw command output.
+
+### Apply Output
+
+<details>
+<summary><code>OpenTofu 1.11.5</code> <code>type=version</code></summary>
+
+\`tofu=1.11.5\`
+
+\`ui=1.2\`
+
+</details>
+
+<details>
+<summary><code>null_resource.ephemeral: Plan to create</code> <code>type=planned_change</code></summary>
+
+\`change.action=create\`
+
+\`change.resource.addr=null_resource.ephemeral\`
+
+\`change.resource.implied_provider=null\`
+
+\`change.resource.module=\`
+
+\`change.resource.resource=null_resource.ephemeral\`
+
+\`change.resource.resource_key=null\`
+
+\`change.resource.resource_name=ephemeral\`
+
+\`change.resource.resource_type=null_resource\`
+
+</details>
+
+<details>
+<summary><code>null_resource.keeper: Plan to create</code> <code>type=planned_change</code></summary>
+
+\`change.action=create\`
+
+\`change.resource.addr=null_resource.keeper\`
+
+\`change.resource.implied_provider=null\`
+
+\`change.resource.module=\`
+
+\`change.resource.resource=null_resource.keeper\`
+
+\`change.resource.resource_key=null\`
+
+\`change.resource.resource_name=keeper\`
+
+\`change.resource.resource_type=null_resource\`
+
+</details>
+
+<details>
+<summary><code>null_resource.keeper: Creating...</code> <code>type=apply_start</code></summary>
+
+\`hook.action=create\`
+
+\`hook.resource.addr=null_resource.keeper\`
+
+\`hook.resource.implied_provider=null\`
+
+\`hook.resource.module=\`
+
+\`hook.resource.resource=null_resource.keeper\`
+
+\`hook.resource.resource_key=null\`
+
+\`hook.resource.resource_name=keeper\`
+
+\`hook.resource.resource_type=null_resource\`
+
+</details>
+
+<details>
+<summary><code>null_resource.ephemeral: Creating...</code> <code>type=apply_start</code></summary>
+
+\`hook.action=create\`
+
+\`hook.resource.addr=null_resource.ephemeral\`
+
+\`hook.resource.implied_provider=null\`
+
+\`hook.resource.module=\`
+
+\`hook.resource.resource=null_resource.ephemeral\`
+
+\`hook.resource.resource_key=null\`
+
+\`hook.resource.resource_name=ephemeral\`
+
+\`hook.resource.resource_type=null_resource\`
+
+</details>
+
+<details>
+<summary><code>null_resource.keeper: Creation complete after 0s [id=817345555659374398]</code> <code>type=apply_complete</code></summary>
+
+\`hook.action=create\`
+
+\`hook.elapsed_seconds=0\`
+
+\`hook.id_key=id\`
+
+\`hook.id_value=817345555659374398\`
+
+\`hook.resource.addr=null_resource.keeper\`
+
+\`hook.resource.implied_provider=null\`
+
+\`hook.resource.module=\`
+
+\`hook.resource.resource=null_resource.keeper\`
+
+\`hook.resource.resource_key=null\`
+
+\`hook.resource.resource_name=keeper\`
+
+\`hook.resource.resource_type=null_resource\`
+
+</details>
+
+<details>
+<summary><code>null_resource.ephemeral: Creation complete after 0s [id=2454178591280020709]</code> <code>type=apply_complete</code></summary>
+
+\`hook.action=create\`
+
+\`hook.elapsed_seconds=0\`
+
+\`hook.id_key=id\`
+
+\`hook.id_value=2454178591280020709\`
+
+\`hook.resource.addr=null_resource.ephemeral\`
+
+\`hook.resource.implied_provider=null\`
+
+\`hook.resource.module=\`
+
+\`hook.resource.resource=null_resource.ephemeral\`
+
+\`hook.resource.resource_key=null\`
+
+\`hook.resource.resource_name=ephemeral\`
+
+\`hook.resource.resource_type=null_resource\`
+
+</details>
+
+<details>
+<summary><code>Apply complete! Resources: 2 added, 0 changed, 0 destroyed.</code> <code>type=change_summary</code></summary>
+
+\`changes.add=2\`
+
+\`changes.change=0\`
+
+\`changes.forget=0\`
+
+\`changes.import=0\`
+
+\`changes.operation=apply\`
+
+\`changes.remove=0\`
+
+</details>
+
+\`Outputs: 0\` \`type=outputs\`
+
+
+"
+`;
+
+exports[`reportFromSteps integration — apply-only fixtures > tofu/removed-resource/1/apply-only > renders without error and matches snapshot 1`] = `
+"## ✅ Apply Succeeded
+
+> ⚠️ **Warning:** Structured plan output was not available. Showing raw command output.
+
+### Apply Output
+
+<details>
+<summary><code>OpenTofu 1.11.5</code> <code>type=version</code></summary>
+
+\`tofu=1.11.5\`
+
+\`ui=1.2\`
+
+</details>
+
+<details>
+<summary><code>null_resource.ephemeral: Plan to remove</code> <code>type=planned_change</code></summary>
+
+\`change.action=remove\`
+
+\`change.reason=delete_because_no_resource_config\`
+
+\`change.resource.addr=null_resource.ephemeral\`
+
+\`change.resource.implied_provider=null\`
+
+\`change.resource.module=\`
+
+\`change.resource.resource=null_resource.ephemeral\`
+
+\`change.resource.resource_key=null\`
+
+\`change.resource.resource_name=ephemeral\`
+
+\`change.resource.resource_type=null_resource\`
+
+</details>
+
+<details>
+<summary><code>Apply complete! Resources: 0 added, 0 changed, 0 destroyed, 1 forgotten.</code> <code>type=change_summary</code></summary>
+
+\`changes.add=0\`
+
+\`changes.change=0\`
+
+\`changes.forget=1\`
+
+\`changes.import=0\`
+
+\`changes.operation=apply\`
+
+\`changes.remove=0\`
+
+</details>
+
+\`Outputs: 0\` \`type=outputs\`
+
+
+"
+`;
+
 exports[`reportFromSteps integration — apply-only fixtures > tofu/sensitive-values/0/apply-only > renders without error and matches snapshot 1`] = `
 "## ✅ Apply Succeeded
 
@@ -24901,6 +27239,98 @@ _(all values known after apply)_
 "
 `;
 
+exports[`reportFromSteps integration — generated fixtures > terraform/import-resource/0 > renders with workspace and matches snapshot 1`] = `
+"<!-- tf-report-action:"test-workspace" -->
+## ✅ \`test-workspace\` Apply: 1 added
+
+## Apply Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Added | random_string | 1 |
+|  | **Added** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>➕ <strong>random_string</strong> existing</summary>
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | <code></code> | <code>(value not in plan)</code> |
+| length |  | <code><ins style="background:#dfd">8</ins></code> |
+| lower |  | <code><ins style="background:#dfd">true</ins></code> |
+| min_lower |  | <code><ins style="background:#dfd">0</ins></code> |
+| min_numeric |  | <code><ins style="background:#dfd">0</ins></code> |
+| min_special |  | <code><ins style="background:#dfd">0</ins></code> |
+| min_upper |  | <code><ins style="background:#dfd">0</ins></code> |
+| number |  | <code><ins style="background:#dfd">true</ins></code> |
+| numeric |  | <code><ins style="background:#dfd">true</ins></code> |
+| result | <code></code> | <code>(value not in plan)</code> |
+| special |  | <code><ins style="background:#dfd">false</ins></code> |
+| upper |  | <code><ins style="background:#dfd">true</ins></code> |
+
+</details>
+"
+`;
+
+exports[`reportFromSteps integration — generated fixtures > terraform/import-resource/0 > renders without error and matches snapshot [default] 1`] = `
+"## ✅ Apply: 1 added
+
+## Apply Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Added | random_string | 1 |
+|  | **Added** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>➕ <strong>random_string</strong> existing</summary>
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | <code></code> | <code>(value not in plan)</code> |
+| length |  | <code><ins style="background:#dfd">8</ins></code> |
+| lower |  | <code><ins style="background:#dfd">true</ins></code> |
+| min_lower |  | <code><ins style="background:#dfd">0</ins></code> |
+| min_numeric |  | <code><ins style="background:#dfd">0</ins></code> |
+| min_special |  | <code><ins style="background:#dfd">0</ins></code> |
+| min_upper |  | <code><ins style="background:#dfd">0</ins></code> |
+| number |  | <code><ins style="background:#dfd">true</ins></code> |
+| numeric |  | <code><ins style="background:#dfd">true</ins></code> |
+| result | <code></code> | <code>(value not in plan)</code> |
+| special |  | <code><ins style="background:#dfd">false</ins></code> |
+| upper |  | <code><ins style="background:#dfd">true</ins></code> |
+
+</details>
+"
+`;
+
+exports[`reportFromSteps integration — generated fixtures > terraform/import-resource/1 > renders with workspace and matches snapshot 1`] = `
+"<!-- tf-report-action:"test-workspace" -->
+## ✅ \`test-workspace\` Apply Complete
+
+## Plan Summary
+
+_No changes._
+"
+`;
+
+exports[`reportFromSteps integration — generated fixtures > terraform/import-resource/1 > renders without error and matches snapshot [default] 1`] = `
+"## ✅ Apply Complete
+
+## Plan Summary
+
+_No changes._
+"
+`;
+
 exports[`reportFromSteps integration — generated fixtures > terraform/local-files/0 > renders with workspace and matches snapshot 1`] = `
 "<!-- tf-report-action:"test-workspace" -->
 ## ✅ \`test-workspace\` Apply: 1 added
@@ -26255,6 +28685,98 @@ exports[`reportFromSteps integration — generated fixtures > terraform/random-r
 "
 `;
 
+exports[`reportFromSteps integration — generated fixtures > terraform/removed-resource/0 > renders with workspace and matches snapshot 1`] = `
+"<!-- tf-report-action:"test-workspace" -->
+## ✅ \`test-workspace\` Apply: 2 added
+
+## Apply Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Added | null_resource | 2 |
+|  | **Added** | **2** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>➕ <strong>null_resource</strong> ephemeral</summary>
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | <code></code> | <code>(value not in plan)</code> |
+| triggers.version |  | <code><ins style="background:#dfd">1</ins></code> |
+
+</details>
+
+<details>
+<summary>➕ <strong>null_resource</strong> keeper</summary>
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | <code></code> | <code>(value not in plan)</code> |
+| triggers.version |  | <code><ins style="background:#dfd">1</ins></code> |
+
+</details>
+"
+`;
+
+exports[`reportFromSteps integration — generated fixtures > terraform/removed-resource/0 > renders without error and matches snapshot [default] 1`] = `
+"## ✅ Apply: 2 added
+
+## Apply Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Added | null_resource | 2 |
+|  | **Added** | **2** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>➕ <strong>null_resource</strong> ephemeral</summary>
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | <code></code> | <code>(value not in plan)</code> |
+| triggers.version |  | <code><ins style="background:#dfd">1</ins></code> |
+
+</details>
+
+<details>
+<summary>➕ <strong>null_resource</strong> keeper</summary>
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | <code></code> | <code>(value not in plan)</code> |
+| triggers.version |  | <code><ins style="background:#dfd">1</ins></code> |
+
+</details>
+"
+`;
+
+exports[`reportFromSteps integration — generated fixtures > terraform/removed-resource/1 > renders with workspace and matches snapshot 1`] = `
+"<!-- tf-report-action:"test-workspace" -->
+## ✅ \`test-workspace\` Apply Complete
+
+## Apply Summary
+
+_No changes._
+"
+`;
+
+exports[`reportFromSteps integration — generated fixtures > terraform/removed-resource/1 > renders without error and matches snapshot [default] 1`] = `
+"## ✅ Apply Complete
+
+## Apply Summary
+
+_No changes._
+"
+`;
+
 exports[`reportFromSteps integration — generated fixtures > terraform/sensitive-values/0 > renders with workspace and matches snapshot 1`] = `
 "<!-- tf-report-action:"test-workspace" -->
 ## ✅ \`test-workspace\` Apply: 1 added
@@ -27423,6 +29945,98 @@ _(all values known after apply)_
 | Output | Action | Before | After |
 | --- | --- | --- | --- |
 | config_value | 🔧 | <code>{"worker_a":"alpha","worker_b":"bravo","worker_c":"charlie"}</code> | <code>{"worker_a":"ALPHA","worker_b":"bravo","worker_c":"charlie"}</code> |
+"
+`;
+
+exports[`reportFromSteps integration — generated fixtures > tofu/import-resource/0 > renders with workspace and matches snapshot 1`] = `
+"<!-- tf-report-action:"test-workspace" -->
+## ✅ \`test-workspace\` Apply: 1 added
+
+## Apply Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Added | random_string | 1 |
+|  | **Added** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>➕ <strong>random_string</strong> existing</summary>
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | <code></code> | <code>(value not in plan)</code> |
+| length |  | <code><ins style="background:#dfd">8</ins></code> |
+| lower |  | <code><ins style="background:#dfd">true</ins></code> |
+| min_lower |  | <code><ins style="background:#dfd">0</ins></code> |
+| min_numeric |  | <code><ins style="background:#dfd">0</ins></code> |
+| min_special |  | <code><ins style="background:#dfd">0</ins></code> |
+| min_upper |  | <code><ins style="background:#dfd">0</ins></code> |
+| number |  | <code><ins style="background:#dfd">true</ins></code> |
+| numeric |  | <code><ins style="background:#dfd">true</ins></code> |
+| result | <code></code> | <code>(value not in plan)</code> |
+| special |  | <code><ins style="background:#dfd">false</ins></code> |
+| upper |  | <code><ins style="background:#dfd">true</ins></code> |
+
+</details>
+"
+`;
+
+exports[`reportFromSteps integration — generated fixtures > tofu/import-resource/0 > renders without error and matches snapshot [default] 1`] = `
+"## ✅ Apply: 1 added
+
+## Apply Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Added | random_string | 1 |
+|  | **Added** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>➕ <strong>random_string</strong> existing</summary>
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | <code></code> | <code>(value not in plan)</code> |
+| length |  | <code><ins style="background:#dfd">8</ins></code> |
+| lower |  | <code><ins style="background:#dfd">true</ins></code> |
+| min_lower |  | <code><ins style="background:#dfd">0</ins></code> |
+| min_numeric |  | <code><ins style="background:#dfd">0</ins></code> |
+| min_special |  | <code><ins style="background:#dfd">0</ins></code> |
+| min_upper |  | <code><ins style="background:#dfd">0</ins></code> |
+| number |  | <code><ins style="background:#dfd">true</ins></code> |
+| numeric |  | <code><ins style="background:#dfd">true</ins></code> |
+| result | <code></code> | <code>(value not in plan)</code> |
+| special |  | <code><ins style="background:#dfd">false</ins></code> |
+| upper |  | <code><ins style="background:#dfd">true</ins></code> |
+
+</details>
+"
+`;
+
+exports[`reportFromSteps integration — generated fixtures > tofu/import-resource/1 > renders with workspace and matches snapshot 1`] = `
+"<!-- tf-report-action:"test-workspace" -->
+## ✅ \`test-workspace\` Apply Complete
+
+## Plan Summary
+
+_No changes._
+"
+`;
+
+exports[`reportFromSteps integration — generated fixtures > tofu/import-resource/1 > renders without error and matches snapshot [default] 1`] = `
+"## ✅ Apply Complete
+
+## Plan Summary
+
+_No changes._
 "
 `;
 
@@ -28777,6 +31391,98 @@ exports[`reportFromSteps integration — generated fixtures > tofu/random-replac
 | Output | Action | Before | After |
 | --- | --- | --- | --- |
 | token_length | ⬜ | <code>16</code> | <code>16</code> |
+"
+`;
+
+exports[`reportFromSteps integration — generated fixtures > tofu/removed-resource/0 > renders with workspace and matches snapshot 1`] = `
+"<!-- tf-report-action:"test-workspace" -->
+## ✅ \`test-workspace\` Apply: 2 added
+
+## Apply Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Added | null_resource | 2 |
+|  | **Added** | **2** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>➕ <strong>null_resource</strong> ephemeral</summary>
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | <code></code> | <code>(value not in plan)</code> |
+| triggers.version |  | <code><ins style="background:#dfd">1</ins></code> |
+
+</details>
+
+<details>
+<summary>➕ <strong>null_resource</strong> keeper</summary>
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | <code></code> | <code>(value not in plan)</code> |
+| triggers.version |  | <code><ins style="background:#dfd">1</ins></code> |
+
+</details>
+"
+`;
+
+exports[`reportFromSteps integration — generated fixtures > tofu/removed-resource/0 > renders without error and matches snapshot [default] 1`] = `
+"## ✅ Apply: 2 added
+
+## Apply Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Added | null_resource | 2 |
+|  | **Added** | **2** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>➕ <strong>null_resource</strong> ephemeral</summary>
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | <code></code> | <code>(value not in plan)</code> |
+| triggers.version |  | <code><ins style="background:#dfd">1</ins></code> |
+
+</details>
+
+<details>
+<summary>➕ <strong>null_resource</strong> keeper</summary>
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | <code></code> | <code>(value not in plan)</code> |
+| triggers.version |  | <code><ins style="background:#dfd">1</ins></code> |
+
+</details>
+"
+`;
+
+exports[`reportFromSteps integration — generated fixtures > tofu/removed-resource/1 > renders with workspace and matches snapshot 1`] = `
+"<!-- tf-report-action:"test-workspace" -->
+## ✅ \`test-workspace\` Apply Complete
+
+## Apply Summary
+
+_No changes._
+"
+`;
+
+exports[`reportFromSteps integration — generated fixtures > tofu/removed-resource/1 > renders without error and matches snapshot [default] 1`] = `
+"## ✅ Apply Complete
+
+## Apply Summary
+
+_No changes._
 "
 `;
 
@@ -30816,6 +33522,216 @@ exports[`reportFromSteps integration — no-show fixtures (Tier 3) > terraform/d
 "
 `;
 
+exports[`reportFromSteps integration — no-show fixtures (Tier 3) > terraform/import-resource/0/no-show > renders without error and matches snapshot 1`] = `
+"## ✅ Plan Succeeded
+
+> ⚠️ **Warning:** Structured plan output was not available. Showing raw command output.
+
+### Plan Output
+
+<details>
+<summary><code>Terraform 1.14.6</code> <code>type=version</code></summary>
+
+\`terraform=1.14.6\`
+
+\`ui=1.2\`
+
+</details>
+
+<details>
+<summary><code>random_string.existing: Plan to create</code> <code>type=planned_change</code></summary>
+
+\`change.action=create\`
+
+\`change.resource.addr=random_string.existing\`
+
+\`change.resource.implied_provider=random\`
+
+\`change.resource.module=\`
+
+\`change.resource.resource=random_string.existing\`
+
+\`change.resource.resource_key=null\`
+
+\`change.resource.resource_name=existing\`
+
+\`change.resource.resource_type=random_string\`
+
+</details>
+
+<details>
+<summary><code>Plan: 1 to add, 0 to change, 0 to destroy.</code> <code>type=change_summary</code></summary>
+
+\`changes.action_invocation=0\`
+
+\`changes.add=1\`
+
+\`changes.change=0\`
+
+\`changes.import=0\`
+
+\`changes.operation=plan\`
+
+\`changes.remove=0\`
+
+</details>
+
+
+"
+`;
+
+exports[`reportFromSteps integration — no-show fixtures (Tier 3) > terraform/import-resource/1/no-show > renders without error and matches snapshot 1`] = `
+"## ✅ Plan Succeeded
+
+> ⚠️ **Warning:** Structured plan output was not available. Showing raw command output.
+
+### Plan Output
+
+<details>
+<summary><code>Terraform 1.14.6</code> <code>type=version</code></summary>
+
+\`terraform=1.14.6\`
+
+\`ui=1.2\`
+
+</details>
+
+<details>
+<summary><code>random_string.imported: Refreshing state... [id=fixedval]</code> <code>type=refresh_start</code></summary>
+
+\`hook.id_key=id\`
+
+\`hook.id_value=fixedval\`
+
+\`hook.resource.addr=random_string.imported\`
+
+\`hook.resource.implied_provider=random\`
+
+\`hook.resource.module=\`
+
+\`hook.resource.resource=random_string.imported\`
+
+\`hook.resource.resource_key=null\`
+
+\`hook.resource.resource_name=imported\`
+
+\`hook.resource.resource_type=random_string\`
+
+</details>
+
+<details>
+<summary><code>random_string.existing: Refreshing state... [id=FCglareD]</code> <code>type=refresh_start</code></summary>
+
+\`hook.id_key=id\`
+
+\`hook.id_value=FCglareD\`
+
+\`hook.resource.addr=random_string.existing\`
+
+\`hook.resource.implied_provider=random\`
+
+\`hook.resource.module=\`
+
+\`hook.resource.resource=random_string.existing\`
+
+\`hook.resource.resource_key=null\`
+
+\`hook.resource.resource_name=existing\`
+
+\`hook.resource.resource_type=random_string\`
+
+</details>
+
+<details>
+<summary><code>random_string.imported: Refresh complete [id=fixedval]</code> <code>type=refresh_complete</code></summary>
+
+\`hook.id_key=id\`
+
+\`hook.id_value=fixedval\`
+
+\`hook.resource.addr=random_string.imported\`
+
+\`hook.resource.implied_provider=random\`
+
+\`hook.resource.module=\`
+
+\`hook.resource.resource=random_string.imported\`
+
+\`hook.resource.resource_key=null\`
+
+\`hook.resource.resource_name=imported\`
+
+\`hook.resource.resource_type=random_string\`
+
+</details>
+
+<details>
+<summary><code>random_string.existing: Refresh complete [id=FCglareD]</code> <code>type=refresh_complete</code></summary>
+
+\`hook.id_key=id\`
+
+\`hook.id_value=FCglareD\`
+
+\`hook.resource.addr=random_string.existing\`
+
+\`hook.resource.implied_provider=random\`
+
+\`hook.resource.module=\`
+
+\`hook.resource.resource=random_string.existing\`
+
+\`hook.resource.resource_key=null\`
+
+\`hook.resource.resource_name=existing\`
+
+\`hook.resource.resource_type=random_string\`
+
+</details>
+
+<details>
+<summary><code>random_string.imported: Plan to import</code> <code>type=planned_change</code></summary>
+
+\`change.action=import\`
+
+\`change.importing.id=fixedval\`
+
+\`change.resource.addr=random_string.imported\`
+
+\`change.resource.implied_provider=random\`
+
+\`change.resource.module=\`
+
+\`change.resource.resource=random_string.imported\`
+
+\`change.resource.resource_key=null\`
+
+\`change.resource.resource_name=imported\`
+
+\`change.resource.resource_type=random_string\`
+
+</details>
+
+<details>
+<summary><code>Plan: 1 to import, 0 to add, 0 to change, 0 to destroy.</code> <code>type=change_summary</code></summary>
+
+\`changes.action_invocation=0\`
+
+\`changes.add=0\`
+
+\`changes.change=0\`
+
+\`changes.import=1\`
+
+\`changes.operation=plan\`
+
+\`changes.remove=0\`
+
+</details>
+
+
+"
+`;
+
 exports[`reportFromSteps integration — no-show fixtures (Tier 3) > terraform/local-files/0/no-show > renders without error and matches snapshot 1`] = `
 "## ✅ Plan Succeeded
 
@@ -32294,6 +35210,202 @@ exports[`reportFromSteps integration — no-show fixtures (Tier 3) > terraform/r
 \`outputs.token_length.action=noop\`
 
 \`outputs.token_length.sensitive=false\`
+
+</details>
+
+
+"
+`;
+
+exports[`reportFromSteps integration — no-show fixtures (Tier 3) > terraform/removed-resource/0/no-show > renders without error and matches snapshot 1`] = `
+"## ✅ Plan Succeeded
+
+> ⚠️ **Warning:** Structured plan output was not available. Showing raw command output.
+
+### Plan Output
+
+<details>
+<summary><code>Terraform 1.14.6</code> <code>type=version</code></summary>
+
+\`terraform=1.14.6\`
+
+\`ui=1.2\`
+
+</details>
+
+<details>
+<summary><code>null_resource.ephemeral: Plan to create</code> <code>type=planned_change</code></summary>
+
+\`change.action=create\`
+
+\`change.resource.addr=null_resource.ephemeral\`
+
+\`change.resource.implied_provider=null\`
+
+\`change.resource.module=\`
+
+\`change.resource.resource=null_resource.ephemeral\`
+
+\`change.resource.resource_key=null\`
+
+\`change.resource.resource_name=ephemeral\`
+
+\`change.resource.resource_type=null_resource\`
+
+</details>
+
+<details>
+<summary><code>null_resource.keeper: Plan to create</code> <code>type=planned_change</code></summary>
+
+\`change.action=create\`
+
+\`change.resource.addr=null_resource.keeper\`
+
+\`change.resource.implied_provider=null\`
+
+\`change.resource.module=\`
+
+\`change.resource.resource=null_resource.keeper\`
+
+\`change.resource.resource_key=null\`
+
+\`change.resource.resource_name=keeper\`
+
+\`change.resource.resource_type=null_resource\`
+
+</details>
+
+<details>
+<summary><code>Plan: 2 to add, 0 to change, 0 to destroy.</code> <code>type=change_summary</code></summary>
+
+\`changes.action_invocation=0\`
+
+\`changes.add=2\`
+
+\`changes.change=0\`
+
+\`changes.import=0\`
+
+\`changes.operation=plan\`
+
+\`changes.remove=0\`
+
+</details>
+
+
+"
+`;
+
+exports[`reportFromSteps integration — no-show fixtures (Tier 3) > terraform/removed-resource/1/no-show > renders without error and matches snapshot 1`] = `
+"## ✅ Plan Succeeded
+
+> ⚠️ **Warning:** Structured plan output was not available. Showing raw command output.
+
+### Plan Output
+
+<details>
+<summary><code>Terraform 1.14.6</code> <code>type=version</code></summary>
+
+\`terraform=1.14.6\`
+
+\`ui=1.2\`
+
+</details>
+
+<details>
+<summary><code>null_resource.keeper: Refreshing state... [id=5001506899250486925]</code> <code>type=refresh_start</code></summary>
+
+\`hook.id_key=id\`
+
+\`hook.id_value=5001506899250486925\`
+
+\`hook.resource.addr=null_resource.keeper\`
+
+\`hook.resource.implied_provider=null\`
+
+\`hook.resource.module=\`
+
+\`hook.resource.resource=null_resource.keeper\`
+
+\`hook.resource.resource_key=null\`
+
+\`hook.resource.resource_name=keeper\`
+
+\`hook.resource.resource_type=null_resource\`
+
+</details>
+
+<details>
+<summary><code>null_resource.keeper: Refresh complete [id=5001506899250486925]</code> <code>type=refresh_complete</code></summary>
+
+\`hook.id_key=id\`
+
+\`hook.id_value=5001506899250486925\`
+
+\`hook.resource.addr=null_resource.keeper\`
+
+\`hook.resource.implied_provider=null\`
+
+\`hook.resource.module=\`
+
+\`hook.resource.resource=null_resource.keeper\`
+
+\`hook.resource.resource_key=null\`
+
+\`hook.resource.resource_name=keeper\`
+
+\`hook.resource.resource_type=null_resource\`
+
+</details>
+
+<details>
+<summary><code>null_resource.ephemeral: Plan to remove</code> <code>type=planned_change</code></summary>
+
+\`change.action=remove\`
+
+\`change.reason=delete_because_no_resource_config\`
+
+\`change.resource.addr=null_resource.ephemeral\`
+
+\`change.resource.implied_provider=null\`
+
+\`change.resource.module=\`
+
+\`change.resource.resource=null_resource.ephemeral\`
+
+\`change.resource.resource_key=null\`
+
+\`change.resource.resource_name=ephemeral\`
+
+\`change.resource.resource_type=null_resource\`
+
+</details>
+
+<details>
+<summary><code>Plan: 0 to add, 0 to change, 0 to destroy.</code> <code>type=change_summary</code></summary>
+
+\`changes.action_invocation=0\`
+
+\`changes.add=0\`
+
+\`changes.change=0\`
+
+\`changes.import=0\`
+
+\`changes.operation=plan\`
+
+\`changes.remove=0\`
+
+</details>
+
+<details>
+<summary>⚠️ <code>Warning: Some objects will no longer be managed by Terraform</code> <code>type=diagnostic</code></summary>
+
+\`diagnostic.detail=If you apply this plan, Terraform will discard its tracking information for t...\`
+
+\`diagnostic.severity=warning\`
+
+\`diagnostic.summary=Some objects will no longer be managed by Terraform\`
 
 </details>
 
@@ -34255,6 +37367,216 @@ exports[`reportFromSteps integration — no-show fixtures (Tier 3) > tofu/deferr
 "
 `;
 
+exports[`reportFromSteps integration — no-show fixtures (Tier 3) > tofu/import-resource/0/no-show > renders without error and matches snapshot 1`] = `
+"## ✅ Plan Succeeded
+
+> ⚠️ **Warning:** Structured plan output was not available. Showing raw command output.
+
+### Plan Output
+
+<details>
+<summary><code>OpenTofu 1.11.5</code> <code>type=version</code></summary>
+
+\`tofu=1.11.5\`
+
+\`ui=1.2\`
+
+</details>
+
+<details>
+<summary><code>random_string.existing: Plan to create</code> <code>type=planned_change</code></summary>
+
+\`change.action=create\`
+
+\`change.resource.addr=random_string.existing\`
+
+\`change.resource.implied_provider=random\`
+
+\`change.resource.module=\`
+
+\`change.resource.resource=random_string.existing\`
+
+\`change.resource.resource_key=null\`
+
+\`change.resource.resource_name=existing\`
+
+\`change.resource.resource_type=random_string\`
+
+</details>
+
+<details>
+<summary><code>Plan: 1 to add, 0 to change, 0 to destroy.</code> <code>type=change_summary</code></summary>
+
+\`changes.add=1\`
+
+\`changes.change=0\`
+
+\`changes.forget=0\`
+
+\`changes.import=0\`
+
+\`changes.operation=plan\`
+
+\`changes.remove=0\`
+
+</details>
+
+
+"
+`;
+
+exports[`reportFromSteps integration — no-show fixtures (Tier 3) > tofu/import-resource/1/no-show > renders without error and matches snapshot 1`] = `
+"## ✅ Plan Succeeded
+
+> ⚠️ **Warning:** Structured plan output was not available. Showing raw command output.
+
+### Plan Output
+
+<details>
+<summary><code>OpenTofu 1.11.5</code> <code>type=version</code></summary>
+
+\`tofu=1.11.5\`
+
+\`ui=1.2\`
+
+</details>
+
+<details>
+<summary><code>random_string.imported: Refreshing state... [id=fixedval]</code> <code>type=refresh_start</code></summary>
+
+\`hook.id_key=id\`
+
+\`hook.id_value=fixedval\`
+
+\`hook.resource.addr=random_string.imported\`
+
+\`hook.resource.implied_provider=random\`
+
+\`hook.resource.module=\`
+
+\`hook.resource.resource=random_string.imported\`
+
+\`hook.resource.resource_key=null\`
+
+\`hook.resource.resource_name=imported\`
+
+\`hook.resource.resource_type=random_string\`
+
+</details>
+
+<details>
+<summary><code>random_string.existing: Refreshing state... [id=qy2kyvYF]</code> <code>type=refresh_start</code></summary>
+
+\`hook.id_key=id\`
+
+\`hook.id_value=qy2kyvYF\`
+
+\`hook.resource.addr=random_string.existing\`
+
+\`hook.resource.implied_provider=random\`
+
+\`hook.resource.module=\`
+
+\`hook.resource.resource=random_string.existing\`
+
+\`hook.resource.resource_key=null\`
+
+\`hook.resource.resource_name=existing\`
+
+\`hook.resource.resource_type=random_string\`
+
+</details>
+
+<details>
+<summary><code>random_string.existing: Refresh complete [id=qy2kyvYF]</code> <code>type=refresh_complete</code></summary>
+
+\`hook.id_key=id\`
+
+\`hook.id_value=qy2kyvYF\`
+
+\`hook.resource.addr=random_string.existing\`
+
+\`hook.resource.implied_provider=random\`
+
+\`hook.resource.module=\`
+
+\`hook.resource.resource=random_string.existing\`
+
+\`hook.resource.resource_key=null\`
+
+\`hook.resource.resource_name=existing\`
+
+\`hook.resource.resource_type=random_string\`
+
+</details>
+
+<details>
+<summary><code>random_string.imported: Refresh complete [id=fixedval]</code> <code>type=refresh_complete</code></summary>
+
+\`hook.id_key=id\`
+
+\`hook.id_value=fixedval\`
+
+\`hook.resource.addr=random_string.imported\`
+
+\`hook.resource.implied_provider=random\`
+
+\`hook.resource.module=\`
+
+\`hook.resource.resource=random_string.imported\`
+
+\`hook.resource.resource_key=null\`
+
+\`hook.resource.resource_name=imported\`
+
+\`hook.resource.resource_type=random_string\`
+
+</details>
+
+<details>
+<summary><code>random_string.imported: Plan to import</code> <code>type=planned_change</code></summary>
+
+\`change.action=import\`
+
+\`change.importing.id=fixedval\`
+
+\`change.resource.addr=random_string.imported\`
+
+\`change.resource.implied_provider=random\`
+
+\`change.resource.module=\`
+
+\`change.resource.resource=random_string.imported\`
+
+\`change.resource.resource_key=null\`
+
+\`change.resource.resource_name=imported\`
+
+\`change.resource.resource_type=random_string\`
+
+</details>
+
+<details>
+<summary><code>Plan: 1 to import, 0 to add, 0 to change, 0 to destroy.</code> <code>type=change_summary</code></summary>
+
+\`changes.add=0\`
+
+\`changes.change=0\`
+
+\`changes.forget=0\`
+
+\`changes.import=1\`
+
+\`changes.operation=plan\`
+
+\`changes.remove=0\`
+
+</details>
+
+
+"
+`;
+
 exports[`reportFromSteps integration — no-show fixtures (Tier 3) > tofu/local-files/0/no-show > renders without error and matches snapshot 1`] = `
 "## ✅ Plan Succeeded
 
@@ -35740,6 +39062,248 @@ exports[`reportFromSteps integration — no-show fixtures (Tier 3) > tofu/random
 "
 `;
 
+exports[`reportFromSteps integration — no-show fixtures (Tier 3) > tofu/removed-resource/0/no-show > renders without error and matches snapshot 1`] = `
+"## ✅ Plan Succeeded
+
+> ⚠️ **Warning:** Structured plan output was not available. Showing raw command output.
+
+### Plan Output
+
+<details>
+<summary><code>OpenTofu 1.11.5</code> <code>type=version</code></summary>
+
+\`tofu=1.11.5\`
+
+\`ui=1.2\`
+
+</details>
+
+<details>
+<summary><code>null_resource.ephemeral: Plan to create</code> <code>type=planned_change</code></summary>
+
+\`change.action=create\`
+
+\`change.resource.addr=null_resource.ephemeral\`
+
+\`change.resource.implied_provider=null\`
+
+\`change.resource.module=\`
+
+\`change.resource.resource=null_resource.ephemeral\`
+
+\`change.resource.resource_key=null\`
+
+\`change.resource.resource_name=ephemeral\`
+
+\`change.resource.resource_type=null_resource\`
+
+</details>
+
+<details>
+<summary><code>null_resource.keeper: Plan to create</code> <code>type=planned_change</code></summary>
+
+\`change.action=create\`
+
+\`change.resource.addr=null_resource.keeper\`
+
+\`change.resource.implied_provider=null\`
+
+\`change.resource.module=\`
+
+\`change.resource.resource=null_resource.keeper\`
+
+\`change.resource.resource_key=null\`
+
+\`change.resource.resource_name=keeper\`
+
+\`change.resource.resource_type=null_resource\`
+
+</details>
+
+<details>
+<summary><code>Plan: 2 to add, 0 to change, 0 to destroy.</code> <code>type=change_summary</code></summary>
+
+\`changes.add=2\`
+
+\`changes.change=0\`
+
+\`changes.forget=0\`
+
+\`changes.import=0\`
+
+\`changes.operation=plan\`
+
+\`changes.remove=0\`
+
+</details>
+
+
+"
+`;
+
+exports[`reportFromSteps integration — no-show fixtures (Tier 3) > tofu/removed-resource/1/no-show > renders without error and matches snapshot 1`] = `
+"## ✅ Plan Succeeded
+
+> ⚠️ **Warning:** Structured plan output was not available. Showing raw command output.
+
+### Plan Output
+
+<details>
+<summary><code>OpenTofu 1.11.5</code> <code>type=version</code></summary>
+
+\`tofu=1.11.5\`
+
+\`ui=1.2\`
+
+</details>
+
+<details>
+<summary><code>null_resource.keeper: Refreshing state... [id=817345555659374398]</code> <code>type=refresh_start</code></summary>
+
+\`hook.id_key=id\`
+
+\`hook.id_value=817345555659374398\`
+
+\`hook.resource.addr=null_resource.keeper\`
+
+\`hook.resource.implied_provider=null\`
+
+\`hook.resource.module=\`
+
+\`hook.resource.resource=null_resource.keeper\`
+
+\`hook.resource.resource_key=null\`
+
+\`hook.resource.resource_name=keeper\`
+
+\`hook.resource.resource_type=null_resource\`
+
+</details>
+
+<details>
+<summary><code>null_resource.ephemeral: Refreshing state... [id=2454178591280020709]</code> <code>type=refresh_start</code></summary>
+
+\`hook.id_key=id\`
+
+\`hook.id_value=2454178591280020709\`
+
+\`hook.resource.addr=null_resource.ephemeral\`
+
+\`hook.resource.implied_provider=null\`
+
+\`hook.resource.module=\`
+
+\`hook.resource.resource=null_resource.ephemeral\`
+
+\`hook.resource.resource_key=null\`
+
+\`hook.resource.resource_name=ephemeral\`
+
+\`hook.resource.resource_type=null_resource\`
+
+</details>
+
+<details>
+<summary><code>null_resource.keeper: Refresh complete [id=817345555659374398]</code> <code>type=refresh_complete</code></summary>
+
+\`hook.id_key=id\`
+
+\`hook.id_value=817345555659374398\`
+
+\`hook.resource.addr=null_resource.keeper\`
+
+\`hook.resource.implied_provider=null\`
+
+\`hook.resource.module=\`
+
+\`hook.resource.resource=null_resource.keeper\`
+
+\`hook.resource.resource_key=null\`
+
+\`hook.resource.resource_name=keeper\`
+
+\`hook.resource.resource_type=null_resource\`
+
+</details>
+
+<details>
+<summary><code>null_resource.ephemeral: Refresh complete [id=2454178591280020709]</code> <code>type=refresh_complete</code></summary>
+
+\`hook.id_key=id\`
+
+\`hook.id_value=2454178591280020709\`
+
+\`hook.resource.addr=null_resource.ephemeral\`
+
+\`hook.resource.implied_provider=null\`
+
+\`hook.resource.module=\`
+
+\`hook.resource.resource=null_resource.ephemeral\`
+
+\`hook.resource.resource_key=null\`
+
+\`hook.resource.resource_name=ephemeral\`
+
+\`hook.resource.resource_type=null_resource\`
+
+</details>
+
+<details>
+<summary><code>null_resource.ephemeral: Plan to remove</code> <code>type=planned_change</code></summary>
+
+\`change.action=remove\`
+
+\`change.reason=delete_because_no_resource_config\`
+
+\`change.resource.addr=null_resource.ephemeral\`
+
+\`change.resource.implied_provider=null\`
+
+\`change.resource.module=\`
+
+\`change.resource.resource=null_resource.ephemeral\`
+
+\`change.resource.resource_key=null\`
+
+\`change.resource.resource_name=ephemeral\`
+
+\`change.resource.resource_type=null_resource\`
+
+</details>
+
+<details>
+<summary><code>Plan: 0 to add, 0 to change, 0 to destroy, 1 to forget.</code> <code>type=change_summary</code></summary>
+
+\`changes.add=0\`
+
+\`changes.change=0\`
+
+\`changes.forget=1\`
+
+\`changes.import=0\`
+
+\`changes.operation=plan\`
+
+\`changes.remove=0\`
+
+</details>
+
+<details>
+<summary>⚠️ <code>Warning: Resource going to be removed from the state</code> <code>type=diagnostic</code></summary>
+
+\`diagnostic.detail=After this plan gets applied, the resource null_resource.ephemeral will not b...\`
+
+\`diagnostic.severity=warning\`
+
+\`diagnostic.summary=Resource going to be removed from the state\`
+
+</details>
+
+
+"
+`;
+
 exports[`reportFromSteps integration — no-show fixtures (Tier 3) > tofu/sensitive-values/0/no-show > renders without error and matches snapshot 1`] = `
 "## ✅ Plan Succeeded
 
@@ -36425,13 +39989,6 @@ _(all values known after apply)_
 
 </details>
 
-<details>
-<summary>⬜ <strong>terraform_data</strong> success</summary>
-
-_No attribute changes._
-
-</details>
-
 ## Outputs
 
 | Output | Action | Before | After |
@@ -36545,15 +40102,6 @@ exports[`reportFromSteps integration — plan-only fixtures > terraform/deferred
 ### 📦 Module: root
 
 <details>
-<summary>⬜ <strong>local_file</strong> config</summary>
-
-| Attribute | Before | After |
-| --- | --- | --- |
-| sensitive_content | <code>(sensitive)</code> | <code>(sensitive)</code> |
-
-</details>
-
-<details>
 <summary>➕ <strong>local_file</strong> metadata</summary>
 
 | Attribute | Before | After |
@@ -36659,22 +40207,6 @@ exports[`reportFromSteps integration — plan-only fixtures > terraform/deferred
 </details>
 
 <details>
-<summary>⬜ <strong>local_file</strong> metadata</summary>
-
-| Attribute | Before | After |
-| --- | --- | --- |
-| sensitive_content | <code>(sensitive)</code> | <code>(sensitive)</code> |
-
-</details>
-
-<details>
-<summary>⬜ <strong>terraform_data</strong> independent</summary>
-
-_No attribute changes._
-
-</details>
-
-<details>
 <summary>🔧 <strong>terraform_data</strong> worker_a — changed: input, output</summary>
 
 _(all values known after apply)_
@@ -36700,6 +40232,67 @@ _(all values known after apply)_
 | Output | Action | Before | After |
 | --- | --- | --- | --- |
 | config_value | 🔧 | <code>{"worker_a":"alpha","worker_b":"bravo","worker_c":"charlie"}</code> | <code>(known after apply)</code> |
+"
+`;
+
+exports[`reportFromSteps integration — plan-only fixtures > terraform/import-resource/0/plan-only > renders plan report and matches snapshot 1`] = `
+"## ✅ Plan: 1 to add
+
+## Plan Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Add | random_string | 1 |
+|  | **Add** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>➕ <strong>random_string</strong> existing</summary>
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | <code></code> | <code>(known after apply)</code> |
+| length |  | <code><ins style="background:#dfd">8</ins></code> |
+| lower |  | <code><ins style="background:#dfd">true</ins></code> |
+| min_lower |  | <code><ins style="background:#dfd">0</ins></code> |
+| min_numeric |  | <code><ins style="background:#dfd">0</ins></code> |
+| min_special |  | <code><ins style="background:#dfd">0</ins></code> |
+| min_upper |  | <code><ins style="background:#dfd">0</ins></code> |
+| number |  | <code><ins style="background:#dfd">true</ins></code> |
+| numeric |  | <code><ins style="background:#dfd">true</ins></code> |
+| result | <code></code> | <code>(known after apply)</code> |
+| special |  | <code><ins style="background:#dfd">false</ins></code> |
+| upper |  | <code><ins style="background:#dfd">true</ins></code> |
+
+</details>
+"
+`;
+
+exports[`reportFromSteps integration — plan-only fixtures > terraform/import-resource/1/plan-only > renders plan report and matches snapshot 1`] = `
+"## ✅ Plan: 1 to import
+
+## Plan Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| 📥 Import | random_string | 1 |
+|  | **Import** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>📥 <strong>random_string</strong> imported</summary>
+
+**Import ID:** \`fixedval\`
+
+_No attribute changes._
+
+</details>
 "
 `;
 
@@ -36856,18 +40449,21 @@ exports[`reportFromSteps integration — plan-only fixtures > terraform/moved-re
 `;
 
 exports[`reportFromSteps integration — plan-only fixtures > terraform/moved-resource/1/plan-only > renders plan report and matches snapshot 1`] = `
-"## ✅ No Changes
+"## ✅ Plan: 1 to move
 
 ## Plan Summary
 
-_No changes._
+| Action | Resource | Count |
+| --- | --- | --- |
+| 🚚 Move | null_resource | 1 |
+|  | **Move** | **1** |
 
 ## Resource Changes
 
 ### 📦 Module: root
 
 <details>
-<summary>⬜ <strong>null_resource</strong> renamed</summary>
+<summary>🚚 <strong>null_resource</strong> renamed</summary>
 
 **Moved from:** \`null_resource.original\`
 
@@ -36987,17 +40583,6 @@ exports[`reportFromSteps integration — plan-only fixtures > terraform/no-op/1/
 ## Plan Summary
 
 _No changes._
-
-## Resource Changes
-
-### 📦 Module: root
-
-<details>
-<summary>⬜ <strong>null_resource</strong> stable</summary>
-
-_No attribute changes._
-
-</details>
 "
 `;
 
@@ -37379,6 +40964,68 @@ exports[`reportFromSteps integration — plan-only fixtures > terraform/random-r
 "
 `;
 
+exports[`reportFromSteps integration — plan-only fixtures > terraform/removed-resource/0/plan-only > renders plan report and matches snapshot 1`] = `
+"## ✅ Plan: 2 to add
+
+## Plan Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Add | null_resource | 2 |
+|  | **Add** | **2** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>➕ <strong>null_resource</strong> ephemeral</summary>
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | <code></code> | <code>(known after apply)</code> |
+| triggers.version |  | <code><ins style="background:#dfd">1</ins></code> |
+
+</details>
+
+<details>
+<summary>➕ <strong>null_resource</strong> keeper</summary>
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | <code></code> | <code>(known after apply)</code> |
+| triggers.version |  | <code><ins style="background:#dfd">1</ins></code> |
+
+</details>
+"
+`;
+
+exports[`reportFromSteps integration — plan-only fixtures > terraform/removed-resource/1/plan-only > renders plan report and matches snapshot 1`] = `
+"## ✅ Plan: 1 to forget
+
+## Plan Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| 👋 Forget | null_resource | 1 |
+|  | **Forget** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>👋 <strong>null_resource</strong> ephemeral</summary>
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | 6679654430280065492 | <code><del style="background:#fdd">6679654430280065492</del></code> |
+| triggers.version | 1 | <code><del style="background:#fdd">1</del></code> |
+
+</details>
+"
+`;
+
 exports[`reportFromSteps integration — plan-only fixtures > terraform/sensitive-values/0/plan-only > renders plan report and matches snapshot 1`] = `
 "## ✅ Plan: 1 to add
 
@@ -37750,13 +41397,6 @@ _(all values known after apply)_
 
 </details>
 
-<details>
-<summary>⬜ <strong>terraform_data</strong> success</summary>
-
-_No attribute changes._
-
-</details>
-
 ## Outputs
 
 | Output | Action | Before | After |
@@ -37870,15 +41510,6 @@ exports[`reportFromSteps integration — plan-only fixtures > tofu/deferred-data
 ### 📦 Module: root
 
 <details>
-<summary>⬜ <strong>local_file</strong> config</summary>
-
-| Attribute | Before | After |
-| --- | --- | --- |
-| sensitive_content | <code>(sensitive)</code> | <code>(sensitive)</code> |
-
-</details>
-
-<details>
 <summary>➕ <strong>local_file</strong> metadata</summary>
 
 | Attribute | Before | After |
@@ -37984,22 +41615,6 @@ exports[`reportFromSteps integration — plan-only fixtures > tofu/deferred-data
 </details>
 
 <details>
-<summary>⬜ <strong>local_file</strong> metadata</summary>
-
-| Attribute | Before | After |
-| --- | --- | --- |
-| sensitive_content | <code>(sensitive)</code> | <code>(sensitive)</code> |
-
-</details>
-
-<details>
-<summary>⬜ <strong>terraform_data</strong> independent</summary>
-
-_No attribute changes._
-
-</details>
-
-<details>
 <summary>🔧 <strong>terraform_data</strong> worker_a — changed: input, output</summary>
 
 _(all values known after apply)_
@@ -38025,6 +41640,67 @@ _(all values known after apply)_
 | Output | Action | Before | After |
 | --- | --- | --- | --- |
 | config_value | 🔧 | <code>{"worker_a":"alpha","worker_b":"bravo","worker_c":"charlie"}</code> | <code>(known after apply)</code> |
+"
+`;
+
+exports[`reportFromSteps integration — plan-only fixtures > tofu/import-resource/0/plan-only > renders plan report and matches snapshot 1`] = `
+"## ✅ Plan: 1 to add
+
+## Plan Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Add | random_string | 1 |
+|  | **Add** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>➕ <strong>random_string</strong> existing</summary>
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | <code></code> | <code>(known after apply)</code> |
+| length |  | <code><ins style="background:#dfd">8</ins></code> |
+| lower |  | <code><ins style="background:#dfd">true</ins></code> |
+| min_lower |  | <code><ins style="background:#dfd">0</ins></code> |
+| min_numeric |  | <code><ins style="background:#dfd">0</ins></code> |
+| min_special |  | <code><ins style="background:#dfd">0</ins></code> |
+| min_upper |  | <code><ins style="background:#dfd">0</ins></code> |
+| number |  | <code><ins style="background:#dfd">true</ins></code> |
+| numeric |  | <code><ins style="background:#dfd">true</ins></code> |
+| result | <code></code> | <code>(known after apply)</code> |
+| special |  | <code><ins style="background:#dfd">false</ins></code> |
+| upper |  | <code><ins style="background:#dfd">true</ins></code> |
+
+</details>
+"
+`;
+
+exports[`reportFromSteps integration — plan-only fixtures > tofu/import-resource/1/plan-only > renders plan report and matches snapshot 1`] = `
+"## ✅ Plan: 1 to import
+
+## Plan Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| 📥 Import | random_string | 1 |
+|  | **Import** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>📥 <strong>random_string</strong> imported</summary>
+
+**Import ID:** \`fixedval\`
+
+_No attribute changes._
+
+</details>
 "
 `;
 
@@ -38181,18 +41857,21 @@ exports[`reportFromSteps integration — plan-only fixtures > tofu/moved-resourc
 `;
 
 exports[`reportFromSteps integration — plan-only fixtures > tofu/moved-resource/1/plan-only > renders plan report and matches snapshot 1`] = `
-"## ✅ No Changes
+"## ✅ Plan: 1 to move
 
 ## Plan Summary
 
-_No changes._
+| Action | Resource | Count |
+| --- | --- | --- |
+| 🚚 Move | null_resource | 1 |
+|  | **Move** | **1** |
 
 ## Resource Changes
 
 ### 📦 Module: root
 
 <details>
-<summary>⬜ <strong>null_resource</strong> renamed</summary>
+<summary>🚚 <strong>null_resource</strong> renamed</summary>
 
 **Moved from:** \`null_resource.original\`
 
@@ -38312,17 +41991,6 @@ exports[`reportFromSteps integration — plan-only fixtures > tofu/no-op/1/plan-
 ## Plan Summary
 
 _No changes._
-
-## Resource Changes
-
-### 📦 Module: root
-
-<details>
-<summary>⬜ <strong>null_resource</strong> stable</summary>
-
-_No attribute changes._
-
-</details>
 "
 `;
 
@@ -38701,6 +42369,68 @@ exports[`reportFromSteps integration — plan-only fixtures > tofu/random-replac
 | Output | Action | Before | After |
 | --- | --- | --- | --- |
 | token_length | ⬜ | <code>16</code> | <code>16</code> |
+"
+`;
+
+exports[`reportFromSteps integration — plan-only fixtures > tofu/removed-resource/0/plan-only > renders plan report and matches snapshot 1`] = `
+"## ✅ Plan: 2 to add
+
+## Plan Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Add | null_resource | 2 |
+|  | **Add** | **2** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>➕ <strong>null_resource</strong> ephemeral</summary>
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | <code></code> | <code>(known after apply)</code> |
+| triggers.version |  | <code><ins style="background:#dfd">1</ins></code> |
+
+</details>
+
+<details>
+<summary>➕ <strong>null_resource</strong> keeper</summary>
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | <code></code> | <code>(known after apply)</code> |
+| triggers.version |  | <code><ins style="background:#dfd">1</ins></code> |
+
+</details>
+"
+`;
+
+exports[`reportFromSteps integration — plan-only fixtures > tofu/removed-resource/1/plan-only > renders plan report and matches snapshot 1`] = `
+"## ✅ Plan: 1 to forget
+
+## Plan Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| 👋 Forget | null_resource | 1 |
+|  | **Forget** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>👋 <strong>null_resource</strong> ephemeral</summary>
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | 2454178591280020709 | <code><del style="background:#fdd">2454178591280020709</del></code> |
+| triggers.version | 1 | <code><del style="background:#fdd">1</del></code> |
+
+</details>
 "
 `;
 
