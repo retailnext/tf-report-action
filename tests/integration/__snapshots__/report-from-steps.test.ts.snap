@@ -28754,20 +28754,54 @@ exports[`reportFromSteps integration — generated fixtures > terraform/removed-
 
 exports[`reportFromSteps integration — generated fixtures > terraform/removed-resource/1 > renders with workspace and matches snapshot 1`] = `
 "<!-- tf-report-action:"test-workspace" -->
-## ✅ \`test-workspace\` Apply Complete
+## ✅ \`test-workspace\` Apply: 1 forgotten
 
 ## Apply Summary
 
-_No changes._
+| Action | Resource | Count |
+| --- | --- | --- |
+| 👋 Forgotten | null_resource | 1 |
+|  | **Forgotten** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>👋 <strong>null_resource</strong> ephemeral</summary>
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | 6679654430280065492 | <code><del style="background:#fdd">6679654430280065492</del></code> |
+| triggers.version | 1 | <code><del style="background:#fdd">1</del></code> |
+
+</details>
 "
 `;
 
 exports[`reportFromSteps integration — generated fixtures > terraform/removed-resource/1 > renders without error and matches snapshot [default] 1`] = `
-"## ✅ Apply Complete
+"## ✅ Apply: 1 forgotten
 
 ## Apply Summary
 
-_No changes._
+| Action | Resource | Count |
+| --- | --- | --- |
+| 👋 Forgotten | null_resource | 1 |
+|  | **Forgotten** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>👋 <strong>null_resource</strong> ephemeral</summary>
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | 6679654430280065492 | <code><del style="background:#fdd">6679654430280065492</del></code> |
+| triggers.version | 1 | <code><del style="background:#fdd">1</del></code> |
+
+</details>
 "
 `;
 
@@ -31461,20 +31495,54 @@ exports[`reportFromSteps integration — generated fixtures > tofu/removed-resou
 
 exports[`reportFromSteps integration — generated fixtures > tofu/removed-resource/1 > renders with workspace and matches snapshot 1`] = `
 "<!-- tf-report-action:"test-workspace" -->
-## ✅ \`test-workspace\` Apply Complete
+## ✅ \`test-workspace\` Apply: 1 forgotten
 
 ## Apply Summary
 
-_No changes._
+| Action | Resource | Count |
+| --- | --- | --- |
+| 👋 Forgotten | null_resource | 1 |
+|  | **Forgotten** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>👋 <strong>null_resource</strong> ephemeral</summary>
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | 2454178591280020709 | <code><del style="background:#fdd">2454178591280020709</del></code> |
+| triggers.version | 1 | <code><del style="background:#fdd">1</del></code> |
+
+</details>
 "
 `;
 
 exports[`reportFromSteps integration — generated fixtures > tofu/removed-resource/1 > renders without error and matches snapshot [default] 1`] = `
-"## ✅ Apply Complete
+"## ✅ Apply: 1 forgotten
 
 ## Apply Summary
 
-_No changes._
+| Action | Resource | Count |
+| --- | --- | --- |
+| 👋 Forgotten | null_resource | 1 |
+|  | **Forgotten** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>👋 <strong>null_resource</strong> ephemeral</summary>
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | 2454178591280020709 | <code><del style="background:#fdd">2454178591280020709</del></code> |
+| triggers.version | 1 | <code><del style="background:#fdd">1</del></code> |
+
+</details>
 "
 `;
 

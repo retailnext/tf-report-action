@@ -255,9 +255,9 @@ describe("reportFromSteps — action classification", () => {
     expect(result).not.toContain("No Changes");
   });
 
-  it("removed-resource/1: forgotten resource shows 👋 Forget in summary", () => {
+  it("terraform/removed-resource/1: forgotten resource shows 👋 Forget in summary", () => {
     const fixture = planOnlyFixtures.find((f) =>
-      f.label.includes("removed-resource/1"),
+      f.label === "terraform/removed-resource/1/plan-only",
     );
     expect(fixture).toBeDefined();
     const resolved = resolveStepFilePaths(fixture!.stepsJson, fixture!.fixtureDir);
@@ -270,6 +270,66 @@ describe("reportFromSteps — action classification", () => {
     expect(result).toContain("Forget");
     expect(result).not.toContain("No Changes");
   });
+
+  it("tofu/removed-resource/1: forgotten resource shows 👋 Forget in summary", () => {
+    const fixture = planOnlyFixtures.find((f) =>
+      f.label === "tofu/removed-resource/1/plan-only",
+    );
+    expect(fixture).toBeDefined();
+    const resolved = resolveStepFilePaths(fixture!.stepsJson, fixture!.fixtureDir);
+    const result = reportFromSteps(resolved, {
+      allowedDirs: [fixture!.fixtureDir],
+      env: NO_GITHUB_ENV,
+    });
+    expect(result).toContain("1 to forget");
+    expect(result).toContain("👋");
+    expect(result).toContain("Forget");
+    expect(result).not.toContain("No Changes");
+  });
+});
+
+// ---------- Targeted assertions for removed-resource/1 apply (forget) ----------
+
+describe("reportFromSteps — forget in apply output", () => {
+  for (const toolLabel of ["terraform/removed-resource/1", "tofu/removed-resource/1"]) {
+    describe(toolLabel, () => {
+      it("shows forgotten resource (not 'No Changes') in apply report", () => {
+        const fixture = generatedFixtures.find((f) => f.label === toolLabel);
+        expect(fixture).toBeDefined();
+        const resolved = resolveStepFilePaths(fixture!.stepsJson, fixture!.fixtureDir);
+        const result = reportFromSteps(resolved, {
+          allowedDirs: [fixture!.fixtureDir],
+          env: NO_GITHUB_ENV,
+        });
+        expect(result).not.toContain("No Changes");
+        expect(result).toContain("ephemeral");
+      });
+
+      it("shows 👋 Forgotten in Apply Summary", () => {
+        const fixture = generatedFixtures.find((f) => f.label === toolLabel);
+        expect(fixture).toBeDefined();
+        const resolved = resolveStepFilePaths(fixture!.stepsJson, fixture!.fixtureDir);
+        const result = reportFromSteps(resolved, {
+          allowedDirs: [fixture!.fixtureDir],
+          env: NO_GITHUB_ENV,
+        });
+        expect(result).toContain("👋");
+        expect(result).toContain("Forgotten");
+      });
+
+      it("uses Apply Summary heading", () => {
+        const fixture = generatedFixtures.find((f) => f.label === toolLabel);
+        expect(fixture).toBeDefined();
+        const resolved = resolveStepFilePaths(fixture!.stepsJson, fixture!.fixtureDir);
+        const result = reportFromSteps(resolved, {
+          allowedDirs: [fixture!.fixtureDir],
+          env: NO_GITHUB_ENV,
+        });
+        expect(result).toContain("## Apply Summary");
+        expect(result).not.toContain("## Plan Summary");
+      });
+    });
+  }
 });
 
 // ---------- Manual fixtures ----------

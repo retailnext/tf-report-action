@@ -70,9 +70,11 @@ export function buildApplyReport(
 ): StructuredReport {
   const report = buildReport(plan, options);
 
-  const appliedAddresses = extractAppliedAddresses(messages);
+  const forgetAddresses = extractForgetAddresses(messages);
+  const appliedAddresses = new Set([...extractAppliedAddresses(messages), ...forgetAddresses]);
   const plannedAddresses = extractPlannedAddresses(messages);
   const applyStatuses = extractApplyStatuses(messages);
+  const forgetStatuses = buildForgetStatuses(forgetAddresses);
   const diagnostics = extractDiagnostics(messages);
   const outputsMessage = findOutputsMessage(messages);
 
@@ -81,7 +83,7 @@ export function buildApplyReport(
 
   // Detect resources that were planned but never started (interrupted apply)
   const notStartedStatuses = buildNotStartedStatuses(plannedAddresses, appliedAddresses, messages);
-  const allStatuses = [...applyStatuses, ...notStartedStatuses];
+  const allStatuses = [...applyStatuses, ...forgetStatuses, ...notStartedStatuses];
 
   if (outputsMessage) {
     resolveOutputValues(report, outputsMessage);
@@ -124,6 +126,37 @@ function extractAppliedAddresses(messages: UIMessage[]): Set<string> {
 }
 
 /**
+ * Collects the set of resource addresses that represent forget operations.
+ * Forget operations use `action: "remove"` in `planned_change` messages and
+ * never emit `apply_start`/`apply_complete` hooks — they are instantaneous
+ * state-only operations that require no provider call. Both Terraform and
+ * OpenTofu emit `planned_change` with `action: "remove"` for forgets; only
+ * OpenTofu additionally reports them as `forget` in the `change_summary`.
+ */
+function extractForgetAddresses(messages: UIMessage[]): Set<string> {
+  const addresses = new Set<string>();
+  for (const msg of messages) {
+    if (isPlannedChange(msg) && msg.change.action === "remove") {
+      addresses.add(msg.change.resource.addr);
+    }
+  }
+  return addresses;
+}
+
+/**
+ * Builds successful ApplyStatus entries for forget operations. Forget
+ * operations always succeed (they are state-only and emit no apply hooks),
+ * so each address maps directly to a success status.
+ */
+function buildForgetStatuses(forgetAddresses: Set<string>): ApplyStatus[] {
+  return [...forgetAddresses].map((address) => ({
+    address,
+    action: "forget" as const,
+    success: true,
+  }));
+}
+
+/**
  * Collects the set of resource addresses that had a `planned_change` message.
  * These represent all resources the apply was supposed to process.
  */
@@ -141,6 +174,10 @@ function extractPlannedAddresses(messages: UIMessage[]): Map<string, PlanAction>
  * Builds ApplyStatus entries for resources that were planned but never
  * started. This happens when an apply is interrupted (timeout, crash,
  * cancellation) before all resources are processed.
+ *
+ * Forget operations are excluded: they never emit apply hooks by design
+ * (they are instantaneous state-only operations) and are handled separately
+ * by `buildForgetStatuses`.
  */
 function buildNotStartedStatuses(
   plannedAddresses: Map<string, PlanAction>,
@@ -158,6 +195,7 @@ function buildNotStartedStatuses(
 
   const notStarted: ApplyStatus[] = [];
   for (const [addr, action] of plannedAddresses) {
+    if (action === "forget") continue; // handled by buildForgetStatuses
     if (!appliedAddresses.has(addr) && !completedAddresses.has(addr)) {
       notStarted.push({
         address: addr,
@@ -185,6 +223,10 @@ function uiActionToPlanAction(action: string): PlanAction {
     case "noop":
       return "no-op";
     case "forget":
+    // In the UI JSONL, forget operations are emitted as "remove" in planned_change
+    // messages (distinct from "delete" which is used for actual destroys). The
+    // change_summary then counts them under "forget". Map both to "forget".
+    case "remove":
       return "forget";
     default:
       return "unknown";

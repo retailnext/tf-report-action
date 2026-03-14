@@ -1020,14 +1020,34 @@ exports[`applyToMarkdown integration > terraform/removed-resource/0 > renders wi
 exports[`applyToMarkdown integration > terraform/removed-resource/1 > renders without error and matches snapshot [default] 1`] = `
 "## Apply Summary
 
-_No changes._
+| Action | Resource | Count |
+| --- | --- | --- |
+| 👋 Forgotten | null_resource | 1 |
+|  | **Forgotten** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>👋 <strong>null_resource</strong> ephemeral</summary>
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | 6679654430280065492 | <code><del style="background:#fdd">6679654430280065492</del></code> |
+| triggers.version | 1 | <code><del style="background:#fdd">1</del></code> |
+
+</details>
 "
 `;
 
 exports[`applyToMarkdown integration > terraform/removed-resource/1 > renders without error and matches snapshot [summary-template] 1`] = `
 "## Apply Summary
 
-_No changes._
+| Action | Resource | Count |
+| --- | --- | --- |
+| 👋 Forgotten | null_resource | 1 |
+|  | **Forgotten** | **1** |
 "
 `;
 
@@ -2306,14 +2326,34 @@ exports[`applyToMarkdown integration > tofu/removed-resource/0 > renders without
 exports[`applyToMarkdown integration > tofu/removed-resource/1 > renders without error and matches snapshot [default] 1`] = `
 "## Apply Summary
 
-_No changes._
+| Action | Resource | Count |
+| --- | --- | --- |
+| 👋 Forgotten | null_resource | 1 |
+|  | **Forgotten** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>👋 <strong>null_resource</strong> ephemeral</summary>
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | 2454178591280020709 | <code><del style="background:#fdd">2454178591280020709</del></code> |
+| triggers.version | 1 | <code><del style="background:#fdd">1</del></code> |
+
+</details>
 "
 `;
 
 exports[`applyToMarkdown integration > tofu/removed-resource/1 > renders without error and matches snapshot [summary-template] 1`] = `
 "## Apply Summary
 
-_No changes._
+| Action | Resource | Count |
+| --- | --- | --- |
+| 👋 Forgotten | null_resource | 1 |
+|  | **Forgotten** | **1** |
 "
 `;
 

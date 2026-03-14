@@ -163,6 +163,8 @@ export interface UIChangeSummary {
   readonly remove: number;
   /** Terraform 1.3+ only; absent in OpenTofu. */
   readonly action_invocation?: number;
+  /** OpenTofu only; counts resources removed from state without destroying infrastructure. Absent in Terraform. */
+  readonly forget?: number;
   /** The operation that produced this summary. */
   readonly operation: "plan" | "apply" | "destroy";
 }

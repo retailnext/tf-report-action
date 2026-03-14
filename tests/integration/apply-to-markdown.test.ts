@@ -80,6 +80,66 @@ describe("applyToMarkdown integration", () => {
     });
   });
 
+  describe("removed-resource/1 forget operation (Terraform)", () => {
+    const fixture = fixtures.find((f) => f.label === "terraform/removed-resource/1");
+
+    it("includes the forgotten resource in apply output", () => {
+      expect(fixture).toBeDefined();
+      const result = applyToMarkdown(fixture!.planJson, fixture!.applyJsonl);
+      expect(result).toContain("ephemeral");
+    });
+
+    it("shows 👋 Forgotten in Apply Summary", () => {
+      expect(fixture).toBeDefined();
+      const result = applyToMarkdown(fixture!.planJson, fixture!.applyJsonl);
+      expect(result).toContain("👋");
+      expect(result).toContain("Forgotten");
+    });
+
+    it("uses Apply Summary heading (not Plan Summary)", () => {
+      expect(fixture).toBeDefined();
+      const result = applyToMarkdown(fixture!.planJson, fixture!.applyJsonl);
+      expect(result).toContain("## Apply Summary");
+      expect(result).not.toContain("## Plan Summary");
+    });
+
+    it("does not show No Changes", () => {
+      expect(fixture).toBeDefined();
+      const result = applyToMarkdown(fixture!.planJson, fixture!.applyJsonl);
+      expect(result).not.toContain("No Changes");
+    });
+  });
+
+  describe("removed-resource/1 forget operation (OpenTofu)", () => {
+    const fixture = fixtures.find((f) => f.label === "tofu/removed-resource/1");
+
+    it("includes the forgotten resource in apply output", () => {
+      expect(fixture).toBeDefined();
+      const result = applyToMarkdown(fixture!.planJson, fixture!.applyJsonl);
+      expect(result).toContain("ephemeral");
+    });
+
+    it("shows 👋 Forgotten in Apply Summary", () => {
+      expect(fixture).toBeDefined();
+      const result = applyToMarkdown(fixture!.planJson, fixture!.applyJsonl);
+      expect(result).toContain("👋");
+      expect(result).toContain("Forgotten");
+    });
+
+    it("uses Apply Summary heading (not Plan Summary)", () => {
+      expect(fixture).toBeDefined();
+      const result = applyToMarkdown(fixture!.planJson, fixture!.applyJsonl);
+      expect(result).toContain("## Apply Summary");
+      expect(result).not.toContain("## Plan Summary");
+    });
+
+    it("does not show No Changes", () => {
+      expect(fixture).toBeDefined();
+      const result = applyToMarkdown(fixture!.planJson, fixture!.applyJsonl);
+      expect(result).not.toContain("No Changes");
+    });
+  });
+
   describe("apply-error/1 error handling", () => {
     const fixture = fixtures.find(
       (f) => f.label === "terraform/apply-error/1",

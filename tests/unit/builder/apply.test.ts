@@ -966,4 +966,153 @@ describe("buildApplyReport", () => {
       expect(statuses[0]!.success).toBe(false);
     });
   });
+
+  describe("forget operations", () => {
+    /**
+     * Helper that creates a planned_change message with action "remove" —
+     * the wire format both Terraform and OpenTofu use for forget operations.
+     */
+    function forgetPlannedChangeMsg(addr: string): UIMessage {
+      return {
+        "@level": "info",
+        "@message": `${addr}: Plan to remove`,
+        "@module": "terraform.ui",
+        "@timestamp": "2024-01-01T00:00:00.000Z",
+        type: "planned_change",
+        change: {
+          resource: {
+            addr,
+            module: "",
+            resource: addr,
+            implied_provider: addr.split("_")[0] ?? "",
+            resource_type: addr.split(".")[0] ?? "",
+            resource_name: addr.split(".").slice(1).join("."),
+            resource_key: null,
+          },
+          action: "remove",
+          reason: "delete_because_no_resource_config",
+        },
+      } as UIMessage;
+    }
+
+    it("retains forgotten resource in the report (survives phantom filter)", () => {
+      const plan = makePlan({
+        resource_changes: [
+          resourceChange("null_resource.ephemeral", ["forget"], {
+            before: { id: "123", triggers: { version: "1" } },
+            after: null,
+          }),
+        ],
+      });
+
+      const messages: UIMessage[] = [
+        versionMsg(),
+        forgetPlannedChangeMsg("null_resource.ephemeral"),
+        // No apply_start / apply_complete — forget is a state-only operation
+      ];
+
+      const report = buildApplyReport(plan, messages);
+      const allAddresses = report.modules.flatMap((m) => m.resources.map((r) => r.address));
+      expect(allAddresses).toContain("null_resource.ephemeral");
+    });
+
+    it("shows forgotten resource under the 'forget' action in the summary", () => {
+      const plan = makePlan({
+        resource_changes: [
+          resourceChange("null_resource.ephemeral", ["forget"], {
+            before: { id: "123", triggers: { version: "1" } },
+            after: null,
+          }),
+        ],
+      });
+
+      const messages: UIMessage[] = [
+        versionMsg(),
+        forgetPlannedChangeMsg("null_resource.ephemeral"),
+      ];
+
+      const report = buildApplyReport(plan, messages);
+      const forgetGroup = report.summary.actions.find((g) => g.action === "forget");
+      expect(forgetGroup).toBeDefined();
+      expect(forgetGroup!.total).toBe(1);
+    });
+
+    it("creates a successful ApplyStatus with action 'forget' for the forgotten resource", () => {
+      const plan = makePlan({
+        resource_changes: [
+          resourceChange("null_resource.ephemeral", ["forget"], {
+            before: { id: "123", triggers: { version: "1" } },
+            after: null,
+          }),
+        ],
+      });
+
+      const messages: UIMessage[] = [
+        versionMsg(),
+        forgetPlannedChangeMsg("null_resource.ephemeral"),
+      ];
+
+      const report = buildApplyReport(plan, messages);
+      const statuses = report.applyStatuses ?? [];
+      const forgetStatus = statuses.find((s) => s.address === "null_resource.ephemeral");
+      expect(forgetStatus).toBeDefined();
+      expect(forgetStatus!.action).toBe("forget");
+      expect(forgetStatus!.success).toBe(true);
+    });
+
+    it("does not create a 'not-started' status for a forgotten resource", () => {
+      const plan = makePlan({
+        resource_changes: [
+          resourceChange("null_resource.ephemeral", ["forget"], {
+            before: { id: "123", triggers: { version: "1" } },
+            after: null,
+          }),
+        ],
+      });
+
+      const messages: UIMessage[] = [
+        versionMsg(),
+        forgetPlannedChangeMsg("null_resource.ephemeral"),
+      ];
+
+      const report = buildApplyReport(plan, messages);
+      const statuses = report.applyStatuses ?? [];
+      // There should be exactly one status and it must be success (not a failed not-started)
+      expect(statuses).toHaveLength(1);
+      expect(statuses[0]!.success).toBe(true);
+    });
+
+    it("handles forget alongside regular apply operations", () => {
+      const plan = makePlan({
+        resource_changes: [
+          resourceChange("null_resource.ephemeral", ["forget"], {
+            before: { id: "123", triggers: { version: "1" } },
+            after: null,
+          }),
+          resourceChange("null_resource.created", ["create"], {
+            before: null,
+            after: { id: null, triggers: {} },
+          }),
+        ],
+      });
+
+      const messages: UIMessage[] = [
+        versionMsg(),
+        forgetPlannedChangeMsg("null_resource.ephemeral"),
+        applyStartMsg("null_resource.created", "create"),
+        applyCompleteMsg("null_resource.created", "create", 0.1, "id", "new-id"),
+      ];
+
+      const report = buildApplyReport(plan, messages);
+      const allAddresses = report.modules.flatMap((m) => m.resources.map((r) => r.address));
+      expect(allAddresses).toContain("null_resource.ephemeral");
+      expect(allAddresses).toContain("null_resource.created");
+
+      const statuses = report.applyStatuses ?? [];
+      const forgetStatus = statuses.find((s) => s.address === "null_resource.ephemeral");
+      const createStatus = statuses.find((s) => s.address === "null_resource.created");
+      expect(forgetStatus?.success).toBe(true);
+      expect(createStatus?.success).toBe(true);
+    });
+  });
 });
