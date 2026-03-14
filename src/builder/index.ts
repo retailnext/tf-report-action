@@ -1,5 +1,5 @@
 import type { Plan } from "../tfjson/plan.js";
-import type { Report } from "../model/report.js";
+import type { StructuredReport } from "../model/report.js";
 import type { ModuleGroup } from "../model/module-group.js";
 import type { ResourceChange as ModelResourceChange } from "../model/resource.js";
 import type { BuildOptions } from "./options.js";
@@ -9,10 +9,10 @@ import { buildSummary } from "./summary.js";
 import { buildOutputChanges } from "./outputs.js";
 
 /**
- * Builds a Report from a parsed Plan.
+ * Builds a StructuredReport from a parsed Plan.
  * Orchestrates: buildConfigRefs → buildResourceChanges → buildDriftChanges → buildSummary → buildOutputChanges → group by module.
  */
-export function buildReport(plan: Plan, options: BuildOptions = {}): Report {
+export function buildReport(plan: Plan, options: BuildOptions = {}): StructuredReport {
   const configRefs = buildConfigRefs(plan.configuration);
   const resources = buildResourceChanges(plan, configRefs, options);
   const driftResources = buildDriftChanges(plan, configRefs, options);
@@ -24,6 +24,10 @@ export function buildReport(plan: Plan, options: BuildOptions = {}): Report {
   const driftModules = groupByModule(driftResources);
 
   return {
+    kind: "structured",
+    title: "",
+    issues: [],
+    isApply: false,
     toolVersion: plan.terraform_version ?? null,
     formatVersion: plan.format_version,
     timestamp: plan.timestamp ?? null,

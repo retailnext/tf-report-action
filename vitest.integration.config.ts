@@ -22,6 +22,7 @@ export default defineConfig({
       exclude: [
         "src/tfjson/**",
         "src/model/**",
+        "src/env/**",
         "src/**/*.d.ts",
         "src/diff/types.ts",
         "src/template/types.ts",
@@ -37,7 +38,8 @@ export default defineConfig({
         "src/steps/reader.ts",
         // Steps barrel re-exports are trivially covered by unit tests.
         "src/steps/index.ts",
-        "src/compositor/**",
+        "src/compositor/index.ts",
+        "src/compositor/types.ts",
       ],
       thresholds: {
         lines: 90,

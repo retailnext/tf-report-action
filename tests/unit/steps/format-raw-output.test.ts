@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { formatRawOutput } from "../../../src/report-from-steps.js";
+import { formatRawOutput } from "../../../src/raw-formatter/index.js";
 
 describe("formatRawOutput", () => {
   it("returns a code block for plain text", () => {

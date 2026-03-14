@@ -19,38 +19,77 @@ It provides three entry points:
 
 ## Module Boundaries
 
-The source is organized into modules with narrow, single-responsibility scopes.
+The source is organized into layered modules with narrow, single-responsibility scopes.
 Follow these boundaries strictly — do not add cross-cutting logic.
+
+### Layer 0 — Foundation (zero project dependencies)
 
 | Module | Responsibility |
 |---|---|
 | `src/tfjson/` | Type definitions for the plan JSON wire format and machine-readable UI log format. **Never modify** files copied from tfplanjson; new type files may be added. |
-| `src/parser/` | Parse raw input strings → typed objects. Plan JSON, UI log JSONL, validate output. Version validation only. |
+| `src/model/` | Shared TypeScript interfaces and constants: `Report` discriminated union, `StepIssue`, `StepOutcome`, `Section`, `CompositionResult`, sentinels, status icons. **No executable logic.** |
+| `src/env/` | `Env` type alias (`Record<string, string \| undefined>`). DI abstraction over `process.env`. |
+
+### Layer 1 — Pure algorithms (depend only on Layer 0)
+
+| Module | Responsibility |
+|---|---|
+| `src/diff/` | Pure LCS, line-diff, and char-diff algorithms. No markdown, no I/O. |
 | `src/flattener/` | Flatten nested `JsonValue` → `Map<string, string \| null>` with dotted-path keys. |
 | `src/sensitivity/` | Detect whether a flattened attribute path is sensitive. Pure predicate. |
-| `src/diff/` | Pure LCS, line-diff, and char-diff algorithms. No markdown, no I/O. |
-| `src/model/` | Shared TypeScript interfaces consumed by `builder/` and `renderer/`. **No logic.** |
-| `src/builder/` | Translate `Plan` → `Report` model (plan builder), or `Plan` + `UIMessage[]` → `Report` (apply builder). Uses `flattener/`, `sensitivity/`, `tfjson/`. |
-| `src/renderer/` | Translate `Report` → markdown string. Auto-detects plan vs apply reports. Uses `model/`, `diff/`, and `template/`. |
-| `src/template/` | Select and apply rendering templates. Used by `renderer/`. |
-| `src/steps/` | GitHub Actions steps context parsing, validation, and secure file reading. Zero internal project dependencies — only Node.js built-ins. This is the I/O boundary between the external world and the pure transformation pipeline. |
-| `src/compositor/` | Budget-aware section assembly. Composes markdown sections within an output size limit, progressively degrading from full → compact → omit. Zero internal project dependencies (strings only). |
-| `src/report-from-steps.ts` | Steps-based report orchestration. Accepts GitHub Actions steps context, reads stdout files, and produces a tiered report (structured → raw text → general workflow). Uses `parser/`, `builder/`, `renderer/`, `steps/`, `compositor/`, and `model/`. |
-| `src/index.ts` | Public API barrel: exports `planToMarkdown`, `applyToMarkdown`, `reportFromSteps`, and all public types (`Options`, `ReportOptions`, `Report`, `PlanAction`, etc.). Orchestrates parser → builder → renderer for `planToMarkdown` and `applyToMarkdown`. |
+| `src/raw-formatter/` | Format raw command output (JSON Lines, validate results, plain text) into markdown fragments. |
+| `src/template/` | Select and apply rendering templates. |
 
-**Dependency rules:**
-- `diff/`, `sensitivity/`, and `flattener/` have zero internal project dependencies.
-- `model/` has zero internal project dependencies.
-- `steps/` has zero internal project dependencies (Node.js built-ins only).
-- `compositor/` has zero internal project dependencies (strings only).
-- `builder/` may import from `tfjson/`, `flattener/`, `sensitivity/`, and `model/`. Nothing else.
-- `builder/apply.ts` additionally imports `buildReport` from `builder/index.ts` (internal to builder module) and `UIMessage` types from `tfjson/`. It must NOT be re-exported from the builder barrel to avoid circular dependencies.
-- `renderer/` may import from `model/`, `diff/`, and `template/`. Nothing else.
+### Layer 2 — I/O and parsing (depend on Layers 0–1)
+
+| Module | Responsibility |
+|---|---|
+| `src/parser/` | Parse Terraform/OpenTofu formats: plan JSON, apply JSONL, validate output. |
+| `src/steps/` | GitHub Actions steps context: parsing, secure file reading, step-data-aware I/O wrappers, outcome helpers. This is the I/O boundary between the external world and the pure transformation pipeline. |
+
+### Layer 3 — Business logic (depend on Layers 0–2)
+
+| Module | Responsibility |
+|---|---|
+| `src/builder/` | Build `Report` (any variant) from parsed input. Plan → StructuredReport, Plan+UIMessages → StructuredReport (apply), steps context → any Report variant (tier detection, step issue collection, title generation). |
+| `src/compositor/` | Budget-aware section assembly. Composes markdown sections within an output size limit, progressively degrading from full → compact → omit. Truncation notice helper. |
+
+### Layer 4 — Rendering (depends on Layers 0–3)
+
+| Module | Responsibility |
+|---|---|
+| `src/renderer/` | Render any `Report` variant to markdown. StructuredReport → full markdown string, TextFallbackReport/WorkflowReport/ErrorReport → Section arrays. Title, step issue, step table, and variant-specific body renderers. |
+
+### Layer 5 — Entry points
+
+| Module | Responsibility |
+|---|---|
+| `src/index.ts` | Public API: `planToMarkdown`, `applyToMarkdown`, `reportFromSteps`. Three pipelines all following parse → build → render (→ compose). |
+
+**Dependency rules (layered — import only from same or lower layer):**
+
+| Module | May import from (beyond `model/`) |
+|---|---|
+| `diff/` | _(nothing)_ |
+| `flattener/` | _(nothing)_ |
+| `sensitivity/` | _(nothing)_ |
+| `raw-formatter/` | _(nothing)_ |
+| `template/` | _(nothing)_ |
+| `env/` | _(nothing)_ |
+| `parser/` | `tfjson/` |
+| `steps/` | `env/` |
+| `builder/` | `tfjson/`, `flattener/`, `sensitivity/`, `steps/`, `env/`, `parser/` |
+| `compositor/` | _(nothing)_ |
+| `renderer/` | `diff/`, `template/`, `raw-formatter/` |
+| `index.ts` | `parser/`, `builder/`, `renderer/`, `compositor/`, `steps/`, `env/` |
+
+**Additional constraints:**
+- `model/` is universal — every module may import from it.
+- `tfjson/` is restricted — only `parser/` and `builder/` may import.
+- `builder/apply.ts` must NOT be re-exported from the builder barrel (circular dep risk).
 - `renderer/` must **not** import sentinel string constants from `model/sentinels.ts` —
   all display logic must use boolean flags (`isSensitive`, `isKnownAfterApply`). This
   is enforced by an ESLint `no-restricted-imports` rule.
-- `report-from-steps.ts` may import from `parser/`, `builder/`, `builder/apply`, `renderer/`, `steps/`, `compositor/`, and `model/`. Nothing else.
-- `index.ts` may import from `parser/`, `builder/`, `builder/apply`, `renderer/`, and re-export from `report-from-steps`. Nothing else.
 
 ---
 
@@ -148,9 +187,18 @@ The `reportFromSteps(stepsJson, options?)` entry point accepts a JSON-encoded Gi
 Actions steps context and produces a report. It **never throws** — all errors become
 markdown content. Output is bounded by `maxOutputLength` (default 63 KiB).
 
+**Pipeline**: `parse steps → build Report → render Section[] → compose within budget`
+— the same parse → build → render → compose pattern as the other two entry points.
+
 **`ReportOptions`** extends `Options` with: `allowedDirs`, `maxOutputLength`, `workspace`,
 `env` (DI for `process.env`), and step ID overrides (`initStep`, `validateStep`,
 `planStep`, `showPlanStep`, `applyStep`).
+
+**Report variants** (discriminated union on `kind`):
+- `StructuredReport` — Tier 1: full plan/apply detail from JSON
+- `TextFallbackReport` — Tier 3: raw command output, no structured plan data
+- `WorkflowReport` — Tier 4: just step statuses, no plan data
+- `ErrorReport` — pipeline/parse errors
 
 **Tiered degradation**:
 - **Tier 1**: show-plan JSON available → full structured report (plan or apply)

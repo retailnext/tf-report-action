@@ -11,6 +11,7 @@ export default defineConfig({
       exclude: [
         "src/tfjson/**", // copied type definitions — no executable code
         "src/model/**", // interface-only files — no executable code
+        "src/env/**", // type alias only — no executable code
         "src/**/*.d.ts",
         // Type-only files with no executable code
         "src/diff/types.ts",

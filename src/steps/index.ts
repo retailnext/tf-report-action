@@ -1,9 +1,8 @@
 /**
- * Steps context parsing, validation, and secure file reading.
+ * Steps context parsing, validation, secure file reading, and outcome helpers.
  *
  * This module is the boundary between the external world (GitHub Actions
  * steps context JSON, files on disk) and the pure transformation pipeline.
- * It has zero internal project dependencies — only Node.js built-ins.
  */
 
 export type { StepData, Steps, StepResult, Env, ReaderOptions } from "./types.js";
@@ -24,3 +23,5 @@ export {
 export { parseSteps } from "./parse.js";
 export type { ReadResult, ReadError, FileReadOutcome } from "./reader.js";
 export { readForParse, readForDisplay, isReadError } from "./reader.js";
+export { readStepFile, readStepStdout, readStepStdoutForDisplay, readStepStderrForDisplay } from "./io.js";
+export { getStepOutcome, hasAnyFailedStep, hasAnyFailedKnownStep, buildStepOutcomes } from "./outcomes.js";

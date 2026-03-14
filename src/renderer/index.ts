@@ -1,4 +1,4 @@
-import type { Report } from "../model/report.js";
+import type { StructuredReport } from "../model/report.js";
 import type { RenderOptions } from "./options.js";
 import type { Diagnostic } from "../model/diagnostic.js";
 import type { DiffEntry } from "../diff/types.js";
@@ -16,7 +16,7 @@ import { resolveTemplate } from "../template/index.js";
  * Automatically detects apply reports (those with diagnostics or applyStatuses)
  * and renders appropriate sections.
  */
-export function renderReport(report: Report, options: RenderOptions = {}): string {
+export function renderReport(report: StructuredReport, options: RenderOptions = {}): string {
   const template = resolveTemplate(options.template ?? "default");
   const writer = new MarkdownWriter();
   const diffCache = new Map<string, DiffEntry[]>();
@@ -90,14 +90,14 @@ export function renderReport(report: Report, options: RenderOptions = {}): strin
 }
 
 /** Returns true when the report was produced from an apply run. */
-function isApplyReport(report: Report): boolean {
+function isApplyReport(report: StructuredReport): boolean {
   return (
     report.diagnostics !== undefined || report.applyStatuses !== undefined
   );
 }
 
 /** Builds a Set of resource addresses that failed during apply. */
-function buildFailedSet(report: Report): Set<string> {
+function buildFailedSet(report: StructuredReport): Set<string> {
   const failed = new Set<string>();
   if (report.applyStatuses) {
     for (const s of report.applyStatuses) {
@@ -110,7 +110,7 @@ function buildFailedSet(report: Report): Set<string> {
 }
 
 /** Builds a Map of resource address → diagnostics for that resource. */
-function buildDiagnosticMap(report: Report): Map<string, Diagnostic[]> {
+function buildDiagnosticMap(report: StructuredReport): Map<string, Diagnostic[]> {
   const map = new Map<string, Diagnostic[]>();
   if (report.diagnostics) {
     for (const diag of report.diagnostics) {
@@ -132,7 +132,7 @@ function buildDiagnosticMap(report: Report): Map<string, Diagnostic[]> {
  * an address, or whose address doesn't match any resource in the report.
  */
 function extractNonResourceDiagnostics(
-  report: Report,
+  report: StructuredReport,
 ): Diagnostic[] {
   if (!report.diagnostics) return [];
 
@@ -158,7 +158,7 @@ function buildApplyContext(
 }
 
 function renderOutputTable(
-  outputs: Report["outputs"],
+  outputs: StructuredReport["outputs"],
   writer: MarkdownWriter,
 ): void {
   writer.tableHeader(["Output", "Action", "Before", "After"]);
@@ -190,7 +190,7 @@ function renderOutputTable(
  * as the changes section but under a distinct heading.
  */
 function renderDriftSection(
-  report: Report,
+  report: StructuredReport,
   writer: MarkdownWriter,
   options: RenderOptions,
   diffCache: Map<string, DiffEntry[]>,

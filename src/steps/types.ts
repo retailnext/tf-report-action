@@ -75,15 +75,10 @@ export type Steps = Readonly<Record<string, StepData>>;
 // ---------------------------------------------------------------------------
 
 /**
- * Abstraction over `process.env` for dependency injection.
- *
- * The library reads environment variables to auto-construct the workflow
- * run logs URL (`GITHUB_REPOSITORY`, `GITHUB_RUN_ID`, `GITHUB_RUN_ATTEMPT`)
- * and to determine the default `allowedDirs` (`RUNNER_TEMP`).
- *
- * Tests inject a plain object instead of mutating `process.env`.
+ * Re-exported from `env/` for backward compatibility. The canonical
+ * definition lives in `src/env/index.ts`.
  */
-export type Env = Readonly<Record<string, string | undefined>>;
+export type { Env } from "../env/index.js";
 
 // ---------------------------------------------------------------------------
 // Reader options (internal)

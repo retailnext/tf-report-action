@@ -18,7 +18,7 @@ import type {
   UIOutputsMessage,
   UIPlannedChangeMessage,
 } from "../tfjson/machine-readable-ui.js";
-import type { Report } from "../model/report.js";
+import type { StructuredReport } from "../model/report.js";
 import type { Diagnostic } from "../model/diagnostic.js";
 import type { ApplyStatus } from "../model/apply-status.js";
 import type { BuildOptions } from "./options.js";
@@ -67,7 +67,7 @@ export function buildApplyReport(
   plan: Plan,
   messages: UIMessage[],
   options: BuildOptions = {},
-): Report {
+): StructuredReport {
   const report = buildReport(plan, options);
 
   const appliedAddresses = extractAppliedAddresses(messages);
@@ -258,7 +258,7 @@ function findOutputsMessage(messages: UIMessage[]): UIOutputsMessage | undefined
  * A resource is a "phantom" if its address does not appear in the
  * applied addresses set. Empty module groups are also removed.
  */
-function filterPhantomResources(report: Report, appliedAddresses: Set<string>): void {
+function filterPhantomResources(report: StructuredReport, appliedAddresses: Set<string>): void {
   for (const group of report.modules) {
     group.resources = group.resources.filter(
       (r) => appliedAddresses.has(r.address),
@@ -273,7 +273,7 @@ function filterPhantomResources(report: Report, appliedAddresses: Set<string>): 
  * so "(known after apply)" is misleading. The plan JSON doesn't contain the
  * resolved values, so we indicate they're not available.
  */
-function replaceKnownAfterApply(report: Report): void {
+function replaceKnownAfterApply(report: StructuredReport): void {
   for (const group of report.modules) {
     for (const resource of group.resources) {
       for (const attr of resource.attributes) {
@@ -296,7 +296,7 @@ function replaceKnownAfterApply(report: Report): void {
  * For non-sensitive outputs, replaces sentinel values with the actual
  * resolved value. Sensitive outputs are never resolved (security invariant).
  */
-function resolveOutputValues(report: Report, outputsMessage: UIOutputsMessage): void {
+function resolveOutputValues(report: StructuredReport, outputsMessage: UIOutputsMessage): void {
   for (const output of report.outputs) {
     const resolved = outputsMessage.outputs[output.name];
     if (!resolved) continue;

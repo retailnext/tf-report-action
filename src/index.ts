@@ -4,13 +4,17 @@ import { parsePlan } from "./parser/index.js";
 import { parseUILog } from "./parser/index.js";
 import { buildReport } from "./builder/index.js";
 import { buildApplyReport } from "./builder/apply.js";
+import { buildReportFromSteps } from "./builder/report-from-steps.js";
 import { renderReport } from "./renderer/index.js";
+import { renderReportSections } from "./renderer/report-sections.js";
+import { composeSections, DEFAULT_MAX_OUTPUT_LENGTH } from "./compositor/index.js";
+import { buildTruncationNotice } from "./compositor/truncation.js";
+import { STATUS_FAILURE } from "./model/status-icons.js";
 
 export type Options = BuildOptions & RenderOptions;
 
-// Re-export the steps-based entry point
-export { reportFromSteps } from "./report-from-steps.js";
-export type { ReportOptions } from "./report-from-steps.js";
+// Re-export the ReportOptions type from the builder
+export type { ReportOptions } from "./builder/report-from-steps.js";
 
 /**
  * Converts a Terraform/OpenTofu plan JSON string into a GitHub-comment-ready
@@ -50,10 +54,76 @@ export function applyToMarkdown(
   return renderReport(report, options);
 }
 
+/**
+ * Generates a GitHub-comment-ready markdown string from a GitHub Actions
+ * steps context JSON string.
+ *
+ * **Never throws.** All errors are rendered as markdown content. Output
+ * length is bounded by `maxOutputLength`.
+ *
+ * This is the third pipeline, following the same parse → build → render → compose
+ * pattern as planToMarkdown and applyToMarkdown.
+ *
+ * @param stepsJson - JSON-encoded GitHub Actions steps context
+ * @param options - Report generation options
+ * @returns Markdown string suitable for a GitHub issue or PR comment body
+ */
+export function reportFromSteps(
+  stepsJson: string,
+  options?: import("./builder/report-from-steps.js").ReportOptions,
+): string {
+  try {
+    return reportFromStepsInner(stepsJson, options);
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : "Unknown error";
+    return `## ${STATUS_FAILURE} Report Generation Failed\n\nAn unexpected error occurred while generating the report:\n\n\`\`\`\n${message}\n\`\`\`\n`;
+  }
+}
+
+function reportFromStepsInner(
+  stepsJson: string,
+  options?: import("./builder/report-from-steps.js").ReportOptions,
+): string {
+  const maxOutputLength = options?.maxOutputLength ?? DEFAULT_MAX_OUTPUT_LENGTH;
+
+  // Build: parse steps → detect tier → build appropriate Report variant
+  const report = buildReportFromSteps(stepsJson, options);
+
+  // Render: Report → Section[]
+  const sections = renderReportSections(report, options);
+
+  // Extract logsUrl for truncation notice
+  const logsUrl = getLogsUrl(report);
+  const truncationNotice = buildTruncationNotice(logsUrl);
+
+  // Compose: Section[] → bounded output string
+  const composeBudget = maxOutputLength - truncationNotice.length;
+  const result = composeSections(sections, composeBudget);
+
+  if (result.degradedCount > 0 || result.omittedCount > 0) {
+    return result.output + truncationNotice;
+  }
+  return result.output;
+}
+
+/** Extract logsUrl from any report variant that carries it. */
+function getLogsUrl(report: import("./model/report.js").Report): string | undefined {
+  switch (report.kind) {
+    case "structured":
+      return report.logsUrl;
+    case "text-fallback":
+      return report.logsUrl;
+    case "workflow":
+      return report.logsUrl;
+    default:
+      return undefined;
+  }
+}
+
 // Re-export types consumers may need
 export type { BuildOptions } from "./builder/options.js";
 export type { RenderOptions, DiffFormat } from "./renderer/options.js";
-export type { Report } from "./model/report.js";
+export type { Report, StructuredReport, TextFallbackReport, WorkflowReport, ErrorReport } from "./model/report.js";
 export type { Summary } from "./model/summary.js";
 export type { ResourceChange } from "./model/resource.js";
 export type { AttributeChange } from "./model/attribute.js";

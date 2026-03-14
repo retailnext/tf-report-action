@@ -7661,7 +7661,6 @@ exports[`reportFromSteps integration — apply-no-show fixtures > terraform/vali
 | \`plan\` | skipped |
 | \`apply\` | skipped |
 
-
 "
 `;
 
@@ -16120,7 +16119,6 @@ exports[`reportFromSteps integration — apply-no-show fixtures > tofu/validate-
 | \`plan\` | skipped |
 | \`apply\` | skipped |
 
-
 "
 `;
 
@@ -20277,7 +20275,6 @@ exports[`reportFromSteps integration — apply-only fixtures > terraform/plan-er
 | \`validate\` | success |
 | \`apply\` | skipped |
 
-
 "
 `;
 
@@ -21271,7 +21268,6 @@ exports[`reportFromSteps integration — apply-only fixtures > terraform/validat
 | \`init\` | success |
 | \`validate\` | failure |
 | \`apply\` | skipped |
-
 
 "
 `;
@@ -25165,7 +25161,6 @@ exports[`reportFromSteps integration — apply-only fixtures > tofu/plan-error/1
 | \`validate\` | success |
 | \`apply\` | skipped |
 
-
 "
 `;
 
@@ -26159,7 +26154,6 @@ exports[`reportFromSteps integration — apply-only fixtures > tofu/validate-err
 | \`init\` | success |
 | \`validate\` | failure |
 | \`apply\` | skipped |
-
 
 "
 `;
@@ -29069,7 +29063,6 @@ exports[`reportFromSteps integration — generated fixtures > terraform/validate
 | \`show-plan\` | skipped |
 | \`apply\` | skipped |
 
-
 "
 `;
 
@@ -29142,7 +29135,6 @@ exports[`reportFromSteps integration — generated fixtures > terraform/validate
 | \`plan\` | skipped |
 | \`show-plan\` | skipped |
 | \`apply\` | skipped |
-
 
 "
 `;
@@ -31778,7 +31770,6 @@ exports[`reportFromSteps integration — generated fixtures > tofu/validate-erro
 | \`show-plan\` | skipped |
 | \`apply\` | skipped |
 
-
 "
 `;
 
@@ -31851,7 +31842,6 @@ exports[`reportFromSteps integration — generated fixtures > tofu/validate-erro
 | \`plan\` | skipped |
 | \`show-plan\` | skipped |
 | \`apply\` | skipped |
-
 
 "
 `;
@@ -32085,7 +32075,6 @@ exports[`reportFromSteps integration — manual fixtures > manual/missing-output
 | \`show-plan\` | success |
 | \`apply\` | success |
 
-
 "
 `;
 
@@ -32116,7 +32105,6 @@ this is not valid JSON for a plan
 | \`plan\` | success |
 | \`show-plan\` | success |
 
-
 "
 `;
 
@@ -32138,7 +32126,6 @@ exports[`reportFromSteps integration — manual fixtures > manual/read-errors > 
 | \`plan\` | success |
 | \`show-plan\` | success |
 | \`apply\` | success |
-
 
 "
 `;
@@ -35728,7 +35715,6 @@ exports[`reportFromSteps integration — no-show fixtures (Tier 3) > terraform/v
 | \`init\` | success |
 | \`validate\` | failure |
 | \`plan\` | skipped |
-
 
 "
 `;
@@ -39620,7 +39606,6 @@ exports[`reportFromSteps integration — no-show fixtures (Tier 3) > tofu/valida
 | \`validate\` | failure |
 | \`plan\` | skipped |
 
-
 "
 `;
 
@@ -41204,7 +41189,6 @@ exports[`reportFromSteps integration — plan-only fixtures > terraform/validate
 | \`plan\` | skipped |
 | \`show-plan\` | skipped |
 
-
 "
 `;
 
@@ -42611,7 +42595,6 @@ exports[`reportFromSteps integration — plan-only fixtures > tofu/validate-erro
 | \`validate\` | failure |
 | \`plan\` | skipped |
 | \`show-plan\` | skipped |
-
 
 "
 `;
