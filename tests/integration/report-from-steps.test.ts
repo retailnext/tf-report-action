@@ -660,3 +660,89 @@ describe("reportFromSteps integration — rendering quality", () => {
     expect(result).not.toContain("Failed");
   });
 });
+
+// ---------- Security: sensitive values must never appear in output ----------
+
+describe("reportFromSteps — sensitive value masking", () => {
+  /**
+   * Literal strings that must never appear in rendered output.
+   * These are the actual secret values from the sensitive-values fixture.
+   * Note: content_md5 hashes are NOT included — Terraform does not mark them
+   * as sensitive, so they legitimately appear in attribute diffs.
+   */
+  const FORBIDDEN_STRINGS = [
+    "initial-secret-value",
+    "updated-secret-value",
+  ];
+
+  function assertNoSecretLeaks(result: string, context: string): void {
+    for (const secret of FORBIDDEN_STRINGS) {
+      expect(result, `${context}: leaked "${secret}"`).not.toContain(secret);
+    }
+  }
+
+  // Full workflow (Tier 1): has show-plan structured output
+  for (const fixture of generatedFixtures) {
+    if (!fixture.label.includes("sensitive-values")) continue;
+    it(`${fixture.label}: no sensitive values in full-workflow output`, () => {
+      const resolved = resolveStepFilePaths(fixture.stepsJson, fixture.fixtureDir);
+      const result = reportFromSteps(resolved, {
+        allowedDirs: [fixture.fixtureDir],
+        env: NO_GITHUB_ENV,
+      });
+      assertNoSecretLeaks(result, fixture.label);
+    });
+  }
+
+  // Plan-only (Tier 1 without apply)
+  for (const fixture of planOnlyFixtures) {
+    if (!fixture.label.includes("sensitive-values")) continue;
+    it(`${fixture.label}: no sensitive values in plan-only output`, () => {
+      const resolved = resolveStepFilePaths(fixture.stepsJson, fixture.fixtureDir);
+      const result = reportFromSteps(resolved, {
+        allowedDirs: [fixture.fixtureDir],
+        env: NO_GITHUB_ENV,
+      });
+      assertNoSecretLeaks(result, fixture.label);
+    });
+  }
+
+  // No-show fallback (Tier 3): raw plan stdout rendered directly
+  for (const fixture of noShowFixtures) {
+    if (!fixture.label.includes("sensitive-values")) continue;
+    it(`${fixture.label}: no sensitive values in no-show fallback output`, () => {
+      const resolved = resolveStepFilePaths(fixture.stepsJson, fixture.fixtureDir);
+      const result = reportFromSteps(resolved, {
+        allowedDirs: [fixture.fixtureDir],
+        env: NO_GITHUB_ENV,
+      });
+      assertNoSecretLeaks(result, fixture.label);
+    });
+  }
+
+  // Apply-no-show fallback (Tier 3 with apply): raw apply stdout rendered
+  for (const fixture of applyNoShowFixtures) {
+    if (!fixture.label.includes("sensitive-values")) continue;
+    it(`${fixture.label}: no sensitive values in apply-no-show fallback output`, () => {
+      const resolved = resolveStepFilePaths(fixture.stepsJson, fixture.fixtureDir);
+      const result = reportFromSteps(resolved, {
+        allowedDirs: [fixture.fixtureDir],
+        env: NO_GITHUB_ENV,
+      });
+      assertNoSecretLeaks(result, fixture.label);
+    });
+  }
+
+  // Apply-only (Tier 2): apply without plan output
+  for (const fixture of applyOnlyFixtures) {
+    if (!fixture.label.includes("sensitive-values")) continue;
+    it(`${fixture.label}: no sensitive values in apply-only output`, () => {
+      const resolved = resolveStepFilePaths(fixture.stepsJson, fixture.fixtureDir);
+      const result = reportFromSteps(resolved, {
+        allowedDirs: [fixture.fixtureDir],
+        env: NO_GITHUB_ENV,
+      });
+      assertNoSecretLeaks(result, fixture.label);
+    });
+  }
+});

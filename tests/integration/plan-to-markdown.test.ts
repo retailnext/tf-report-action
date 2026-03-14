@@ -39,3 +39,24 @@ describe("planToMarkdown integration", () => {
     });
   }
 });
+
+// ---------- Security: sensitive values must never appear in output ----------
+
+describe("planToMarkdown — sensitive value masking", () => {
+  const FORBIDDEN_STRINGS = [
+    "initial-secret-value",
+    "updated-secret-value",
+  ];
+
+  for (const { label, json } of fixtures) {
+    if (!label.includes("sensitive-values")) continue;
+    for (const { name, options } of OPTION_VARIANTS) {
+      it(`${label} [${name}]: no sensitive values in output`, () => {
+        const result = planToMarkdown(json, options);
+        for (const secret of FORBIDDEN_STRINGS) {
+          expect(result, `leaked "${secret}"`).not.toContain(secret);
+        }
+      });
+    }
+  }
+});
