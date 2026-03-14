@@ -33,7 +33,8 @@ describe("formatRawOutput", () => {
     const input = '{"@level":"error","@message":"Error occurred","type":"diagnostic","diagnostic":{"severity":"error","summary":"Something broke","detail":"details here"}}';
     const result = formatRawOutput(input);
     expect(result).toContain("🚨");
-    expect(result).toContain("`Error occurred`");
+    // Inside <summary>, <code> tags are used instead of backticks
+    expect(result).toContain("<code>Error occurred</code>");
     expect(result).toContain("`diagnostic.summary=Something broke`");
     expect(result).toContain("`diagnostic.detail=details here`");
   });
@@ -166,8 +167,10 @@ describe("formatRawOutput", () => {
     const result = formatRawOutput(input);
     expect(result).toContain("<details>");
     expect(result).toContain("<summary>");
-    expect(result).toContain("`Plan: 1 to add`");
-    expect(result).toContain("`type=change_summary`");
+    // Inside <summary>, <code> tags are used instead of backticks
+    expect(result).toContain("<code>Plan: 1 to add</code>");
+    expect(result).toContain("<code>type=change_summary</code>");
+    // Fields in <details> body still use backticks
     expect(result).toContain("`changes.add=1`");
     expect(result).toContain("`changes.change=0`");
     expect(result).toContain("`changes.remove=0`");

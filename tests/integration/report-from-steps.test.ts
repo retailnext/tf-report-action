@@ -554,8 +554,8 @@ describe("reportFromSteps integration — rendering quality", () => {
     });
     // Should extract @message fields as readable text
     expect(result).toMatch(/Plan to replace/);
-    // JSON Lines uses backtick-wrapped message format
-    expect(result).toContain("`type=");
+    // JSON Lines uses <code> tags inside <summary> for type labels
+    expect(result).toContain("<code>type=");
     // Title should say Apply Succeeded (not bare "Apply")
     expect(result).toContain("Apply Succeeded");
   });

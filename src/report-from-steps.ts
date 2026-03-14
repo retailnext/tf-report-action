@@ -838,11 +838,25 @@ function flattenJsonFields(
 }
 
 /**
+ * Escape characters that have special meaning in HTML.
+ * Used for text placed inside HTML tags like `<code>` within `<summary>`.
+ */
+function escapeHtml(text: string): string {
+  return text
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
+}
+
+/**
  * Format a single JSON Lines message in pretty-json-log style.
  *
  * Messages with extra fields beyond the envelope are wrapped in a
- * `<details>` block so the fields can be expanded. Messages without
- * extra fields render as a plain backtick-wrapped paragraph.
+ * `<details>` block so the fields can be expanded. Inside `<summary>`,
+ * `<code>` tags are used because GitHub does not render backtick markdown
+ * within `<summary>` elements. Messages without extra fields render as
+ * plain backtick-wrapped paragraphs (where markdown works normally).
  */
 function formatJsonLinesMessage(msg: JsonLinesMsg): string {
   const level = typeof msg["@level"] === "string" ? msg["@level"] : "info";
@@ -850,16 +864,19 @@ function formatJsonLinesMessage(msg: JsonLinesMsg): string {
   const icon = levelIcon(level);
   const prefix = icon ? `${icon} ` : "";
   const typeStr = typeof msg.type === "string" ? msg.type : "";
-  const typeSuffix = typeStr ? ` \`type=${typeStr}\`` : "";
 
   const fields = flattenJsonFields(msg as Record<string, unknown>, ENVELOPE_KEYS);
 
   if (fields.length === 0) {
+    const typeSuffix = typeStr ? ` \`type=${typeStr}\`` : "";
     return `${prefix}\`${message}\`${typeSuffix}`;
   }
 
+  // Inside <summary>, markdown backticks don't render — use <code> tags
+  const escapedMsg = escapeHtml(message);
+  const typeSuffix = typeStr ? ` <code>type=${escapeHtml(typeStr)}</code>` : "";
   const fieldLines = fields.join("\n\n");
-  return `<details>\n<summary>${prefix}\`${message}\`${typeSuffix}</summary>\n\n${fieldLines}\n\n</details>`;
+  return `<details>\n<summary>${prefix}<code>${escapedMsg}</code>${typeSuffix}</summary>\n\n${fieldLines}\n\n</details>`;
 }
 
 /**
