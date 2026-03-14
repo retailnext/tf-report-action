@@ -6,11 +6,14 @@
 outputs into GitHub-comment-ready markdown strings. It is **not** a GitHub Action; it
 will be incorporated into one separately.
 
-It provides two main entry points:
+It provides three entry points:
 - `planToMarkdown(json, options?)` — converts plan JSON (from `show -json <planfile>`)
   into a plan report
 - `applyToMarkdown(planJson, applyJsonl, options?)` — converts plan JSON plus apply
   JSONL (from `apply -json`) into an apply report showing only actually-changed resources
+- `reportFromSteps(stepsJson, options?)` — accepts a GitHub Actions steps context JSON
+  and produces a report with tiered degradation (structured plan → raw text → general
+  workflow table)
 
 ---
 
@@ -32,7 +35,8 @@ Follow these boundaries strictly — do not add cross-cutting logic.
 | `src/template/` | Select and apply rendering templates. Used by `renderer/`. |
 | `src/steps/` | GitHub Actions steps context parsing, validation, and secure file reading. Zero internal project dependencies — only Node.js built-ins. This is the I/O boundary between the external world and the pure transformation pipeline. |
 | `src/compositor/` | Budget-aware section assembly. Composes markdown sections within an output size limit, progressively degrading from full → compact → omit. Zero internal project dependencies (strings only). |
-| `src/index.ts` | Public API: `planToMarkdown(json, options?)`, `applyToMarkdown(planJson, applyJsonl, options?)`, and `reportFromSteps(stepsJson, options?)`. Orchestrates parser → builder → renderer; for `reportFromSteps`, also orchestrates steps/ and compositor/. |
+| `src/report-from-steps.ts` | Steps-based report orchestration. Accepts GitHub Actions steps context, reads stdout files, and produces a tiered report (structured → raw text → general workflow). Uses `parser/`, `builder/`, `renderer/`, `steps/`, `compositor/`, and `model/`. |
+| `src/index.ts` | Public API barrel: re-exports `planToMarkdown`, `applyToMarkdown`, and `reportFromSteps`. Orchestrates parser → builder → renderer for `planToMarkdown` and `applyToMarkdown`. |
 
 **Dependency rules:**
 - `diff/`, `sensitivity/`, and `flattener/` have zero internal project dependencies.
@@ -42,8 +46,11 @@ Follow these boundaries strictly — do not add cross-cutting logic.
 - `builder/` may import from `tfjson/`, `flattener/`, `sensitivity/`, and `model/`. Nothing else.
 - `builder/apply.ts` additionally imports `buildReport` from `builder/index.ts` (internal to builder module) and `UIMessage` types from `tfjson/`. It must NOT be re-exported from the builder barrel to avoid circular dependencies.
 - `renderer/` may import from `model/`, `diff/`, and `template/`. Nothing else.
-- `index.ts` may import from `parser/`, `builder/`, `builder/apply`, `renderer/`, `steps/`, and `compositor/`. Nothing else.
+- `renderer/` must **not** import sentinel string constants from `model/sentinels.ts` —
+  all display logic must use boolean flags (`isSensitive`, `isKnownAfterApply`). This
+  is enforced by an ESLint `no-restricted-imports` rule.
 - `report-from-steps.ts` may import from `parser/`, `builder/`, `builder/apply`, `renderer/`, `steps/`, `compositor/`, and `model/`. Nothing else.
+- `index.ts` may import from `parser/`, `builder/`, `builder/apply`, `renderer/`, and re-export from `report-from-steps`. Nothing else.
 
 ---
 
@@ -89,6 +96,32 @@ Modules most likely to need this: `src/flattener/`, `src/sensitivity/`, `src/dif
 Sensitive attribute values are **always masked** as `(sensitive)`. There is no option
 to reveal them. This is a security invariant — do not add any bypass.
 
+## Sentinel Value Architecture
+
+Sentinel string constants (`SENSITIVE_MASK`, `KNOWN_AFTER_APPLY`, `VALUE_NOT_IN_PLAN`)
+are defined in `src/model/sentinels.ts`. They serve as display text assigned in the
+builder layer. **All logic must use boolean flags** (`isSensitive`, `isKnownAfterApply`)
+on the model interfaces — never compare rendered strings against sentinel values.
+
+- The renderer must **not** import from `model/sentinels.ts` (enforced by ESLint).
+- `isKnownAfterApply` stays `true` even after replacement with `VALUE_NOT_IN_PLAN`
+  in the apply builder, because the value is still a placeholder that should not be
+  character-diffed.
+- Values with `isSensitive` or `isKnownAfterApply` are rendered as-is without
+  character-level diffing against previous values.
+
+## Action Classification
+
+The `PlanAction` type includes derived actions beyond the raw Terraform/OpenTofu
+action strings:
+- `"replace"` — derived from two-element action pairs (`create+delete` or `delete+create`)
+- `"move"` — derived from `no-op` with `previous_address` set (moved block)
+- `"import"` — derived from `no-op` with `importing` set (import block, no other changes)
+
+Import combined with `create`/`update` retains the original action — `importId` is
+metadata. True no-op resources (unchanged, not moved or imported) are filtered out
+of the report entirely and never shown.
+
 ## Data Source Exclusion
 
 Data sources are **never** shown in plan or apply output. They are excluded by
@@ -120,9 +153,12 @@ markdown content. Output is bounded by `maxOutputLength` (default 63 KiB).
 `planStep`, `showPlanStep`, `applyStep`).
 
 **Tiered degradation**:
-- **Tier 1**: show-plan JSON available → full structured report
-- **Tier 3**: No show-plan, but plan/apply step present → raw text fallback
+- **Tier 1**: show-plan JSON available → full structured report (plan or apply)
+- **Tier 3**: No show-plan, but plan/apply step present → raw text fallback with
+  JSON Lines formatting where possible
 - **Tier 4**: No recognized terraform steps → general workflow table
+
+_(Tier 2 is reserved for future use.)_
 
 **Dynamic title generation**: Title includes status icon, optional workspace prefix,
 operation label, and change counts. Determined automatically from report content.
@@ -188,9 +224,9 @@ them, because attribute values may be sensitive. This means:
 `terraform` or `tofu` against a fixture workspace under `tests/fixtures/`.**
 
 - Every plan JSON loaded in `tests/integration/` must come from
-  `tests/fixtures/generated/<tool>/<workspace>/<N>/plan.json`.
+  `tests/fixtures/generated/<tool>/<workspace>/<N>/show-plan.stdout`.
 - Every apply JSONL loaded in `tests/integration/` must come from
-  `tests/fixtures/generated/<tool>/<workspace>/<N>/apply.jsonl`.
+  `tests/fixtures/generated/<tool>/<workspace>/<N>/apply.stdout`.
 - No inline-constructed plan objects are permitted in `tests/integration/`.
 - No manually-crafted JSON strings are permitted in `tests/integration/`.
 - Error-path tests (invalid JSON, unsupported format version, etc.) belong in
@@ -203,12 +239,12 @@ them, because attribute values may be sensitive. This means:
 - Any test constructs a plan JSON object or string inline (e.g. `{ format_version: "1.0", ... }`,
   `JSON.stringify({...})`, template literals containing plan-like JSON).
 - Any test imports or uses a helper that returns a hardcoded plan object.
-- Any `plan.json` file under `tests/integration/` is not a symlink or copy of a file
+- Any `show-plan.stdout` file under `tests/integration/` is not a symlink or copy of a file
   from `tests/fixtures/generated/`.
 - Any plan JSON is loaded from a path outside `tests/fixtures/generated/`.
 
 The only permitted pattern for obtaining plan input in `tests/integration/` is
-reading a file from `tests/fixtures/generated/<tool>/<workspace>/<N>/plan.json`.
+reading a file from `tests/fixtures/generated/<tool>/<workspace>/<N>/show-plan.stdout`.
 
 ---
 
@@ -223,29 +259,46 @@ browser-viewable HTML page. It calls `planToMarkdown()` (or `applyToMarkdown()` 
 
 ```bash
 # Render a fixture plan
-npm run render -- tests/fixtures/generated/terraform/null-lifecycle/2/plan.json
+npm run render -- tests/fixtures/generated/terraform/null-lifecycle/2/show-plan.stdout
 
 # Render an apply report (plan + apply output)
-npm run render -- plan.json --apply apply.jsonl --title "PR #42"
+npm run render -- show-plan.stdout --apply apply.stdout --title "PR #42"
+
+# Render from steps context (most common in CI integration)
+npm run render -- --steps tests/fixtures/generated/terraform/null-lifecycle/2/steps.json
 
 # With options
-npm run render -- plan.json --title "PR #42" --template summary
-npm run render -- plan.json --show-unchanged --diff-format simple
+npm run render -- show-plan.stdout --title "PR #42" --template summary
+npm run render -- show-plan.stdout --show-unchanged --diff-format simple
+
+# Open the fixture gallery (all fixtures rendered in a navigable HTML page)
+npm run gallery -- --no-open
 
 # From stdin
-cat plan.json | npm run render --
+cat show-plan.stdout | npm run render --
 ```
 
 **Supported flags** (each maps 1:1 to an `Options` field or a render-script behaviour):
 
 | Flag | `Options` field / behaviour | Default |
 |---|---|---|
+| `--steps <file>` | Steps JSON file; uses `reportFromSteps` instead of `planToMarkdown` | _(plan-only mode)_ |
 | `--apply <file>` | Reads apply JSON Lines; calls `applyToMarkdown` instead of `planToMarkdown` | _(plan-only mode)_ |
 | `--title <text>` | `title` | _(none)_ |
 | `--template <default\|summary>` | `template` | `"default"` |
 | `--show-unchanged` | `showUnchangedAttributes` | `false` |
 | `--diff-format <inline\|simple>` | `diffFormat` | `"inline"` |
+| `--workspace <name>` | `workspace` (for title and dedup marker) | _(none)_ |
+| `--logs-url <url>` | Parses a GitHub Actions run URL into `env` vars | _(none)_ |
+| `--allowed-dirs <dirs>` | Comma-separated allowed directories for file reading | _(runner temp)_ |
+| `--max-output-length <n>` | Maximum output length in characters | `65000` |
+| `--gallery` | Render all fixture steps JSONs into a navigable gallery HTML page | _(off)_ |
 | `--no-open` | Suppress browser opening (write HTML only) | _(browser opens by default)_ |
+
+The **gallery** (`npm run gallery`) renders all fixture steps JSON files into a single
+HTML page with keyboard navigation (←/→ arrows), text filtering, and a "Copy Markdown"
+button for each fixture. It uses marked.js and DOMPurify loaded from CDN — no npm UI
+dependencies are added to the project.
 
 **Maintenance rule:** When `Options` (defined across `src/renderer/options.ts` and
 `src/builder/options.ts`) gains, loses, or renames a field, update `parseArgs()` in
@@ -260,5 +313,5 @@ command that causes the user's browser to open. This includes:
 
 When running `npm run render` as part of any task, always append `--no-open`:
 ```bash
-npm run render -- plan.json --no-open
+npm run render -- show-plan.stdout --no-open
 ```
