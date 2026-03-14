@@ -24,12 +24,15 @@ function resourceChange(
   actions: string[],
   overrides: Record<string, unknown> = {},
 ) {
+  // previous_address is a top-level ResourceChange field, not inside change
+  const { previous_address, ...changeOverrides } = overrides;
   return {
     address,
     mode: "managed",
     type: address.split(".")[0],
     name: address.split(".").slice(1).join("."),
     provider_name: "registry.terraform.io/hashicorp/null",
+    ...(previous_address !== undefined ? { previous_address } : {}),
     change: {
       actions,
       before: null,
@@ -37,7 +40,7 @@ function resourceChange(
       after_unknown: {},
       before_sensitive: {},
       after_sensitive: {},
-      ...overrides,
+      ...changeOverrides,
     },
   };
 }
@@ -967,10 +970,12 @@ describe("buildApplyReport", () => {
     });
   });
 
-  describe("forget operations", () => {
+  describe("state-only operations", () => {
     /**
-     * Helper that creates a planned_change message with action "remove" —
-     * the wire format both Terraform and OpenTofu use for forget operations.
+     * Realistic planned_change message with action "remove" — emitted by both
+     * Terraform and OpenTofu for forget operations in the apply JSONL. Included
+     * for accuracy; detection now uses the plan JSON (actions: ["forget"]), not
+     * this JSONL message.
      */
     function forgetPlannedChangeMsg(addr: string): UIMessage {
       return {
@@ -995,124 +1000,298 @@ describe("buildApplyReport", () => {
       } as UIMessage;
     }
 
-    it("retains forgotten resource in the report (survives phantom filter)", () => {
-      const plan = makePlan({
-        resource_changes: [
-          resourceChange("null_resource.ephemeral", ["forget"], {
-            before: { id: "123", triggers: { version: "1" } },
-            after: null,
-          }),
-        ],
+    describe("forget", () => {
+      it("retains forgotten resource in the report (survives phantom filter)", () => {
+        const plan = makePlan({
+          resource_changes: [
+            resourceChange("null_resource.ephemeral", ["forget"], {
+              before: { id: "123", triggers: { version: "1" } },
+              after: null,
+            }),
+          ],
+        });
+
+        const messages: UIMessage[] = [
+          versionMsg(),
+          forgetPlannedChangeMsg("null_resource.ephemeral"),
+        ];
+
+        const report = buildApplyReport(plan, messages);
+        const allAddresses = report.modules.flatMap((m) => m.resources.map((r) => r.address));
+        expect(allAddresses).toContain("null_resource.ephemeral");
       });
 
-      const messages: UIMessage[] = [
-        versionMsg(),
-        forgetPlannedChangeMsg("null_resource.ephemeral"),
-        // No apply_start / apply_complete — forget is a state-only operation
-      ];
+      it("is detected from the plan JSON alone, without any JSONL planned_change", () => {
+        const plan = makePlan({
+          resource_changes: [
+            resourceChange("null_resource.ephemeral", ["forget"], {
+              before: { id: "123", triggers: { version: "1" } },
+              after: null,
+            }),
+          ],
+        });
 
-      const report = buildApplyReport(plan, messages);
-      const allAddresses = report.modules.flatMap((m) => m.resources.map((r) => r.address));
-      expect(allAddresses).toContain("null_resource.ephemeral");
+        // No forgetPlannedChangeMsg — detection must come from plan JSON
+        const messages: UIMessage[] = [versionMsg()];
+
+        const report = buildApplyReport(plan, messages);
+        const allAddresses = report.modules.flatMap((m) => m.resources.map((r) => r.address));
+        expect(allAddresses).toContain("null_resource.ephemeral");
+      });
+
+      it("shows forgotten resource under the 'forget' action in the summary", () => {
+        const plan = makePlan({
+          resource_changes: [
+            resourceChange("null_resource.ephemeral", ["forget"], {
+              before: { id: "123", triggers: { version: "1" } },
+              after: null,
+            }),
+          ],
+        });
+
+        const messages: UIMessage[] = [
+          versionMsg(),
+          forgetPlannedChangeMsg("null_resource.ephemeral"),
+        ];
+
+        const report = buildApplyReport(plan, messages);
+        const forgetGroup = report.summary.actions.find((g) => g.action === "forget");
+        expect(forgetGroup).toBeDefined();
+        expect(forgetGroup!.total).toBe(1);
+      });
+
+      it("creates a successful ApplyStatus with action 'forget' for the forgotten resource", () => {
+        const plan = makePlan({
+          resource_changes: [
+            resourceChange("null_resource.ephemeral", ["forget"], {
+              before: { id: "123", triggers: { version: "1" } },
+              after: null,
+            }),
+          ],
+        });
+
+        const messages: UIMessage[] = [
+          versionMsg(),
+          forgetPlannedChangeMsg("null_resource.ephemeral"),
+        ];
+
+        const report = buildApplyReport(plan, messages);
+        const statuses = report.applyStatuses ?? [];
+        const forgetStatus = statuses.find((s) => s.address === "null_resource.ephemeral");
+        expect(forgetStatus).toBeDefined();
+        expect(forgetStatus!.action).toBe("forget");
+        expect(forgetStatus!.success).toBe(true);
+      });
+
+      it("does not create a 'not-started' status for a forgotten resource", () => {
+        const plan = makePlan({
+          resource_changes: [
+            resourceChange("null_resource.ephemeral", ["forget"], {
+              before: { id: "123", triggers: { version: "1" } },
+              after: null,
+            }),
+          ],
+        });
+
+        const messages: UIMessage[] = [
+          versionMsg(),
+          forgetPlannedChangeMsg("null_resource.ephemeral"),
+        ];
+
+        const report = buildApplyReport(plan, messages);
+        const statuses = report.applyStatuses ?? [];
+        expect(statuses).toHaveLength(1);
+        expect(statuses[0]!.success).toBe(true);
+      });
     });
 
-    it("shows forgotten resource under the 'forget' action in the summary", () => {
-      const plan = makePlan({
-        resource_changes: [
-          resourceChange("null_resource.ephemeral", ["forget"], {
-            before: { id: "123", triggers: { version: "1" } },
-            after: null,
-          }),
-        ],
+    describe("move", () => {
+      it("retains moved resource in the report (survives phantom filter)", () => {
+        const plan = makePlan({
+          resource_changes: [
+            resourceChange("null_resource.renamed", ["no-op"], {
+              before: { id: "123" },
+              after: { id: "123" },
+              previous_address: "null_resource.original",
+            }),
+          ],
+        });
+
+        const report = buildApplyReport(plan, [versionMsg()]);
+        const allAddresses = report.modules.flatMap((m) => m.resources.map((r) => r.address));
+        expect(allAddresses).toContain("null_resource.renamed");
       });
 
-      const messages: UIMessage[] = [
-        versionMsg(),
-        forgetPlannedChangeMsg("null_resource.ephemeral"),
-      ];
+      it("shows moved resource under the 'move' action in the summary", () => {
+        const plan = makePlan({
+          resource_changes: [
+            resourceChange("null_resource.renamed", ["no-op"], {
+              before: { id: "123" },
+              after: { id: "123" },
+              previous_address: "null_resource.original",
+            }),
+          ],
+        });
 
-      const report = buildApplyReport(plan, messages);
-      const forgetGroup = report.summary.actions.find((g) => g.action === "forget");
-      expect(forgetGroup).toBeDefined();
-      expect(forgetGroup!.total).toBe(1);
+        const report = buildApplyReport(plan, [versionMsg()]);
+        const moveGroup = report.summary.actions.find((g) => g.action === "move");
+        expect(moveGroup).toBeDefined();
+        expect(moveGroup!.total).toBe(1);
+      });
+
+      it("creates a successful ApplyStatus with action 'move' for the moved resource", () => {
+        const plan = makePlan({
+          resource_changes: [
+            resourceChange("null_resource.renamed", ["no-op"], {
+              before: { id: "123" },
+              after: { id: "123" },
+              previous_address: "null_resource.original",
+            }),
+          ],
+        });
+
+        const report = buildApplyReport(plan, [versionMsg()]);
+        const statuses = report.applyStatuses ?? [];
+        const moveStatus = statuses.find((s) => s.address === "null_resource.renamed");
+        expect(moveStatus).toBeDefined();
+        expect(moveStatus!.action).toBe("move");
+        expect(moveStatus!.success).toBe(true);
+      });
+
+      it("does not create a 'not-started' status for a moved resource", () => {
+        const plan = makePlan({
+          resource_changes: [
+            resourceChange("null_resource.renamed", ["no-op"], {
+              before: { id: "123" },
+              after: { id: "123" },
+              previous_address: "null_resource.original",
+            }),
+          ],
+        });
+
+        const report = buildApplyReport(plan, [versionMsg()]);
+        const statuses = report.applyStatuses ?? [];
+        expect(statuses).toHaveLength(1);
+        expect(statuses[0]!.success).toBe(true);
+      });
     });
 
-    it("creates a successful ApplyStatus with action 'forget' for the forgotten resource", () => {
-      const plan = makePlan({
-        resource_changes: [
-          resourceChange("null_resource.ephemeral", ["forget"], {
-            before: { id: "123", triggers: { version: "1" } },
-            after: null,
-          }),
-        ],
+    describe("import (state-only, no attribute changes)", () => {
+      it("retains imported resource in the report (survives phantom filter)", () => {
+        const plan = makePlan({
+          resource_changes: [
+            resourceChange("random_string.imported", ["no-op"], {
+              before: { id: "fixedval" },
+              after: { id: "fixedval" },
+              importing: { id: "fixedval" },
+            }),
+          ],
+        });
+
+        const report = buildApplyReport(plan, [versionMsg()]);
+        const allAddresses = report.modules.flatMap((m) => m.resources.map((r) => r.address));
+        expect(allAddresses).toContain("random_string.imported");
       });
 
-      const messages: UIMessage[] = [
-        versionMsg(),
-        forgetPlannedChangeMsg("null_resource.ephemeral"),
-      ];
+      it("shows imported resource under the 'import' action in the summary", () => {
+        const plan = makePlan({
+          resource_changes: [
+            resourceChange("random_string.imported", ["no-op"], {
+              before: { id: "fixedval" },
+              after: { id: "fixedval" },
+              importing: { id: "fixedval" },
+            }),
+          ],
+        });
 
-      const report = buildApplyReport(plan, messages);
-      const statuses = report.applyStatuses ?? [];
-      const forgetStatus = statuses.find((s) => s.address === "null_resource.ephemeral");
-      expect(forgetStatus).toBeDefined();
-      expect(forgetStatus!.action).toBe("forget");
-      expect(forgetStatus!.success).toBe(true);
+        const report = buildApplyReport(plan, [versionMsg()]);
+        const importGroup = report.summary.actions.find((g) => g.action === "import");
+        expect(importGroup).toBeDefined();
+        expect(importGroup!.total).toBe(1);
+      });
+
+      it("creates a successful ApplyStatus with action 'import' for the imported resource", () => {
+        const plan = makePlan({
+          resource_changes: [
+            resourceChange("random_string.imported", ["no-op"], {
+              before: { id: "fixedval" },
+              after: { id: "fixedval" },
+              importing: { id: "fixedval" },
+            }),
+          ],
+        });
+
+        const report = buildApplyReport(plan, [versionMsg()]);
+        const statuses = report.applyStatuses ?? [];
+        const importStatus = statuses.find((s) => s.address === "random_string.imported");
+        expect(importStatus).toBeDefined();
+        expect(importStatus!.action).toBe("import");
+        expect(importStatus!.success).toBe(true);
+      });
+
+      it("does not create a 'not-started' status for an imported resource", () => {
+        const plan = makePlan({
+          resource_changes: [
+            resourceChange("random_string.imported", ["no-op"], {
+              before: { id: "fixedval" },
+              after: { id: "fixedval" },
+              importing: { id: "fixedval" },
+            }),
+          ],
+        });
+
+        const report = buildApplyReport(plan, [versionMsg()]);
+        const statuses = report.applyStatuses ?? [];
+        expect(statuses).toHaveLength(1);
+        expect(statuses[0]!.success).toBe(true);
+      });
     });
 
-    it("does not create a 'not-started' status for a forgotten resource", () => {
-      const plan = makePlan({
-        resource_changes: [
-          resourceChange("null_resource.ephemeral", ["forget"], {
-            before: { id: "123", triggers: { version: "1" } },
-            after: null,
-          }),
-        ],
+    describe("mixed: forget + move + import + regular apply", () => {
+      it("all state-only and hook-based resources appear with correct statuses", () => {
+        const plan = makePlan({
+          resource_changes: [
+            resourceChange("null_resource.forgotten", ["forget"], {
+              before: { id: "1" },
+              after: null,
+            }),
+            resourceChange("null_resource.renamed", ["no-op"], {
+              before: { id: "2" },
+              after: { id: "2" },
+              previous_address: "null_resource.original",
+            }),
+            resourceChange("random_string.imported", ["no-op"], {
+              before: { id: "fixedval" },
+              after: { id: "fixedval" },
+              importing: { id: "fixedval" },
+            }),
+            resourceChange("null_resource.created", ["create"], {
+              before: null,
+              after: { id: null },
+            }),
+          ],
+        });
+
+        const messages: UIMessage[] = [
+          versionMsg(),
+          forgetPlannedChangeMsg("null_resource.forgotten"),
+          applyStartMsg("null_resource.created", "create"),
+          applyCompleteMsg("null_resource.created", "create", 0.1, "id", "new-id"),
+        ];
+
+        const report = buildApplyReport(plan, messages);
+        const allAddresses = report.modules.flatMap((m) => m.resources.map((r) => r.address));
+        expect(allAddresses).toContain("null_resource.forgotten");
+        expect(allAddresses).toContain("null_resource.renamed");
+        expect(allAddresses).toContain("random_string.imported");
+        expect(allAddresses).toContain("null_resource.created");
+
+        const statuses = report.applyStatuses ?? [];
+        expect(statuses.find((s) => s.address === "null_resource.forgotten")?.action).toBe("forget");
+        expect(statuses.find((s) => s.address === "null_resource.renamed")?.action).toBe("move");
+        expect(statuses.find((s) => s.address === "random_string.imported")?.action).toBe("import");
+        expect(statuses.every((s) => s.success)).toBe(true);
       });
-
-      const messages: UIMessage[] = [
-        versionMsg(),
-        forgetPlannedChangeMsg("null_resource.ephemeral"),
-      ];
-
-      const report = buildApplyReport(plan, messages);
-      const statuses = report.applyStatuses ?? [];
-      // There should be exactly one status and it must be success (not a failed not-started)
-      expect(statuses).toHaveLength(1);
-      expect(statuses[0]!.success).toBe(true);
-    });
-
-    it("handles forget alongside regular apply operations", () => {
-      const plan = makePlan({
-        resource_changes: [
-          resourceChange("null_resource.ephemeral", ["forget"], {
-            before: { id: "123", triggers: { version: "1" } },
-            after: null,
-          }),
-          resourceChange("null_resource.created", ["create"], {
-            before: null,
-            after: { id: null, triggers: {} },
-          }),
-        ],
-      });
-
-      const messages: UIMessage[] = [
-        versionMsg(),
-        forgetPlannedChangeMsg("null_resource.ephemeral"),
-        applyStartMsg("null_resource.created", "create"),
-        applyCompleteMsg("null_resource.created", "create", 0.1, "id", "new-id"),
-      ];
-
-      const report = buildApplyReport(plan, messages);
-      const allAddresses = report.modules.flatMap((m) => m.resources.map((r) => r.address));
-      expect(allAddresses).toContain("null_resource.ephemeral");
-      expect(allAddresses).toContain("null_resource.created");
-
-      const statuses = report.applyStatuses ?? [];
-      const forgetStatus = statuses.find((s) => s.address === "null_resource.ephemeral");
-      const createStatus = statuses.find((s) => s.address === "null_resource.created");
-      expect(forgetStatus?.success).toBe(true);
-      expect(createStatus?.success).toBe(true);
     });
   });
 });

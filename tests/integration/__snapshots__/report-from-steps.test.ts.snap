@@ -27308,20 +27308,52 @@ exports[`reportFromSteps integration — generated fixtures > terraform/import-r
 
 exports[`reportFromSteps integration — generated fixtures > terraform/import-resource/1 > renders with workspace and matches snapshot 1`] = `
 "<!-- tf-report-action:"test-workspace" -->
-## ✅ \`test-workspace\` Apply Complete
+## ✅ \`test-workspace\` Apply: 1 imported
 
-## Plan Summary
+## Apply Summary
 
-_No changes._
+| Action | Resource | Count |
+| --- | --- | --- |
+| 📥 Imported | random_string | 1 |
+|  | **Imported** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>📥 <strong>random_string</strong> imported</summary>
+
+**Import ID:** \`fixedval\`
+
+_No attribute changes._
+
+</details>
 "
 `;
 
 exports[`reportFromSteps integration — generated fixtures > terraform/import-resource/1 > renders without error and matches snapshot [default] 1`] = `
-"## ✅ Apply Complete
+"## ✅ Apply: 1 imported
 
-## Plan Summary
+## Apply Summary
 
-_No changes._
+| Action | Resource | Count |
+| --- | --- | --- |
+| 📥 Imported | random_string | 1 |
+|  | **Imported** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>📥 <strong>random_string</strong> imported</summary>
+
+**Import ID:** \`fixedval\`
+
+_No attribute changes._
+
+</details>
 "
 `;
 
@@ -27634,20 +27666,52 @@ exports[`reportFromSteps integration — generated fixtures > terraform/moved-re
 
 exports[`reportFromSteps integration — generated fixtures > terraform/moved-resource/1 > renders with workspace and matches snapshot 1`] = `
 "<!-- tf-report-action:"test-workspace" -->
-## ✅ \`test-workspace\` Apply Complete
+## ✅ \`test-workspace\` Apply: 1 moved
 
-## Plan Summary
+## Apply Summary
 
-_No changes._
+| Action | Resource | Count |
+| --- | --- | --- |
+| 🚚 Moved | null_resource | 1 |
+|  | **Moved** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>🚚 <strong>null_resource</strong> renamed</summary>
+
+**Moved from:** \`null_resource.original\`
+
+_No attribute changes._
+
+</details>
 "
 `;
 
 exports[`reportFromSteps integration — generated fixtures > terraform/moved-resource/1 > renders without error and matches snapshot [default] 1`] = `
-"## ✅ Apply Complete
+"## ✅ Apply: 1 moved
 
-## Plan Summary
+## Apply Summary
 
-_No changes._
+| Action | Resource | Count |
+| --- | --- | --- |
+| 🚚 Moved | null_resource | 1 |
+|  | **Moved** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>🚚 <strong>null_resource</strong> renamed</summary>
+
+**Moved from:** \`null_resource.original\`
+
+_No attribute changes._
+
+</details>
 "
 `;
 
@@ -30049,20 +30113,52 @@ exports[`reportFromSteps integration — generated fixtures > tofu/import-resour
 
 exports[`reportFromSteps integration — generated fixtures > tofu/import-resource/1 > renders with workspace and matches snapshot 1`] = `
 "<!-- tf-report-action:"test-workspace" -->
-## ✅ \`test-workspace\` Apply Complete
+## ✅ \`test-workspace\` Apply: 1 imported
 
-## Plan Summary
+## Apply Summary
 
-_No changes._
+| Action | Resource | Count |
+| --- | --- | --- |
+| 📥 Imported | random_string | 1 |
+|  | **Imported** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>📥 <strong>random_string</strong> imported</summary>
+
+**Import ID:** \`fixedval\`
+
+_No attribute changes._
+
+</details>
 "
 `;
 
 exports[`reportFromSteps integration — generated fixtures > tofu/import-resource/1 > renders without error and matches snapshot [default] 1`] = `
-"## ✅ Apply Complete
+"## ✅ Apply: 1 imported
 
-## Plan Summary
+## Apply Summary
 
-_No changes._
+| Action | Resource | Count |
+| --- | --- | --- |
+| 📥 Imported | random_string | 1 |
+|  | **Imported** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>📥 <strong>random_string</strong> imported</summary>
+
+**Import ID:** \`fixedval\`
+
+_No attribute changes._
+
+</details>
 "
 `;
 
@@ -30375,20 +30471,52 @@ exports[`reportFromSteps integration — generated fixtures > tofu/moved-resourc
 
 exports[`reportFromSteps integration — generated fixtures > tofu/moved-resource/1 > renders with workspace and matches snapshot 1`] = `
 "<!-- tf-report-action:"test-workspace" -->
-## ✅ \`test-workspace\` Apply Complete
+## ✅ \`test-workspace\` Apply: 1 moved
 
-## Plan Summary
+## Apply Summary
 
-_No changes._
+| Action | Resource | Count |
+| --- | --- | --- |
+| 🚚 Moved | null_resource | 1 |
+|  | **Moved** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>🚚 <strong>null_resource</strong> renamed</summary>
+
+**Moved from:** \`null_resource.original\`
+
+_No attribute changes._
+
+</details>
 "
 `;
 
 exports[`reportFromSteps integration — generated fixtures > tofu/moved-resource/1 > renders without error and matches snapshot [default] 1`] = `
-"## ✅ Apply Complete
+"## ✅ Apply: 1 moved
 
-## Plan Summary
+## Apply Summary
 
-_No changes._
+| Action | Resource | Count |
+| --- | --- | --- |
+| 🚚 Moved | null_resource | 1 |
+|  | **Moved** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>🚚 <strong>null_resource</strong> renamed</summary>
+
+**Moved from:** \`null_resource.original\`
+
+_No attribute changes._
+
+</details>
 "
 `;
 

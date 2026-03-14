@@ -3,9 +3,12 @@
  * apply outcomes from machine-readable UI log messages.
  *
  * The key operation is **phantom filtering**: resources that appear in the
- * plan but were not actually applied (no `apply_start`/`apply_errored`
- * message) are removed from the report. This ensures the apply report
- * only shows resources that were actually changed.
+ * plan but were not actually applied are removed from the report. Resources
+ * that were actually changed fall into two categories:
+ * - Hook-based: emitted `apply_start`/`apply_errored` messages (creates,
+ *   updates, deletes, replaces).
+ * - State-only: no provider call and therefore no apply hooks (forgets, moves,
+ *   and state-only imports). These are identified from the plan JSON.
  */
 
 import type { Plan } from "../tfjson/plan.js";
@@ -70,11 +73,14 @@ export function buildApplyReport(
 ): StructuredReport {
   const report = buildReport(plan, options);
 
-  const forgetAddresses = extractForgetAddresses(messages);
-  const appliedAddresses = new Set([...extractAppliedAddresses(messages), ...forgetAddresses]);
+  const stateOnlyAddresses = extractStateOnlyAddresses(plan);
+  const appliedAddresses = new Set([
+    ...extractAppliedAddresses(messages),
+    ...stateOnlyAddresses.keys(),
+  ]);
   const plannedAddresses = extractPlannedAddresses(messages);
   const applyStatuses = extractApplyStatuses(messages);
-  const forgetStatuses = buildForgetStatuses(forgetAddresses);
+  const stateOnlyStatuses = buildStateOnlyStatuses(stateOnlyAddresses);
   const diagnostics = extractDiagnostics(messages);
   const outputsMessage = findOutputsMessage(messages);
 
@@ -83,7 +89,7 @@ export function buildApplyReport(
 
   // Detect resources that were planned but never started (interrupted apply)
   const notStartedStatuses = buildNotStartedStatuses(plannedAddresses, appliedAddresses, messages);
-  const allStatuses = [...applyStatuses, ...forgetStatuses, ...notStartedStatuses];
+  const allStatuses = [...applyStatuses, ...stateOnlyStatuses, ...notStartedStatuses];
 
   if (outputsMessage) {
     resolveOutputValues(report, outputsMessage);
@@ -126,32 +132,49 @@ function extractAppliedAddresses(messages: UIMessage[]): Set<string> {
 }
 
 /**
- * Collects the set of resource addresses that represent forget operations.
- * Forget operations use `action: "remove"` in `planned_change` messages and
- * never emit `apply_start`/`apply_complete` hooks — they are instantaneous
- * state-only operations that require no provider call. Both Terraform and
- * OpenTofu emit `planned_change` with `action: "remove"` for forgets; only
- * OpenTofu additionally reports them as `forget` in the `change_summary`.
+ * Extracts addresses of state-only operations from the plan JSON.
+ *
+ * State-only operations require no provider call and therefore emit no
+ * `apply_start`/`apply_complete` hooks in the apply JSONL. All three types
+ * are reliably identifiable from the plan JSON alone:
+ * - **Forget** (`actions: ["forget"]`): removes a resource from state without
+ *   destroying the real infrastructure (via `removed { destroy = false }`).
+ *   Emits a `planned_change action="remove"` in the JSONL but no apply hooks.
+ * - **Move** (`actions: ["no-op"]` + `previous_address`): renames a resource
+ *   in state; no provider call needed. No JSONL messages at all.
+ * - **State-only import** (`actions: ["no-op"]` + `importing`): imports a
+ *   resource that already matches the desired state; no update required.
+ *   No JSONL messages at all.
  */
-function extractForgetAddresses(messages: UIMessage[]): Set<string> {
-  const addresses = new Set<string>();
-  for (const msg of messages) {
-    if (isPlannedChange(msg) && msg.change.action === "remove") {
-      addresses.add(msg.change.resource.addr);
+function extractStateOnlyAddresses(plan: Plan): Map<string, PlanAction> {
+  const addresses = new Map<string, PlanAction>();
+  for (const rc of plan.resource_changes ?? []) {
+    if (rc.mode === "data") continue;
+    const actions = rc.change.actions;
+    if (actions.length !== 1) continue;
+    const action = actions[0];
+    if (action === "forget") {
+      if (rc.address) addresses.set(rc.address, "forget");
+    } else if (action === "no-op") {
+      if (rc.previous_address) {
+        if (rc.address) addresses.set(rc.address, "move");
+      } else if (rc.change.importing) {
+        if (rc.address) addresses.set(rc.address, "import");
+      }
     }
   }
   return addresses;
 }
 
 /**
- * Builds successful ApplyStatus entries for forget operations. Forget
- * operations always succeed (they are state-only and emit no apply hooks),
- * so each address maps directly to a success status.
+ * Builds successful ApplyStatus entries for state-only operations.
+ * State-only operations (forget, move, state-only import) always succeed —
+ * they are instantaneous state mutations with no provider call and no hooks.
  */
-function buildForgetStatuses(forgetAddresses: Set<string>): ApplyStatus[] {
-  return [...forgetAddresses].map((address) => ({
+function buildStateOnlyStatuses(stateOnlyAddresses: Map<string, PlanAction>): ApplyStatus[] {
+  return [...stateOnlyAddresses.entries()].map(([address, action]) => ({
     address,
-    action: "forget" as const,
+    action,
     success: true,
   }));
 }
@@ -175,9 +198,11 @@ function extractPlannedAddresses(messages: UIMessage[]): Map<string, PlanAction>
  * started. This happens when an apply is interrupted (timeout, crash,
  * cancellation) before all resources are processed.
  *
- * Forget operations are excluded: they never emit apply hooks by design
- * (they are instantaneous state-only operations) and are handled separately
- * by `buildForgetStatuses`.
+ * State-only operations (forget, move, state-only import) are never in this
+ * list: their addresses are included in `appliedAddresses` via
+ * `extractStateOnlyAddresses`, so `!appliedAddresses.has(addr)` is already
+ * false for them. Move and import additionally never appear in
+ * `plannedAddresses` since they emit no `planned_change` JSONL messages.
  */
 function buildNotStartedStatuses(
   plannedAddresses: Map<string, PlanAction>,
@@ -195,7 +220,6 @@ function buildNotStartedStatuses(
 
   const notStarted: ApplyStatus[] = [];
   for (const [addr, action] of plannedAddresses) {
-    if (action === "forget") continue; // handled by buildForgetStatuses
     if (!appliedAddresses.has(addr) && !completedAddresses.has(addr)) {
       notStarted.push({
         address: addr,
@@ -223,6 +247,7 @@ function uiActionToPlanAction(action: string): PlanAction {
     case "noop":
       return "no-op";
     case "forget":
+      return "forget";
     // In the UI JSONL, forget operations are emitted as "remove" in planned_change
     // messages (distinct from "delete" which is used for actual destroys). The
     // change_summary then counts them under "forget". Map both to "forget".

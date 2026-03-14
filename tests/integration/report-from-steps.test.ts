@@ -223,37 +223,37 @@ describe("reportFromSteps — action classification", () => {
     expect(result).not.toContain("Resource Changes");
   });
 
-  it("moved-resource/1: moved resource shows 🚚 Move in summary", () => {
-    const fixture = planOnlyFixtures.find((f) =>
-      f.label.includes("moved-resource/1"),
-    );
-    expect(fixture).toBeDefined();
-    const resolved = resolveStepFilePaths(fixture!.stepsJson, fixture!.fixtureDir);
-    const result = reportFromSteps(resolved, {
-      allowedDirs: [fixture!.fixtureDir],
-      env: NO_GITHUB_ENV,
+  for (const toolLabel of ["terraform/moved-resource/1/plan-only", "tofu/moved-resource/1/plan-only"]) {
+    it(`${toolLabel}: moved resource shows 🚚 Move in summary`, () => {
+      const fixture = planOnlyFixtures.find((f) => f.label === toolLabel);
+      expect(fixture).toBeDefined();
+      const resolved = resolveStepFilePaths(fixture!.stepsJson, fixture!.fixtureDir);
+      const result = reportFromSteps(resolved, {
+        allowedDirs: [fixture!.fixtureDir],
+        env: NO_GITHUB_ENV,
+      });
+      expect(result).toContain("1 to move");
+      expect(result).toContain("🚚");
+      expect(result).toContain("Move");
+      expect(result).not.toContain("No Changes");
     });
-    expect(result).toContain("1 to move");
-    expect(result).toContain("🚚");
-    expect(result).toContain("Move");
-    expect(result).not.toContain("No Changes");
-  });
+  }
 
-  it("import-resource/1: imported resource shows 📥 Import in summary", () => {
-    const fixture = planOnlyFixtures.find((f) =>
-      f.label.includes("import-resource/1"),
-    );
-    expect(fixture).toBeDefined();
-    const resolved = resolveStepFilePaths(fixture!.stepsJson, fixture!.fixtureDir);
-    const result = reportFromSteps(resolved, {
-      allowedDirs: [fixture!.fixtureDir],
-      env: NO_GITHUB_ENV,
+  for (const toolLabel of ["terraform/import-resource/1/plan-only", "tofu/import-resource/1/plan-only"]) {
+    it(`${toolLabel}: imported resource shows 📥 Import in summary`, () => {
+      const fixture = planOnlyFixtures.find((f) => f.label === toolLabel);
+      expect(fixture).toBeDefined();
+      const resolved = resolveStepFilePaths(fixture!.stepsJson, fixture!.fixtureDir);
+      const result = reportFromSteps(resolved, {
+        allowedDirs: [fixture!.fixtureDir],
+        env: NO_GITHUB_ENV,
+      });
+      expect(result).toContain("1 to import");
+      expect(result).toContain("📥");
+      expect(result).toContain("Import");
+      expect(result).not.toContain("No Changes");
     });
-    expect(result).toContain("1 to import");
-    expect(result).toContain("📥");
-    expect(result).toContain("Import");
-    expect(result).not.toContain("No Changes");
-  });
+  }
 
   it("terraform/removed-resource/1: forgotten resource shows 👋 Forget in summary", () => {
     const fixture = planOnlyFixtures.find((f) =>
@@ -315,6 +315,90 @@ describe("reportFromSteps — forget in apply output", () => {
         });
         expect(result).toContain("👋");
         expect(result).toContain("Forgotten");
+      });
+
+      it("uses Apply Summary heading", () => {
+        const fixture = generatedFixtures.find((f) => f.label === toolLabel);
+        expect(fixture).toBeDefined();
+        const resolved = resolveStepFilePaths(fixture!.stepsJson, fixture!.fixtureDir);
+        const result = reportFromSteps(resolved, {
+          allowedDirs: [fixture!.fixtureDir],
+          env: NO_GITHUB_ENV,
+        });
+        expect(result).toContain("## Apply Summary");
+        expect(result).not.toContain("## Plan Summary");
+      });
+    });
+  }
+});
+
+// ---------- Targeted assertions for state-only operations in apply output ----------
+
+describe("reportFromSteps — state-only operations in apply output", () => {
+  for (const toolLabel of ["terraform/moved-resource/1", "tofu/moved-resource/1"]) {
+    describe(`${toolLabel} move operation`, () => {
+      it("shows moved resource (not 'No Changes') in apply report", () => {
+        const fixture = generatedFixtures.find((f) => f.label === toolLabel);
+        expect(fixture).toBeDefined();
+        const resolved = resolveStepFilePaths(fixture!.stepsJson, fixture!.fixtureDir);
+        const result = reportFromSteps(resolved, {
+          allowedDirs: [fixture!.fixtureDir],
+          env: NO_GITHUB_ENV,
+        });
+        expect(result).not.toContain("No Changes");
+        expect(result).toContain("renamed");
+      });
+
+      it("shows 🚚 Moved in Apply Summary", () => {
+        const fixture = generatedFixtures.find((f) => f.label === toolLabel);
+        expect(fixture).toBeDefined();
+        const resolved = resolveStepFilePaths(fixture!.stepsJson, fixture!.fixtureDir);
+        const result = reportFromSteps(resolved, {
+          allowedDirs: [fixture!.fixtureDir],
+          env: NO_GITHUB_ENV,
+        });
+        expect(result).toContain("🚚");
+        expect(result).toContain("Moved");
+      });
+
+      it("uses Apply Summary heading", () => {
+        const fixture = generatedFixtures.find((f) => f.label === toolLabel);
+        expect(fixture).toBeDefined();
+        const resolved = resolveStepFilePaths(fixture!.stepsJson, fixture!.fixtureDir);
+        const result = reportFromSteps(resolved, {
+          allowedDirs: [fixture!.fixtureDir],
+          env: NO_GITHUB_ENV,
+        });
+        expect(result).toContain("## Apply Summary");
+        expect(result).not.toContain("## Plan Summary");
+      });
+    });
+  }
+
+  for (const toolLabel of ["terraform/import-resource/1", "tofu/import-resource/1"]) {
+    describe(`${toolLabel} state-only import`, () => {
+      it("shows imported resource (not 'No Changes') in apply report", () => {
+        const fixture = generatedFixtures.find((f) => f.label === toolLabel);
+        expect(fixture).toBeDefined();
+        const resolved = resolveStepFilePaths(fixture!.stepsJson, fixture!.fixtureDir);
+        const result = reportFromSteps(resolved, {
+          allowedDirs: [fixture!.fixtureDir],
+          env: NO_GITHUB_ENV,
+        });
+        expect(result).not.toContain("No Changes");
+        expect(result).toContain("imported");
+      });
+
+      it("shows 📥 Imported in Apply Summary", () => {
+        const fixture = generatedFixtures.find((f) => f.label === toolLabel);
+        expect(fixture).toBeDefined();
+        const resolved = resolveStepFilePaths(fixture!.stepsJson, fixture!.fixtureDir);
+        const result = reportFromSteps(resolved, {
+          allowedDirs: [fixture!.fixtureDir],
+          env: NO_GITHUB_ENV,
+        });
+        expect(result).toContain("📥");
+        expect(result).toContain("Imported");
       });
 
       it("uses Apply Summary heading", () => {

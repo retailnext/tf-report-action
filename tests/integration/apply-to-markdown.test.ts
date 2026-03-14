@@ -140,6 +140,70 @@ describe("applyToMarkdown integration", () => {
     });
   });
 
+  for (const toolLabel of ["terraform/moved-resource/1", "tofu/moved-resource/1"]) {
+    describe(`${toolLabel} move operation`, () => {
+      const fixture = fixtures.find((f) => f.label === toolLabel);
+
+      it("includes the moved resource in apply output", () => {
+        expect(fixture).toBeDefined();
+        const result = applyToMarkdown(fixture!.planJson, fixture!.applyJsonl);
+        expect(result).toContain("renamed");
+      });
+
+      it("shows 🚚 Moved in Apply Summary", () => {
+        expect(fixture).toBeDefined();
+        const result = applyToMarkdown(fixture!.planJson, fixture!.applyJsonl);
+        expect(result).toContain("🚚");
+        expect(result).toContain("Moved");
+      });
+
+      it("uses Apply Summary heading (not Plan Summary)", () => {
+        expect(fixture).toBeDefined();
+        const result = applyToMarkdown(fixture!.planJson, fixture!.applyJsonl);
+        expect(result).toContain("## Apply Summary");
+        expect(result).not.toContain("## Plan Summary");
+      });
+
+      it("does not show No Changes", () => {
+        expect(fixture).toBeDefined();
+        const result = applyToMarkdown(fixture!.planJson, fixture!.applyJsonl);
+        expect(result).not.toContain("No Changes");
+      });
+    });
+  }
+
+  for (const toolLabel of ["terraform/import-resource/1", "tofu/import-resource/1"]) {
+    describe(`${toolLabel} state-only import`, () => {
+      const fixture = fixtures.find((f) => f.label === toolLabel);
+
+      it("includes the imported resource in apply output", () => {
+        expect(fixture).toBeDefined();
+        const result = applyToMarkdown(fixture!.planJson, fixture!.applyJsonl);
+        expect(result).toContain("imported");
+      });
+
+      it("shows 📥 Imported in Apply Summary", () => {
+        expect(fixture).toBeDefined();
+        const result = applyToMarkdown(fixture!.planJson, fixture!.applyJsonl);
+        expect(result).toContain("📥");
+        expect(result).toContain("Imported");
+      });
+
+      it("uses Apply Summary heading (not Plan Summary)", () => {
+        expect(fixture).toBeDefined();
+        const result = applyToMarkdown(fixture!.planJson, fixture!.applyJsonl);
+        expect(result).toContain("## Apply Summary");
+        expect(result).not.toContain("## Plan Summary");
+      });
+
+      it("does not show No Changes", () => {
+        expect(fixture).toBeDefined();
+        const result = applyToMarkdown(fixture!.planJson, fixture!.applyJsonl);
+        expect(result).not.toContain("No Changes");
+      });
+    });
+  }
+
   describe("apply-error/1 error handling", () => {
     const fixture = fixtures.find(
       (f) => f.label === "terraform/apply-error/1",

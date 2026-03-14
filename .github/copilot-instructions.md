@@ -259,10 +259,11 @@ them, because attribute values may be sensitive. This means:
 - Integration tests live under `tests/integration/` and are driven by real plan JSON
   and apply JSONL files generated from fixture Terraform workspaces.
 - Coverage thresholds: 90% lines/functions/statements, 85% branches.
-- Run `npm run test:coverage` locally; CI runs `npm run test:coverage:ci`.
-- **After adding or modifying any source code, run `npm run test:coverage` and verify
-  that coverage thresholds are still met.** If new code causes coverage to drop below
-  thresholds, add unit tests until thresholds are satisfied before committing.
+- **After adding or modifying any source code, run `npm run ci` and verify all checks
+  pass.** `npm run ci` runs lint, typecheck, full coverage (unit + integration combined),
+  and integration-only coverage in sequence. If coverage drops below thresholds, add
+  tests until thresholds are satisfied before committing. If snapshots need updating,
+  run `npx vitest run -u` first, then re-run `npm run ci`.
 - Use the `/add-fixture-workspace` skill to add fixture workspaces.
 - Use the `/generate-fixtures` skill to regenerate fixture JSON files.
 
