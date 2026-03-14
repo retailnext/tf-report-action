@@ -421,6 +421,12 @@ function buildGalleryHtml(entriesJson: string): string {
       text-overflow: ellipsis; white-space: nowrap;
     }
     #position-label { font-size: 12px; color: #57606a; white-space: nowrap; }
+    #btn-copy {
+      padding: 4px 12px; font-size: 13px; border: 1px solid #d0d7de;
+      border-radius: 6px; background: #f6f8fa; cursor: pointer; white-space: nowrap;
+    }
+    #btn-copy:hover { background: #eaeef2; }
+    #btn-copy.copied { background: #dafbe1; border-color: #116329; color: #116329; }
     #content-area {
       flex: 1; overflow-y: auto; padding: 32px;
       max-width: 1012px;
@@ -478,6 +484,7 @@ function buildGalleryHtml(entriesJson: string): string {
     <div id="nav-bar">
       <button id="btn-prev" title="Previous (←)">← Prev</button>
       <button id="btn-next" title="Next (→)">Next →</button>
+      <button id="btn-copy" title="Copy markdown to clipboard">📋 Copy Markdown</button>
       <span id="fixture-path"></span>
       <span id="position-label"></span>
     </div>
@@ -500,6 +507,7 @@ function buildGalleryHtml(entriesJson: string): string {
     var contentArea = document.getElementById('content-area');
     var btnPrev = document.getElementById('btn-prev');
     var btnNext = document.getElementById('btn-next');
+    var btnCopy = document.getElementById('btn-copy');
 
     // Build the visible (filtered) index list
     var visibleIndices = [];
@@ -591,6 +599,19 @@ function buildGalleryHtml(entriesJson: string): string {
 
     btnPrev.addEventListener('click', goPrev);
     btnNext.addEventListener('click', goNext);
+
+    btnCopy.addEventListener('click', function() {
+      if (visibleIndices.length === 0) return;
+      var entry = entries[visibleIndices[currentVisiblePos]];
+      navigator.clipboard.writeText(entry.markdown).then(function() {
+        btnCopy.textContent = '✅ Copied!';
+        btnCopy.classList.add('copied');
+        setTimeout(function() {
+          btnCopy.textContent = '📋 Copy Markdown';
+          btnCopy.classList.remove('copied');
+        }, 1500);
+      });
+    });
 
     filterInput.addEventListener('input', function() {
       applyFilter();
