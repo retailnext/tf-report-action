@@ -1,23 +1,18 @@
 import { describe, it, expect } from "vitest";
 import { renderReportSections } from "../../../src/renderer/report-sections.js";
-import type {
-  TextFallbackReport,
-  WorkflowReport,
-  ErrorReport,
-  StructuredReport,
-} from "../../../src/model/report.js";
+import type { Report } from "../../../src/model/report.js";
 
 describe("renderReportSections", () => {
   describe("structured report", () => {
     it("renders marker, title, and body for a structured report", () => {
-      const report: StructuredReport = {
-        kind: "structured",
+      const report: Report = {
         title: "Terraform Plan",
         issues: [],
-        isApply: false,
+        steps: [],
+        warnings: [],
+        rawStdout: [],
         toolVersion: "1.5.0",
         formatVersion: "1.2",
-        timestamp: null,
         summary: { actions: [], failures: [] },
         modules: [],
         outputs: [],
@@ -40,8 +35,7 @@ describe("renderReportSections", () => {
     });
 
     it("renders step issues before the body", () => {
-      const report: StructuredReport = {
-        kind: "structured",
+      const report: Report = {
         title: "Plan",
         issues: [
           {
@@ -51,10 +45,11 @@ describe("renderReportSections", () => {
             stdout: "warning output",
           },
         ],
-        isApply: false,
+        steps: [],
+        warnings: [],
+        rawStdout: [],
         toolVersion: "1.5.0",
         formatVersion: "1.2",
-        timestamp: null,
         summary: { actions: [], failures: [] },
         modules: [],
         outputs: [],
@@ -71,11 +66,8 @@ describe("renderReportSections", () => {
 
   describe("text-fallback report", () => {
     it("renders marker, title, issues, and body sections", () => {
-      const report: TextFallbackReport = {
-        kind: "text-fallback",
+      const report: Report = {
         title: "Terraform Plan",
-        tool: undefined,
-        fallbackReason: "show-plan-parse-error",
         issues: [
           {
             id: "show-plan",
@@ -84,10 +76,16 @@ describe("renderReportSections", () => {
             stdout: "raw output",
           },
         ],
-        readErrors: [],
         steps: [],
-        hasOutput: true,
-        planContent: "Plan: 1 to add",
+        warnings: [],
+        rawStdout: [
+          {
+            stepId: "plan",
+            label: "Plan Output",
+            content: "Plan: 1 to add",
+            truncated: false,
+          },
+        ],
         workspace: "prod",
       };
       const sections = renderReportSections(report);
@@ -95,20 +93,21 @@ describe("renderReportSections", () => {
       expect(ids).toContain("marker");
       expect(ids).toContain("title");
       expect(ids).toContain("issue-show-plan");
-      expect(ids).toContain("note");
-      expect(ids).toContain("plan-output");
+      expect(ids).toContain("raw-plan");
     });
   });
 
   describe("workflow report", () => {
     it("renders title and step table", () => {
-      const report: WorkflowReport = {
-        kind: "workflow",
+      const report: Report = {
         title: "Workflow Summary",
+        issues: [],
         steps: [
           { id: "init", outcome: "success" },
           { id: "plan", outcome: "success" },
         ],
+        warnings: [],
+        rawStdout: [],
       };
       const sections = renderReportSections(report);
       const ids = sections.map((s) => s.id);
@@ -121,10 +120,13 @@ describe("renderReportSections", () => {
 
   describe("error report", () => {
     it("renders title and message", () => {
-      const report: ErrorReport = {
-        kind: "error",
+      const report: Report = {
         title: "❌ Pipeline Error",
-        message: "Steps context could not be parsed.",
+        issues: [],
+        steps: [],
+        warnings: [],
+        rawStdout: [],
+        error: "Steps context could not be parsed.",
       };
       const sections = renderReportSections(report);
       const ids = sections.map((s) => s.id);
@@ -139,11 +141,13 @@ describe("renderReportSections", () => {
     });
 
     it("includes step statuses when present", () => {
-      const report: ErrorReport = {
-        kind: "error",
+      const report: Report = {
         title: "Error",
-        message: "Failed.",
+        issues: [],
         steps: [{ id: "init", outcome: "failure" }],
+        warnings: [],
+        rawStdout: [],
+        error: "Failed.",
       };
       const sections = renderReportSections(report);
       expect(sections.map((s) => s.id)).toContain("step-statuses");

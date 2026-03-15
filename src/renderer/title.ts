@@ -33,18 +33,9 @@ export function renderWorkspaceMarker(report: Report): Section | undefined {
   };
 }
 
-/** Extract workspace from any report variant. */
+/** Extract workspace from the report. */
 function getWorkspace(report: Report): string | undefined {
-  switch (report.kind) {
-    case "structured":
-      return report.workspace;
-    case "text-fallback":
-      return report.workspace;
-    case "workflow":
-      return report.workspace;
-    case "error":
-      return report.workspace;
-  }
+  return report.workspace;
 }
 
 /** Escape special characters in workspace name for safe HTML comment embedding. */

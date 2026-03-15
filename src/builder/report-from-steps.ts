@@ -1,16 +1,16 @@
 /**
- * Builds a Report (any variant) from parsed GitHub Actions steps context.
+ * Builds a Report from parsed GitHub Actions steps context.
  *
- * This is the "build" step for the third pipeline (reportFromSteps).
+ * This is the "build" step for the reportFromSteps pipeline.
  * It orchestrates: detect tier → read files → build issues → construct
- * the appropriate Report variant with title.
+ * a progressively-enriched Report with title.
  */
 
 import type { BuildOptions } from "./options.js";
 import type { RenderOptions } from "../renderer/options.js";
 import type { Env } from "../env/index.js";
 import type { Steps, StepData, ReaderOptions } from "../steps/types.js";
-import type { Report, StructuredReport, TextFallbackReport, WorkflowReport, ErrorReport, Tool, FallbackReason } from "../model/report.js";
+import type { Report, Tool } from "../model/report.js";
 import type { StepIssue } from "../model/step-issue.js";
 import { expectedCommand } from "../model/step-commands.js";
 import { parseSteps } from "../steps/parse.js";
@@ -66,14 +66,22 @@ export interface ReportOptions extends BuildOptions, RenderOptions {
   applyStep?: string;
 }
 
+/** Create an empty Report with required fields initialized. */
+function createEmptyReport(): Report {
+  return {
+    title: "",
+    issues: [],
+    steps: [],
+    warnings: [],
+    rawStdout: [],
+  };
+}
+
 /**
  * Build a Report from a steps context JSON string.
  *
- * Returns a Report variant appropriate for the available data:
- * - StructuredReport (Tier 1) when show-plan JSON is available
- * - TextFallbackReport (Tier 3) when only raw stdout is available
- * - WorkflowReport (Tier 4) when no plan output is available
- * - ErrorReport when parsing fails
+ * Returns a progressively-enriched Report with fields populated based on
+ * available data. The renderer checks field presence to decide what to show.
  */
 export function buildReportFromSteps(
   stepsJson: string,
@@ -144,12 +152,11 @@ export function buildReportFromSteps(
       tool ??= detectToolFromOutput(tier.planRead?.content)
             ?? detectToolFromOutput(tier.applyRead?.content);
       return buildTextFallbackReport(
-        tier, steps, knownStepIds, issues, workspace, logsUrl,
-        tool, "show-plan-unavailable",
+        tier, steps, knownStepIds, issues, workspace, logsUrl, tool,
       );
     }
     case "tier4": {
-      return buildWorkflowReport(steps, workspace, logsUrl);
+      return buildWorkflowOnlyReport(steps, workspace, logsUrl);
     }
   }
 }
@@ -170,7 +177,7 @@ function buildTier1Report(
   options: ReportOptions | undefined,
   tool: Tool | undefined,
 ): Report {
-  let report: StructuredReport;
+  let report: Report;
   let isApplyMode = false;
 
   // Parse the plan JSON
@@ -201,8 +208,7 @@ function buildTier1Report(
         tool ??= detectToolFromOutput(fallbackTier.planRead?.content)
               ?? detectToolFromOutput(fallbackTier.applyRead?.content);
         return buildTextFallbackReport(
-          fallbackTier, steps, knownStepIds, issues, workspace, logsUrl,
-          tool, "show-plan-parse-error",
+          fallbackTier, steps, knownStepIds, issues, workspace, logsUrl, tool,
         );
       }
     }
@@ -246,9 +252,10 @@ function buildTier1Report(
   }
 
   // Set the cross-cutting fields
+  report.operation = isApplyMode ? "apply" : "plan";
   report.title = buildStructuredTitle(report, isApplyMode, workspace, hasStepFailures);
   report.issues = issues;
-  report.isApply = isApplyMode;
+  report.steps = buildStepOutcomes(steps);
   if (workspace !== undefined) report.workspace = workspace;
   if (logsUrl !== undefined) report.logsUrl = logsUrl;
 
@@ -263,9 +270,8 @@ function buildTextFallbackReport(
   workspace: string | undefined,
   logsUrl: string | undefined,
   tool: Tool | undefined,
-  fallbackReason: FallbackReason,
-): TextFallbackReport {
-  const hasOutput = tier.planRead?.content !== undefined || tier.applyRead?.content !== undefined;
+): Report {
+  const report = createEmptyReport();
   const hasStepFailure =
     hasAnyFailedStep(steps, knownStepIds)
     || hasAnyFailedKnownStep(steps, knownStepIds);
@@ -277,30 +283,54 @@ function buildTextFallbackReport(
   const label = isApply ? "Apply" : "Plan";
   const suffix = hasFailure ? "Failed" : "Succeeded";
 
-  const report: TextFallbackReport = {
-    kind: "text-fallback",
-    title: `${icon} ${wsPrefix}${label} ${suffix}`,
-    tool,
-    fallbackReason,
-    issues,
-    readErrors: tier.readErrors,
-    steps: buildStepOutcomes(steps),
-    hasOutput,
-  };
-  if (tier.planRead?.content !== undefined) (report as { planContent: string }).planContent = tier.planRead.content;
-  if (tier.planRead?.truncated === true) (report as { planTruncated: boolean }).planTruncated = true;
-  if (tier.applyRead?.content !== undefined) (report as { applyContent: string }).applyContent = tier.applyRead.content;
-  if (tier.applyRead?.truncated === true) (report as { applyTruncated: boolean }).applyTruncated = true;
-  if (workspace !== undefined) (report as { workspace: string }).workspace = workspace;
-  if (logsUrl !== undefined) (report as { logsUrl: string }).logsUrl = logsUrl;
+  report.title = `${icon} ${wsPrefix}${label} ${suffix}`;
+  report.issues = issues;
+  report.steps = buildStepOutcomes(steps);
+  if (tool !== undefined) report.tool = tool;
+  report.operation = isApply ? "apply" : "plan";
+  if (workspace !== undefined) report.workspace = workspace;
+  if (logsUrl !== undefined) report.logsUrl = logsUrl;
+
+  // Add read errors as warnings
+  for (const err of tier.readErrors) {
+    report.warnings.push(err);
+  }
+
+  // Add raw stdout blocks
+  const hasOutput = tier.planRead?.content !== undefined || tier.applyRead?.content !== undefined;
+  if (tier.planRead?.content !== undefined) {
+    report.rawStdout.push({
+      stepId: "plan",
+      label: "Plan Output",
+      content: tier.planRead.content,
+      truncated: tier.planRead.truncated === true,
+    });
+  }
+  if (tier.applyRead?.content !== undefined) {
+    report.rawStdout.push({
+      stepId: "apply",
+      label: "Apply Output",
+      content: tier.applyRead.content,
+      truncated: tier.applyRead.truncated === true,
+    });
+  }
+
+  // Add warning about limited report (only when we have output to show)
+  if (hasOutput) {
+    report.warnings.push(
+      `Report limited because \`${expectedCommand(tool, "show-plan")}\` output was not available. Showing raw command output.`,
+    );
+  }
+
   return report;
 }
 
-function buildWorkflowReport(
+function buildWorkflowOnlyReport(
   steps: Steps,
   workspace: string | undefined,
   logsUrl: string | undefined,
-): WorkflowReport {
+): Report {
+  const report = createEmptyReport();
   const stepOutcomes = buildStepOutcomes(steps);
   const failedSteps = stepOutcomes.filter((s) => s.outcome === "failure");
   const hasFailure = failedSteps.length > 0;
@@ -319,13 +349,10 @@ function buildWorkflowReport(
     label = "Succeeded";
   }
 
-  const report: WorkflowReport = {
-    kind: "workflow",
-    title: `${icon} ${wsPrefix}${label}`,
-    steps: stepOutcomes,
-  };
-  if (logsUrl !== undefined) (report as { logsUrl: string }).logsUrl = logsUrl;
-  if (workspace !== undefined) (report as { workspace: string }).workspace = workspace;
+  report.title = `${icon} ${wsPrefix}${label}`;
+  report.steps = stepOutcomes;
+  if (logsUrl !== undefined) report.logsUrl = logsUrl;
+  if (workspace !== undefined) report.workspace = workspace;
   return report;
 }
 
@@ -334,15 +361,13 @@ function buildErrorReport(
   message: string,
   workspace: string | undefined,
   steps?: readonly { id: string; outcome: string }[],
-): ErrorReport {
+): Report {
   const wsPrefix = workspace ? `\`${workspace}\` ` : "";
-  const report: ErrorReport = {
-    kind: "error",
-    title: `${STATUS_FAILURE} ${wsPrefix}${heading}`,
-    message,
-  };
-  if (steps !== undefined) (report as { steps: readonly { id: string; outcome: string }[] }).steps = steps;
-  if (workspace !== undefined) (report as { workspace: string }).workspace = workspace;
+  const report = createEmptyReport();
+  report.title = `${STATUS_FAILURE} ${wsPrefix}${heading}`;
+  report.error = message;
+  if (steps !== undefined) report.steps = [...steps];
+  if (workspace !== undefined) report.workspace = workspace;
   return report;
 }
 

@@ -1,19 +1,22 @@
 import { describe, it, expect } from "vitest";
 import { renderErrorBody } from "../../../src/renderer/error.js";
-import type { ErrorReport } from "../../../src/model/report.js";
+import type { Report } from "../../../src/model/report.js";
 
-function makeReport(overrides: Partial<Omit<ErrorReport, "kind">> = {}): ErrorReport {
+function makeReport(overrides: Partial<Report> = {}): Report {
   return {
-    kind: "error",
     title: "Error",
-    message: "Something went wrong.",
+    issues: [],
+    steps: [],
+    warnings: [],
+    rawStdout: [],
+    error: "Something went wrong.",
     ...overrides,
   };
 }
 
 describe("renderErrorBody", () => {
   it("renders error message as a section", () => {
-    const report = makeReport({ message: "Plan parsing failed." });
+    const report = makeReport({ error: "Plan parsing failed." });
     const sections = renderErrorBody(report);
     const msg = sections.find((s) => s.id === "message");
     expect(msg).toBeDefined();
@@ -35,13 +38,13 @@ describe("renderErrorBody", () => {
     expect(stepTable!.full).toContain("| `plan` | failure |");
   });
 
-  it("does not render step table when steps is undefined", () => {
+  it("does not render step table when steps array is empty", () => {
     const report = makeReport();
     const sections = renderErrorBody(report);
     expect(sections.find((s) => s.id === "step-statuses")).toBeUndefined();
   });
 
-  it("does not render step table when steps array is empty", () => {
+  it("does not render step table when steps array is explicitly empty", () => {
     const report = makeReport({ steps: [] });
     const sections = renderErrorBody(report);
     expect(sections.find((s) => s.id === "step-statuses")).toBeUndefined();

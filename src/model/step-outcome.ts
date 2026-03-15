@@ -10,4 +10,7 @@ export interface StepOutcome {
 
   /** Outcome string (e.g. "success", "failure", "cancelled", "skipped", "unknown"). */
   readonly outcome: string;
+
+  /** Exit code from the step, if available. */
+  readonly exitCode?: string;
 }

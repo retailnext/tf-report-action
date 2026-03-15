@@ -106,24 +106,15 @@ function reportFromStepsInner(
   return result.output;
 }
 
-/** Extract logsUrl from any report variant that carries it. */
+/** Extract logsUrl from the report. */
 function getLogsUrl(report: import("./model/report.js").Report): string | undefined {
-  switch (report.kind) {
-    case "structured":
-      return report.logsUrl;
-    case "text-fallback":
-      return report.logsUrl;
-    case "workflow":
-      return report.logsUrl;
-    default:
-      return undefined;
-  }
+  return report.logsUrl;
 }
 
 // Re-export types consumers may need
 export type { BuildOptions } from "./builder/options.js";
 export type { RenderOptions, DiffFormat } from "./renderer/options.js";
-export type { Report, StructuredReport, TextFallbackReport, WorkflowReport, ErrorReport, Tool, FallbackReason } from "./model/report.js";
+export type { Report, RawStepStdout, Tool } from "./model/report.js";
 export type { StepRole } from "./model/step-commands.js";
 export { expectedCommand } from "./model/step-commands.js";
 export type { Summary } from "./model/summary.js";

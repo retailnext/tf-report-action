@@ -1,12 +1,14 @@
 import { describe, it, expect } from "vitest";
 import { renderWorkflowBody } from "../../../src/renderer/workflow.js";
-import type { WorkflowReport } from "../../../src/model/report.js";
+import type { Report } from "../../../src/model/report.js";
 
-function makeReport(overrides: Partial<Omit<WorkflowReport, "kind">> = {}): WorkflowReport {
+function makeReport(overrides: Partial<Report> = {}): Report {
   return {
-    kind: "workflow",
     title: "Terraform Plan",
+    issues: [],
     steps: [],
+    warnings: [],
+    rawStdout: [],
     ...overrides,
   };
 }

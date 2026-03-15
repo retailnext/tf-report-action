@@ -5,6 +5,10 @@
  * Built by the builder from raw step data; rendered by the renderer into
  * markdown. This decouples data gathering (I/O, classification) from
  * presentation (markdown formatting).
+ *
+ * A step can produce a StepIssue whether it failed or succeeded:
+ * - Failed step → `isFailed: true`, stdout/stderr for debugging context
+ * - Successful step with stderr → `isFailed: false`, stderr for warnings/deprecations
  */
 export interface StepIssue {
   /** Step identifier (e.g. "init", "validate", "show-plan"). */
@@ -37,4 +41,7 @@ export interface StepIssue {
   readonly stderrTruncated?: boolean;
   /** Error message if stderr could not be read. */
   readonly stderrError?: string;
+
+  /** Exit code from the step, if available. */
+  readonly exitCode?: string;
 }

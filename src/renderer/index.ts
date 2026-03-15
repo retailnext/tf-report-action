@@ -1,7 +1,8 @@
-import type { StructuredReport } from "../model/report.js";
+import type { Report } from "../model/report.js";
 import type { RenderOptions } from "./options.js";
 import type { Diagnostic } from "../model/diagnostic.js";
 import type { DiffEntry } from "../diff/types.js";
+import type { OutputChange } from "../model/output.js";
 import { MarkdownWriter } from "./writer.js";
 import { renderSummary } from "./summary.js";
 import { renderResource } from "./resource.js";
@@ -12,16 +13,23 @@ import { MODULE_ICON, DRIFT_ICON } from "../model/status-icons.js";
 import { resolveTemplate } from "../template/index.js";
 
 /**
- * Renders a Report model to a markdown string.
+ * Renders a Report's structured body (summary, resources, outputs, drift,
+ * diagnostics) to a markdown string. Requires that the report has `summary`
+ * and `modules` populated (i.e., from show-plan JSON or JSONL enrichment).
+ *
  * Automatically detects apply reports (those with diagnostics or applyStatuses)
  * and renders appropriate sections.
  */
-export function renderReport(report: StructuredReport, options: RenderOptions = {}): string {
+export function renderReport(report: Report, options: RenderOptions = {}): string {
   const template = resolveTemplate(options.template ?? "default");
   const writer = new MarkdownWriter();
   const diffCache = new Map<string, DiffEntry[]>();
   const isApply = isApplyReport(report);
   const summaryHeading = isApply ? "Apply Summary" : "Plan Summary";
+  const summary = report.summary;
+  const modules = report.modules ?? [];
+  const outputs = report.outputs ?? [];
+  const driftModules = report.driftModules ?? [];
 
   // Build apply context maps
   const failedAddresses = buildFailedSet(report);
@@ -34,7 +42,9 @@ export function renderReport(report: StructuredReport, options: RenderOptions = 
 
   if (template.name === "summary") {
     writer.heading(summaryHeading, 2);
-    renderSummary(report.summary, writer, isApply);
+    if (summary) {
+      renderSummary(summary, writer, isApply);
+    }
     // Summary template: all diagnostics go in top-level section
     if (report.diagnostics !== undefined && report.diagnostics.length > 0) {
       renderDiagnostics(report.diagnostics, writer, 2);
@@ -44,7 +54,9 @@ export function renderReport(report: StructuredReport, options: RenderOptions = 
 
   // Default template
   writer.heading(summaryHeading, 2);
-  renderSummary(report.summary, writer, isApply);
+  if (summary) {
+    renderSummary(summary, writer, isApply);
+  }
 
   // Non-resource diagnostics between summary and resource changes
   if (nonResourceDiags.length > 0) {
@@ -52,14 +64,14 @@ export function renderReport(report: StructuredReport, options: RenderOptions = 
   }
 
   // Resource drift section (between summary and resource changes)
-  if (report.driftModules.length > 0) {
-    renderDriftSection(report, writer, options, diffCache);
+  if (driftModules.length > 0) {
+    renderDriftSection(driftModules, writer, options, diffCache);
   }
 
-  if (report.modules.length > 0 || report.outputs.length > 0) {
+  if (modules.length > 0 || outputs.length > 0) {
     writer.heading("Resource Changes", 2);
 
-    for (const moduleGroup of report.modules) {
+    for (const moduleGroup of modules) {
       const moduleLabel =
         moduleGroup.moduleAddress === ""
           ? "root"
@@ -80,9 +92,9 @@ export function renderReport(report: StructuredReport, options: RenderOptions = 
       }
     }
 
-    if (report.outputs.length > 0) {
+    if (outputs.length > 0) {
       writer.heading("Outputs", 2);
-      renderOutputTable(report.outputs, writer);
+      renderOutputTable(outputs, writer);
     }
   }
 
@@ -90,14 +102,14 @@ export function renderReport(report: StructuredReport, options: RenderOptions = 
 }
 
 /** Returns true when the report was produced from an apply run. */
-function isApplyReport(report: StructuredReport): boolean {
+function isApplyReport(report: Report): boolean {
   return (
     report.diagnostics !== undefined || report.applyStatuses !== undefined
   );
 }
 
 /** Builds a Set of resource addresses that failed during apply. */
-function buildFailedSet(report: StructuredReport): Set<string> {
+function buildFailedSet(report: Report): Set<string> {
   const failed = new Set<string>();
   if (report.applyStatuses) {
     for (const s of report.applyStatuses) {
@@ -110,7 +122,7 @@ function buildFailedSet(report: StructuredReport): Set<string> {
 }
 
 /** Builds a Map of resource address → diagnostics for that resource. */
-function buildDiagnosticMap(report: StructuredReport): Map<string, Diagnostic[]> {
+function buildDiagnosticMap(report: Report): Map<string, Diagnostic[]> {
   const map = new Map<string, Diagnostic[]>();
   if (report.diagnostics) {
     for (const diag of report.diagnostics) {
@@ -132,12 +144,12 @@ function buildDiagnosticMap(report: StructuredReport): Map<string, Diagnostic[]>
  * an address, or whose address doesn't match any resource in the report.
  */
 function extractNonResourceDiagnostics(
-  report: StructuredReport,
+  report: Report,
 ): Diagnostic[] {
   if (!report.diagnostics) return [];
 
   const resourceAddresses = new Set(
-    report.modules.flatMap((m) => m.resources.map((r) => r.address)),
+    (report.modules ?? []).flatMap((m) => m.resources.map((r) => r.address)),
   );
 
   return report.diagnostics.filter(
@@ -158,7 +170,7 @@ function buildApplyContext(
 }
 
 function renderOutputTable(
-  outputs: StructuredReport["outputs"],
+  outputs: readonly OutputChange[],
   writer: MarkdownWriter,
 ): void {
   writer.tableHeader(["Output", "Action", "Before", "After"]);
@@ -190,18 +202,18 @@ function renderOutputTable(
  * as the changes section but under a distinct heading.
  */
 function renderDriftSection(
-  report: StructuredReport,
+  driftModules: readonly import("../model/module-group.js").ModuleGroup[],
   writer: MarkdownWriter,
   options: RenderOptions,
   diffCache: Map<string, DiffEntry[]>,
 ): void {
-  const driftCount = report.driftModules.reduce(
+  const driftCount = driftModules.reduce(
     (sum, m) => sum + m.resources.length,
     0,
   );
   writer.heading(`${DRIFT_ICON} Resource Drift (${String(driftCount)} detected)`, 2);
 
-  for (const moduleGroup of report.driftModules) {
+  for (const moduleGroup of driftModules) {
     const moduleLabel =
       moduleGroup.moduleAddress === ""
         ? "root"

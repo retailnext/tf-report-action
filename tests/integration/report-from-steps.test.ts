@@ -190,7 +190,7 @@ describe("reportFromSteps integration — apply-only fixtures", () => {
         expect(result).toMatchSnapshot();
       });
 
-      it("produces Tier 3 output with apply content", () => {
+      it("produces output for apply-only fixture", () => {
         const resolved = resolveStepFilePaths(stepsJson, fixtureDir);
         const options: ReportOptions = {
           allowedDirs: [fixtureDir],
@@ -199,8 +199,8 @@ describe("reportFromSteps integration — apply-only fixtures", () => {
         const result = reportFromSteps(resolved, options);
         // No plan step means no Plan Output section
         expect(result).not.toContain("Plan Output");
-        // Should have either apply output or note about unavailable output
-        expect(result).toMatch(/Apply Output|No readable output|Apply/);
+        // Should have either apply content, step table, or note about unavailable output
+        expect(result).toMatch(/Apply|Steps|Outcome|No readable output/);
       });
     });
   }

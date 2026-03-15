@@ -6,32 +6,39 @@
  * counts, action types, failure state). The renderer just renders it.
  */
 
-import type { StructuredReport } from "../model/report.js";
+import type { Report } from "../model/report.js";
 import type { Summary } from "../model/summary.js";
 import { STATUS_SUCCESS, STATUS_FAILURE } from "../model/status-icons.js";
 
 /**
- * Build a title for a StructuredReport.
+ * Build a title for a structured report (plan or apply) that has a summary.
  *
- * @param report - The structured report with summary data
+ * @param report - The report with summary data
  * @param isApply - Whether this is an apply report
  * @param workspace - Optional workspace name for title prefix
  * @param hasStepFailures - Whether any workflow steps failed
  */
 export function buildStructuredTitle(
-  report: StructuredReport,
+  report: Report,
   isApply: boolean,
   workspace: string | undefined,
   hasStepFailures: boolean,
 ): string {
-  const hasFailures = report.summary.failures.length > 0;
+  const summary = report.summary;
+  if (!summary) {
+    // No summary data — fall back to a generic title
+    const icon = hasStepFailures ? STATUS_FAILURE : STATUS_SUCCESS;
+    const wsPrefix = workspace ? `\`${workspace}\` ` : "";
+    return `${icon} ${wsPrefix}${isApply ? "Apply" : "Plan"}`;
+  }
+  const hasFailures = summary.failures.length > 0;
   const icon = hasFailures || hasStepFailures ? STATUS_FAILURE : STATUS_SUCCESS;
   const wsPrefix = workspace ? `\`${workspace}\` ` : "";
 
   if (isApply) {
-    const parts = buildApplyCountParts(report.summary);
+    const parts = buildApplyCountParts(summary);
     if (hasFailures) {
-      const failParts = buildFailureCountParts(report.summary);
+      const failParts = buildFailureCountParts(summary);
       return `${icon} ${wsPrefix}Apply Failed: ${[...failParts, ...parts].join(", ")}`;
     }
     if (parts.length === 0) {
@@ -41,7 +48,7 @@ export function buildStructuredTitle(
   }
 
   // Plan mode
-  const totalActions = report.summary.actions.reduce((sum, g) => sum + g.total, 0);
+  const totalActions = summary.actions.reduce((sum, g) => sum + g.total, 0);
   if (totalActions === 0 && !hasFailures && !hasStepFailures) {
     return `${icon} ${wsPrefix}No Changes`;
   }
@@ -50,7 +57,7 @@ export function buildStructuredTitle(
     return `${icon} ${wsPrefix}Plan Failed`;
   }
 
-  const parts = buildPlanCountParts(report.summary);
+  const parts = buildPlanCountParts(summary);
   return `${icon} ${wsPrefix}Plan: ${parts.join(", ")}`;
 }
 

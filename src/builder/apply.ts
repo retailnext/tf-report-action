@@ -21,7 +21,7 @@ import type {
   UIOutputsMessage,
   UIPlannedChangeMessage,
 } from "../tfjson/machine-readable-ui.js";
-import type { StructuredReport } from "../model/report.js";
+import type { Report } from "../model/report.js";
 import type { Diagnostic } from "../model/diagnostic.js";
 import type { ApplyStatus } from "../model/apply-status.js";
 import type { BuildOptions } from "./options.js";
@@ -70,7 +70,7 @@ export function buildApplyReport(
   plan: Plan,
   messages: UIMessage[],
   options: BuildOptions = {},
-): StructuredReport {
+): Report {
   const report = buildReport(plan, options);
 
   const stateOnlyAddresses = extractStateOnlyAddresses(plan);
@@ -100,7 +100,7 @@ export function buildApplyReport(
   );
 
   report.summary = buildApplySummary(
-    report.modules.flatMap((m) => m.resources),
+    (report.modules ?? []).flatMap((m) => m.resources),
     failedAddresses,
   );
 
@@ -110,6 +110,8 @@ export function buildApplyReport(
   if (allStatuses.length > 0) {
     report.applyStatuses = allStatuses;
   }
+
+  report.operation = "apply";
 
   return report;
 }
@@ -325,7 +327,8 @@ function findOutputsMessage(messages: UIMessage[]): UIOutputsMessage | undefined
  * A resource is a "phantom" if its address does not appear in the
  * applied addresses set. Empty module groups are also removed.
  */
-function filterPhantomResources(report: StructuredReport, appliedAddresses: Set<string>): void {
+function filterPhantomResources(report: Report, appliedAddresses: Set<string>): void {
+  if (!report.modules) return;
   for (const group of report.modules) {
     group.resources = group.resources.filter(
       (r) => appliedAddresses.has(r.address),
@@ -340,8 +343,8 @@ function filterPhantomResources(report: StructuredReport, appliedAddresses: Set<
  * so "(known after apply)" is misleading. The plan JSON doesn't contain the
  * resolved values, so we indicate they're not available.
  */
-function replaceKnownAfterApply(report: StructuredReport): void {
-  for (const group of report.modules) {
+function replaceKnownAfterApply(report: Report): void {
+  for (const group of report.modules ?? []) {
     for (const resource of group.resources) {
       for (const attr of resource.attributes) {
         if (attr.isKnownAfterApply) {
@@ -351,7 +354,7 @@ function replaceKnownAfterApply(report: StructuredReport): void {
     }
   }
 
-  for (const output of report.outputs) {
+  for (const output of report.outputs ?? []) {
     if (output.isKnownAfterApply) {
       output.after = VALUE_NOT_IN_PLAN;
     }
@@ -363,8 +366,8 @@ function replaceKnownAfterApply(report: StructuredReport): void {
  * For non-sensitive outputs, replaces sentinel values with the actual
  * resolved value. Sensitive outputs are never resolved (security invariant).
  */
-function resolveOutputValues(report: StructuredReport, outputsMessage: UIOutputsMessage): void {
-  for (const output of report.outputs) {
+function resolveOutputValues(report: Report, outputsMessage: UIOutputsMessage): void {
+  for (const output of report.outputs ?? []) {
     const resolved = outputsMessage.outputs[output.name];
     if (!resolved) continue;
 

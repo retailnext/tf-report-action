@@ -1,13 +1,12 @@
 /**
- * Top-level report section renderer — dispatches on report kind to produce
+ * Top-level report section renderer — checks report field presence to produce
  * an ordered array of Sections ready for the compositor.
  *
  * This is the "render" step for the reportFromSteps pipeline. It converts
- * any Report variant into Section[], which the compositor then assembles
- * within a budget.
+ * any Report into Section[], which the compositor then assembles within a budget.
  */
 
-import type { Report, StructuredReport } from "../model/report.js";
+import type { Report } from "../model/report.js";
 import type { Section } from "../model/section.js";
 import type { RenderOptions } from "./options.js";
 import { renderReport } from "./index.js";
@@ -16,12 +15,13 @@ import { renderStepIssue } from "./step-issue.js";
 import { renderTextFallbackBody } from "./text-fallback.js";
 import { renderWorkflowBody } from "./workflow.js";
 import { renderErrorBody } from "./error.js";
+import { DIAGNOSTIC_WARNING } from "../model/status-icons.js";
 
 /**
- * Render any Report variant into an ordered array of Sections.
+ * Render a Report into an ordered array of Sections.
  *
  * Sections include: workspace marker (fixed), title (fixed), step issues,
- * and the variant-specific body sections.
+ * warnings, and body sections determined by what report fields are populated.
  */
 export function renderReportSections(
   report: Report,
@@ -38,39 +38,44 @@ export function renderReportSections(
   // Title
   sections.push(renderTitle(report));
 
-  // Step issues (common across structured and text-fallback)
-  const issues = getIssues(report);
-  for (const issue of issues) {
+  // Step issues
+  for (const issue of report.issues) {
     sections.push(renderStepIssue(issue));
   }
 
-  // Body sections (variant-specific)
-  switch (report.kind) {
-    case "structured": {
-      const bodyMarkdown = renderStructuredBody(report, options);
-      sections.push({ id: "report-body", full: bodyMarkdown });
-      break;
-    }
-    case "text-fallback": {
-      sections.push(...renderTextFallbackBody(report));
-      break;
-    }
-    case "workflow": {
-      sections.push(...renderWorkflowBody(report));
-      break;
-    }
-    case "error": {
-      sections.push(...renderErrorBody(report));
-      break;
-    }
+  // Warnings (always rendered when present, before body)
+  for (const warning of report.warnings) {
+    sections.push({
+      id: `warning-${warning.slice(0, 40)}`,
+      full: `> ${DIAGNOSTIC_WARNING} **Warning:** ${warning}\n\n`,
+      fixed: true,
+    });
+  }
+
+  // Body sections — determined by which fields are populated
+  if (report.error !== undefined) {
+    // Error report
+    sections.push(...renderErrorBody(report));
+  } else if (report.summary !== undefined || report.modules !== undefined) {
+    // Structured body (from show-plan JSON or JSONL enrichment)
+    const bodyMarkdown = renderStructuredBody(report, options);
+    sections.push({ id: "report-body", full: bodyMarkdown });
+    // Also render any raw stdout blocks (e.g. plaintext plan + JSONL show-plan)
+    sections.push(...renderRawStdoutSections(report));
+  } else if (report.rawStdout.length > 0) {
+    // Text fallback — raw stdout blocks only
+    sections.push(...renderTextFallbackBody(report));
+  } else if (report.steps.length > 0) {
+    // Workflow-only — just step table
+    sections.push(...renderWorkflowBody(report));
   }
 
   return sections;
 }
 
-/** Render the body of a StructuredReport using the existing renderer. */
+/** Render the structured body of a Report using the existing renderer. */
 function renderStructuredBody(
-  report: StructuredReport,
+  report: Report,
   options?: RenderOptions,
 ): string {
   // Strip any user title — the title is handled by renderTitle() above
@@ -79,14 +84,13 @@ function renderStructuredBody(
   return renderReport(report, renderOptsNoTitle);
 }
 
-/** Extract issues from report variants that carry them. */
-function getIssues(report: Report): readonly import("../model/step-issue.js").StepIssue[] {
-  switch (report.kind) {
-    case "structured":
-      return report.issues;
-    case "text-fallback":
-      return report.issues;
-    default:
-      return [];
+/** Render raw stdout blocks as collapsible sections. */
+function renderRawStdoutSections(report: Report): Section[] {
+  const sections: Section[] = [];
+  for (const raw of report.rawStdout) {
+    const truncNote = raw.truncated ? "\n\n> **Note:** Output was truncated." : "";
+    const full = `<details><summary>${raw.label}</summary>\n\n\`\`\`\n${raw.content}\n\`\`\`${truncNote}\n\n</details>\n\n`;
+    sections.push({ id: `raw-${raw.stepId}`, full });
   }
+  return sections;
 }

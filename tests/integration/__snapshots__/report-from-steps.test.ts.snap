@@ -9066,7 +9066,7 @@ exports[`reportFromSteps integration — apply-no-show fixtures > terraform/vali
 
 </details>
 
-### ⚠️ plan: stdout_file output missing in steps
+> ⚠️ **Warning:** ⚠️ plan: stdout_file output missing in steps
 
 ### Steps
 
@@ -18978,7 +18978,7 @@ exports[`reportFromSteps integration — apply-no-show fixtures > tofu/validate-
 
 </details>
 
-### ⚠️ plan: stdout_file output missing in steps
+> ⚠️ **Warning:** ⚠️ plan: stdout_file output missing in steps
 
 ### Steps
 
@@ -23988,8 +23988,6 @@ exports[`reportFromSteps integration — apply-only fixtures > terraform/plan-er
 exports[`reportFromSteps integration — apply-only fixtures > terraform/plan-error/1/apply-only > renders without error and matches snapshot 1`] = `
 "## ✅ Plan Succeeded
 
-> **Note:** No readable output was available for this run.
-
 ### Steps
 
 | Step | Outcome |
@@ -25025,8 +25023,6 @@ exports[`reportFromSteps integration — apply-only fixtures > terraform/validat
 </details>
 
 </details>
-
-> **Note:** No readable output was available for this run.
 
 ### Steps
 
@@ -29757,8 +29753,6 @@ exports[`reportFromSteps integration — apply-only fixtures > tofu/plan-error/0
 exports[`reportFromSteps integration — apply-only fixtures > tofu/plan-error/1/apply-only > renders without error and matches snapshot 1`] = `
 "## ✅ Plan Succeeded
 
-> **Note:** No readable output was available for this run.
-
 ### Steps
 
 | Step | Outcome |
@@ -30794,8 +30788,6 @@ exports[`reportFromSteps integration — apply-only fixtures > tofu/validate-err
 </details>
 
 </details>
-
-> **Note:** No readable output was available for this run.
 
 ### Steps
 
@@ -34457,7 +34449,7 @@ exports[`reportFromSteps integration — generated fixtures > terraform/validate
 
 </details>
 
-### ⚠️ plan: stdout_file output missing in steps
+> ⚠️ **Warning:** ⚠️ plan: stdout_file output missing in steps
 
 ### Steps
 
@@ -34530,7 +34522,7 @@ exports[`reportFromSteps integration — generated fixtures > terraform/validate
 
 </details>
 
-### ⚠️ plan: stdout_file output missing in steps
+> ⚠️ **Warning:** ⚠️ plan: stdout_file output missing in steps
 
 ### Steps
 
@@ -37930,7 +37922,7 @@ exports[`reportFromSteps integration — generated fixtures > tofu/validate-erro
 
 </details>
 
-### ⚠️ plan: stdout_file output missing in steps
+> ⚠️ **Warning:** ⚠️ plan: stdout_file output missing in steps
 
 ### Steps
 
@@ -38003,7 +37995,7 @@ exports[`reportFromSteps integration — generated fixtures > tofu/validate-erro
 
 </details>
 
-### ⚠️ plan: stdout_file output missing in steps
+> ⚠️ **Warning:** ⚠️ plan: stdout_file output missing in steps
 
 ### Steps
 
@@ -38263,11 +38255,11 @@ module.naming.random_string.suffix
 exports[`reportFromSteps integration — manual fixtures > manual/missing-outputs > renders without error and matches snapshot 1`] = `
 "## ✅ Apply Succeeded
 
-### ⚠️ show-plan: stdout_file output missing in steps
+> ⚠️ **Warning:** ⚠️ show-plan: stdout_file output missing in steps
 
-### ⚠️ plan: stdout_file output missing in steps
+> ⚠️ **Warning:** ⚠️ plan: stdout_file output missing in steps
 
-### ⚠️ apply: stdout_file output missing in steps
+> ⚠️ **Warning:** ⚠️ apply: stdout_file output missing in steps
 
 ### Steps
 
@@ -38299,7 +38291,7 @@ this is not valid JSON for a plan
 
 </details>
 
-### ⚠️ plan stdout: File not found or not accessible
+> ⚠️ **Warning:** ⚠️ plan stdout: File not found or not accessible
 
 ### Steps
 
@@ -38315,11 +38307,11 @@ this is not valid JSON for a plan
 exports[`reportFromSteps integration — manual fixtures > manual/read-errors > renders without error and matches snapshot 1`] = `
 "## ✅ Apply Succeeded
 
-### ⚠️ show-plan stdout: File not found or not accessible
+> ⚠️ **Warning:** ⚠️ show-plan stdout: File not found or not accessible
 
-### ⚠️ plan stdout: File not found or not accessible
+> ⚠️ **Warning:** ⚠️ plan stdout: File not found or not accessible
 
-### ⚠️ apply stdout: File not found or not accessible
+> ⚠️ **Warning:** ⚠️ apply stdout: File not found or not accessible
 
 ### Steps
 
@@ -38337,6 +38329,8 @@ exports[`reportFromSteps integration — manual fixtures > manual/read-errors > 
 exports[`reportFromSteps integration — manual fixtures > manual/successful-workflow > renders without error and matches snapshot 1`] = `
 "## ✅ Succeeded
 
+### Steps
+
 | Step | Outcome |
 |------|--------|
 | \`checkout\` | success |
@@ -38349,6 +38343,8 @@ exports[`reportFromSteps integration — manual fixtures > manual/successful-wor
 
 exports[`reportFromSteps integration — manual fixtures > manual/unrelated-workflow > renders without error and matches snapshot 1`] = `
 "## ❌ \`test\` Failed
+
+### Steps
 
 | Step | Outcome |
 |------|--------|
@@ -42481,7 +42477,7 @@ exports[`reportFromSteps integration — no-show fixtures (Tier 3) > terraform/v
 
 </details>
 
-### ⚠️ plan: stdout_file output missing in steps
+> ⚠️ **Warning:** ⚠️ plan: stdout_file output missing in steps
 
 ### Steps
 
@@ -46958,7 +46954,7 @@ exports[`reportFromSteps integration — no-show fixtures (Tier 3) > tofu/valida
 
 </details>
 
-### ⚠️ plan: stdout_file output missing in steps
+> ⚠️ **Warning:** ⚠️ plan: stdout_file output missing in steps
 
 ### Steps
 
@@ -48895,7 +48891,7 @@ exports[`reportFromSteps integration — plan-only fixtures > terraform/validate
 
 </details>
 
-### ⚠️ plan: stdout_file output missing in steps
+> ⚠️ **Warning:** ⚠️ plan: stdout_file output missing in steps
 
 ### Steps
 
@@ -50659,7 +50655,7 @@ exports[`reportFromSteps integration — plan-only fixtures > tofu/validate-erro
 
 </details>
 
-### ⚠️ plan: stdout_file output missing in steps
+> ⚠️ **Warning:** ⚠️ plan: stdout_file output missing in steps
 
 ### Steps
 

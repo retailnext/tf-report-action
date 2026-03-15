@@ -248,6 +248,20 @@ export interface UIChangeSummaryMessage extends UIMessageBase {
   readonly changes: UIChangeSummary;
 }
 
+/**
+ * Emitted during plan when a resource's real-world state has drifted from
+ * the prior state. Structurally identical to `planned_change` but uses the
+ * `resource_drift` type discriminant.
+ */
+export interface UIResourceDriftMessage extends UIMessageBase {
+  readonly type: "resource_drift";
+  readonly change: {
+    readonly resource: UIResourceAddr;
+    readonly action: UIChangeAction;
+    readonly reason?: string;
+  };
+}
+
 // ─── Apply Hook Messages ────────────────────────────────────────────────────
 
 /** Emitted when a resource operation begins during apply. */
@@ -390,6 +404,7 @@ export type UIMessage =
   | UIDiagnosticMessage
   | UIPlannedChangeMessage
   | UIChangeSummaryMessage
+  | UIResourceDriftMessage
   | UIApplyStartMessage
   | UIApplyProgressMessage
   | UIApplyCompleteMessage

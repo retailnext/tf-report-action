@@ -23,9 +23,9 @@ describe("buildReport", () => {
     expect(report.toolVersion).toBe("1.9.0");
   });
 
-  it("reports null toolVersion when terraform_version is absent", () => {
+  it("reports undefined toolVersion when terraform_version is absent", () => {
     const report = buildReport(basePlan());
-    expect(report.toolVersion).toBe(null);
+    expect(report.toolVersion).toBeUndefined();
   });
 
   it("includes format_version in report", () => {

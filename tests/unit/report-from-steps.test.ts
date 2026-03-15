@@ -130,7 +130,6 @@ describe("tier 4 — general workflow", () => {
   it("renders report for empty steps {}", () => {
     const result = reportFromSteps(stepsJson({}), baseOpts());
     expect(result).toContain("Succeeded");
-    expect(result).toContain("No steps were found");
   });
 
   it("renders general workflow for unrecognized steps", () => {

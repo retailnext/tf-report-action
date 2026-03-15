@@ -20,137 +20,135 @@ import type { StepOutcome } from "./step-outcome.js";
 export type Tool = "terraform" | "tofu";
 
 // ---------------------------------------------------------------------------
-// Fallback reason
+// Raw step stdout
 // ---------------------------------------------------------------------------
 
 /**
- * Why the report fell back from structured (Tier 1) to text (Tier 3).
+ * Raw stdout content from a step whose output could not be parsed into
+ * structured report fields. This is specifically the step's **stdout** —
+ * stderr is handled separately via StepIssue.
  *
- * Currently only show-plan determines Tier 1 eligibility. When Tier 2
- * is implemented (e.g., from plan JSONL), new reasons can be added
- * (e.g., `"plan-jsonl-unavailable"`, `"plan-jsonl-parse-error"`).
+ * Use case: `tofu plan` (without `-json`) produces human-readable text to
+ * stdout. That text can't be parsed structurally, so it's displayed as-is
+ * in a collapsible code block. The same step's stderr (warnings,
+ * deprecations) is still surfaced independently as a StepIssue.
  */
-export type FallbackReason =
-  /** show-plan step missing, failed, or output unreadable. */
-  | "show-plan-unavailable"
-  /** show-plan output was read but could not be parsed as plan JSON. */
-  | "show-plan-parse-error";
+export interface RawStepStdout {
+  /** Step identifier (e.g. "plan", "apply", "show-plan"). */
+  readonly stepId: string;
+  /** Human-readable label (e.g. "Plan Output", "Apply Output"). */
+  readonly label: string;
+  /** The raw stdout content. */
+  readonly content: string;
+  /** Whether the content was truncated due to size limits. */
+  readonly truncated: boolean;
+}
 
 // ---------------------------------------------------------------------------
-// Report variants
+// Report
 // ---------------------------------------------------------------------------
 
 /**
- * A structured report built from plan JSON (Tier 1).
+ * A single progressively-enriched report. There is no discriminated union —
+ * each step independently contributes structured data or raw content based
+ * on what's parseable. The renderer checks what fields are present.
  *
- * This is the richest report variant — it has full resource detail,
- * attribute diffs, module grouping, etc. Produced by `buildReport()`
- * and `buildApplyReport()`.
+ * ## Construction patterns (not separate types)
+ *
+ * - **Full structured report** = Report with `summary`, `modules`,
+ *   `formatVersion` populated (from show-plan JSON)
+ * - **JSONL-enriched report** = Report with `summary`, `modules` (no
+ *   attributes) populated (from plan/apply JSONL)
+ * - **Raw text report** = Report with `rawStdout` populated
+ * - **Workflow-only report** = Report with only `steps` populated
+ * - **Error report** = Report with `error` populated
  */
-export interface StructuredReport {
-  readonly kind: "structured";
+export interface Report {
+  // ── Always present ──────────────────────────────────────────────────────
 
   /** Report title (rendered as the top-level heading). */
   title: string;
 
-  /** Step-level issues (failed init/validate, parse errors). */
+  /** Step-level issues (failed steps, parse errors, stderr warnings). */
   issues: StepIssue[];
 
-  /** Whether this is an apply report (vs plan-only). */
-  isApply: boolean;
+  /** Step outcomes for all steps. */
+  steps: StepOutcome[];
 
-  /** terraform_version field from the plan (may be a Terraform or OpenTofu version string). */
-  toolVersion: string | null;
-  formatVersion: string;
-  /** timestamp field from the plan, if present (OpenTofu plans include this). */
-  timestamp: string | null;
-  summary: Summary;
-  /** Resources grouped by module. Root module resources have moduleAddress === "". */
-  modules: ModuleGroup[];
-  /** Top-level output changes (not inside any module). */
-  outputs: OutputChange[];
+  /** Warnings about missing data, scanner quality, parse failures. */
+  warnings: string[];
+
   /**
-   * Resources whose real-world state has drifted from the prior state,
-   * grouped by module. Populated from plan.resource_drift.
-   * Empty array when no drift is detected.
+   * Raw stdout from steps whose output could not be parsed structurally.
+   * Each entry is a collapsible code block in the rendered output.
    */
-  driftModules: ModuleGroup[];
-  /**
-   * Diagnostics (errors and warnings) from the apply run.
-   * Only present in apply reports; undefined for plan-only reports.
-   */
-  diagnostics?: Diagnostic[];
-  /**
-   * Per-resource apply outcomes (success/failure, elapsed time).
-   * Only present in apply reports; undefined for plan-only reports.
-   */
-  applyStatuses?: ApplyStatus[];
+  rawStdout: RawStepStdout[];
+
+  // ── Present when environment allows ─────────────────────────────────────
 
   /** Workspace name for dedup marker and title prefix. */
   workspace?: string;
+
   /** GitHub Actions logs URL. */
   logsUrl?: string;
-}
 
-/**
- * A text-fallback report built from raw command output (Tier 3).
- *
- * Produced when structured plan JSON is unavailable but raw stdout
- * from plan/apply commands was captured.
- */
-export interface TextFallbackReport {
-  readonly kind: "text-fallback";
-  readonly title: string;
   /** Auto-detected IaC tool, or undefined when detection was inconclusive. */
-  readonly tool: Tool | undefined;
-  /** Why the report fell back from structured to text. */
-  readonly fallbackReason: FallbackReason;
-  readonly issues: readonly StepIssue[];
-  readonly readErrors: readonly string[];
-  readonly planContent?: string;
-  readonly planTruncated?: boolean;
-  readonly applyContent?: string;
-  readonly applyTruncated?: boolean;
-  readonly steps: readonly StepOutcome[];
-  /** Whether any readable output was found. */
-  readonly hasOutput: boolean;
-  readonly workspace?: string;
-  readonly logsUrl?: string;
-}
+  tool?: Tool;
 
-/**
- * A workflow-only report with just step statuses (Tier 4).
- *
- * Produced when no plan/apply output is available at all — the report
- * shows the overall step outcomes and a link to the full logs.
- */
-export interface WorkflowReport {
-  readonly kind: "workflow";
-  readonly title: string;
-  readonly steps: readonly StepOutcome[];
-  readonly logsUrl?: string;
-  readonly workspace?: string;
-}
+  // ── Operation metadata ──────────────────────────────────────────────────
 
-/**
- * An error report produced when the pipeline itself fails.
- *
- * Shown when steps context is invalid, plan parsing fails with no
- * fallback, or other unrecoverable errors occur.
- */
-export interface ErrorReport {
-  readonly kind: "error";
-  readonly title: string;
-  readonly message: string;
-  readonly steps?: readonly StepOutcome[];
-  readonly workspace?: string;
-}
+  /**
+   * The operation type. Replaces the former `isApply` boolean.
+   * Comes from `change_summary.operation` in JSONL. When only plan JSON
+   * is available, inferred from step presence.
+   */
+  operation?: "plan" | "apply" | "destroy";
 
-/**
- * Discriminated union of all report variants.
- *
- * The builder produces a Report; the renderer switches on `kind` to
- * determine how to render it. This ensures the same parse → build →
- * render pipeline works for all tiers.
- */
-export type Report = StructuredReport | TextFallbackReport | WorkflowReport | ErrorReport;
+  /** Tool version string from plan JSON (`terraform_version` field). */
+  toolVersion?: string;
+
+  /** Plan JSON format version. */
+  formatVersion?: string;
+
+  /** Timestamp from the plan, if present (OpenTofu plans include this). */
+  timestamp?: string;
+
+  // ── Progressive enrichment from JSONL or plan JSON ──────────────────────
+
+  /** Plan/apply summary with per-action-type resource counts. */
+  summary?: Summary;
+
+  /**
+   * Resources grouped by module. Root module resources have
+   * `moduleAddress === ""`. Resources from JSONL have no attributes;
+   * resources from show-plan JSON have full attribute detail.
+   */
+  modules?: ModuleGroup[];
+
+  /**
+   * Resources whose real-world state has drifted from the prior state,
+   * grouped by module. Populated from plan JSON `resource_drift` or
+   * JSONL `resource_drift` messages.
+   */
+  driftModules?: ModuleGroup[];
+
+  /** Top-level output changes (not inside any module). */
+  outputs?: OutputChange[];
+
+  /**
+   * Diagnostics (errors and warnings) from validate, plan, and/or apply.
+   * Each diagnostic carries a `source` field identifying its origin.
+   */
+  diagnostics?: Diagnostic[];
+
+  /**
+   * Per-resource apply outcomes (success/failure, elapsed time).
+   * Present only in apply reports.
+   */
+  applyStatuses?: ApplyStatus[];
+
+  // ── Error state ─────────────────────────────────────────────────────────
+
+  /** Pipeline error message. When set, the report is an error report. */
+  error?: string;
+}

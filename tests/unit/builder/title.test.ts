@@ -5,7 +5,7 @@ import {
   buildApplyCountParts,
   buildFailureCountParts,
 } from "../../../src/builder/title.js";
-import type { StructuredReport } from "../../../src/model/report.js";
+import type { Report } from "../../../src/model/report.js";
 import type { Summary, SummaryActionGroup } from "../../../src/model/summary.js";
 
 function makeSummary(
@@ -23,19 +23,14 @@ function makeActionGroup(action: string, total: number): SummaryActionGroup {
   };
 }
 
-function makeReport(summary: Summary): StructuredReport {
+function makeReport(summary: Summary): Report {
   return {
-    kind: "structured",
     title: "",
     issues: [],
-    isApply: false,
-    toolVersion: null,
-    formatVersion: "1.2",
-    timestamp: null,
+    steps: [],
+    warnings: [],
+    rawStdout: [],
     summary,
-    modules: [],
-    outputs: [],
-    driftModules: [],
   };
 }
 
