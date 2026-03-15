@@ -40,6 +40,9 @@ export default defineConfig({
         "src/steps/index.ts",
         "src/compositor/index.ts",
         "src/compositor/types.ts",
+        // JSONL scanner is not yet wired into any entry point — integration
+        // coverage will be added when report-from-steps uses the scanner (Phase 2).
+        "src/jsonl-scanner/**",
       ],
       thresholds: {
         lines: 90,
