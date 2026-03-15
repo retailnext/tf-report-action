@@ -6,6 +6,40 @@ import type { ApplyStatus } from "./apply-status.js";
 import type { StepIssue } from "./step-issue.js";
 import type { StepOutcome } from "./step-outcome.js";
 
+// ---------------------------------------------------------------------------
+// Tool identification
+// ---------------------------------------------------------------------------
+
+/**
+ * The IaC tool CLI command name.
+ *
+ * Used in warning messages and command hints to tell the user which binary
+ * was (or should be) invoked. Auto-detected from available step outputs
+ * when not explicitly provided.
+ */
+export type Tool = "terraform" | "tofu";
+
+// ---------------------------------------------------------------------------
+// Fallback reason
+// ---------------------------------------------------------------------------
+
+/**
+ * Why the report fell back from structured (Tier 1) to text (Tier 3).
+ *
+ * Currently only show-plan determines Tier 1 eligibility. When Tier 2
+ * is implemented (e.g., from plan JSONL), new reasons can be added
+ * (e.g., `"plan-jsonl-unavailable"`, `"plan-jsonl-parse-error"`).
+ */
+export type FallbackReason =
+  /** show-plan step missing, failed, or output unreadable. */
+  | "show-plan-unavailable"
+  /** show-plan output was read but could not be parsed as plan JSON. */
+  | "show-plan-parse-error";
+
+// ---------------------------------------------------------------------------
+// Report variants
+// ---------------------------------------------------------------------------
+
 /**
  * A structured report built from plan JSON (Tier 1).
  *
@@ -67,6 +101,10 @@ export interface StructuredReport {
 export interface TextFallbackReport {
   readonly kind: "text-fallback";
   readonly title: string;
+  /** Auto-detected IaC tool, or undefined when detection was inconclusive. */
+  readonly tool: Tool | undefined;
+  /** Why the report fell back from structured to text. */
+  readonly fallbackReason: FallbackReason;
   readonly issues: readonly StepIssue[];
   readonly readErrors: readonly string[];
   readonly planContent?: string;

@@ -123,7 +123,9 @@ function getLogsUrl(report: import("./model/report.js").Report): string | undefi
 // Re-export types consumers may need
 export type { BuildOptions } from "./builder/options.js";
 export type { RenderOptions, DiffFormat } from "./renderer/options.js";
-export type { Report, StructuredReport, TextFallbackReport, WorkflowReport, ErrorReport } from "./model/report.js";
+export type { Report, StructuredReport, TextFallbackReport, WorkflowReport, ErrorReport, Tool, FallbackReason } from "./model/report.js";
+export type { StepRole } from "./model/step-commands.js";
+export { expectedCommand } from "./model/step-commands.js";
 export type { Summary } from "./model/summary.js";
 export type { ResourceChange } from "./model/resource.js";
 export type { AttributeChange } from "./model/attribute.js";

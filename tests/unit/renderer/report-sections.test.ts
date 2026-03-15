@@ -74,6 +74,8 @@ describe("renderReportSections", () => {
       const report: TextFallbackReport = {
         kind: "text-fallback",
         title: "Terraform Plan",
+        tool: undefined,
+        fallbackReason: "show-plan-parse-error",
         issues: [
           {
             id: "show-plan",

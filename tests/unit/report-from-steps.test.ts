@@ -347,7 +347,8 @@ describe("tier 3 — text fallback", () => {
       }),
       baseOpts(),
     );
-    expect(result).toContain("Structured plan output was not available");
+    expect(result).toContain("show -json <tfplan>");
+    expect(result).toContain("was not available");
     expect(result).toContain("Plan: 2 to add");
   });
 
@@ -381,7 +382,8 @@ describe("tier 3 — text fallback", () => {
       }),
       baseOpts(),
     );
-    expect(result).toContain("Structured plan output was not available");
+    expect(result).toContain("show -json <tfplan>");
+    expect(result).toContain("was not available");
     expect(result).toContain("some plan text");
   });
 

@@ -7,3 +7,4 @@
 export { parsePlan } from "./plan.js";
 export { parseUILog } from "./ui-log.js";
 export { parseValidateOutput } from "./validate-output.js";
+export { detectToolFromPlan, detectToolFromOutput } from "./detect-tool.js";

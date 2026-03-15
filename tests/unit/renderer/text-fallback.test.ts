@@ -6,6 +6,8 @@ function makeReport(overrides: Partial<Omit<TextFallbackReport, "kind">> = {}): 
   return {
     kind: "text-fallback",
     title: "Terraform Plan",
+    tool: undefined,
+    fallbackReason: "show-plan-unavailable",
     issues: [],
     readErrors: [],
     steps: [],
@@ -24,7 +26,8 @@ describe("renderTextFallbackBody", () => {
     const note = sections.find((s) => s.id === "note");
     expect(note).toBeDefined();
     expect(note!.full).toContain("Warning:");
-    expect(note!.full).toContain("Structured plan output was not available");
+    expect(note!.full).toContain("show -json <tfplan>");
+    expect(note!.full).toContain("was not available");
     expect(note!.fixed).toBe(true);
 
     const planOutput = sections.find((s) => s.id === "plan-output");
@@ -120,5 +123,83 @@ describe("renderTextFallbackBody", () => {
     });
     const sections = renderTextFallbackBody(report);
     expect(sections.find((s) => s.id === "step-statuses")).toBeUndefined();
+  });
+
+  describe("warning note variants", () => {
+    it("includes tool prefix when tool is 'tofu'", () => {
+      const report = makeReport({
+        hasOutput: true,
+        tool: "tofu",
+        fallbackReason: "show-plan-unavailable",
+        planContent: "plan output",
+      });
+      const sections = renderTextFallbackBody(report);
+      const note = sections.find((s) => s.id === "note");
+      expect(note!.full).toContain("`tofu show -json <tfplan>`");
+    });
+
+    it("includes tool prefix when tool is 'terraform'", () => {
+      const report = makeReport({
+        hasOutput: true,
+        tool: "terraform",
+        fallbackReason: "show-plan-unavailable",
+        planContent: "plan output",
+      });
+      const sections = renderTextFallbackBody(report);
+      const note = sections.find((s) => s.id === "note");
+      expect(note!.full).toContain("`terraform show -json <tfplan>`");
+    });
+
+    it("omits tool prefix when tool is undefined", () => {
+      const report = makeReport({
+        hasOutput: true,
+        tool: undefined,
+        fallbackReason: "show-plan-unavailable",
+        planContent: "plan output",
+      });
+      const sections = renderTextFallbackBody(report);
+      const note = sections.find((s) => s.id === "note");
+      expect(note!.full).toContain("`show -json <tfplan>`");
+      expect(note!.full).not.toContain("tofu");
+      expect(note!.full).not.toContain("terraform");
+    });
+
+    it("shows 'not available' for show-plan-unavailable reason", () => {
+      const report = makeReport({
+        hasOutput: true,
+        fallbackReason: "show-plan-unavailable",
+        planContent: "plan output",
+      });
+      const sections = renderTextFallbackBody(report);
+      const note = sections.find((s) => s.id === "note");
+      expect(note!.full).toContain("was not available");
+      expect(note!.full).not.toContain("not valid plan JSON");
+    });
+
+    it("shows parse error message for show-plan-parse-error reason", () => {
+      const report = makeReport({
+        hasOutput: true,
+        tool: "tofu",
+        fallbackReason: "show-plan-parse-error",
+        planContent: "plan output",
+      });
+      const sections = renderTextFallbackBody(report);
+      const note = sections.find((s) => s.id === "note");
+      expect(note!.full).toContain("not valid plan JSON");
+      expect(note!.full).toContain("Expected output from `tofu show -json <tfplan>`");
+    });
+
+    it("shows parse error message without tool for show-plan-parse-error when tool is undefined", () => {
+      const report = makeReport({
+        hasOutput: true,
+        tool: undefined,
+        fallbackReason: "show-plan-parse-error",
+        planContent: "plan output",
+      });
+      const sections = renderTextFallbackBody(report);
+      const note = sections.find((s) => s.id === "note");
+      expect(note!.full).toContain("not valid plan JSON");
+      expect(note!.full).toContain("Expected output from `show -json <tfplan>`");
+    });
   });
 });

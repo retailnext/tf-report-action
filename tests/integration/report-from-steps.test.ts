@@ -798,7 +798,8 @@ describe("reportFromSteps integration — rendering quality", () => {
     expect(result).toContain("Plan Succeeded");
     // Warning callout for missing structured output
     expect(result).toContain("⚠️");
-    expect(result).toContain("Structured plan output was not available");
+    expect(result).toContain("show -json <tfplan>");
+    expect(result).toContain("was not available");
   });
 
   it("parse-failure: title is ✅ (not ❌) when all steps succeeded", () => {

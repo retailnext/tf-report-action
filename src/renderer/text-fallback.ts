@@ -7,9 +7,27 @@
 
 import type { TextFallbackReport } from "../model/report.js";
 import type { Section } from "../model/section.js";
+import { expectedCommand } from "../model/step-commands.js";
 import { formatRawOutput } from "../raw-formatter/index.js";
 import { DIAGNOSTIC_WARNING } from "../model/status-icons.js";
 import { renderStepStatusTable } from "./step-table.js";
+
+/**
+ * Build the warning note text based on the fallback reason and detected tool.
+ *
+ * Two variants:
+ * - `show-plan-unavailable`: the show-plan output was missing/failed/unreadable
+ * - `show-plan-parse-error`: the show-plan output existed but was not valid plan JSON
+ */
+function buildWarningNote(report: TextFallbackReport): string {
+  const command = expectedCommand(report.tool, "show-plan");
+  switch (report.fallbackReason) {
+    case "show-plan-unavailable":
+      return `> ${DIAGNOSTIC_WARNING} **Warning:** Report limited because \`${command}\` output was not available. Showing raw command output.\n\n`;
+    case "show-plan-parse-error":
+      return `> ${DIAGNOSTIC_WARNING} **Warning:** Report limited because \`show-plan\` output was not valid plan JSON. Expected output from \`${command}\`. Showing raw command output.\n\n`;
+  }
+}
 
 /**
  * Render the body sections for a text-fallback report.
@@ -33,7 +51,7 @@ export function renderTextFallbackBody(report: TextFallbackReport): Section[] {
   if (report.hasOutput) {
     sections.push({
       id: "note",
-      full: `> ${DIAGNOSTIC_WARNING} **Warning:** Structured plan output was not available. Showing raw command output.\n\n`,
+      full: buildWarningNote(report),
       fixed: true,
     });
   } else if (report.readErrors.length === 0) {

@@ -3,7 +3,7 @@
 exports[`reportFromSteps integration — apply-no-show fixtures > terraform/apply-error/0/apply-no-show > renders without error and matches snapshot 1`] = `
 "## ✅ Apply Succeeded
 
-> ⚠️ **Warning:** Structured plan output was not available. Showing raw command output.
+> ⚠️ **Warning:** Report limited because \`terraform show -json <tfplan>\` output was not available. Showing raw command output.
 
 ### Plan Output
 
@@ -457,7 +457,7 @@ exports[`reportFromSteps integration — apply-no-show fixtures > terraform/appl
 exports[`reportFromSteps integration — apply-no-show fixtures > terraform/apply-error/1/apply-no-show > renders without error and matches snapshot 1`] = `
 "## ❌ Apply Failed
 
-> ⚠️ **Warning:** Structured plan output was not available. Showing raw command output.
+> ⚠️ **Warning:** Report limited because \`terraform show -json <tfplan>\` output was not available. Showing raw command output.
 
 ### Plan Output
 
@@ -939,7 +939,7 @@ exports[`reportFromSteps integration — apply-no-show fixtures > terraform/appl
 exports[`reportFromSteps integration — apply-no-show fixtures > terraform/deferred-data-source/0/apply-no-show > renders without error and matches snapshot 1`] = `
 "## ✅ Apply Succeeded
 
-> ⚠️ **Warning:** Structured plan output was not available. Showing raw command output.
+> ⚠️ **Warning:** Report limited because \`terraform show -json <tfplan>\` output was not available. Showing raw command output.
 
 ### Plan Output
 
@@ -1565,7 +1565,7 @@ exports[`reportFromSteps integration — apply-no-show fixtures > terraform/defe
 exports[`reportFromSteps integration — apply-no-show fixtures > terraform/deferred-data-source/1/apply-no-show > renders without error and matches snapshot 1`] = `
 "## ✅ Apply Succeeded
 
-> ⚠️ **Warning:** Structured plan output was not available. Showing raw command output.
+> ⚠️ **Warning:** Report limited because \`terraform show -json <tfplan>\` output was not available. Showing raw command output.
 
 ### Plan Output
 
@@ -2281,7 +2281,7 @@ exports[`reportFromSteps integration — apply-no-show fixtures > terraform/defe
 exports[`reportFromSteps integration — apply-no-show fixtures > terraform/deferred-data-source/2/apply-no-show > renders without error and matches snapshot 1`] = `
 "## ✅ Apply Succeeded
 
-> ⚠️ **Warning:** Structured plan output was not available. Showing raw command output.
+> ⚠️ **Warning:** Report limited because \`terraform show -json <tfplan>\` output was not available. Showing raw command output.
 
 ### Plan Output
 
@@ -3053,7 +3053,7 @@ exports[`reportFromSteps integration — apply-no-show fixtures > terraform/defe
 exports[`reportFromSteps integration — apply-no-show fixtures > terraform/import-resource/0/apply-no-show > renders without error and matches snapshot 1`] = `
 "## ✅ Apply Succeeded
 
-> ⚠️ **Warning:** Structured plan output was not available. Showing raw command output.
+> ⚠️ **Warning:** Report limited because \`terraform show -json <tfplan>\` output was not available. Showing raw command output.
 
 ### Plan Output
 
@@ -3211,7 +3211,7 @@ exports[`reportFromSteps integration — apply-no-show fixtures > terraform/impo
 exports[`reportFromSteps integration — apply-no-show fixtures > terraform/import-resource/1/apply-no-show > renders without error and matches snapshot 1`] = `
 "## ✅ Apply Succeeded
 
-> ⚠️ **Warning:** Structured plan output was not available. Showing raw command output.
+> ⚠️ **Warning:** Report limited because \`terraform show -json <tfplan>\` output was not available. Showing raw command output.
 
 ### Plan Output
 
@@ -3394,7 +3394,7 @@ exports[`reportFromSteps integration — apply-no-show fixtures > terraform/impo
 exports[`reportFromSteps integration — apply-no-show fixtures > terraform/local-files/0/apply-no-show > renders without error and matches snapshot 1`] = `
 "## ✅ Apply Succeeded
 
-> ⚠️ **Warning:** Structured plan output was not available. Showing raw command output.
+> ⚠️ **Warning:** Report limited because \`terraform show -json <tfplan>\` output was not available. Showing raw command output.
 
 ### Plan Output
 
@@ -3570,7 +3570,7 @@ exports[`reportFromSteps integration — apply-no-show fixtures > terraform/loca
 exports[`reportFromSteps integration — apply-no-show fixtures > terraform/local-files/1/apply-no-show > renders without error and matches snapshot 1`] = `
 "## ✅ Apply Succeeded
 
-> ⚠️ **Warning:** Structured plan output was not available. Showing raw command output.
+> ⚠️ **Warning:** Report limited because \`terraform show -json <tfplan>\` output was not available. Showing raw command output.
 
 ### Plan Output
 
@@ -3844,7 +3844,7 @@ exports[`reportFromSteps integration — apply-no-show fixtures > terraform/loca
 exports[`reportFromSteps integration — apply-no-show fixtures > terraform/moved-resource/0/apply-no-show > renders without error and matches snapshot 1`] = `
 "## ✅ Apply Succeeded
 
-> ⚠️ **Warning:** Structured plan output was not available. Showing raw command output.
+> ⚠️ **Warning:** Report limited because \`terraform show -json <tfplan>\` output was not available. Showing raw command output.
 
 ### Plan Output
 
@@ -4002,7 +4002,7 @@ exports[`reportFromSteps integration — apply-no-show fixtures > terraform/move
 exports[`reportFromSteps integration — apply-no-show fixtures > terraform/moved-resource/1/apply-no-show > renders without error and matches snapshot 1`] = `
 "## ✅ Apply Succeeded
 
-> ⚠️ **Warning:** Structured plan output was not available. Showing raw command output.
+> ⚠️ **Warning:** Report limited because \`terraform show -json <tfplan>\` output was not available. Showing raw command output.
 
 ### Plan Output
 
@@ -4151,7 +4151,7 @@ exports[`reportFromSteps integration — apply-no-show fixtures > terraform/move
 exports[`reportFromSteps integration — apply-no-show fixtures > terraform/no-detailed-exitcode/0/apply-no-show > renders without error and matches snapshot 1`] = `
 "## ✅ Apply Succeeded
 
-> ⚠️ **Warning:** Structured plan output was not available. Showing raw command output.
+> ⚠️ **Warning:** Report limited because \`terraform show -json <tfplan>\` output was not available. Showing raw command output.
 
 ### Plan Output
 
@@ -4309,7 +4309,7 @@ exports[`reportFromSteps integration — apply-no-show fixtures > terraform/no-d
 exports[`reportFromSteps integration — apply-no-show fixtures > terraform/no-detailed-exitcode/1/apply-no-show > renders without error and matches snapshot 1`] = `
 "## ✅ Apply Succeeded
 
-> ⚠️ **Warning:** Structured plan output was not available. Showing raw command output.
+> ⚠️ **Warning:** Report limited because \`terraform show -json <tfplan>\` output was not available. Showing raw command output.
 
 ### Plan Output
 
@@ -4517,7 +4517,7 @@ exports[`reportFromSteps integration — apply-no-show fixtures > terraform/no-d
 exports[`reportFromSteps integration — apply-no-show fixtures > terraform/no-json-flags/0/apply-no-show > renders without error and matches snapshot 1`] = `
 "## ✅ Apply Succeeded
 
-> ⚠️ **Warning:** Structured plan output was not available. Showing raw command output.
+> ⚠️ **Warning:** Report limited because \`terraform show -json <tfplan>\` output was not available. Showing raw command output.
 
 ### Plan Output
 
@@ -4564,7 +4564,7 @@ Apply complete! Resources: 1 added, 0 changed, 0 destroyed.[0m
 exports[`reportFromSteps integration — apply-no-show fixtures > terraform/no-op/0/apply-no-show > renders without error and matches snapshot 1`] = `
 "## ✅ Apply Succeeded
 
-> ⚠️ **Warning:** Structured plan output was not available. Showing raw command output.
+> ⚠️ **Warning:** Report limited because \`terraform show -json <tfplan>\` output was not available. Showing raw command output.
 
 ### Plan Output
 
@@ -4722,7 +4722,7 @@ exports[`reportFromSteps integration — apply-no-show fixtures > terraform/no-o
 exports[`reportFromSteps integration — apply-no-show fixtures > terraform/no-op/1/apply-no-show > renders without error and matches snapshot 1`] = `
 "## ✅ Apply Succeeded
 
-> ⚠️ **Warning:** Structured plan output was not available. Showing raw command output.
+> ⚠️ **Warning:** Report limited because \`terraform show -json <tfplan>\` output was not available. Showing raw command output.
 
 ### Plan Output
 
@@ -4836,7 +4836,7 @@ exports[`reportFromSteps integration — apply-no-show fixtures > terraform/no-o
 exports[`reportFromSteps integration — apply-no-show fixtures > terraform/null-lifecycle/0/apply-no-show > renders without error and matches snapshot 1`] = `
 "## ✅ Apply Succeeded
 
-> ⚠️ **Warning:** Structured plan output was not available. Showing raw command output.
+> ⚠️ **Warning:** Report limited because \`terraform show -json <tfplan>\` output was not available. Showing raw command output.
 
 ### Plan Output
 
@@ -4904,7 +4904,7 @@ exports[`reportFromSteps integration — apply-no-show fixtures > terraform/null
 exports[`reportFromSteps integration — apply-no-show fixtures > terraform/null-lifecycle/1/apply-no-show > renders without error and matches snapshot 1`] = `
 "## ✅ Apply Succeeded
 
-> ⚠️ **Warning:** Structured plan output was not available. Showing raw command output.
+> ⚠️ **Warning:** Report limited because \`terraform show -json <tfplan>\` output was not available. Showing raw command output.
 
 ### Plan Output
 
@@ -5242,7 +5242,7 @@ exports[`reportFromSteps integration — apply-no-show fixtures > terraform/null
 exports[`reportFromSteps integration — apply-no-show fixtures > terraform/null-lifecycle/2/apply-no-show > renders without error and matches snapshot 1`] = `
 "## ✅ Apply Succeeded
 
-> ⚠️ **Warning:** Structured plan output was not available. Showing raw command output.
+> ⚠️ **Warning:** Report limited because \`terraform show -json <tfplan>\` output was not available. Showing raw command output.
 
 ### Plan Output
 
@@ -5778,7 +5778,7 @@ exports[`reportFromSteps integration — apply-no-show fixtures > terraform/null
 exports[`reportFromSteps integration — apply-no-show fixtures > terraform/plan-error/0/apply-no-show > renders without error and matches snapshot 1`] = `
 "## ✅ Apply Succeeded
 
-> ⚠️ **Warning:** Structured plan output was not available. Showing raw command output.
+> ⚠️ **Warning:** Report limited because \`terraform show -json <tfplan>\` output was not available. Showing raw command output.
 
 ### Plan Output
 
@@ -5936,7 +5936,7 @@ exports[`reportFromSteps integration — apply-no-show fixtures > terraform/plan
 exports[`reportFromSteps integration — apply-no-show fixtures > terraform/plan-error/1/apply-no-show > renders without error and matches snapshot 1`] = `
 "## ❌ Plan Failed
 
-> ⚠️ **Warning:** Structured plan output was not available. Showing raw command output.
+> ⚠️ **Warning:** Report limited because \`terraform show -json <tfplan>\` output was not available. Showing raw command output.
 
 ### Plan Output
 
@@ -6102,7 +6102,7 @@ exports[`reportFromSteps integration — apply-no-show fixtures > terraform/plan
 exports[`reportFromSteps integration — apply-no-show fixtures > terraform/random-replace/0/apply-no-show > renders without error and matches snapshot 1`] = `
 "## ✅ Apply Succeeded
 
-> ⚠️ **Warning:** Structured plan output was not available. Showing raw command output.
+> ⚠️ **Warning:** Report limited because \`terraform show -json <tfplan>\` output was not available. Showing raw command output.
 
 ### Plan Output
 
@@ -6278,7 +6278,7 @@ exports[`reportFromSteps integration — apply-no-show fixtures > terraform/rand
 exports[`reportFromSteps integration — apply-no-show fixtures > terraform/random-replace/1/apply-no-show > renders without error and matches snapshot 1`] = `
 "## ✅ Apply Succeeded
 
-> ⚠️ **Warning:** Structured plan output was not available. Showing raw command output.
+> ⚠️ **Warning:** Report limited because \`terraform show -json <tfplan>\` output was not available. Showing raw command output.
 
 ### Plan Output
 
@@ -6552,7 +6552,7 @@ exports[`reportFromSteps integration — apply-no-show fixtures > terraform/rand
 exports[`reportFromSteps integration — apply-no-show fixtures > terraform/removed-resource/0/apply-no-show > renders without error and matches snapshot 1`] = `
 "## ✅ Apply Succeeded
 
-> ⚠️ **Warning:** Structured plan output was not available. Showing raw command output.
+> ⚠️ **Warning:** Report limited because \`terraform show -json <tfplan>\` output was not available. Showing raw command output.
 
 ### Plan Output
 
@@ -6800,7 +6800,7 @@ exports[`reportFromSteps integration — apply-no-show fixtures > terraform/remo
 exports[`reportFromSteps integration — apply-no-show fixtures > terraform/removed-resource/1/apply-no-show > renders without error and matches snapshot 1`] = `
 "## ✅ Apply Succeeded
 
-> ⚠️ **Warning:** Structured plan output was not available. Showing raw command output.
+> ⚠️ **Warning:** Report limited because \`terraform show -json <tfplan>\` output was not available. Showing raw command output.
 
 ### Plan Output
 
@@ -6971,7 +6971,7 @@ exports[`reportFromSteps integration — apply-no-show fixtures > terraform/remo
 exports[`reportFromSteps integration — apply-no-show fixtures > terraform/sensitive-values/0/apply-no-show > renders without error and matches snapshot 1`] = `
 "## ✅ Apply Succeeded
 
-> ⚠️ **Warning:** Structured plan output was not available. Showing raw command output.
+> ⚠️ **Warning:** Report limited because \`terraform show -json <tfplan>\` output was not available. Showing raw command output.
 
 ### Plan Output
 
@@ -7155,7 +7155,7 @@ exports[`reportFromSteps integration — apply-no-show fixtures > terraform/sens
 exports[`reportFromSteps integration — apply-no-show fixtures > terraform/sensitive-values/1/apply-no-show > renders without error and matches snapshot 1`] = `
 "## ✅ Apply Succeeded
 
-> ⚠️ **Warning:** Structured plan output was not available. Showing raw command output.
+> ⚠️ **Warning:** Report limited because \`terraform show -json <tfplan>\` output was not available. Showing raw command output.
 
 ### Plan Output
 
@@ -7437,7 +7437,7 @@ exports[`reportFromSteps integration — apply-no-show fixtures > terraform/sens
 exports[`reportFromSteps integration — apply-no-show fixtures > terraform/validate-error/0/apply-no-show > renders without error and matches snapshot 1`] = `
 "## ✅ Apply Succeeded
 
-> ⚠️ **Warning:** Structured plan output was not available. Showing raw command output.
+> ⚠️ **Warning:** Report limited because \`terraform show -json <tfplan>\` output was not available. Showing raw command output.
 
 ### Plan Output
 
@@ -7667,7 +7667,7 @@ exports[`reportFromSteps integration — apply-no-show fixtures > terraform/vali
 exports[`reportFromSteps integration — apply-no-show fixtures > terraform/with-modules/0/apply-no-show > renders without error and matches snapshot 1`] = `
 "## ✅ Apply Succeeded
 
-> ⚠️ **Warning:** Structured plan output was not available. Showing raw command output.
+> ⚠️ **Warning:** Report limited because \`terraform show -json <tfplan>\` output was not available. Showing raw command output.
 
 ### Plan Output
 
@@ -7943,7 +7943,7 @@ exports[`reportFromSteps integration — apply-no-show fixtures > terraform/with
 exports[`reportFromSteps integration — apply-no-show fixtures > terraform/with-modules/1/apply-no-show > renders without error and matches snapshot 1`] = `
 "## ✅ Apply Succeeded
 
-> ⚠️ **Warning:** Structured plan output was not available. Showing raw command output.
+> ⚠️ **Warning:** Report limited because \`terraform show -json <tfplan>\` output was not available. Showing raw command output.
 
 ### Plan Output
 
@@ -8415,7 +8415,7 @@ exports[`reportFromSteps integration — apply-no-show fixtures > terraform/with
 exports[`reportFromSteps integration — apply-no-show fixtures > tofu/apply-error/0/apply-no-show > renders without error and matches snapshot 1`] = `
 "## ✅ Apply Succeeded
 
-> ⚠️ **Warning:** Structured plan output was not available. Showing raw command output.
+> ⚠️ **Warning:** Report limited because \`tofu show -json <tfplan>\` output was not available. Showing raw command output.
 
 ### Plan Output
 
@@ -8869,7 +8869,7 @@ exports[`reportFromSteps integration — apply-no-show fixtures > tofu/apply-err
 exports[`reportFromSteps integration — apply-no-show fixtures > tofu/apply-error/1/apply-no-show > renders without error and matches snapshot 1`] = `
 "## ❌ Apply Failed
 
-> ⚠️ **Warning:** Structured plan output was not available. Showing raw command output.
+> ⚠️ **Warning:** Report limited because \`tofu show -json <tfplan>\` output was not available. Showing raw command output.
 
 ### Plan Output
 
@@ -9351,7 +9351,7 @@ exports[`reportFromSteps integration — apply-no-show fixtures > tofu/apply-err
 exports[`reportFromSteps integration — apply-no-show fixtures > tofu/deferred-data-source/0/apply-no-show > renders without error and matches snapshot 1`] = `
 "## ✅ Apply Succeeded
 
-> ⚠️ **Warning:** Structured plan output was not available. Showing raw command output.
+> ⚠️ **Warning:** Report limited because \`tofu show -json <tfplan>\` output was not available. Showing raw command output.
 
 ### Plan Output
 
@@ -9977,7 +9977,7 @@ exports[`reportFromSteps integration — apply-no-show fixtures > tofu/deferred-
 exports[`reportFromSteps integration — apply-no-show fixtures > tofu/deferred-data-source/1/apply-no-show > renders without error and matches snapshot 1`] = `
 "## ✅ Apply Succeeded
 
-> ⚠️ **Warning:** Structured plan output was not available. Showing raw command output.
+> ⚠️ **Warning:** Report limited because \`tofu show -json <tfplan>\` output was not available. Showing raw command output.
 
 ### Plan Output
 
@@ -10693,7 +10693,7 @@ exports[`reportFromSteps integration — apply-no-show fixtures > tofu/deferred-
 exports[`reportFromSteps integration — apply-no-show fixtures > tofu/deferred-data-source/2/apply-no-show > renders without error and matches snapshot 1`] = `
 "## ✅ Apply Succeeded
 
-> ⚠️ **Warning:** Structured plan output was not available. Showing raw command output.
+> ⚠️ **Warning:** Report limited because \`tofu show -json <tfplan>\` output was not available. Showing raw command output.
 
 ### Plan Output
 
@@ -11465,7 +11465,7 @@ exports[`reportFromSteps integration — apply-no-show fixtures > tofu/deferred-
 exports[`reportFromSteps integration — apply-no-show fixtures > tofu/import-resource/0/apply-no-show > renders without error and matches snapshot 1`] = `
 "## ✅ Apply Succeeded
 
-> ⚠️ **Warning:** Structured plan output was not available. Showing raw command output.
+> ⚠️ **Warning:** Report limited because \`tofu show -json <tfplan>\` output was not available. Showing raw command output.
 
 ### Plan Output
 
@@ -11623,7 +11623,7 @@ exports[`reportFromSteps integration — apply-no-show fixtures > tofu/import-re
 exports[`reportFromSteps integration — apply-no-show fixtures > tofu/import-resource/1/apply-no-show > renders without error and matches snapshot 1`] = `
 "## ✅ Apply Succeeded
 
-> ⚠️ **Warning:** Structured plan output was not available. Showing raw command output.
+> ⚠️ **Warning:** Report limited because \`tofu show -json <tfplan>\` output was not available. Showing raw command output.
 
 ### Plan Output
 
@@ -11806,7 +11806,7 @@ exports[`reportFromSteps integration — apply-no-show fixtures > tofu/import-re
 exports[`reportFromSteps integration — apply-no-show fixtures > tofu/local-files/0/apply-no-show > renders without error and matches snapshot 1`] = `
 "## ✅ Apply Succeeded
 
-> ⚠️ **Warning:** Structured plan output was not available. Showing raw command output.
+> ⚠️ **Warning:** Report limited because \`tofu show -json <tfplan>\` output was not available. Showing raw command output.
 
 ### Plan Output
 
@@ -11982,7 +11982,7 @@ exports[`reportFromSteps integration — apply-no-show fixtures > tofu/local-fil
 exports[`reportFromSteps integration — apply-no-show fixtures > tofu/local-files/1/apply-no-show > renders without error and matches snapshot 1`] = `
 "## ✅ Apply Succeeded
 
-> ⚠️ **Warning:** Structured plan output was not available. Showing raw command output.
+> ⚠️ **Warning:** Report limited because \`tofu show -json <tfplan>\` output was not available. Showing raw command output.
 
 ### Plan Output
 
@@ -12256,7 +12256,7 @@ exports[`reportFromSteps integration — apply-no-show fixtures > tofu/local-fil
 exports[`reportFromSteps integration — apply-no-show fixtures > tofu/moved-resource/0/apply-no-show > renders without error and matches snapshot 1`] = `
 "## ✅ Apply Succeeded
 
-> ⚠️ **Warning:** Structured plan output was not available. Showing raw command output.
+> ⚠️ **Warning:** Report limited because \`tofu show -json <tfplan>\` output was not available. Showing raw command output.
 
 ### Plan Output
 
@@ -12414,7 +12414,7 @@ exports[`reportFromSteps integration — apply-no-show fixtures > tofu/moved-res
 exports[`reportFromSteps integration — apply-no-show fixtures > tofu/moved-resource/1/apply-no-show > renders without error and matches snapshot 1`] = `
 "## ✅ Apply Succeeded
 
-> ⚠️ **Warning:** Structured plan output was not available. Showing raw command output.
+> ⚠️ **Warning:** Report limited because \`tofu show -json <tfplan>\` output was not available. Showing raw command output.
 
 ### Plan Output
 
@@ -12563,7 +12563,7 @@ exports[`reportFromSteps integration — apply-no-show fixtures > tofu/moved-res
 exports[`reportFromSteps integration — apply-no-show fixtures > tofu/no-detailed-exitcode/0/apply-no-show > renders without error and matches snapshot 1`] = `
 "## ✅ Apply Succeeded
 
-> ⚠️ **Warning:** Structured plan output was not available. Showing raw command output.
+> ⚠️ **Warning:** Report limited because \`tofu show -json <tfplan>\` output was not available. Showing raw command output.
 
 ### Plan Output
 
@@ -12721,7 +12721,7 @@ exports[`reportFromSteps integration — apply-no-show fixtures > tofu/no-detail
 exports[`reportFromSteps integration — apply-no-show fixtures > tofu/no-detailed-exitcode/1/apply-no-show > renders without error and matches snapshot 1`] = `
 "## ✅ Apply Succeeded
 
-> ⚠️ **Warning:** Structured plan output was not available. Showing raw command output.
+> ⚠️ **Warning:** Report limited because \`tofu show -json <tfplan>\` output was not available. Showing raw command output.
 
 ### Plan Output
 
@@ -12929,7 +12929,7 @@ exports[`reportFromSteps integration — apply-no-show fixtures > tofu/no-detail
 exports[`reportFromSteps integration — apply-no-show fixtures > tofu/no-json-flags/0/apply-no-show > renders without error and matches snapshot 1`] = `
 "## ✅ Apply Succeeded
 
-> ⚠️ **Warning:** Structured plan output was not available. Showing raw command output.
+> ⚠️ **Warning:** Report limited because \`tofu show -json <tfplan>\` output was not available. Showing raw command output.
 
 ### Plan Output
 
@@ -12976,7 +12976,7 @@ Apply complete! Resources: 1 added, 0 changed, 0 destroyed.
 exports[`reportFromSteps integration — apply-no-show fixtures > tofu/no-op/0/apply-no-show > renders without error and matches snapshot 1`] = `
 "## ✅ Apply Succeeded
 
-> ⚠️ **Warning:** Structured plan output was not available. Showing raw command output.
+> ⚠️ **Warning:** Report limited because \`tofu show -json <tfplan>\` output was not available. Showing raw command output.
 
 ### Plan Output
 
@@ -13134,7 +13134,7 @@ exports[`reportFromSteps integration — apply-no-show fixtures > tofu/no-op/0/a
 exports[`reportFromSteps integration — apply-no-show fixtures > tofu/no-op/1/apply-no-show > renders without error and matches snapshot 1`] = `
 "## ✅ Apply Succeeded
 
-> ⚠️ **Warning:** Structured plan output was not available. Showing raw command output.
+> ⚠️ **Warning:** Report limited because \`tofu show -json <tfplan>\` output was not available. Showing raw command output.
 
 ### Plan Output
 
@@ -13248,7 +13248,7 @@ exports[`reportFromSteps integration — apply-no-show fixtures > tofu/no-op/1/a
 exports[`reportFromSteps integration — apply-no-show fixtures > tofu/null-lifecycle/0/apply-no-show > renders without error and matches snapshot 1`] = `
 "## ✅ Apply Succeeded
 
-> ⚠️ **Warning:** Structured plan output was not available. Showing raw command output.
+> ⚠️ **Warning:** Report limited because \`tofu show -json <tfplan>\` output was not available. Showing raw command output.
 
 ### Plan Output
 
@@ -13316,7 +13316,7 @@ exports[`reportFromSteps integration — apply-no-show fixtures > tofu/null-life
 exports[`reportFromSteps integration — apply-no-show fixtures > tofu/null-lifecycle/1/apply-no-show > renders without error and matches snapshot 1`] = `
 "## ✅ Apply Succeeded
 
-> ⚠️ **Warning:** Structured plan output was not available. Showing raw command output.
+> ⚠️ **Warning:** Report limited because \`tofu show -json <tfplan>\` output was not available. Showing raw command output.
 
 ### Plan Output
 
@@ -13654,7 +13654,7 @@ exports[`reportFromSteps integration — apply-no-show fixtures > tofu/null-life
 exports[`reportFromSteps integration — apply-no-show fixtures > tofu/null-lifecycle/2/apply-no-show > renders without error and matches snapshot 1`] = `
 "## ✅ Apply Succeeded
 
-> ⚠️ **Warning:** Structured plan output was not available. Showing raw command output.
+> ⚠️ **Warning:** Report limited because \`tofu show -json <tfplan>\` output was not available. Showing raw command output.
 
 ### Plan Output
 
@@ -14190,7 +14190,7 @@ exports[`reportFromSteps integration — apply-no-show fixtures > tofu/null-life
 exports[`reportFromSteps integration — apply-no-show fixtures > tofu/plan-error/0/apply-no-show > renders without error and matches snapshot 1`] = `
 "## ✅ Apply Succeeded
 
-> ⚠️ **Warning:** Structured plan output was not available. Showing raw command output.
+> ⚠️ **Warning:** Report limited because \`tofu show -json <tfplan>\` output was not available. Showing raw command output.
 
 ### Plan Output
 
@@ -14348,7 +14348,7 @@ exports[`reportFromSteps integration — apply-no-show fixtures > tofu/plan-erro
 exports[`reportFromSteps integration — apply-no-show fixtures > tofu/plan-error/1/apply-no-show > renders without error and matches snapshot 1`] = `
 "## ❌ Plan Failed
 
-> ⚠️ **Warning:** Structured plan output was not available. Showing raw command output.
+> ⚠️ **Warning:** Report limited because \`tofu show -json <tfplan>\` output was not available. Showing raw command output.
 
 ### Plan Output
 
@@ -14514,7 +14514,7 @@ exports[`reportFromSteps integration — apply-no-show fixtures > tofu/plan-erro
 exports[`reportFromSteps integration — apply-no-show fixtures > tofu/random-replace/0/apply-no-show > renders without error and matches snapshot 1`] = `
 "## ✅ Apply Succeeded
 
-> ⚠️ **Warning:** Structured plan output was not available. Showing raw command output.
+> ⚠️ **Warning:** Report limited because \`tofu show -json <tfplan>\` output was not available. Showing raw command output.
 
 ### Plan Output
 
@@ -14690,7 +14690,7 @@ exports[`reportFromSteps integration — apply-no-show fixtures > tofu/random-re
 exports[`reportFromSteps integration — apply-no-show fixtures > tofu/random-replace/1/apply-no-show > renders without error and matches snapshot 1`] = `
 "## ✅ Apply Succeeded
 
-> ⚠️ **Warning:** Structured plan output was not available. Showing raw command output.
+> ⚠️ **Warning:** Report limited because \`tofu show -json <tfplan>\` output was not available. Showing raw command output.
 
 ### Plan Output
 
@@ -14964,7 +14964,7 @@ exports[`reportFromSteps integration — apply-no-show fixtures > tofu/random-re
 exports[`reportFromSteps integration — apply-no-show fixtures > tofu/removed-resource/0/apply-no-show > renders without error and matches snapshot 1`] = `
 "## ✅ Apply Succeeded
 
-> ⚠️ **Warning:** Structured plan output was not available. Showing raw command output.
+> ⚠️ **Warning:** Report limited because \`tofu show -json <tfplan>\` output was not available. Showing raw command output.
 
 ### Plan Output
 
@@ -15212,7 +15212,7 @@ exports[`reportFromSteps integration — apply-no-show fixtures > tofu/removed-r
 exports[`reportFromSteps integration — apply-no-show fixtures > tofu/removed-resource/1/apply-no-show > renders without error and matches snapshot 1`] = `
 "## ✅ Apply Succeeded
 
-> ⚠️ **Warning:** Structured plan output was not available. Showing raw command output.
+> ⚠️ **Warning:** Report limited because \`tofu show -json <tfplan>\` output was not available. Showing raw command output.
 
 ### Plan Output
 
@@ -15429,7 +15429,7 @@ exports[`reportFromSteps integration — apply-no-show fixtures > tofu/removed-r
 exports[`reportFromSteps integration — apply-no-show fixtures > tofu/sensitive-values/0/apply-no-show > renders without error and matches snapshot 1`] = `
 "## ✅ Apply Succeeded
 
-> ⚠️ **Warning:** Structured plan output was not available. Showing raw command output.
+> ⚠️ **Warning:** Report limited because \`tofu show -json <tfplan>\` output was not available. Showing raw command output.
 
 ### Plan Output
 
@@ -15613,7 +15613,7 @@ exports[`reportFromSteps integration — apply-no-show fixtures > tofu/sensitive
 exports[`reportFromSteps integration — apply-no-show fixtures > tofu/sensitive-values/1/apply-no-show > renders without error and matches snapshot 1`] = `
 "## ✅ Apply Succeeded
 
-> ⚠️ **Warning:** Structured plan output was not available. Showing raw command output.
+> ⚠️ **Warning:** Report limited because \`tofu show -json <tfplan>\` output was not available. Showing raw command output.
 
 ### Plan Output
 
@@ -15895,7 +15895,7 @@ exports[`reportFromSteps integration — apply-no-show fixtures > tofu/sensitive
 exports[`reportFromSteps integration — apply-no-show fixtures > tofu/validate-error/0/apply-no-show > renders without error and matches snapshot 1`] = `
 "## ✅ Apply Succeeded
 
-> ⚠️ **Warning:** Structured plan output was not available. Showing raw command output.
+> ⚠️ **Warning:** Report limited because \`tofu show -json <tfplan>\` output was not available. Showing raw command output.
 
 ### Plan Output
 
@@ -16125,7 +16125,7 @@ exports[`reportFromSteps integration — apply-no-show fixtures > tofu/validate-
 exports[`reportFromSteps integration — apply-no-show fixtures > tofu/with-modules/0/apply-no-show > renders without error and matches snapshot 1`] = `
 "## ✅ Apply Succeeded
 
-> ⚠️ **Warning:** Structured plan output was not available. Showing raw command output.
+> ⚠️ **Warning:** Report limited because \`tofu show -json <tfplan>\` output was not available. Showing raw command output.
 
 ### Plan Output
 
@@ -16401,7 +16401,7 @@ exports[`reportFromSteps integration — apply-no-show fixtures > tofu/with-modu
 exports[`reportFromSteps integration — apply-no-show fixtures > tofu/with-modules/1/apply-no-show > renders without error and matches snapshot 1`] = `
 "## ✅ Apply Succeeded
 
-> ⚠️ **Warning:** Structured plan output was not available. Showing raw command output.
+> ⚠️ **Warning:** Report limited because \`tofu show -json <tfplan>\` output was not available. Showing raw command output.
 
 ### Plan Output
 
@@ -16873,7 +16873,7 @@ exports[`reportFromSteps integration — apply-no-show fixtures > tofu/with-modu
 exports[`reportFromSteps integration — apply-only fixtures > terraform/apply-error/0/apply-only > renders without error and matches snapshot 1`] = `
 "## ✅ Apply Succeeded
 
-> ⚠️ **Warning:** Structured plan output was not available. Showing raw command output.
+> ⚠️ **Warning:** Report limited because \`terraform show -json <tfplan>\` output was not available. Showing raw command output.
 
 ### Apply Output
 
@@ -17222,7 +17222,7 @@ exports[`reportFromSteps integration — apply-only fixtures > terraform/apply-e
 exports[`reportFromSteps integration — apply-only fixtures > terraform/apply-error/1/apply-only > renders without error and matches snapshot 1`] = `
 "## ❌ Apply Failed
 
-> ⚠️ **Warning:** Structured plan output was not available. Showing raw command output.
+> ⚠️ **Warning:** Report limited because \`terraform show -json <tfplan>\` output was not available. Showing raw command output.
 
 ### Apply Output
 
@@ -17480,7 +17480,7 @@ exports[`reportFromSteps integration — apply-only fixtures > terraform/apply-e
 exports[`reportFromSteps integration — apply-only fixtures > terraform/deferred-data-source/0/apply-only > renders without error and matches snapshot 1`] = `
 "## ✅ Apply Succeeded
 
-> ⚠️ **Warning:** Structured plan output was not available. Showing raw command output.
+> ⚠️ **Warning:** Report limited because \`terraform show -json <tfplan>\` output was not available. Showing raw command output.
 
 ### Apply Output
 
@@ -17940,7 +17940,7 @@ exports[`reportFromSteps integration — apply-only fixtures > terraform/deferre
 exports[`reportFromSteps integration — apply-only fixtures > terraform/deferred-data-source/1/apply-only > renders without error and matches snapshot 1`] = `
 "## ✅ Apply Succeeded
 
-> ⚠️ **Warning:** Structured plan output was not available. Showing raw command output.
+> ⚠️ **Warning:** Report limited because \`terraform show -json <tfplan>\` output was not available. Showing raw command output.
 
 ### Apply Output
 
@@ -18260,7 +18260,7 @@ exports[`reportFromSteps integration — apply-only fixtures > terraform/deferre
 exports[`reportFromSteps integration — apply-only fixtures > terraform/deferred-data-source/2/apply-only > renders without error and matches snapshot 1`] = `
 "## ✅ Apply Succeeded
 
-> ⚠️ **Warning:** Structured plan output was not available. Showing raw command output.
+> ⚠️ **Warning:** Report limited because \`terraform show -json <tfplan>\` output was not available. Showing raw command output.
 
 ### Apply Output
 
@@ -18609,7 +18609,7 @@ exports[`reportFromSteps integration — apply-only fixtures > terraform/deferre
 exports[`reportFromSteps integration — apply-only fixtures > terraform/import-resource/0/apply-only > renders without error and matches snapshot 1`] = `
 "## ✅ Apply Succeeded
 
-> ⚠️ **Warning:** Structured plan output was not available. Showing raw command output.
+> ⚠️ **Warning:** Report limited because \`terraform show -json <tfplan>\` output was not available. Showing raw command output.
 
 ### Apply Output
 
@@ -18717,7 +18717,7 @@ exports[`reportFromSteps integration — apply-only fixtures > terraform/import-
 exports[`reportFromSteps integration — apply-only fixtures > terraform/import-resource/1/apply-only > renders without error and matches snapshot 1`] = `
 "## ✅ Apply Succeeded
 
-> ⚠️ **Warning:** Structured plan output was not available. Showing raw command output.
+> ⚠️ **Warning:** Report limited because \`terraform show -json <tfplan>\` output was not available. Showing raw command output.
 
 ### Apply Output
 
@@ -18756,7 +18756,7 @@ exports[`reportFromSteps integration — apply-only fixtures > terraform/import-
 exports[`reportFromSteps integration — apply-only fixtures > terraform/local-files/0/apply-only > renders without error and matches snapshot 1`] = `
 "## ✅ Apply Succeeded
 
-> ⚠️ **Warning:** Structured plan output was not available. Showing raw command output.
+> ⚠️ **Warning:** Report limited because \`terraform show -json <tfplan>\` output was not available. Showing raw command output.
 
 ### Apply Output
 
@@ -18873,7 +18873,7 @@ exports[`reportFromSteps integration — apply-only fixtures > terraform/local-f
 exports[`reportFromSteps integration — apply-only fixtures > terraform/local-files/1/apply-only > renders without error and matches snapshot 1`] = `
 "## ✅ Apply Succeeded
 
-> ⚠️ **Warning:** Structured plan output was not available. Showing raw command output.
+> ⚠️ **Warning:** Report limited because \`terraform show -json <tfplan>\` output was not available. Showing raw command output.
 
 ### Apply Output
 
@@ -19040,7 +19040,7 @@ exports[`reportFromSteps integration — apply-only fixtures > terraform/local-f
 exports[`reportFromSteps integration — apply-only fixtures > terraform/moved-resource/0/apply-only > renders without error and matches snapshot 1`] = `
 "## ✅ Apply Succeeded
 
-> ⚠️ **Warning:** Structured plan output was not available. Showing raw command output.
+> ⚠️ **Warning:** Report limited because \`terraform show -json <tfplan>\` output was not available. Showing raw command output.
 
 ### Apply Output
 
@@ -19148,7 +19148,7 @@ exports[`reportFromSteps integration — apply-only fixtures > terraform/moved-r
 exports[`reportFromSteps integration — apply-only fixtures > terraform/moved-resource/1/apply-only > renders without error and matches snapshot 1`] = `
 "## ✅ Apply Succeeded
 
-> ⚠️ **Warning:** Structured plan output was not available. Showing raw command output.
+> ⚠️ **Warning:** Report limited because \`terraform show -json <tfplan>\` output was not available. Showing raw command output.
 
 ### Apply Output
 
@@ -19187,7 +19187,7 @@ exports[`reportFromSteps integration — apply-only fixtures > terraform/moved-r
 exports[`reportFromSteps integration — apply-only fixtures > terraform/no-detailed-exitcode/0/apply-only > renders without error and matches snapshot 1`] = `
 "## ✅ Apply Succeeded
 
-> ⚠️ **Warning:** Structured plan output was not available. Showing raw command output.
+> ⚠️ **Warning:** Report limited because \`terraform show -json <tfplan>\` output was not available. Showing raw command output.
 
 ### Apply Output
 
@@ -19295,7 +19295,7 @@ exports[`reportFromSteps integration — apply-only fixtures > terraform/no-deta
 exports[`reportFromSteps integration — apply-only fixtures > terraform/no-detailed-exitcode/1/apply-only > renders without error and matches snapshot 1`] = `
 "## ✅ Apply Succeeded
 
-> ⚠️ **Warning:** Structured plan output was not available. Showing raw command output.
+> ⚠️ **Warning:** Report limited because \`terraform show -json <tfplan>\` output was not available. Showing raw command output.
 
 ### Apply Output
 
@@ -19405,7 +19405,7 @@ exports[`reportFromSteps integration — apply-only fixtures > terraform/no-deta
 exports[`reportFromSteps integration — apply-only fixtures > terraform/no-json-flags/0/apply-only > renders without error and matches snapshot 1`] = `
 "## ✅ Apply Succeeded
 
-> ⚠️ **Warning:** Structured plan output was not available. Showing raw command output.
+> ⚠️ **Warning:** Report limited because \`show -json <tfplan>\` output was not available. Showing raw command output.
 
 ### Apply Output
 
@@ -19423,7 +19423,7 @@ Apply complete! Resources: 1 added, 0 changed, 0 destroyed.[0m
 exports[`reportFromSteps integration — apply-only fixtures > terraform/no-op/0/apply-only > renders without error and matches snapshot 1`] = `
 "## ✅ Apply Succeeded
 
-> ⚠️ **Warning:** Structured plan output was not available. Showing raw command output.
+> ⚠️ **Warning:** Report limited because \`terraform show -json <tfplan>\` output was not available. Showing raw command output.
 
 ### Apply Output
 
@@ -19531,7 +19531,7 @@ exports[`reportFromSteps integration — apply-only fixtures > terraform/no-op/0
 exports[`reportFromSteps integration — apply-only fixtures > terraform/no-op/1/apply-only > renders without error and matches snapshot 1`] = `
 "## ✅ Apply Succeeded
 
-> ⚠️ **Warning:** Structured plan output was not available. Showing raw command output.
+> ⚠️ **Warning:** Report limited because \`terraform show -json <tfplan>\` output was not available. Showing raw command output.
 
 ### Apply Output
 
@@ -19570,7 +19570,7 @@ exports[`reportFromSteps integration — apply-only fixtures > terraform/no-op/1
 exports[`reportFromSteps integration — apply-only fixtures > terraform/null-lifecycle/0/apply-only > renders without error and matches snapshot 1`] = `
 "## ✅ Apply Succeeded
 
-> ⚠️ **Warning:** Structured plan output was not available. Showing raw command output.
+> ⚠️ **Warning:** Report limited because \`terraform show -json <tfplan>\` output was not available. Showing raw command output.
 
 ### Apply Output
 
@@ -19609,7 +19609,7 @@ exports[`reportFromSteps integration — apply-only fixtures > terraform/null-li
 exports[`reportFromSteps integration — apply-only fixtures > terraform/null-lifecycle/1/apply-only > renders without error and matches snapshot 1`] = `
 "## ✅ Apply Succeeded
 
-> ⚠️ **Warning:** Structured plan output was not available. Showing raw command output.
+> ⚠️ **Warning:** Report limited because \`terraform show -json <tfplan>\` output was not available. Showing raw command output.
 
 ### Apply Output
 
@@ -19855,7 +19855,7 @@ exports[`reportFromSteps integration — apply-only fixtures > terraform/null-li
 exports[`reportFromSteps integration — apply-only fixtures > terraform/null-lifecycle/2/apply-only > renders without error and matches snapshot 1`] = `
 "## ✅ Apply Succeeded
 
-> ⚠️ **Warning:** Structured plan output was not available. Showing raw command output.
+> ⚠️ **Warning:** Report limited because \`terraform show -json <tfplan>\` output was not available. Showing raw command output.
 
 ### Apply Output
 
@@ -20157,7 +20157,7 @@ exports[`reportFromSteps integration — apply-only fixtures > terraform/null-li
 exports[`reportFromSteps integration — apply-only fixtures > terraform/plan-error/0/apply-only > renders without error and matches snapshot 1`] = `
 "## ✅ Apply Succeeded
 
-> ⚠️ **Warning:** Structured plan output was not available. Showing raw command output.
+> ⚠️ **Warning:** Report limited because \`terraform show -json <tfplan>\` output was not available. Showing raw command output.
 
 ### Apply Output
 
@@ -20281,7 +20281,7 @@ exports[`reportFromSteps integration — apply-only fixtures > terraform/plan-er
 exports[`reportFromSteps integration — apply-only fixtures > terraform/random-replace/0/apply-only > renders without error and matches snapshot 1`] = `
 "## ✅ Apply Succeeded
 
-> ⚠️ **Warning:** Structured plan output was not available. Showing raw command output.
+> ⚠️ **Warning:** Report limited because \`terraform show -json <tfplan>\` output was not available. Showing raw command output.
 
 ### Apply Output
 
@@ -20398,7 +20398,7 @@ exports[`reportFromSteps integration — apply-only fixtures > terraform/random-
 exports[`reportFromSteps integration — apply-only fixtures > terraform/random-replace/1/apply-only > renders without error and matches snapshot 1`] = `
 "## ✅ Apply Succeeded
 
-> ⚠️ **Warning:** Structured plan output was not available. Showing raw command output.
+> ⚠️ **Warning:** Report limited because \`terraform show -json <tfplan>\` output was not available. Showing raw command output.
 
 ### Apply Output
 
@@ -20565,7 +20565,7 @@ exports[`reportFromSteps integration — apply-only fixtures > terraform/random-
 exports[`reportFromSteps integration — apply-only fixtures > terraform/removed-resource/0/apply-only > renders without error and matches snapshot 1`] = `
 "## ✅ Apply Succeeded
 
-> ⚠️ **Warning:** Structured plan output was not available. Showing raw command output.
+> ⚠️ **Warning:** Report limited because \`terraform show -json <tfplan>\` output was not available. Showing raw command output.
 
 ### Apply Output
 
@@ -20742,7 +20742,7 @@ exports[`reportFromSteps integration — apply-only fixtures > terraform/removed
 exports[`reportFromSteps integration — apply-only fixtures > terraform/removed-resource/1/apply-only > renders without error and matches snapshot 1`] = `
 "## ✅ Apply Succeeded
 
-> ⚠️ **Warning:** Structured plan output was not available. Showing raw command output.
+> ⚠️ **Warning:** Report limited because \`terraform show -json <tfplan>\` output was not available. Showing raw command output.
 
 ### Apply Output
 
@@ -20804,7 +20804,7 @@ exports[`reportFromSteps integration — apply-only fixtures > terraform/removed
 exports[`reportFromSteps integration — apply-only fixtures > terraform/sensitive-values/0/apply-only > renders without error and matches snapshot 1`] = `
 "## ✅ Apply Succeeded
 
-> ⚠️ **Warning:** Structured plan output was not available. Showing raw command output.
+> ⚠️ **Warning:** Report limited because \`terraform show -json <tfplan>\` output was not available. Showing raw command output.
 
 ### Apply Output
 
@@ -20925,7 +20925,7 @@ exports[`reportFromSteps integration — apply-only fixtures > terraform/sensiti
 exports[`reportFromSteps integration — apply-only fixtures > terraform/sensitive-values/1/apply-only > renders without error and matches snapshot 1`] = `
 "## ✅ Apply Succeeded
 
-> ⚠️ **Warning:** Structured plan output was not available. Showing raw command output.
+> ⚠️ **Warning:** Report limited because \`terraform show -json <tfplan>\` output was not available. Showing raw command output.
 
 ### Apply Output
 
@@ -21096,7 +21096,7 @@ exports[`reportFromSteps integration — apply-only fixtures > terraform/sensiti
 exports[`reportFromSteps integration — apply-only fixtures > terraform/validate-error/0/apply-only > renders without error and matches snapshot 1`] = `
 "## ✅ Apply Succeeded
 
-> ⚠️ **Warning:** Structured plan output was not available. Showing raw command output.
+> ⚠️ **Warning:** Report limited because \`terraform show -json <tfplan>\` output was not available. Showing raw command output.
 
 ### Apply Output
 
@@ -21275,7 +21275,7 @@ exports[`reportFromSteps integration — apply-only fixtures > terraform/validat
 exports[`reportFromSteps integration — apply-only fixtures > terraform/with-modules/0/apply-only > renders without error and matches snapshot 1`] = `
 "## ✅ Apply Succeeded
 
-> ⚠️ **Warning:** Structured plan output was not available. Showing raw command output.
+> ⚠️ **Warning:** Report limited because \`terraform show -json <tfplan>\` output was not available. Showing raw command output.
 
 ### Apply Output
 
@@ -21467,7 +21467,7 @@ exports[`reportFromSteps integration — apply-only fixtures > terraform/with-mo
 exports[`reportFromSteps integration — apply-only fixtures > terraform/with-modules/1/apply-only > renders without error and matches snapshot 1`] = `
 "## ✅ Apply Succeeded
 
-> ⚠️ **Warning:** Structured plan output was not available. Showing raw command output.
+> ⚠️ **Warning:** Report limited because \`terraform show -json <tfplan>\` output was not available. Showing raw command output.
 
 ### Apply Output
 
@@ -21759,7 +21759,7 @@ exports[`reportFromSteps integration — apply-only fixtures > terraform/with-mo
 exports[`reportFromSteps integration — apply-only fixtures > tofu/apply-error/0/apply-only > renders without error and matches snapshot 1`] = `
 "## ✅ Apply Succeeded
 
-> ⚠️ **Warning:** Structured plan output was not available. Showing raw command output.
+> ⚠️ **Warning:** Report limited because \`tofu show -json <tfplan>\` output was not available. Showing raw command output.
 
 ### Apply Output
 
@@ -22108,7 +22108,7 @@ exports[`reportFromSteps integration — apply-only fixtures > tofu/apply-error/
 exports[`reportFromSteps integration — apply-only fixtures > tofu/apply-error/1/apply-only > renders without error and matches snapshot 1`] = `
 "## ❌ Apply Failed
 
-> ⚠️ **Warning:** Structured plan output was not available. Showing raw command output.
+> ⚠️ **Warning:** Report limited because \`tofu show -json <tfplan>\` output was not available. Showing raw command output.
 
 ### Apply Output
 
@@ -22366,7 +22366,7 @@ exports[`reportFromSteps integration — apply-only fixtures > tofu/apply-error/
 exports[`reportFromSteps integration — apply-only fixtures > tofu/deferred-data-source/0/apply-only > renders without error and matches snapshot 1`] = `
 "## ✅ Apply Succeeded
 
-> ⚠️ **Warning:** Structured plan output was not available. Showing raw command output.
+> ⚠️ **Warning:** Report limited because \`tofu show -json <tfplan>\` output was not available. Showing raw command output.
 
 ### Apply Output
 
@@ -22826,7 +22826,7 @@ exports[`reportFromSteps integration — apply-only fixtures > tofu/deferred-dat
 exports[`reportFromSteps integration — apply-only fixtures > tofu/deferred-data-source/1/apply-only > renders without error and matches snapshot 1`] = `
 "## ✅ Apply Succeeded
 
-> ⚠️ **Warning:** Structured plan output was not available. Showing raw command output.
+> ⚠️ **Warning:** Report limited because \`tofu show -json <tfplan>\` output was not available. Showing raw command output.
 
 ### Apply Output
 
@@ -23146,7 +23146,7 @@ exports[`reportFromSteps integration — apply-only fixtures > tofu/deferred-dat
 exports[`reportFromSteps integration — apply-only fixtures > tofu/deferred-data-source/2/apply-only > renders without error and matches snapshot 1`] = `
 "## ✅ Apply Succeeded
 
-> ⚠️ **Warning:** Structured plan output was not available. Showing raw command output.
+> ⚠️ **Warning:** Report limited because \`tofu show -json <tfplan>\` output was not available. Showing raw command output.
 
 ### Apply Output
 
@@ -23495,7 +23495,7 @@ exports[`reportFromSteps integration — apply-only fixtures > tofu/deferred-dat
 exports[`reportFromSteps integration — apply-only fixtures > tofu/import-resource/0/apply-only > renders without error and matches snapshot 1`] = `
 "## ✅ Apply Succeeded
 
-> ⚠️ **Warning:** Structured plan output was not available. Showing raw command output.
+> ⚠️ **Warning:** Report limited because \`tofu show -json <tfplan>\` output was not available. Showing raw command output.
 
 ### Apply Output
 
@@ -23603,7 +23603,7 @@ exports[`reportFromSteps integration — apply-only fixtures > tofu/import-resou
 exports[`reportFromSteps integration — apply-only fixtures > tofu/import-resource/1/apply-only > renders without error and matches snapshot 1`] = `
 "## ✅ Apply Succeeded
 
-> ⚠️ **Warning:** Structured plan output was not available. Showing raw command output.
+> ⚠️ **Warning:** Report limited because \`tofu show -json <tfplan>\` output was not available. Showing raw command output.
 
 ### Apply Output
 
@@ -23642,7 +23642,7 @@ exports[`reportFromSteps integration — apply-only fixtures > tofu/import-resou
 exports[`reportFromSteps integration — apply-only fixtures > tofu/local-files/0/apply-only > renders without error and matches snapshot 1`] = `
 "## ✅ Apply Succeeded
 
-> ⚠️ **Warning:** Structured plan output was not available. Showing raw command output.
+> ⚠️ **Warning:** Report limited because \`tofu show -json <tfplan>\` output was not available. Showing raw command output.
 
 ### Apply Output
 
@@ -23759,7 +23759,7 @@ exports[`reportFromSteps integration — apply-only fixtures > tofu/local-files/
 exports[`reportFromSteps integration — apply-only fixtures > tofu/local-files/1/apply-only > renders without error and matches snapshot 1`] = `
 "## ✅ Apply Succeeded
 
-> ⚠️ **Warning:** Structured plan output was not available. Showing raw command output.
+> ⚠️ **Warning:** Report limited because \`tofu show -json <tfplan>\` output was not available. Showing raw command output.
 
 ### Apply Output
 
@@ -23926,7 +23926,7 @@ exports[`reportFromSteps integration — apply-only fixtures > tofu/local-files/
 exports[`reportFromSteps integration — apply-only fixtures > tofu/moved-resource/0/apply-only > renders without error and matches snapshot 1`] = `
 "## ✅ Apply Succeeded
 
-> ⚠️ **Warning:** Structured plan output was not available. Showing raw command output.
+> ⚠️ **Warning:** Report limited because \`tofu show -json <tfplan>\` output was not available. Showing raw command output.
 
 ### Apply Output
 
@@ -24034,7 +24034,7 @@ exports[`reportFromSteps integration — apply-only fixtures > tofu/moved-resour
 exports[`reportFromSteps integration — apply-only fixtures > tofu/moved-resource/1/apply-only > renders without error and matches snapshot 1`] = `
 "## ✅ Apply Succeeded
 
-> ⚠️ **Warning:** Structured plan output was not available. Showing raw command output.
+> ⚠️ **Warning:** Report limited because \`tofu show -json <tfplan>\` output was not available. Showing raw command output.
 
 ### Apply Output
 
@@ -24073,7 +24073,7 @@ exports[`reportFromSteps integration — apply-only fixtures > tofu/moved-resour
 exports[`reportFromSteps integration — apply-only fixtures > tofu/no-detailed-exitcode/0/apply-only > renders without error and matches snapshot 1`] = `
 "## ✅ Apply Succeeded
 
-> ⚠️ **Warning:** Structured plan output was not available. Showing raw command output.
+> ⚠️ **Warning:** Report limited because \`tofu show -json <tfplan>\` output was not available. Showing raw command output.
 
 ### Apply Output
 
@@ -24181,7 +24181,7 @@ exports[`reportFromSteps integration — apply-only fixtures > tofu/no-detailed-
 exports[`reportFromSteps integration — apply-only fixtures > tofu/no-detailed-exitcode/1/apply-only > renders without error and matches snapshot 1`] = `
 "## ✅ Apply Succeeded
 
-> ⚠️ **Warning:** Structured plan output was not available. Showing raw command output.
+> ⚠️ **Warning:** Report limited because \`tofu show -json <tfplan>\` output was not available. Showing raw command output.
 
 ### Apply Output
 
@@ -24291,7 +24291,7 @@ exports[`reportFromSteps integration — apply-only fixtures > tofu/no-detailed-
 exports[`reportFromSteps integration — apply-only fixtures > tofu/no-json-flags/0/apply-only > renders without error and matches snapshot 1`] = `
 "## ✅ Apply Succeeded
 
-> ⚠️ **Warning:** Structured plan output was not available. Showing raw command output.
+> ⚠️ **Warning:** Report limited because \`show -json <tfplan>\` output was not available. Showing raw command output.
 
 ### Apply Output
 
@@ -24309,7 +24309,7 @@ Apply complete! Resources: 1 added, 0 changed, 0 destroyed.
 exports[`reportFromSteps integration — apply-only fixtures > tofu/no-op/0/apply-only > renders without error and matches snapshot 1`] = `
 "## ✅ Apply Succeeded
 
-> ⚠️ **Warning:** Structured plan output was not available. Showing raw command output.
+> ⚠️ **Warning:** Report limited because \`tofu show -json <tfplan>\` output was not available. Showing raw command output.
 
 ### Apply Output
 
@@ -24417,7 +24417,7 @@ exports[`reportFromSteps integration — apply-only fixtures > tofu/no-op/0/appl
 exports[`reportFromSteps integration — apply-only fixtures > tofu/no-op/1/apply-only > renders without error and matches snapshot 1`] = `
 "## ✅ Apply Succeeded
 
-> ⚠️ **Warning:** Structured plan output was not available. Showing raw command output.
+> ⚠️ **Warning:** Report limited because \`tofu show -json <tfplan>\` output was not available. Showing raw command output.
 
 ### Apply Output
 
@@ -24456,7 +24456,7 @@ exports[`reportFromSteps integration — apply-only fixtures > tofu/no-op/1/appl
 exports[`reportFromSteps integration — apply-only fixtures > tofu/null-lifecycle/0/apply-only > renders without error and matches snapshot 1`] = `
 "## ✅ Apply Succeeded
 
-> ⚠️ **Warning:** Structured plan output was not available. Showing raw command output.
+> ⚠️ **Warning:** Report limited because \`tofu show -json <tfplan>\` output was not available. Showing raw command output.
 
 ### Apply Output
 
@@ -24495,7 +24495,7 @@ exports[`reportFromSteps integration — apply-only fixtures > tofu/null-lifecyc
 exports[`reportFromSteps integration — apply-only fixtures > tofu/null-lifecycle/1/apply-only > renders without error and matches snapshot 1`] = `
 "## ✅ Apply Succeeded
 
-> ⚠️ **Warning:** Structured plan output was not available. Showing raw command output.
+> ⚠️ **Warning:** Report limited because \`tofu show -json <tfplan>\` output was not available. Showing raw command output.
 
 ### Apply Output
 
@@ -24741,7 +24741,7 @@ exports[`reportFromSteps integration — apply-only fixtures > tofu/null-lifecyc
 exports[`reportFromSteps integration — apply-only fixtures > tofu/null-lifecycle/2/apply-only > renders without error and matches snapshot 1`] = `
 "## ✅ Apply Succeeded
 
-> ⚠️ **Warning:** Structured plan output was not available. Showing raw command output.
+> ⚠️ **Warning:** Report limited because \`tofu show -json <tfplan>\` output was not available. Showing raw command output.
 
 ### Apply Output
 
@@ -25043,7 +25043,7 @@ exports[`reportFromSteps integration — apply-only fixtures > tofu/null-lifecyc
 exports[`reportFromSteps integration — apply-only fixtures > tofu/plan-error/0/apply-only > renders without error and matches snapshot 1`] = `
 "## ✅ Apply Succeeded
 
-> ⚠️ **Warning:** Structured plan output was not available. Showing raw command output.
+> ⚠️ **Warning:** Report limited because \`tofu show -json <tfplan>\` output was not available. Showing raw command output.
 
 ### Apply Output
 
@@ -25167,7 +25167,7 @@ exports[`reportFromSteps integration — apply-only fixtures > tofu/plan-error/1
 exports[`reportFromSteps integration — apply-only fixtures > tofu/random-replace/0/apply-only > renders without error and matches snapshot 1`] = `
 "## ✅ Apply Succeeded
 
-> ⚠️ **Warning:** Structured plan output was not available. Showing raw command output.
+> ⚠️ **Warning:** Report limited because \`tofu show -json <tfplan>\` output was not available. Showing raw command output.
 
 ### Apply Output
 
@@ -25284,7 +25284,7 @@ exports[`reportFromSteps integration — apply-only fixtures > tofu/random-repla
 exports[`reportFromSteps integration — apply-only fixtures > tofu/random-replace/1/apply-only > renders without error and matches snapshot 1`] = `
 "## ✅ Apply Succeeded
 
-> ⚠️ **Warning:** Structured plan output was not available. Showing raw command output.
+> ⚠️ **Warning:** Report limited because \`tofu show -json <tfplan>\` output was not available. Showing raw command output.
 
 ### Apply Output
 
@@ -25451,7 +25451,7 @@ exports[`reportFromSteps integration — apply-only fixtures > tofu/random-repla
 exports[`reportFromSteps integration — apply-only fixtures > tofu/removed-resource/0/apply-only > renders without error and matches snapshot 1`] = `
 "## ✅ Apply Succeeded
 
-> ⚠️ **Warning:** Structured plan output was not available. Showing raw command output.
+> ⚠️ **Warning:** Report limited because \`tofu show -json <tfplan>\` output was not available. Showing raw command output.
 
 ### Apply Output
 
@@ -25628,7 +25628,7 @@ exports[`reportFromSteps integration — apply-only fixtures > tofu/removed-reso
 exports[`reportFromSteps integration — apply-only fixtures > tofu/removed-resource/1/apply-only > renders without error and matches snapshot 1`] = `
 "## ✅ Apply Succeeded
 
-> ⚠️ **Warning:** Structured plan output was not available. Showing raw command output.
+> ⚠️ **Warning:** Report limited because \`tofu show -json <tfplan>\` output was not available. Showing raw command output.
 
 ### Apply Output
 
@@ -25690,7 +25690,7 @@ exports[`reportFromSteps integration — apply-only fixtures > tofu/removed-reso
 exports[`reportFromSteps integration — apply-only fixtures > tofu/sensitive-values/0/apply-only > renders without error and matches snapshot 1`] = `
 "## ✅ Apply Succeeded
 
-> ⚠️ **Warning:** Structured plan output was not available. Showing raw command output.
+> ⚠️ **Warning:** Report limited because \`tofu show -json <tfplan>\` output was not available. Showing raw command output.
 
 ### Apply Output
 
@@ -25811,7 +25811,7 @@ exports[`reportFromSteps integration — apply-only fixtures > tofu/sensitive-va
 exports[`reportFromSteps integration — apply-only fixtures > tofu/sensitive-values/1/apply-only > renders without error and matches snapshot 1`] = `
 "## ✅ Apply Succeeded
 
-> ⚠️ **Warning:** Structured plan output was not available. Showing raw command output.
+> ⚠️ **Warning:** Report limited because \`tofu show -json <tfplan>\` output was not available. Showing raw command output.
 
 ### Apply Output
 
@@ -25982,7 +25982,7 @@ exports[`reportFromSteps integration — apply-only fixtures > tofu/sensitive-va
 exports[`reportFromSteps integration — apply-only fixtures > tofu/validate-error/0/apply-only > renders without error and matches snapshot 1`] = `
 "## ✅ Apply Succeeded
 
-> ⚠️ **Warning:** Structured plan output was not available. Showing raw command output.
+> ⚠️ **Warning:** Report limited because \`tofu show -json <tfplan>\` output was not available. Showing raw command output.
 
 ### Apply Output
 
@@ -26161,7 +26161,7 @@ exports[`reportFromSteps integration — apply-only fixtures > tofu/validate-err
 exports[`reportFromSteps integration — apply-only fixtures > tofu/with-modules/0/apply-only > renders without error and matches snapshot 1`] = `
 "## ✅ Apply Succeeded
 
-> ⚠️ **Warning:** Structured plan output was not available. Showing raw command output.
+> ⚠️ **Warning:** Report limited because \`tofu show -json <tfplan>\` output was not available. Showing raw command output.
 
 ### Apply Output
 
@@ -26353,7 +26353,7 @@ exports[`reportFromSteps integration — apply-only fixtures > tofu/with-modules
 exports[`reportFromSteps integration — apply-only fixtures > tofu/with-modules/1/apply-only > renders without error and matches snapshot 1`] = `
 "## ✅ Apply Succeeded
 
-> ⚠️ **Warning:** Structured plan output was not available. Showing raw command output.
+> ⚠️ **Warning:** Report limited because \`tofu show -json <tfplan>\` output was not available. Showing raw command output.
 
 ### Apply Output
 
@@ -27827,7 +27827,7 @@ exports[`reportFromSteps integration — generated fixtures > terraform/no-json-
 
 ### ⚠️ \`apply\`: output could not be parsed
 
-> Apply output could not be parsed as structured data: Failed to parse UI log line 1: not valid JSON
+> Apply output could not be parsed: Failed to parse UI log line 1: not valid JSON. Expected JSON Lines output from \`tofu apply -json <tfplan>\`.
 
 <details open>
 <summary>stdout</summary>
@@ -27870,7 +27870,7 @@ exports[`reportFromSteps integration — generated fixtures > terraform/no-json-
 
 ### ⚠️ \`apply\`: output could not be parsed
 
-> Apply output could not be parsed as structured data: Failed to parse UI log line 1: not valid JSON
+> Apply output could not be parsed: Failed to parse UI log line 1: not valid JSON. Expected JSON Lines output from \`tofu apply -json <tfplan>\`.
 
 <details open>
 <summary>stdout</summary>
@@ -28260,7 +28260,7 @@ exports[`reportFromSteps integration — generated fixtures > terraform/plan-err
 "<!-- tf-report-action:"test-workspace" -->
 ## ❌ \`test-workspace\` Plan Failed
 
-> ⚠️ **Warning:** Structured plan output was not available. Showing raw command output.
+> ⚠️ **Warning:** Report limited because \`terraform show -json <tfplan>\` output was not available. Showing raw command output.
 
 ### Plan Output
 
@@ -28426,7 +28426,7 @@ exports[`reportFromSteps integration — generated fixtures > terraform/plan-err
 exports[`reportFromSteps integration — generated fixtures > terraform/plan-error/1 > renders without error and matches snapshot [default] 1`] = `
 "## ❌ Plan Failed
 
-> ⚠️ **Warning:** Structured plan output was not available. Showing raw command output.
+> ⚠️ **Warning:** Report limited because \`terraform show -json <tfplan>\` output was not available. Showing raw command output.
 
 ### Plan Output
 
@@ -30632,7 +30632,7 @@ exports[`reportFromSteps integration — generated fixtures > tofu/no-json-flags
 
 ### ⚠️ \`apply\`: output could not be parsed
 
-> Apply output could not be parsed as structured data: Failed to parse UI log line 1: not valid JSON
+> Apply output could not be parsed: Failed to parse UI log line 1: not valid JSON. Expected JSON Lines output from \`tofu apply -json <tfplan>\`.
 
 <details open>
 <summary>stdout</summary>
@@ -30675,7 +30675,7 @@ exports[`reportFromSteps integration — generated fixtures > tofu/no-json-flags
 
 ### ⚠️ \`apply\`: output could not be parsed
 
-> Apply output could not be parsed as structured data: Failed to parse UI log line 1: not valid JSON
+> Apply output could not be parsed: Failed to parse UI log line 1: not valid JSON. Expected JSON Lines output from \`tofu apply -json <tfplan>\`.
 
 <details open>
 <summary>stdout</summary>
@@ -31065,7 +31065,7 @@ exports[`reportFromSteps integration — generated fixtures > tofu/plan-error/1 
 "<!-- tf-report-action:"test-workspace" -->
 ## ❌ \`test-workspace\` Plan Failed
 
-> ⚠️ **Warning:** Structured plan output was not available. Showing raw command output.
+> ⚠️ **Warning:** Report limited because \`tofu show -json <tfplan>\` output was not available. Showing raw command output.
 
 ### Plan Output
 
@@ -31231,7 +31231,7 @@ exports[`reportFromSteps integration — generated fixtures > tofu/plan-error/1 
 exports[`reportFromSteps integration — generated fixtures > tofu/plan-error/1 > renders without error and matches snapshot [default] 1`] = `
 "## ❌ Plan Failed
 
-> ⚠️ **Warning:** Structured plan output was not available. Showing raw command output.
+> ⚠️ **Warning:** Report limited because \`tofu show -json <tfplan>\` output was not available. Showing raw command output.
 
 ### Plan Output
 
@@ -32279,7 +32279,7 @@ exports[`reportFromSteps integration — manual fixtures > manual/parse-failure 
 
 ### ⚠️ \`show-plan\`: output could not be parsed
 
-> Plan output could not be parsed: Failed to parse plan JSON: input is not valid JSON
+> Plan output could not be parsed: Failed to parse plan JSON: input is not valid JSON. Expected output from \`show -json <tfplan>\`.
 
 <details open>
 <summary>stdout</summary>
@@ -32354,7 +32354,7 @@ exports[`reportFromSteps integration — manual fixtures > manual/unrelated-work
 exports[`reportFromSteps integration — no-show fixtures (Tier 3) > terraform/apply-error/0/no-show > renders without error and matches snapshot 1`] = `
 "## ✅ Plan Succeeded
 
-> ⚠️ **Warning:** Structured plan output was not available. Showing raw command output.
+> ⚠️ **Warning:** Report limited because \`terraform show -json <tfplan>\` output was not available. Showing raw command output.
 
 ### Plan Output
 
@@ -32467,7 +32467,7 @@ exports[`reportFromSteps integration — no-show fixtures (Tier 3) > terraform/a
 exports[`reportFromSteps integration — no-show fixtures (Tier 3) > terraform/apply-error/1/no-show > renders without error and matches snapshot 1`] = `
 "## ✅ Plan Succeeded
 
-> ⚠️ **Warning:** Structured plan output was not available. Showing raw command output.
+> ⚠️ **Warning:** Report limited because \`terraform show -json <tfplan>\` output was not available. Showing raw command output.
 
 ### Plan Output
 
@@ -32699,7 +32699,7 @@ exports[`reportFromSteps integration — no-show fixtures (Tier 3) > terraform/a
 exports[`reportFromSteps integration — no-show fixtures (Tier 3) > terraform/deferred-data-source/0/no-show > renders without error and matches snapshot 1`] = `
 "## ✅ Plan Succeeded
 
-> ⚠️ **Warning:** Structured plan output was not available. Showing raw command output.
+> ⚠️ **Warning:** Report limited because \`terraform show -json <tfplan>\` output was not available. Showing raw command output.
 
 ### Plan Output
 
@@ -32873,7 +32873,7 @@ exports[`reportFromSteps integration — no-show fixtures (Tier 3) > terraform/d
 exports[`reportFromSteps integration — no-show fixtures (Tier 3) > terraform/deferred-data-source/1/no-show > renders without error and matches snapshot 1`] = `
 "## ✅ Plan Succeeded
 
-> ⚠️ **Warning:** Structured plan output was not available. Showing raw command output.
+> ⚠️ **Warning:** Report limited because \`terraform show -json <tfplan>\` output was not available. Showing raw command output.
 
 ### Plan Output
 
@@ -33277,7 +33277,7 @@ exports[`reportFromSteps integration — no-show fixtures (Tier 3) > terraform/d
 exports[`reportFromSteps integration — no-show fixtures (Tier 3) > terraform/deferred-data-source/2/no-show > renders without error and matches snapshot 1`] = `
 "## ✅ Plan Succeeded
 
-> ⚠️ **Warning:** Structured plan output was not available. Showing raw command output.
+> ⚠️ **Warning:** Report limited because \`terraform show -json <tfplan>\` output was not available. Showing raw command output.
 
 ### Plan Output
 
@@ -33708,7 +33708,7 @@ exports[`reportFromSteps integration — no-show fixtures (Tier 3) > terraform/d
 exports[`reportFromSteps integration — no-show fixtures (Tier 3) > terraform/import-resource/0/no-show > renders without error and matches snapshot 1`] = `
 "## ✅ Plan Succeeded
 
-> ⚠️ **Warning:** Structured plan output was not available. Showing raw command output.
+> ⚠️ **Warning:** Report limited because \`terraform show -json <tfplan>\` output was not available. Showing raw command output.
 
 ### Plan Output
 
@@ -33766,7 +33766,7 @@ exports[`reportFromSteps integration — no-show fixtures (Tier 3) > terraform/i
 exports[`reportFromSteps integration — no-show fixtures (Tier 3) > terraform/import-resource/1/no-show > renders without error and matches snapshot 1`] = `
 "## ✅ Plan Succeeded
 
-> ⚠️ **Warning:** Structured plan output was not available. Showing raw command output.
+> ⚠️ **Warning:** Report limited because \`terraform show -json <tfplan>\` output was not available. Showing raw command output.
 
 ### Plan Output
 
@@ -33918,7 +33918,7 @@ exports[`reportFromSteps integration — no-show fixtures (Tier 3) > terraform/i
 exports[`reportFromSteps integration — no-show fixtures (Tier 3) > terraform/local-files/0/no-show > renders without error and matches snapshot 1`] = `
 "## ✅ Plan Succeeded
 
-> ⚠️ **Warning:** Structured plan output was not available. Showing raw command output.
+> ⚠️ **Warning:** Report limited because \`terraform show -json <tfplan>\` output was not available. Showing raw command output.
 
 ### Plan Output
 
@@ -33985,7 +33985,7 @@ exports[`reportFromSteps integration — no-show fixtures (Tier 3) > terraform/l
 exports[`reportFromSteps integration — no-show fixtures (Tier 3) > terraform/local-files/1/no-show > renders without error and matches snapshot 1`] = `
 "## ✅ Plan Succeeded
 
-> ⚠️ **Warning:** Structured plan output was not available. Showing raw command output.
+> ⚠️ **Warning:** Report limited because \`terraform show -json <tfplan>\` output was not available. Showing raw command output.
 
 ### Plan Output
 
@@ -34100,7 +34100,7 @@ exports[`reportFromSteps integration — no-show fixtures (Tier 3) > terraform/l
 exports[`reportFromSteps integration — no-show fixtures (Tier 3) > terraform/moved-resource/0/no-show > renders without error and matches snapshot 1`] = `
 "## ✅ Plan Succeeded
 
-> ⚠️ **Warning:** Structured plan output was not available. Showing raw command output.
+> ⚠️ **Warning:** Report limited because \`terraform show -json <tfplan>\` output was not available. Showing raw command output.
 
 ### Plan Output
 
@@ -34158,7 +34158,7 @@ exports[`reportFromSteps integration — no-show fixtures (Tier 3) > terraform/m
 exports[`reportFromSteps integration — no-show fixtures (Tier 3) > terraform/moved-resource/1/no-show > renders without error and matches snapshot 1`] = `
 "## ✅ Plan Succeeded
 
-> ⚠️ **Warning:** Structured plan output was not available. Showing raw command output.
+> ⚠️ **Warning:** Report limited because \`terraform show -json <tfplan>\` output was not available. Showing raw command output.
 
 ### Plan Output
 
@@ -34276,7 +34276,7 @@ exports[`reportFromSteps integration — no-show fixtures (Tier 3) > terraform/m
 exports[`reportFromSteps integration — no-show fixtures (Tier 3) > terraform/no-detailed-exitcode/0/no-show > renders without error and matches snapshot 1`] = `
 "## ✅ Plan Succeeded
 
-> ⚠️ **Warning:** Structured plan output was not available. Showing raw command output.
+> ⚠️ **Warning:** Report limited because \`terraform show -json <tfplan>\` output was not available. Showing raw command output.
 
 ### Plan Output
 
@@ -34334,7 +34334,7 @@ exports[`reportFromSteps integration — no-show fixtures (Tier 3) > terraform/n
 exports[`reportFromSteps integration — no-show fixtures (Tier 3) > terraform/no-detailed-exitcode/1/no-show > renders without error and matches snapshot 1`] = `
 "## ✅ Plan Succeeded
 
-> ⚠️ **Warning:** Structured plan output was not available. Showing raw command output.
+> ⚠️ **Warning:** Report limited because \`terraform show -json <tfplan>\` output was not available. Showing raw command output.
 
 ### Plan Output
 
@@ -34440,7 +34440,7 @@ exports[`reportFromSteps integration — no-show fixtures (Tier 3) > terraform/n
 exports[`reportFromSteps integration — no-show fixtures (Tier 3) > terraform/no-json-flags/0/no-show > renders without error and matches snapshot 1`] = `
 "## ✅ Plan Succeeded
 
-> ⚠️ **Warning:** Structured plan output was not available. Showing raw command output.
+> ⚠️ **Warning:** Report limited because \`terraform show -json <tfplan>\` output was not available. Showing raw command output.
 
 ### Plan Output
 
@@ -34477,7 +34477,7 @@ To perform exactly these actions, run the following command to apply:
 exports[`reportFromSteps integration — no-show fixtures (Tier 3) > terraform/no-op/0/no-show > renders without error and matches snapshot 1`] = `
 "## ✅ Plan Succeeded
 
-> ⚠️ **Warning:** Structured plan output was not available. Showing raw command output.
+> ⚠️ **Warning:** Report limited because \`terraform show -json <tfplan>\` output was not available. Showing raw command output.
 
 ### Plan Output
 
@@ -34535,7 +34535,7 @@ exports[`reportFromSteps integration — no-show fixtures (Tier 3) > terraform/n
 exports[`reportFromSteps integration — no-show fixtures (Tier 3) > terraform/no-op/1/no-show > renders without error and matches snapshot 1`] = `
 "## ✅ Plan Succeeded
 
-> ⚠️ **Warning:** Structured plan output was not available. Showing raw command output.
+> ⚠️ **Warning:** Report limited because \`terraform show -json <tfplan>\` output was not available. Showing raw command output.
 
 ### Plan Output
 
@@ -34618,7 +34618,7 @@ exports[`reportFromSteps integration — no-show fixtures (Tier 3) > terraform/n
 exports[`reportFromSteps integration — no-show fixtures (Tier 3) > terraform/null-lifecycle/0/no-show > renders without error and matches snapshot 1`] = `
 "## ✅ Plan Succeeded
 
-> ⚠️ **Warning:** Structured plan output was not available. Showing raw command output.
+> ⚠️ **Warning:** Report limited because \`terraform show -json <tfplan>\` output was not available. Showing raw command output.
 
 ### Plan Output
 
@@ -34655,7 +34655,7 @@ exports[`reportFromSteps integration — no-show fixtures (Tier 3) > terraform/n
 exports[`reportFromSteps integration — no-show fixtures (Tier 3) > terraform/null-lifecycle/1/no-show > renders without error and matches snapshot 1`] = `
 "## ✅ Plan Succeeded
 
-> ⚠️ **Warning:** Structured plan output was not available. Showing raw command output.
+> ⚠️ **Warning:** Report limited because \`terraform show -json <tfplan>\` output was not available. Showing raw command output.
 
 ### Plan Output
 
@@ -34755,7 +34755,7 @@ exports[`reportFromSteps integration — no-show fixtures (Tier 3) > terraform/n
 exports[`reportFromSteps integration — no-show fixtures (Tier 3) > terraform/null-lifecycle/2/no-show > renders without error and matches snapshot 1`] = `
 "## ✅ Plan Succeeded
 
-> ⚠️ **Warning:** Structured plan output was not available. Showing raw command output.
+> ⚠️ **Warning:** Report limited because \`terraform show -json <tfplan>\` output was not available. Showing raw command output.
 
 ### Plan Output
 
@@ -34997,7 +34997,7 @@ exports[`reportFromSteps integration — no-show fixtures (Tier 3) > terraform/n
 exports[`reportFromSteps integration — no-show fixtures (Tier 3) > terraform/plan-error/0/no-show > renders without error and matches snapshot 1`] = `
 "## ✅ Plan Succeeded
 
-> ⚠️ **Warning:** Structured plan output was not available. Showing raw command output.
+> ⚠️ **Warning:** Report limited because \`terraform show -json <tfplan>\` output was not available. Showing raw command output.
 
 ### Plan Output
 
@@ -35055,7 +35055,7 @@ exports[`reportFromSteps integration — no-show fixtures (Tier 3) > terraform/p
 exports[`reportFromSteps integration — no-show fixtures (Tier 3) > terraform/plan-error/1/no-show > renders without error and matches snapshot 1`] = `
 "## ❌ Plan Failed
 
-> ⚠️ **Warning:** Structured plan output was not available. Showing raw command output.
+> ⚠️ **Warning:** Report limited because \`terraform show -json <tfplan>\` output was not available. Showing raw command output.
 
 ### Plan Output
 
@@ -35221,7 +35221,7 @@ exports[`reportFromSteps integration — no-show fixtures (Tier 3) > terraform/p
 exports[`reportFromSteps integration — no-show fixtures (Tier 3) > terraform/random-replace/0/no-show > renders without error and matches snapshot 1`] = `
 "## ✅ Plan Succeeded
 
-> ⚠️ **Warning:** Structured plan output was not available. Showing raw command output.
+> ⚠️ **Warning:** Report limited because \`terraform show -json <tfplan>\` output was not available. Showing raw command output.
 
 ### Plan Output
 
@@ -35288,7 +35288,7 @@ exports[`reportFromSteps integration — no-show fixtures (Tier 3) > terraform/r
 exports[`reportFromSteps integration — no-show fixtures (Tier 3) > terraform/random-replace/1/no-show > renders without error and matches snapshot 1`] = `
 "## ✅ Plan Succeeded
 
-> ⚠️ **Warning:** Structured plan output was not available. Showing raw command output.
+> ⚠️ **Warning:** Report limited because \`terraform show -json <tfplan>\` output was not available. Showing raw command output.
 
 ### Plan Output
 
@@ -35403,7 +35403,7 @@ exports[`reportFromSteps integration — no-show fixtures (Tier 3) > terraform/r
 exports[`reportFromSteps integration — no-show fixtures (Tier 3) > terraform/removed-resource/0/no-show > renders without error and matches snapshot 1`] = `
 "## ✅ Plan Succeeded
 
-> ⚠️ **Warning:** Structured plan output was not available. Showing raw command output.
+> ⚠️ **Warning:** Report limited because \`terraform show -json <tfplan>\` output was not available. Showing raw command output.
 
 ### Plan Output
 
@@ -35482,7 +35482,7 @@ exports[`reportFromSteps integration — no-show fixtures (Tier 3) > terraform/r
 exports[`reportFromSteps integration — no-show fixtures (Tier 3) > terraform/removed-resource/1/no-show > renders without error and matches snapshot 1`] = `
 "## ✅ Plan Succeeded
 
-> ⚠️ **Warning:** Structured plan output was not available. Showing raw command output.
+> ⚠️ **Warning:** Report limited because \`terraform show -json <tfplan>\` output was not available. Showing raw command output.
 
 ### Plan Output
 
@@ -35599,7 +35599,7 @@ exports[`reportFromSteps integration — no-show fixtures (Tier 3) > terraform/r
 exports[`reportFromSteps integration — no-show fixtures (Tier 3) > terraform/sensitive-values/0/no-show > renders without error and matches snapshot 1`] = `
 "## ✅ Plan Succeeded
 
-> ⚠️ **Warning:** Structured plan output was not available. Showing raw command output.
+> ⚠️ **Warning:** Report limited because \`terraform show -json <tfplan>\` output was not available. Showing raw command output.
 
 ### Plan Output
 
@@ -35670,7 +35670,7 @@ exports[`reportFromSteps integration — no-show fixtures (Tier 3) > terraform/s
 exports[`reportFromSteps integration — no-show fixtures (Tier 3) > terraform/sensitive-values/1/no-show > renders without error and matches snapshot 1`] = `
 "## ✅ Plan Succeeded
 
-> ⚠️ **Warning:** Structured plan output was not available. Showing raw command output.
+> ⚠️ **Warning:** Report limited because \`terraform show -json <tfplan>\` output was not available. Showing raw command output.
 
 ### Plan Output
 
@@ -35789,7 +35789,7 @@ exports[`reportFromSteps integration — no-show fixtures (Tier 3) > terraform/s
 exports[`reportFromSteps integration — no-show fixtures (Tier 3) > terraform/validate-error/0/no-show > renders without error and matches snapshot 1`] = `
 "## ✅ Plan Succeeded
 
-> ⚠️ **Warning:** Structured plan output was not available. Showing raw command output.
+> ⚠️ **Warning:** Report limited because \`terraform show -json <tfplan>\` output was not available. Showing raw command output.
 
 ### Plan Output
 
@@ -35918,7 +35918,7 @@ exports[`reportFromSteps integration — no-show fixtures (Tier 3) > terraform/v
 exports[`reportFromSteps integration — no-show fixtures (Tier 3) > terraform/with-modules/0/no-show > renders without error and matches snapshot 1`] = `
 "## ✅ Plan Succeeded
 
-> ⚠️ **Warning:** Structured plan output was not available. Showing raw command output.
+> ⚠️ **Warning:** Report limited because \`terraform show -json <tfplan>\` output was not available. Showing raw command output.
 
 ### Plan Output
 
@@ -36010,7 +36010,7 @@ exports[`reportFromSteps integration — no-show fixtures (Tier 3) > terraform/w
 exports[`reportFromSteps integration — no-show fixtures (Tier 3) > terraform/with-modules/1/no-show > renders without error and matches snapshot 1`] = `
 "## ✅ Plan Succeeded
 
-> ⚠️ **Warning:** Structured plan output was not available. Showing raw command output.
+> ⚠️ **Warning:** Report limited because \`terraform show -json <tfplan>\` output was not available. Showing raw command output.
 
 ### Plan Output
 
@@ -36198,7 +36198,7 @@ exports[`reportFromSteps integration — no-show fixtures (Tier 3) > terraform/w
 exports[`reportFromSteps integration — no-show fixtures (Tier 3) > tofu/apply-error/0/no-show > renders without error and matches snapshot 1`] = `
 "## ✅ Plan Succeeded
 
-> ⚠️ **Warning:** Structured plan output was not available. Showing raw command output.
+> ⚠️ **Warning:** Report limited because \`tofu show -json <tfplan>\` output was not available. Showing raw command output.
 
 ### Plan Output
 
@@ -36311,7 +36311,7 @@ exports[`reportFromSteps integration — no-show fixtures (Tier 3) > tofu/apply-
 exports[`reportFromSteps integration — no-show fixtures (Tier 3) > tofu/apply-error/1/no-show > renders without error and matches snapshot 1`] = `
 "## ✅ Plan Succeeded
 
-> ⚠️ **Warning:** Structured plan output was not available. Showing raw command output.
+> ⚠️ **Warning:** Report limited because \`tofu show -json <tfplan>\` output was not available. Showing raw command output.
 
 ### Plan Output
 
@@ -36543,7 +36543,7 @@ exports[`reportFromSteps integration — no-show fixtures (Tier 3) > tofu/apply-
 exports[`reportFromSteps integration — no-show fixtures (Tier 3) > tofu/deferred-data-source/0/no-show > renders without error and matches snapshot 1`] = `
 "## ✅ Plan Succeeded
 
-> ⚠️ **Warning:** Structured plan output was not available. Showing raw command output.
+> ⚠️ **Warning:** Report limited because \`tofu show -json <tfplan>\` output was not available. Showing raw command output.
 
 ### Plan Output
 
@@ -36717,7 +36717,7 @@ exports[`reportFromSteps integration — no-show fixtures (Tier 3) > tofu/deferr
 exports[`reportFromSteps integration — no-show fixtures (Tier 3) > tofu/deferred-data-source/1/no-show > renders without error and matches snapshot 1`] = `
 "## ✅ Plan Succeeded
 
-> ⚠️ **Warning:** Structured plan output was not available. Showing raw command output.
+> ⚠️ **Warning:** Report limited because \`tofu show -json <tfplan>\` output was not available. Showing raw command output.
 
 ### Plan Output
 
@@ -37121,7 +37121,7 @@ exports[`reportFromSteps integration — no-show fixtures (Tier 3) > tofu/deferr
 exports[`reportFromSteps integration — no-show fixtures (Tier 3) > tofu/deferred-data-source/2/no-show > renders without error and matches snapshot 1`] = `
 "## ✅ Plan Succeeded
 
-> ⚠️ **Warning:** Structured plan output was not available. Showing raw command output.
+> ⚠️ **Warning:** Report limited because \`tofu show -json <tfplan>\` output was not available. Showing raw command output.
 
 ### Plan Output
 
@@ -37552,7 +37552,7 @@ exports[`reportFromSteps integration — no-show fixtures (Tier 3) > tofu/deferr
 exports[`reportFromSteps integration — no-show fixtures (Tier 3) > tofu/import-resource/0/no-show > renders without error and matches snapshot 1`] = `
 "## ✅ Plan Succeeded
 
-> ⚠️ **Warning:** Structured plan output was not available. Showing raw command output.
+> ⚠️ **Warning:** Report limited because \`tofu show -json <tfplan>\` output was not available. Showing raw command output.
 
 ### Plan Output
 
@@ -37610,7 +37610,7 @@ exports[`reportFromSteps integration — no-show fixtures (Tier 3) > tofu/import
 exports[`reportFromSteps integration — no-show fixtures (Tier 3) > tofu/import-resource/1/no-show > renders without error and matches snapshot 1`] = `
 "## ✅ Plan Succeeded
 
-> ⚠️ **Warning:** Structured plan output was not available. Showing raw command output.
+> ⚠️ **Warning:** Report limited because \`tofu show -json <tfplan>\` output was not available. Showing raw command output.
 
 ### Plan Output
 
@@ -37762,7 +37762,7 @@ exports[`reportFromSteps integration — no-show fixtures (Tier 3) > tofu/import
 exports[`reportFromSteps integration — no-show fixtures (Tier 3) > tofu/local-files/0/no-show > renders without error and matches snapshot 1`] = `
 "## ✅ Plan Succeeded
 
-> ⚠️ **Warning:** Structured plan output was not available. Showing raw command output.
+> ⚠️ **Warning:** Report limited because \`tofu show -json <tfplan>\` output was not available. Showing raw command output.
 
 ### Plan Output
 
@@ -37829,7 +37829,7 @@ exports[`reportFromSteps integration — no-show fixtures (Tier 3) > tofu/local-
 exports[`reportFromSteps integration — no-show fixtures (Tier 3) > tofu/local-files/1/no-show > renders without error and matches snapshot 1`] = `
 "## ✅ Plan Succeeded
 
-> ⚠️ **Warning:** Structured plan output was not available. Showing raw command output.
+> ⚠️ **Warning:** Report limited because \`tofu show -json <tfplan>\` output was not available. Showing raw command output.
 
 ### Plan Output
 
@@ -37944,7 +37944,7 @@ exports[`reportFromSteps integration — no-show fixtures (Tier 3) > tofu/local-
 exports[`reportFromSteps integration — no-show fixtures (Tier 3) > tofu/moved-resource/0/no-show > renders without error and matches snapshot 1`] = `
 "## ✅ Plan Succeeded
 
-> ⚠️ **Warning:** Structured plan output was not available. Showing raw command output.
+> ⚠️ **Warning:** Report limited because \`tofu show -json <tfplan>\` output was not available. Showing raw command output.
 
 ### Plan Output
 
@@ -38002,7 +38002,7 @@ exports[`reportFromSteps integration — no-show fixtures (Tier 3) > tofu/moved-
 exports[`reportFromSteps integration — no-show fixtures (Tier 3) > tofu/moved-resource/1/no-show > renders without error and matches snapshot 1`] = `
 "## ✅ Plan Succeeded
 
-> ⚠️ **Warning:** Structured plan output was not available. Showing raw command output.
+> ⚠️ **Warning:** Report limited because \`tofu show -json <tfplan>\` output was not available. Showing raw command output.
 
 ### Plan Output
 
@@ -38120,7 +38120,7 @@ exports[`reportFromSteps integration — no-show fixtures (Tier 3) > tofu/moved-
 exports[`reportFromSteps integration — no-show fixtures (Tier 3) > tofu/no-detailed-exitcode/0/no-show > renders without error and matches snapshot 1`] = `
 "## ✅ Plan Succeeded
 
-> ⚠️ **Warning:** Structured plan output was not available. Showing raw command output.
+> ⚠️ **Warning:** Report limited because \`tofu show -json <tfplan>\` output was not available. Showing raw command output.
 
 ### Plan Output
 
@@ -38178,7 +38178,7 @@ exports[`reportFromSteps integration — no-show fixtures (Tier 3) > tofu/no-det
 exports[`reportFromSteps integration — no-show fixtures (Tier 3) > tofu/no-detailed-exitcode/1/no-show > renders without error and matches snapshot 1`] = `
 "## ✅ Plan Succeeded
 
-> ⚠️ **Warning:** Structured plan output was not available. Showing raw command output.
+> ⚠️ **Warning:** Report limited because \`tofu show -json <tfplan>\` output was not available. Showing raw command output.
 
 ### Plan Output
 
@@ -38284,7 +38284,7 @@ exports[`reportFromSteps integration — no-show fixtures (Tier 3) > tofu/no-det
 exports[`reportFromSteps integration — no-show fixtures (Tier 3) > tofu/no-json-flags/0/no-show > renders without error and matches snapshot 1`] = `
 "## ✅ Plan Succeeded
 
-> ⚠️ **Warning:** Structured plan output was not available. Showing raw command output.
+> ⚠️ **Warning:** Report limited because \`tofu show -json <tfplan>\` output was not available. Showing raw command output.
 
 ### Plan Output
 
@@ -38321,7 +38321,7 @@ To perform exactly these actions, run the following command to apply:
 exports[`reportFromSteps integration — no-show fixtures (Tier 3) > tofu/no-op/0/no-show > renders without error and matches snapshot 1`] = `
 "## ✅ Plan Succeeded
 
-> ⚠️ **Warning:** Structured plan output was not available. Showing raw command output.
+> ⚠️ **Warning:** Report limited because \`tofu show -json <tfplan>\` output was not available. Showing raw command output.
 
 ### Plan Output
 
@@ -38379,7 +38379,7 @@ exports[`reportFromSteps integration — no-show fixtures (Tier 3) > tofu/no-op/
 exports[`reportFromSteps integration — no-show fixtures (Tier 3) > tofu/no-op/1/no-show > renders without error and matches snapshot 1`] = `
 "## ✅ Plan Succeeded
 
-> ⚠️ **Warning:** Structured plan output was not available. Showing raw command output.
+> ⚠️ **Warning:** Report limited because \`tofu show -json <tfplan>\` output was not available. Showing raw command output.
 
 ### Plan Output
 
@@ -38462,7 +38462,7 @@ exports[`reportFromSteps integration — no-show fixtures (Tier 3) > tofu/no-op/
 exports[`reportFromSteps integration — no-show fixtures (Tier 3) > tofu/null-lifecycle/0/no-show > renders without error and matches snapshot 1`] = `
 "## ✅ Plan Succeeded
 
-> ⚠️ **Warning:** Structured plan output was not available. Showing raw command output.
+> ⚠️ **Warning:** Report limited because \`tofu show -json <tfplan>\` output was not available. Showing raw command output.
 
 ### Plan Output
 
@@ -38499,7 +38499,7 @@ exports[`reportFromSteps integration — no-show fixtures (Tier 3) > tofu/null-l
 exports[`reportFromSteps integration — no-show fixtures (Tier 3) > tofu/null-lifecycle/1/no-show > renders without error and matches snapshot 1`] = `
 "## ✅ Plan Succeeded
 
-> ⚠️ **Warning:** Structured plan output was not available. Showing raw command output.
+> ⚠️ **Warning:** Report limited because \`tofu show -json <tfplan>\` output was not available. Showing raw command output.
 
 ### Plan Output
 
@@ -38599,7 +38599,7 @@ exports[`reportFromSteps integration — no-show fixtures (Tier 3) > tofu/null-l
 exports[`reportFromSteps integration — no-show fixtures (Tier 3) > tofu/null-lifecycle/2/no-show > renders without error and matches snapshot 1`] = `
 "## ✅ Plan Succeeded
 
-> ⚠️ **Warning:** Structured plan output was not available. Showing raw command output.
+> ⚠️ **Warning:** Report limited because \`tofu show -json <tfplan>\` output was not available. Showing raw command output.
 
 ### Plan Output
 
@@ -38841,7 +38841,7 @@ exports[`reportFromSteps integration — no-show fixtures (Tier 3) > tofu/null-l
 exports[`reportFromSteps integration — no-show fixtures (Tier 3) > tofu/plan-error/0/no-show > renders without error and matches snapshot 1`] = `
 "## ✅ Plan Succeeded
 
-> ⚠️ **Warning:** Structured plan output was not available. Showing raw command output.
+> ⚠️ **Warning:** Report limited because \`tofu show -json <tfplan>\` output was not available. Showing raw command output.
 
 ### Plan Output
 
@@ -38899,7 +38899,7 @@ exports[`reportFromSteps integration — no-show fixtures (Tier 3) > tofu/plan-e
 exports[`reportFromSteps integration — no-show fixtures (Tier 3) > tofu/plan-error/1/no-show > renders without error and matches snapshot 1`] = `
 "## ❌ Plan Failed
 
-> ⚠️ **Warning:** Structured plan output was not available. Showing raw command output.
+> ⚠️ **Warning:** Report limited because \`tofu show -json <tfplan>\` output was not available. Showing raw command output.
 
 ### Plan Output
 
@@ -39065,7 +39065,7 @@ exports[`reportFromSteps integration — no-show fixtures (Tier 3) > tofu/plan-e
 exports[`reportFromSteps integration — no-show fixtures (Tier 3) > tofu/random-replace/0/no-show > renders without error and matches snapshot 1`] = `
 "## ✅ Plan Succeeded
 
-> ⚠️ **Warning:** Structured plan output was not available. Showing raw command output.
+> ⚠️ **Warning:** Report limited because \`tofu show -json <tfplan>\` output was not available. Showing raw command output.
 
 ### Plan Output
 
@@ -39132,7 +39132,7 @@ exports[`reportFromSteps integration — no-show fixtures (Tier 3) > tofu/random
 exports[`reportFromSteps integration — no-show fixtures (Tier 3) > tofu/random-replace/1/no-show > renders without error and matches snapshot 1`] = `
 "## ✅ Plan Succeeded
 
-> ⚠️ **Warning:** Structured plan output was not available. Showing raw command output.
+> ⚠️ **Warning:** Report limited because \`tofu show -json <tfplan>\` output was not available. Showing raw command output.
 
 ### Plan Output
 
@@ -39247,7 +39247,7 @@ exports[`reportFromSteps integration — no-show fixtures (Tier 3) > tofu/random
 exports[`reportFromSteps integration — no-show fixtures (Tier 3) > tofu/removed-resource/0/no-show > renders without error and matches snapshot 1`] = `
 "## ✅ Plan Succeeded
 
-> ⚠️ **Warning:** Structured plan output was not available. Showing raw command output.
+> ⚠️ **Warning:** Report limited because \`tofu show -json <tfplan>\` output was not available. Showing raw command output.
 
 ### Plan Output
 
@@ -39326,7 +39326,7 @@ exports[`reportFromSteps integration — no-show fixtures (Tier 3) > tofu/remove
 exports[`reportFromSteps integration — no-show fixtures (Tier 3) > tofu/removed-resource/1/no-show > renders without error and matches snapshot 1`] = `
 "## ✅ Plan Succeeded
 
-> ⚠️ **Warning:** Structured plan output was not available. Showing raw command output.
+> ⚠️ **Warning:** Report limited because \`tofu show -json <tfplan>\` output was not available. Showing raw command output.
 
 ### Plan Output
 
@@ -39489,7 +39489,7 @@ exports[`reportFromSteps integration — no-show fixtures (Tier 3) > tofu/remove
 exports[`reportFromSteps integration — no-show fixtures (Tier 3) > tofu/sensitive-values/0/no-show > renders without error and matches snapshot 1`] = `
 "## ✅ Plan Succeeded
 
-> ⚠️ **Warning:** Structured plan output was not available. Showing raw command output.
+> ⚠️ **Warning:** Report limited because \`tofu show -json <tfplan>\` output was not available. Showing raw command output.
 
 ### Plan Output
 
@@ -39560,7 +39560,7 @@ exports[`reportFromSteps integration — no-show fixtures (Tier 3) > tofu/sensit
 exports[`reportFromSteps integration — no-show fixtures (Tier 3) > tofu/sensitive-values/1/no-show > renders without error and matches snapshot 1`] = `
 "## ✅ Plan Succeeded
 
-> ⚠️ **Warning:** Structured plan output was not available. Showing raw command output.
+> ⚠️ **Warning:** Report limited because \`tofu show -json <tfplan>\` output was not available. Showing raw command output.
 
 ### Plan Output
 
@@ -39679,7 +39679,7 @@ exports[`reportFromSteps integration — no-show fixtures (Tier 3) > tofu/sensit
 exports[`reportFromSteps integration — no-show fixtures (Tier 3) > tofu/validate-error/0/no-show > renders without error and matches snapshot 1`] = `
 "## ✅ Plan Succeeded
 
-> ⚠️ **Warning:** Structured plan output was not available. Showing raw command output.
+> ⚠️ **Warning:** Report limited because \`tofu show -json <tfplan>\` output was not available. Showing raw command output.
 
 ### Plan Output
 
@@ -39808,7 +39808,7 @@ exports[`reportFromSteps integration — no-show fixtures (Tier 3) > tofu/valida
 exports[`reportFromSteps integration — no-show fixtures (Tier 3) > tofu/with-modules/0/no-show > renders without error and matches snapshot 1`] = `
 "## ✅ Plan Succeeded
 
-> ⚠️ **Warning:** Structured plan output was not available. Showing raw command output.
+> ⚠️ **Warning:** Report limited because \`tofu show -json <tfplan>\` output was not available. Showing raw command output.
 
 ### Plan Output
 
@@ -39900,7 +39900,7 @@ exports[`reportFromSteps integration — no-show fixtures (Tier 3) > tofu/with-m
 exports[`reportFromSteps integration — no-show fixtures (Tier 3) > tofu/with-modules/1/no-show > renders without error and matches snapshot 1`] = `
 "## ✅ Plan Succeeded
 
-> ⚠️ **Warning:** Structured plan output was not available. Showing raw command output.
+> ⚠️ **Warning:** Report limited because \`tofu show -json <tfplan>\` output was not available. Showing raw command output.
 
 ### Plan Output
 
@@ -40906,7 +40906,7 @@ exports[`reportFromSteps integration — plan-only fixtures > terraform/plan-err
 exports[`reportFromSteps integration — plan-only fixtures > terraform/plan-error/1/plan-only > renders plan report and matches snapshot 1`] = `
 "## ❌ Plan Failed
 
-> ⚠️ **Warning:** Structured plan output was not available. Showing raw command output.
+> ⚠️ **Warning:** Report limited because \`terraform show -json <tfplan>\` output was not available. Showing raw command output.
 
 ### Plan Output
 
@@ -42313,7 +42313,7 @@ exports[`reportFromSteps integration — plan-only fixtures > tofu/plan-error/0/
 exports[`reportFromSteps integration — plan-only fixtures > tofu/plan-error/1/plan-only > renders plan report and matches snapshot 1`] = `
 "## ❌ Plan Failed
 
-> ⚠️ **Warning:** Structured plan output was not available. Showing raw command output.
+> ⚠️ **Warning:** Report limited because \`tofu show -json <tfplan>\` output was not available. Showing raw command output.
 
 ### Plan Output
 

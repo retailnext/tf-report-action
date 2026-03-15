@@ -10,8 +10,9 @@ import type { BuildOptions } from "./options.js";
 import type { RenderOptions } from "../renderer/options.js";
 import type { Env } from "../env/index.js";
 import type { Steps, StepData, ReaderOptions } from "../steps/types.js";
-import type { Report, StructuredReport, TextFallbackReport, WorkflowReport, ErrorReport } from "../model/report.js";
+import type { Report, StructuredReport, TextFallbackReport, WorkflowReport, ErrorReport, Tool, FallbackReason } from "../model/report.js";
 import type { StepIssue } from "../model/step-issue.js";
+import { expectedCommand } from "../model/step-commands.js";
 import { parseSteps } from "../steps/parse.js";
 import {
   DEFAULT_INIT_STEP,
@@ -24,7 +25,7 @@ import {
 } from "../steps/types.js";
 import { readStepStdout } from "../steps/io.js";
 import { getStepOutcome, hasAnyFailedStep, hasAnyFailedKnownStep, buildStepOutcomes } from "../steps/outcomes.js";
-import { parsePlan, parseUILog } from "../parser/index.js";
+import { parsePlan, parseUILog, detectToolFromPlan, detectToolFromOutput } from "../parser/index.js";
 import { buildReport } from "./index.js";
 import { buildApplyReport } from "./apply.js";
 import { detectTier } from "./tier.js";
@@ -46,6 +47,13 @@ export interface ReportOptions extends BuildOptions, RenderOptions {
   workspace?: string;
   /** Environment variables (defaults to process.env). Injected for testability. */
   env?: Env;
+  /**
+   * IaC tool CLI command name for error messages.
+   *
+   * Auto-detected from available step outputs when not provided. Set this
+   * to override auto-detection.
+   */
+  tool?: Tool;
   /** Step ID for the init step. Default: "init" */
   initStep?: string;
   /** Step ID for the validate step. Default: "validate" */
@@ -120,17 +128,24 @@ export function buildReportFromSteps(
   // Determine report tier
   const tier = detectTier(showPlanStep, planStep, applyStep, readerOpts);
 
+  // Tool name — explicit override or auto-detected later
+  let tool: Tool | undefined = options?.tool;
+
   switch (tier.kind) {
     case "tier1": {
       return buildTier1Report(
         tier.showPlanJson, showPlanStep, showPlanStepId, applyStep, applyStepId,
         steps, knownStepIds, issues, hasStepFailures, workspace, logsUrl,
-        readerOpts, options,
+        readerOpts, options, tool,
       );
     }
     case "tier3": {
+      // Auto-detect tool from available raw content
+      tool ??= detectToolFromOutput(tier.planRead?.content)
+            ?? detectToolFromOutput(tier.applyRead?.content);
       return buildTextFallbackReport(
         tier, steps, knownStepIds, issues, workspace, logsUrl,
+        tool, "show-plan-unavailable",
       );
     }
     case "tier4": {
@@ -153,6 +168,7 @@ function buildTier1Report(
   logsUrl: string | undefined,
   readerOpts: ReaderOptions,
   options: ReportOptions | undefined,
+  tool: Tool | undefined,
 ): Report {
   let report: StructuredReport;
   let isApplyMode = false;
@@ -162,13 +178,18 @@ function buildTier1Report(
   try {
     plan = parsePlan(showPlanJson);
   } catch (planErr: unknown) {
-    // Plan parse failed — show-plan step produced unreadable output
+    // Plan parse failed — show-plan step produced unparseable output.
+    // Try to detect the tool from the raw content before falling back.
+    tool ??= detectToolFromOutput(showPlanJson);
+
+    const errorDetail = planErr instanceof Error ? planErr.message : "unknown error";
+    const commandHint = expectedCommand(tool, "show-plan");
     if (showPlanStep) {
       issues.push(buildStepIssue(
         showPlanStep,
         showPlanStepId,
         readerOpts,
-        `Plan output could not be parsed: ${planErr instanceof Error ? planErr.message : "unknown error"}`,
+        `Plan output could not be parsed: ${errorDetail}. Expected output from \`${commandHint}\`.`,
       ));
     }
     // Fall through to Tier 3 if plan or apply steps have raw output
@@ -176,8 +197,12 @@ function buildTier1Report(
     if (planStep || applyStep) {
       const fallbackTier = detectTier(undefined, planStep, applyStep, readerOpts);
       if (fallbackTier.kind === "tier3") {
+        // Try to detect tool from fallback content too
+        tool ??= detectToolFromOutput(fallbackTier.planRead?.content)
+              ?? detectToolFromOutput(fallbackTier.applyRead?.content);
         return buildTextFallbackReport(
           fallbackTier, steps, knownStepIds, issues, workspace, logsUrl,
+          tool, "show-plan-parse-error",
         );
       }
     }
@@ -189,6 +214,9 @@ function buildTier1Report(
     );
   }
 
+  // Auto-detect tool from the successfully parsed plan
+  tool ??= detectToolFromPlan(plan);
+
   // If apply step is present, try to parse its JSONL output
   if (applyStep && getStepOutcome(applyStep) !== "skipped") {
     isApplyMode = true;
@@ -199,11 +227,15 @@ function buildTier1Report(
         report = buildApplyReport(plan, messages, options);
       } catch (applyErr: unknown) {
         report = buildReport(plan, options);
+        // Auto-detect tool from apply content if still unknown
+        tool ??= detectToolFromOutput(applyRead.content);
+        const errorDetail = applyErr instanceof Error ? applyErr.message : "unknown error";
+        const commandHint = expectedCommand(tool, "apply");
         issues.push(buildStepIssue(
           applyStep,
           applyStepId,
           readerOpts,
-          `Apply output could not be parsed as structured data: ${applyErr instanceof Error ? applyErr.message : "unknown error"}`,
+          `Apply output could not be parsed: ${errorDetail}. Expected JSON Lines output from \`${commandHint}\`.`,
         ));
       }
     } else {
@@ -230,6 +262,8 @@ function buildTextFallbackReport(
   issues: StepIssue[],
   workspace: string | undefined,
   logsUrl: string | undefined,
+  tool: Tool | undefined,
+  fallbackReason: FallbackReason,
 ): TextFallbackReport {
   const hasOutput = tier.planRead?.content !== undefined || tier.applyRead?.content !== undefined;
   const hasStepFailure =
@@ -246,6 +280,8 @@ function buildTextFallbackReport(
   const report: TextFallbackReport = {
     kind: "text-fallback",
     title: `${icon} ${wsPrefix}${label} ${suffix}`,
+    tool,
+    fallbackReason,
     issues,
     readErrors: tier.readErrors,
     steps: buildStepOutcomes(steps),
