@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import {
-  buildStructuredTitle,
+  buildTitle,
   buildPlanCountParts,
   buildApplyCountParts,
   buildFailureCountParts,
@@ -23,103 +23,181 @@ function makeActionGroup(action: string, total: number): SummaryActionGroup {
   };
 }
 
-function makeReport(summary: Summary): Report {
+function makeReport(overrides: Partial<Report> = {}): Report {
   return {
     title: "",
     issues: [],
     steps: [],
     warnings: [],
     rawStdout: [],
-    summary,
+    ...overrides,
   };
 }
 
-describe("buildStructuredTitle", () => {
+describe("buildTitle", () => {
   it("returns plan title with create counts", () => {
-    const summary = makeSummary([makeActionGroup("create", 3)]);
-    const report = makeReport(summary);
-    const title = buildStructuredTitle(report, false, undefined, false);
-    expect(title).toBe("✅ Plan: 3 to add");
+    const report = makeReport({
+      summary: makeSummary([makeActionGroup("create", 3)]),
+      operation: "plan",
+    });
+    expect(buildTitle(report)).toBe("✅ Plan: 3 to add");
   });
 
   it("returns plan title with multiple action counts", () => {
-    const summary = makeSummary([
-      makeActionGroup("create", 2),
-      makeActionGroup("update", 1),
-      makeActionGroup("delete", 3),
-    ]);
-    const report = makeReport(summary);
-    const title = buildStructuredTitle(report, false, undefined, false);
-    expect(title).toBe("✅ Plan: 2 to add, 1 to change, 3 to destroy");
+    const report = makeReport({
+      summary: makeSummary([
+        makeActionGroup("create", 2),
+        makeActionGroup("update", 1),
+        makeActionGroup("delete", 3),
+      ]),
+      operation: "plan",
+    });
+    expect(buildTitle(report)).toBe("✅ Plan: 2 to add, 1 to change, 3 to destroy");
   });
 
   it("returns 'No Changes' when no actions and no failures", () => {
-    const summary = makeSummary();
-    const report = makeReport(summary);
-    const title = buildStructuredTitle(report, false, undefined, false);
-    expect(title).toBe("✅ No Changes");
+    const report = makeReport({
+      summary: makeSummary(),
+      operation: "plan",
+    });
+    expect(buildTitle(report)).toBe("✅ No Changes");
   });
 
   it("returns 'Plan Failed' when summary has failures", () => {
-    const summary = makeSummary([], [makeActionGroup("create", 1)]);
-    const report = makeReport(summary);
-    const title = buildStructuredTitle(report, false, undefined, false);
-    expect(title).toBe("❌ Plan Failed");
+    const report = makeReport({
+      summary: makeSummary([], [makeActionGroup("create", 1)]),
+      operation: "plan",
+    });
+    expect(buildTitle(report)).toBe("❌ Plan Failed");
   });
 
-  it("returns 'Plan Failed' when hasStepFailures is true", () => {
-    const summary = makeSummary([makeActionGroup("create", 2)]);
-    const report = makeReport(summary);
-    const title = buildStructuredTitle(report, false, undefined, true);
-    expect(title).toBe("❌ Plan Failed");
+  it("returns 'Plan Failed' when plan step has failure", () => {
+    const report = makeReport({
+      summary: makeSummary([makeActionGroup("create", 2)]),
+      operation: "plan",
+      steps: [{ id: "plan", outcome: "failure" }],
+    });
+    expect(buildTitle(report)).toBe("❌ Plan Failed");
   });
 
   it("includes workspace prefix when workspace is provided", () => {
-    const summary = makeSummary([makeActionGroup("create", 1)]);
-    const report = makeReport(summary);
-    const title = buildStructuredTitle(report, false, "staging", false);
-    expect(title).toBe("✅ `staging` Plan: 1 to add");
+    const report = makeReport({
+      summary: makeSummary([makeActionGroup("create", 1)]),
+      operation: "plan",
+      workspace: "staging",
+    });
+    expect(buildTitle(report)).toBe("✅ `staging` Plan: 1 to add");
   });
 
   it("includes workspace prefix in No Changes title", () => {
-    const summary = makeSummary();
-    const report = makeReport(summary);
-    const title = buildStructuredTitle(report, false, "prod", false);
-    expect(title).toBe("✅ `prod` No Changes");
+    const report = makeReport({
+      summary: makeSummary(),
+      operation: "plan",
+      workspace: "prod",
+    });
+    expect(buildTitle(report)).toBe("✅ `prod` No Changes");
   });
 
   it("returns apply title with successful counts", () => {
-    const summary = makeSummary([
-      makeActionGroup("create", 1),
-      makeActionGroup("update", 2),
-    ]);
-    const report = makeReport(summary);
-    const title = buildStructuredTitle(report, true, undefined, false);
-    expect(title).toBe("✅ Apply: 1 added, 2 changed");
+    const report = makeReport({
+      summary: makeSummary([
+        makeActionGroup("create", 1),
+        makeActionGroup("update", 2),
+      ]),
+      operation: "apply",
+    });
+    expect(buildTitle(report)).toBe("✅ Apply: 1 added, 2 changed");
   });
 
   it("returns 'Apply Complete' when apply has no actions", () => {
-    const summary = makeSummary();
-    const report = makeReport(summary);
-    const title = buildStructuredTitle(report, true, undefined, false);
-    expect(title).toBe("✅ Apply Complete");
+    const report = makeReport({
+      summary: makeSummary(),
+      operation: "apply",
+    });
+    expect(buildTitle(report)).toBe("✅ Apply Complete");
   });
 
   it("returns 'Apply Failed' with failure and success counts", () => {
-    const summary = makeSummary(
-      [makeActionGroup("create", 1)],
-      [makeActionGroup("create", 2)],
-    );
-    const report = makeReport(summary);
-    const title = buildStructuredTitle(report, true, undefined, false);
-    expect(title).toBe("❌ Apply Failed: 2 failed, 1 added");
+    const report = makeReport({
+      summary: makeSummary(
+        [makeActionGroup("create", 1)],
+        [makeActionGroup("create", 2)],
+      ),
+      operation: "apply",
+    });
+    expect(buildTitle(report)).toBe("❌ Apply Failed: 2 failed, 1 added");
   });
 
   it("includes workspace prefix in apply titles", () => {
-    const summary = makeSummary([makeActionGroup("delete", 1)]);
-    const report = makeReport(summary);
-    const title = buildStructuredTitle(report, true, "prod", false);
-    expect(title).toBe("✅ `prod` Apply: 1 destroyed");
+    const report = makeReport({
+      summary: makeSummary([makeActionGroup("delete", 1)]),
+      operation: "apply",
+      workspace: "prod",
+    });
+    expect(buildTitle(report)).toBe("✅ `prod` Apply: 1 destroyed");
+  });
+
+  it("returns error title when error is set", () => {
+    const report = makeReport({ error: "something broke" });
+    expect(buildTitle(report)).toBe("❌ Report Generation Failed");
+  });
+
+  it("returns error title with workspace", () => {
+    const report = makeReport({ error: "something broke", workspace: "dev" });
+    expect(buildTitle(report)).toBe("❌ `dev` Report Generation Failed");
+  });
+
+  it("returns 'All Steps Skipped' when all steps are skipped", () => {
+    const report = makeReport({
+      steps: [
+        { id: "init", outcome: "skipped" },
+        { id: "plan", outcome: "skipped" },
+      ],
+    });
+    expect(buildTitle(report)).toBe("⚠️ All Steps Skipped");
+  });
+
+  it("returns 'Succeeded' when no data is available", () => {
+    const report = makeReport();
+    expect(buildTitle(report)).toBe("✅ Succeeded");
+  });
+
+  it("returns 'Plan Succeeded' when operation is set but no summary", () => {
+    const report = makeReport({ operation: "plan" });
+    expect(buildTitle(report)).toBe("✅ Plan Succeeded");
+  });
+
+  it("returns 'Failed' when non-IaC step failed and no summary", () => {
+    const report = makeReport({
+      steps: [{ id: "custom-step", outcome: "failure" }],
+    });
+    expect(buildTitle(report)).toBe("❌ `custom-step` Failed");
+  });
+
+  it("returns 'Failed' when multiple non-IaC steps failed", () => {
+    const report = makeReport({
+      steps: [
+        { id: "step-a", outcome: "failure" },
+        { id: "step-b", outcome: "failure" },
+      ],
+    });
+    expect(buildTitle(report)).toBe("❌ Failed");
+  });
+
+  it("returns IaC failure title when plan step fails", () => {
+    const report = makeReport({
+      steps: [{ id: "plan", outcome: "failure" }],
+      operation: "plan",
+    });
+    expect(buildTitle(report)).toBe("❌ Plan Failed");
+  });
+
+  it("returns IaC failure title when apply step fails", () => {
+    const report = makeReport({
+      steps: [{ id: "apply", outcome: "failure" }],
+      operation: "apply",
+    });
+    expect(buildTitle(report)).toBe("❌ Apply Failed");
   });
 });
 

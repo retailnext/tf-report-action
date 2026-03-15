@@ -31437,7 +31437,7 @@ terraform_data.success
 
 exports[`reportFromSteps integration — generated fixtures > terraform/apply-error/1 > renders with workspace and matches snapshot 1`] = `
 "<!-- tf-report-action:"test-workspace" -->
-## ❌ \`test-workspace\` Apply Failed: 1 failed
+## ❌ \`test-workspace\` Apply Failed
 
 ## Apply Summary
 
@@ -31480,7 +31480,7 @@ Error running command 'exit 1': exit status 1. Output:
 `;
 
 exports[`reportFromSteps integration — generated fixtures > terraform/apply-error/1 > renders without error and matches snapshot [default] 1`] = `
-"## ❌ Apply Failed: 1 failed
+"## ❌ Apply Failed
 
 ## Apply Summary
 
@@ -34910,7 +34910,7 @@ terraform_data.success
 
 exports[`reportFromSteps integration — generated fixtures > tofu/apply-error/1 > renders with workspace and matches snapshot 1`] = `
 "<!-- tf-report-action:"test-workspace" -->
-## ❌ \`test-workspace\` Apply Failed: 1 failed
+## ❌ \`test-workspace\` Apply Failed
 
 ## Apply Summary
 
@@ -34953,7 +34953,7 @@ Error running command 'exit 1': exit status 1. Output:
 `;
 
 exports[`reportFromSteps integration — generated fixtures > tofu/apply-error/1 > renders without error and matches snapshot [default] 1`] = `
-"## ❌ Apply Failed: 1 failed
+"## ❌ Apply Failed
 
 ## Apply Summary
 

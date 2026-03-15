@@ -1,9 +1,11 @@
 import type { ResourceChange as TFResourceChange } from "../tfjson/resource.js";
 import type { Plan } from "../tfjson/plan.js";
 import type { ResourceChange as ModelResourceChange } from "../model/resource.js";
+import type { ModuleGroup } from "../model/module-group.js";
 import type { PlanAction } from "../model/plan-action.js";
 import type { BuildOptions } from "./options.js";
 import type { ConfigRefIndex } from "./config-refs.js";
+import type { PlannedChange } from "../jsonl-scanner/types.js";
 import { determineAction } from "./action.js";
 import { buildAttributeChanges } from "./attributes.js";
 
@@ -132,4 +134,71 @@ function isAllUnknownAfterApply(
   }
 
   return false;
+}
+
+/**
+ * Builds ModuleGroup[] from JSONL scanner planned changes. Resources have
+ * no attribute detail (JSONL does not carry before/after values), but the
+ * renderer handles this by showing action + address only for attribute-less
+ * resources.
+ *
+ * Groups resources by module address, same as the show-plan JSON path.
+ * Data source filtering is not needed here — the scanner only extracts
+ * managed resource planned_change messages (data sources don't emit them).
+ */
+export function buildModulesFromScan(changes: readonly PlannedChange[]): ModuleGroup[] {
+  const groupMap = new Map<string, ModelResourceChange[]>();
+
+  for (const change of changes) {
+    // Skip no-op (shouldn't appear in JSONL, but be safe)
+    if (change.action === "no-op") continue;
+
+    const moduleAddr = change.module;
+    let resources = groupMap.get(moduleAddr);
+    if (!resources) {
+      resources = [];
+      groupMap.set(moduleAddr, resources);
+    }
+
+    // Extract resource name from address (after the last dot that isn't inside brackets)
+    const name = extractResourceName(change.address);
+
+    resources.push({
+      address: change.address,
+      moduleAddress: moduleAddr || null,
+      type: change.resourceType,
+      name,
+      action: change.action,
+      actionReason: change.reason ?? null,
+      attributes: [],
+      importId: null,
+      movedFromAddress: null,
+      allUnknownAfterApply: false,
+    });
+  }
+
+  // Sort modules: root first, then alphabetically
+  const sortedModules = [...groupMap.entries()].sort(([a], [b]) => {
+    if (a === "") return -1;
+    if (b === "") return 1;
+    return a.localeCompare(b);
+  });
+
+  return sortedModules.map(([moduleAddress, resources]) => ({
+    moduleAddress,
+    resources,
+    outputs: [],
+  }));
+}
+
+/**
+ * Extracts the resource name from a full resource address.
+ * Example: "module.child.aws_instance.web[0]" → "web"
+ */
+function extractResourceName(address: string): string {
+  // Remove any index suffix like [0] or ["key"]
+  const withoutIndex = address.replace(/\[.*\]$/, "");
+  // Take everything after the last dot
+  const lastDot = withoutIndex.lastIndexOf(".");
+  return lastDot >= 0 ? withoutIndex.slice(lastDot + 1) : withoutIndex;
 }

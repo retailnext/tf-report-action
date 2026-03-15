@@ -1,6 +1,7 @@
 import type { ResourceChange } from "../model/resource.js";
 import type { PlanAction } from "../model/plan-action.js";
 import type { Summary, SummaryActionGroup, ResourceTypeCount } from "../model/summary.js";
+import type { PlannedChange } from "../jsonl-scanner/types.js";
 
 /** Actions that count toward summary totals, in display order. */
 const SUMMARY_ACTIONS: readonly PlanAction[] = [
@@ -57,6 +58,56 @@ function buildActionGroups(
       buckets.set(r.action, typeCounts);
     }
     typeCounts.set(r.type, (typeCounts.get(r.type) ?? 0) + 1);
+  }
+
+  const groups: SummaryActionGroup[] = [];
+  for (const action of actionOrder) {
+    const typeCounts = buckets.get(action);
+    if (!typeCounts) continue;
+
+    const resourceTypes: ResourceTypeCount[] = [...typeCounts.entries()]
+      .map(([type, count]) => ({ type, count }))
+      .sort((a, b) => b.count - a.count || a.type.localeCompare(b.type));
+
+    const total = resourceTypes.reduce((sum, rt) => sum + rt.count, 0);
+    groups.push({ action, resourceTypes, total });
+  }
+
+  return groups;
+}
+
+/**
+ * Builds a plan Summary from JSONL scanner output. Uses `PlannedChange`
+ * records which carry action and resource type but no attribute detail.
+ *
+ * Produces the same `Summary` shape as `buildSummary` — the renderer
+ * cannot distinguish a summary from plan JSON vs JSONL.
+ */
+export function buildSummaryFromScan(changes: readonly PlannedChange[]): Summary {
+  return {
+    actions: buildActionGroupsFromScan(changes, SUMMARY_ACTIONS),
+    failures: [],
+  };
+}
+
+/**
+ * Groups PlannedChange records by action and resource type, identical
+ * in output shape to `buildActionGroups` for ResourceChange.
+ */
+function buildActionGroupsFromScan(
+  changes: readonly PlannedChange[],
+  actionOrder: readonly PlanAction[],
+): SummaryActionGroup[] {
+  const buckets = new Map<PlanAction, Map<string, number>>();
+
+  for (const c of changes) {
+    if (!actionOrder.includes(c.action)) continue;
+    let typeCounts = buckets.get(c.action);
+    if (!typeCounts) {
+      typeCounts = new Map();
+      buckets.set(c.action, typeCounts);
+    }
+    typeCounts.set(c.resourceType, (typeCounts.get(c.resourceType) ?? 0) + 1);
   }
 
   const groups: SummaryActionGroup[] = [];

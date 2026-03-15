@@ -24,14 +24,13 @@ import {
   DEFAULT_MAX_DISPLAY_READ,
 } from "../steps/types.js";
 import { readStepStdout } from "../steps/io.js";
-import { getStepOutcome, hasAnyFailedStep, hasAnyFailedKnownStep, buildStepOutcomes } from "../steps/outcomes.js";
+import { getStepOutcome, buildStepOutcomes } from "../steps/outcomes.js";
 import { parsePlan, parseUILog, detectToolFromPlan, detectToolFromOutput } from "../parser/index.js";
 import { buildReport } from "./index.js";
 import { buildApplyReport } from "./apply.js";
 import { detectTier } from "./tier.js";
 import { buildStepIssue } from "./step-issues.js";
-import { buildStructuredTitle } from "./title.js";
-import { STATUS_SUCCESS, STATUS_FAILURE } from "../model/status-icons.js";
+import { buildTitle } from "./title.js";
 import { tmpdir } from "node:os";
 
 /**
@@ -253,11 +252,11 @@ function buildTier1Report(
 
   // Set the cross-cutting fields
   report.operation = isApplyMode ? "apply" : "plan";
-  report.title = buildStructuredTitle(report, isApplyMode, workspace, hasStepFailures);
   report.issues = issues;
   report.steps = buildStepOutcomes(steps);
   if (workspace !== undefined) report.workspace = workspace;
   if (logsUrl !== undefined) report.logsUrl = logsUrl;
+  report.title = buildTitle(report);
 
   return report;
 }
@@ -272,18 +271,8 @@ function buildTextFallbackReport(
   tool: Tool | undefined,
 ): Report {
   const report = createEmptyReport();
-  const hasStepFailure =
-    hasAnyFailedStep(steps, knownStepIds)
-    || hasAnyFailedKnownStep(steps, knownStepIds);
-  const hasIssueFailure = issues.some((i) => i.isFailed);
-  const hasFailure = hasStepFailure || hasIssueFailure;
-  const icon = hasFailure ? STATUS_FAILURE : STATUS_SUCCESS;
-  const wsPrefix = workspace ? `\`${workspace}\` ` : "";
   const isApply = tier.applyRead !== undefined;
-  const label = isApply ? "Apply" : "Plan";
-  const suffix = hasFailure ? "Failed" : "Succeeded";
 
-  report.title = `${icon} ${wsPrefix}${label} ${suffix}`;
   report.issues = issues;
   report.steps = buildStepOutcomes(steps);
   if (tool !== undefined) report.tool = tool;
@@ -322,6 +311,8 @@ function buildTextFallbackReport(
     );
   }
 
+  report.title = buildTitle(report);
+
   return report;
 }
 
@@ -331,28 +322,10 @@ function buildWorkflowOnlyReport(
   logsUrl: string | undefined,
 ): Report {
   const report = createEmptyReport();
-  const stepOutcomes = buildStepOutcomes(steps);
-  const failedSteps = stepOutcomes.filter((s) => s.outcome === "failure");
-  const hasFailure = failedSteps.length > 0;
-  const icon = hasFailure ? STATUS_FAILURE : STATUS_SUCCESS;
-  const wsPrefix = workspace ? `\`${workspace}\` ` : "";
-
-  let label: string;
-  if (hasFailure) {
-    if (failedSteps.length === 1) {
-      const stepName = failedSteps[0]?.id ?? "unknown";
-      label = `\`${stepName}\` Failed`;
-    } else {
-      label = "Failed";
-    }
-  } else {
-    label = "Succeeded";
-  }
-
-  report.title = `${icon} ${wsPrefix}${label}`;
-  report.steps = stepOutcomes;
+  report.steps = buildStepOutcomes(steps);
   if (logsUrl !== undefined) report.logsUrl = logsUrl;
   if (workspace !== undefined) report.workspace = workspace;
+  report.title = buildTitle(report);
   return report;
 }
 
@@ -362,12 +335,11 @@ function buildErrorReport(
   workspace: string | undefined,
   steps?: readonly { id: string; outcome: string }[],
 ): Report {
-  const wsPrefix = workspace ? `\`${workspace}\` ` : "";
   const report = createEmptyReport();
-  report.title = `${STATUS_FAILURE} ${wsPrefix}${heading}`;
   report.error = message;
   if (steps !== undefined) report.steps = [...steps];
   if (workspace !== undefined) report.workspace = workspace;
+  report.title = buildTitle(report);
   return report;
 }
 
