@@ -1000,28 +1000,28 @@ exports[`applyToMarkdown integration > terraform/no-op/0 > renders without error
 `;
 
 exports[`applyToMarkdown integration > terraform/no-op/1 > renders without error and matches snapshot [default] 1`] = `
-"## Plan Summary
+"## Apply Summary
 
 _No changes._
 "
 `;
 
 exports[`applyToMarkdown integration > terraform/no-op/1 > renders without error and matches snapshot [summary-template] 1`] = `
-"## Plan Summary
+"## Apply Summary
 
 _No changes._
 "
 `;
 
 exports[`applyToMarkdown integration > terraform/null-lifecycle/0 > renders without error and matches snapshot [default] 1`] = `
-"## Plan Summary
+"## Apply Summary
 
 _No changes._
 "
 `;
 
 exports[`applyToMarkdown integration > terraform/null-lifecycle/0 > renders without error and matches snapshot [summary-template] 1`] = `
-"## Plan Summary
+"## Apply Summary
 
 _No changes._
 "
@@ -2684,28 +2684,28 @@ exports[`applyToMarkdown integration > tofu/no-op/0 > renders without error and 
 `;
 
 exports[`applyToMarkdown integration > tofu/no-op/1 > renders without error and matches snapshot [default] 1`] = `
-"## Plan Summary
+"## Apply Summary
 
 _No changes._
 "
 `;
 
 exports[`applyToMarkdown integration > tofu/no-op/1 > renders without error and matches snapshot [summary-template] 1`] = `
-"## Plan Summary
+"## Apply Summary
 
 _No changes._
 "
 `;
 
 exports[`applyToMarkdown integration > tofu/null-lifecycle/0 > renders without error and matches snapshot [default] 1`] = `
-"## Plan Summary
+"## Apply Summary
 
 _No changes._
 "
 `;
 
 exports[`applyToMarkdown integration > tofu/null-lifecycle/0 > renders without error and matches snapshot [summary-template] 1`] = `
-"## Plan Summary
+"## Apply Summary
 
 _No changes._
 "

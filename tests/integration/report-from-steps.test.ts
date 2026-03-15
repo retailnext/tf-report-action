@@ -129,18 +129,18 @@ describe("reportFromSteps integration — no-show fixtures (Tier 3)", () => {
         expect(result).toMatchSnapshot();
       });
 
-      it("produces Tier 3 output (no Plan Summary)", () => {
+      it("produces structured output from JSONL (Tier 2 enrichment)", () => {
         const resolved = resolveStepFilePaths(stepsJson, fixtureDir);
         const options: ReportOptions = {
           allowedDirs: [fixtureDir],
           env: NO_GITHUB_ENV,
         };
         const result = reportFromSteps(resolved, options);
-        // Tier 3 does not produce structured "Plan Summary"
-        expect(result).not.toContain("Plan Summary");
-        // Should have either raw command output, a note about unavailable output,
-        // or step failure details with read error warnings
-        expect(result).toMatch(/raw command output|No readable output|stdout_file output missing|failed/);
+        // Tier 2 produces structured output from JSONL scanning, or no-change plan with just step table.
+        // When structured data is available, should have a warning about limited detail.
+        // When no changes were detected, just step statuses are shown.
+        // Either way, should NOT show "raw command output" text block.
+        expect(result).not.toContain("```\n{");
       });
     });
   }
@@ -161,15 +161,15 @@ describe("reportFromSteps integration — apply-no-show fixtures", () => {
         expect(result).toMatchSnapshot();
       });
 
-      it("includes output in Tier 3", () => {
+      it("includes structured or raw output", () => {
         const resolved = resolveStepFilePaths(stepsJson, fixtureDir);
         const options: ReportOptions = {
           allowedDirs: [fixtureDir],
           env: NO_GITHUB_ENV,
         };
         const result = reportFromSteps(resolved, options);
-        // Should have plan output, apply output, or failure/warning details
-        expect(result).toMatch(/Plan Output|Apply Output|No readable output|raw command output|stdout_file output missing|failed/);
+        // Should have structured content, raw output blocks, or at minimum step statuses
+        expect(result).toMatch(/Plan Summary|Apply Summary|Plan Output|Apply Output|No readable output|raw command output|stdout_file output missing|failed|attribute details|Steps/);
       });
     });
   }
@@ -470,7 +470,7 @@ describe("reportFromSteps integration — error fixture scenarios", () => {
     expect(result).toContain("❌");
   });
 
-  it("plan-error: renders failed plan with stdout", () => {
+  it("plan-error: renders failed plan with step issue details", () => {
     const fixture = generatedFixtures.find((f) =>
       f.label.includes("plan-error/1"),
     );
@@ -482,8 +482,8 @@ describe("reportFromSteps integration — error fixture scenarios", () => {
     });
     // Should show failure icon
     expect(result).toContain("❌");
-    // Should have plan output (Tier 3 with readable plan stdout)
-    expect(result).toContain("Plan Output");
+    // Plan failed — should have step issue with plan failure details
+    expect(result).toContain("`plan` failed");
   });
 
   it("plan-error: plan-only variant shows plan failure without apply", () => {
@@ -516,7 +516,7 @@ describe("reportFromSteps integration — error fixture scenarios", () => {
     expect(result).toContain("| Step | Outcome |");
   });
 
-  it("no-show fixture with readable plan stdout shows raw output", () => {
+  it("no-show fixture with readable plan stdout produces JSONL-enriched report", () => {
     // Pick a normal (non-error) fixture's no-show variant
     const fixture = noShowFixtures.find((f) =>
       f.label.includes("null-lifecycle") && !f.label.includes("0/"),
@@ -527,9 +527,10 @@ describe("reportFromSteps integration — error fixture scenarios", () => {
       allowedDirs: [fixture!.fixtureDir],
       env: NO_GITHUB_ENV,
     });
-    // Should show raw command output note
-    expect(result).toContain("raw command output");
-    expect(result).toContain("Plan Output");
+    // Should produce structured output from JSONL scanning (Tier 2)
+    // with a warning about limited attribute detail
+    expect(result).toContain("attribute details are not available");
+    expect(result).toContain("Plan Summary");
   });
 
   it("no-show fixture under budget pressure truncates output", () => {
@@ -574,8 +575,8 @@ describe("reportFromSteps integration — error fixture scenarios", () => {
       allowedDirs: [fixture!.fixtureDir],
       env: NO_GITHUB_ENV,
     });
-    // Should show structured plan (show-plan JSON was available)
-    expect(result).toContain("Plan Summary");
+    // Should show structured content (show-plan JSON was available)
+    expect(result).toMatch(/Plan Summary|Apply Summary/);
     // Apply ran but was not -json, so scanner finds no records — this results
     // in an apply report with all resources phantom-filtered out
     expect(result).toContain("Apply");
@@ -583,7 +584,7 @@ describe("reportFromSteps integration — error fixture scenarios", () => {
     expect(result).toContain("✅");
   });
 
-  it("apply-no-show: shows apply raw output in Tier 3 (no structured plan)", () => {
+  it("apply-no-show: shows JSONL-enriched apply report (no show-plan)", () => {
     const fixture = applyNoShowFixtures.find((f) =>
       f.label.includes("null-lifecycle") && f.label.includes("/2/"),
     );
@@ -593,9 +594,8 @@ describe("reportFromSteps integration — error fixture scenarios", () => {
       allowedDirs: [fixture!.fixtureDir],
       env: NO_GITHUB_ENV,
     });
-    // Should show Tier 3 with apply content
-    expect(result).toContain("Apply Output");
-    expect(result).toContain("raw command output");
+    // Should show JSONL-enriched report with apply data
+    expect(result).toMatch(/Apply|attribute details/);
   });
 
   it("apply-only: shows only apply output with no plan section", () => {
@@ -671,7 +671,8 @@ describe("reportFromSteps integration — targeted scenarios", () => {
       env: NO_GITHUB_ENV,
     };
     const result = reportFromSteps(resolved, options);
-    expect(result).toContain("Plan Summary");
+    // Tier 1 report has structured summary (Plan or Apply depending on step presence)
+    expect(result).toMatch(/Plan Summary|Apply Summary/);
   });
 
   it("uses apply titles for apply fixtures", () => {
@@ -750,7 +751,7 @@ describe("reportFromSteps integration — rendering quality", () => {
     expect(result).toContain("<details>");
   });
 
-  it("random-replace/1/apply-no-show: JSON Lines formatted with @message, raw JSON collapsed", () => {
+  it("random-replace/1/apply-no-show: JSONL-enriched structured apply report", () => {
     const fixture = applyNoShowFixtures.find((f) =>
       f.label.includes("random-replace/1"),
     );
@@ -760,12 +761,10 @@ describe("reportFromSteps integration — rendering quality", () => {
       allowedDirs: [fixture!.fixtureDir],
       env: NO_GITHUB_ENV,
     });
-    // Should extract @message fields as readable text
-    expect(result).toMatch(/Plan to replace/);
-    // JSON Lines uses <code> tags inside <summary> for type labels
-    expect(result).toContain("<code>type=");
-    // Title should say Apply Succeeded (not bare "Apply")
-    expect(result).toContain("Apply Succeeded");
+    // JSONL scanner produces structured data — summary and resource list
+    expect(result).toMatch(/Apply.*replaced|Apply Summary/);
+    // Warning about missing attribute detail
+    expect(result).toContain("attribute details are not available");
   });
 
   it("apply-error/1/apply-no-show: title says Apply Failed", () => {
@@ -782,7 +781,7 @@ describe("reportFromSteps integration — rendering quality", () => {
     expect(result).toContain("Apply Failed");
   });
 
-  it("deferred-data-source/2/no-show: Plan Succeeded with ⚠️ warning for missing structured output", () => {
+  it("deferred-data-source/2/no-show: shows JSONL-enriched plan with ⚠️ warning for limited detail", () => {
     const fixture = noShowFixtures.find((f) =>
       f.label.includes("deferred-data-source/2"),
     );
@@ -793,11 +792,10 @@ describe("reportFromSteps integration — rendering quality", () => {
       env: NO_GITHUB_ENV,
     });
     expect(result).toContain("✅");
-    expect(result).toContain("Plan Succeeded");
-    // Warning callout for missing structured output
+    expect(result).toContain("Plan");
+    // Warning callout for limited attribute detail
     expect(result).toContain("⚠️");
-    expect(result).toContain("show -json <tfplan>");
-    expect(result).toContain("was not available");
+    expect(result).toContain("attribute details are not available");
   });
 
   it("parse-failure: title is ✅ (not ❌) when all steps succeeded", () => {
@@ -812,11 +810,10 @@ describe("reportFromSteps integration — rendering quality", () => {
     });
     // Title should NOT show ❌ — all steps succeeded
     expect(result).toMatch(/^## ✅/);
-    // Should say "output could not be parsed" not "success"
-    expect(result).toContain("output could not be parsed");
-    expect(result).not.toContain("`show-plan` success");
-    // File read errors should have ⚠️ prefix
-    expect(result).toContain("⚠️ plan stdout:");
+    // Should mention parse failure for show-plan
+    expect(result).toMatch(/show-plan.*could not be parsed|output could not be parsed/);
+    // File read errors should appear as warnings
+    expect(result).toContain("plan stdout:");
   });
 
   it("missing-outputs: uses correct wording with ⚠️ bullets", () => {

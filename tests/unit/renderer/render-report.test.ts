@@ -20,8 +20,8 @@ function emptyReport(overrides: Partial<Report> = {}): Report {
 }
 
 describe("renderReport — apply-specific rendering", () => {
-  it("uses 'Apply Summary' heading when diagnostics are present", () => {
-    const report = emptyReport({ diagnostics: [] });
+  it("uses 'Apply Summary' heading when operation is apply", () => {
+    const report = emptyReport({ operation: "apply", diagnostics: [] });
     const md = renderReport(report);
     expect(md).toContain("## Apply Summary");
     expect(md).not.toContain("## Plan Summary");
@@ -29,6 +29,7 @@ describe("renderReport — apply-specific rendering", () => {
 
   it("uses 'Apply Summary' heading when applyStatuses are present", () => {
     const report = emptyReport({
+      operation: "apply",
       applyStatuses: [
         { address: "null_resource.a", action: "create", success: true },
       ],
@@ -62,6 +63,7 @@ describe("renderReport — apply-specific rendering", () => {
 
   it("renders resource-specific diagnostics inline on the resource", () => {
     const report = emptyReport({
+      operation: "apply",
       modules: [{
         moduleAddress: "",
         resources: [{
@@ -101,6 +103,7 @@ describe("renderReport — apply-specific rendering", () => {
 
   it("opens <details> for failed resources", () => {
     const report = emptyReport({
+      operation: "apply",
       modules: [{
         moduleAddress: "",
         resources: [{
@@ -164,6 +167,7 @@ describe("renderReport — apply-specific rendering", () => {
 
   it("summary template renders all diagnostics in top-level section", () => {
     const report = emptyReport({
+      operation: "apply",
       diagnostics: [
         { severity: "warning", summary: "Deprecated", detail: "" },
         { severity: "error", summary: "Something failed", detail: "details", address: "null_resource.x" },
@@ -183,6 +187,7 @@ describe("renderReport — apply-specific rendering", () => {
 
   it("uses past-tense labels in apply summary", () => {
     const report = emptyReport({
+      operation: "apply",
       summary: {
         actions: [{ action: "create", resourceTypes: [{ type: "null_resource", count: 1 }], total: 1 }],
         failures: [],

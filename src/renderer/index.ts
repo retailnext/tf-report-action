@@ -103,9 +103,7 @@ export function renderReport(report: Report, options: RenderOptions = {}): strin
 
 /** Returns true when the report was produced from an apply run. */
 function isApplyReport(report: Report): boolean {
-  return (
-    report.diagnostics !== undefined || report.applyStatuses !== undefined
-  );
+  return report.operation === "apply" || report.operation === "destroy";
 }
 
 /** Builds a Set of resource addresses that failed during apply. */
