@@ -12,7 +12,9 @@ exports[`reportFromSteps integration — apply-no-show fixtures > terraform/appl
 | ➕ Added | terraform_data | 2 |
 |  | null_resource | 1 |
 |  | **Added** | **3** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -47,6 +49,7 @@ terraform_data.depends_on_fail
 _No attribute changes._
 
 </details>
+
 "
 `;
 
@@ -331,7 +334,9 @@ Exit code: \`1\`
 |  | **Changed** | **1** |
 | ± Replaced | null_resource | 1 |
 |  | **Replaced** | **1** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details open>
@@ -361,6 +366,7 @@ terraform_data.depends_on_fail
 _No attribute changes._
 
 </details>
+
 "
 `;
 
@@ -376,7 +382,9 @@ exports[`reportFromSteps integration — apply-no-show fixtures > terraform/defe
 | ➕ Added | terraform_data | 4 |
 |  | local_file | 1 |
 |  | **Added** | **5** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -444,6 +452,7 @@ terraform_data.worker_a
 _No attribute changes._
 
 </details>
+
 "
 `;
 
@@ -460,7 +469,9 @@ exports[`reportFromSteps integration — apply-no-show fixtures > terraform/defe
 |  | **Added** | **1** |
 | 🔧 Changed | terraform_data | 4 |
 |  | **Changed** | **4** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -528,6 +539,7 @@ terraform_data.worker_c
 _No attribute changes._
 
 </details>
+
 "
 `;
 
@@ -544,7 +556,9 @@ exports[`reportFromSteps integration — apply-no-show fixtures > terraform/defe
 |  | **Changed** | **3** |
 | ± Replaced | local_file | 1 |
 |  | **Replaced** | **1** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -601,6 +615,7 @@ terraform_data.worker_c
 _No attribute changes._
 
 </details>
+
 "
 `;
 
@@ -615,7 +630,9 @@ exports[`reportFromSteps integration — apply-no-show fixtures > terraform/impo
 | --- | --- | --- |
 | ➕ Added | random_string | 1 |
 |  | **Added** | **1** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -628,6 +645,7 @@ random_string.existing
 _No attribute changes._
 
 </details>
+
 "
 `;
 
@@ -642,7 +660,9 @@ exports[`reportFromSteps integration — apply-no-show fixtures > terraform/impo
 | --- | --- | --- |
 | 📥 Imported | random_string | 1 |
 |  | **Imported** | **1** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -655,6 +675,7 @@ random_string.imported
 _No attribute changes._
 
 </details>
+
 "
 `;
 
@@ -669,7 +690,9 @@ exports[`reportFromSteps integration — apply-no-show fixtures > terraform/loca
 | --- | --- | --- |
 | ➕ Added | local_file | 1 |
 |  | **Added** | **1** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -682,6 +705,7 @@ local_file.readme
 _No attribute changes._
 
 </details>
+
 "
 `;
 
@@ -696,7 +720,9 @@ exports[`reportFromSteps integration — apply-no-show fixtures > terraform/loca
 | --- | --- | --- |
 | ± Replaced | local_file | 1 |
 |  | **Replaced** | **1** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -709,6 +735,7 @@ local_file.readme
 _No attribute changes._
 
 </details>
+
 "
 `;
 
@@ -723,7 +750,9 @@ exports[`reportFromSteps integration — apply-no-show fixtures > terraform/move
 | --- | --- | --- |
 | ➕ Added | null_resource | 1 |
 |  | **Added** | **1** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -736,6 +765,7 @@ null_resource.original
 _No attribute changes._
 
 </details>
+
 "
 `;
 
@@ -750,7 +780,9 @@ exports[`reportFromSteps integration — apply-no-show fixtures > terraform/move
 | --- | --- | --- |
 | 🚚 Moved | null_resource | 1 |
 |  | **Moved** | **1** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -763,6 +795,7 @@ null_resource.renamed
 _No attribute changes._
 
 </details>
+
 "
 `;
 
@@ -777,7 +810,9 @@ exports[`reportFromSteps integration — apply-no-show fixtures > terraform/nest
 | --- | --- | --- |
 | ➕ Added | null_resource | 3 |
 |  | **Added** | **3** |
+
 ## Resource Changes
+
 ### 📦 Module: \`module.parent["1"].module.child\`
 
 <details>
@@ -790,6 +825,7 @@ module.parent["1"].module.child.null_resource.item[0]
 _No attribute changes._
 
 </details>
+
 ### 📦 Module: \`module.parent["2"].module.child\`
 
 <details>
@@ -813,6 +849,7 @@ module.parent["2"].module.child.null_resource.item[1]
 _No attribute changes._
 
 </details>
+
 "
 `;
 
@@ -829,7 +866,9 @@ exports[`reportFromSteps integration — apply-no-show fixtures > terraform/nest
 |  | **Added** | **3** |
 | 🗑️ Destroyed | null_resource | 2 |
 |  | **Destroyed** | **2** |
+
 ## Resource Changes
+
 ### 📦 Module: \`module.parent["2"].module.child\`
 
 <details>
@@ -853,6 +892,7 @@ module.parent["2"].module.child.null_resource.item[0]
 _No attribute changes._
 
 </details>
+
 ### 📦 Module: \`module.parent["3"].module.child\`
 
 <details>
@@ -887,6 +927,7 @@ module.parent["3"].module.child.null_resource.item[1]
 _No attribute changes._
 
 </details>
+
 "
 `;
 
@@ -901,7 +942,9 @@ exports[`reportFromSteps integration — apply-no-show fixtures > terraform/no-d
 | --- | --- | --- |
 | ➕ Added | null_resource | 1 |
 |  | **Added** | **1** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -914,6 +957,7 @@ null_resource.example
 _No attribute changes._
 
 </details>
+
 "
 `;
 
@@ -928,7 +972,9 @@ exports[`reportFromSteps integration — apply-no-show fixtures > terraform/no-d
 | --- | --- | --- |
 | 🗑️ Destroyed | null_resource | 1 |
 |  | **Destroyed** | **1** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -941,6 +987,7 @@ null_resource.example
 _No attribute changes._
 
 </details>
+
 "
 `;
 
@@ -1002,7 +1049,9 @@ exports[`reportFromSteps integration — apply-no-show fixtures > terraform/no-o
 | --- | --- | --- |
 | ➕ Added | null_resource | 1 |
 |  | **Added** | **1** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -1015,6 +1064,7 @@ null_resource.stable
 _No attribute changes._
 
 </details>
+
 "
 `;
 
@@ -1060,7 +1110,9 @@ exports[`reportFromSteps integration — apply-no-show fixtures > terraform/null
 | ➕ Added | null_resource | 2 |
 |  | terraform_data | 1 |
 |  | **Added** | **3** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -1095,6 +1147,7 @@ null_resource.beta
 _No attribute changes._
 
 </details>
+
 "
 `;
 
@@ -1113,7 +1166,9 @@ exports[`reportFromSteps integration — apply-no-show fixtures > terraform/null
 |  | **Replaced** | **1** |
 | 🗑️ Destroyed | null_resource | 1 |
 |  | **Destroyed** | **1** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -1148,6 +1203,7 @@ null_resource.alpha
 _No attribute changes._
 
 </details>
+
 "
 `;
 
@@ -1162,7 +1218,9 @@ exports[`reportFromSteps integration — apply-no-show fixtures > terraform/plan
 | --- | --- | --- |
 | ➕ Added | null_resource | 1 |
 |  | **Added** | **1** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -1175,6 +1233,7 @@ null_resource.baseline
 _No attribute changes._
 
 </details>
+
 "
 `;
 
@@ -1361,6 +1420,7 @@ Exit code: \`1\`
 | --- | --- | --- |
 | 🗑️ Destroy | null_resource | 1 |
 |  | **Destroy** | **1** |
+
 ## Errors
 
 🚨 **Read local file data source error** — \`data.local_file.missing\`
@@ -1368,7 +1428,10 @@ Exit code: \`1\`
 > The file at given path cannot be read.
 
 +Original Error: open /nonexistent/path/to/file.txt: no such file or directory
-> \`data "local_file" "missing" {\` in data "local_file" "missing" (line 19)## Resource Changes
+> \`data "local_file" "missing" {\` in data "local_file" "missing" (line 19)
+
+## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -1381,6 +1444,7 @@ null_resource.baseline
 _No attribute changes._
 
 </details>
+
 "
 `;
 
@@ -1395,7 +1459,9 @@ exports[`reportFromSteps integration — apply-no-show fixtures > terraform/rand
 | --- | --- | --- |
 | ➕ Added | random_string | 1 |
 |  | **Added** | **1** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -1408,6 +1474,7 @@ random_string.token
 _No attribute changes._
 
 </details>
+
 "
 `;
 
@@ -1422,7 +1489,9 @@ exports[`reportFromSteps integration — apply-no-show fixtures > terraform/rand
 | --- | --- | --- |
 | ± Replaced | random_string | 1 |
 |  | **Replaced** | **1** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -1435,6 +1504,7 @@ random_string.token
 _No attribute changes._
 
 </details>
+
 "
 `;
 
@@ -1449,7 +1519,9 @@ exports[`reportFromSteps integration — apply-no-show fixtures > terraform/remo
 | --- | --- | --- |
 | ➕ Added | null_resource | 2 |
 |  | **Added** | **2** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -1473,6 +1545,7 @@ null_resource.keeper
 _No attribute changes._
 
 </details>
+
 "
 `;
 
@@ -1487,6 +1560,7 @@ exports[`reportFromSteps integration — apply-no-show fixtures > terraform/remo
 | --- | --- | --- |
 | 👋 Forgotten | null_resource | 1 |
 |  | **Forgotten** | **1** |
+
 ## Warnings
 
 ⚠️ **Some objects will no longer be managed by Terraform**
@@ -1494,7 +1568,10 @@ exports[`reportFromSteps integration — apply-no-show fixtures > terraform/remo
 > If you apply this plan, Terraform will discard its tracking information for the following objects, but it will not delete them:
  - null_resource.ephemeral
 
-After applying this plan, Terraform will no longer manage these objects. You will need to import them into Terraform to manage them again.## Resource Changes
+After applying this plan, Terraform will no longer manage these objects. You will need to import them into Terraform to manage them again.
+
+## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -1507,6 +1584,7 @@ null_resource.ephemeral
 _No attribute changes._
 
 </details>
+
 "
 `;
 
@@ -1521,7 +1599,9 @@ exports[`reportFromSteps integration — apply-no-show fixtures > terraform/sens
 | --- | --- | --- |
 | ➕ Added | local_sensitive_file | 1 |
 |  | **Added** | **1** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -1534,6 +1614,7 @@ local_sensitive_file.secret
 _No attribute changes._
 
 </details>
+
 "
 `;
 
@@ -1548,7 +1629,9 @@ exports[`reportFromSteps integration — apply-no-show fixtures > terraform/sens
 | --- | --- | --- |
 | ± Replaced | local_sensitive_file | 1 |
 |  | **Replaced** | **1** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -1561,6 +1644,7 @@ local_sensitive_file.secret
 _No attribute changes._
 
 </details>
+
 "
 `;
 
@@ -1575,7 +1659,9 @@ exports[`reportFromSteps integration — apply-no-show fixtures > terraform/vali
 | --- | --- | --- |
 | ➕ Added | null_resource | 1 |
 |  | **Added** | **1** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -1588,6 +1674,7 @@ null_resource.baseline
 _No attribute changes._
 
 </details>
+
 "
 `;
 
@@ -1677,7 +1764,9 @@ exports[`reportFromSteps integration — apply-no-show fixtures > terraform/with
 | ➕ Added | null_resource | 1 |
 |  | random_string | 1 |
 |  | **Added** | **2** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -1690,6 +1779,7 @@ null_resource.root
 _No attribute changes._
 
 </details>
+
 ### 📦 Module: \`module.naming\`
 
 <details>
@@ -1702,6 +1792,7 @@ module.naming.random_string.suffix
 _No attribute changes._
 
 </details>
+
 "
 `;
 
@@ -1717,7 +1808,9 @@ exports[`reportFromSteps integration — apply-no-show fixtures > terraform/with
 | ± Replaced | null_resource | 1 |
 |  | random_string | 1 |
 |  | **Replaced** | **2** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -1730,6 +1823,7 @@ null_resource.root
 _No attribute changes._
 
 </details>
+
 ### 📦 Module: \`module.naming\`
 
 <details>
@@ -1742,6 +1836,7 @@ module.naming.random_string.suffix
 _No attribute changes._
 
 </details>
+
 "
 `;
 
@@ -1757,7 +1852,9 @@ exports[`reportFromSteps integration — apply-no-show fixtures > tofu/apply-err
 | ➕ Added | terraform_data | 2 |
 |  | null_resource | 1 |
 |  | **Added** | **3** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -1792,6 +1889,7 @@ terraform_data.depends_on_fail
 _No attribute changes._
 
 </details>
+
 "
 `;
 
@@ -2076,7 +2174,9 @@ Exit code: \`1\`
 |  | **Changed** | **1** |
 | ± Replaced | null_resource | 1 |
 |  | **Replaced** | **1** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details open>
@@ -2106,6 +2206,7 @@ terraform_data.depends_on_fail
 _No attribute changes._
 
 </details>
+
 "
 `;
 
@@ -2121,7 +2222,9 @@ exports[`reportFromSteps integration — apply-no-show fixtures > tofu/deferred-
 | ➕ Added | terraform_data | 4 |
 |  | local_file | 1 |
 |  | **Added** | **5** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -2189,6 +2292,7 @@ terraform_data.worker_a
 _No attribute changes._
 
 </details>
+
 "
 `;
 
@@ -2205,7 +2309,9 @@ exports[`reportFromSteps integration — apply-no-show fixtures > tofu/deferred-
 |  | **Added** | **1** |
 | 🔧 Changed | terraform_data | 4 |
 |  | **Changed** | **4** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -2273,6 +2379,7 @@ terraform_data.worker_c
 _No attribute changes._
 
 </details>
+
 "
 `;
 
@@ -2289,7 +2396,9 @@ exports[`reportFromSteps integration — apply-no-show fixtures > tofu/deferred-
 |  | **Changed** | **3** |
 | ± Replaced | local_file | 1 |
 |  | **Replaced** | **1** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -2346,6 +2455,7 @@ terraform_data.worker_b
 _No attribute changes._
 
 </details>
+
 "
 `;
 
@@ -2360,7 +2470,9 @@ exports[`reportFromSteps integration — apply-no-show fixtures > tofu/import-re
 | --- | --- | --- |
 | ➕ Added | random_string | 1 |
 |  | **Added** | **1** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -2373,6 +2485,7 @@ random_string.existing
 _No attribute changes._
 
 </details>
+
 "
 `;
 
@@ -2387,7 +2500,9 @@ exports[`reportFromSteps integration — apply-no-show fixtures > tofu/import-re
 | --- | --- | --- |
 | 📥 Imported | random_string | 1 |
 |  | **Imported** | **1** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -2400,6 +2515,7 @@ random_string.imported
 _No attribute changes._
 
 </details>
+
 "
 `;
 
@@ -2414,7 +2530,9 @@ exports[`reportFromSteps integration — apply-no-show fixtures > tofu/local-fil
 | --- | --- | --- |
 | ➕ Added | local_file | 1 |
 |  | **Added** | **1** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -2427,6 +2545,7 @@ local_file.readme
 _No attribute changes._
 
 </details>
+
 "
 `;
 
@@ -2441,7 +2560,9 @@ exports[`reportFromSteps integration — apply-no-show fixtures > tofu/local-fil
 | --- | --- | --- |
 | ± Replaced | local_file | 1 |
 |  | **Replaced** | **1** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -2454,6 +2575,7 @@ local_file.readme
 _No attribute changes._
 
 </details>
+
 "
 `;
 
@@ -2468,7 +2590,9 @@ exports[`reportFromSteps integration — apply-no-show fixtures > tofu/moved-res
 | --- | --- | --- |
 | ➕ Added | null_resource | 1 |
 |  | **Added** | **1** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -2481,6 +2605,7 @@ null_resource.original
 _No attribute changes._
 
 </details>
+
 "
 `;
 
@@ -2495,7 +2620,9 @@ exports[`reportFromSteps integration — apply-no-show fixtures > tofu/moved-res
 | --- | --- | --- |
 | 🚚 Moved | null_resource | 1 |
 |  | **Moved** | **1** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -2508,6 +2635,7 @@ null_resource.renamed
 _No attribute changes._
 
 </details>
+
 "
 `;
 
@@ -2522,7 +2650,9 @@ exports[`reportFromSteps integration — apply-no-show fixtures > tofu/nested-mo
 | --- | --- | --- |
 | ➕ Added | null_resource | 3 |
 |  | **Added** | **3** |
+
 ## Resource Changes
+
 ### 📦 Module: \`module.parent["1"].module.child\`
 
 <details>
@@ -2535,6 +2665,7 @@ module.parent["1"].module.child.null_resource.item[0]
 _No attribute changes._
 
 </details>
+
 ### 📦 Module: \`module.parent["2"].module.child\`
 
 <details>
@@ -2558,6 +2689,7 @@ module.parent["2"].module.child.null_resource.item[0]
 _No attribute changes._
 
 </details>
+
 "
 `;
 
@@ -2574,7 +2706,9 @@ exports[`reportFromSteps integration — apply-no-show fixtures > tofu/nested-mo
 |  | **Added** | **3** |
 | 🗑️ Destroyed | null_resource | 2 |
 |  | **Destroyed** | **2** |
+
 ## Resource Changes
+
 ### 📦 Module: \`module.parent["2"].module.child\`
 
 <details>
@@ -2598,6 +2732,7 @@ module.parent["2"].module.child.null_resource.item[1]
 _No attribute changes._
 
 </details>
+
 ### 📦 Module: \`module.parent["3"].module.child\`
 
 <details>
@@ -2632,6 +2767,7 @@ module.parent["3"].module.child.null_resource.item[2]
 _No attribute changes._
 
 </details>
+
 "
 `;
 
@@ -2646,7 +2782,9 @@ exports[`reportFromSteps integration — apply-no-show fixtures > tofu/no-detail
 | --- | --- | --- |
 | ➕ Added | null_resource | 1 |
 |  | **Added** | **1** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -2659,6 +2797,7 @@ null_resource.example
 _No attribute changes._
 
 </details>
+
 "
 `;
 
@@ -2673,7 +2812,9 @@ exports[`reportFromSteps integration — apply-no-show fixtures > tofu/no-detail
 | --- | --- | --- |
 | 🗑️ Destroyed | null_resource | 1 |
 |  | **Destroyed** | **1** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -2686,6 +2827,7 @@ null_resource.example
 _No attribute changes._
 
 </details>
+
 "
 `;
 
@@ -2747,7 +2889,9 @@ exports[`reportFromSteps integration — apply-no-show fixtures > tofu/no-op/0/a
 | --- | --- | --- |
 | ➕ Added | null_resource | 1 |
 |  | **Added** | **1** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -2760,6 +2904,7 @@ null_resource.stable
 _No attribute changes._
 
 </details>
+
 "
 `;
 
@@ -2805,7 +2950,9 @@ exports[`reportFromSteps integration — apply-no-show fixtures > tofu/null-life
 | ➕ Added | null_resource | 2 |
 |  | terraform_data | 1 |
 |  | **Added** | **3** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -2840,6 +2987,7 @@ null_resource.alpha
 _No attribute changes._
 
 </details>
+
 "
 `;
 
@@ -2858,7 +3006,9 @@ exports[`reportFromSteps integration — apply-no-show fixtures > tofu/null-life
 |  | **Replaced** | **1** |
 | 🗑️ Destroyed | null_resource | 1 |
 |  | **Destroyed** | **1** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -2893,6 +3043,7 @@ null_resource.alpha
 _No attribute changes._
 
 </details>
+
 "
 `;
 
@@ -2907,7 +3058,9 @@ exports[`reportFromSteps integration — apply-no-show fixtures > tofu/plan-erro
 | --- | --- | --- |
 | ➕ Added | null_resource | 1 |
 |  | **Added** | **1** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -2920,6 +3073,7 @@ null_resource.baseline
 _No attribute changes._
 
 </details>
+
 "
 `;
 
@@ -3106,6 +3260,7 @@ Exit code: \`1\`
 | --- | --- | --- |
 | 🗑️ Destroy | null_resource | 1 |
 |  | **Destroy** | **1** |
+
 ## Errors
 
 🚨 **Read local file data source error** — \`data.local_file.missing\`
@@ -3113,7 +3268,10 @@ Exit code: \`1\`
 > The file at given path cannot be read.
 
 +Original Error: open /nonexistent/path/to/file.txt: no such file or directory
-> \`data "local_file" "missing" {\` in data "local_file" "missing" (line 19)## Resource Changes
+> \`data "local_file" "missing" {\` in data "local_file" "missing" (line 19)
+
+## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -3126,6 +3284,7 @@ null_resource.baseline
 _No attribute changes._
 
 </details>
+
 "
 `;
 
@@ -3140,7 +3299,9 @@ exports[`reportFromSteps integration — apply-no-show fixtures > tofu/random-re
 | --- | --- | --- |
 | ➕ Added | random_string | 1 |
 |  | **Added** | **1** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -3153,6 +3314,7 @@ random_string.token
 _No attribute changes._
 
 </details>
+
 "
 `;
 
@@ -3167,7 +3329,9 @@ exports[`reportFromSteps integration — apply-no-show fixtures > tofu/random-re
 | --- | --- | --- |
 | ± Replaced | random_string | 1 |
 |  | **Replaced** | **1** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -3180,6 +3344,7 @@ random_string.token
 _No attribute changes._
 
 </details>
+
 "
 `;
 
@@ -3194,7 +3359,9 @@ exports[`reportFromSteps integration — apply-no-show fixtures > tofu/removed-r
 | --- | --- | --- |
 | ➕ Added | null_resource | 2 |
 |  | **Added** | **2** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -3218,6 +3385,7 @@ null_resource.keeper
 _No attribute changes._
 
 </details>
+
 "
 `;
 
@@ -3232,13 +3400,17 @@ exports[`reportFromSteps integration — apply-no-show fixtures > tofu/removed-r
 | --- | --- | --- |
 | 👋 Forgotten | null_resource | 1 |
 |  | **Forgotten** | **1** |
+
 ## Warnings
 
 ⚠️ **Resource going to be removed from the state**
 
 > After this plan gets applied, the resource null_resource.ephemeral will not be managed anymore by OpenTofu.
 
-In case you want to manage the resource again, you will have to import it.## Resource Changes
+In case you want to manage the resource again, you will have to import it.
+
+## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -3251,6 +3423,7 @@ null_resource.ephemeral
 _No attribute changes._
 
 </details>
+
 "
 `;
 
@@ -3265,7 +3438,9 @@ exports[`reportFromSteps integration — apply-no-show fixtures > tofu/sensitive
 | --- | --- | --- |
 | ➕ Added | local_sensitive_file | 1 |
 |  | **Added** | **1** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -3278,6 +3453,7 @@ local_sensitive_file.secret
 _No attribute changes._
 
 </details>
+
 "
 `;
 
@@ -3292,7 +3468,9 @@ exports[`reportFromSteps integration — apply-no-show fixtures > tofu/sensitive
 | --- | --- | --- |
 | ± Replaced | local_sensitive_file | 1 |
 |  | **Replaced** | **1** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -3305,6 +3483,7 @@ local_sensitive_file.secret
 _No attribute changes._
 
 </details>
+
 "
 `;
 
@@ -3319,7 +3498,9 @@ exports[`reportFromSteps integration — apply-no-show fixtures > tofu/validate-
 | --- | --- | --- |
 | ➕ Added | null_resource | 1 |
 |  | **Added** | **1** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -3332,6 +3513,7 @@ null_resource.baseline
 _No attribute changes._
 
 </details>
+
 "
 `;
 
@@ -3421,7 +3603,9 @@ exports[`reportFromSteps integration — apply-no-show fixtures > tofu/with-modu
 | ➕ Added | null_resource | 1 |
 |  | random_string | 1 |
 |  | **Added** | **2** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -3434,6 +3618,7 @@ null_resource.root
 _No attribute changes._
 
 </details>
+
 ### 📦 Module: \`module.naming\`
 
 <details>
@@ -3446,6 +3631,7 @@ module.naming.random_string.suffix
 _No attribute changes._
 
 </details>
+
 "
 `;
 
@@ -3461,7 +3647,9 @@ exports[`reportFromSteps integration — apply-no-show fixtures > tofu/with-modu
 | ± Replaced | null_resource | 1 |
 |  | random_string | 1 |
 |  | **Replaced** | **2** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -3474,6 +3662,7 @@ null_resource.root
 _No attribute changes._
 
 </details>
+
 ### 📦 Module: \`module.naming\`
 
 <details>
@@ -3486,6 +3675,7 @@ module.naming.random_string.suffix
 _No attribute changes._
 
 </details>
+
 "
 `;
 
@@ -3501,7 +3691,9 @@ exports[`reportFromSteps integration — apply-only fixtures > terraform/apply-e
 | ➕ Added | terraform_data | 2 |
 |  | null_resource | 1 |
 |  | **Added** | **3** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -3536,6 +3728,7 @@ terraform_data.depends_on_fail
 _No attribute changes._
 
 </details>
+
 "
 `;
 
@@ -3820,7 +4013,9 @@ Exit code: \`1\`
 |  | **Changed** | **1** |
 | ± Replaced | null_resource | 1 |
 |  | **Replaced** | **1** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details open>
@@ -3850,6 +4045,7 @@ terraform_data.depends_on_fail
 _No attribute changes._
 
 </details>
+
 "
 `;
 
@@ -3865,7 +4061,9 @@ exports[`reportFromSteps integration — apply-only fixtures > terraform/deferre
 | ➕ Added | terraform_data | 4 |
 |  | local_file | 1 |
 |  | **Added** | **5** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -3933,6 +4131,7 @@ terraform_data.worker_a
 _No attribute changes._
 
 </details>
+
 "
 `;
 
@@ -3949,7 +4148,9 @@ exports[`reportFromSteps integration — apply-only fixtures > terraform/deferre
 |  | **Added** | **1** |
 | 🔧 Changed | terraform_data | 4 |
 |  | **Changed** | **4** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -4017,6 +4218,7 @@ terraform_data.worker_c
 _No attribute changes._
 
 </details>
+
 "
 `;
 
@@ -4033,7 +4235,9 @@ exports[`reportFromSteps integration — apply-only fixtures > terraform/deferre
 |  | **Changed** | **3** |
 | ± Replaced | local_file | 1 |
 |  | **Replaced** | **1** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -4090,6 +4294,7 @@ terraform_data.worker_c
 _No attribute changes._
 
 </details>
+
 "
 `;
 
@@ -4104,7 +4309,9 @@ exports[`reportFromSteps integration — apply-only fixtures > terraform/import-
 | --- | --- | --- |
 | ➕ Added | random_string | 1 |
 |  | **Added** | **1** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -4117,6 +4324,7 @@ random_string.existing
 _No attribute changes._
 
 </details>
+
 "
 `;
 
@@ -4145,7 +4353,9 @@ exports[`reportFromSteps integration — apply-only fixtures > terraform/local-f
 | --- | --- | --- |
 | ➕ Added | local_file | 1 |
 |  | **Added** | **1** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -4158,6 +4368,7 @@ local_file.readme
 _No attribute changes._
 
 </details>
+
 "
 `;
 
@@ -4172,7 +4383,9 @@ exports[`reportFromSteps integration — apply-only fixtures > terraform/local-f
 | --- | --- | --- |
 | ± Replaced | local_file | 1 |
 |  | **Replaced** | **1** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -4185,6 +4398,7 @@ local_file.readme
 _No attribute changes._
 
 </details>
+
 "
 `;
 
@@ -4199,7 +4413,9 @@ exports[`reportFromSteps integration — apply-only fixtures > terraform/moved-r
 | --- | --- | --- |
 | ➕ Added | null_resource | 1 |
 |  | **Added** | **1** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -4212,6 +4428,7 @@ null_resource.original
 _No attribute changes._
 
 </details>
+
 "
 `;
 
@@ -4240,7 +4457,9 @@ exports[`reportFromSteps integration — apply-only fixtures > terraform/nested-
 | --- | --- | --- |
 | ➕ Added | null_resource | 3 |
 |  | **Added** | **3** |
+
 ## Resource Changes
+
 ### 📦 Module: \`module.parent["1"].module.child\`
 
 <details>
@@ -4253,6 +4472,7 @@ module.parent["1"].module.child.null_resource.item[0]
 _No attribute changes._
 
 </details>
+
 ### 📦 Module: \`module.parent["2"].module.child\`
 
 <details>
@@ -4276,6 +4496,7 @@ module.parent["2"].module.child.null_resource.item[1]
 _No attribute changes._
 
 </details>
+
 "
 `;
 
@@ -4292,7 +4513,9 @@ exports[`reportFromSteps integration — apply-only fixtures > terraform/nested-
 |  | **Added** | **3** |
 | 🗑️ Destroyed | null_resource | 2 |
 |  | **Destroyed** | **2** |
+
 ## Resource Changes
+
 ### 📦 Module: \`module.parent["2"].module.child\`
 
 <details>
@@ -4316,6 +4539,7 @@ module.parent["2"].module.child.null_resource.item[0]
 _No attribute changes._
 
 </details>
+
 ### 📦 Module: \`module.parent["3"].module.child\`
 
 <details>
@@ -4350,6 +4574,7 @@ module.parent["3"].module.child.null_resource.item[1]
 _No attribute changes._
 
 </details>
+
 "
 `;
 
@@ -4364,7 +4589,9 @@ exports[`reportFromSteps integration — apply-only fixtures > terraform/no-deta
 | --- | --- | --- |
 | ➕ Added | null_resource | 1 |
 |  | **Added** | **1** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -4377,6 +4604,7 @@ null_resource.example
 _No attribute changes._
 
 </details>
+
 "
 `;
 
@@ -4391,7 +4619,9 @@ exports[`reportFromSteps integration — apply-only fixtures > terraform/no-deta
 | --- | --- | --- |
 | 🗑️ Destroyed | null_resource | 1 |
 |  | **Destroyed** | **1** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -4404,6 +4634,7 @@ null_resource.example
 _No attribute changes._
 
 </details>
+
 "
 `;
 
@@ -4436,7 +4667,9 @@ exports[`reportFromSteps integration — apply-only fixtures > terraform/no-op/0
 | --- | --- | --- |
 | ➕ Added | null_resource | 1 |
 |  | **Added** | **1** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -4449,6 +4682,7 @@ null_resource.stable
 _No attribute changes._
 
 </details>
+
 "
 `;
 
@@ -4492,7 +4726,9 @@ exports[`reportFromSteps integration — apply-only fixtures > terraform/null-li
 | ➕ Added | null_resource | 2 |
 |  | terraform_data | 1 |
 |  | **Added** | **3** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -4527,6 +4763,7 @@ null_resource.beta
 _No attribute changes._
 
 </details>
+
 "
 `;
 
@@ -4545,7 +4782,9 @@ exports[`reportFromSteps integration — apply-only fixtures > terraform/null-li
 |  | **Replaced** | **1** |
 | 🗑️ Destroyed | null_resource | 1 |
 |  | **Destroyed** | **1** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -4580,6 +4819,7 @@ null_resource.alpha
 _No attribute changes._
 
 </details>
+
 "
 `;
 
@@ -4594,7 +4834,9 @@ exports[`reportFromSteps integration — apply-only fixtures > terraform/plan-er
 | --- | --- | --- |
 | ➕ Added | null_resource | 1 |
 |  | **Added** | **1** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -4607,6 +4849,7 @@ null_resource.baseline
 _No attribute changes._
 
 </details>
+
 "
 `;
 
@@ -4635,7 +4878,9 @@ exports[`reportFromSteps integration — apply-only fixtures > terraform/random-
 | --- | --- | --- |
 | ➕ Added | random_string | 1 |
 |  | **Added** | **1** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -4648,6 +4893,7 @@ random_string.token
 _No attribute changes._
 
 </details>
+
 "
 `;
 
@@ -4662,7 +4908,9 @@ exports[`reportFromSteps integration — apply-only fixtures > terraform/random-
 | --- | --- | --- |
 | ± Replaced | random_string | 1 |
 |  | **Replaced** | **1** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -4675,6 +4923,7 @@ random_string.token
 _No attribute changes._
 
 </details>
+
 "
 `;
 
@@ -4689,7 +4938,9 @@ exports[`reportFromSteps integration — apply-only fixtures > terraform/removed
 | --- | --- | --- |
 | ➕ Added | null_resource | 2 |
 |  | **Added** | **2** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -4713,6 +4964,7 @@ null_resource.keeper
 _No attribute changes._
 
 </details>
+
 "
 `;
 
@@ -4727,7 +4979,9 @@ exports[`reportFromSteps integration — apply-only fixtures > terraform/removed
 | --- | --- | --- |
 | 👋 Forgotten | null_resource | 1 |
 |  | **Forgotten** | **1** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -4740,6 +4994,7 @@ null_resource.ephemeral
 _No attribute changes._
 
 </details>
+
 "
 `;
 
@@ -4754,7 +5009,9 @@ exports[`reportFromSteps integration — apply-only fixtures > terraform/sensiti
 | --- | --- | --- |
 | ➕ Added | local_sensitive_file | 1 |
 |  | **Added** | **1** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -4767,6 +5024,7 @@ local_sensitive_file.secret
 _No attribute changes._
 
 </details>
+
 "
 `;
 
@@ -4781,7 +5039,9 @@ exports[`reportFromSteps integration — apply-only fixtures > terraform/sensiti
 | --- | --- | --- |
 | ± Replaced | local_sensitive_file | 1 |
 |  | **Replaced** | **1** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -4794,6 +5054,7 @@ local_sensitive_file.secret
 _No attribute changes._
 
 </details>
+
 "
 `;
 
@@ -4808,7 +5069,9 @@ exports[`reportFromSteps integration — apply-only fixtures > terraform/validat
 | --- | --- | --- |
 | ➕ Added | null_resource | 1 |
 |  | **Added** | **1** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -4821,6 +5084,7 @@ null_resource.baseline
 _No attribute changes._
 
 </details>
+
 "
 `;
 
@@ -4907,7 +5171,9 @@ exports[`reportFromSteps integration — apply-only fixtures > terraform/with-mo
 | ➕ Added | null_resource | 1 |
 |  | random_string | 1 |
 |  | **Added** | **2** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -4920,6 +5186,7 @@ null_resource.root
 _No attribute changes._
 
 </details>
+
 ### 📦 Module: \`module.naming\`
 
 <details>
@@ -4932,6 +5199,7 @@ module.naming.random_string.suffix
 _No attribute changes._
 
 </details>
+
 "
 `;
 
@@ -4947,7 +5215,9 @@ exports[`reportFromSteps integration — apply-only fixtures > terraform/with-mo
 | ± Replaced | null_resource | 1 |
 |  | random_string | 1 |
 |  | **Replaced** | **2** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -4960,6 +5230,7 @@ null_resource.root
 _No attribute changes._
 
 </details>
+
 ### 📦 Module: \`module.naming\`
 
 <details>
@@ -4972,6 +5243,7 @@ module.naming.random_string.suffix
 _No attribute changes._
 
 </details>
+
 "
 `;
 
@@ -4987,7 +5259,9 @@ exports[`reportFromSteps integration — apply-only fixtures > tofu/apply-error/
 | ➕ Added | terraform_data | 2 |
 |  | null_resource | 1 |
 |  | **Added** | **3** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -5022,6 +5296,7 @@ terraform_data.depends_on_fail
 _No attribute changes._
 
 </details>
+
 "
 `;
 
@@ -5306,7 +5581,9 @@ Exit code: \`1\`
 |  | **Changed** | **1** |
 | ± Replaced | null_resource | 1 |
 |  | **Replaced** | **1** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details open>
@@ -5336,6 +5613,7 @@ terraform_data.depends_on_fail
 _No attribute changes._
 
 </details>
+
 "
 `;
 
@@ -5351,7 +5629,9 @@ exports[`reportFromSteps integration — apply-only fixtures > tofu/deferred-dat
 | ➕ Added | terraform_data | 4 |
 |  | local_file | 1 |
 |  | **Added** | **5** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -5419,6 +5699,7 @@ terraform_data.worker_a
 _No attribute changes._
 
 </details>
+
 "
 `;
 
@@ -5435,7 +5716,9 @@ exports[`reportFromSteps integration — apply-only fixtures > tofu/deferred-dat
 |  | **Added** | **1** |
 | 🔧 Changed | terraform_data | 4 |
 |  | **Changed** | **4** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -5503,6 +5786,7 @@ terraform_data.worker_c
 _No attribute changes._
 
 </details>
+
 "
 `;
 
@@ -5519,7 +5803,9 @@ exports[`reportFromSteps integration — apply-only fixtures > tofu/deferred-dat
 |  | **Changed** | **3** |
 | ± Replaced | local_file | 1 |
 |  | **Replaced** | **1** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -5576,6 +5862,7 @@ terraform_data.worker_b
 _No attribute changes._
 
 </details>
+
 "
 `;
 
@@ -5590,7 +5877,9 @@ exports[`reportFromSteps integration — apply-only fixtures > tofu/import-resou
 | --- | --- | --- |
 | ➕ Added | random_string | 1 |
 |  | **Added** | **1** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -5603,6 +5892,7 @@ random_string.existing
 _No attribute changes._
 
 </details>
+
 "
 `;
 
@@ -5631,7 +5921,9 @@ exports[`reportFromSteps integration — apply-only fixtures > tofu/local-files/
 | --- | --- | --- |
 | ➕ Added | local_file | 1 |
 |  | **Added** | **1** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -5644,6 +5936,7 @@ local_file.readme
 _No attribute changes._
 
 </details>
+
 "
 `;
 
@@ -5658,7 +5951,9 @@ exports[`reportFromSteps integration — apply-only fixtures > tofu/local-files/
 | --- | --- | --- |
 | ± Replaced | local_file | 1 |
 |  | **Replaced** | **1** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -5671,6 +5966,7 @@ local_file.readme
 _No attribute changes._
 
 </details>
+
 "
 `;
 
@@ -5685,7 +5981,9 @@ exports[`reportFromSteps integration — apply-only fixtures > tofu/moved-resour
 | --- | --- | --- |
 | ➕ Added | null_resource | 1 |
 |  | **Added** | **1** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -5698,6 +5996,7 @@ null_resource.original
 _No attribute changes._
 
 </details>
+
 "
 `;
 
@@ -5726,7 +6025,9 @@ exports[`reportFromSteps integration — apply-only fixtures > tofu/nested-modul
 | --- | --- | --- |
 | ➕ Added | null_resource | 3 |
 |  | **Added** | **3** |
+
 ## Resource Changes
+
 ### 📦 Module: \`module.parent["1"].module.child\`
 
 <details>
@@ -5739,6 +6040,7 @@ module.parent["1"].module.child.null_resource.item[0]
 _No attribute changes._
 
 </details>
+
 ### 📦 Module: \`module.parent["2"].module.child\`
 
 <details>
@@ -5762,6 +6064,7 @@ module.parent["2"].module.child.null_resource.item[0]
 _No attribute changes._
 
 </details>
+
 "
 `;
 
@@ -5778,7 +6081,9 @@ exports[`reportFromSteps integration — apply-only fixtures > tofu/nested-modul
 |  | **Added** | **3** |
 | 🗑️ Destroyed | null_resource | 2 |
 |  | **Destroyed** | **2** |
+
 ## Resource Changes
+
 ### 📦 Module: \`module.parent["2"].module.child\`
 
 <details>
@@ -5802,6 +6107,7 @@ module.parent["2"].module.child.null_resource.item[1]
 _No attribute changes._
 
 </details>
+
 ### 📦 Module: \`module.parent["3"].module.child\`
 
 <details>
@@ -5836,6 +6142,7 @@ module.parent["3"].module.child.null_resource.item[2]
 _No attribute changes._
 
 </details>
+
 "
 `;
 
@@ -5850,7 +6157,9 @@ exports[`reportFromSteps integration — apply-only fixtures > tofu/no-detailed-
 | --- | --- | --- |
 | ➕ Added | null_resource | 1 |
 |  | **Added** | **1** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -5863,6 +6172,7 @@ null_resource.example
 _No attribute changes._
 
 </details>
+
 "
 `;
 
@@ -5877,7 +6187,9 @@ exports[`reportFromSteps integration — apply-only fixtures > tofu/no-detailed-
 | --- | --- | --- |
 | 🗑️ Destroyed | null_resource | 1 |
 |  | **Destroyed** | **1** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -5890,6 +6202,7 @@ null_resource.example
 _No attribute changes._
 
 </details>
+
 "
 `;
 
@@ -5922,7 +6235,9 @@ exports[`reportFromSteps integration — apply-only fixtures > tofu/no-op/0/appl
 | --- | --- | --- |
 | ➕ Added | null_resource | 1 |
 |  | **Added** | **1** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -5935,6 +6250,7 @@ null_resource.stable
 _No attribute changes._
 
 </details>
+
 "
 `;
 
@@ -5978,7 +6294,9 @@ exports[`reportFromSteps integration — apply-only fixtures > tofu/null-lifecyc
 | ➕ Added | null_resource | 2 |
 |  | terraform_data | 1 |
 |  | **Added** | **3** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -6013,6 +6331,7 @@ null_resource.alpha
 _No attribute changes._
 
 </details>
+
 "
 `;
 
@@ -6031,7 +6350,9 @@ exports[`reportFromSteps integration — apply-only fixtures > tofu/null-lifecyc
 |  | **Replaced** | **1** |
 | 🗑️ Destroyed | null_resource | 1 |
 |  | **Destroyed** | **1** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -6066,6 +6387,7 @@ null_resource.alpha
 _No attribute changes._
 
 </details>
+
 "
 `;
 
@@ -6080,7 +6402,9 @@ exports[`reportFromSteps integration — apply-only fixtures > tofu/plan-error/0
 | --- | --- | --- |
 | ➕ Added | null_resource | 1 |
 |  | **Added** | **1** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -6093,6 +6417,7 @@ null_resource.baseline
 _No attribute changes._
 
 </details>
+
 "
 `;
 
@@ -6121,7 +6446,9 @@ exports[`reportFromSteps integration — apply-only fixtures > tofu/random-repla
 | --- | --- | --- |
 | ➕ Added | random_string | 1 |
 |  | **Added** | **1** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -6134,6 +6461,7 @@ random_string.token
 _No attribute changes._
 
 </details>
+
 "
 `;
 
@@ -6148,7 +6476,9 @@ exports[`reportFromSteps integration — apply-only fixtures > tofu/random-repla
 | --- | --- | --- |
 | ± Replaced | random_string | 1 |
 |  | **Replaced** | **1** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -6161,6 +6491,7 @@ random_string.token
 _No attribute changes._
 
 </details>
+
 "
 `;
 
@@ -6175,7 +6506,9 @@ exports[`reportFromSteps integration — apply-only fixtures > tofu/removed-reso
 | --- | --- | --- |
 | ➕ Added | null_resource | 2 |
 |  | **Added** | **2** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -6199,6 +6532,7 @@ null_resource.keeper
 _No attribute changes._
 
 </details>
+
 "
 `;
 
@@ -6213,7 +6547,9 @@ exports[`reportFromSteps integration — apply-only fixtures > tofu/removed-reso
 | --- | --- | --- |
 | 👋 Forgotten | null_resource | 1 |
 |  | **Forgotten** | **1** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -6226,6 +6562,7 @@ null_resource.ephemeral
 _No attribute changes._
 
 </details>
+
 "
 `;
 
@@ -6240,7 +6577,9 @@ exports[`reportFromSteps integration — apply-only fixtures > tofu/sensitive-va
 | --- | --- | --- |
 | ➕ Added | local_sensitive_file | 1 |
 |  | **Added** | **1** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -6253,6 +6592,7 @@ local_sensitive_file.secret
 _No attribute changes._
 
 </details>
+
 "
 `;
 
@@ -6267,7 +6607,9 @@ exports[`reportFromSteps integration — apply-only fixtures > tofu/sensitive-va
 | --- | --- | --- |
 | ± Replaced | local_sensitive_file | 1 |
 |  | **Replaced** | **1** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -6280,6 +6622,7 @@ local_sensitive_file.secret
 _No attribute changes._
 
 </details>
+
 "
 `;
 
@@ -6294,7 +6637,9 @@ exports[`reportFromSteps integration — apply-only fixtures > tofu/validate-err
 | --- | --- | --- |
 | ➕ Added | null_resource | 1 |
 |  | **Added** | **1** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -6307,6 +6652,7 @@ null_resource.baseline
 _No attribute changes._
 
 </details>
+
 "
 `;
 
@@ -6393,7 +6739,9 @@ exports[`reportFromSteps integration — apply-only fixtures > tofu/with-modules
 | ➕ Added | null_resource | 1 |
 |  | random_string | 1 |
 |  | **Added** | **2** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -6406,6 +6754,7 @@ null_resource.root
 _No attribute changes._
 
 </details>
+
 ### 📦 Module: \`module.naming\`
 
 <details>
@@ -6418,6 +6767,7 @@ module.naming.random_string.suffix
 _No attribute changes._
 
 </details>
+
 "
 `;
 
@@ -6433,7 +6783,9 @@ exports[`reportFromSteps integration — apply-only fixtures > tofu/with-modules
 | ± Replaced | null_resource | 1 |
 |  | random_string | 1 |
 |  | **Replaced** | **2** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -6446,6 +6798,7 @@ null_resource.root
 _No attribute changes._
 
 </details>
+
 ### 📦 Module: \`module.naming\`
 
 <details>
@@ -6458,6 +6811,7 @@ module.naming.random_string.suffix
 _No attribute changes._
 
 </details>
+
 "
 `;
 
@@ -6472,7 +6826,9 @@ exports[`reportFromSteps integration — generated fixtures > terraform/apply-er
 | ➕ Added | terraform_data | 2 |
 |  | null_resource | 1 |
 |  | **Added** | **3** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -6514,12 +6870,14 @@ terraform_data.success
 | output | <code></code> | <code>(value not in plan)</code> |
 
 </details>
+
 ## Outputs
 
 | Output | Action | Before | After |
 | --- | --- | --- | --- |
 | depends_on_fail_output | ➕ |  | <code>6991765980908842876</code> |
 | success_output | ➕ |  | <code>stable</code> |
+
 "
 `;
 
@@ -6533,7 +6891,9 @@ exports[`reportFromSteps integration — generated fixtures > terraform/apply-er
 | ➕ Added | terraform_data | 2 |
 |  | null_resource | 1 |
 |  | **Added** | **3** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -6575,12 +6935,14 @@ terraform_data.success
 | output | <code></code> | <code>(value not in plan)</code> |
 
 </details>
+
 ## Outputs
 
 | Output | Action | Before | After |
 | --- | --- | --- | --- |
 | depends_on_fail_output | ➕ |  | <code>6991765980908842876</code> |
 | success_output | ➕ |  | <code>stable</code> |
+
 "
 `;
 
@@ -6862,7 +7224,9 @@ Exit code: \`1\`
 | --- | --- | --- |
 | ❌ Replace failed | null_resource | 1 |
 |  | **Replace failed** | **1** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details open>
@@ -6890,12 +7254,14 @@ Error running command 'exit 1': exit status 1. Output:
 \`\`\`
 
 </details>
+
 ## Outputs
 
 | Output | Action | Before | After |
 | --- | --- | --- | --- |
 | depends_on_fail_output | 🔧 | <code>6991765980908842876</code> | <code>(value not in plan)</code> |
 | success_output | ⬜ | <code>stable</code> | <code>stable</code> |
+
 "
 `;
 
@@ -7176,7 +7542,9 @@ Exit code: \`1\`
 | --- | --- | --- |
 | ❌ Replace failed | null_resource | 1 |
 |  | **Replace failed** | **1** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details open>
@@ -7204,12 +7572,14 @@ Error running command 'exit 1': exit status 1. Output:
 \`\`\`
 
 </details>
+
 ## Outputs
 
 | Output | Action | Before | After |
 | --- | --- | --- | --- |
 | depends_on_fail_output | 🔧 | <code>6991765980908842876</code> | <code>(value not in plan)</code> |
 | success_output | ⬜ | <code>stable</code> | <code>stable</code> |
+
 "
 `;
 
@@ -7224,7 +7594,9 @@ exports[`reportFromSteps integration — generated fixtures > terraform/deferred
 | ➕ Added | terraform_data | 4 |
 |  | local_file | 1 |
 |  | **Added** | **5** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -7310,11 +7682,13 @@ terraform_data.worker_c
 _(all values known after apply)_
 
 </details>
+
 ## Outputs
 
 | Output | Action | Before | After |
 | --- | --- | --- | --- |
 | config_value | ➕ |  | <code>{"worker_a":"alpha","worker_b":"bravo","worker_c":"charlie"}</code> |
+
 "
 `;
 
@@ -7328,7 +7702,9 @@ exports[`reportFromSteps integration — generated fixtures > terraform/deferred
 | ➕ Added | terraform_data | 4 |
 |  | local_file | 1 |
 |  | **Added** | **5** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -7414,11 +7790,13 @@ terraform_data.worker_c
 _(all values known after apply)_
 
 </details>
+
 ## Outputs
 
 | Output | Action | Before | After |
 | --- | --- | --- | --- |
 | config_value | ➕ |  | <code>{"worker_a":"alpha","worker_b":"bravo","worker_c":"charlie"}</code> |
+
 "
 `;
 
@@ -7434,7 +7812,9 @@ exports[`reportFromSteps integration — generated fixtures > terraform/deferred
 |  | **Added** | **1** |
 | 🔧 Changed | terraform_data | 1 |
 |  | **Changed** | **1** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -7474,11 +7854,13 @@ terraform_data.independent
 | output | <code>v1</code> | <code>(value not in plan)</code> |
 
 </details>
+
 ## Outputs
 
 | Output | Action | Before | After |
 | --- | --- | --- | --- |
 | config_value | 🔧 | <code>{"worker_a":"alpha","worker_b":"bravo","worker_c":"charlie"}</code> | <code>{"worker_a":"alpha","worker_b":"bravo","worker_c":"charlie"}</code> |
+
 "
 `;
 
@@ -7493,7 +7875,9 @@ exports[`reportFromSteps integration — generated fixtures > terraform/deferred
 |  | **Added** | **1** |
 | 🔧 Changed | terraform_data | 1 |
 |  | **Changed** | **1** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -7533,11 +7917,13 @@ terraform_data.independent
 | output | <code>v1</code> | <code>(value not in plan)</code> |
 
 </details>
+
 ## Outputs
 
 | Output | Action | Before | After |
 | --- | --- | --- | --- |
 | config_value | 🔧 | <code>{"worker_a":"alpha","worker_b":"bravo","worker_c":"charlie"}</code> | <code>{"worker_a":"alpha","worker_b":"bravo","worker_c":"charlie"}</code> |
+
 "
 `;
 
@@ -7553,7 +7939,9 @@ exports[`reportFromSteps integration — generated fixtures > terraform/deferred
 |  | **Changed** | **1** |
 | ± Replaced | local_file | 1 |
 |  | **Replaced** | **1** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -7600,11 +7988,13 @@ terraform_data.worker_a
 _(all values known after apply)_
 
 </details>
+
 ## Outputs
 
 | Output | Action | Before | After |
 | --- | --- | --- | --- |
 | config_value | 🔧 | <code>{"worker_a":"alpha","worker_b":"bravo","worker_c":"charlie"}</code> | <code>{"worker_a":"ALPHA","worker_b":"bravo","worker_c":"charlie"}</code> |
+
 "
 `;
 
@@ -7619,7 +8009,9 @@ exports[`reportFromSteps integration — generated fixtures > terraform/deferred
 |  | **Changed** | **1** |
 | ± Replaced | local_file | 1 |
 |  | **Replaced** | **1** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -7666,11 +8058,13 @@ terraform_data.worker_a
 _(all values known after apply)_
 
 </details>
+
 ## Outputs
 
 | Output | Action | Before | After |
 | --- | --- | --- | --- |
 | config_value | 🔧 | <code>{"worker_a":"alpha","worker_b":"bravo","worker_c":"charlie"}</code> | <code>{"worker_a":"ALPHA","worker_b":"bravo","worker_c":"charlie"}</code> |
+
 "
 `;
 
@@ -7684,7 +8078,9 @@ exports[`reportFromSteps integration — generated fixtures > terraform/import-r
 | --- | --- | --- |
 | ➕ Added | random_string | 1 |
 |  | **Added** | **1** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -7710,6 +8106,7 @@ random_string.existing
 | upper |  | <code><ins style="background:#dfd">true</ins></code> |
 
 </details>
+
 "
 `;
 
@@ -7722,7 +8119,9 @@ exports[`reportFromSteps integration — generated fixtures > terraform/import-r
 | --- | --- | --- |
 | ➕ Added | random_string | 1 |
 |  | **Added** | **1** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -7748,6 +8147,7 @@ random_string.existing
 | upper |  | <code><ins style="background:#dfd">true</ins></code> |
 
 </details>
+
 "
 `;
 
@@ -7761,7 +8161,9 @@ exports[`reportFromSteps integration — generated fixtures > terraform/import-r
 | --- | --- | --- |
 | 📥 Imported | random_string | 1 |
 |  | **Imported** | **1** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -7776,6 +8178,7 @@ random_string.imported
 _No attribute changes._
 
 </details>
+
 "
 `;
 
@@ -7788,7 +8191,9 @@ exports[`reportFromSteps integration — generated fixtures > terraform/import-r
 | --- | --- | --- |
 | 📥 Imported | random_string | 1 |
 |  | **Imported** | **1** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -7803,6 +8208,7 @@ random_string.imported
 _No attribute changes._
 
 </details>
+
 "
 `;
 
@@ -7816,7 +8222,9 @@ exports[`reportFromSteps integration — generated fixtures > terraform/local-fi
 | --- | --- | --- |
 | ➕ Added | local_file | 1 |
 |  | **Added** | **1** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -7862,11 +8270,13 @@ Line 12: end of file
 </details>
 
 </details>
+
 ## Outputs
 
 | Output | Action | Before | After |
 | --- | --- | --- | --- |
 | readme_path | ➕ |  | <code>./output/readme.txt</code> |
+
 "
 `;
 
@@ -7879,7 +8289,9 @@ exports[`reportFromSteps integration — generated fixtures > terraform/local-fi
 | --- | --- | --- |
 | ➕ Added | local_file | 1 |
 |  | **Added** | **1** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -7925,11 +8337,13 @@ Line 12: end of file
 </details>
 
 </details>
+
 ## Outputs
 
 | Output | Action | Before | After |
 | --- | --- | --- | --- |
 | readme_path | ➕ |  | <code>./output/readme.txt</code> |
+
 "
 `;
 
@@ -7943,7 +8357,9 @@ exports[`reportFromSteps integration — generated fixtures > terraform/local-fi
 | --- | --- | --- |
 | ± Replaced | local_file | 1 |
 |  | **Replaced** | **1** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -7991,11 +8407,13 @@ local_file.readme
 </details>
 
 </details>
+
 ## Outputs
 
 | Output | Action | Before | After |
 | --- | --- | --- | --- |
 | readme_path | ⬜ | <code>./output/readme.txt</code> | <code>./output/readme.txt</code> |
+
 "
 `;
 
@@ -8008,7 +8426,9 @@ exports[`reportFromSteps integration — generated fixtures > terraform/local-fi
 | --- | --- | --- |
 | ± Replaced | local_file | 1 |
 |  | **Replaced** | **1** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -8056,11 +8476,13 @@ local_file.readme
 </details>
 
 </details>
+
 ## Outputs
 
 | Output | Action | Before | After |
 | --- | --- | --- | --- |
 | readme_path | ⬜ | <code>./output/readme.txt</code> | <code>./output/readme.txt</code> |
+
 "
 `;
 
@@ -8074,7 +8496,9 @@ exports[`reportFromSteps integration — generated fixtures > terraform/moved-re
 | --- | --- | --- |
 | ➕ Added | null_resource | 1 |
 |  | **Added** | **1** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -8090,6 +8514,7 @@ null_resource.original
 | triggers.version |  | <code><ins style="background:#dfd">1</ins></code> |
 
 </details>
+
 "
 `;
 
@@ -8102,7 +8527,9 @@ exports[`reportFromSteps integration — generated fixtures > terraform/moved-re
 | --- | --- | --- |
 | ➕ Added | null_resource | 1 |
 |  | **Added** | **1** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -8118,6 +8545,7 @@ null_resource.original
 | triggers.version |  | <code><ins style="background:#dfd">1</ins></code> |
 
 </details>
+
 "
 `;
 
@@ -8131,7 +8559,9 @@ exports[`reportFromSteps integration — generated fixtures > terraform/moved-re
 | --- | --- | --- |
 | 🚚 Moved | null_resource | 1 |
 |  | **Moved** | **1** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -8146,6 +8576,7 @@ null_resource.renamed
 _No attribute changes._
 
 </details>
+
 "
 `;
 
@@ -8158,7 +8589,9 @@ exports[`reportFromSteps integration — generated fixtures > terraform/moved-re
 | --- | --- | --- |
 | 🚚 Moved | null_resource | 1 |
 |  | **Moved** | **1** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -8173,6 +8606,7 @@ null_resource.renamed
 _No attribute changes._
 
 </details>
+
 "
 `;
 
@@ -8186,7 +8620,9 @@ exports[`reportFromSteps integration — generated fixtures > terraform/nested-m
 | --- | --- | --- |
 | ➕ Added | null_resource | 3 |
 |  | **Added** | **3** |
+
 ## Resource Changes
+
 ### 📦 Module: \`module.parent["1"].module.child\`
 
 <details>
@@ -8203,6 +8639,7 @@ module.parent["1"].module.child.null_resource.item[0]
 | triggers.label |  | <code><ins style="background:#dfd">1</ins></code> |
 
 </details>
+
 ### 📦 Module: \`module.parent["2"].module.child\`
 
 <details>
@@ -8234,6 +8671,7 @@ module.parent["2"].module.child.null_resource.item[1]
 | triggers.label |  | <code><ins style="background:#dfd">2</ins></code> |
 
 </details>
+
 "
 `;
 
@@ -8246,7 +8684,9 @@ exports[`reportFromSteps integration — generated fixtures > terraform/nested-m
 | --- | --- | --- |
 | ➕ Added | null_resource | 3 |
 |  | **Added** | **3** |
+
 ## Resource Changes
+
 ### 📦 Module: \`module.parent["1"].module.child\`
 
 <details>
@@ -8263,6 +8703,7 @@ module.parent["1"].module.child.null_resource.item[0]
 | triggers.label |  | <code><ins style="background:#dfd">1</ins></code> |
 
 </details>
+
 ### 📦 Module: \`module.parent["2"].module.child\`
 
 <details>
@@ -8294,6 +8735,7 @@ module.parent["2"].module.child.null_resource.item[1]
 | triggers.label |  | <code><ins style="background:#dfd">2</ins></code> |
 
 </details>
+
 "
 `;
 
@@ -8309,7 +8751,9 @@ exports[`reportFromSteps integration — generated fixtures > terraform/nested-m
 |  | **Added** | **3** |
 | 🗑️ Destroyed | null_resource | 2 |
 |  | **Destroyed** | **2** |
+
 ## Resource Changes
+
 ### 📦 Module: \`module.parent["2"].module.child\`
 
 <details>
@@ -8341,6 +8785,7 @@ module.parent["2"].module.child.null_resource.item[1]
 | triggers.label | 2 | <code><del style="background:#fdd">2</del></code> |
 
 </details>
+
 ### 📦 Module: \`module.parent["3"].module.child\`
 
 <details>
@@ -8387,6 +8832,7 @@ module.parent["3"].module.child.null_resource.item[2]
 | triggers.label |  | <code><ins style="background:#dfd">3</ins></code> |
 
 </details>
+
 "
 `;
 
@@ -8401,7 +8847,9 @@ exports[`reportFromSteps integration — generated fixtures > terraform/nested-m
 |  | **Added** | **3** |
 | 🗑️ Destroyed | null_resource | 2 |
 |  | **Destroyed** | **2** |
+
 ## Resource Changes
+
 ### 📦 Module: \`module.parent["2"].module.child\`
 
 <details>
@@ -8433,6 +8881,7 @@ module.parent["2"].module.child.null_resource.item[1]
 | triggers.label | 2 | <code><del style="background:#fdd">2</del></code> |
 
 </details>
+
 ### 📦 Module: \`module.parent["3"].module.child\`
 
 <details>
@@ -8479,6 +8928,7 @@ module.parent["3"].module.child.null_resource.item[2]
 | triggers.label |  | <code><ins style="background:#dfd">3</ins></code> |
 
 </details>
+
 "
 `;
 
@@ -8492,7 +8942,9 @@ exports[`reportFromSteps integration — generated fixtures > terraform/no-detai
 | --- | --- | --- |
 | ➕ Added | null_resource | 1 |
 |  | **Added** | **1** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -8508,6 +8960,7 @@ null_resource.example
 | triggers.value |  | <code><ins style="background:#dfd">hello</ins></code> |
 
 </details>
+
 "
 `;
 
@@ -8520,7 +8973,9 @@ exports[`reportFromSteps integration — generated fixtures > terraform/no-detai
 | --- | --- | --- |
 | ➕ Added | null_resource | 1 |
 |  | **Added** | **1** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -8536,6 +8991,7 @@ null_resource.example
 | triggers.value |  | <code><ins style="background:#dfd">hello</ins></code> |
 
 </details>
+
 "
 `;
 
@@ -8549,7 +9005,9 @@ exports[`reportFromSteps integration — generated fixtures > terraform/no-detai
 | --- | --- | --- |
 | 🗑️ Destroyed | null_resource | 1 |
 |  | **Destroyed** | **1** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -8565,6 +9023,7 @@ null_resource.example
 | triggers.value | hello | <code><del style="background:#fdd">hello</del></code> |
 
 </details>
+
 "
 `;
 
@@ -8577,7 +9036,9 @@ exports[`reportFromSteps integration — generated fixtures > terraform/no-detai
 | --- | --- | --- |
 | 🗑️ Destroyed | null_resource | 1 |
 |  | **Destroyed** | **1** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -8593,6 +9054,7 @@ null_resource.example
 | triggers.value | hello | <code><del style="background:#fdd">hello</del></code> |
 
 </details>
+
 "
 `;
 
@@ -8603,6 +9065,7 @@ exports[`reportFromSteps integration — generated fixtures > terraform/no-json-
 ## Apply Summary
 
 _No changes._
+
 <details><summary>Plan Output</summary>
 
 \`\`\`
@@ -8655,6 +9118,7 @@ exports[`reportFromSteps integration — generated fixtures > terraform/no-json-
 ## Apply Summary
 
 _No changes._
+
 <details><summary>Plan Output</summary>
 
 \`\`\`
@@ -8711,7 +9175,9 @@ exports[`reportFromSteps integration — generated fixtures > terraform/no-op/0 
 | --- | --- | --- |
 | ➕ Added | null_resource | 1 |
 |  | **Added** | **1** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -8727,6 +9193,7 @@ null_resource.stable
 | triggers.version |  | <code><ins style="background:#dfd">1</ins></code> |
 
 </details>
+
 "
 `;
 
@@ -8739,7 +9206,9 @@ exports[`reportFromSteps integration — generated fixtures > terraform/no-op/0 
 | --- | --- | --- |
 | ➕ Added | null_resource | 1 |
 |  | **Added** | **1** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -8755,6 +9224,7 @@ null_resource.stable
 | triggers.version |  | <code><ins style="background:#dfd">1</ins></code> |
 
 </details>
+
 "
 `;
 
@@ -8765,6 +9235,7 @@ exports[`reportFromSteps integration — generated fixtures > terraform/no-op/1 
 ## Apply Summary
 
 _No changes._
+
 "
 `;
 
@@ -8774,6 +9245,7 @@ exports[`reportFromSteps integration — generated fixtures > terraform/no-op/1 
 ## Apply Summary
 
 _No changes._
+
 "
 `;
 
@@ -8784,6 +9256,7 @@ exports[`reportFromSteps integration — generated fixtures > terraform/null-lif
 ## Apply Summary
 
 _No changes._
+
 "
 `;
 
@@ -8793,6 +9266,7 @@ exports[`reportFromSteps integration — generated fixtures > terraform/null-lif
 ## Apply Summary
 
 _No changes._
+
 "
 `;
 
@@ -8807,7 +9281,9 @@ exports[`reportFromSteps integration — generated fixtures > terraform/null-lif
 | ➕ Added | null_resource | 2 |
 |  | terraform_data | 1 |
 |  | **Added** | **3** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -8854,6 +9330,7 @@ terraform_data.meta
 | output | <code></code> | <code>(value not in plan)</code> |
 
 </details>
+
 "
 `;
 
@@ -8867,7 +9344,9 @@ exports[`reportFromSteps integration — generated fixtures > terraform/null-lif
 | ➕ Added | null_resource | 2 |
 |  | terraform_data | 1 |
 |  | **Added** | **3** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -8914,6 +9393,7 @@ terraform_data.meta
 | output | <code></code> | <code>(value not in plan)</code> |
 
 </details>
+
 "
 `;
 
@@ -8931,7 +9411,9 @@ exports[`reportFromSteps integration — generated fixtures > terraform/null-lif
 |  | **Replaced** | **1** |
 | 🗑️ Destroyed | null_resource | 1 |
 |  | **Destroyed** | **1** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -8976,6 +9458,7 @@ terraform_data.meta
 | output | <code>v1</code> | <code>(value not in plan)</code> |
 
 </details>
+
 "
 `;
 
@@ -8992,7 +9475,9 @@ exports[`reportFromSteps integration — generated fixtures > terraform/null-lif
 |  | **Replaced** | **1** |
 | 🗑️ Destroyed | null_resource | 1 |
 |  | **Destroyed** | **1** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -9037,6 +9522,7 @@ terraform_data.meta
 | output | <code>v1</code> | <code>(value not in plan)</code> |
 
 </details>
+
 "
 `;
 
@@ -9050,7 +9536,9 @@ exports[`reportFromSteps integration — generated fixtures > terraform/plan-err
 | --- | --- | --- |
 | ➕ Added | null_resource | 1 |
 |  | **Added** | **1** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -9066,6 +9554,7 @@ null_resource.baseline
 | triggers.value |  | <code><ins style="background:#dfd">v1</ins></code> |
 
 </details>
+
 "
 `;
 
@@ -9078,7 +9567,9 @@ exports[`reportFromSteps integration — generated fixtures > terraform/plan-err
 | --- | --- | --- |
 | ➕ Added | null_resource | 1 |
 |  | **Added** | **1** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -9094,6 +9585,7 @@ null_resource.baseline
 | triggers.value |  | <code><ins style="background:#dfd">v1</ins></code> |
 
 </details>
+
 "
 `;
 
@@ -9281,6 +9773,7 @@ Exit code: \`1\`
 | --- | --- | --- |
 | 🗑️ Destroy | null_resource | 1 |
 |  | **Destroy** | **1** |
+
 ## Errors
 
 🚨 **Read local file data source error** — \`data.local_file.missing\`
@@ -9288,7 +9781,10 @@ Exit code: \`1\`
 > The file at given path cannot be read.
 
 +Original Error: open /nonexistent/path/to/file.txt: no such file or directory
-> \`data "local_file" "missing" {\` in data "local_file" "missing" (line 19)## Resource Changes
+> \`data "local_file" "missing" {\` in data "local_file" "missing" (line 19)
+
+## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -9301,6 +9797,7 @@ null_resource.baseline
 _No attribute changes._
 
 </details>
+
 "
 `;
 
@@ -9487,6 +9984,7 @@ Exit code: \`1\`
 | --- | --- | --- |
 | 🗑️ Destroy | null_resource | 1 |
 |  | **Destroy** | **1** |
+
 ## Errors
 
 🚨 **Read local file data source error** — \`data.local_file.missing\`
@@ -9494,7 +9992,10 @@ Exit code: \`1\`
 > The file at given path cannot be read.
 
 +Original Error: open /nonexistent/path/to/file.txt: no such file or directory
-> \`data "local_file" "missing" {\` in data "local_file" "missing" (line 19)## Resource Changes
+> \`data "local_file" "missing" {\` in data "local_file" "missing" (line 19)
+
+## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -9507,6 +10008,7 @@ null_resource.baseline
 _No attribute changes._
 
 </details>
+
 "
 `;
 
@@ -9520,7 +10022,9 @@ exports[`reportFromSteps integration — generated fixtures > terraform/random-r
 | --- | --- | --- |
 | ➕ Added | random_string | 1 |
 |  | **Added** | **1** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -9547,11 +10051,13 @@ random_string.token
 | upper |  | <code><ins style="background:#dfd">true</ins></code> |
 
 </details>
+
 ## Outputs
 
 | Output | Action | Before | After |
 | --- | --- | --- | --- |
 | token_length | ➕ |  | <code>16</code> |
+
 "
 `;
 
@@ -9564,7 +10070,9 @@ exports[`reportFromSteps integration — generated fixtures > terraform/random-r
 | --- | --- | --- |
 | ➕ Added | random_string | 1 |
 |  | **Added** | **1** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -9591,11 +10099,13 @@ random_string.token
 | upper |  | <code><ins style="background:#dfd">true</ins></code> |
 
 </details>
+
 ## Outputs
 
 | Output | Action | Before | After |
 | --- | --- | --- | --- |
 | token_length | ➕ |  | <code>16</code> |
+
 "
 `;
 
@@ -9609,7 +10119,9 @@ exports[`reportFromSteps integration — generated fixtures > terraform/random-r
 | --- | --- | --- |
 | ± Replaced | random_string | 1 |
 |  | **Replaced** | **1** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -9626,11 +10138,13 @@ random_string.token
 | result | <code>8bxyyCcqLfN6esga</code> | <code>(value not in plan)</code> |
 
 </details>
+
 ## Outputs
 
 | Output | Action | Before | After |
 | --- | --- | --- | --- |
 | token_length | ⬜ | <code>16</code> | <code>16</code> |
+
 "
 `;
 
@@ -9643,7 +10157,9 @@ exports[`reportFromSteps integration — generated fixtures > terraform/random-r
 | --- | --- | --- |
 | ± Replaced | random_string | 1 |
 |  | **Replaced** | **1** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -9660,11 +10176,13 @@ random_string.token
 | result | <code>8bxyyCcqLfN6esga</code> | <code>(value not in plan)</code> |
 
 </details>
+
 ## Outputs
 
 | Output | Action | Before | After |
 | --- | --- | --- | --- |
 | token_length | ⬜ | <code>16</code> | <code>16</code> |
+
 "
 `;
 
@@ -9678,7 +10196,9 @@ exports[`reportFromSteps integration — generated fixtures > terraform/removed-
 | --- | --- | --- |
 | ➕ Added | null_resource | 2 |
 |  | **Added** | **2** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -9708,6 +10228,7 @@ null_resource.keeper
 | triggers.version |  | <code><ins style="background:#dfd">1</ins></code> |
 
 </details>
+
 "
 `;
 
@@ -9720,7 +10241,9 @@ exports[`reportFromSteps integration — generated fixtures > terraform/removed-
 | --- | --- | --- |
 | ➕ Added | null_resource | 2 |
 |  | **Added** | **2** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -9750,6 +10273,7 @@ null_resource.keeper
 | triggers.version |  | <code><ins style="background:#dfd">1</ins></code> |
 
 </details>
+
 "
 `;
 
@@ -9763,6 +10287,7 @@ exports[`reportFromSteps integration — generated fixtures > terraform/removed-
 | --- | --- | --- |
 | 👋 Forgotten | null_resource | 1 |
 |  | **Forgotten** | **1** |
+
 ## Warnings
 
 ⚠️ **Some objects will no longer be managed by Terraform**
@@ -9770,7 +10295,10 @@ exports[`reportFromSteps integration — generated fixtures > terraform/removed-
 > If you apply this plan, Terraform will discard its tracking information for the following objects, but it will not delete them:
  - null_resource.ephemeral
 
-After applying this plan, Terraform will no longer manage these objects. You will need to import them into Terraform to manage them again.## Resource Changes
+After applying this plan, Terraform will no longer manage these objects. You will need to import them into Terraform to manage them again.
+
+## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -9786,6 +10314,7 @@ null_resource.ephemeral
 | triggers.version | 1 | <code><del style="background:#fdd">1</del></code> |
 
 </details>
+
 "
 `;
 
@@ -9798,6 +10327,7 @@ exports[`reportFromSteps integration — generated fixtures > terraform/removed-
 | --- | --- | --- |
 | 👋 Forgotten | null_resource | 1 |
 |  | **Forgotten** | **1** |
+
 ## Warnings
 
 ⚠️ **Some objects will no longer be managed by Terraform**
@@ -9805,7 +10335,10 @@ exports[`reportFromSteps integration — generated fixtures > terraform/removed-
 > If you apply this plan, Terraform will discard its tracking information for the following objects, but it will not delete them:
  - null_resource.ephemeral
 
-After applying this plan, Terraform will no longer manage these objects. You will need to import them into Terraform to manage them again.## Resource Changes
+After applying this plan, Terraform will no longer manage these objects. You will need to import them into Terraform to manage them again.
+
+## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -9821,6 +10354,7 @@ null_resource.ephemeral
 | triggers.version | 1 | <code><del style="background:#fdd">1</del></code> |
 
 </details>
+
 "
 `;
 
@@ -9834,7 +10368,9 @@ exports[`reportFromSteps integration — generated fixtures > terraform/sensitiv
 | --- | --- | --- |
 | ➕ Added | local_sensitive_file | 1 |
 |  | **Added** | **1** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -9860,12 +10396,14 @@ local_sensitive_file.secret
 | id | <code></code> | <code>(value not in plan)</code> |
 
 </details>
+
 ## Outputs
 
 | Output | Action | Before | After |
 | --- | --- | --- | --- |
 | secret_checksum | ➕ | <code>(sensitive)</code> | <code>(sensitive)</code> |
 | secret_path | ➕ |  | <code>./output/secret.txt</code> |
+
 "
 `;
 
@@ -9878,7 +10416,9 @@ exports[`reportFromSteps integration — generated fixtures > terraform/sensitiv
 | --- | --- | --- |
 | ➕ Added | local_sensitive_file | 1 |
 |  | **Added** | **1** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -9904,12 +10444,14 @@ local_sensitive_file.secret
 | id | <code></code> | <code>(value not in plan)</code> |
 
 </details>
+
 ## Outputs
 
 | Output | Action | Before | After |
 | --- | --- | --- | --- |
 | secret_checksum | ➕ | <code>(sensitive)</code> | <code>(sensitive)</code> |
 | secret_path | ➕ |  | <code>./output/secret.txt</code> |
+
 "
 `;
 
@@ -9923,7 +10465,9 @@ exports[`reportFromSteps integration — generated fixtures > terraform/sensitiv
 | --- | --- | --- |
 | ± Replaced | local_sensitive_file | 1 |
 |  | **Replaced** | **1** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -9946,12 +10490,14 @@ local_sensitive_file.secret
 | id | <code>ffae43b95440019e9bb698e9713dc5ac27be8dd5</code> | <code>(value not in plan)</code> |
 
 </details>
+
 ## Outputs
 
 | Output | Action | Before | After |
 | --- | --- | --- | --- |
 | secret_checksum | 🔧 | <code>(sensitive)</code> | <code>(sensitive)</code> |
 | secret_path | ⬜ | <code>./output/secret.txt</code> | <code>./output/secret.txt</code> |
+
 "
 `;
 
@@ -9964,7 +10510,9 @@ exports[`reportFromSteps integration — generated fixtures > terraform/sensitiv
 | --- | --- | --- |
 | ± Replaced | local_sensitive_file | 1 |
 |  | **Replaced** | **1** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -9987,12 +10535,14 @@ local_sensitive_file.secret
 | id | <code>ffae43b95440019e9bb698e9713dc5ac27be8dd5</code> | <code>(value not in plan)</code> |
 
 </details>
+
 ## Outputs
 
 | Output | Action | Before | After |
 | --- | --- | --- | --- |
 | secret_checksum | 🔧 | <code>(sensitive)</code> | <code>(sensitive)</code> |
 | secret_path | ⬜ | <code>./output/secret.txt</code> | <code>./output/secret.txt</code> |
+
 "
 `;
 
@@ -10006,7 +10556,9 @@ exports[`reportFromSteps integration — generated fixtures > terraform/validate
 | --- | --- | --- |
 | ➕ Added | null_resource | 1 |
 |  | **Added** | **1** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -10022,6 +10574,7 @@ null_resource.baseline
 | triggers.value |  | <code><ins style="background:#dfd">v1</ins></code> |
 
 </details>
+
 "
 `;
 
@@ -10034,7 +10587,9 @@ exports[`reportFromSteps integration — generated fixtures > terraform/validate
 | --- | --- | --- |
 | ➕ Added | null_resource | 1 |
 |  | **Added** | **1** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -10050,6 +10605,7 @@ null_resource.baseline
 | triggers.value |  | <code><ins style="background:#dfd">v1</ins></code> |
 
 </details>
+
 "
 `;
 
@@ -10215,7 +10771,9 @@ exports[`reportFromSteps integration — generated fixtures > terraform/with-mod
 | ➕ Added | null_resource | 1 |
 |  | random_string | 1 |
 |  | **Added** | **2** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -10231,6 +10789,7 @@ null_resource.root
 | triggers.stage |  | <code><ins style="background:#dfd">0</ins></code> |
 
 </details>
+
 ### 📦 Module: \`module.naming\`
 
 <details>
@@ -10257,12 +10816,14 @@ module.naming.random_string.suffix
 | upper |  | <code><ins style="background:#dfd">false</ins></code> |
 
 </details>
+
 ## Outputs
 
 | Output | Action | Before | After |
 | --- | --- | --- | --- |
 | generated_name | ➕ |  | <code>fixture-dx12h5s0</code> |
 | root_id | ➕ |  | <code>1416987651343215284</code> |
+
 "
 `;
 
@@ -10276,7 +10837,9 @@ exports[`reportFromSteps integration — generated fixtures > terraform/with-mod
 | ➕ Added | null_resource | 1 |
 |  | random_string | 1 |
 |  | **Added** | **2** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -10292,6 +10855,7 @@ null_resource.root
 | triggers.stage |  | <code><ins style="background:#dfd">0</ins></code> |
 
 </details>
+
 ### 📦 Module: \`module.naming\`
 
 <details>
@@ -10318,12 +10882,14 @@ module.naming.random_string.suffix
 | upper |  | <code><ins style="background:#dfd">false</ins></code> |
 
 </details>
+
 ## Outputs
 
 | Output | Action | Before | After |
 | --- | --- | --- | --- |
 | generated_name | ➕ |  | <code>fixture-dx12h5s0</code> |
 | root_id | ➕ |  | <code>1416987651343215284</code> |
+
 "
 `;
 
@@ -10338,7 +10904,9 @@ exports[`reportFromSteps integration — generated fixtures > terraform/with-mod
 | ± Replaced | null_resource | 1 |
 |  | random_string | 1 |
 |  | **Replaced** | **2** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -10354,6 +10922,7 @@ null_resource.root
 | triggers.stage | 0 | <code><ins style="background:#dfd">1</ins><del style="background:#fdd">0</del></code> |
 
 </details>
+
 ### 📦 Module: \`module.naming\`
 
 <details>
@@ -10370,12 +10939,14 @@ module.naming.random_string.suffix
 | result | <code>dx12h5s0</code> | <code>(value not in plan)</code> |
 
 </details>
+
 ## Outputs
 
 | Output | Action | Before | After |
 | --- | --- | --- | --- |
 | generated_name | 🔧 | <code>fixture-dx12h5s0</code> | <code>fixture-updated-bmat2t36</code> |
 | root_id | 🔧 | <code>1416987651343215284</code> | <code>1603630222204103251</code> |
+
 "
 `;
 
@@ -10389,7 +10960,9 @@ exports[`reportFromSteps integration — generated fixtures > terraform/with-mod
 | ± Replaced | null_resource | 1 |
 |  | random_string | 1 |
 |  | **Replaced** | **2** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -10405,6 +10978,7 @@ null_resource.root
 | triggers.stage | 0 | <code><ins style="background:#dfd">1</ins><del style="background:#fdd">0</del></code> |
 
 </details>
+
 ### 📦 Module: \`module.naming\`
 
 <details>
@@ -10421,12 +10995,14 @@ module.naming.random_string.suffix
 | result | <code>dx12h5s0</code> | <code>(value not in plan)</code> |
 
 </details>
+
 ## Outputs
 
 | Output | Action | Before | After |
 | --- | --- | --- | --- |
 | generated_name | 🔧 | <code>fixture-dx12h5s0</code> | <code>fixture-updated-bmat2t36</code> |
 | root_id | 🔧 | <code>1416987651343215284</code> | <code>1603630222204103251</code> |
+
 "
 `;
 
@@ -10441,7 +11017,9 @@ exports[`reportFromSteps integration — generated fixtures > tofu/apply-error/0
 | ➕ Added | terraform_data | 2 |
 |  | null_resource | 1 |
 |  | **Added** | **3** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -10483,12 +11061,14 @@ terraform_data.success
 | output | <code></code> | <code>(value not in plan)</code> |
 
 </details>
+
 ## Outputs
 
 | Output | Action | Before | After |
 | --- | --- | --- | --- |
 | depends_on_fail_output | ➕ |  | <code>6572019016639558200</code> |
 | success_output | ➕ |  | <code>stable</code> |
+
 "
 `;
 
@@ -10502,7 +11082,9 @@ exports[`reportFromSteps integration — generated fixtures > tofu/apply-error/0
 | ➕ Added | terraform_data | 2 |
 |  | null_resource | 1 |
 |  | **Added** | **3** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -10544,12 +11126,14 @@ terraform_data.success
 | output | <code></code> | <code>(value not in plan)</code> |
 
 </details>
+
 ## Outputs
 
 | Output | Action | Before | After |
 | --- | --- | --- | --- |
 | depends_on_fail_output | ➕ |  | <code>6572019016639558200</code> |
 | success_output | ➕ |  | <code>stable</code> |
+
 "
 `;
 
@@ -10831,7 +11415,9 @@ Exit code: \`1\`
 | --- | --- | --- |
 | ❌ Replace failed | null_resource | 1 |
 |  | **Replace failed** | **1** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details open>
@@ -10859,12 +11445,14 @@ Error running command 'exit 1': exit status 1. Output:
 \`\`\`
 
 </details>
+
 ## Outputs
 
 | Output | Action | Before | After |
 | --- | --- | --- | --- |
 | depends_on_fail_output | 🔧 | <code>6572019016639558200</code> | <code>(value not in plan)</code> |
 | success_output | ⬜ | <code>stable</code> | <code>stable</code> |
+
 "
 `;
 
@@ -11145,7 +11733,9 @@ Exit code: \`1\`
 | --- | --- | --- |
 | ❌ Replace failed | null_resource | 1 |
 |  | **Replace failed** | **1** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details open>
@@ -11173,12 +11763,14 @@ Error running command 'exit 1': exit status 1. Output:
 \`\`\`
 
 </details>
+
 ## Outputs
 
 | Output | Action | Before | After |
 | --- | --- | --- | --- |
 | depends_on_fail_output | 🔧 | <code>6572019016639558200</code> | <code>(value not in plan)</code> |
 | success_output | ⬜ | <code>stable</code> | <code>stable</code> |
+
 "
 `;
 
@@ -11193,7 +11785,9 @@ exports[`reportFromSteps integration — generated fixtures > tofu/deferred-data
 | ➕ Added | terraform_data | 4 |
 |  | local_file | 1 |
 |  | **Added** | **5** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -11279,11 +11873,13 @@ terraform_data.worker_c
 _(all values known after apply)_
 
 </details>
+
 ## Outputs
 
 | Output | Action | Before | After |
 | --- | --- | --- | --- |
 | config_value | ➕ |  | <code>{"worker_a":"alpha","worker_b":"bravo","worker_c":"charlie"}</code> |
+
 "
 `;
 
@@ -11297,7 +11893,9 @@ exports[`reportFromSteps integration — generated fixtures > tofu/deferred-data
 | ➕ Added | terraform_data | 4 |
 |  | local_file | 1 |
 |  | **Added** | **5** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -11383,11 +11981,13 @@ terraform_data.worker_c
 _(all values known after apply)_
 
 </details>
+
 ## Outputs
 
 | Output | Action | Before | After |
 | --- | --- | --- | --- |
 | config_value | ➕ |  | <code>{"worker_a":"alpha","worker_b":"bravo","worker_c":"charlie"}</code> |
+
 "
 `;
 
@@ -11403,7 +12003,9 @@ exports[`reportFromSteps integration — generated fixtures > tofu/deferred-data
 |  | **Added** | **1** |
 | 🔧 Changed | terraform_data | 1 |
 |  | **Changed** | **1** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -11443,11 +12045,13 @@ terraform_data.independent
 | output | <code>v1</code> | <code>(value not in plan)</code> |
 
 </details>
+
 ## Outputs
 
 | Output | Action | Before | After |
 | --- | --- | --- | --- |
 | config_value | 🔧 | <code>{"worker_a":"alpha","worker_b":"bravo","worker_c":"charlie"}</code> | <code>{"worker_a":"alpha","worker_b":"bravo","worker_c":"charlie"}</code> |
+
 "
 `;
 
@@ -11462,7 +12066,9 @@ exports[`reportFromSteps integration — generated fixtures > tofu/deferred-data
 |  | **Added** | **1** |
 | 🔧 Changed | terraform_data | 1 |
 |  | **Changed** | **1** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -11502,11 +12108,13 @@ terraform_data.independent
 | output | <code>v1</code> | <code>(value not in plan)</code> |
 
 </details>
+
 ## Outputs
 
 | Output | Action | Before | After |
 | --- | --- | --- | --- |
 | config_value | 🔧 | <code>{"worker_a":"alpha","worker_b":"bravo","worker_c":"charlie"}</code> | <code>{"worker_a":"alpha","worker_b":"bravo","worker_c":"charlie"}</code> |
+
 "
 `;
 
@@ -11522,7 +12130,9 @@ exports[`reportFromSteps integration — generated fixtures > tofu/deferred-data
 |  | **Changed** | **1** |
 | ± Replaced | local_file | 1 |
 |  | **Replaced** | **1** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -11569,11 +12179,13 @@ terraform_data.worker_a
 _(all values known after apply)_
 
 </details>
+
 ## Outputs
 
 | Output | Action | Before | After |
 | --- | --- | --- | --- |
 | config_value | 🔧 | <code>{"worker_a":"alpha","worker_b":"bravo","worker_c":"charlie"}</code> | <code>{"worker_a":"ALPHA","worker_b":"bravo","worker_c":"charlie"}</code> |
+
 "
 `;
 
@@ -11588,7 +12200,9 @@ exports[`reportFromSteps integration — generated fixtures > tofu/deferred-data
 |  | **Changed** | **1** |
 | ± Replaced | local_file | 1 |
 |  | **Replaced** | **1** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -11635,11 +12249,13 @@ terraform_data.worker_a
 _(all values known after apply)_
 
 </details>
+
 ## Outputs
 
 | Output | Action | Before | After |
 | --- | --- | --- | --- |
 | config_value | 🔧 | <code>{"worker_a":"alpha","worker_b":"bravo","worker_c":"charlie"}</code> | <code>{"worker_a":"ALPHA","worker_b":"bravo","worker_c":"charlie"}</code> |
+
 "
 `;
 
@@ -11653,7 +12269,9 @@ exports[`reportFromSteps integration — generated fixtures > tofu/import-resour
 | --- | --- | --- |
 | ➕ Added | random_string | 1 |
 |  | **Added** | **1** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -11679,6 +12297,7 @@ random_string.existing
 | upper |  | <code><ins style="background:#dfd">true</ins></code> |
 
 </details>
+
 "
 `;
 
@@ -11691,7 +12310,9 @@ exports[`reportFromSteps integration — generated fixtures > tofu/import-resour
 | --- | --- | --- |
 | ➕ Added | random_string | 1 |
 |  | **Added** | **1** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -11717,6 +12338,7 @@ random_string.existing
 | upper |  | <code><ins style="background:#dfd">true</ins></code> |
 
 </details>
+
 "
 `;
 
@@ -11730,7 +12352,9 @@ exports[`reportFromSteps integration — generated fixtures > tofu/import-resour
 | --- | --- | --- |
 | 📥 Imported | random_string | 1 |
 |  | **Imported** | **1** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -11745,6 +12369,7 @@ random_string.imported
 _No attribute changes._
 
 </details>
+
 "
 `;
 
@@ -11757,7 +12382,9 @@ exports[`reportFromSteps integration — generated fixtures > tofu/import-resour
 | --- | --- | --- |
 | 📥 Imported | random_string | 1 |
 |  | **Imported** | **1** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -11772,6 +12399,7 @@ random_string.imported
 _No attribute changes._
 
 </details>
+
 "
 `;
 
@@ -11785,7 +12413,9 @@ exports[`reportFromSteps integration — generated fixtures > tofu/local-files/0
 | --- | --- | --- |
 | ➕ Added | local_file | 1 |
 |  | **Added** | **1** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -11831,11 +12461,13 @@ Line 12: end of file
 </details>
 
 </details>
+
 ## Outputs
 
 | Output | Action | Before | After |
 | --- | --- | --- | --- |
 | readme_path | ➕ |  | <code>./output/readme.txt</code> |
+
 "
 `;
 
@@ -11848,7 +12480,9 @@ exports[`reportFromSteps integration — generated fixtures > tofu/local-files/0
 | --- | --- | --- |
 | ➕ Added | local_file | 1 |
 |  | **Added** | **1** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -11894,11 +12528,13 @@ Line 12: end of file
 </details>
 
 </details>
+
 ## Outputs
 
 | Output | Action | Before | After |
 | --- | --- | --- | --- |
 | readme_path | ➕ |  | <code>./output/readme.txt</code> |
+
 "
 `;
 
@@ -11912,7 +12548,9 @@ exports[`reportFromSteps integration — generated fixtures > tofu/local-files/1
 | --- | --- | --- |
 | ± Replaced | local_file | 1 |
 |  | **Replaced** | **1** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -11960,11 +12598,13 @@ local_file.readme
 </details>
 
 </details>
+
 ## Outputs
 
 | Output | Action | Before | After |
 | --- | --- | --- | --- |
 | readme_path | ⬜ | <code>./output/readme.txt</code> | <code>./output/readme.txt</code> |
+
 "
 `;
 
@@ -11977,7 +12617,9 @@ exports[`reportFromSteps integration — generated fixtures > tofu/local-files/1
 | --- | --- | --- |
 | ± Replaced | local_file | 1 |
 |  | **Replaced** | **1** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -12025,11 +12667,13 @@ local_file.readme
 </details>
 
 </details>
+
 ## Outputs
 
 | Output | Action | Before | After |
 | --- | --- | --- | --- |
 | readme_path | ⬜ | <code>./output/readme.txt</code> | <code>./output/readme.txt</code> |
+
 "
 `;
 
@@ -12043,7 +12687,9 @@ exports[`reportFromSteps integration — generated fixtures > tofu/moved-resourc
 | --- | --- | --- |
 | ➕ Added | null_resource | 1 |
 |  | **Added** | **1** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -12059,6 +12705,7 @@ null_resource.original
 | triggers.version |  | <code><ins style="background:#dfd">1</ins></code> |
 
 </details>
+
 "
 `;
 
@@ -12071,7 +12718,9 @@ exports[`reportFromSteps integration — generated fixtures > tofu/moved-resourc
 | --- | --- | --- |
 | ➕ Added | null_resource | 1 |
 |  | **Added** | **1** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -12087,6 +12736,7 @@ null_resource.original
 | triggers.version |  | <code><ins style="background:#dfd">1</ins></code> |
 
 </details>
+
 "
 `;
 
@@ -12100,7 +12750,9 @@ exports[`reportFromSteps integration — generated fixtures > tofu/moved-resourc
 | --- | --- | --- |
 | 🚚 Moved | null_resource | 1 |
 |  | **Moved** | **1** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -12115,6 +12767,7 @@ null_resource.renamed
 _No attribute changes._
 
 </details>
+
 "
 `;
 
@@ -12127,7 +12780,9 @@ exports[`reportFromSteps integration — generated fixtures > tofu/moved-resourc
 | --- | --- | --- |
 | 🚚 Moved | null_resource | 1 |
 |  | **Moved** | **1** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -12142,6 +12797,7 @@ null_resource.renamed
 _No attribute changes._
 
 </details>
+
 "
 `;
 
@@ -12155,7 +12811,9 @@ exports[`reportFromSteps integration — generated fixtures > tofu/nested-module
 | --- | --- | --- |
 | ➕ Added | null_resource | 3 |
 |  | **Added** | **3** |
+
 ## Resource Changes
+
 ### 📦 Module: \`module.parent["1"].module.child\`
 
 <details>
@@ -12172,6 +12830,7 @@ module.parent["1"].module.child.null_resource.item[0]
 | triggers.label |  | <code><ins style="background:#dfd">1</ins></code> |
 
 </details>
+
 ### 📦 Module: \`module.parent["2"].module.child\`
 
 <details>
@@ -12203,6 +12862,7 @@ module.parent["2"].module.child.null_resource.item[1]
 | triggers.label |  | <code><ins style="background:#dfd">2</ins></code> |
 
 </details>
+
 "
 `;
 
@@ -12215,7 +12875,9 @@ exports[`reportFromSteps integration — generated fixtures > tofu/nested-module
 | --- | --- | --- |
 | ➕ Added | null_resource | 3 |
 |  | **Added** | **3** |
+
 ## Resource Changes
+
 ### 📦 Module: \`module.parent["1"].module.child\`
 
 <details>
@@ -12232,6 +12894,7 @@ module.parent["1"].module.child.null_resource.item[0]
 | triggers.label |  | <code><ins style="background:#dfd">1</ins></code> |
 
 </details>
+
 ### 📦 Module: \`module.parent["2"].module.child\`
 
 <details>
@@ -12263,6 +12926,7 @@ module.parent["2"].module.child.null_resource.item[1]
 | triggers.label |  | <code><ins style="background:#dfd">2</ins></code> |
 
 </details>
+
 "
 `;
 
@@ -12278,7 +12942,9 @@ exports[`reportFromSteps integration — generated fixtures > tofu/nested-module
 |  | **Added** | **3** |
 | 🗑️ Destroyed | null_resource | 2 |
 |  | **Destroyed** | **2** |
+
 ## Resource Changes
+
 ### 📦 Module: \`module.parent["2"].module.child\`
 
 <details>
@@ -12310,6 +12976,7 @@ module.parent["2"].module.child.null_resource.item[1]
 | triggers.label | 2 | <code><del style="background:#fdd">2</del></code> |
 
 </details>
+
 ### 📦 Module: \`module.parent["3"].module.child\`
 
 <details>
@@ -12356,6 +13023,7 @@ module.parent["3"].module.child.null_resource.item[2]
 | triggers.label |  | <code><ins style="background:#dfd">3</ins></code> |
 
 </details>
+
 "
 `;
 
@@ -12370,7 +13038,9 @@ exports[`reportFromSteps integration — generated fixtures > tofu/nested-module
 |  | **Added** | **3** |
 | 🗑️ Destroyed | null_resource | 2 |
 |  | **Destroyed** | **2** |
+
 ## Resource Changes
+
 ### 📦 Module: \`module.parent["2"].module.child\`
 
 <details>
@@ -12402,6 +13072,7 @@ module.parent["2"].module.child.null_resource.item[1]
 | triggers.label | 2 | <code><del style="background:#fdd">2</del></code> |
 
 </details>
+
 ### 📦 Module: \`module.parent["3"].module.child\`
 
 <details>
@@ -12448,6 +13119,7 @@ module.parent["3"].module.child.null_resource.item[2]
 | triggers.label |  | <code><ins style="background:#dfd">3</ins></code> |
 
 </details>
+
 "
 `;
 
@@ -12461,7 +13133,9 @@ exports[`reportFromSteps integration — generated fixtures > tofu/no-detailed-e
 | --- | --- | --- |
 | ➕ Added | null_resource | 1 |
 |  | **Added** | **1** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -12477,6 +13151,7 @@ null_resource.example
 | triggers.value |  | <code><ins style="background:#dfd">hello</ins></code> |
 
 </details>
+
 "
 `;
 
@@ -12489,7 +13164,9 @@ exports[`reportFromSteps integration — generated fixtures > tofu/no-detailed-e
 | --- | --- | --- |
 | ➕ Added | null_resource | 1 |
 |  | **Added** | **1** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -12505,6 +13182,7 @@ null_resource.example
 | triggers.value |  | <code><ins style="background:#dfd">hello</ins></code> |
 
 </details>
+
 "
 `;
 
@@ -12518,7 +13196,9 @@ exports[`reportFromSteps integration — generated fixtures > tofu/no-detailed-e
 | --- | --- | --- |
 | 🗑️ Destroyed | null_resource | 1 |
 |  | **Destroyed** | **1** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -12534,6 +13214,7 @@ null_resource.example
 | triggers.value | hello | <code><del style="background:#fdd">hello</del></code> |
 
 </details>
+
 "
 `;
 
@@ -12546,7 +13227,9 @@ exports[`reportFromSteps integration — generated fixtures > tofu/no-detailed-e
 | --- | --- | --- |
 | 🗑️ Destroyed | null_resource | 1 |
 |  | **Destroyed** | **1** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -12562,6 +13245,7 @@ null_resource.example
 | triggers.value | hello | <code><del style="background:#fdd">hello</del></code> |
 
 </details>
+
 "
 `;
 
@@ -12572,6 +13256,7 @@ exports[`reportFromSteps integration — generated fixtures > tofu/no-json-flags
 ## Apply Summary
 
 _No changes._
+
 <details><summary>Plan Output</summary>
 
 \`\`\`
@@ -12624,6 +13309,7 @@ exports[`reportFromSteps integration — generated fixtures > tofu/no-json-flags
 ## Apply Summary
 
 _No changes._
+
 <details><summary>Plan Output</summary>
 
 \`\`\`
@@ -12680,7 +13366,9 @@ exports[`reportFromSteps integration — generated fixtures > tofu/no-op/0 > ren
 | --- | --- | --- |
 | ➕ Added | null_resource | 1 |
 |  | **Added** | **1** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -12696,6 +13384,7 @@ null_resource.stable
 | triggers.version |  | <code><ins style="background:#dfd">1</ins></code> |
 
 </details>
+
 "
 `;
 
@@ -12708,7 +13397,9 @@ exports[`reportFromSteps integration — generated fixtures > tofu/no-op/0 > ren
 | --- | --- | --- |
 | ➕ Added | null_resource | 1 |
 |  | **Added** | **1** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -12724,6 +13415,7 @@ null_resource.stable
 | triggers.version |  | <code><ins style="background:#dfd">1</ins></code> |
 
 </details>
+
 "
 `;
 
@@ -12734,6 +13426,7 @@ exports[`reportFromSteps integration — generated fixtures > tofu/no-op/1 > ren
 ## Apply Summary
 
 _No changes._
+
 "
 `;
 
@@ -12743,6 +13436,7 @@ exports[`reportFromSteps integration — generated fixtures > tofu/no-op/1 > ren
 ## Apply Summary
 
 _No changes._
+
 "
 `;
 
@@ -12753,6 +13447,7 @@ exports[`reportFromSteps integration — generated fixtures > tofu/null-lifecycl
 ## Apply Summary
 
 _No changes._
+
 "
 `;
 
@@ -12762,6 +13457,7 @@ exports[`reportFromSteps integration — generated fixtures > tofu/null-lifecycl
 ## Apply Summary
 
 _No changes._
+
 "
 `;
 
@@ -12776,7 +13472,9 @@ exports[`reportFromSteps integration — generated fixtures > tofu/null-lifecycl
 | ➕ Added | null_resource | 2 |
 |  | terraform_data | 1 |
 |  | **Added** | **3** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -12823,6 +13521,7 @@ terraform_data.meta
 | output | <code></code> | <code>(value not in plan)</code> |
 
 </details>
+
 "
 `;
 
@@ -12836,7 +13535,9 @@ exports[`reportFromSteps integration — generated fixtures > tofu/null-lifecycl
 | ➕ Added | null_resource | 2 |
 |  | terraform_data | 1 |
 |  | **Added** | **3** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -12883,6 +13584,7 @@ terraform_data.meta
 | output | <code></code> | <code>(value not in plan)</code> |
 
 </details>
+
 "
 `;
 
@@ -12900,7 +13602,9 @@ exports[`reportFromSteps integration — generated fixtures > tofu/null-lifecycl
 |  | **Replaced** | **1** |
 | 🗑️ Destroyed | null_resource | 1 |
 |  | **Destroyed** | **1** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -12945,6 +13649,7 @@ terraform_data.meta
 | output | <code>v1</code> | <code>(value not in plan)</code> |
 
 </details>
+
 "
 `;
 
@@ -12961,7 +13666,9 @@ exports[`reportFromSteps integration — generated fixtures > tofu/null-lifecycl
 |  | **Replaced** | **1** |
 | 🗑️ Destroyed | null_resource | 1 |
 |  | **Destroyed** | **1** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -13006,6 +13713,7 @@ terraform_data.meta
 | output | <code>v1</code> | <code>(value not in plan)</code> |
 
 </details>
+
 "
 `;
 
@@ -13019,7 +13727,9 @@ exports[`reportFromSteps integration — generated fixtures > tofu/plan-error/0 
 | --- | --- | --- |
 | ➕ Added | null_resource | 1 |
 |  | **Added** | **1** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -13035,6 +13745,7 @@ null_resource.baseline
 | triggers.value |  | <code><ins style="background:#dfd">v1</ins></code> |
 
 </details>
+
 "
 `;
 
@@ -13047,7 +13758,9 @@ exports[`reportFromSteps integration — generated fixtures > tofu/plan-error/0 
 | --- | --- | --- |
 | ➕ Added | null_resource | 1 |
 |  | **Added** | **1** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -13063,6 +13776,7 @@ null_resource.baseline
 | triggers.value |  | <code><ins style="background:#dfd">v1</ins></code> |
 
 </details>
+
 "
 `;
 
@@ -13250,6 +13964,7 @@ Exit code: \`1\`
 | --- | --- | --- |
 | 🗑️ Destroy | null_resource | 1 |
 |  | **Destroy** | **1** |
+
 ## Errors
 
 🚨 **Read local file data source error** — \`data.local_file.missing\`
@@ -13257,7 +13972,10 @@ Exit code: \`1\`
 > The file at given path cannot be read.
 
 +Original Error: open /nonexistent/path/to/file.txt: no such file or directory
-> \`data "local_file" "missing" {\` in data "local_file" "missing" (line 19)## Resource Changes
+> \`data "local_file" "missing" {\` in data "local_file" "missing" (line 19)
+
+## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -13270,6 +13988,7 @@ null_resource.baseline
 _No attribute changes._
 
 </details>
+
 "
 `;
 
@@ -13456,6 +14175,7 @@ Exit code: \`1\`
 | --- | --- | --- |
 | 🗑️ Destroy | null_resource | 1 |
 |  | **Destroy** | **1** |
+
 ## Errors
 
 🚨 **Read local file data source error** — \`data.local_file.missing\`
@@ -13463,7 +14183,10 @@ Exit code: \`1\`
 > The file at given path cannot be read.
 
 +Original Error: open /nonexistent/path/to/file.txt: no such file or directory
-> \`data "local_file" "missing" {\` in data "local_file" "missing" (line 19)## Resource Changes
+> \`data "local_file" "missing" {\` in data "local_file" "missing" (line 19)
+
+## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -13476,6 +14199,7 @@ null_resource.baseline
 _No attribute changes._
 
 </details>
+
 "
 `;
 
@@ -13489,7 +14213,9 @@ exports[`reportFromSteps integration — generated fixtures > tofu/random-replac
 | --- | --- | --- |
 | ➕ Added | random_string | 1 |
 |  | **Added** | **1** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -13516,11 +14242,13 @@ random_string.token
 | upper |  | <code><ins style="background:#dfd">true</ins></code> |
 
 </details>
+
 ## Outputs
 
 | Output | Action | Before | After |
 | --- | --- | --- | --- |
 | token_length | ➕ |  | <code>16</code> |
+
 "
 `;
 
@@ -13533,7 +14261,9 @@ exports[`reportFromSteps integration — generated fixtures > tofu/random-replac
 | --- | --- | --- |
 | ➕ Added | random_string | 1 |
 |  | **Added** | **1** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -13560,11 +14290,13 @@ random_string.token
 | upper |  | <code><ins style="background:#dfd">true</ins></code> |
 
 </details>
+
 ## Outputs
 
 | Output | Action | Before | After |
 | --- | --- | --- | --- |
 | token_length | ➕ |  | <code>16</code> |
+
 "
 `;
 
@@ -13578,7 +14310,9 @@ exports[`reportFromSteps integration — generated fixtures > tofu/random-replac
 | --- | --- | --- |
 | ± Replaced | random_string | 1 |
 |  | **Replaced** | **1** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -13595,11 +14329,13 @@ random_string.token
 | result | <code>4SmmpS2VsTztR0vw</code> | <code>(value not in plan)</code> |
 
 </details>
+
 ## Outputs
 
 | Output | Action | Before | After |
 | --- | --- | --- | --- |
 | token_length | ⬜ | <code>16</code> | <code>16</code> |
+
 "
 `;
 
@@ -13612,7 +14348,9 @@ exports[`reportFromSteps integration — generated fixtures > tofu/random-replac
 | --- | --- | --- |
 | ± Replaced | random_string | 1 |
 |  | **Replaced** | **1** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -13629,11 +14367,13 @@ random_string.token
 | result | <code>4SmmpS2VsTztR0vw</code> | <code>(value not in plan)</code> |
 
 </details>
+
 ## Outputs
 
 | Output | Action | Before | After |
 | --- | --- | --- | --- |
 | token_length | ⬜ | <code>16</code> | <code>16</code> |
+
 "
 `;
 
@@ -13647,7 +14387,9 @@ exports[`reportFromSteps integration — generated fixtures > tofu/removed-resou
 | --- | --- | --- |
 | ➕ Added | null_resource | 2 |
 |  | **Added** | **2** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -13677,6 +14419,7 @@ null_resource.keeper
 | triggers.version |  | <code><ins style="background:#dfd">1</ins></code> |
 
 </details>
+
 "
 `;
 
@@ -13689,7 +14432,9 @@ exports[`reportFromSteps integration — generated fixtures > tofu/removed-resou
 | --- | --- | --- |
 | ➕ Added | null_resource | 2 |
 |  | **Added** | **2** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -13719,6 +14464,7 @@ null_resource.keeper
 | triggers.version |  | <code><ins style="background:#dfd">1</ins></code> |
 
 </details>
+
 "
 `;
 
@@ -13732,13 +14478,17 @@ exports[`reportFromSteps integration — generated fixtures > tofu/removed-resou
 | --- | --- | --- |
 | 👋 Forgotten | null_resource | 1 |
 |  | **Forgotten** | **1** |
+
 ## Warnings
 
 ⚠️ **Resource going to be removed from the state**
 
 > After this plan gets applied, the resource null_resource.ephemeral will not be managed anymore by OpenTofu.
 
-In case you want to manage the resource again, you will have to import it.## Resource Changes
+In case you want to manage the resource again, you will have to import it.
+
+## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -13754,6 +14504,7 @@ null_resource.ephemeral
 | triggers.version | 1 | <code><del style="background:#fdd">1</del></code> |
 
 </details>
+
 "
 `;
 
@@ -13766,13 +14517,17 @@ exports[`reportFromSteps integration — generated fixtures > tofu/removed-resou
 | --- | --- | --- |
 | 👋 Forgotten | null_resource | 1 |
 |  | **Forgotten** | **1** |
+
 ## Warnings
 
 ⚠️ **Resource going to be removed from the state**
 
 > After this plan gets applied, the resource null_resource.ephemeral will not be managed anymore by OpenTofu.
 
-In case you want to manage the resource again, you will have to import it.## Resource Changes
+In case you want to manage the resource again, you will have to import it.
+
+## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -13788,6 +14543,7 @@ null_resource.ephemeral
 | triggers.version | 1 | <code><del style="background:#fdd">1</del></code> |
 
 </details>
+
 "
 `;
 
@@ -13801,7 +14557,9 @@ exports[`reportFromSteps integration — generated fixtures > tofu/sensitive-val
 | --- | --- | --- |
 | ➕ Added | local_sensitive_file | 1 |
 |  | **Added** | **1** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -13827,12 +14585,14 @@ local_sensitive_file.secret
 | id | <code></code> | <code>(value not in plan)</code> |
 
 </details>
+
 ## Outputs
 
 | Output | Action | Before | After |
 | --- | --- | --- | --- |
 | secret_checksum | ➕ | <code>(sensitive)</code> | <code>(sensitive)</code> |
 | secret_path | ➕ |  | <code>./output/secret.txt</code> |
+
 "
 `;
 
@@ -13845,7 +14605,9 @@ exports[`reportFromSteps integration — generated fixtures > tofu/sensitive-val
 | --- | --- | --- |
 | ➕ Added | local_sensitive_file | 1 |
 |  | **Added** | **1** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -13871,12 +14633,14 @@ local_sensitive_file.secret
 | id | <code></code> | <code>(value not in plan)</code> |
 
 </details>
+
 ## Outputs
 
 | Output | Action | Before | After |
 | --- | --- | --- | --- |
 | secret_checksum | ➕ | <code>(sensitive)</code> | <code>(sensitive)</code> |
 | secret_path | ➕ |  | <code>./output/secret.txt</code> |
+
 "
 `;
 
@@ -13890,7 +14654,9 @@ exports[`reportFromSteps integration — generated fixtures > tofu/sensitive-val
 | --- | --- | --- |
 | ± Replaced | local_sensitive_file | 1 |
 |  | **Replaced** | **1** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -13913,12 +14679,14 @@ local_sensitive_file.secret
 | id | <code>ffae43b95440019e9bb698e9713dc5ac27be8dd5</code> | <code>(value not in plan)</code> |
 
 </details>
+
 ## Outputs
 
 | Output | Action | Before | After |
 | --- | --- | --- | --- |
 | secret_checksum | 🔧 | <code>(sensitive)</code> | <code>(sensitive)</code> |
 | secret_path | ⬜ | <code>./output/secret.txt</code> | <code>./output/secret.txt</code> |
+
 "
 `;
 
@@ -13931,7 +14699,9 @@ exports[`reportFromSteps integration — generated fixtures > tofu/sensitive-val
 | --- | --- | --- |
 | ± Replaced | local_sensitive_file | 1 |
 |  | **Replaced** | **1** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -13954,12 +14724,14 @@ local_sensitive_file.secret
 | id | <code>ffae43b95440019e9bb698e9713dc5ac27be8dd5</code> | <code>(value not in plan)</code> |
 
 </details>
+
 ## Outputs
 
 | Output | Action | Before | After |
 | --- | --- | --- | --- |
 | secret_checksum | 🔧 | <code>(sensitive)</code> | <code>(sensitive)</code> |
 | secret_path | ⬜ | <code>./output/secret.txt</code> | <code>./output/secret.txt</code> |
+
 "
 `;
 
@@ -13973,7 +14745,9 @@ exports[`reportFromSteps integration — generated fixtures > tofu/validate-erro
 | --- | --- | --- |
 | ➕ Added | null_resource | 1 |
 |  | **Added** | **1** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -13989,6 +14763,7 @@ null_resource.baseline
 | triggers.value |  | <code><ins style="background:#dfd">v1</ins></code> |
 
 </details>
+
 "
 `;
 
@@ -14001,7 +14776,9 @@ exports[`reportFromSteps integration — generated fixtures > tofu/validate-erro
 | --- | --- | --- |
 | ➕ Added | null_resource | 1 |
 |  | **Added** | **1** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -14017,6 +14794,7 @@ null_resource.baseline
 | triggers.value |  | <code><ins style="background:#dfd">v1</ins></code> |
 
 </details>
+
 "
 `;
 
@@ -14182,7 +14960,9 @@ exports[`reportFromSteps integration — generated fixtures > tofu/with-modules/
 | ➕ Added | null_resource | 1 |
 |  | random_string | 1 |
 |  | **Added** | **2** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -14198,6 +14978,7 @@ null_resource.root
 | triggers.stage |  | <code><ins style="background:#dfd">0</ins></code> |
 
 </details>
+
 ### 📦 Module: \`module.naming\`
 
 <details>
@@ -14224,12 +15005,14 @@ module.naming.random_string.suffix
 | upper |  | <code><ins style="background:#dfd">false</ins></code> |
 
 </details>
+
 ## Outputs
 
 | Output | Action | Before | After |
 | --- | --- | --- | --- |
 | generated_name | ➕ |  | <code>fixture-3r4wm4cq</code> |
 | root_id | ➕ |  | <code>7773149748109350</code> |
+
 "
 `;
 
@@ -14243,7 +15026,9 @@ exports[`reportFromSteps integration — generated fixtures > tofu/with-modules/
 | ➕ Added | null_resource | 1 |
 |  | random_string | 1 |
 |  | **Added** | **2** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -14259,6 +15044,7 @@ null_resource.root
 | triggers.stage |  | <code><ins style="background:#dfd">0</ins></code> |
 
 </details>
+
 ### 📦 Module: \`module.naming\`
 
 <details>
@@ -14285,12 +15071,14 @@ module.naming.random_string.suffix
 | upper |  | <code><ins style="background:#dfd">false</ins></code> |
 
 </details>
+
 ## Outputs
 
 | Output | Action | Before | After |
 | --- | --- | --- | --- |
 | generated_name | ➕ |  | <code>fixture-3r4wm4cq</code> |
 | root_id | ➕ |  | <code>7773149748109350</code> |
+
 "
 `;
 
@@ -14305,7 +15093,9 @@ exports[`reportFromSteps integration — generated fixtures > tofu/with-modules/
 | ± Replaced | null_resource | 1 |
 |  | random_string | 1 |
 |  | **Replaced** | **2** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -14321,6 +15111,7 @@ null_resource.root
 | triggers.stage | 0 | <code><ins style="background:#dfd">1</ins><del style="background:#fdd">0</del></code> |
 
 </details>
+
 ### 📦 Module: \`module.naming\`
 
 <details>
@@ -14337,12 +15128,14 @@ module.naming.random_string.suffix
 | result | <code>3r4wm4cq</code> | <code>(value not in plan)</code> |
 
 </details>
+
 ## Outputs
 
 | Output | Action | Before | After |
 | --- | --- | --- | --- |
 | generated_name | 🔧 | <code>fixture-3r4wm4cq</code> | <code>fixture-updated-2zar5q4q</code> |
 | root_id | 🔧 | <code>7773149748109350</code> | <code>6653873194553917674</code> |
+
 "
 `;
 
@@ -14356,7 +15149,9 @@ exports[`reportFromSteps integration — generated fixtures > tofu/with-modules/
 | ± Replaced | null_resource | 1 |
 |  | random_string | 1 |
 |  | **Replaced** | **2** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -14372,6 +15167,7 @@ null_resource.root
 | triggers.stage | 0 | <code><ins style="background:#dfd">1</ins><del style="background:#fdd">0</del></code> |
 
 </details>
+
 ### 📦 Module: \`module.naming\`
 
 <details>
@@ -14388,12 +15184,14 @@ module.naming.random_string.suffix
 | result | <code>3r4wm4cq</code> | <code>(value not in plan)</code> |
 
 </details>
+
 ## Outputs
 
 | Output | Action | Before | After |
 | --- | --- | --- | --- |
 | generated_name | 🔧 | <code>fixture-3r4wm4cq</code> | <code>fixture-updated-2zar5q4q</code> |
 | root_id | 🔧 | <code>7773149748109350</code> | <code>6653873194553917674</code> |
+
 "
 `;
 
@@ -14520,7 +15318,9 @@ exports[`reportFromSteps integration — no-show fixtures (Tier 3) > terraform/a
 | ➕ Add | terraform_data | 2 |
 |  | null_resource | 1 |
 |  | **Add** | **3** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -14555,6 +15355,7 @@ terraform_data.depends_on_fail
 _No attribute changes._
 
 </details>
+
 "
 `;
 
@@ -14571,7 +15372,9 @@ exports[`reportFromSteps integration — no-show fixtures (Tier 3) > terraform/a
 |  | **Change** | **1** |
 | ± Replace | null_resource | 1 |
 |  | **Replace** | **1** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -14595,6 +15398,7 @@ terraform_data.depends_on_fail
 _No attribute changes._
 
 </details>
+
 "
 `;
 
@@ -14610,7 +15414,9 @@ exports[`reportFromSteps integration — no-show fixtures (Tier 3) > terraform/d
 | ➕ Add | terraform_data | 4 |
 |  | local_file | 1 |
 |  | **Add** | **5** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -14678,6 +15484,7 @@ terraform_data.worker_a
 _No attribute changes._
 
 </details>
+
 "
 `;
 
@@ -14694,7 +15501,9 @@ exports[`reportFromSteps integration — no-show fixtures (Tier 3) > terraform/d
 |  | **Add** | **1** |
 | 🔧 Change | terraform_data | 4 |
 |  | **Change** | **4** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -14762,6 +15571,7 @@ terraform_data.worker_c
 _No attribute changes._
 
 </details>
+
 "
 `;
 
@@ -14778,7 +15588,9 @@ exports[`reportFromSteps integration — no-show fixtures (Tier 3) > terraform/d
 |  | **Change** | **3** |
 | ± Replace | local_file | 1 |
 |  | **Replace** | **1** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -14835,6 +15647,7 @@ terraform_data.worker_c
 _No attribute changes._
 
 </details>
+
 "
 `;
 
@@ -14849,7 +15662,9 @@ exports[`reportFromSteps integration — no-show fixtures (Tier 3) > terraform/i
 | --- | --- | --- |
 | ➕ Add | random_string | 1 |
 |  | **Add** | **1** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -14862,6 +15677,7 @@ random_string.existing
 _No attribute changes._
 
 </details>
+
 "
 `;
 
@@ -14876,7 +15692,9 @@ exports[`reportFromSteps integration — no-show fixtures (Tier 3) > terraform/i
 | --- | --- | --- |
 | 📥 Import | random_string | 1 |
 |  | **Import** | **1** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -14889,6 +15707,7 @@ random_string.imported
 _No attribute changes._
 
 </details>
+
 "
 `;
 
@@ -14903,7 +15722,9 @@ exports[`reportFromSteps integration — no-show fixtures (Tier 3) > terraform/l
 | --- | --- | --- |
 | ➕ Add | local_file | 1 |
 |  | **Add** | **1** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -14916,6 +15737,7 @@ local_file.readme
 _No attribute changes._
 
 </details>
+
 "
 `;
 
@@ -14930,7 +15752,9 @@ exports[`reportFromSteps integration — no-show fixtures (Tier 3) > terraform/l
 | --- | --- | --- |
 | ± Replace | local_file | 1 |
 |  | **Replace** | **1** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -14943,6 +15767,7 @@ local_file.readme
 _No attribute changes._
 
 </details>
+
 "
 `;
 
@@ -14957,7 +15782,9 @@ exports[`reportFromSteps integration — no-show fixtures (Tier 3) > terraform/m
 | --- | --- | --- |
 | ➕ Add | null_resource | 1 |
 |  | **Add** | **1** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -14970,6 +15797,7 @@ null_resource.original
 _No attribute changes._
 
 </details>
+
 "
 `;
 
@@ -14984,7 +15812,9 @@ exports[`reportFromSteps integration — no-show fixtures (Tier 3) > terraform/m
 | --- | --- | --- |
 | 🚚 Move | null_resource | 1 |
 |  | **Move** | **1** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -14997,6 +15827,7 @@ null_resource.renamed
 _No attribute changes._
 
 </details>
+
 "
 `;
 
@@ -15011,7 +15842,9 @@ exports[`reportFromSteps integration — no-show fixtures (Tier 3) > terraform/n
 | --- | --- | --- |
 | ➕ Add | null_resource | 3 |
 |  | **Add** | **3** |
+
 ## Resource Changes
+
 ### 📦 Module: \`module.parent["1"].module.child\`
 
 <details>
@@ -15024,6 +15857,7 @@ module.parent["1"].module.child.null_resource.item[0]
 _No attribute changes._
 
 </details>
+
 ### 📦 Module: \`module.parent["2"].module.child\`
 
 <details>
@@ -15047,6 +15881,7 @@ module.parent["2"].module.child.null_resource.item[1]
 _No attribute changes._
 
 </details>
+
 "
 `;
 
@@ -15063,7 +15898,9 @@ exports[`reportFromSteps integration — no-show fixtures (Tier 3) > terraform/n
 |  | **Add** | **3** |
 | 🗑️ Destroy | null_resource | 2 |
 |  | **Destroy** | **2** |
+
 ## Resource Changes
+
 ### 📦 Module: \`module.parent["2"].module.child\`
 
 <details>
@@ -15087,6 +15924,7 @@ module.parent["2"].module.child.null_resource.item[0]
 _No attribute changes._
 
 </details>
+
 ### 📦 Module: \`module.parent["3"].module.child\`
 
 <details>
@@ -15121,6 +15959,7 @@ module.parent["3"].module.child.null_resource.item[1]
 _No attribute changes._
 
 </details>
+
 "
 `;
 
@@ -15135,7 +15974,9 @@ exports[`reportFromSteps integration — no-show fixtures (Tier 3) > terraform/n
 | --- | --- | --- |
 | ➕ Add | null_resource | 1 |
 |  | **Add** | **1** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -15148,6 +15989,7 @@ null_resource.example
 _No attribute changes._
 
 </details>
+
 "
 `;
 
@@ -15162,7 +16004,9 @@ exports[`reportFromSteps integration — no-show fixtures (Tier 3) > terraform/n
 | --- | --- | --- |
 | 🗑️ Destroy | null_resource | 1 |
 |  | **Destroy** | **1** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -15175,6 +16019,7 @@ null_resource.example
 _No attribute changes._
 
 </details>
+
 "
 `;
 
@@ -15226,7 +16071,9 @@ exports[`reportFromSteps integration — no-show fixtures (Tier 3) > terraform/n
 | --- | --- | --- |
 | ➕ Add | null_resource | 1 |
 |  | **Add** | **1** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -15239,6 +16086,7 @@ null_resource.stable
 _No attribute changes._
 
 </details>
+
 "
 `;
 
@@ -15282,7 +16130,9 @@ exports[`reportFromSteps integration — no-show fixtures (Tier 3) > terraform/n
 | ➕ Add | null_resource | 2 |
 |  | terraform_data | 1 |
 |  | **Add** | **3** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -15317,6 +16167,7 @@ null_resource.beta
 _No attribute changes._
 
 </details>
+
 "
 `;
 
@@ -15335,7 +16186,9 @@ exports[`reportFromSteps integration — no-show fixtures (Tier 3) > terraform/n
 |  | **Replace** | **1** |
 | 🗑️ Destroy | null_resource | 1 |
 |  | **Destroy** | **1** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -15370,6 +16223,7 @@ null_resource.alpha
 _No attribute changes._
 
 </details>
+
 "
 `;
 
@@ -15384,7 +16238,9 @@ exports[`reportFromSteps integration — no-show fixtures (Tier 3) > terraform/p
 | --- | --- | --- |
 | ➕ Add | null_resource | 1 |
 |  | **Add** | **1** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -15397,6 +16253,7 @@ null_resource.baseline
 _No attribute changes._
 
 </details>
+
 "
 `;
 
@@ -15583,6 +16440,7 @@ Exit code: \`1\`
 | --- | --- | --- |
 | 🗑️ Destroy | null_resource | 1 |
 |  | **Destroy** | **1** |
+
 ## Errors
 
 🚨 **Read local file data source error** — \`data.local_file.missing\`
@@ -15590,7 +16448,10 @@ Exit code: \`1\`
 > The file at given path cannot be read.
 
 +Original Error: open /nonexistent/path/to/file.txt: no such file or directory
-> \`data "local_file" "missing" {\` in data "local_file" "missing" (line 19)## Resource Changes
+> \`data "local_file" "missing" {\` in data "local_file" "missing" (line 19)
+
+## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -15603,6 +16464,7 @@ null_resource.baseline
 _No attribute changes._
 
 </details>
+
 "
 `;
 
@@ -15617,7 +16479,9 @@ exports[`reportFromSteps integration — no-show fixtures (Tier 3) > terraform/r
 | --- | --- | --- |
 | ➕ Add | random_string | 1 |
 |  | **Add** | **1** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -15630,6 +16494,7 @@ random_string.token
 _No attribute changes._
 
 </details>
+
 "
 `;
 
@@ -15644,7 +16509,9 @@ exports[`reportFromSteps integration — no-show fixtures (Tier 3) > terraform/r
 | --- | --- | --- |
 | ± Replace | random_string | 1 |
 |  | **Replace** | **1** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -15657,6 +16524,7 @@ random_string.token
 _No attribute changes._
 
 </details>
+
 "
 `;
 
@@ -15671,7 +16539,9 @@ exports[`reportFromSteps integration — no-show fixtures (Tier 3) > terraform/r
 | --- | --- | --- |
 | ➕ Add | null_resource | 2 |
 |  | **Add** | **2** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -15695,6 +16565,7 @@ null_resource.keeper
 _No attribute changes._
 
 </details>
+
 "
 `;
 
@@ -15709,6 +16580,7 @@ exports[`reportFromSteps integration — no-show fixtures (Tier 3) > terraform/r
 | --- | --- | --- |
 | 👋 Forget | null_resource | 1 |
 |  | **Forget** | **1** |
+
 ## Warnings
 
 ⚠️ **Some objects will no longer be managed by Terraform**
@@ -15716,7 +16588,10 @@ exports[`reportFromSteps integration — no-show fixtures (Tier 3) > terraform/r
 > If you apply this plan, Terraform will discard its tracking information for the following objects, but it will not delete them:
  - null_resource.ephemeral
 
-After applying this plan, Terraform will no longer manage these objects. You will need to import them into Terraform to manage them again.## Resource Changes
+After applying this plan, Terraform will no longer manage these objects. You will need to import them into Terraform to manage them again.
+
+## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -15729,6 +16604,7 @@ null_resource.ephemeral
 _No attribute changes._
 
 </details>
+
 "
 `;
 
@@ -15743,7 +16619,9 @@ exports[`reportFromSteps integration — no-show fixtures (Tier 3) > terraform/s
 | --- | --- | --- |
 | ➕ Add | local_sensitive_file | 1 |
 |  | **Add** | **1** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -15756,6 +16634,7 @@ local_sensitive_file.secret
 _No attribute changes._
 
 </details>
+
 "
 `;
 
@@ -15770,7 +16649,9 @@ exports[`reportFromSteps integration — no-show fixtures (Tier 3) > terraform/s
 | --- | --- | --- |
 | ± Replace | local_sensitive_file | 1 |
 |  | **Replace** | **1** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -15783,6 +16664,7 @@ local_sensitive_file.secret
 _No attribute changes._
 
 </details>
+
 "
 `;
 
@@ -15797,7 +16679,9 @@ exports[`reportFromSteps integration — no-show fixtures (Tier 3) > terraform/v
 | --- | --- | --- |
 | ➕ Add | null_resource | 1 |
 |  | **Add** | **1** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -15810,6 +16694,7 @@ null_resource.baseline
 _No attribute changes._
 
 </details>
+
 "
 `;
 
@@ -15898,7 +16783,9 @@ exports[`reportFromSteps integration — no-show fixtures (Tier 3) > terraform/w
 | ➕ Add | null_resource | 1 |
 |  | random_string | 1 |
 |  | **Add** | **2** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -15911,6 +16798,7 @@ null_resource.root
 _No attribute changes._
 
 </details>
+
 ### 📦 Module: \`module.naming\`
 
 <details>
@@ -15923,6 +16811,7 @@ module.naming.random_string.suffix
 _No attribute changes._
 
 </details>
+
 "
 `;
 
@@ -15938,7 +16827,9 @@ exports[`reportFromSteps integration — no-show fixtures (Tier 3) > terraform/w
 | ± Replace | null_resource | 1 |
 |  | random_string | 1 |
 |  | **Replace** | **2** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -15951,6 +16842,7 @@ null_resource.root
 _No attribute changes._
 
 </details>
+
 ### 📦 Module: \`module.naming\`
 
 <details>
@@ -15963,6 +16855,7 @@ module.naming.random_string.suffix
 _No attribute changes._
 
 </details>
+
 "
 `;
 
@@ -15978,7 +16871,9 @@ exports[`reportFromSteps integration — no-show fixtures (Tier 3) > tofu/apply-
 | ➕ Add | terraform_data | 2 |
 |  | null_resource | 1 |
 |  | **Add** | **3** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -16013,6 +16908,7 @@ terraform_data.depends_on_fail
 _No attribute changes._
 
 </details>
+
 "
 `;
 
@@ -16029,7 +16925,9 @@ exports[`reportFromSteps integration — no-show fixtures (Tier 3) > tofu/apply-
 |  | **Change** | **1** |
 | ± Replace | null_resource | 1 |
 |  | **Replace** | **1** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -16053,6 +16951,7 @@ terraform_data.depends_on_fail
 _No attribute changes._
 
 </details>
+
 "
 `;
 
@@ -16068,7 +16967,9 @@ exports[`reportFromSteps integration — no-show fixtures (Tier 3) > tofu/deferr
 | ➕ Add | terraform_data | 4 |
 |  | local_file | 1 |
 |  | **Add** | **5** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -16136,6 +17037,7 @@ terraform_data.worker_a
 _No attribute changes._
 
 </details>
+
 "
 `;
 
@@ -16152,7 +17054,9 @@ exports[`reportFromSteps integration — no-show fixtures (Tier 3) > tofu/deferr
 |  | **Add** | **1** |
 | 🔧 Change | terraform_data | 4 |
 |  | **Change** | **4** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -16220,6 +17124,7 @@ terraform_data.worker_c
 _No attribute changes._
 
 </details>
+
 "
 `;
 
@@ -16236,7 +17141,9 @@ exports[`reportFromSteps integration — no-show fixtures (Tier 3) > tofu/deferr
 |  | **Change** | **3** |
 | ± Replace | local_file | 1 |
 |  | **Replace** | **1** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -16293,6 +17200,7 @@ terraform_data.worker_b
 _No attribute changes._
 
 </details>
+
 "
 `;
 
@@ -16307,7 +17215,9 @@ exports[`reportFromSteps integration — no-show fixtures (Tier 3) > tofu/import
 | --- | --- | --- |
 | ➕ Add | random_string | 1 |
 |  | **Add** | **1** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -16320,6 +17230,7 @@ random_string.existing
 _No attribute changes._
 
 </details>
+
 "
 `;
 
@@ -16334,7 +17245,9 @@ exports[`reportFromSteps integration — no-show fixtures (Tier 3) > tofu/import
 | --- | --- | --- |
 | 📥 Import | random_string | 1 |
 |  | **Import** | **1** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -16347,6 +17260,7 @@ random_string.imported
 _No attribute changes._
 
 </details>
+
 "
 `;
 
@@ -16361,7 +17275,9 @@ exports[`reportFromSteps integration — no-show fixtures (Tier 3) > tofu/local-
 | --- | --- | --- |
 | ➕ Add | local_file | 1 |
 |  | **Add** | **1** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -16374,6 +17290,7 @@ local_file.readme
 _No attribute changes._
 
 </details>
+
 "
 `;
 
@@ -16388,7 +17305,9 @@ exports[`reportFromSteps integration — no-show fixtures (Tier 3) > tofu/local-
 | --- | --- | --- |
 | ± Replace | local_file | 1 |
 |  | **Replace** | **1** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -16401,6 +17320,7 @@ local_file.readme
 _No attribute changes._
 
 </details>
+
 "
 `;
 
@@ -16415,7 +17335,9 @@ exports[`reportFromSteps integration — no-show fixtures (Tier 3) > tofu/moved-
 | --- | --- | --- |
 | ➕ Add | null_resource | 1 |
 |  | **Add** | **1** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -16428,6 +17350,7 @@ null_resource.original
 _No attribute changes._
 
 </details>
+
 "
 `;
 
@@ -16442,7 +17365,9 @@ exports[`reportFromSteps integration — no-show fixtures (Tier 3) > tofu/moved-
 | --- | --- | --- |
 | 🚚 Move | null_resource | 1 |
 |  | **Move** | **1** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -16455,6 +17380,7 @@ null_resource.renamed
 _No attribute changes._
 
 </details>
+
 "
 `;
 
@@ -16469,7 +17395,9 @@ exports[`reportFromSteps integration — no-show fixtures (Tier 3) > tofu/nested
 | --- | --- | --- |
 | ➕ Add | null_resource | 3 |
 |  | **Add** | **3** |
+
 ## Resource Changes
+
 ### 📦 Module: \`module.parent["1"].module.child\`
 
 <details>
@@ -16482,6 +17410,7 @@ module.parent["1"].module.child.null_resource.item[0]
 _No attribute changes._
 
 </details>
+
 ### 📦 Module: \`module.parent["2"].module.child\`
 
 <details>
@@ -16505,6 +17434,7 @@ module.parent["2"].module.child.null_resource.item[0]
 _No attribute changes._
 
 </details>
+
 "
 `;
 
@@ -16521,7 +17451,9 @@ exports[`reportFromSteps integration — no-show fixtures (Tier 3) > tofu/nested
 |  | **Add** | **3** |
 | 🗑️ Destroy | null_resource | 2 |
 |  | **Destroy** | **2** |
+
 ## Resource Changes
+
 ### 📦 Module: \`module.parent["2"].module.child\`
 
 <details>
@@ -16545,6 +17477,7 @@ module.parent["2"].module.child.null_resource.item[1]
 _No attribute changes._
 
 </details>
+
 ### 📦 Module: \`module.parent["3"].module.child\`
 
 <details>
@@ -16579,6 +17512,7 @@ module.parent["3"].module.child.null_resource.item[2]
 _No attribute changes._
 
 </details>
+
 "
 `;
 
@@ -16593,7 +17527,9 @@ exports[`reportFromSteps integration — no-show fixtures (Tier 3) > tofu/no-det
 | --- | --- | --- |
 | ➕ Add | null_resource | 1 |
 |  | **Add** | **1** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -16606,6 +17542,7 @@ null_resource.example
 _No attribute changes._
 
 </details>
+
 "
 `;
 
@@ -16620,7 +17557,9 @@ exports[`reportFromSteps integration — no-show fixtures (Tier 3) > tofu/no-det
 | --- | --- | --- |
 | 🗑️ Destroy | null_resource | 1 |
 |  | **Destroy** | **1** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -16633,6 +17572,7 @@ null_resource.example
 _No attribute changes._
 
 </details>
+
 "
 `;
 
@@ -16684,7 +17624,9 @@ exports[`reportFromSteps integration — no-show fixtures (Tier 3) > tofu/no-op/
 | --- | --- | --- |
 | ➕ Add | null_resource | 1 |
 |  | **Add** | **1** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -16697,6 +17639,7 @@ null_resource.stable
 _No attribute changes._
 
 </details>
+
 "
 `;
 
@@ -16740,7 +17683,9 @@ exports[`reportFromSteps integration — no-show fixtures (Tier 3) > tofu/null-l
 | ➕ Add | null_resource | 2 |
 |  | terraform_data | 1 |
 |  | **Add** | **3** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -16775,6 +17720,7 @@ null_resource.alpha
 _No attribute changes._
 
 </details>
+
 "
 `;
 
@@ -16793,7 +17739,9 @@ exports[`reportFromSteps integration — no-show fixtures (Tier 3) > tofu/null-l
 |  | **Replace** | **1** |
 | 🗑️ Destroy | null_resource | 1 |
 |  | **Destroy** | **1** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -16828,6 +17776,7 @@ null_resource.alpha
 _No attribute changes._
 
 </details>
+
 "
 `;
 
@@ -16842,7 +17791,9 @@ exports[`reportFromSteps integration — no-show fixtures (Tier 3) > tofu/plan-e
 | --- | --- | --- |
 | ➕ Add | null_resource | 1 |
 |  | **Add** | **1** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -16855,6 +17806,7 @@ null_resource.baseline
 _No attribute changes._
 
 </details>
+
 "
 `;
 
@@ -17041,6 +17993,7 @@ Exit code: \`1\`
 | --- | --- | --- |
 | 🗑️ Destroy | null_resource | 1 |
 |  | **Destroy** | **1** |
+
 ## Errors
 
 🚨 **Read local file data source error** — \`data.local_file.missing\`
@@ -17048,7 +18001,10 @@ Exit code: \`1\`
 > The file at given path cannot be read.
 
 +Original Error: open /nonexistent/path/to/file.txt: no such file or directory
-> \`data "local_file" "missing" {\` in data "local_file" "missing" (line 19)## Resource Changes
+> \`data "local_file" "missing" {\` in data "local_file" "missing" (line 19)
+
+## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -17061,6 +18017,7 @@ null_resource.baseline
 _No attribute changes._
 
 </details>
+
 "
 `;
 
@@ -17075,7 +18032,9 @@ exports[`reportFromSteps integration — no-show fixtures (Tier 3) > tofu/random
 | --- | --- | --- |
 | ➕ Add | random_string | 1 |
 |  | **Add** | **1** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -17088,6 +18047,7 @@ random_string.token
 _No attribute changes._
 
 </details>
+
 "
 `;
 
@@ -17102,7 +18062,9 @@ exports[`reportFromSteps integration — no-show fixtures (Tier 3) > tofu/random
 | --- | --- | --- |
 | ± Replace | random_string | 1 |
 |  | **Replace** | **1** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -17115,6 +18077,7 @@ random_string.token
 _No attribute changes._
 
 </details>
+
 "
 `;
 
@@ -17129,7 +18092,9 @@ exports[`reportFromSteps integration — no-show fixtures (Tier 3) > tofu/remove
 | --- | --- | --- |
 | ➕ Add | null_resource | 2 |
 |  | **Add** | **2** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -17153,6 +18118,7 @@ null_resource.keeper
 _No attribute changes._
 
 </details>
+
 "
 `;
 
@@ -17167,13 +18133,17 @@ exports[`reportFromSteps integration — no-show fixtures (Tier 3) > tofu/remove
 | --- | --- | --- |
 | 👋 Forget | null_resource | 1 |
 |  | **Forget** | **1** |
+
 ## Warnings
 
 ⚠️ **Resource going to be removed from the state**
 
 > After this plan gets applied, the resource null_resource.ephemeral will not be managed anymore by OpenTofu.
 
-In case you want to manage the resource again, you will have to import it.## Resource Changes
+In case you want to manage the resource again, you will have to import it.
+
+## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -17186,6 +18156,7 @@ null_resource.ephemeral
 _No attribute changes._
 
 </details>
+
 "
 `;
 
@@ -17200,7 +18171,9 @@ exports[`reportFromSteps integration — no-show fixtures (Tier 3) > tofu/sensit
 | --- | --- | --- |
 | ➕ Add | local_sensitive_file | 1 |
 |  | **Add** | **1** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -17213,6 +18186,7 @@ local_sensitive_file.secret
 _No attribute changes._
 
 </details>
+
 "
 `;
 
@@ -17227,7 +18201,9 @@ exports[`reportFromSteps integration — no-show fixtures (Tier 3) > tofu/sensit
 | --- | --- | --- |
 | ± Replace | local_sensitive_file | 1 |
 |  | **Replace** | **1** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -17240,6 +18216,7 @@ local_sensitive_file.secret
 _No attribute changes._
 
 </details>
+
 "
 `;
 
@@ -17254,7 +18231,9 @@ exports[`reportFromSteps integration — no-show fixtures (Tier 3) > tofu/valida
 | --- | --- | --- |
 | ➕ Add | null_resource | 1 |
 |  | **Add** | **1** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -17267,6 +18246,7 @@ null_resource.baseline
 _No attribute changes._
 
 </details>
+
 "
 `;
 
@@ -17355,7 +18335,9 @@ exports[`reportFromSteps integration — no-show fixtures (Tier 3) > tofu/with-m
 | ➕ Add | null_resource | 1 |
 |  | random_string | 1 |
 |  | **Add** | **2** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -17368,6 +18350,7 @@ null_resource.root
 _No attribute changes._
 
 </details>
+
 ### 📦 Module: \`module.naming\`
 
 <details>
@@ -17380,6 +18363,7 @@ module.naming.random_string.suffix
 _No attribute changes._
 
 </details>
+
 "
 `;
 
@@ -17395,7 +18379,9 @@ exports[`reportFromSteps integration — no-show fixtures (Tier 3) > tofu/with-m
 | ± Replace | null_resource | 1 |
 |  | random_string | 1 |
 |  | **Replace** | **2** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -17408,6 +18394,7 @@ null_resource.root
 _No attribute changes._
 
 </details>
+
 ### 📦 Module: \`module.naming\`
 
 <details>
@@ -17420,6 +18407,7 @@ module.naming.random_string.suffix
 _No attribute changes._
 
 </details>
+
 "
 `;
 
@@ -17433,7 +18421,9 @@ exports[`reportFromSteps integration — plan-only fixtures > terraform/apply-er
 | ➕ Add | terraform_data | 2 |
 |  | null_resource | 1 |
 |  | **Add** | **3** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -17475,12 +18465,14 @@ terraform_data.success
 | output | <code></code> | <code>(known after apply)</code> |
 
 </details>
+
 ## Outputs
 
 | Output | Action | Before | After |
 | --- | --- | --- | --- |
 | depends_on_fail_output | ➕ |  | <code>(known after apply)</code> |
 | success_output | ➕ |  | <code>(known after apply)</code> |
+
 "
 `;
 
@@ -17495,7 +18487,9 @@ exports[`reportFromSteps integration — plan-only fixtures > terraform/apply-er
 |  | **Change** | **1** |
 | ± Replace | null_resource | 1 |
 |  | **Replace** | **1** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -17522,12 +18516,14 @@ terraform_data.depends_on_fail
 _(all values known after apply)_
 
 </details>
+
 ## Outputs
 
 | Output | Action | Before | After |
 | --- | --- | --- | --- |
 | depends_on_fail_output | 🔧 | <code>6991765980908842876</code> | <code>(known after apply)</code> |
 | success_output | ⬜ | <code>stable</code> | <code>stable</code> |
+
 "
 `;
 
@@ -17541,7 +18537,9 @@ exports[`reportFromSteps integration — plan-only fixtures > terraform/deferred
 | ➕ Add | terraform_data | 4 |
 |  | local_file | 1 |
 |  | **Add** | **5** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -17627,11 +18625,13 @@ terraform_data.worker_c
 _(all values known after apply)_
 
 </details>
+
 ## Outputs
 
 | Output | Action | Before | After |
 | --- | --- | --- | --- |
 | config_value | ➕ |  | <code>(known after apply)</code> |
+
 "
 `;
 
@@ -17646,7 +18646,9 @@ exports[`reportFromSteps integration — plan-only fixtures > terraform/deferred
 |  | **Add** | **1** |
 | 🔧 Change | terraform_data | 4 |
 |  | **Change** | **4** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -17719,11 +18721,13 @@ terraform_data.worker_c
 _(all values known after apply)_
 
 </details>
+
 ## Outputs
 
 | Output | Action | Before | After |
 | --- | --- | --- | --- |
 | config_value | 🔧 | <code>{"worker_a":"alpha","worker_b":"bravo","worker_c":"charlie"}</code> | <code>(known after apply)</code> |
+
 "
 `;
 
@@ -17738,7 +18742,9 @@ exports[`reportFromSteps integration — plan-only fixtures > terraform/deferred
 |  | **Change** | **3** |
 | ± Replace | local_file | 1 |
 |  | **Replace** | **1** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -17807,11 +18813,13 @@ terraform_data.worker_c
 _(all values known after apply)_
 
 </details>
+
 ## Outputs
 
 | Output | Action | Before | After |
 | --- | --- | --- | --- |
 | config_value | 🔧 | <code>{"worker_a":"alpha","worker_b":"bravo","worker_c":"charlie"}</code> | <code>(known after apply)</code> |
+
 "
 `;
 
@@ -17824,7 +18832,9 @@ exports[`reportFromSteps integration — plan-only fixtures > terraform/import-r
 | --- | --- | --- |
 | ➕ Add | random_string | 1 |
 |  | **Add** | **1** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -17850,6 +18860,7 @@ random_string.existing
 | upper |  | <code><ins style="background:#dfd">true</ins></code> |
 
 </details>
+
 "
 `;
 
@@ -17862,7 +18873,9 @@ exports[`reportFromSteps integration — plan-only fixtures > terraform/import-r
 | --- | --- | --- |
 | 📥 Import | random_string | 1 |
 |  | **Import** | **1** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -17877,6 +18890,7 @@ random_string.imported
 _No attribute changes._
 
 </details>
+
 "
 `;
 
@@ -17889,7 +18903,9 @@ exports[`reportFromSteps integration — plan-only fixtures > terraform/local-fi
 | --- | --- | --- |
 | ➕ Add | local_file | 1 |
 |  | **Add** | **1** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -17935,11 +18951,13 @@ Line 12: end of file
 </details>
 
 </details>
+
 ## Outputs
 
 | Output | Action | Before | After |
 | --- | --- | --- | --- |
 | readme_path | ➕ |  | <code>./output/readme.txt</code> |
+
 "
 `;
 
@@ -17952,7 +18970,9 @@ exports[`reportFromSteps integration — plan-only fixtures > terraform/local-fi
 | --- | --- | --- |
 | ± Replace | local_file | 1 |
 |  | **Replace** | **1** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -18000,11 +19020,13 @@ local_file.readme
 </details>
 
 </details>
+
 ## Outputs
 
 | Output | Action | Before | After |
 | --- | --- | --- | --- |
 | readme_path | ⬜ | <code>./output/readme.txt</code> | <code>./output/readme.txt</code> |
+
 "
 `;
 
@@ -18017,7 +19039,9 @@ exports[`reportFromSteps integration — plan-only fixtures > terraform/moved-re
 | --- | --- | --- |
 | ➕ Add | null_resource | 1 |
 |  | **Add** | **1** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -18033,6 +19057,7 @@ null_resource.original
 | triggers.version |  | <code><ins style="background:#dfd">1</ins></code> |
 
 </details>
+
 "
 `;
 
@@ -18045,7 +19070,9 @@ exports[`reportFromSteps integration — plan-only fixtures > terraform/moved-re
 | --- | --- | --- |
 | 🚚 Move | null_resource | 1 |
 |  | **Move** | **1** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -18060,6 +19087,7 @@ null_resource.renamed
 _No attribute changes._
 
 </details>
+
 "
 `;
 
@@ -18072,7 +19100,9 @@ exports[`reportFromSteps integration — plan-only fixtures > terraform/nested-m
 | --- | --- | --- |
 | ➕ Add | null_resource | 3 |
 |  | **Add** | **3** |
+
 ## Resource Changes
+
 ### 📦 Module: \`module.parent["1"].module.child\`
 
 <details>
@@ -18089,6 +19119,7 @@ module.parent["1"].module.child.null_resource.item[0]
 | triggers.label |  | <code><ins style="background:#dfd">1</ins></code> |
 
 </details>
+
 ### 📦 Module: \`module.parent["2"].module.child\`
 
 <details>
@@ -18120,6 +19151,7 @@ module.parent["2"].module.child.null_resource.item[1]
 | triggers.label |  | <code><ins style="background:#dfd">2</ins></code> |
 
 </details>
+
 "
 `;
 
@@ -18134,7 +19166,9 @@ exports[`reportFromSteps integration — plan-only fixtures > terraform/nested-m
 |  | **Add** | **3** |
 | 🗑️ Destroy | null_resource | 2 |
 |  | **Destroy** | **2** |
+
 ## Resource Changes
+
 ### 📦 Module: \`module.parent["2"].module.child\`
 
 <details>
@@ -18166,6 +19200,7 @@ module.parent["2"].module.child.null_resource.item[1]
 | triggers.label | 2 | <code><del style="background:#fdd">2</del></code> |
 
 </details>
+
 ### 📦 Module: \`module.parent["3"].module.child\`
 
 <details>
@@ -18212,6 +19247,7 @@ module.parent["3"].module.child.null_resource.item[2]
 | triggers.label |  | <code><ins style="background:#dfd">3</ins></code> |
 
 </details>
+
 "
 `;
 
@@ -18224,7 +19260,9 @@ exports[`reportFromSteps integration — plan-only fixtures > terraform/no-detai
 | --- | --- | --- |
 | ➕ Add | null_resource | 1 |
 |  | **Add** | **1** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -18240,6 +19278,7 @@ null_resource.example
 | triggers.value |  | <code><ins style="background:#dfd">hello</ins></code> |
 
 </details>
+
 "
 `;
 
@@ -18252,7 +19291,9 @@ exports[`reportFromSteps integration — plan-only fixtures > terraform/no-detai
 | --- | --- | --- |
 | 🗑️ Destroy | null_resource | 1 |
 |  | **Destroy** | **1** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -18268,6 +19309,7 @@ null_resource.example
 | triggers.value | hello | <code><del style="background:#fdd">hello</del></code> |
 
 </details>
+
 "
 `;
 
@@ -18280,7 +19322,9 @@ exports[`reportFromSteps integration — plan-only fixtures > terraform/no-json-
 | --- | --- | --- |
 | ➕ Add | null_resource | 1 |
 |  | **Add** | **1** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -18296,6 +19340,7 @@ null_resource.example
 | triggers.value |  | <code><ins style="background:#dfd">hello</ins></code> |
 
 </details>
+
 <details><summary>Plan Output</summary>
 
 \`\`\`
@@ -18339,7 +19384,9 @@ exports[`reportFromSteps integration — plan-only fixtures > terraform/no-op/0/
 | --- | --- | --- |
 | ➕ Add | null_resource | 1 |
 |  | **Add** | **1** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -18355,6 +19402,7 @@ null_resource.stable
 | triggers.version |  | <code><ins style="background:#dfd">1</ins></code> |
 
 </details>
+
 "
 `;
 
@@ -18364,6 +19412,7 @@ exports[`reportFromSteps integration — plan-only fixtures > terraform/no-op/1/
 ## Plan Summary
 
 _No changes._
+
 "
 `;
 
@@ -18373,6 +19422,7 @@ exports[`reportFromSteps integration — plan-only fixtures > terraform/null-lif
 ## Plan Summary
 
 _No changes._
+
 "
 `;
 
@@ -18386,7 +19436,9 @@ exports[`reportFromSteps integration — plan-only fixtures > terraform/null-lif
 | ➕ Add | null_resource | 2 |
 |  | terraform_data | 1 |
 |  | **Add** | **3** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -18433,6 +19485,7 @@ terraform_data.meta
 | output | <code></code> | <code>(known after apply)</code> |
 
 </details>
+
 "
 `;
 
@@ -18449,7 +19502,9 @@ exports[`reportFromSteps integration — plan-only fixtures > terraform/null-lif
 |  | **Replace** | **1** |
 | 🗑️ Destroy | null_resource | 1 |
 |  | **Destroy** | **1** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -18494,6 +19549,7 @@ terraform_data.meta
 | output | <code>v1</code> | <code>(known after apply)</code> |
 
 </details>
+
 "
 `;
 
@@ -18506,7 +19562,9 @@ exports[`reportFromSteps integration — plan-only fixtures > terraform/plan-err
 | --- | --- | --- |
 | ➕ Add | null_resource | 1 |
 |  | **Add** | **1** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -18522,6 +19580,7 @@ null_resource.baseline
 | triggers.value |  | <code><ins style="background:#dfd">v1</ins></code> |
 
 </details>
+
 "
 `;
 
@@ -18708,6 +19767,7 @@ Exit code: \`1\`
 | --- | --- | --- |
 | 🗑️ Destroy | null_resource | 1 |
 |  | **Destroy** | **1** |
+
 ## Errors
 
 🚨 **Read local file data source error** — \`data.local_file.missing\`
@@ -18715,7 +19775,10 @@ Exit code: \`1\`
 > The file at given path cannot be read.
 
 +Original Error: open /nonexistent/path/to/file.txt: no such file or directory
-> \`data "local_file" "missing" {\` in data "local_file" "missing" (line 19)## Resource Changes
+> \`data "local_file" "missing" {\` in data "local_file" "missing" (line 19)
+
+## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -18728,6 +19791,7 @@ null_resource.baseline
 _No attribute changes._
 
 </details>
+
 "
 `;
 
@@ -18740,7 +19804,9 @@ exports[`reportFromSteps integration — plan-only fixtures > terraform/random-r
 | --- | --- | --- |
 | ➕ Add | random_string | 1 |
 |  | **Add** | **1** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -18767,11 +19833,13 @@ random_string.token
 | upper |  | <code><ins style="background:#dfd">true</ins></code> |
 
 </details>
+
 ## Outputs
 
 | Output | Action | Before | After |
 | --- | --- | --- | --- |
 | token_length | ➕ |  | <code>16</code> |
+
 "
 `;
 
@@ -18784,7 +19852,9 @@ exports[`reportFromSteps integration — plan-only fixtures > terraform/random-r
 | --- | --- | --- |
 | ± Replace | random_string | 1 |
 |  | **Replace** | **1** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -18801,11 +19871,13 @@ random_string.token
 | result | <code>8bxyyCcqLfN6esga</code> | <code>(known after apply)</code> |
 
 </details>
+
 ## Outputs
 
 | Output | Action | Before | After |
 | --- | --- | --- | --- |
 | token_length | ⬜ | <code>16</code> | <code>16</code> |
+
 "
 `;
 
@@ -18818,7 +19890,9 @@ exports[`reportFromSteps integration — plan-only fixtures > terraform/removed-
 | --- | --- | --- |
 | ➕ Add | null_resource | 2 |
 |  | **Add** | **2** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -18848,6 +19922,7 @@ null_resource.keeper
 | triggers.version |  | <code><ins style="background:#dfd">1</ins></code> |
 
 </details>
+
 "
 `;
 
@@ -18860,6 +19935,7 @@ exports[`reportFromSteps integration — plan-only fixtures > terraform/removed-
 | --- | --- | --- |
 | 👋 Forget | null_resource | 1 |
 |  | **Forget** | **1** |
+
 ## Warnings
 
 ⚠️ **Some objects will no longer be managed by Terraform**
@@ -18867,7 +19943,10 @@ exports[`reportFromSteps integration — plan-only fixtures > terraform/removed-
 > If you apply this plan, Terraform will discard its tracking information for the following objects, but it will not delete them:
  - null_resource.ephemeral
 
-After applying this plan, Terraform will no longer manage these objects. You will need to import them into Terraform to manage them again.## Resource Changes
+After applying this plan, Terraform will no longer manage these objects. You will need to import them into Terraform to manage them again.
+
+## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -18883,6 +19962,7 @@ null_resource.ephemeral
 | triggers.version | 1 | <code><del style="background:#fdd">1</del></code> |
 
 </details>
+
 "
 `;
 
@@ -18895,7 +19975,9 @@ exports[`reportFromSteps integration — plan-only fixtures > terraform/sensitiv
 | --- | --- | --- |
 | ➕ Add | local_sensitive_file | 1 |
 |  | **Add** | **1** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -18921,12 +20003,14 @@ local_sensitive_file.secret
 | id | <code></code> | <code>(known after apply)</code> |
 
 </details>
+
 ## Outputs
 
 | Output | Action | Before | After |
 | --- | --- | --- | --- |
 | secret_checksum | ➕ | <code>(sensitive)</code> | <code>(sensitive)</code> |
 | secret_path | ➕ |  | <code>./output/secret.txt</code> |
+
 "
 `;
 
@@ -18939,7 +20023,9 @@ exports[`reportFromSteps integration — plan-only fixtures > terraform/sensitiv
 | --- | --- | --- |
 | ± Replace | local_sensitive_file | 1 |
 |  | **Replace** | **1** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -18962,12 +20048,14 @@ local_sensitive_file.secret
 | id | <code>ffae43b95440019e9bb698e9713dc5ac27be8dd5</code> | <code>(known after apply)</code> |
 
 </details>
+
 ## Outputs
 
 | Output | Action | Before | After |
 | --- | --- | --- | --- |
 | secret_checksum | 🔧 | <code>(sensitive)</code> | <code>(sensitive)</code> |
 | secret_path | ⬜ | <code>./output/secret.txt</code> | <code>./output/secret.txt</code> |
+
 "
 `;
 
@@ -18980,7 +20068,9 @@ exports[`reportFromSteps integration — plan-only fixtures > terraform/validate
 | --- | --- | --- |
 | ➕ Add | null_resource | 1 |
 |  | **Add** | **1** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -18996,6 +20086,7 @@ null_resource.baseline
 | triggers.value |  | <code><ins style="background:#dfd">v1</ins></code> |
 
 </details>
+
 "
 `;
 
@@ -19083,7 +20174,9 @@ exports[`reportFromSteps integration — plan-only fixtures > terraform/with-mod
 | ➕ Add | null_resource | 1 |
 |  | random_string | 1 |
 |  | **Add** | **2** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -19099,6 +20192,7 @@ null_resource.root
 | triggers.stage |  | <code><ins style="background:#dfd">0</ins></code> |
 
 </details>
+
 ### 📦 Module: \`module.naming\`
 
 <details>
@@ -19125,12 +20219,14 @@ module.naming.random_string.suffix
 | upper |  | <code><ins style="background:#dfd">false</ins></code> |
 
 </details>
+
 ## Outputs
 
 | Output | Action | Before | After |
 | --- | --- | --- | --- |
 | generated_name | ➕ |  | <code>(known after apply)</code> |
 | root_id | ➕ |  | <code>(known after apply)</code> |
+
 "
 `;
 
@@ -19144,7 +20240,9 @@ exports[`reportFromSteps integration — plan-only fixtures > terraform/with-mod
 | ± Replace | null_resource | 1 |
 |  | random_string | 1 |
 |  | **Replace** | **2** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -19160,6 +20258,7 @@ null_resource.root
 | triggers.stage | 0 | <code><ins style="background:#dfd">1</ins><del style="background:#fdd">0</del></code> |
 
 </details>
+
 ### 📦 Module: \`module.naming\`
 
 <details>
@@ -19176,12 +20275,14 @@ module.naming.random_string.suffix
 | result | <code>dx12h5s0</code> | <code>(known after apply)</code> |
 
 </details>
+
 ## Outputs
 
 | Output | Action | Before | After |
 | --- | --- | --- | --- |
 | generated_name | 🔧 | <code>fixture-dx12h5s0</code> | <code>(known after apply)</code> |
 | root_id | 🔧 | <code>1416987651343215284</code> | <code>(known after apply)</code> |
+
 "
 `;
 
@@ -19195,7 +20296,9 @@ exports[`reportFromSteps integration — plan-only fixtures > tofu/apply-error/0
 | ➕ Add | terraform_data | 2 |
 |  | null_resource | 1 |
 |  | **Add** | **3** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -19237,12 +20340,14 @@ terraform_data.success
 | output | <code></code> | <code>(known after apply)</code> |
 
 </details>
+
 ## Outputs
 
 | Output | Action | Before | After |
 | --- | --- | --- | --- |
 | depends_on_fail_output | ➕ |  | <code>(known after apply)</code> |
 | success_output | ➕ |  | <code>(known after apply)</code> |
+
 "
 `;
 
@@ -19257,7 +20362,9 @@ exports[`reportFromSteps integration — plan-only fixtures > tofu/apply-error/1
 |  | **Change** | **1** |
 | ± Replace | null_resource | 1 |
 |  | **Replace** | **1** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -19284,12 +20391,14 @@ terraform_data.depends_on_fail
 _(all values known after apply)_
 
 </details>
+
 ## Outputs
 
 | Output | Action | Before | After |
 | --- | --- | --- | --- |
 | depends_on_fail_output | 🔧 | <code>6572019016639558200</code> | <code>(known after apply)</code> |
 | success_output | ⬜ | <code>stable</code> | <code>stable</code> |
+
 "
 `;
 
@@ -19303,7 +20412,9 @@ exports[`reportFromSteps integration — plan-only fixtures > tofu/deferred-data
 | ➕ Add | terraform_data | 4 |
 |  | local_file | 1 |
 |  | **Add** | **5** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -19389,11 +20500,13 @@ terraform_data.worker_c
 _(all values known after apply)_
 
 </details>
+
 ## Outputs
 
 | Output | Action | Before | After |
 | --- | --- | --- | --- |
 | config_value | ➕ |  | <code>(known after apply)</code> |
+
 "
 `;
 
@@ -19408,7 +20521,9 @@ exports[`reportFromSteps integration — plan-only fixtures > tofu/deferred-data
 |  | **Add** | **1** |
 | 🔧 Change | terraform_data | 4 |
 |  | **Change** | **4** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -19481,11 +20596,13 @@ terraform_data.worker_c
 _(all values known after apply)_
 
 </details>
+
 ## Outputs
 
 | Output | Action | Before | After |
 | --- | --- | --- | --- |
 | config_value | 🔧 | <code>{"worker_a":"alpha","worker_b":"bravo","worker_c":"charlie"}</code> | <code>(known after apply)</code> |
+
 "
 `;
 
@@ -19500,7 +20617,9 @@ exports[`reportFromSteps integration — plan-only fixtures > tofu/deferred-data
 |  | **Change** | **3** |
 | ± Replace | local_file | 1 |
 |  | **Replace** | **1** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -19569,11 +20688,13 @@ terraform_data.worker_c
 _(all values known after apply)_
 
 </details>
+
 ## Outputs
 
 | Output | Action | Before | After |
 | --- | --- | --- | --- |
 | config_value | 🔧 | <code>{"worker_a":"alpha","worker_b":"bravo","worker_c":"charlie"}</code> | <code>(known after apply)</code> |
+
 "
 `;
 
@@ -19586,7 +20707,9 @@ exports[`reportFromSteps integration — plan-only fixtures > tofu/import-resour
 | --- | --- | --- |
 | ➕ Add | random_string | 1 |
 |  | **Add** | **1** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -19612,6 +20735,7 @@ random_string.existing
 | upper |  | <code><ins style="background:#dfd">true</ins></code> |
 
 </details>
+
 "
 `;
 
@@ -19624,7 +20748,9 @@ exports[`reportFromSteps integration — plan-only fixtures > tofu/import-resour
 | --- | --- | --- |
 | 📥 Import | random_string | 1 |
 |  | **Import** | **1** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -19639,6 +20765,7 @@ random_string.imported
 _No attribute changes._
 
 </details>
+
 "
 `;
 
@@ -19651,7 +20778,9 @@ exports[`reportFromSteps integration — plan-only fixtures > tofu/local-files/0
 | --- | --- | --- |
 | ➕ Add | local_file | 1 |
 |  | **Add** | **1** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -19697,11 +20826,13 @@ Line 12: end of file
 </details>
 
 </details>
+
 ## Outputs
 
 | Output | Action | Before | After |
 | --- | --- | --- | --- |
 | readme_path | ➕ |  | <code>./output/readme.txt</code> |
+
 "
 `;
 
@@ -19714,7 +20845,9 @@ exports[`reportFromSteps integration — plan-only fixtures > tofu/local-files/1
 | --- | --- | --- |
 | ± Replace | local_file | 1 |
 |  | **Replace** | **1** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -19762,11 +20895,13 @@ local_file.readme
 </details>
 
 </details>
+
 ## Outputs
 
 | Output | Action | Before | After |
 | --- | --- | --- | --- |
 | readme_path | ⬜ | <code>./output/readme.txt</code> | <code>./output/readme.txt</code> |
+
 "
 `;
 
@@ -19779,7 +20914,9 @@ exports[`reportFromSteps integration — plan-only fixtures > tofu/moved-resourc
 | --- | --- | --- |
 | ➕ Add | null_resource | 1 |
 |  | **Add** | **1** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -19795,6 +20932,7 @@ null_resource.original
 | triggers.version |  | <code><ins style="background:#dfd">1</ins></code> |
 
 </details>
+
 "
 `;
 
@@ -19807,7 +20945,9 @@ exports[`reportFromSteps integration — plan-only fixtures > tofu/moved-resourc
 | --- | --- | --- |
 | 🚚 Move | null_resource | 1 |
 |  | **Move** | **1** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -19822,6 +20962,7 @@ null_resource.renamed
 _No attribute changes._
 
 </details>
+
 "
 `;
 
@@ -19834,7 +20975,9 @@ exports[`reportFromSteps integration — plan-only fixtures > tofu/nested-module
 | --- | --- | --- |
 | ➕ Add | null_resource | 3 |
 |  | **Add** | **3** |
+
 ## Resource Changes
+
 ### 📦 Module: \`module.parent["1"].module.child\`
 
 <details>
@@ -19851,6 +20994,7 @@ module.parent["1"].module.child.null_resource.item[0]
 | triggers.label |  | <code><ins style="background:#dfd">1</ins></code> |
 
 </details>
+
 ### 📦 Module: \`module.parent["2"].module.child\`
 
 <details>
@@ -19882,6 +21026,7 @@ module.parent["2"].module.child.null_resource.item[1]
 | triggers.label |  | <code><ins style="background:#dfd">2</ins></code> |
 
 </details>
+
 "
 `;
 
@@ -19896,7 +21041,9 @@ exports[`reportFromSteps integration — plan-only fixtures > tofu/nested-module
 |  | **Add** | **3** |
 | 🗑️ Destroy | null_resource | 2 |
 |  | **Destroy** | **2** |
+
 ## Resource Changes
+
 ### 📦 Module: \`module.parent["2"].module.child\`
 
 <details>
@@ -19928,6 +21075,7 @@ module.parent["2"].module.child.null_resource.item[1]
 | triggers.label | 2 | <code><del style="background:#fdd">2</del></code> |
 
 </details>
+
 ### 📦 Module: \`module.parent["3"].module.child\`
 
 <details>
@@ -19974,6 +21122,7 @@ module.parent["3"].module.child.null_resource.item[2]
 | triggers.label |  | <code><ins style="background:#dfd">3</ins></code> |
 
 </details>
+
 "
 `;
 
@@ -19986,7 +21135,9 @@ exports[`reportFromSteps integration — plan-only fixtures > tofu/no-detailed-e
 | --- | --- | --- |
 | ➕ Add | null_resource | 1 |
 |  | **Add** | **1** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -20002,6 +21153,7 @@ null_resource.example
 | triggers.value |  | <code><ins style="background:#dfd">hello</ins></code> |
 
 </details>
+
 "
 `;
 
@@ -20014,7 +21166,9 @@ exports[`reportFromSteps integration — plan-only fixtures > tofu/no-detailed-e
 | --- | --- | --- |
 | 🗑️ Destroy | null_resource | 1 |
 |  | **Destroy** | **1** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -20030,6 +21184,7 @@ null_resource.example
 | triggers.value | hello | <code><del style="background:#fdd">hello</del></code> |
 
 </details>
+
 "
 `;
 
@@ -20042,7 +21197,9 @@ exports[`reportFromSteps integration — plan-only fixtures > tofu/no-json-flags
 | --- | --- | --- |
 | ➕ Add | null_resource | 1 |
 |  | **Add** | **1** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -20058,6 +21215,7 @@ null_resource.example
 | triggers.value |  | <code><ins style="background:#dfd">hello</ins></code> |
 
 </details>
+
 <details><summary>Plan Output</summary>
 
 \`\`\`
@@ -20101,7 +21259,9 @@ exports[`reportFromSteps integration — plan-only fixtures > tofu/no-op/0/plan-
 | --- | --- | --- |
 | ➕ Add | null_resource | 1 |
 |  | **Add** | **1** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -20117,6 +21277,7 @@ null_resource.stable
 | triggers.version |  | <code><ins style="background:#dfd">1</ins></code> |
 
 </details>
+
 "
 `;
 
@@ -20126,6 +21287,7 @@ exports[`reportFromSteps integration — plan-only fixtures > tofu/no-op/1/plan-
 ## Plan Summary
 
 _No changes._
+
 "
 `;
 
@@ -20135,6 +21297,7 @@ exports[`reportFromSteps integration — plan-only fixtures > tofu/null-lifecycl
 ## Plan Summary
 
 _No changes._
+
 "
 `;
 
@@ -20148,7 +21311,9 @@ exports[`reportFromSteps integration — plan-only fixtures > tofu/null-lifecycl
 | ➕ Add | null_resource | 2 |
 |  | terraform_data | 1 |
 |  | **Add** | **3** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -20195,6 +21360,7 @@ terraform_data.meta
 | output | <code></code> | <code>(known after apply)</code> |
 
 </details>
+
 "
 `;
 
@@ -20211,7 +21377,9 @@ exports[`reportFromSteps integration — plan-only fixtures > tofu/null-lifecycl
 |  | **Replace** | **1** |
 | 🗑️ Destroy | null_resource | 1 |
 |  | **Destroy** | **1** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -20256,6 +21424,7 @@ terraform_data.meta
 | output | <code>v1</code> | <code>(known after apply)</code> |
 
 </details>
+
 "
 `;
 
@@ -20268,7 +21437,9 @@ exports[`reportFromSteps integration — plan-only fixtures > tofu/plan-error/0/
 | --- | --- | --- |
 | ➕ Add | null_resource | 1 |
 |  | **Add** | **1** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -20284,6 +21455,7 @@ null_resource.baseline
 | triggers.value |  | <code><ins style="background:#dfd">v1</ins></code> |
 
 </details>
+
 "
 `;
 
@@ -20470,6 +21642,7 @@ Exit code: \`1\`
 | --- | --- | --- |
 | 🗑️ Destroy | null_resource | 1 |
 |  | **Destroy** | **1** |
+
 ## Errors
 
 🚨 **Read local file data source error** — \`data.local_file.missing\`
@@ -20477,7 +21650,10 @@ Exit code: \`1\`
 > The file at given path cannot be read.
 
 +Original Error: open /nonexistent/path/to/file.txt: no such file or directory
-> \`data "local_file" "missing" {\` in data "local_file" "missing" (line 19)## Resource Changes
+> \`data "local_file" "missing" {\` in data "local_file" "missing" (line 19)
+
+## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -20490,6 +21666,7 @@ null_resource.baseline
 _No attribute changes._
 
 </details>
+
 "
 `;
 
@@ -20502,7 +21679,9 @@ exports[`reportFromSteps integration — plan-only fixtures > tofu/random-replac
 | --- | --- | --- |
 | ➕ Add | random_string | 1 |
 |  | **Add** | **1** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -20529,11 +21708,13 @@ random_string.token
 | upper |  | <code><ins style="background:#dfd">true</ins></code> |
 
 </details>
+
 ## Outputs
 
 | Output | Action | Before | After |
 | --- | --- | --- | --- |
 | token_length | ➕ |  | <code>16</code> |
+
 "
 `;
 
@@ -20546,7 +21727,9 @@ exports[`reportFromSteps integration — plan-only fixtures > tofu/random-replac
 | --- | --- | --- |
 | ± Replace | random_string | 1 |
 |  | **Replace** | **1** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -20563,11 +21746,13 @@ random_string.token
 | result | <code>4SmmpS2VsTztR0vw</code> | <code>(known after apply)</code> |
 
 </details>
+
 ## Outputs
 
 | Output | Action | Before | After |
 | --- | --- | --- | --- |
 | token_length | ⬜ | <code>16</code> | <code>16</code> |
+
 "
 `;
 
@@ -20580,7 +21765,9 @@ exports[`reportFromSteps integration — plan-only fixtures > tofu/removed-resou
 | --- | --- | --- |
 | ➕ Add | null_resource | 2 |
 |  | **Add** | **2** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -20610,6 +21797,7 @@ null_resource.keeper
 | triggers.version |  | <code><ins style="background:#dfd">1</ins></code> |
 
 </details>
+
 "
 `;
 
@@ -20622,13 +21810,17 @@ exports[`reportFromSteps integration — plan-only fixtures > tofu/removed-resou
 | --- | --- | --- |
 | 👋 Forget | null_resource | 1 |
 |  | **Forget** | **1** |
+
 ## Warnings
 
 ⚠️ **Resource going to be removed from the state**
 
 > After this plan gets applied, the resource null_resource.ephemeral will not be managed anymore by OpenTofu.
 
-In case you want to manage the resource again, you will have to import it.## Resource Changes
+In case you want to manage the resource again, you will have to import it.
+
+## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -20644,6 +21836,7 @@ null_resource.ephemeral
 | triggers.version | 1 | <code><del style="background:#fdd">1</del></code> |
 
 </details>
+
 "
 `;
 
@@ -20656,7 +21849,9 @@ exports[`reportFromSteps integration — plan-only fixtures > tofu/sensitive-val
 | --- | --- | --- |
 | ➕ Add | local_sensitive_file | 1 |
 |  | **Add** | **1** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -20682,12 +21877,14 @@ local_sensitive_file.secret
 | id | <code></code> | <code>(known after apply)</code> |
 
 </details>
+
 ## Outputs
 
 | Output | Action | Before | After |
 | --- | --- | --- | --- |
 | secret_checksum | ➕ | <code>(sensitive)</code> | <code>(sensitive)</code> |
 | secret_path | ➕ |  | <code>./output/secret.txt</code> |
+
 "
 `;
 
@@ -20700,7 +21897,9 @@ exports[`reportFromSteps integration — plan-only fixtures > tofu/sensitive-val
 | --- | --- | --- |
 | ± Replace | local_sensitive_file | 1 |
 |  | **Replace** | **1** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -20723,12 +21922,14 @@ local_sensitive_file.secret
 | id | <code>ffae43b95440019e9bb698e9713dc5ac27be8dd5</code> | <code>(known after apply)</code> |
 
 </details>
+
 ## Outputs
 
 | Output | Action | Before | After |
 | --- | --- | --- | --- |
 | secret_checksum | 🔧 | <code>(sensitive)</code> | <code>(sensitive)</code> |
 | secret_path | ⬜ | <code>./output/secret.txt</code> | <code>./output/secret.txt</code> |
+
 "
 `;
 
@@ -20741,7 +21942,9 @@ exports[`reportFromSteps integration — plan-only fixtures > tofu/validate-erro
 | --- | --- | --- |
 | ➕ Add | null_resource | 1 |
 |  | **Add** | **1** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -20757,6 +21960,7 @@ null_resource.baseline
 | triggers.value |  | <code><ins style="background:#dfd">v1</ins></code> |
 
 </details>
+
 "
 `;
 
@@ -20844,7 +22048,9 @@ exports[`reportFromSteps integration — plan-only fixtures > tofu/with-modules/
 | ➕ Add | null_resource | 1 |
 |  | random_string | 1 |
 |  | **Add** | **2** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -20860,6 +22066,7 @@ null_resource.root
 | triggers.stage |  | <code><ins style="background:#dfd">0</ins></code> |
 
 </details>
+
 ### 📦 Module: \`module.naming\`
 
 <details>
@@ -20886,12 +22093,14 @@ module.naming.random_string.suffix
 | upper |  | <code><ins style="background:#dfd">false</ins></code> |
 
 </details>
+
 ## Outputs
 
 | Output | Action | Before | After |
 | --- | --- | --- | --- |
 | generated_name | ➕ |  | <code>(known after apply)</code> |
 | root_id | ➕ |  | <code>(known after apply)</code> |
+
 "
 `;
 
@@ -20905,7 +22114,9 @@ exports[`reportFromSteps integration — plan-only fixtures > tofu/with-modules/
 | ± Replace | null_resource | 1 |
 |  | random_string | 1 |
 |  | **Replace** | **2** |
+
 ## Resource Changes
+
 ### 📦 Module: root
 
 <details>
@@ -20921,6 +22132,7 @@ null_resource.root
 | triggers.stage | 0 | <code><ins style="background:#dfd">1</ins><del style="background:#fdd">0</del></code> |
 
 </details>
+
 ### 📦 Module: \`module.naming\`
 
 <details>
@@ -20937,11 +22149,13 @@ module.naming.random_string.suffix
 | result | <code>3r4wm4cq</code> | <code>(known after apply)</code> |
 
 </details>
+
 ## Outputs
 
 | Output | Action | Before | After |
 | --- | --- | --- | --- |
 | generated_name | 🔧 | <code>fixture-3r4wm4cq</code> | <code>(known after apply)</code> |
 | root_id | 🔧 | <code>7773149748109350</code> | <code>(known after apply)</code> |
+
 "
 `;

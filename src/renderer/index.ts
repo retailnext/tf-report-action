@@ -14,6 +14,18 @@ import { MODULE_ICON, DRIFT_ICON } from "../model/status-icons.js";
 import { resolveTemplate } from "../template/index.js";
 
 /**
+ * Ensure content ends with exactly two newlines (a trailing blank line).
+ *
+ * Sections are concatenated without separators, so each must end with
+ * `\n\n` to provide the required blank line before the next markdown
+ * heading or block element.
+ */
+function ensureTrailingBlankLine(content: string): string {
+  const trimmed = content.replace(/\n+$/, "");
+  return trimmed + "\n\n";
+}
+
+/**
  * Renders a Report's structured body as an array of compositable Sections.
  *
  * Each major part (summary, drift, module groups, outputs, diagnostics)
@@ -61,7 +73,7 @@ export function renderStructuredSections(
     if (template.name === "summary" && report.diagnostics !== undefined && report.diagnostics.length > 0) {
       renderDiagnostics(report.diagnostics, writer, 2);
     }
-    sections.push({ id: "summary", full: writer.build(), fixed: true });
+    sections.push({ id: "summary", full: ensureTrailingBlankLine(writer.build()), fixed: true });
   }
 
   if (template.name === "summary") {
@@ -72,21 +84,21 @@ export function renderStructuredSections(
   if (nonResourceDiags.length > 0) {
     const writer = new MarkdownWriter();
     renderDiagnostics(nonResourceDiags, writer, 2);
-    sections.push({ id: "non-resource-diagnostics", full: writer.build(), fixed: true });
+    sections.push({ id: "non-resource-diagnostics", full: ensureTrailingBlankLine(writer.build()), fixed: true });
   }
 
   // Drift section
   if (driftModules.length > 0) {
     const writer = new MarkdownWriter();
     renderDriftSection(driftModules, writer, options, diffCache);
-    sections.push({ id: "drift", full: writer.build() });
+    sections.push({ id: "drift", full: ensureTrailingBlankLine(writer.build()) });
   }
 
   // Resource changes — one section per module group for granular budget control
   if (modules.length > 0) {
     const writer = new MarkdownWriter();
     writer.heading("Resource Changes", 2);
-    sections.push({ id: "resource-changes-heading", full: writer.build(), fixed: true });
+    sections.push({ id: "resource-changes-heading", full: ensureTrailingBlankLine(writer.build()), fixed: true });
 
     for (const moduleGroup of modules) {
       const moduleLabel =
@@ -111,7 +123,7 @@ export function renderStructuredSections(
 
       sections.push({
         id: `module-${moduleGroup.moduleAddress || "root"}`,
-        full: mw.build(),
+        full: ensureTrailingBlankLine(mw.build()),
         compact: `### ${MODULE_ICON} Module: ${moduleLabel}\n\n_(details omitted)_\n\n`,
       });
     }
@@ -122,7 +134,7 @@ export function renderStructuredSections(
     const writer = new MarkdownWriter();
     writer.heading("Outputs", 2);
     renderOutputTable(outputs, writer);
-    sections.push({ id: "outputs", full: writer.build() });
+    sections.push({ id: "outputs", full: ensureTrailingBlankLine(writer.build()) });
   }
 
   return sections;
