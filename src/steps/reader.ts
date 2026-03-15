@@ -41,7 +41,7 @@ export interface ReadError {
 export type FileReadOutcome = ReadResult | ReadError;
 
 /** Type guard to check if a result is a ReadError. */
-export function isReadError(result: FileReadOutcome | ValidatedFile): result is ReadError {
+export function isReadError(result: FileReadOutcome | ValidatedPath): result is ReadError {
   return "error" in result;
 }
 
@@ -118,14 +118,37 @@ export function readForDisplay(
   }
 }
 
+/**
+ * Validate a file path without reading it.
+ *
+ * Performs the same security checks as the read functions (allowed directory,
+ * regular file, absolute path) but returns only the validated real path and
+ * size. This is used by the JSONL scanner which handles its own file reading
+ * via chunked I/O.
+ *
+ * @param filePath - Absolute path to the file
+ * @param options - Reader security options (allowedDirs)
+ * @returns The validated real path and size, or an error description
+ */
+export function getValidatedPath(
+  filePath: string,
+  options: ReaderOptions,
+): ValidatedPath | ReadError {
+  return validateFile(filePath, options);
+}
+
 // ---------------------------------------------------------------------------
 // Internal validation
 // ---------------------------------------------------------------------------
 
-interface ValidatedFile {
+/** Result of file path validation (without reading). */
+export interface ValidatedPath {
   readonly realPath: string;
   readonly size: number;
 }
+
+/** @internal */
+type ValidatedFile = ValidatedPath;
 
 function validateFile(
   filePath: string,

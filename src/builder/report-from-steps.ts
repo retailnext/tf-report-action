@@ -12,6 +12,8 @@ import type { Env } from "../env/index.js";
 import type { Steps, StepData, ReaderOptions } from "../steps/types.js";
 import type { Report, Tool } from "../model/report.js";
 import type { StepIssue } from "../model/step-issue.js";
+import type { StepFileRead } from "../model/step-file-read.js";
+import type { Tier } from "./tier.js";
 import { expectedCommand } from "../model/step-commands.js";
 import { parseSteps } from "../steps/parse.js";
 import {
@@ -145,6 +147,24 @@ export function buildReportFromSteps(
         tier.showPlanJson, showPlanStep, showPlanStepId, applyStep, applyStepId,
         steps, knownStepIds, issues, hasStepFailures, workspace, logsUrl,
         readerOpts, options, tool,
+      );
+    }
+    case "tier2": {
+      // TODO(report-from-steps-refactor): Full Tier 2 implementation with JSONL scanner.
+      // For now, re-read stdout as raw text and fall through to Tier 3 behavior.
+      let planRead: StepFileRead | undefined;
+      let applyRead: StepFileRead | undefined;
+      if (planStep) planRead = readStepStdout(planStep, readerOpts);
+      if (applyStep && getStepOutcome(applyStep) !== "skipped") {
+        applyRead = readStepStdout(applyStep, readerOpts);
+      }
+      const tier3Fallback: Tier = { kind: "tier3", readErrors: tier.readErrors };
+      if (planRead) (tier3Fallback as { planRead: StepFileRead }).planRead = planRead;
+      if (applyRead) (tier3Fallback as { applyRead: StepFileRead }).applyRead = applyRead;
+      tool ??= detectToolFromOutput(planRead?.content)
+            ?? detectToolFromOutput(applyRead?.content);
+      return buildTextFallbackReport(
+        tier3Fallback, steps, knownStepIds, issues, workspace, logsUrl, tool,
       );
     }
     case "tier3": {

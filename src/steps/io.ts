@@ -9,7 +9,7 @@
 
 import type { StepData, ReaderOptions } from "./types.js";
 import type { StepFileRead } from "../model/step-file-read.js";
-import { readForParse, readForDisplay, isReadError } from "./reader.js";
+import { readForParse, readForDisplay, isReadError, getValidatedPath } from "./reader.js";
 import { OUTPUT_STDOUT_FILE, OUTPUT_STDERR_FILE } from "./types.js";
 
 /**
@@ -49,4 +49,19 @@ export function readStepStdoutForDisplay(step: StepData, readerOpts: ReaderOptio
 /** Read a step's stderr file for display (first maxDisplayRead bytes). */
 export function readStepStderrForDisplay(step: StepData, readerOpts: ReaderOptions): StepFileRead {
   return readStepFile(step, OUTPUT_STDERR_FILE, readerOpts, true);
+}
+
+/**
+ * Get the validated real path to a step's stdout file without reading it.
+ *
+ * Returns the resolved, security-validated file path or `undefined` if the
+ * step has no stdout_file output or the path fails validation. This is used
+ * by the JSONL scanner which reads the file itself via chunked I/O.
+ */
+export function getStepStdoutPath(step: StepData, readerOpts: ReaderOptions): string | undefined {
+  const filePath = step.outputs?.[OUTPUT_STDOUT_FILE];
+  if (!filePath) return undefined;
+  const result = getValidatedPath(filePath, readerOpts);
+  if ("error" in result) return undefined;
+  return result.realPath;
 }

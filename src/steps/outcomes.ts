@@ -7,10 +7,16 @@
 
 import type { StepData, Steps } from "./types.js";
 import type { StepOutcome } from "../model/step-outcome.js";
+import { OUTPUT_EXIT_CODE } from "./types.js";
 
 /** Get the effective outcome of a step (prefers `outcome` over `conclusion`). */
 export function getStepOutcome(step: StepData): string {
   return step.outcome ?? step.conclusion ?? "unknown";
+}
+
+/** Get the exit code string from a step's outputs, if present. */
+export function getExitCode(step: StepData): string | undefined {
+  return step.outputs?.[OUTPUT_EXIT_CODE] ?? undefined;
 }
 
 /** Check if any step outside the known IaC step IDs has failed. */
@@ -31,8 +37,11 @@ export function hasAnyFailedKnownStep(steps: Steps, knownStepIds: ReadonlySet<st
 export function buildStepOutcomes(steps: Steps, excludeIds?: ReadonlySet<string>): StepOutcome[] {
   return Object.entries(steps)
     .filter(([id]) => !excludeIds?.has(id))
-    .map(([id, step]) => ({
-      id,
-      outcome: getStepOutcome(step),
-    }));
+    .map(([id, step]) => {
+      const outcome = getStepOutcome(step);
+      const exitCode = getExitCode(step);
+      const result: StepOutcome = { id, outcome };
+      if (exitCode !== undefined) (result as { exitCode: string }).exitCode = exitCode;
+      return result;
+    });
 }
