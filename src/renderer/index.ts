@@ -1,5 +1,6 @@
 import type { Report } from "../model/report.js";
 import type { RenderOptions } from "./options.js";
+import type { Section } from "../model/section.js";
 import type { Diagnostic } from "../model/diagnostic.js";
 import type { DiffEntry } from "../diff/types.js";
 import type { OutputChange } from "../model/output.js";
@@ -13,16 +14,20 @@ import { MODULE_ICON, DRIFT_ICON } from "../model/status-icons.js";
 import { resolveTemplate } from "../template/index.js";
 
 /**
- * Renders a Report's structured body (summary, resources, outputs, drift,
- * diagnostics) to a markdown string. Requires that the report has `summary`
- * and `modules` populated (i.e., from show-plan JSON or JSONL enrichment).
+ * Renders a Report's structured body as an array of compositable Sections.
  *
- * Automatically detects apply reports (those with diagnostics or applyStatuses)
- * and renders appropriate sections.
+ * Each major part (summary, drift, module groups, outputs, diagnostics)
+ * is a separate Section so the compositor can degrade or omit individual
+ * sections under budget pressure.
+ *
+ * Requires that the report has `summary` or `modules` populated (i.e.,
+ * from show-plan JSON or JSONL enrichment).
  */
-export function renderReport(report: Report, options: RenderOptions = {}): string {
+export function renderStructuredSections(
+  report: Report,
+  options: RenderOptions = {},
+): Section[] {
   const template = resolveTemplate(options.template ?? "default");
-  const writer = new MarkdownWriter();
   const diffCache = new Map<string, DiffEntry[]>();
   const isApply = isApplyReport(report);
   const summaryHeading = isApply ? "Apply Summary" : "Plan Summary";
@@ -30,46 +35,58 @@ export function renderReport(report: Report, options: RenderOptions = {}): strin
   const modules = report.modules ?? [];
   const outputs = report.outputs ?? [];
   const driftModules = report.driftModules ?? [];
+  const sections: Section[] = [];
 
   // Build apply context maps
   const failedAddresses = buildFailedSet(report);
   const diagByAddress = buildDiagnosticMap(report);
   const nonResourceDiags = extractNonResourceDiagnostics(report);
 
+  // Optional user-provided title (used by library API, not reportFromSteps)
   if (options.title) {
-    writer.heading(options.title, 2);
+    sections.push({
+      id: "user-title",
+      full: `## ${options.title}\n\n`,
+      fixed: true,
+    });
   }
 
-  if (template.name === "summary") {
+  // Summary section (always shown when present)
+  {
+    const writer = new MarkdownWriter();
     writer.heading(summaryHeading, 2);
     if (summary) {
       renderSummary(summary, writer, isApply);
     }
-    // Summary template: all diagnostics go in top-level section
-    if (report.diagnostics !== undefined && report.diagnostics.length > 0) {
+    if (template.name === "summary" && report.diagnostics !== undefined && report.diagnostics.length > 0) {
       renderDiagnostics(report.diagnostics, writer, 2);
     }
-    return writer.build();
+    sections.push({ id: "summary", full: writer.build(), fixed: true });
   }
 
-  // Default template
-  writer.heading(summaryHeading, 2);
-  if (summary) {
-    renderSummary(summary, writer, isApply);
+  if (template.name === "summary") {
+    return sections;
   }
 
-  // Non-resource diagnostics between summary and resource changes
+  // Non-resource diagnostics (between summary and resource changes)
   if (nonResourceDiags.length > 0) {
+    const writer = new MarkdownWriter();
     renderDiagnostics(nonResourceDiags, writer, 2);
+    sections.push({ id: "non-resource-diagnostics", full: writer.build(), fixed: true });
   }
 
-  // Resource drift section (between summary and resource changes)
+  // Drift section
   if (driftModules.length > 0) {
+    const writer = new MarkdownWriter();
     renderDriftSection(driftModules, writer, options, diffCache);
+    sections.push({ id: "drift", full: writer.build() });
   }
 
-  if (modules.length > 0 || outputs.length > 0) {
+  // Resource changes — one section per module group for granular budget control
+  if (modules.length > 0) {
+    const writer = new MarkdownWriter();
     writer.heading("Resource Changes", 2);
+    sections.push({ id: "resource-changes-heading", full: writer.build(), fixed: true });
 
     for (const moduleGroup of modules) {
       const moduleLabel =
@@ -77,28 +94,51 @@ export function renderReport(report: Report, options: RenderOptions = {}): strin
           ? "root"
           : `\`${moduleGroup.moduleAddress}\``;
 
-      writer.heading(`${MODULE_ICON} Module: ${moduleLabel}`, 3);
+      const mw = new MarkdownWriter();
+      mw.heading(`${MODULE_ICON} Module: ${moduleLabel}`, 3);
 
       for (const resource of moduleGroup.resources) {
         const applyContext = isApply
           ? buildApplyContext(resource.address, failedAddresses, diagByAddress)
           : undefined;
-        renderResource(resource, writer, options, diffCache, applyContext);
+        renderResource(resource, mw, options, diffCache, applyContext);
       }
 
       if (moduleGroup.outputs.length > 0) {
-        writer.heading("Outputs", 4);
-        renderOutputTable(moduleGroup.outputs, writer);
+        mw.heading("Outputs", 4);
+        renderOutputTable(moduleGroup.outputs, mw);
       }
-    }
 
-    if (outputs.length > 0) {
-      writer.heading("Outputs", 2);
-      renderOutputTable(outputs, writer);
+      sections.push({
+        id: `module-${moduleGroup.moduleAddress || "root"}`,
+        full: mw.build(),
+        compact: `### ${MODULE_ICON} Module: ${moduleLabel}\n\n_(details omitted)_\n\n`,
+      });
     }
   }
 
-  return writer.build();
+  // Top-level outputs
+  if (outputs.length > 0) {
+    const writer = new MarkdownWriter();
+    writer.heading("Outputs", 2);
+    renderOutputTable(outputs, writer);
+    sections.push({ id: "outputs", full: writer.build() });
+  }
+
+  return sections;
+}
+
+/**
+ * Renders a Report's structured body to a markdown string.
+ *
+ * Convenience wrapper around `renderStructuredSections` for the library
+ * API (`planToMarkdown`, `applyToMarkdown`) where the output is not
+ * budget-constrained.
+ */
+export function renderReport(report: Report, options: RenderOptions = {}): string {
+  return renderStructuredSections(report, options)
+    .map((s) => s.full)
+    .join("");
 }
 
 /** Returns true when the report was produced from an apply run. */

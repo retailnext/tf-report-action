@@ -22,7 +22,7 @@ describe("renderDiagnostics", () => {
     expect(md).toContain("### Errors");
     expect(md).toContain("🚨 **Failed to read data source**");
     expect(md).toContain("`data.external.failing`");
-    expect(md).toContain("```\nconnection refused\n```");
+    expect(md).toContain("> connection refused");
     expect(md).not.toContain("### Warnings");
   });
 

@@ -8,9 +8,7 @@ exports[`planToMarkdown integration > terraform/apply-error/0 > renders without 
 | ➕ Add | terraform_data | 2 |
 |  | null_resource | 1 |
 |  | **Add** | **3** |
-
 ## Resource Changes
-
 ### 📦 Module: root
 
 <details>
@@ -52,7 +50,6 @@ terraform_data.success
 | output | <code></code> | <code>(known after apply)</code> |
 
 </details>
-
 ## Outputs
 
 | Output | Action | Before | After |
@@ -70,9 +67,7 @@ exports[`planToMarkdown integration > terraform/apply-error/0 > renders without 
 | ➕ Add | terraform_data | 2 |
 |  | null_resource | 1 |
 |  | **Add** | **3** |
-
 ## Resource Changes
-
 ### 📦 Module: root
 
 <details>
@@ -114,7 +109,6 @@ terraform_data.success
 | output | <code></code> | <code>(known after apply)</code> |
 
 </details>
-
 ## Outputs
 
 | Output | Action | Before | After |
@@ -132,9 +126,7 @@ exports[`planToMarkdown integration > terraform/apply-error/0 > renders without 
 | ➕ Add | terraform_data | 2 |
 |  | null_resource | 1 |
 |  | **Add** | **3** |
-
 ## Resource Changes
-
 ### 📦 Module: root
 
 <details>
@@ -182,7 +174,6 @@ terraform_data.success
 | triggers_replace |  |  |
 
 </details>
-
 ## Outputs
 
 | Output | Action | Before | After |
@@ -212,9 +203,7 @@ exports[`planToMarkdown integration > terraform/apply-error/1 > renders without 
 |  | **Change** | **1** |
 | ± Replace | null_resource | 1 |
 |  | **Replace** | **1** |
-
 ## Resource Changes
-
 ### 📦 Module: root
 
 <details>
@@ -241,7 +230,6 @@ terraform_data.depends_on_fail
 _(all values known after apply)_
 
 </details>
-
 ## Outputs
 
 | Output | Action | Before | After |
@@ -260,9 +248,7 @@ exports[`planToMarkdown integration > terraform/apply-error/1 > renders without 
 |  | **Change** | **1** |
 | ± Replace | null_resource | 1 |
 |  | **Replace** | **1** |
-
 ## Resource Changes
-
 ### 📦 Module: root
 
 <details>
@@ -289,7 +275,6 @@ terraform_data.depends_on_fail
 _(all values known after apply)_
 
 </details>
-
 ## Outputs
 
 | Output | Action | Before | After |
@@ -308,9 +293,7 @@ exports[`planToMarkdown integration > terraform/apply-error/1 > renders without 
 |  | **Change** | **1** |
 | ± Replace | null_resource | 1 |
 |  | **Replace** | **1** |
-
 ## Resource Changes
-
 ### 📦 Module: root
 
 <details>
@@ -342,7 +325,6 @@ terraform_data.depends_on_fail
 | triggers_replace |  |  |
 
 </details>
-
 ## Outputs
 
 | Output | Action | Before | After |
@@ -372,9 +354,7 @@ exports[`planToMarkdown integration > terraform/deferred-data-source/0 > renders
 | ➕ Add | terraform_data | 4 |
 |  | local_file | 1 |
 |  | **Add** | **5** |
-
 ## Resource Changes
-
 ### 📦 Module: root
 
 <details>
@@ -460,7 +440,6 @@ terraform_data.worker_c
 _(all values known after apply)_
 
 </details>
-
 ## Outputs
 
 | Output | Action | Before | After |
@@ -477,9 +456,7 @@ exports[`planToMarkdown integration > terraform/deferred-data-source/0 > renders
 | ➕ Add | terraform_data | 4 |
 |  | local_file | 1 |
 |  | **Add** | **5** |
-
 ## Resource Changes
-
 ### 📦 Module: root
 
 <details>
@@ -565,7 +542,6 @@ terraform_data.worker_c
 _(all values known after apply)_
 
 </details>
-
 ## Outputs
 
 | Output | Action | Before | After |
@@ -582,9 +558,7 @@ exports[`planToMarkdown integration > terraform/deferred-data-source/0 > renders
 | ➕ Add | terraform_data | 4 |
 |  | local_file | 1 |
 |  | **Add** | **5** |
-
 ## Resource Changes
-
 ### 📦 Module: root
 
 <details>
@@ -688,7 +662,6 @@ terraform_data.worker_c
 | triggers_replace |  |  |
 
 </details>
-
 ## Outputs
 
 | Output | Action | Before | After |
@@ -717,9 +690,7 @@ exports[`planToMarkdown integration > terraform/deferred-data-source/1 > renders
 |  | **Add** | **1** |
 | 🔧 Change | terraform_data | 4 |
 |  | **Change** | **4** |
-
 ## Resource Changes
-
 ### 📦 Module: root
 
 <details>
@@ -792,7 +763,6 @@ terraform_data.worker_c
 _(all values known after apply)_
 
 </details>
-
 ## Outputs
 
 | Output | Action | Before | After |
@@ -810,9 +780,7 @@ exports[`planToMarkdown integration > terraform/deferred-data-source/1 > renders
 |  | **Add** | **1** |
 | 🔧 Change | terraform_data | 4 |
 |  | **Change** | **4** |
-
 ## Resource Changes
-
 ### 📦 Module: root
 
 <details>
@@ -885,7 +853,6 @@ terraform_data.worker_c
 _(all values known after apply)_
 
 </details>
-
 ## Outputs
 
 | Output | Action | Before | After |
@@ -903,9 +870,7 @@ exports[`planToMarkdown integration > terraform/deferred-data-source/1 > renders
 |  | **Add** | **1** |
 | 🔧 Change | terraform_data | 4 |
 |  | **Change** | **4** |
-
 ## Resource Changes
-
 ### 📦 Module: root
 
 <details>
@@ -997,7 +962,6 @@ terraform_data.worker_c
 | triggers_replace |  |  |
 
 </details>
-
 ## Outputs
 
 | Output | Action | Before | After |
@@ -1027,9 +991,7 @@ exports[`planToMarkdown integration > terraform/deferred-data-source/2 > renders
 |  | **Change** | **3** |
 | ± Replace | local_file | 1 |
 |  | **Replace** | **1** |
-
 ## Resource Changes
-
 ### 📦 Module: root
 
 <details>
@@ -1098,7 +1060,6 @@ terraform_data.worker_c
 _(all values known after apply)_
 
 </details>
-
 ## Outputs
 
 | Output | Action | Before | After |
@@ -1116,9 +1077,7 @@ exports[`planToMarkdown integration > terraform/deferred-data-source/2 > renders
 |  | **Change** | **3** |
 | ± Replace | local_file | 1 |
 |  | **Replace** | **1** |
-
 ## Resource Changes
-
 ### 📦 Module: root
 
 <details>
@@ -1187,7 +1146,6 @@ terraform_data.worker_c
 _(all values known after apply)_
 
 </details>
-
 ## Outputs
 
 | Output | Action | Before | After |
@@ -1205,9 +1163,7 @@ exports[`planToMarkdown integration > terraform/deferred-data-source/2 > renders
 |  | **Change** | **3** |
 | ± Replace | local_file | 1 |
 |  | **Replace** | **1** |
-
 ## Resource Changes
-
 ### 📦 Module: root
 
 <details>
@@ -1296,7 +1252,6 @@ terraform_data.worker_c
 | triggers_replace |  |  |
 
 </details>
-
 ## Outputs
 
 | Output | Action | Before | After |
@@ -1324,9 +1279,7 @@ exports[`planToMarkdown integration > terraform/import-resource/0 > renders with
 | --- | --- | --- |
 | ➕ Add | random_string | 1 |
 |  | **Add** | **1** |
-
 ## Resource Changes
-
 ### 📦 Module: root
 
 <details>
@@ -1362,9 +1315,7 @@ exports[`planToMarkdown integration > terraform/import-resource/0 > renders with
 | --- | --- | --- |
 | ➕ Add | random_string | 1 |
 |  | **Add** | **1** |
-
 ## Resource Changes
-
 ### 📦 Module: root
 
 <details>
@@ -1400,9 +1351,7 @@ exports[`planToMarkdown integration > terraform/import-resource/0 > renders with
 | --- | --- | --- |
 | ➕ Add | random_string | 1 |
 |  | **Add** | **1** |
-
 ## Resource Changes
-
 ### 📦 Module: root
 
 <details>
@@ -1450,9 +1399,7 @@ exports[`planToMarkdown integration > terraform/import-resource/1 > renders with
 | --- | --- | --- |
 | 📥 Import | random_string | 1 |
 |  | **Import** | **1** |
-
 ## Resource Changes
-
 ### 📦 Module: root
 
 <details>
@@ -1477,9 +1424,7 @@ exports[`planToMarkdown integration > terraform/import-resource/1 > renders with
 | --- | --- | --- |
 | 📥 Import | random_string | 1 |
 |  | **Import** | **1** |
-
 ## Resource Changes
-
 ### 📦 Module: root
 
 <details>
@@ -1504,9 +1449,7 @@ exports[`planToMarkdown integration > terraform/import-resource/1 > renders with
 | --- | --- | --- |
 | 📥 Import | random_string | 1 |
 |  | **Import** | **1** |
-
 ## Resource Changes
-
 ### 📦 Module: root
 
 <details>
@@ -1556,9 +1499,7 @@ exports[`planToMarkdown integration > terraform/local-files/0 > renders without 
 | --- | --- | --- |
 | ➕ Add | local_file | 1 |
 |  | **Add** | **1** |
-
 ## Resource Changes
-
 ### 📦 Module: root
 
 <details>
@@ -1604,7 +1545,6 @@ Line 12: end of file
 </details>
 
 </details>
-
 ## Outputs
 
 | Output | Action | Before | After |
@@ -1620,9 +1560,7 @@ exports[`planToMarkdown integration > terraform/local-files/0 > renders without 
 | --- | --- | --- |
 | ➕ Add | local_file | 1 |
 |  | **Add** | **1** |
-
 ## Resource Changes
-
 ### 📦 Module: root
 
 <details>
@@ -1668,7 +1606,6 @@ Line 12: end of file
 </details>
 
 </details>
-
 ## Outputs
 
 | Output | Action | Before | After |
@@ -1684,9 +1621,7 @@ exports[`planToMarkdown integration > terraform/local-files/0 > renders without 
 | --- | --- | --- |
 | ➕ Add | local_file | 1 |
 |  | **Add** | **1** |
-
 ## Resource Changes
-
 ### 📦 Module: root
 
 <details>
@@ -1734,7 +1669,6 @@ Line 12: end of file
 </details>
 
 </details>
-
 ## Outputs
 
 | Output | Action | Before | After |
@@ -1760,9 +1694,7 @@ exports[`planToMarkdown integration > terraform/local-files/1 > renders without 
 | --- | --- | --- |
 | ± Replace | local_file | 1 |
 |  | **Replace** | **1** |
-
 ## Resource Changes
-
 ### 📦 Module: root
 
 <details>
@@ -1810,7 +1742,6 @@ local_file.readme
 </details>
 
 </details>
-
 ## Outputs
 
 | Output | Action | Before | After |
@@ -1826,9 +1757,7 @@ exports[`planToMarkdown integration > terraform/local-files/1 > renders without 
 | --- | --- | --- |
 | ± Replace | local_file | 1 |
 |  | **Replace** | **1** |
-
 ## Resource Changes
-
 ### 📦 Module: root
 
 <details>
@@ -1876,7 +1805,6 @@ local_file.readme
 </details>
 
 </details>
-
 ## Outputs
 
 | Output | Action | Before | After |
@@ -1892,9 +1820,7 @@ exports[`planToMarkdown integration > terraform/local-files/1 > renders without 
 | --- | --- | --- |
 | ± Replace | local_file | 1 |
 |  | **Replace** | **1** |
-
 ## Resource Changes
-
 ### 📦 Module: root
 
 <details>
@@ -1947,7 +1873,6 @@ local_file.readme
 </details>
 
 </details>
-
 ## Outputs
 
 | Output | Action | Before | After |
@@ -1973,9 +1898,7 @@ exports[`planToMarkdown integration > terraform/moved-resource/0 > renders witho
 | --- | --- | --- |
 | ➕ Add | null_resource | 1 |
 |  | **Add** | **1** |
-
 ## Resource Changes
-
 ### 📦 Module: root
 
 <details>
@@ -2001,9 +1924,7 @@ exports[`planToMarkdown integration > terraform/moved-resource/0 > renders witho
 | --- | --- | --- |
 | ➕ Add | null_resource | 1 |
 |  | **Add** | **1** |
-
 ## Resource Changes
-
 ### 📦 Module: root
 
 <details>
@@ -2029,9 +1950,7 @@ exports[`planToMarkdown integration > terraform/moved-resource/0 > renders witho
 | --- | --- | --- |
 | ➕ Add | null_resource | 1 |
 |  | **Add** | **1** |
-
 ## Resource Changes
-
 ### 📦 Module: root
 
 <details>
@@ -2067,9 +1986,7 @@ exports[`planToMarkdown integration > terraform/moved-resource/1 > renders witho
 | --- | --- | --- |
 | 🚚 Move | null_resource | 1 |
 |  | **Move** | **1** |
-
 ## Resource Changes
-
 ### 📦 Module: root
 
 <details>
@@ -2094,9 +2011,7 @@ exports[`planToMarkdown integration > terraform/moved-resource/1 > renders witho
 | --- | --- | --- |
 | 🚚 Move | null_resource | 1 |
 |  | **Move** | **1** |
-
 ## Resource Changes
-
 ### 📦 Module: root
 
 <details>
@@ -2121,9 +2036,7 @@ exports[`planToMarkdown integration > terraform/moved-resource/1 > renders witho
 | --- | --- | --- |
 | 🚚 Move | null_resource | 1 |
 |  | **Move** | **1** |
-
 ## Resource Changes
-
 ### 📦 Module: root
 
 <details>
@@ -2161,9 +2074,7 @@ exports[`planToMarkdown integration > terraform/nested-modules/0 > renders witho
 | --- | --- | --- |
 | ➕ Add | null_resource | 3 |
 |  | **Add** | **3** |
-
 ## Resource Changes
-
 ### 📦 Module: \`module.parent["1"].module.child\`
 
 <details>
@@ -2180,7 +2091,6 @@ module.parent["1"].module.child.null_resource.item[0]
 | triggers.label |  | <code><ins style="background:#dfd">1</ins></code> |
 
 </details>
-
 ### 📦 Module: \`module.parent["2"].module.child\`
 
 <details>
@@ -2222,9 +2132,7 @@ exports[`planToMarkdown integration > terraform/nested-modules/0 > renders witho
 | --- | --- | --- |
 | ➕ Add | null_resource | 3 |
 |  | **Add** | **3** |
-
 ## Resource Changes
-
 ### 📦 Module: \`module.parent["1"].module.child\`
 
 <details>
@@ -2241,7 +2149,6 @@ module.parent["1"].module.child.null_resource.item[0]
 | triggers.label |  | + 1 |
 
 </details>
-
 ### 📦 Module: \`module.parent["2"].module.child\`
 
 <details>
@@ -2283,9 +2190,7 @@ exports[`planToMarkdown integration > terraform/nested-modules/0 > renders witho
 | --- | --- | --- |
 | ➕ Add | null_resource | 3 |
 |  | **Add** | **3** |
-
 ## Resource Changes
-
 ### 📦 Module: \`module.parent["1"].module.child\`
 
 <details>
@@ -2302,7 +2207,6 @@ module.parent["1"].module.child.null_resource.item[0]
 | triggers.label |  | <code><ins style="background:#dfd">1</ins></code> |
 
 </details>
-
 ### 📦 Module: \`module.parent["2"].module.child\`
 
 <details>
@@ -2356,9 +2260,7 @@ exports[`planToMarkdown integration > terraform/nested-modules/1 > renders witho
 |  | **Add** | **3** |
 | 🗑️ Destroy | null_resource | 2 |
 |  | **Destroy** | **2** |
-
 ## Resource Changes
-
 ### 📦 Module: \`module.parent["2"].module.child\`
 
 <details>
@@ -2390,7 +2292,6 @@ module.parent["2"].module.child.null_resource.item[1]
 | triggers.label | 2 | <code><del style="background:#fdd">2</del></code> |
 
 </details>
-
 ### 📦 Module: \`module.parent["3"].module.child\`
 
 <details>
@@ -2449,9 +2350,7 @@ exports[`planToMarkdown integration > terraform/nested-modules/1 > renders witho
 |  | **Add** | **3** |
 | 🗑️ Destroy | null_resource | 2 |
 |  | **Destroy** | **2** |
-
 ## Resource Changes
-
 ### 📦 Module: \`module.parent["2"].module.child\`
 
 <details>
@@ -2483,7 +2382,6 @@ module.parent["2"].module.child.null_resource.item[1]
 | triggers.label | 2 | - 2 |
 
 </details>
-
 ### 📦 Module: \`module.parent["3"].module.child\`
 
 <details>
@@ -2542,9 +2440,7 @@ exports[`planToMarkdown integration > terraform/nested-modules/1 > renders witho
 |  | **Add** | **3** |
 | 🗑️ Destroy | null_resource | 2 |
 |  | **Destroy** | **2** |
-
 ## Resource Changes
-
 ### 📦 Module: \`module.parent["2"].module.child\`
 
 <details>
@@ -2576,7 +2472,6 @@ module.parent["2"].module.child.null_resource.item[1]
 | triggers.label | 2 | <code><del style="background:#fdd">2</del></code> |
 
 </details>
-
 ### 📦 Module: \`module.parent["3"].module.child\`
 
 <details>
@@ -2645,9 +2540,7 @@ exports[`planToMarkdown integration > terraform/no-detailed-exitcode/0 > renders
 | --- | --- | --- |
 | ➕ Add | null_resource | 1 |
 |  | **Add** | **1** |
-
 ## Resource Changes
-
 ### 📦 Module: root
 
 <details>
@@ -2673,9 +2566,7 @@ exports[`planToMarkdown integration > terraform/no-detailed-exitcode/0 > renders
 | --- | --- | --- |
 | ➕ Add | null_resource | 1 |
 |  | **Add** | **1** |
-
 ## Resource Changes
-
 ### 📦 Module: root
 
 <details>
@@ -2701,9 +2592,7 @@ exports[`planToMarkdown integration > terraform/no-detailed-exitcode/0 > renders
 | --- | --- | --- |
 | ➕ Add | null_resource | 1 |
 |  | **Add** | **1** |
-
 ## Resource Changes
-
 ### 📦 Module: root
 
 <details>
@@ -2739,9 +2628,7 @@ exports[`planToMarkdown integration > terraform/no-detailed-exitcode/1 > renders
 | --- | --- | --- |
 | 🗑️ Destroy | null_resource | 1 |
 |  | **Destroy** | **1** |
-
 ## Resource Changes
-
 ### 📦 Module: root
 
 <details>
@@ -2767,9 +2654,7 @@ exports[`planToMarkdown integration > terraform/no-detailed-exitcode/1 > renders
 | --- | --- | --- |
 | 🗑️ Destroy | null_resource | 1 |
 |  | **Destroy** | **1** |
-
 ## Resource Changes
-
 ### 📦 Module: root
 
 <details>
@@ -2795,9 +2680,7 @@ exports[`planToMarkdown integration > terraform/no-detailed-exitcode/1 > renders
 | --- | --- | --- |
 | 🗑️ Destroy | null_resource | 1 |
 |  | **Destroy** | **1** |
-
 ## Resource Changes
-
 ### 📦 Module: root
 
 <details>
@@ -2833,9 +2716,7 @@ exports[`planToMarkdown integration > terraform/no-json-flags/0 > renders withou
 | --- | --- | --- |
 | ➕ Add | null_resource | 1 |
 |  | **Add** | **1** |
-
 ## Resource Changes
-
 ### 📦 Module: root
 
 <details>
@@ -2861,9 +2742,7 @@ exports[`planToMarkdown integration > terraform/no-json-flags/0 > renders withou
 | --- | --- | --- |
 | ➕ Add | null_resource | 1 |
 |  | **Add** | **1** |
-
 ## Resource Changes
-
 ### 📦 Module: root
 
 <details>
@@ -2889,9 +2768,7 @@ exports[`planToMarkdown integration > terraform/no-json-flags/0 > renders withou
 | --- | --- | --- |
 | ➕ Add | null_resource | 1 |
 |  | **Add** | **1** |
-
 ## Resource Changes
-
 ### 📦 Module: root
 
 <details>
@@ -2927,9 +2804,7 @@ exports[`planToMarkdown integration > terraform/no-op/0 > renders without error 
 | --- | --- | --- |
 | ➕ Add | null_resource | 1 |
 |  | **Add** | **1** |
-
 ## Resource Changes
-
 ### 📦 Module: root
 
 <details>
@@ -2955,9 +2830,7 @@ exports[`planToMarkdown integration > terraform/no-op/0 > renders without error 
 | --- | --- | --- |
 | ➕ Add | null_resource | 1 |
 |  | **Add** | **1** |
-
 ## Resource Changes
-
 ### 📦 Module: root
 
 <details>
@@ -2983,9 +2856,7 @@ exports[`planToMarkdown integration > terraform/no-op/0 > renders without error 
 | --- | --- | --- |
 | ➕ Add | null_resource | 1 |
 |  | **Add** | **1** |
-
 ## Resource Changes
-
 ### 📦 Module: root
 
 <details>
@@ -3078,9 +2949,7 @@ exports[`planToMarkdown integration > terraform/null-lifecycle/1 > renders witho
 | ➕ Add | null_resource | 2 |
 |  | terraform_data | 1 |
 |  | **Add** | **3** |
-
 ## Resource Changes
-
 ### 📦 Module: root
 
 <details>
@@ -3138,9 +3007,7 @@ exports[`planToMarkdown integration > terraform/null-lifecycle/1 > renders witho
 | ➕ Add | null_resource | 2 |
 |  | terraform_data | 1 |
 |  | **Add** | **3** |
-
 ## Resource Changes
-
 ### 📦 Module: root
 
 <details>
@@ -3198,9 +3065,7 @@ exports[`planToMarkdown integration > terraform/null-lifecycle/1 > renders witho
 | ➕ Add | null_resource | 2 |
 |  | terraform_data | 1 |
 |  | **Add** | **3** |
-
 ## Resource Changes
-
 ### 📦 Module: root
 
 <details>
@@ -3273,9 +3138,7 @@ exports[`planToMarkdown integration > terraform/null-lifecycle/2 > renders witho
 |  | **Replace** | **1** |
 | 🗑️ Destroy | null_resource | 1 |
 |  | **Destroy** | **1** |
-
 ## Resource Changes
-
 ### 📦 Module: root
 
 <details>
@@ -3334,9 +3197,7 @@ exports[`planToMarkdown integration > terraform/null-lifecycle/2 > renders witho
 |  | **Replace** | **1** |
 | 🗑️ Destroy | null_resource | 1 |
 |  | **Destroy** | **1** |
-
 ## Resource Changes
-
 ### 📦 Module: root
 
 <details>
@@ -3395,9 +3256,7 @@ exports[`planToMarkdown integration > terraform/null-lifecycle/2 > renders witho
 |  | **Replace** | **1** |
 | 🗑️ Destroy | null_resource | 1 |
 |  | **Destroy** | **1** |
-
 ## Resource Changes
-
 ### 📦 Module: root
 
 <details>
@@ -3469,9 +3328,7 @@ exports[`planToMarkdown integration > terraform/plan-error/0 > renders without e
 | --- | --- | --- |
 | ➕ Add | null_resource | 1 |
 |  | **Add** | **1** |
-
 ## Resource Changes
-
 ### 📦 Module: root
 
 <details>
@@ -3497,9 +3354,7 @@ exports[`planToMarkdown integration > terraform/plan-error/0 > renders without e
 | --- | --- | --- |
 | ➕ Add | null_resource | 1 |
 |  | **Add** | **1** |
-
 ## Resource Changes
-
 ### 📦 Module: root
 
 <details>
@@ -3525,9 +3380,7 @@ exports[`planToMarkdown integration > terraform/plan-error/0 > renders without e
 | --- | --- | --- |
 | ➕ Add | null_resource | 1 |
 |  | **Add** | **1** |
-
 ## Resource Changes
-
 ### 📦 Module: root
 
 <details>
@@ -3563,9 +3416,7 @@ exports[`planToMarkdown integration > terraform/random-replace/0 > renders witho
 | --- | --- | --- |
 | ➕ Add | random_string | 1 |
 |  | **Add** | **1** |
-
 ## Resource Changes
-
 ### 📦 Module: root
 
 <details>
@@ -3592,7 +3443,6 @@ random_string.token
 | upper |  | <code><ins style="background:#dfd">true</ins></code> |
 
 </details>
-
 ## Outputs
 
 | Output | Action | Before | After |
@@ -3608,9 +3458,7 @@ exports[`planToMarkdown integration > terraform/random-replace/0 > renders witho
 | --- | --- | --- |
 | ➕ Add | random_string | 1 |
 |  | **Add** | **1** |
-
 ## Resource Changes
-
 ### 📦 Module: root
 
 <details>
@@ -3637,7 +3485,6 @@ random_string.token
 | upper |  | + true |
 
 </details>
-
 ## Outputs
 
 | Output | Action | Before | After |
@@ -3653,9 +3500,7 @@ exports[`planToMarkdown integration > terraform/random-replace/0 > renders witho
 | --- | --- | --- |
 | ➕ Add | random_string | 1 |
 |  | **Add** | **1** |
-
 ## Resource Changes
-
 ### 📦 Module: root
 
 <details>
@@ -3683,7 +3528,6 @@ random_string.token
 | upper |  | <code><ins style="background:#dfd">true</ins></code> |
 
 </details>
-
 ## Outputs
 
 | Output | Action | Before | After |
@@ -3709,9 +3553,7 @@ exports[`planToMarkdown integration > terraform/random-replace/1 > renders witho
 | --- | --- | --- |
 | ± Replace | random_string | 1 |
 |  | **Replace** | **1** |
-
 ## Resource Changes
-
 ### 📦 Module: root
 
 <details>
@@ -3728,7 +3570,6 @@ random_string.token
 | result | <code>8bxyyCcqLfN6esga</code> | <code>(known after apply)</code> |
 
 </details>
-
 ## Outputs
 
 | Output | Action | Before | After |
@@ -3744,9 +3585,7 @@ exports[`planToMarkdown integration > terraform/random-replace/1 > renders witho
 | --- | --- | --- |
 | ± Replace | random_string | 1 |
 |  | **Replace** | **1** |
-
 ## Resource Changes
-
 ### 📦 Module: root
 
 <details>
@@ -3763,7 +3602,6 @@ random_string.token
 | result | <code>8bxyyCcqLfN6esga</code> | <code>(known after apply)</code> |
 
 </details>
-
 ## Outputs
 
 | Output | Action | Before | After |
@@ -3779,9 +3617,7 @@ exports[`planToMarkdown integration > terraform/random-replace/1 > renders witho
 | --- | --- | --- |
 | ± Replace | random_string | 1 |
 |  | **Replace** | **1** |
-
 ## Resource Changes
-
 ### 📦 Module: root
 
 <details>
@@ -3809,7 +3645,6 @@ random_string.token
 | upper | true | <code>true</code> |
 
 </details>
-
 ## Outputs
 
 | Output | Action | Before | After |
@@ -3835,9 +3670,7 @@ exports[`planToMarkdown integration > terraform/removed-resource/0 > renders wit
 | --- | --- | --- |
 | ➕ Add | null_resource | 2 |
 |  | **Add** | **2** |
-
 ## Resource Changes
-
 ### 📦 Module: root
 
 <details>
@@ -3877,9 +3710,7 @@ exports[`planToMarkdown integration > terraform/removed-resource/0 > renders wit
 | --- | --- | --- |
 | ➕ Add | null_resource | 2 |
 |  | **Add** | **2** |
-
 ## Resource Changes
-
 ### 📦 Module: root
 
 <details>
@@ -3919,9 +3750,7 @@ exports[`planToMarkdown integration > terraform/removed-resource/0 > renders wit
 | --- | --- | --- |
 | ➕ Add | null_resource | 2 |
 |  | **Add** | **2** |
-
 ## Resource Changes
-
 ### 📦 Module: root
 
 <details>
@@ -3971,9 +3800,7 @@ exports[`planToMarkdown integration > terraform/removed-resource/1 > renders wit
 | --- | --- | --- |
 | 👋 Forget | null_resource | 1 |
 |  | **Forget** | **1** |
-
 ## Resource Changes
-
 ### 📦 Module: root
 
 <details>
@@ -3999,9 +3826,7 @@ exports[`planToMarkdown integration > terraform/removed-resource/1 > renders wit
 | --- | --- | --- |
 | 👋 Forget | null_resource | 1 |
 |  | **Forget** | **1** |
-
 ## Resource Changes
-
 ### 📦 Module: root
 
 <details>
@@ -4027,9 +3852,7 @@ exports[`planToMarkdown integration > terraform/removed-resource/1 > renders wit
 | --- | --- | --- |
 | 👋 Forget | null_resource | 1 |
 |  | **Forget** | **1** |
-
 ## Resource Changes
-
 ### 📦 Module: root
 
 <details>
@@ -4065,9 +3888,7 @@ exports[`planToMarkdown integration > terraform/sensitive-values/0 > renders wit
 | --- | --- | --- |
 | ➕ Add | local_sensitive_file | 1 |
 |  | **Add** | **1** |
-
 ## Resource Changes
-
 ### 📦 Module: root
 
 <details>
@@ -4093,7 +3914,6 @@ local_sensitive_file.secret
 | id | <code></code> | <code>(known after apply)</code> |
 
 </details>
-
 ## Outputs
 
 | Output | Action | Before | After |
@@ -4110,9 +3930,7 @@ exports[`planToMarkdown integration > terraform/sensitive-values/0 > renders wit
 | --- | --- | --- |
 | ➕ Add | local_sensitive_file | 1 |
 |  | **Add** | **1** |
-
 ## Resource Changes
-
 ### 📦 Module: root
 
 <details>
@@ -4138,7 +3956,6 @@ local_sensitive_file.secret
 | id | <code></code> | <code>(known after apply)</code> |
 
 </details>
-
 ## Outputs
 
 | Output | Action | Before | After |
@@ -4155,9 +3972,7 @@ exports[`planToMarkdown integration > terraform/sensitive-values/0 > renders wit
 | --- | --- | --- |
 | ➕ Add | local_sensitive_file | 1 |
 |  | **Add** | **1** |
-
 ## Resource Changes
-
 ### 📦 Module: root
 
 <details>
@@ -4184,7 +3999,6 @@ local_sensitive_file.secret
 | source |  |  |
 
 </details>
-
 ## Outputs
 
 | Output | Action | Before | After |
@@ -4211,9 +4025,7 @@ exports[`planToMarkdown integration > terraform/sensitive-values/1 > renders wit
 | --- | --- | --- |
 | ± Replace | local_sensitive_file | 1 |
 |  | **Replace** | **1** |
-
 ## Resource Changes
-
 ### 📦 Module: root
 
 <details>
@@ -4236,7 +4048,6 @@ local_sensitive_file.secret
 | id | <code>ffae43b95440019e9bb698e9713dc5ac27be8dd5</code> | <code>(known after apply)</code> |
 
 </details>
-
 ## Outputs
 
 | Output | Action | Before | After |
@@ -4253,9 +4064,7 @@ exports[`planToMarkdown integration > terraform/sensitive-values/1 > renders wit
 | --- | --- | --- |
 | ± Replace | local_sensitive_file | 1 |
 |  | **Replace** | **1** |
-
 ## Resource Changes
-
 ### 📦 Module: root
 
 <details>
@@ -4278,7 +4087,6 @@ local_sensitive_file.secret
 | id | <code>ffae43b95440019e9bb698e9713dc5ac27be8dd5</code> | <code>(known after apply)</code> |
 
 </details>
-
 ## Outputs
 
 | Output | Action | Before | After |
@@ -4295,9 +4103,7 @@ exports[`planToMarkdown integration > terraform/sensitive-values/1 > renders wit
 | --- | --- | --- |
 | ± Replace | local_sensitive_file | 1 |
 |  | **Replace** | **1** |
-
 ## Resource Changes
-
 ### 📦 Module: root
 
 <details>
@@ -4324,7 +4130,6 @@ local_sensitive_file.secret
 | source |  |  |
 
 </details>
-
 ## Outputs
 
 | Output | Action | Before | After |
@@ -4351,9 +4156,7 @@ exports[`planToMarkdown integration > terraform/validate-error/0 > renders witho
 | --- | --- | --- |
 | ➕ Add | null_resource | 1 |
 |  | **Add** | **1** |
-
 ## Resource Changes
-
 ### 📦 Module: root
 
 <details>
@@ -4379,9 +4182,7 @@ exports[`planToMarkdown integration > terraform/validate-error/0 > renders witho
 | --- | --- | --- |
 | ➕ Add | null_resource | 1 |
 |  | **Add** | **1** |
-
 ## Resource Changes
-
 ### 📦 Module: root
 
 <details>
@@ -4407,9 +4208,7 @@ exports[`planToMarkdown integration > terraform/validate-error/0 > renders witho
 | --- | --- | --- |
 | ➕ Add | null_resource | 1 |
 |  | **Add** | **1** |
-
 ## Resource Changes
-
 ### 📦 Module: root
 
 <details>
@@ -4446,9 +4245,7 @@ exports[`planToMarkdown integration > terraform/with-modules/0 > renders without
 | ➕ Add | null_resource | 1 |
 |  | random_string | 1 |
 |  | **Add** | **2** |
-
 ## Resource Changes
-
 ### 📦 Module: root
 
 <details>
@@ -4464,7 +4261,6 @@ null_resource.root
 | triggers.stage |  | <code><ins style="background:#dfd">0</ins></code> |
 
 </details>
-
 ### 📦 Module: \`module.naming\`
 
 <details>
@@ -4491,7 +4287,6 @@ module.naming.random_string.suffix
 | upper |  | <code><ins style="background:#dfd">false</ins></code> |
 
 </details>
-
 ## Outputs
 
 | Output | Action | Before | After |
@@ -4509,9 +4304,7 @@ exports[`planToMarkdown integration > terraform/with-modules/0 > renders without
 | ➕ Add | null_resource | 1 |
 |  | random_string | 1 |
 |  | **Add** | **2** |
-
 ## Resource Changes
-
 ### 📦 Module: root
 
 <details>
@@ -4527,7 +4320,6 @@ null_resource.root
 | triggers.stage |  | + 0 |
 
 </details>
-
 ### 📦 Module: \`module.naming\`
 
 <details>
@@ -4554,7 +4346,6 @@ module.naming.random_string.suffix
 | upper |  | + false |
 
 </details>
-
 ## Outputs
 
 | Output | Action | Before | After |
@@ -4572,9 +4363,7 @@ exports[`planToMarkdown integration > terraform/with-modules/0 > renders without
 | ➕ Add | null_resource | 1 |
 |  | random_string | 1 |
 |  | **Add** | **2** |
-
 ## Resource Changes
-
 ### 📦 Module: root
 
 <details>
@@ -4590,7 +4379,6 @@ null_resource.root
 | triggers.stage |  | <code><ins style="background:#dfd">0</ins></code> |
 
 </details>
-
 ### 📦 Module: \`module.naming\`
 
 <details>
@@ -4618,7 +4406,6 @@ module.naming.random_string.suffix
 | upper |  | <code><ins style="background:#dfd">false</ins></code> |
 
 </details>
-
 ## Outputs
 
 | Output | Action | Before | After |
@@ -4647,9 +4434,7 @@ exports[`planToMarkdown integration > terraform/with-modules/1 > renders without
 | ± Replace | null_resource | 1 |
 |  | random_string | 1 |
 |  | **Replace** | **2** |
-
 ## Resource Changes
-
 ### 📦 Module: root
 
 <details>
@@ -4665,7 +4450,6 @@ null_resource.root
 | triggers.stage | 0 | <code><ins style="background:#dfd">1</ins><del style="background:#fdd">0</del></code> |
 
 </details>
-
 ### 📦 Module: \`module.naming\`
 
 <details>
@@ -4682,7 +4466,6 @@ module.naming.random_string.suffix
 | result | <code>dx12h5s0</code> | <code>(known after apply)</code> |
 
 </details>
-
 ## Outputs
 
 | Output | Action | Before | After |
@@ -4700,9 +4483,7 @@ exports[`planToMarkdown integration > terraform/with-modules/1 > renders without
 | ± Replace | null_resource | 1 |
 |  | random_string | 1 |
 |  | **Replace** | **2** |
-
 ## Resource Changes
-
 ### 📦 Module: root
 
 <details>
@@ -4718,7 +4499,6 @@ null_resource.root
 | triggers.stage | 0 | - 0<br>+ 1 |
 
 </details>
-
 ### 📦 Module: \`module.naming\`
 
 <details>
@@ -4735,7 +4515,6 @@ module.naming.random_string.suffix
 | result | <code>dx12h5s0</code> | <code>(known after apply)</code> |
 
 </details>
-
 ## Outputs
 
 | Output | Action | Before | After |
@@ -4753,9 +4532,7 @@ exports[`planToMarkdown integration > terraform/with-modules/1 > renders without
 | ± Replace | null_resource | 1 |
 |  | random_string | 1 |
 |  | **Replace** | **2** |
-
 ## Resource Changes
-
 ### 📦 Module: root
 
 <details>
@@ -4771,7 +4548,6 @@ null_resource.root
 | triggers.stage | 0 | <code><ins style="background:#dfd">1</ins><del style="background:#fdd">0</del></code> |
 
 </details>
-
 ### 📦 Module: \`module.naming\`
 
 <details>
@@ -4799,7 +4575,6 @@ module.naming.random_string.suffix
 | upper | false | <code>false</code> |
 
 </details>
-
 ## Outputs
 
 | Output | Action | Before | After |
@@ -4828,9 +4603,7 @@ exports[`planToMarkdown integration > tofu/apply-error/0 > renders without error
 | ➕ Add | terraform_data | 2 |
 |  | null_resource | 1 |
 |  | **Add** | **3** |
-
 ## Resource Changes
-
 ### 📦 Module: root
 
 <details>
@@ -4872,7 +4645,6 @@ terraform_data.success
 | output | <code></code> | <code>(known after apply)</code> |
 
 </details>
-
 ## Outputs
 
 | Output | Action | Before | After |
@@ -4890,9 +4662,7 @@ exports[`planToMarkdown integration > tofu/apply-error/0 > renders without error
 | ➕ Add | terraform_data | 2 |
 |  | null_resource | 1 |
 |  | **Add** | **3** |
-
 ## Resource Changes
-
 ### 📦 Module: root
 
 <details>
@@ -4934,7 +4704,6 @@ terraform_data.success
 | output | <code></code> | <code>(known after apply)</code> |
 
 </details>
-
 ## Outputs
 
 | Output | Action | Before | After |
@@ -4952,9 +4721,7 @@ exports[`planToMarkdown integration > tofu/apply-error/0 > renders without error
 | ➕ Add | terraform_data | 2 |
 |  | null_resource | 1 |
 |  | **Add** | **3** |
-
 ## Resource Changes
-
 ### 📦 Module: root
 
 <details>
@@ -5002,7 +4769,6 @@ terraform_data.success
 | triggers_replace |  |  |
 
 </details>
-
 ## Outputs
 
 | Output | Action | Before | After |
@@ -5032,9 +4798,7 @@ exports[`planToMarkdown integration > tofu/apply-error/1 > renders without error
 |  | **Change** | **1** |
 | ± Replace | null_resource | 1 |
 |  | **Replace** | **1** |
-
 ## Resource Changes
-
 ### 📦 Module: root
 
 <details>
@@ -5061,7 +4825,6 @@ terraform_data.depends_on_fail
 _(all values known after apply)_
 
 </details>
-
 ## Outputs
 
 | Output | Action | Before | After |
@@ -5080,9 +4843,7 @@ exports[`planToMarkdown integration > tofu/apply-error/1 > renders without error
 |  | **Change** | **1** |
 | ± Replace | null_resource | 1 |
 |  | **Replace** | **1** |
-
 ## Resource Changes
-
 ### 📦 Module: root
 
 <details>
@@ -5109,7 +4870,6 @@ terraform_data.depends_on_fail
 _(all values known after apply)_
 
 </details>
-
 ## Outputs
 
 | Output | Action | Before | After |
@@ -5128,9 +4888,7 @@ exports[`planToMarkdown integration > tofu/apply-error/1 > renders without error
 |  | **Change** | **1** |
 | ± Replace | null_resource | 1 |
 |  | **Replace** | **1** |
-
 ## Resource Changes
-
 ### 📦 Module: root
 
 <details>
@@ -5162,7 +4920,6 @@ terraform_data.depends_on_fail
 | triggers_replace |  |  |
 
 </details>
-
 ## Outputs
 
 | Output | Action | Before | After |
@@ -5192,9 +4949,7 @@ exports[`planToMarkdown integration > tofu/deferred-data-source/0 > renders with
 | ➕ Add | terraform_data | 4 |
 |  | local_file | 1 |
 |  | **Add** | **5** |
-
 ## Resource Changes
-
 ### 📦 Module: root
 
 <details>
@@ -5280,7 +5035,6 @@ terraform_data.worker_c
 _(all values known after apply)_
 
 </details>
-
 ## Outputs
 
 | Output | Action | Before | After |
@@ -5297,9 +5051,7 @@ exports[`planToMarkdown integration > tofu/deferred-data-source/0 > renders with
 | ➕ Add | terraform_data | 4 |
 |  | local_file | 1 |
 |  | **Add** | **5** |
-
 ## Resource Changes
-
 ### 📦 Module: root
 
 <details>
@@ -5385,7 +5137,6 @@ terraform_data.worker_c
 _(all values known after apply)_
 
 </details>
-
 ## Outputs
 
 | Output | Action | Before | After |
@@ -5402,9 +5153,7 @@ exports[`planToMarkdown integration > tofu/deferred-data-source/0 > renders with
 | ➕ Add | terraform_data | 4 |
 |  | local_file | 1 |
 |  | **Add** | **5** |
-
 ## Resource Changes
-
 ### 📦 Module: root
 
 <details>
@@ -5508,7 +5257,6 @@ terraform_data.worker_c
 | triggers_replace |  |  |
 
 </details>
-
 ## Outputs
 
 | Output | Action | Before | After |
@@ -5537,9 +5285,7 @@ exports[`planToMarkdown integration > tofu/deferred-data-source/1 > renders with
 |  | **Add** | **1** |
 | 🔧 Change | terraform_data | 4 |
 |  | **Change** | **4** |
-
 ## Resource Changes
-
 ### 📦 Module: root
 
 <details>
@@ -5612,7 +5358,6 @@ terraform_data.worker_c
 _(all values known after apply)_
 
 </details>
-
 ## Outputs
 
 | Output | Action | Before | After |
@@ -5630,9 +5375,7 @@ exports[`planToMarkdown integration > tofu/deferred-data-source/1 > renders with
 |  | **Add** | **1** |
 | 🔧 Change | terraform_data | 4 |
 |  | **Change** | **4** |
-
 ## Resource Changes
-
 ### 📦 Module: root
 
 <details>
@@ -5705,7 +5448,6 @@ terraform_data.worker_c
 _(all values known after apply)_
 
 </details>
-
 ## Outputs
 
 | Output | Action | Before | After |
@@ -5723,9 +5465,7 @@ exports[`planToMarkdown integration > tofu/deferred-data-source/1 > renders with
 |  | **Add** | **1** |
 | 🔧 Change | terraform_data | 4 |
 |  | **Change** | **4** |
-
 ## Resource Changes
-
 ### 📦 Module: root
 
 <details>
@@ -5817,7 +5557,6 @@ terraform_data.worker_c
 | triggers_replace |  |  |
 
 </details>
-
 ## Outputs
 
 | Output | Action | Before | After |
@@ -5847,9 +5586,7 @@ exports[`planToMarkdown integration > tofu/deferred-data-source/2 > renders with
 |  | **Change** | **3** |
 | ± Replace | local_file | 1 |
 |  | **Replace** | **1** |
-
 ## Resource Changes
-
 ### 📦 Module: root
 
 <details>
@@ -5918,7 +5655,6 @@ terraform_data.worker_c
 _(all values known after apply)_
 
 </details>
-
 ## Outputs
 
 | Output | Action | Before | After |
@@ -5936,9 +5672,7 @@ exports[`planToMarkdown integration > tofu/deferred-data-source/2 > renders with
 |  | **Change** | **3** |
 | ± Replace | local_file | 1 |
 |  | **Replace** | **1** |
-
 ## Resource Changes
-
 ### 📦 Module: root
 
 <details>
@@ -6007,7 +5741,6 @@ terraform_data.worker_c
 _(all values known after apply)_
 
 </details>
-
 ## Outputs
 
 | Output | Action | Before | After |
@@ -6025,9 +5758,7 @@ exports[`planToMarkdown integration > tofu/deferred-data-source/2 > renders with
 |  | **Change** | **3** |
 | ± Replace | local_file | 1 |
 |  | **Replace** | **1** |
-
 ## Resource Changes
-
 ### 📦 Module: root
 
 <details>
@@ -6116,7 +5847,6 @@ terraform_data.worker_c
 | triggers_replace |  |  |
 
 </details>
-
 ## Outputs
 
 | Output | Action | Before | After |
@@ -6144,9 +5874,7 @@ exports[`planToMarkdown integration > tofu/import-resource/0 > renders without e
 | --- | --- | --- |
 | ➕ Add | random_string | 1 |
 |  | **Add** | **1** |
-
 ## Resource Changes
-
 ### 📦 Module: root
 
 <details>
@@ -6182,9 +5910,7 @@ exports[`planToMarkdown integration > tofu/import-resource/0 > renders without e
 | --- | --- | --- |
 | ➕ Add | random_string | 1 |
 |  | **Add** | **1** |
-
 ## Resource Changes
-
 ### 📦 Module: root
 
 <details>
@@ -6220,9 +5946,7 @@ exports[`planToMarkdown integration > tofu/import-resource/0 > renders without e
 | --- | --- | --- |
 | ➕ Add | random_string | 1 |
 |  | **Add** | **1** |
-
 ## Resource Changes
-
 ### 📦 Module: root
 
 <details>
@@ -6270,9 +5994,7 @@ exports[`planToMarkdown integration > tofu/import-resource/1 > renders without e
 | --- | --- | --- |
 | 📥 Import | random_string | 1 |
 |  | **Import** | **1** |
-
 ## Resource Changes
-
 ### 📦 Module: root
 
 <details>
@@ -6297,9 +6019,7 @@ exports[`planToMarkdown integration > tofu/import-resource/1 > renders without e
 | --- | --- | --- |
 | 📥 Import | random_string | 1 |
 |  | **Import** | **1** |
-
 ## Resource Changes
-
 ### 📦 Module: root
 
 <details>
@@ -6324,9 +6044,7 @@ exports[`planToMarkdown integration > tofu/import-resource/1 > renders without e
 | --- | --- | --- |
 | 📥 Import | random_string | 1 |
 |  | **Import** | **1** |
-
 ## Resource Changes
-
 ### 📦 Module: root
 
 <details>
@@ -6376,9 +6094,7 @@ exports[`planToMarkdown integration > tofu/local-files/0 > renders without error
 | --- | --- | --- |
 | ➕ Add | local_file | 1 |
 |  | **Add** | **1** |
-
 ## Resource Changes
-
 ### 📦 Module: root
 
 <details>
@@ -6424,7 +6140,6 @@ Line 12: end of file
 </details>
 
 </details>
-
 ## Outputs
 
 | Output | Action | Before | After |
@@ -6440,9 +6155,7 @@ exports[`planToMarkdown integration > tofu/local-files/0 > renders without error
 | --- | --- | --- |
 | ➕ Add | local_file | 1 |
 |  | **Add** | **1** |
-
 ## Resource Changes
-
 ### 📦 Module: root
 
 <details>
@@ -6488,7 +6201,6 @@ Line 12: end of file
 </details>
 
 </details>
-
 ## Outputs
 
 | Output | Action | Before | After |
@@ -6504,9 +6216,7 @@ exports[`planToMarkdown integration > tofu/local-files/0 > renders without error
 | --- | --- | --- |
 | ➕ Add | local_file | 1 |
 |  | **Add** | **1** |
-
 ## Resource Changes
-
 ### 📦 Module: root
 
 <details>
@@ -6554,7 +6264,6 @@ Line 12: end of file
 </details>
 
 </details>
-
 ## Outputs
 
 | Output | Action | Before | After |
@@ -6580,9 +6289,7 @@ exports[`planToMarkdown integration > tofu/local-files/1 > renders without error
 | --- | --- | --- |
 | ± Replace | local_file | 1 |
 |  | **Replace** | **1** |
-
 ## Resource Changes
-
 ### 📦 Module: root
 
 <details>
@@ -6630,7 +6337,6 @@ local_file.readme
 </details>
 
 </details>
-
 ## Outputs
 
 | Output | Action | Before | After |
@@ -6646,9 +6352,7 @@ exports[`planToMarkdown integration > tofu/local-files/1 > renders without error
 | --- | --- | --- |
 | ± Replace | local_file | 1 |
 |  | **Replace** | **1** |
-
 ## Resource Changes
-
 ### 📦 Module: root
 
 <details>
@@ -6696,7 +6400,6 @@ local_file.readme
 </details>
 
 </details>
-
 ## Outputs
 
 | Output | Action | Before | After |
@@ -6712,9 +6415,7 @@ exports[`planToMarkdown integration > tofu/local-files/1 > renders without error
 | --- | --- | --- |
 | ± Replace | local_file | 1 |
 |  | **Replace** | **1** |
-
 ## Resource Changes
-
 ### 📦 Module: root
 
 <details>
@@ -6767,7 +6468,6 @@ local_file.readme
 </details>
 
 </details>
-
 ## Outputs
 
 | Output | Action | Before | After |
@@ -6793,9 +6493,7 @@ exports[`planToMarkdown integration > tofu/moved-resource/0 > renders without er
 | --- | --- | --- |
 | ➕ Add | null_resource | 1 |
 |  | **Add** | **1** |
-
 ## Resource Changes
-
 ### 📦 Module: root
 
 <details>
@@ -6821,9 +6519,7 @@ exports[`planToMarkdown integration > tofu/moved-resource/0 > renders without er
 | --- | --- | --- |
 | ➕ Add | null_resource | 1 |
 |  | **Add** | **1** |
-
 ## Resource Changes
-
 ### 📦 Module: root
 
 <details>
@@ -6849,9 +6545,7 @@ exports[`planToMarkdown integration > tofu/moved-resource/0 > renders without er
 | --- | --- | --- |
 | ➕ Add | null_resource | 1 |
 |  | **Add** | **1** |
-
 ## Resource Changes
-
 ### 📦 Module: root
 
 <details>
@@ -6887,9 +6581,7 @@ exports[`planToMarkdown integration > tofu/moved-resource/1 > renders without er
 | --- | --- | --- |
 | 🚚 Move | null_resource | 1 |
 |  | **Move** | **1** |
-
 ## Resource Changes
-
 ### 📦 Module: root
 
 <details>
@@ -6914,9 +6606,7 @@ exports[`planToMarkdown integration > tofu/moved-resource/1 > renders without er
 | --- | --- | --- |
 | 🚚 Move | null_resource | 1 |
 |  | **Move** | **1** |
-
 ## Resource Changes
-
 ### 📦 Module: root
 
 <details>
@@ -6941,9 +6631,7 @@ exports[`planToMarkdown integration > tofu/moved-resource/1 > renders without er
 | --- | --- | --- |
 | 🚚 Move | null_resource | 1 |
 |  | **Move** | **1** |
-
 ## Resource Changes
-
 ### 📦 Module: root
 
 <details>
@@ -6981,9 +6669,7 @@ exports[`planToMarkdown integration > tofu/nested-modules/0 > renders without er
 | --- | --- | --- |
 | ➕ Add | null_resource | 3 |
 |  | **Add** | **3** |
-
 ## Resource Changes
-
 ### 📦 Module: \`module.parent["1"].module.child\`
 
 <details>
@@ -7000,7 +6686,6 @@ module.parent["1"].module.child.null_resource.item[0]
 | triggers.label |  | <code><ins style="background:#dfd">1</ins></code> |
 
 </details>
-
 ### 📦 Module: \`module.parent["2"].module.child\`
 
 <details>
@@ -7042,9 +6727,7 @@ exports[`planToMarkdown integration > tofu/nested-modules/0 > renders without er
 | --- | --- | --- |
 | ➕ Add | null_resource | 3 |
 |  | **Add** | **3** |
-
 ## Resource Changes
-
 ### 📦 Module: \`module.parent["1"].module.child\`
 
 <details>
@@ -7061,7 +6744,6 @@ module.parent["1"].module.child.null_resource.item[0]
 | triggers.label |  | + 1 |
 
 </details>
-
 ### 📦 Module: \`module.parent["2"].module.child\`
 
 <details>
@@ -7103,9 +6785,7 @@ exports[`planToMarkdown integration > tofu/nested-modules/0 > renders without er
 | --- | --- | --- |
 | ➕ Add | null_resource | 3 |
 |  | **Add** | **3** |
-
 ## Resource Changes
-
 ### 📦 Module: \`module.parent["1"].module.child\`
 
 <details>
@@ -7122,7 +6802,6 @@ module.parent["1"].module.child.null_resource.item[0]
 | triggers.label |  | <code><ins style="background:#dfd">1</ins></code> |
 
 </details>
-
 ### 📦 Module: \`module.parent["2"].module.child\`
 
 <details>
@@ -7176,9 +6855,7 @@ exports[`planToMarkdown integration > tofu/nested-modules/1 > renders without er
 |  | **Add** | **3** |
 | 🗑️ Destroy | null_resource | 2 |
 |  | **Destroy** | **2** |
-
 ## Resource Changes
-
 ### 📦 Module: \`module.parent["2"].module.child\`
 
 <details>
@@ -7210,7 +6887,6 @@ module.parent["2"].module.child.null_resource.item[1]
 | triggers.label | 2 | <code><del style="background:#fdd">2</del></code> |
 
 </details>
-
 ### 📦 Module: \`module.parent["3"].module.child\`
 
 <details>
@@ -7269,9 +6945,7 @@ exports[`planToMarkdown integration > tofu/nested-modules/1 > renders without er
 |  | **Add** | **3** |
 | 🗑️ Destroy | null_resource | 2 |
 |  | **Destroy** | **2** |
-
 ## Resource Changes
-
 ### 📦 Module: \`module.parent["2"].module.child\`
 
 <details>
@@ -7303,7 +6977,6 @@ module.parent["2"].module.child.null_resource.item[1]
 | triggers.label | 2 | - 2 |
 
 </details>
-
 ### 📦 Module: \`module.parent["3"].module.child\`
 
 <details>
@@ -7362,9 +7035,7 @@ exports[`planToMarkdown integration > tofu/nested-modules/1 > renders without er
 |  | **Add** | **3** |
 | 🗑️ Destroy | null_resource | 2 |
 |  | **Destroy** | **2** |
-
 ## Resource Changes
-
 ### 📦 Module: \`module.parent["2"].module.child\`
 
 <details>
@@ -7396,7 +7067,6 @@ module.parent["2"].module.child.null_resource.item[1]
 | triggers.label | 2 | <code><del style="background:#fdd">2</del></code> |
 
 </details>
-
 ### 📦 Module: \`module.parent["3"].module.child\`
 
 <details>
@@ -7465,9 +7135,7 @@ exports[`planToMarkdown integration > tofu/no-detailed-exitcode/0 > renders with
 | --- | --- | --- |
 | ➕ Add | null_resource | 1 |
 |  | **Add** | **1** |
-
 ## Resource Changes
-
 ### 📦 Module: root
 
 <details>
@@ -7493,9 +7161,7 @@ exports[`planToMarkdown integration > tofu/no-detailed-exitcode/0 > renders with
 | --- | --- | --- |
 | ➕ Add | null_resource | 1 |
 |  | **Add** | **1** |
-
 ## Resource Changes
-
 ### 📦 Module: root
 
 <details>
@@ -7521,9 +7187,7 @@ exports[`planToMarkdown integration > tofu/no-detailed-exitcode/0 > renders with
 | --- | --- | --- |
 | ➕ Add | null_resource | 1 |
 |  | **Add** | **1** |
-
 ## Resource Changes
-
 ### 📦 Module: root
 
 <details>
@@ -7559,9 +7223,7 @@ exports[`planToMarkdown integration > tofu/no-detailed-exitcode/1 > renders with
 | --- | --- | --- |
 | 🗑️ Destroy | null_resource | 1 |
 |  | **Destroy** | **1** |
-
 ## Resource Changes
-
 ### 📦 Module: root
 
 <details>
@@ -7587,9 +7249,7 @@ exports[`planToMarkdown integration > tofu/no-detailed-exitcode/1 > renders with
 | --- | --- | --- |
 | 🗑️ Destroy | null_resource | 1 |
 |  | **Destroy** | **1** |
-
 ## Resource Changes
-
 ### 📦 Module: root
 
 <details>
@@ -7615,9 +7275,7 @@ exports[`planToMarkdown integration > tofu/no-detailed-exitcode/1 > renders with
 | --- | --- | --- |
 | 🗑️ Destroy | null_resource | 1 |
 |  | **Destroy** | **1** |
-
 ## Resource Changes
-
 ### 📦 Module: root
 
 <details>
@@ -7653,9 +7311,7 @@ exports[`planToMarkdown integration > tofu/no-json-flags/0 > renders without err
 | --- | --- | --- |
 | ➕ Add | null_resource | 1 |
 |  | **Add** | **1** |
-
 ## Resource Changes
-
 ### 📦 Module: root
 
 <details>
@@ -7681,9 +7337,7 @@ exports[`planToMarkdown integration > tofu/no-json-flags/0 > renders without err
 | --- | --- | --- |
 | ➕ Add | null_resource | 1 |
 |  | **Add** | **1** |
-
 ## Resource Changes
-
 ### 📦 Module: root
 
 <details>
@@ -7709,9 +7363,7 @@ exports[`planToMarkdown integration > tofu/no-json-flags/0 > renders without err
 | --- | --- | --- |
 | ➕ Add | null_resource | 1 |
 |  | **Add** | **1** |
-
 ## Resource Changes
-
 ### 📦 Module: root
 
 <details>
@@ -7747,9 +7399,7 @@ exports[`planToMarkdown integration > tofu/no-op/0 > renders without error and m
 | --- | --- | --- |
 | ➕ Add | null_resource | 1 |
 |  | **Add** | **1** |
-
 ## Resource Changes
-
 ### 📦 Module: root
 
 <details>
@@ -7775,9 +7425,7 @@ exports[`planToMarkdown integration > tofu/no-op/0 > renders without error and m
 | --- | --- | --- |
 | ➕ Add | null_resource | 1 |
 |  | **Add** | **1** |
-
 ## Resource Changes
-
 ### 📦 Module: root
 
 <details>
@@ -7803,9 +7451,7 @@ exports[`planToMarkdown integration > tofu/no-op/0 > renders without error and m
 | --- | --- | --- |
 | ➕ Add | null_resource | 1 |
 |  | **Add** | **1** |
-
 ## Resource Changes
-
 ### 📦 Module: root
 
 <details>
@@ -7898,9 +7544,7 @@ exports[`planToMarkdown integration > tofu/null-lifecycle/1 > renders without er
 | ➕ Add | null_resource | 2 |
 |  | terraform_data | 1 |
 |  | **Add** | **3** |
-
 ## Resource Changes
-
 ### 📦 Module: root
 
 <details>
@@ -7958,9 +7602,7 @@ exports[`planToMarkdown integration > tofu/null-lifecycle/1 > renders without er
 | ➕ Add | null_resource | 2 |
 |  | terraform_data | 1 |
 |  | **Add** | **3** |
-
 ## Resource Changes
-
 ### 📦 Module: root
 
 <details>
@@ -8018,9 +7660,7 @@ exports[`planToMarkdown integration > tofu/null-lifecycle/1 > renders without er
 | ➕ Add | null_resource | 2 |
 |  | terraform_data | 1 |
 |  | **Add** | **3** |
-
 ## Resource Changes
-
 ### 📦 Module: root
 
 <details>
@@ -8093,9 +7733,7 @@ exports[`planToMarkdown integration > tofu/null-lifecycle/2 > renders without er
 |  | **Replace** | **1** |
 | 🗑️ Destroy | null_resource | 1 |
 |  | **Destroy** | **1** |
-
 ## Resource Changes
-
 ### 📦 Module: root
 
 <details>
@@ -8154,9 +7792,7 @@ exports[`planToMarkdown integration > tofu/null-lifecycle/2 > renders without er
 |  | **Replace** | **1** |
 | 🗑️ Destroy | null_resource | 1 |
 |  | **Destroy** | **1** |
-
 ## Resource Changes
-
 ### 📦 Module: root
 
 <details>
@@ -8215,9 +7851,7 @@ exports[`planToMarkdown integration > tofu/null-lifecycle/2 > renders without er
 |  | **Replace** | **1** |
 | 🗑️ Destroy | null_resource | 1 |
 |  | **Destroy** | **1** |
-
 ## Resource Changes
-
 ### 📦 Module: root
 
 <details>
@@ -8289,9 +7923,7 @@ exports[`planToMarkdown integration > tofu/plan-error/0 > renders without error 
 | --- | --- | --- |
 | ➕ Add | null_resource | 1 |
 |  | **Add** | **1** |
-
 ## Resource Changes
-
 ### 📦 Module: root
 
 <details>
@@ -8317,9 +7949,7 @@ exports[`planToMarkdown integration > tofu/plan-error/0 > renders without error 
 | --- | --- | --- |
 | ➕ Add | null_resource | 1 |
 |  | **Add** | **1** |
-
 ## Resource Changes
-
 ### 📦 Module: root
 
 <details>
@@ -8345,9 +7975,7 @@ exports[`planToMarkdown integration > tofu/plan-error/0 > renders without error 
 | --- | --- | --- |
 | ➕ Add | null_resource | 1 |
 |  | **Add** | **1** |
-
 ## Resource Changes
-
 ### 📦 Module: root
 
 <details>
@@ -8383,9 +8011,7 @@ exports[`planToMarkdown integration > tofu/random-replace/0 > renders without er
 | --- | --- | --- |
 | ➕ Add | random_string | 1 |
 |  | **Add** | **1** |
-
 ## Resource Changes
-
 ### 📦 Module: root
 
 <details>
@@ -8412,7 +8038,6 @@ random_string.token
 | upper |  | <code><ins style="background:#dfd">true</ins></code> |
 
 </details>
-
 ## Outputs
 
 | Output | Action | Before | After |
@@ -8428,9 +8053,7 @@ exports[`planToMarkdown integration > tofu/random-replace/0 > renders without er
 | --- | --- | --- |
 | ➕ Add | random_string | 1 |
 |  | **Add** | **1** |
-
 ## Resource Changes
-
 ### 📦 Module: root
 
 <details>
@@ -8457,7 +8080,6 @@ random_string.token
 | upper |  | + true |
 
 </details>
-
 ## Outputs
 
 | Output | Action | Before | After |
@@ -8473,9 +8095,7 @@ exports[`planToMarkdown integration > tofu/random-replace/0 > renders without er
 | --- | --- | --- |
 | ➕ Add | random_string | 1 |
 |  | **Add** | **1** |
-
 ## Resource Changes
-
 ### 📦 Module: root
 
 <details>
@@ -8503,7 +8123,6 @@ random_string.token
 | upper |  | <code><ins style="background:#dfd">true</ins></code> |
 
 </details>
-
 ## Outputs
 
 | Output | Action | Before | After |
@@ -8529,9 +8148,7 @@ exports[`planToMarkdown integration > tofu/random-replace/1 > renders without er
 | --- | --- | --- |
 | ± Replace | random_string | 1 |
 |  | **Replace** | **1** |
-
 ## Resource Changes
-
 ### 📦 Module: root
 
 <details>
@@ -8548,7 +8165,6 @@ random_string.token
 | result | <code>4SmmpS2VsTztR0vw</code> | <code>(known after apply)</code> |
 
 </details>
-
 ## Outputs
 
 | Output | Action | Before | After |
@@ -8564,9 +8180,7 @@ exports[`planToMarkdown integration > tofu/random-replace/1 > renders without er
 | --- | --- | --- |
 | ± Replace | random_string | 1 |
 |  | **Replace** | **1** |
-
 ## Resource Changes
-
 ### 📦 Module: root
 
 <details>
@@ -8583,7 +8197,6 @@ random_string.token
 | result | <code>4SmmpS2VsTztR0vw</code> | <code>(known after apply)</code> |
 
 </details>
-
 ## Outputs
 
 | Output | Action | Before | After |
@@ -8599,9 +8212,7 @@ exports[`planToMarkdown integration > tofu/random-replace/1 > renders without er
 | --- | --- | --- |
 | ± Replace | random_string | 1 |
 |  | **Replace** | **1** |
-
 ## Resource Changes
-
 ### 📦 Module: root
 
 <details>
@@ -8629,7 +8240,6 @@ random_string.token
 | upper | true | <code>true</code> |
 
 </details>
-
 ## Outputs
 
 | Output | Action | Before | After |
@@ -8655,9 +8265,7 @@ exports[`planToMarkdown integration > tofu/removed-resource/0 > renders without 
 | --- | --- | --- |
 | ➕ Add | null_resource | 2 |
 |  | **Add** | **2** |
-
 ## Resource Changes
-
 ### 📦 Module: root
 
 <details>
@@ -8697,9 +8305,7 @@ exports[`planToMarkdown integration > tofu/removed-resource/0 > renders without 
 | --- | --- | --- |
 | ➕ Add | null_resource | 2 |
 |  | **Add** | **2** |
-
 ## Resource Changes
-
 ### 📦 Module: root
 
 <details>
@@ -8739,9 +8345,7 @@ exports[`planToMarkdown integration > tofu/removed-resource/0 > renders without 
 | --- | --- | --- |
 | ➕ Add | null_resource | 2 |
 |  | **Add** | **2** |
-
 ## Resource Changes
-
 ### 📦 Module: root
 
 <details>
@@ -8791,9 +8395,7 @@ exports[`planToMarkdown integration > tofu/removed-resource/1 > renders without 
 | --- | --- | --- |
 | 👋 Forget | null_resource | 1 |
 |  | **Forget** | **1** |
-
 ## Resource Changes
-
 ### 📦 Module: root
 
 <details>
@@ -8819,9 +8421,7 @@ exports[`planToMarkdown integration > tofu/removed-resource/1 > renders without 
 | --- | --- | --- |
 | 👋 Forget | null_resource | 1 |
 |  | **Forget** | **1** |
-
 ## Resource Changes
-
 ### 📦 Module: root
 
 <details>
@@ -8847,9 +8447,7 @@ exports[`planToMarkdown integration > tofu/removed-resource/1 > renders without 
 | --- | --- | --- |
 | 👋 Forget | null_resource | 1 |
 |  | **Forget** | **1** |
-
 ## Resource Changes
-
 ### 📦 Module: root
 
 <details>
@@ -8885,9 +8483,7 @@ exports[`planToMarkdown integration > tofu/sensitive-values/0 > renders without 
 | --- | --- | --- |
 | ➕ Add | local_sensitive_file | 1 |
 |  | **Add** | **1** |
-
 ## Resource Changes
-
 ### 📦 Module: root
 
 <details>
@@ -8913,7 +8509,6 @@ local_sensitive_file.secret
 | id | <code></code> | <code>(known after apply)</code> |
 
 </details>
-
 ## Outputs
 
 | Output | Action | Before | After |
@@ -8930,9 +8525,7 @@ exports[`planToMarkdown integration > tofu/sensitive-values/0 > renders without 
 | --- | --- | --- |
 | ➕ Add | local_sensitive_file | 1 |
 |  | **Add** | **1** |
-
 ## Resource Changes
-
 ### 📦 Module: root
 
 <details>
@@ -8958,7 +8551,6 @@ local_sensitive_file.secret
 | id | <code></code> | <code>(known after apply)</code> |
 
 </details>
-
 ## Outputs
 
 | Output | Action | Before | After |
@@ -8975,9 +8567,7 @@ exports[`planToMarkdown integration > tofu/sensitive-values/0 > renders without 
 | --- | --- | --- |
 | ➕ Add | local_sensitive_file | 1 |
 |  | **Add** | **1** |
-
 ## Resource Changes
-
 ### 📦 Module: root
 
 <details>
@@ -9004,7 +8594,6 @@ local_sensitive_file.secret
 | source |  |  |
 
 </details>
-
 ## Outputs
 
 | Output | Action | Before | After |
@@ -9031,9 +8620,7 @@ exports[`planToMarkdown integration > tofu/sensitive-values/1 > renders without 
 | --- | --- | --- |
 | ± Replace | local_sensitive_file | 1 |
 |  | **Replace** | **1** |
-
 ## Resource Changes
-
 ### 📦 Module: root
 
 <details>
@@ -9056,7 +8643,6 @@ local_sensitive_file.secret
 | id | <code>ffae43b95440019e9bb698e9713dc5ac27be8dd5</code> | <code>(known after apply)</code> |
 
 </details>
-
 ## Outputs
 
 | Output | Action | Before | After |
@@ -9073,9 +8659,7 @@ exports[`planToMarkdown integration > tofu/sensitive-values/1 > renders without 
 | --- | --- | --- |
 | ± Replace | local_sensitive_file | 1 |
 |  | **Replace** | **1** |
-
 ## Resource Changes
-
 ### 📦 Module: root
 
 <details>
@@ -9098,7 +8682,6 @@ local_sensitive_file.secret
 | id | <code>ffae43b95440019e9bb698e9713dc5ac27be8dd5</code> | <code>(known after apply)</code> |
 
 </details>
-
 ## Outputs
 
 | Output | Action | Before | After |
@@ -9115,9 +8698,7 @@ exports[`planToMarkdown integration > tofu/sensitive-values/1 > renders without 
 | --- | --- | --- |
 | ± Replace | local_sensitive_file | 1 |
 |  | **Replace** | **1** |
-
 ## Resource Changes
-
 ### 📦 Module: root
 
 <details>
@@ -9144,7 +8725,6 @@ local_sensitive_file.secret
 | source |  |  |
 
 </details>
-
 ## Outputs
 
 | Output | Action | Before | After |
@@ -9171,9 +8751,7 @@ exports[`planToMarkdown integration > tofu/validate-error/0 > renders without er
 | --- | --- | --- |
 | ➕ Add | null_resource | 1 |
 |  | **Add** | **1** |
-
 ## Resource Changes
-
 ### 📦 Module: root
 
 <details>
@@ -9199,9 +8777,7 @@ exports[`planToMarkdown integration > tofu/validate-error/0 > renders without er
 | --- | --- | --- |
 | ➕ Add | null_resource | 1 |
 |  | **Add** | **1** |
-
 ## Resource Changes
-
 ### 📦 Module: root
 
 <details>
@@ -9227,9 +8803,7 @@ exports[`planToMarkdown integration > tofu/validate-error/0 > renders without er
 | --- | --- | --- |
 | ➕ Add | null_resource | 1 |
 |  | **Add** | **1** |
-
 ## Resource Changes
-
 ### 📦 Module: root
 
 <details>
@@ -9266,9 +8840,7 @@ exports[`planToMarkdown integration > tofu/with-modules/0 > renders without erro
 | ➕ Add | null_resource | 1 |
 |  | random_string | 1 |
 |  | **Add** | **2** |
-
 ## Resource Changes
-
 ### 📦 Module: root
 
 <details>
@@ -9284,7 +8856,6 @@ null_resource.root
 | triggers.stage |  | <code><ins style="background:#dfd">0</ins></code> |
 
 </details>
-
 ### 📦 Module: \`module.naming\`
 
 <details>
@@ -9311,7 +8882,6 @@ module.naming.random_string.suffix
 | upper |  | <code><ins style="background:#dfd">false</ins></code> |
 
 </details>
-
 ## Outputs
 
 | Output | Action | Before | After |
@@ -9329,9 +8899,7 @@ exports[`planToMarkdown integration > tofu/with-modules/0 > renders without erro
 | ➕ Add | null_resource | 1 |
 |  | random_string | 1 |
 |  | **Add** | **2** |
-
 ## Resource Changes
-
 ### 📦 Module: root
 
 <details>
@@ -9347,7 +8915,6 @@ null_resource.root
 | triggers.stage |  | + 0 |
 
 </details>
-
 ### 📦 Module: \`module.naming\`
 
 <details>
@@ -9374,7 +8941,6 @@ module.naming.random_string.suffix
 | upper |  | + false |
 
 </details>
-
 ## Outputs
 
 | Output | Action | Before | After |
@@ -9392,9 +8958,7 @@ exports[`planToMarkdown integration > tofu/with-modules/0 > renders without erro
 | ➕ Add | null_resource | 1 |
 |  | random_string | 1 |
 |  | **Add** | **2** |
-
 ## Resource Changes
-
 ### 📦 Module: root
 
 <details>
@@ -9410,7 +8974,6 @@ null_resource.root
 | triggers.stage |  | <code><ins style="background:#dfd">0</ins></code> |
 
 </details>
-
 ### 📦 Module: \`module.naming\`
 
 <details>
@@ -9438,7 +9001,6 @@ module.naming.random_string.suffix
 | upper |  | <code><ins style="background:#dfd">false</ins></code> |
 
 </details>
-
 ## Outputs
 
 | Output | Action | Before | After |
@@ -9467,9 +9029,7 @@ exports[`planToMarkdown integration > tofu/with-modules/1 > renders without erro
 | ± Replace | null_resource | 1 |
 |  | random_string | 1 |
 |  | **Replace** | **2** |
-
 ## Resource Changes
-
 ### 📦 Module: root
 
 <details>
@@ -9485,7 +9045,6 @@ null_resource.root
 | triggers.stage | 0 | <code><ins style="background:#dfd">1</ins><del style="background:#fdd">0</del></code> |
 
 </details>
-
 ### 📦 Module: \`module.naming\`
 
 <details>
@@ -9502,7 +9061,6 @@ module.naming.random_string.suffix
 | result | <code>3r4wm4cq</code> | <code>(known after apply)</code> |
 
 </details>
-
 ## Outputs
 
 | Output | Action | Before | After |
@@ -9520,9 +9078,7 @@ exports[`planToMarkdown integration > tofu/with-modules/1 > renders without erro
 | ± Replace | null_resource | 1 |
 |  | random_string | 1 |
 |  | **Replace** | **2** |
-
 ## Resource Changes
-
 ### 📦 Module: root
 
 <details>
@@ -9538,7 +9094,6 @@ null_resource.root
 | triggers.stage | 0 | - 0<br>+ 1 |
 
 </details>
-
 ### 📦 Module: \`module.naming\`
 
 <details>
@@ -9555,7 +9110,6 @@ module.naming.random_string.suffix
 | result | <code>3r4wm4cq</code> | <code>(known after apply)</code> |
 
 </details>
-
 ## Outputs
 
 | Output | Action | Before | After |
@@ -9573,9 +9127,7 @@ exports[`planToMarkdown integration > tofu/with-modules/1 > renders without erro
 | ± Replace | null_resource | 1 |
 |  | random_string | 1 |
 |  | **Replace** | **2** |
-
 ## Resource Changes
-
 ### 📦 Module: root
 
 <details>
@@ -9591,7 +9143,6 @@ null_resource.root
 | triggers.stage | 0 | <code><ins style="background:#dfd">1</ins><del style="background:#fdd">0</del></code> |
 
 </details>
-
 ### 📦 Module: \`module.naming\`
 
 <details>
@@ -9619,7 +9170,6 @@ module.naming.random_string.suffix
 | upper | false | <code>false</code> |
 
 </details>
-
 ## Outputs
 
 | Output | Action | Before | After |

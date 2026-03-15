@@ -24,6 +24,12 @@ export class MarkdownWriter {
     return this;
   }
 
+  /** Appends a blockquote line (> prefix). */
+  blockquote(text: string): this {
+    this.lines.push(`> ${text}`);
+    return this;
+  }
+
   /** Appends a blank line. */
   blankLine(): this {
     this.lines.push("");

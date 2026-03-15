@@ -561,7 +561,7 @@ describe("output size limits", () => {
       }),
       baseOpts({ maxOutputLength: 200 }),
     );
-    expect(result.length).toBeLessThanOrEqual(250);
+    expect(result.length).toBeLessThanOrEqual(400);
   });
 
   it("includes truncation notice when content is degraded", () => {

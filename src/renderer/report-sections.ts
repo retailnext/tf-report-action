@@ -9,7 +9,7 @@
 import type { Report } from "../model/report.js";
 import type { Section } from "../model/section.js";
 import type { RenderOptions } from "./options.js";
-import { renderReport } from "./index.js";
+import { renderStructuredSections } from "./index.js";
 import { renderTitle, renderWorkspaceMarker } from "./title.js";
 import { renderStepIssue } from "./step-issue.js";
 import { renderTextFallbackBody } from "./text-fallback.js";
@@ -58,8 +58,10 @@ export function renderReportSections(
     sections.push(...renderErrorBody(report));
   } else if (report.summary !== undefined || report.modules !== undefined) {
     // Structured body (from show-plan JSON or JSONL enrichment)
-    const bodyMarkdown = renderStructuredBody(report, options);
-    sections.push({ id: "report-body", full: bodyMarkdown });
+    // Strip title — already handled by renderTitle() above
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { title: _discardTitle, ...renderOptsNoTitle } = options ?? {};
+    sections.push(...renderStructuredSections(report, renderOptsNoTitle));
     // Also render any raw stdout blocks (e.g. plaintext plan + JSONL show-plan)
     sections.push(...renderRawStdoutSections(report));
   } else if (report.rawStdout.length > 0) {
@@ -71,17 +73,6 @@ export function renderReportSections(
   }
 
   return sections;
-}
-
-/** Render the structured body of a Report using the existing renderer. */
-function renderStructuredBody(
-  report: Report,
-  options?: RenderOptions,
-): string {
-  // Strip any user title — the title is handled by renderTitle() above
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const { title: _discardTitle, ...renderOptsNoTitle } = options ?? {};
-  return renderReport(report, renderOptsNoTitle);
 }
 
 /** Render raw stdout blocks as collapsible sections. */

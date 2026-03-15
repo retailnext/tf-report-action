@@ -21,6 +21,10 @@ export function renderStepIssue(issue: StepIssue): Section {
 
   let content = `### ${icon} ${issue.heading}\n\n`;
 
+  if (issue.exitCode !== undefined) {
+    content += `Exit code: \`${issue.exitCode}\`\n\n`;
+  }
+
   if (issue.diagnostic !== undefined) {
     content += `> ${issue.diagnostic}\n\n`;
   }

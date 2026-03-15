@@ -23,7 +23,7 @@ describe("renderReportSections", () => {
       const ids = sections.map((s) => s.id);
       expect(ids).toContain("marker");
       expect(ids).toContain("title");
-      expect(ids).toContain("report-body");
+      expect(ids).toContain("summary");
 
       const marker = sections.find((s) => s.id === "marker")!;
       expect(marker.full).toContain("staging");
@@ -58,9 +58,9 @@ describe("renderReportSections", () => {
       const sections = renderReportSections(report);
       const ids = sections.map((s) => s.id);
       const issueIdx = ids.indexOf("issue-validate");
-      const bodyIdx = ids.indexOf("report-body");
+      const summaryIdx = ids.indexOf("summary");
       expect(issueIdx).toBeGreaterThan(-1);
-      expect(bodyIdx).toBeGreaterThan(issueIdx);
+      expect(summaryIdx).toBeGreaterThan(issueIdx);
     });
   });
 
