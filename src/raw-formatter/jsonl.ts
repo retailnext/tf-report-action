@@ -111,7 +111,7 @@ export function formatJsonLinesMessage(msg: JsonLinesMsg): string {
   const escapedMsg = escapeHtml(message);
   const typeSuffix = typeStr ? ` <code>type=${escapeHtml(typeStr)}</code>` : "";
   const fieldLines = fields.join("\n\n");
-  return `<details>\n<summary>${prefix}<code>${escapedMsg}</code>${typeSuffix}</summary>\n\n${fieldLines}\n\n</details>`;
+  return `<details>\n<summary>${prefix}<code>${escapedMsg}</code>${typeSuffix}</summary>\n<br>\n\n${fieldLines}\n\n</details>`;
 }
 
 /**
@@ -177,7 +177,7 @@ export function tryFormatJsonLines(content: string): string | undefined {
         return `\`${message}\``;
       })
       .join("\n\n");
-    parts.push(`<details>\n<summary>${countParts.join(", ")} message(s) omitted</summary>\n\n${inner}\n\n</details>`);
+    parts.push(`<details>\n<summary>${countParts.join(", ")} message(s) omitted</summary>\n<br>\n\n${inner}\n\n</details>`);
   }
 
   return parts.join("\n\n") + "\n";

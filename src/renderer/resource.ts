@@ -56,6 +56,7 @@ export function renderResource(
   const shouldOpen = applyContext !== undefined &&
     (applyContext.failed || applyContext.diagnostics.length > 0);
   writer.detailsOpen(summaryText, shouldOpen);
+  writer.codeFence(resource.address);
 
   // Show import/moved-from metadata
   if (resource.importId !== null) {

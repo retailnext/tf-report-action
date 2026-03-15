@@ -50,6 +50,21 @@ describe("renderResource", () => {
     expect(output).toContain("➕");
   });
 
+  it("renders resource address in code fence after summary", () => {
+    const output = render(makeResource({ address: "null_resource.test" }));
+    expect(output).toContain("```\nnull_resource.test\n```");
+  });
+
+  it("renders full module address in code fence", () => {
+    const output = render(makeResource({
+      address: 'module.parent["2"].module.child.null_resource.item[1]',
+      moduleAddress: 'module.parent["2"].module.child',
+      type: "null_resource",
+      name: "item",
+    }));
+    expect(output).toContain('```\nmodule.parent["2"].module.child.null_resource.item[1]\n```');
+  });
+
   it("shows delete symbol for delete action", () => {
     const output = render(makeResource({ action: "delete" }));
     expect(output).toContain("🗑️");

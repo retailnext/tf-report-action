@@ -46,7 +46,7 @@ describe("formatRawOutput", () => {
     expect(result).toContain("`Warning message`");
   });
 
-  it("collapses trace/debug messages with count", () => {
+  it("collapses trace/debug messages with count and <br> spacing", () => {
     const input = [
       '{"@level":"info","@message":"visible"}',
       '{"@level":"trace","@message":"trace msg 1"}',
@@ -59,6 +59,7 @@ describe("formatRawOutput", () => {
     expect(result).toContain("2 trace");
     expect(result).toContain("1 debug");
     expect(result).toContain("message(s) omitted");
+    expect(result).toContain("</summary>\n<br>");
     // Collapsed but not dropped, wrapped in backticks
     expect(result).toContain("`trace msg 1`");
     expect(result).toContain("`debug msg 1`");
@@ -162,11 +163,12 @@ describe("formatRawOutput", () => {
     expect(snippetIdx).toBeLessThan(summaryIdx);
   });
 
-  it("wraps messages with extra fields in details/summary", () => {
+  it("wraps messages with extra fields in details/summary with <br> spacing", () => {
     const input = '{"@level":"info","@message":"Plan: 1 to add","type":"change_summary","changes":{"add":1,"change":0,"remove":0}}';
     const result = formatRawOutput(input);
     expect(result).toContain("<details>");
     expect(result).toContain("<summary>");
+    expect(result).toContain("</summary>\n<br>");
     // Inside <summary>, <code> tags are used instead of backticks
     expect(result).toContain("<code>Plan: 1 to add</code>");
     expect(result).toContain("<code>type=change_summary</code>");
