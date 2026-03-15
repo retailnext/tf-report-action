@@ -17,10 +17,10 @@ export type Options = BuildOptions & RenderOptions;
 export type { ReportOptions } from "./builder/report-from-steps.js";
 
 /**
- * Converts a Terraform/OpenTofu plan JSON string into a GitHub-comment-ready
+ * Converts an OpenTofu/Terraform plan JSON string into a GitHub-comment-ready
  * markdown string.
  *
- * @param json - The output of `terraform show -json <planfile>` or `tofu show -json <planfile>`
+ * @param json - The output of `tofu show -json <planfile>` or `terraform show -json <planfile>`
  * @param options - Optional rendering options
  * @returns Markdown string suitable for a GitHub issue or PR comment body
  */
@@ -31,15 +31,15 @@ export function planToMarkdown(json: string, options?: Options): string {
 }
 
 /**
- * Converts a Terraform/OpenTofu plan JSON string and apply JSONL output into
+ * Converts an OpenTofu/Terraform plan JSON string and apply JSONL output into
  * a GitHub-comment-ready markdown string showing what was actually changed.
  *
  * The apply report filters out "phantom" changes — resources that appeared in
  * the plan but were not actually modified during apply. It also includes
  * diagnostics (errors/warnings) and per-resource apply outcomes.
  *
- * @param planJson - The output of `terraform show -json <planfile>` or `tofu show -json <planfile>`
- * @param applyJsonl - The JSON Lines output of `terraform apply -json` or `tofu apply -json`
+ * @param planJson - The output of `tofu show -json <planfile>` or `terraform show -json <planfile>`
+ * @param applyJsonl - The JSON Lines output of `tofu apply -json` or `terraform apply -json`
  * @param options - Optional rendering options
  * @returns Markdown string suitable for a GitHub issue or PR comment body
  */

@@ -2,7 +2,7 @@
 // (https://github.com/oocx/tfplan2md), used under the MIT License.
 
 /**
- * Try to parse content as a Terraform validate JSON result and format
+ * Try to parse content as an OpenTofu/Terraform validate JSON result and format
  * its diagnostics. Returns undefined if the content is not a validate result.
  */
 

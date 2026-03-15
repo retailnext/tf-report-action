@@ -40,16 +40,9 @@ export default defineConfig({
         "src/steps/index.ts",
         "src/compositor/index.ts",
         "src/compositor/types.ts",
-        // JSONL scanner is not yet wired into any entry point — integration
-        // coverage will be added when report-from-steps uses the scanner (Phase 2).
-        "src/jsonl-scanner/**",
       ],
       thresholds: {
-        // Temporarily reduced from 90% during Phase 2 implementation. New builder
-        // functions (buildSummaryFromScan, buildModulesFromScan, buildTitle variants)
-        // are not yet wired into the integration test path. Will be restored to 90%
-        // when Phase 2 wiring is complete and integration tests exercise the scanner.
-        lines: 85,
+        lines: 90,
         functions: 90,
         // The diff modules (lcs.ts, char-diff.ts, line-diff.ts) have inherently
         // unreachable branches from `?? 0`/`?? ""` fallbacks required by
@@ -57,7 +50,7 @@ export default defineConfig({
         // regardless of test coverage. 80% is the realistic ceiling for integration
         // branch coverage given this constraint.
         branches: 80,
-        statements: 85,
+        statements: 90,
       },
     },
   },
