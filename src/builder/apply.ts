@@ -1,102 +1,85 @@
 /**
  * Builds an apply report by enriching a plan-based Report with actual
- * apply outcomes from machine-readable UI log messages.
+ * apply outcomes from a JSONL scan result.
  *
  * The key operation is **phantom filtering**: resources that appear in the
  * plan but were not actually applied are removed from the report. Resources
  * that were actually changed fall into two categories:
- * - Hook-based: emitted `apply_start`/`apply_errored` messages (creates,
+ * - Hook-based: had `apply_complete`/`apply_errored` messages (creates,
  *   updates, deletes, replaces).
  * - State-only: no provider call and therefore no apply hooks (forgets, moves,
  *   and state-only imports). These are identified from the plan JSON.
  */
 
 import type { Plan } from "../tfjson/plan.js";
-import type {
-  UIMessage,
-  UIApplyStartMessage,
-  UIApplyCompleteMessage,
-  UIApplyErroredMessage,
-  UIDiagnosticMessage,
-  UIOutputsMessage,
-  UIPlannedChangeMessage,
-} from "../tfjson/machine-readable-ui.js";
+import type { UIOutputsMessage } from "../tfjson/machine-readable-ui.js";
 import type { Report } from "../model/report.js";
 import type { Diagnostic } from "../model/diagnostic.js";
 import type { ApplyStatus } from "../model/apply-status.js";
 import type { BuildOptions } from "./options.js";
 import type { PlanAction } from "../model/plan-action.js";
+import type { ScanResult } from "../jsonl-scanner/types.js";
 import { buildReport } from "./index.js";
 import { buildApplySummary } from "./summary.js";
 import { VALUE_NOT_IN_PLAN } from "../model/sentinels.js";
-
-// ─── Type Guards ────────────────────────────────────────────────────────────
-
-function isApplyStart(msg: UIMessage): msg is UIApplyStartMessage {
-  return msg.type === "apply_start";
-}
-
-function isApplyComplete(msg: UIMessage): msg is UIApplyCompleteMessage {
-  return msg.type === "apply_complete";
-}
-
-function isApplyErrored(msg: UIMessage): msg is UIApplyErroredMessage {
-  return msg.type === "apply_errored";
-}
-
-function isDiagnostic(msg: UIMessage): msg is UIDiagnosticMessage {
-  return msg.type === "diagnostic";
-}
-
-function isOutputs(msg: UIMessage): msg is UIOutputsMessage {
-  return msg.type === "outputs";
-}
-
-function isPlannedChange(msg: UIMessage): msg is UIPlannedChangeMessage {
-  return msg.type === "planned_change";
-}
 
 // ─── Public API ─────────────────────────────────────────────────────────────
 
 /**
  * Builds a Report enriched with apply outcomes. Starts from a plan-based
- * report and filters/augments it using the apply UI log messages.
+ * report and filters/augments it using the apply scan result.
  *
- * @param plan    - Parsed plan JSON (from `show -json`)
- * @param messages - Parsed UI log messages (from apply `-json`)
- * @param options  - Build options (same as for plan reports)
+ * @param plan       - Parsed plan JSON (from `show -json`)
+ * @param scanResult - Result from scanning apply JSONL
+ * @param options    - Build options (same as for plan reports)
  */
 export function buildApplyReport(
   plan: Plan,
-  messages: UIMessage[],
+  scanResult: ScanResult,
   options: BuildOptions = {},
 ): Report {
   const report = buildReport(plan, options);
 
   const stateOnlyAddresses = extractStateOnlyAddresses(plan);
   const appliedAddresses = new Set([
-    ...extractAppliedAddresses(messages),
+    ...scanResult.applyStatuses.map((s) => s.address),
     ...stateOnlyAddresses.keys(),
   ]);
-  const plannedAddresses = extractPlannedAddresses(messages);
-  const applyStatuses = extractApplyStatuses(messages);
+
+  // Build planned address map from scan result
+  const plannedAddresses = new Map<string, PlanAction>();
+  for (const change of scanResult.plannedChanges) {
+    plannedAddresses.set(change.address, change.action);
+  }
+
   const stateOnlyStatuses = buildStateOnlyStatuses(stateOnlyAddresses);
-  const diagnostics = extractDiagnostics(messages);
-  const outputsMessage = findOutputsMessage(messages);
+
+  // Set diagnostic source to "apply" for all scan diagnostics
+  const diagnostics: Diagnostic[] = scanResult.diagnostics.map((d) => ({
+    ...d,
+    source: "apply" as const,
+  }));
 
   filterPhantomResources(report, appliedAddresses);
   replaceKnownAfterApply(report);
 
   // Detect resources that were planned but never started (interrupted apply)
-  const notStartedStatuses = buildNotStartedStatuses(plannedAddresses, appliedAddresses, messages);
-  const allStatuses = [...applyStatuses, ...stateOnlyStatuses, ...notStartedStatuses];
+  const completedAddresses = new Set(
+    scanResult.applyStatuses.filter((s) => s.success).map((s) => s.address),
+  );
+  const notStartedStatuses = buildNotStartedStatuses(
+    plannedAddresses,
+    appliedAddresses,
+    completedAddresses,
+  );
+  const allStatuses = [...scanResult.applyStatuses, ...stateOnlyStatuses, ...notStartedStatuses];
 
-  if (outputsMessage) {
-    resolveOutputValues(report, outputsMessage);
+  if (scanResult.outputsMessage) {
+    resolveOutputValues(report, scanResult.outputsMessage);
   }
 
   const failedAddresses = new Set(
-    applyStatuses.filter((s) => !s.success).map((s) => s.address),
+    scanResult.applyStatuses.filter((s) => !s.success).map((s) => s.address),
   );
 
   report.summary = buildApplySummary(
@@ -113,31 +96,21 @@ export function buildApplyReport(
 
   report.operation = "apply";
 
+  // Tool version from scan (may override plan JSON detection)
+  if (scanResult.tool !== undefined) {
+    report.tool = scanResult.tool;
+  }
+
   return report;
 }
 
-// ─── Extraction Helpers ─────────────────────────────────────────────────────
-
-/**
- * Collects the set of resource addresses that were actually applied.
- * A resource appears in this set if it has an `apply_start` or `apply_errored`
- * message — even failed resources were attempted and should appear in the report.
- */
-function extractAppliedAddresses(messages: UIMessage[]): Set<string> {
-  const addresses = new Set<string>();
-  for (const msg of messages) {
-    if (isApplyStart(msg) || isApplyErrored(msg)) {
-      addresses.add(msg.hook.resource.addr);
-    }
-  }
-  return addresses;
-}
+// ─── Plan-Based Extraction ──────────────────────────────────────────────────
 
 /**
  * Extracts addresses of state-only operations from the plan JSON.
  *
  * State-only operations require no provider call and therefore emit no
- * `apply_start`/`apply_complete` hooks in the apply JSONL. All three types
+ * `apply_complete`/`apply_errored` hooks in the apply JSONL. All three types
  * are reliably identifiable from the plan JSON alone:
  * - **Forget** (`actions: ["forget"]`): removes a resource from state without
  *   destroying the real infrastructure (via `removed { destroy = false }`).
@@ -182,20 +155,6 @@ function buildStateOnlyStatuses(stateOnlyAddresses: Map<string, PlanAction>): Ap
 }
 
 /**
- * Collects the set of resource addresses that had a `planned_change` message.
- * These represent all resources the apply was supposed to process.
- */
-function extractPlannedAddresses(messages: UIMessage[]): Map<string, PlanAction> {
-  const planned = new Map<string, PlanAction>();
-  for (const msg of messages) {
-    if (isPlannedChange(msg)) {
-      planned.set(msg.change.resource.addr, uiActionToPlanAction(msg.change.action));
-    }
-  }
-  return planned;
-}
-
-/**
  * Builds ApplyStatus entries for resources that were planned but never
  * started. This happens when an apply is interrupted (timeout, crash,
  * cancellation) before all resources are processed.
@@ -209,17 +168,8 @@ function extractPlannedAddresses(messages: UIMessage[]): Map<string, PlanAction>
 function buildNotStartedStatuses(
   plannedAddresses: Map<string, PlanAction>,
   appliedAddresses: Set<string>,
-  messages: UIMessage[],
+  completedAddresses: Set<string>,
 ): ApplyStatus[] {
-  // Also check apply_complete addresses (some resources may have completed
-  // without being in the applied set due to edge cases)
-  const completedAddresses = new Set<string>();
-  for (const msg of messages) {
-    if (isApplyComplete(msg)) {
-      completedAddresses.add(msg.hook.resource.addr);
-    }
-  }
-
   const notStarted: ApplyStatus[] = [];
   for (const [addr, action] of plannedAddresses) {
     if (!appliedAddresses.has(addr) && !completedAddresses.has(addr)) {
@@ -231,93 +181,6 @@ function buildNotStartedStatuses(
     }
   }
   return notStarted;
-}
-
-/** Maps a UI change action string to the model's PlanAction. */
-function uiActionToPlanAction(action: string): PlanAction {
-  switch (action) {
-    case "create":
-      return "create";
-    case "update":
-      return "update";
-    case "delete":
-      return "delete";
-    case "replace":
-      return "replace";
-    case "read":
-      return "read";
-    case "noop":
-      return "no-op";
-    case "forget":
-      return "forget";
-    // In the UI JSONL, forget operations are emitted as "remove" in planned_change
-    // messages (distinct from "delete" which is used for actual destroys). The
-    // change_summary then counts them under "forget". Map both to "forget".
-    case "remove":
-      return "forget";
-    default:
-      return "unknown";
-  }
-}
-
-/**
- * Builds ApplyStatus entries from apply hook messages. For resources that have
- * multiple start/complete cycles (e.g. replace = delete + create), the last
- * outcome for each address is used.
- */
-function extractApplyStatuses(messages: UIMessage[]): ApplyStatus[] {
-  const statusMap = new Map<string, ApplyStatus>();
-
-  for (const msg of messages) {
-    if (isApplyComplete(msg)) {
-      const status: ApplyStatus = {
-        address: msg.hook.resource.addr,
-        action: uiActionToPlanAction(msg.hook.action),
-        success: true,
-        elapsed: msg.hook.elapsed_seconds,
-        ...(msg.hook.id_key !== undefined ? { idKey: msg.hook.id_key } : {}),
-        ...(msg.hook.id_value !== undefined ? { idValue: msg.hook.id_value } : {}),
-      };
-      statusMap.set(msg.hook.resource.addr, status);
-    } else if (isApplyErrored(msg)) {
-      statusMap.set(msg.hook.resource.addr, {
-        address: msg.hook.resource.addr,
-        action: uiActionToPlanAction(msg.hook.action),
-        success: false,
-        elapsed: msg.hook.elapsed_seconds,
-      });
-    }
-  }
-
-  return [...statusMap.values()];
-}
-
-/** Extracts diagnostics (errors and warnings) from UI messages. */
-function extractDiagnostics(messages: UIMessage[]): Diagnostic[] {
-  const diagnostics: Diagnostic[] = [];
-  for (const msg of messages) {
-    if (isDiagnostic(msg)) {
-      const diag: Diagnostic = {
-        severity: msg.diagnostic.severity,
-        summary: msg.diagnostic.summary,
-        detail: msg.diagnostic.detail,
-        ...(msg.diagnostic.address !== undefined ? { address: msg.diagnostic.address } : {}),
-      };
-      diagnostics.push(diag);
-    }
-  }
-  return diagnostics;
-}
-
-/** Finds the last `outputs` message in the log (there should be at most one). */
-function findOutputsMessage(messages: UIMessage[]): UIOutputsMessage | undefined {
-  for (let i = messages.length - 1; i >= 0; i--) {
-    const msg = messages[i];
-    if (msg && isOutputs(msg)) {
-      return msg;
-    }
-  }
-  return undefined;
 }
 
 // ─── Report Mutation Helpers ────────────────────────────────────────────────

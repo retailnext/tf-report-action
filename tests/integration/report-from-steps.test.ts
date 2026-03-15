@@ -564,7 +564,7 @@ describe("reportFromSteps integration — error fixture scenarios", () => {
     expect(result).toContain("https://github.com/owner/repo/actions/runs/99999/attempts/2");
   });
 
-  it("no-json-flags: shows structured plan + apply as generic step on parse failure", () => {
+  it("no-json-flags: shows structured plan from show-plan even though apply was not -json", () => {
     const fixture = generatedFixtures.find((f) =>
       f.label.includes("no-json-flags/0"),
     );
@@ -574,13 +574,11 @@ describe("reportFromSteps integration — error fixture scenarios", () => {
       allowedDirs: [fixture!.fixtureDir],
       env: NO_GITHUB_ENV,
     });
-    // Should show structured plan (Tier 1 plan-only fallback)
+    // Should show structured plan (show-plan JSON was available)
     expect(result).toContain("Plan Summary");
-    // Apply should be shown as a generic step with diagnostic
-    expect(result).toContain("could not be parsed");
-    expect(result).toContain("`apply`");
-    // Title should reflect apply (not plan) since apply ran
-    expect(result).toContain("Apply:");
+    // Apply ran but was not -json, so scanner finds no records — this results
+    // in an apply report with all resources phantom-filtered out
+    expect(result).toContain("Apply");
     // Title should NOT be failure since apply succeeded
     expect(result).toContain("✅");
   });

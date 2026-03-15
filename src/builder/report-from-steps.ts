@@ -25,9 +25,10 @@ import {
 } from "../steps/types.js";
 import { readStepStdout } from "../steps/io.js";
 import { getStepOutcome, buildStepOutcomes } from "../steps/outcomes.js";
-import { parsePlan, parseUILog, detectToolFromPlan, detectToolFromOutput } from "../parser/index.js";
+import { parsePlan, detectToolFromPlan, detectToolFromOutput } from "../parser/index.js";
 import { buildReport } from "./index.js";
 import { buildApplyReport } from "./apply.js";
+import { scanString } from "../jsonl-scanner/scan.js";
 import { detectTier } from "./tier.js";
 import { buildStepIssue } from "./step-issues.js";
 import { buildTitle } from "./title.js";
@@ -228,8 +229,8 @@ function buildTier1Report(
     const applyRead = readStepStdout(applyStep, readerOpts);
     if (applyRead.content !== undefined) {
       try {
-        const messages = parseUILog(applyRead.content);
-        report = buildApplyReport(plan, messages, options);
+        const applyScan = scanString(applyRead.content);
+        report = buildApplyReport(plan, applyScan, options);
       } catch (applyErr: unknown) {
         report = buildReport(plan, options);
         // Auto-detect tool from apply content if still unknown

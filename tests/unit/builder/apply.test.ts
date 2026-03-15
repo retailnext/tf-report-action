@@ -1,7 +1,8 @@
 import { describe, it, expect } from "vitest";
 import { buildApplyReport } from "../../../src/builder/apply.js";
 import type { Plan } from "../../../src/tfjson/plan.js";
-import type { UIMessage, UIDiagnosticMessage } from "../../../src/tfjson/machine-readable-ui.js";
+import type { UIOutputsMessage } from "../../../src/tfjson/machine-readable-ui.js";
+import type { ScanResult } from "../../../src/jsonl-scanner/types.js";
 import { VALUE_NOT_IN_PLAN } from "../../../src/model/sentinels.js";
 
 // ─── Helpers ────────────────────────────────────────────────────────────────
@@ -65,106 +66,25 @@ function outputChange(
   };
 }
 
-function applyStartMsg(addr: string, action = "update"): UIMessage {
+/** Creates a ScanResult with sensible defaults. */
+function makeScanResult(overrides: Partial<ScanResult> = {}): ScanResult {
   return {
-    "@level": "info",
-    "@message": `${addr}: Modifying...`,
-    "@module": "terraform.ui",
-    "@timestamp": "2024-01-01T00:00:00.000Z",
-    type: "apply_start",
-    hook: {
-      resource: {
-        addr,
-        module: "",
-        resource: addr,
-        implied_provider: addr.split("_")[0] ?? "",
-        resource_type: addr.split(".")[0] ?? "",
-        resource_name: addr.split(".").slice(1).join("."),
-        resource_key: null,
-      },
-      action,
-    },
-  } as UIMessage;
+    plannedChanges: [],
+    applyStatuses: [],
+    diagnostics: [],
+    driftChanges: [],
+    totalLines: 0,
+    parsedLines: 0,
+    unknownTypeLines: 0,
+    unparseableLines: 0,
+    ...overrides,
+  };
 }
 
-function applyCompleteMsg(
-  addr: string,
-  action = "update",
-  elapsed = 0.5,
-  idKey?: string,
-  idValue?: string,
-): UIMessage {
-  return {
-    "@level": "info",
-    "@message": `${addr}: Modifications complete`,
-    "@module": "terraform.ui",
-    "@timestamp": "2024-01-01T00:00:01.000Z",
-    type: "apply_complete",
-    hook: {
-      resource: {
-        addr,
-        module: "",
-        resource: addr,
-        implied_provider: addr.split("_")[0] ?? "",
-        resource_type: addr.split(".")[0] ?? "",
-        resource_name: addr.split(".").slice(1).join("."),
-        resource_key: null,
-      },
-      action,
-      elapsed_seconds: elapsed,
-      id_key: idKey,
-      id_value: idValue,
-    },
-  } as UIMessage;
-}
-
-function applyErroredMsg(addr: string, action = "create", elapsed = 1.0): UIMessage {
-  return {
-    "@level": "info",
-    "@message": `${addr}: Error`,
-    "@module": "terraform.ui",
-    "@timestamp": "2024-01-01T00:00:01.000Z",
-    type: "apply_errored",
-    hook: {
-      resource: {
-        addr,
-        module: "",
-        resource: addr,
-        implied_provider: addr.split("_")[0] ?? "",
-        resource_type: addr.split(".")[0] ?? "",
-        resource_name: addr.split(".").slice(1).join("."),
-        resource_key: null,
-      },
-      action,
-      elapsed_seconds: elapsed,
-    },
-  } as UIMessage;
-}
-
-function diagnosticMsg(
-  severity: "error" | "warning",
-  summary: string,
-  detail = "",
-  address?: string,
-): UIMessage {
-  return {
-    "@level": severity === "error" ? "error" : "warn",
-    "@message": summary,
-    "@module": "terraform.ui",
-    "@timestamp": "2024-01-01T00:00:02.000Z",
-    type: "diagnostic",
-    diagnostic: {
-      severity,
-      summary,
-      detail,
-      ...(address !== undefined ? { address } : {}),
-    },
-  } as UIMessage;
-}
-
-function outputsMsg(
+/** Creates a UIOutputsMessage from a simplified outputs map. */
+function makeOutputsMessage(
   outputs: Record<string, { sensitive: boolean; value?: unknown }>,
-): UIMessage {
+): UIOutputsMessage {
   return {
     "@level": "info",
     "@message": "Outputs",
@@ -177,26 +97,14 @@ function outputsMsg(
         { sensitive, ...(value !== undefined ? { value } : {}) },
       ]),
     ),
-  } as UIMessage;
-}
-
-function versionMsg(): UIMessage {
-  return {
-    "@level": "info",
-    "@message": "Terraform 1.9.0",
-    "@module": "terraform.ui",
-    "@timestamp": "2024-01-01T00:00:00.000Z",
-    type: "version",
-    terraform: "1.9.0",
-    ui: "1.2",
-  } as UIMessage;
+  } as UIOutputsMessage;
 }
 
 // ─── Tests ──────────────────────────────────────────────────────────────────
 
 describe("buildApplyReport", () => {
   describe("phantom filtering", () => {
-    it("excludes resources that have no apply_start message", () => {
+    it("excludes resources that have no apply status", () => {
       const plan = makePlan({
         resource_changes: [
           resourceChange("null_resource.real", ["update"], {
@@ -210,13 +118,13 @@ describe("buildApplyReport", () => {
         ],
       });
 
-      const messages: UIMessage[] = [
-        versionMsg(),
-        applyStartMsg("null_resource.real"),
-        applyCompleteMsg("null_resource.real"),
-      ];
+      const scanResult = makeScanResult({
+        applyStatuses: [
+          { address: "null_resource.real", action: "update", success: true },
+        ],
+      });
 
-      const report = buildApplyReport(plan, messages);
+      const report = buildApplyReport(plan, scanResult);
 
       const allAddresses = report.modules.flatMap((m) =>
         m.resources.map((r) => r.address),
@@ -235,15 +143,13 @@ describe("buildApplyReport", () => {
         ],
       });
 
-      const messages: UIMessage[] = [
-        versionMsg(),
-        applyStartMsg("null_resource.failing", "delete"),
-        applyCompleteMsg("null_resource.failing", "delete"),
-        applyStartMsg("null_resource.failing", "create"),
-        applyErroredMsg("null_resource.failing", "create"),
-      ];
+      const scanResult = makeScanResult({
+        applyStatuses: [
+          { address: "null_resource.failing", action: "create", success: false },
+        ],
+      });
 
-      const report = buildApplyReport(plan, messages);
+      const report = buildApplyReport(plan, scanResult);
       const allAddresses = report.modules.flatMap((m) =>
         m.resources.map((r) => r.address),
       );
@@ -264,10 +170,8 @@ describe("buildApplyReport", () => {
         ],
       });
 
-      // No apply_start messages — all resources are phantoms
-      const messages: UIMessage[] = [versionMsg()];
-
-      const report = buildApplyReport(plan, messages);
+      // No apply statuses — all resources are phantoms
+      const report = buildApplyReport(plan, makeScanResult());
       expect(report.modules).toHaveLength(0);
     });
 
@@ -281,13 +185,13 @@ describe("buildApplyReport", () => {
         ],
       });
 
-      const messages: UIMessage[] = [
-        versionMsg(),
-        applyStartMsg("data.local_command.read_config", "read"),
-        applyCompleteMsg("data.local_command.read_config", "read"),
-      ];
+      const scanResult = makeScanResult({
+        applyStatuses: [
+          { address: "data.local_command.read_config", action: "read", success: true },
+        ],
+      });
 
-      const report = buildApplyReport(plan, messages);
+      const report = buildApplyReport(plan, scanResult);
       const allAddresses = report.modules.flatMap((m) =>
         m.resources.map((r) => r.address),
       );
@@ -305,26 +209,21 @@ describe("buildApplyReport", () => {
         ],
       });
 
-      const messages: UIMessage[] = [
-        versionMsg(),
-        applyStartMsg("null_resource.keeper", "update"),
-        applyCompleteMsg("null_resource.keeper", "update"),
-        {
-          "@level": "error",
-          "@message": "Error reading data source",
-          "@module": "tofu.ui",
-          "@timestamp": "2025-01-01T00:00:00.000000Z",
-          type: "diagnostic",
-          diagnostic: {
+      const scanResult = makeScanResult({
+        applyStatuses: [
+          { address: "null_resource.keeper", action: "update", success: true },
+        ],
+        diagnostics: [
+          {
             severity: "error",
             summary: "Failed to read data source",
             detail: "data.external.failing_query: query returned non-zero exit code",
             address: "data.external.failing_query",
           },
-        } satisfies UIDiagnosticMessage,
-      ];
+        ],
+      });
 
-      const report = buildApplyReport(plan, messages);
+      const report = buildApplyReport(plan, scanResult);
 
       // Data source must NOT appear in resource changes
       const allAddresses = report.modules.flatMap((m) =>
@@ -340,6 +239,7 @@ describe("buildApplyReport", () => {
       expect(report.diagnostics![0]!.address).toBe("data.external.failing_query");
       expect(report.diagnostics![0]!.severity).toBe("error");
       expect(report.diagnostics![0]!.summary).toBe("Failed to read data source");
+      expect(report.diagnostics![0]!.source).toBe("apply");
     });
   });
 
@@ -359,13 +259,13 @@ describe("buildApplyReport", () => {
         ],
       });
 
-      const messages: UIMessage[] = [
-        versionMsg(),
-        applyStartMsg("null_resource.applied"),
-        applyCompleteMsg("null_resource.applied"),
-      ];
+      const scanResult = makeScanResult({
+        applyStatuses: [
+          { address: "null_resource.applied", action: "update", success: true },
+        ],
+      });
 
-      const report = buildApplyReport(plan, messages);
+      const report = buildApplyReport(plan, scanResult);
 
       // Only the applied resource should be counted
       const updateGroup = report.summary.actions.find((g) => g.action === "update");
@@ -384,8 +284,7 @@ describe("buildApplyReport", () => {
         ],
       });
 
-      const messages: UIMessage[] = [versionMsg()];
-      const report = buildApplyReport(plan, messages);
+      const report = buildApplyReport(plan, makeScanResult());
       expect(report.summary).toEqual({ actions: [], failures: [] });
     });
   });
@@ -402,13 +301,13 @@ describe("buildApplyReport", () => {
         ],
       });
 
-      const messages: UIMessage[] = [
-        versionMsg(),
-        applyStartMsg("null_resource.deferred"),
-        applyCompleteMsg("null_resource.deferred"),
-      ];
+      const scanResult = makeScanResult({
+        applyStatuses: [
+          { address: "null_resource.deferred", action: "update", success: true },
+        ],
+      });
 
-      const report = buildApplyReport(plan, messages);
+      const report = buildApplyReport(plan, scanResult);
       const resource = report.modules[0]?.resources[0];
       expect(resource).toBeDefined();
 
@@ -428,8 +327,7 @@ describe("buildApplyReport", () => {
 
       // Need at least one applied resource for the report to make sense,
       // but outputs are independent of resource filtering
-      const messages: UIMessage[] = [versionMsg()];
-      const report = buildApplyReport(plan, messages);
+      const report = buildApplyReport(plan, makeScanResult());
 
       const output = report.outputs.find((o) => o.name === "test_out");
       expect(output?.after).toBe(VALUE_NOT_IN_PLAN);
@@ -445,13 +343,13 @@ describe("buildApplyReport", () => {
         ],
       });
 
-      const messages: UIMessage[] = [
-        versionMsg(),
-        applyStartMsg("null_resource.normal"),
-        applyCompleteMsg("null_resource.normal"),
-      ];
+      const scanResult = makeScanResult({
+        applyStatuses: [
+          { address: "null_resource.normal", action: "update", success: true },
+        ],
+      });
 
-      const report = buildApplyReport(plan, messages);
+      const report = buildApplyReport(plan, scanResult);
       const idAttr = report.modules[0]?.resources[0]?.attributes.find(
         (a) => a.name === "id",
       );
@@ -461,7 +359,7 @@ describe("buildApplyReport", () => {
   });
 
   describe("diagnostic extraction", () => {
-    it("extracts error diagnostics from messages", () => {
+    it("extracts error diagnostics from scan result", () => {
       const plan = makePlan({
         resource_changes: [
           resourceChange("null_resource.failing", ["delete", "create"], {
@@ -471,76 +369,89 @@ describe("buildApplyReport", () => {
         ],
       });
 
-      const messages: UIMessage[] = [
-        versionMsg(),
-        applyStartMsg("null_resource.failing", "delete"),
-        applyCompleteMsg("null_resource.failing", "delete"),
-        applyStartMsg("null_resource.failing", "create"),
-        applyErroredMsg("null_resource.failing", "create"),
-        diagnosticMsg(
-          "error",
-          "provisioner error",
-          "exit status 1",
-          "null_resource.failing",
-        ),
-      ];
+      const scanResult = makeScanResult({
+        applyStatuses: [
+          { address: "null_resource.failing", action: "create", success: false },
+        ],
+        diagnostics: [
+          {
+            severity: "error",
+            summary: "provisioner error",
+            detail: "exit status 1",
+            address: "null_resource.failing",
+          },
+        ],
+      });
 
-      const report = buildApplyReport(plan, messages);
+      const report = buildApplyReport(plan, scanResult);
       expect(report.diagnostics).toBeDefined();
       expect(report.diagnostics).toHaveLength(1);
       expect(report.diagnostics?.[0]?.severity).toBe("error");
       expect(report.diagnostics?.[0]?.summary).toBe("provisioner error");
       expect(report.diagnostics?.[0]?.detail).toBe("exit status 1");
       expect(report.diagnostics?.[0]?.address).toBe("null_resource.failing");
+      expect(report.diagnostics?.[0]?.source).toBe("apply");
     });
 
     it("extracts warning diagnostics", () => {
       const plan = makePlan();
-      const messages: UIMessage[] = [
-        versionMsg(),
-        diagnosticMsg("warning", "deprecated attribute", "Use xyz instead"),
-      ];
 
-      const report = buildApplyReport(plan, messages);
+      const scanResult = makeScanResult({
+        diagnostics: [
+          { severity: "warning", summary: "deprecated attribute", detail: "Use xyz instead" },
+        ],
+      });
+
+      const report = buildApplyReport(plan, scanResult);
       expect(report.diagnostics).toBeDefined();
       expect(report.diagnostics).toHaveLength(1);
       expect(report.diagnostics?.[0]?.severity).toBe("warning");
+      expect(report.diagnostics?.[0]?.source).toBe("apply");
     });
 
     it("omits diagnostics field when no diagnostics present", () => {
       const plan = makePlan();
-      const messages: UIMessage[] = [versionMsg()];
-      const report = buildApplyReport(plan, messages);
+      const report = buildApplyReport(plan, makeScanResult());
       expect(report.diagnostics).toBeUndefined();
     });
 
     it("preserves diagnostics without address", () => {
       const plan = makePlan();
-      const messages: UIMessage[] = [
-        versionMsg(),
-        diagnosticMsg("warning", "general warning"),
-      ];
 
-      const report = buildApplyReport(plan, messages);
+      const scanResult = makeScanResult({
+        diagnostics: [
+          { severity: "warning", summary: "general warning", detail: "" },
+        ],
+      });
+
+      const report = buildApplyReport(plan, scanResult);
       expect(report.diagnostics?.[0]?.address).toBeUndefined();
+      expect(report.diagnostics?.[0]?.source).toBe("apply");
     });
   });
 
   describe("apply status extraction", () => {
-    it("builds success statuses from apply_complete messages", () => {
+    it("passes through success statuses from scan result", () => {
       const plan = makePlan({
         resource_changes: [
           resourceChange("null_resource.web", ["create"]),
         ],
       });
 
-      const messages: UIMessage[] = [
-        versionMsg(),
-        applyStartMsg("null_resource.web", "create"),
-        applyCompleteMsg("null_resource.web", "create", 1.5, "id", "abc123"),
-      ];
+      const scanResult = makeScanResult({
+        applyStatuses: [
+          {
+            address: "null_resource.web",
+            action: "create",
+            success: true,
+            elapsed: 1.5,
+            idKey: "id",
+            idValue: "abc123",
+          },
+        ],
+      });
 
-      const report = buildApplyReport(plan, messages);
+      const report = buildApplyReport(plan, scanResult);
       expect(report.applyStatuses).toBeDefined();
       expect(report.applyStatuses).toHaveLength(1);
 
@@ -553,7 +464,7 @@ describe("buildApplyReport", () => {
       expect(status?.idValue).toBe("abc123");
     });
 
-    it("builds failure statuses from apply_errored messages", () => {
+    it("passes through failure statuses from scan result", () => {
       const plan = makePlan({
         resource_changes: [
           resourceChange("null_resource.failing", ["delete", "create"], {
@@ -563,18 +474,15 @@ describe("buildApplyReport", () => {
         ],
       });
 
-      const messages: UIMessage[] = [
-        versionMsg(),
-        applyStartMsg("null_resource.failing", "delete"),
-        applyCompleteMsg("null_resource.failing", "delete", 0.1),
-        applyStartMsg("null_resource.failing", "create"),
-        applyErroredMsg("null_resource.failing", "create", 2.0),
-      ];
+      const scanResult = makeScanResult({
+        applyStatuses: [
+          { address: "null_resource.failing", action: "create", success: false, elapsed: 2.0 },
+        ],
+      });
 
-      const report = buildApplyReport(plan, messages);
+      const report = buildApplyReport(plan, scanResult);
       expect(report.applyStatuses).toHaveLength(1);
 
-      // Last event wins — the errored create overrides the successful delete
       const status = report.applyStatuses?.[0];
       expect(status?.success).toBe(false);
       expect(status?.action).toBe("create");
@@ -583,12 +491,11 @@ describe("buildApplyReport", () => {
 
     it("omits applyStatuses field when no apply hooks present", () => {
       const plan = makePlan();
-      const messages: UIMessage[] = [versionMsg()];
-      const report = buildApplyReport(plan, messages);
+      const report = buildApplyReport(plan, makeScanResult());
       expect(report.applyStatuses).toBeUndefined();
     });
 
-    it("maps UI action 'noop' to plan action 'no-op'", () => {
+    it("preserves no-op action from scan result", () => {
       const plan = makePlan({
         resource_changes: [
           resourceChange("null_resource.noop", ["no-op"], {
@@ -598,13 +505,13 @@ describe("buildApplyReport", () => {
         ],
       });
 
-      const messages: UIMessage[] = [
-        versionMsg(),
-        applyStartMsg("null_resource.noop", "noop"),
-        applyCompleteMsg("null_resource.noop", "noop"),
-      ];
+      const scanResult = makeScanResult({
+        applyStatuses: [
+          { address: "null_resource.noop", action: "no-op", success: true },
+        ],
+      });
 
-      const report = buildApplyReport(plan, messages);
+      const report = buildApplyReport(plan, scanResult);
       expect(report.applyStatuses?.[0]?.action).toBe("no-op");
     });
   });
@@ -617,14 +524,13 @@ describe("buildApplyReport", () => {
         }),
       });
 
-      const messages: UIMessage[] = [
-        versionMsg(),
-        outputsMsg({
+      const scanResult = makeScanResult({
+        outputsMessage: makeOutputsMessage({
           result: { sensitive: false, value: "resolved_value" },
         }),
-      ];
+      });
 
-      const report = buildApplyReport(plan, messages);
+      const report = buildApplyReport(plan, scanResult);
       const output = report.outputs.find((o) => o.name === "result");
       expect(output?.after).toBe("resolved_value");
     });
@@ -636,14 +542,13 @@ describe("buildApplyReport", () => {
         }),
       });
 
-      const messages: UIMessage[] = [
-        versionMsg(),
-        outputsMsg({
+      const scanResult = makeScanResult({
+        outputsMessage: makeOutputsMessage({
           data: { sensitive: false, value: { key: "val" } },
         }),
-      ];
+      });
 
-      const report = buildApplyReport(plan, messages);
+      const report = buildApplyReport(plan, scanResult);
       const output = report.outputs.find((o) => o.name === "data");
       expect(output?.after).toBe('{\n  "key": "val"\n}');
     });
@@ -656,14 +561,13 @@ describe("buildApplyReport", () => {
         }),
       });
 
-      const messages: UIMessage[] = [
-        versionMsg(),
-        outputsMsg({
+      const scanResult = makeScanResult({
+        outputsMessage: makeOutputsMessage({
           secret: { sensitive: true, value: "leaked_secret" },
         }),
-      ];
+      });
 
-      const report = buildApplyReport(plan, messages);
+      const report = buildApplyReport(plan, scanResult);
       const output = report.outputs.find((o) => o.name === "secret");
       // Must not contain the sensitive value
       expect(output?.after).not.toBe("leaked_secret");
@@ -678,14 +582,13 @@ describe("buildApplyReport", () => {
         }),
       });
 
-      const messages: UIMessage[] = [
-        versionMsg(),
-        outputsMsg({
+      const scanResult = makeScanResult({
+        outputsMessage: makeOutputsMessage({
           sneaky: { sensitive: true, value: "secret_value" },
         }),
-      ];
+      });
 
-      const report = buildApplyReport(plan, messages);
+      const report = buildApplyReport(plan, scanResult);
       const output = report.outputs.find((o) => o.name === "sneaky");
       expect(output?.after).not.toBe("secret_value");
     });
@@ -695,14 +598,13 @@ describe("buildApplyReport", () => {
         output_changes: outputChange("known", ["update"], "before_val", "after_val"),
       });
 
-      const messages: UIMessage[] = [
-        versionMsg(),
-        outputsMsg({
+      const scanResult = makeScanResult({
+        outputsMessage: makeOutputsMessage({
           known: { sensitive: false, value: "resolved_val" },
         }),
-      ];
+      });
 
-      const report = buildApplyReport(plan, messages);
+      const report = buildApplyReport(plan, scanResult);
       const output = report.outputs.find((o) => o.name === "known");
       // after_val was already a concrete value, not a sentinel — should not be replaced
       expect(output?.after).toBe("after_val");
@@ -715,8 +617,7 @@ describe("buildApplyReport", () => {
         }),
       });
 
-      const messages: UIMessage[] = [versionMsg()];
-      const report = buildApplyReport(plan, messages);
+      const report = buildApplyReport(plan, makeScanResult());
       const output = report.outputs.find((o) => o.name === "test");
       // With no outputs message, sentinel was already replaced by replaceKnownAfterApply
       expect(output?.after).toBe(VALUE_NOT_IN_PLAN);
@@ -724,14 +625,14 @@ describe("buildApplyReport", () => {
   });
 
   describe("empty and edge cases", () => {
-    it("handles empty messages array", () => {
+    it("handles empty scan result", () => {
       const plan = makePlan({
         resource_changes: [
           resourceChange("null_resource.x", ["create"]),
         ],
       });
 
-      const report = buildApplyReport(plan, []);
+      const report = buildApplyReport(plan, makeScanResult());
       expect(report.modules).toHaveLength(0);
       expect(report.summary).toEqual({ actions: [], failures: [] });
       expect(report.diagnostics).toBeUndefined();
@@ -740,8 +641,7 @@ describe("buildApplyReport", () => {
 
     it("handles plan with no resource changes", () => {
       const plan = makePlan();
-      const messages: UIMessage[] = [versionMsg()];
-      const report = buildApplyReport(plan, messages);
+      const report = buildApplyReport(plan, makeScanResult());
       expect(report.modules).toHaveLength(0);
       expect(report.summary).toEqual({ actions: [], failures: [] });
     });
@@ -751,34 +651,29 @@ describe("buildApplyReport", () => {
         terraform_version: "1.9.0",
         timestamp: "2024-01-01T00:00:00Z",
       });
-      const messages: UIMessage[] = [versionMsg()];
-      const report = buildApplyReport(plan, messages);
+      const report = buildApplyReport(plan, makeScanResult());
       expect(report.toolVersion).toBe("1.9.0");
       expect(report.formatVersion).toBe("1.2");
       expect(report.timestamp).toBe("2024-01-01T00:00:00Z");
     });
 
-    it("ignores unknown message types gracefully", () => {
+    it("handles scan result with unknown type lines gracefully", () => {
       const plan = makePlan({
         resource_changes: [
           resourceChange("null_resource.ok", ["create"]),
         ],
       });
 
-      const messages: UIMessage[] = [
-        versionMsg(),
-        {
-          "@level": "info",
-          "@message": "some future message type",
-          "@module": "terraform.ui",
-          "@timestamp": "2024-01-01T00:00:00.000Z",
-          type: "future_type",
-        } as UIMessage,
-        applyStartMsg("null_resource.ok", "create"),
-        applyCompleteMsg("null_resource.ok", "create"),
-      ];
+      const scanResult = makeScanResult({
+        applyStatuses: [
+          { address: "null_resource.ok", action: "create", success: true },
+        ],
+        unknownTypeLines: 1,
+        totalLines: 3,
+        parsedLines: 2,
+      });
 
-      const report = buildApplyReport(plan, messages);
+      const report = buildApplyReport(plan, scanResult);
       const allAddresses = report.modules.flatMap((m) =>
         m.resources.map((r) => r.address),
       );
@@ -798,15 +693,21 @@ describe("buildApplyReport", () => {
         ],
       });
 
-      const messages: UIMessage[] = [
-        versionMsg(),
-        applyStartMsg("null_resource.replaced", "delete"),
-        applyCompleteMsg("null_resource.replaced", "delete", 0.1),
-        applyStartMsg("null_resource.replaced", "create"),
-        applyCompleteMsg("null_resource.replaced", "create", 0.3, "id", "new123"),
-      ];
+      // Scanner consolidates the delete+create sequence into the final status
+      const scanResult = makeScanResult({
+        applyStatuses: [
+          {
+            address: "null_resource.replaced",
+            action: "create",
+            success: true,
+            elapsed: 0.3,
+            idKey: "id",
+            idValue: "new123",
+          },
+        ],
+      });
 
-      const report = buildApplyReport(plan, messages);
+      const report = buildApplyReport(plan, scanResult);
 
       // Resource should be present (not phantom)
       const allAddresses = report.modules.flatMap((m) =>
@@ -826,28 +727,6 @@ describe("buildApplyReport", () => {
   });
 
   describe("planned_change: not-started detection", () => {
-    function plannedChangeMsg(addr: string, action = "create"): UIMessage {
-      return {
-        "@level": "info",
-        "@message": `${addr}: Plan to ${action}`,
-        "@module": "terraform.ui",
-        "@timestamp": "2024-01-01T00:00:00.000Z",
-        type: "planned_change",
-        change: {
-          resource: {
-            addr,
-            module: "",
-            resource: addr,
-            implied_provider: addr.split("_")[0] ?? "",
-            resource_type: addr.split(".")[0] ?? "",
-            resource_name: addr.split(".").slice(1).join("."),
-            resource_key: null,
-          },
-          action,
-        },
-      } as UIMessage;
-    }
-
     it("creates not-started statuses for resources that were planned but never applied", () => {
       const plan = makePlan({
         resource_changes: [
@@ -857,17 +736,18 @@ describe("buildApplyReport", () => {
         ],
       });
 
-      const messages: UIMessage[] = [
-        versionMsg(),
-        plannedChangeMsg("null_resource.a", "create"),
-        plannedChangeMsg("null_resource.b", "create"),
-        plannedChangeMsg("null_resource.c", "create"),
-        applyStartMsg("null_resource.a", "create"),
-        applyCompleteMsg("null_resource.a", "create"),
-        // b and c never started — interrupted apply
-      ];
+      const scanResult = makeScanResult({
+        plannedChanges: [
+          { address: "null_resource.a", resourceType: "null_resource", module: "", action: "create" },
+          { address: "null_resource.b", resourceType: "null_resource", module: "", action: "create" },
+          { address: "null_resource.c", resourceType: "null_resource", module: "", action: "create" },
+        ],
+        applyStatuses: [
+          { address: "null_resource.a", action: "create", success: true },
+        ],
+      });
 
-      const report = buildApplyReport(plan, messages);
+      const report = buildApplyReport(plan, scanResult);
       const statuses = report.applyStatuses!;
 
       // a was completed
@@ -893,14 +773,16 @@ describe("buildApplyReport", () => {
         ],
       });
 
-      const messages: UIMessage[] = [
-        versionMsg(),
-        plannedChangeMsg("null_resource.a", "create"),
-        applyStartMsg("null_resource.a", "create"),
-        applyCompleteMsg("null_resource.a", "create"),
-      ];
+      const scanResult = makeScanResult({
+        plannedChanges: [
+          { address: "null_resource.a", resourceType: "null_resource", module: "", action: "create" },
+        ],
+        applyStatuses: [
+          { address: "null_resource.a", action: "create", success: true },
+        ],
+      });
 
-      const report = buildApplyReport(plan, messages);
+      const report = buildApplyReport(plan, scanResult);
       const statuses = report.applyStatuses!;
       expect(statuses).toHaveLength(1);
       expect(statuses[0]!.success).toBe(true);
@@ -913,14 +795,16 @@ describe("buildApplyReport", () => {
         ],
       });
 
-      const messages: UIMessage[] = [
-        versionMsg(),
-        plannedChangeMsg("null_resource.fail", "create"),
-        applyStartMsg("null_resource.fail", "create"),
-        applyErroredMsg("null_resource.fail", "create"),
-      ];
+      const scanResult = makeScanResult({
+        plannedChanges: [
+          { address: "null_resource.fail", resourceType: "null_resource", module: "", action: "create" },
+        ],
+        applyStatuses: [
+          { address: "null_resource.fail", action: "create", success: false, elapsed: 1.0 },
+        ],
+      });
 
-      const report = buildApplyReport(plan, messages);
+      const report = buildApplyReport(plan, scanResult);
       const statuses = report.applyStatuses!;
       expect(statuses).toHaveLength(1);
       expect(statuses[0]!.address).toBe("null_resource.fail");
@@ -929,20 +813,20 @@ describe("buildApplyReport", () => {
       expect(statuses[0]!.elapsed).toBeDefined();
     });
 
-    it("handles apply with no planned_change messages", () => {
+    it("handles apply with no planned_change entries", () => {
       const plan = makePlan({
         resource_changes: [
           resourceChange("null_resource.a", ["create"]),
         ],
       });
 
-      const messages: UIMessage[] = [
-        versionMsg(),
-        applyStartMsg("null_resource.a", "create"),
-        applyCompleteMsg("null_resource.a", "create"),
-      ];
+      const scanResult = makeScanResult({
+        applyStatuses: [
+          { address: "null_resource.a", action: "create", success: true },
+        ],
+      });
 
-      const report = buildApplyReport(plan, messages);
+      const report = buildApplyReport(plan, scanResult);
       const statuses = report.applyStatuses!;
       expect(statuses).toHaveLength(1);
       expect(statuses[0]!.success).toBe(true);
@@ -955,13 +839,13 @@ describe("buildApplyReport", () => {
         ],
       });
 
-      const messages: UIMessage[] = [
-        versionMsg(),
-        plannedChangeMsg("null_resource.del", "delete"),
-        // Never applied
-      ];
+      const scanResult = makeScanResult({
+        plannedChanges: [
+          { address: "null_resource.del", resourceType: "null_resource", module: "", action: "delete" },
+        ],
+      });
 
-      const report = buildApplyReport(plan, messages);
+      const report = buildApplyReport(plan, scanResult);
       const statuses = report.applyStatuses!;
       expect(statuses).toHaveLength(1);
       expect(statuses[0]!.address).toBe("null_resource.del");
@@ -971,35 +855,6 @@ describe("buildApplyReport", () => {
   });
 
   describe("state-only operations", () => {
-    /**
-     * Realistic planned_change message with action "remove" — emitted by both
-     * Terraform and OpenTofu for forget operations in the apply JSONL. Included
-     * for accuracy; detection now uses the plan JSON (actions: ["forget"]), not
-     * this JSONL message.
-     */
-    function forgetPlannedChangeMsg(addr: string): UIMessage {
-      return {
-        "@level": "info",
-        "@message": `${addr}: Plan to remove`,
-        "@module": "terraform.ui",
-        "@timestamp": "2024-01-01T00:00:00.000Z",
-        type: "planned_change",
-        change: {
-          resource: {
-            addr,
-            module: "",
-            resource: addr,
-            implied_provider: addr.split("_")[0] ?? "",
-            resource_type: addr.split(".")[0] ?? "",
-            resource_name: addr.split(".").slice(1).join("."),
-            resource_key: null,
-          },
-          action: "remove",
-          reason: "delete_because_no_resource_config",
-        },
-      } as UIMessage;
-    }
-
     describe("forget", () => {
       it("retains forgotten resource in the report (survives phantom filter)", () => {
         const plan = makePlan({
@@ -1011,12 +866,13 @@ describe("buildApplyReport", () => {
           ],
         });
 
-        const messages: UIMessage[] = [
-          versionMsg(),
-          forgetPlannedChangeMsg("null_resource.ephemeral"),
-        ];
+        const scanResult = makeScanResult({
+          plannedChanges: [
+            { address: "null_resource.ephemeral", resourceType: "null_resource", module: "", action: "forget" },
+          ],
+        });
 
-        const report = buildApplyReport(plan, messages);
+        const report = buildApplyReport(plan, scanResult);
         const allAddresses = report.modules.flatMap((m) => m.resources.map((r) => r.address));
         expect(allAddresses).toContain("null_resource.ephemeral");
       });
@@ -1031,10 +887,8 @@ describe("buildApplyReport", () => {
           ],
         });
 
-        // No forgetPlannedChangeMsg — detection must come from plan JSON
-        const messages: UIMessage[] = [versionMsg()];
-
-        const report = buildApplyReport(plan, messages);
+        // No planned changes in scan result — detection must come from plan JSON
+        const report = buildApplyReport(plan, makeScanResult());
         const allAddresses = report.modules.flatMap((m) => m.resources.map((r) => r.address));
         expect(allAddresses).toContain("null_resource.ephemeral");
       });
@@ -1049,12 +903,13 @@ describe("buildApplyReport", () => {
           ],
         });
 
-        const messages: UIMessage[] = [
-          versionMsg(),
-          forgetPlannedChangeMsg("null_resource.ephemeral"),
-        ];
+        const scanResult = makeScanResult({
+          plannedChanges: [
+            { address: "null_resource.ephemeral", resourceType: "null_resource", module: "", action: "forget" },
+          ],
+        });
 
-        const report = buildApplyReport(plan, messages);
+        const report = buildApplyReport(plan, scanResult);
         const forgetGroup = report.summary.actions.find((g) => g.action === "forget");
         expect(forgetGroup).toBeDefined();
         expect(forgetGroup!.total).toBe(1);
@@ -1070,12 +925,13 @@ describe("buildApplyReport", () => {
           ],
         });
 
-        const messages: UIMessage[] = [
-          versionMsg(),
-          forgetPlannedChangeMsg("null_resource.ephemeral"),
-        ];
+        const scanResult = makeScanResult({
+          plannedChanges: [
+            { address: "null_resource.ephemeral", resourceType: "null_resource", module: "", action: "forget" },
+          ],
+        });
 
-        const report = buildApplyReport(plan, messages);
+        const report = buildApplyReport(plan, scanResult);
         const statuses = report.applyStatuses ?? [];
         const forgetStatus = statuses.find((s) => s.address === "null_resource.ephemeral");
         expect(forgetStatus).toBeDefined();
@@ -1093,12 +949,13 @@ describe("buildApplyReport", () => {
           ],
         });
 
-        const messages: UIMessage[] = [
-          versionMsg(),
-          forgetPlannedChangeMsg("null_resource.ephemeral"),
-        ];
+        const scanResult = makeScanResult({
+          plannedChanges: [
+            { address: "null_resource.ephemeral", resourceType: "null_resource", module: "", action: "forget" },
+          ],
+        });
 
-        const report = buildApplyReport(plan, messages);
+        const report = buildApplyReport(plan, scanResult);
         const statuses = report.applyStatuses ?? [];
         expect(statuses).toHaveLength(1);
         expect(statuses[0]!.success).toBe(true);
@@ -1117,7 +974,7 @@ describe("buildApplyReport", () => {
           ],
         });
 
-        const report = buildApplyReport(plan, [versionMsg()]);
+        const report = buildApplyReport(plan, makeScanResult());
         const allAddresses = report.modules.flatMap((m) => m.resources.map((r) => r.address));
         expect(allAddresses).toContain("null_resource.renamed");
       });
@@ -1133,7 +990,7 @@ describe("buildApplyReport", () => {
           ],
         });
 
-        const report = buildApplyReport(plan, [versionMsg()]);
+        const report = buildApplyReport(plan, makeScanResult());
         const moveGroup = report.summary.actions.find((g) => g.action === "move");
         expect(moveGroup).toBeDefined();
         expect(moveGroup!.total).toBe(1);
@@ -1150,7 +1007,7 @@ describe("buildApplyReport", () => {
           ],
         });
 
-        const report = buildApplyReport(plan, [versionMsg()]);
+        const report = buildApplyReport(plan, makeScanResult());
         const statuses = report.applyStatuses ?? [];
         const moveStatus = statuses.find((s) => s.address === "null_resource.renamed");
         expect(moveStatus).toBeDefined();
@@ -1169,7 +1026,7 @@ describe("buildApplyReport", () => {
           ],
         });
 
-        const report = buildApplyReport(plan, [versionMsg()]);
+        const report = buildApplyReport(plan, makeScanResult());
         const statuses = report.applyStatuses ?? [];
         expect(statuses).toHaveLength(1);
         expect(statuses[0]!.success).toBe(true);
@@ -1188,7 +1045,7 @@ describe("buildApplyReport", () => {
           ],
         });
 
-        const report = buildApplyReport(plan, [versionMsg()]);
+        const report = buildApplyReport(plan, makeScanResult());
         const allAddresses = report.modules.flatMap((m) => m.resources.map((r) => r.address));
         expect(allAddresses).toContain("random_string.imported");
       });
@@ -1204,7 +1061,7 @@ describe("buildApplyReport", () => {
           ],
         });
 
-        const report = buildApplyReport(plan, [versionMsg()]);
+        const report = buildApplyReport(plan, makeScanResult());
         const importGroup = report.summary.actions.find((g) => g.action === "import");
         expect(importGroup).toBeDefined();
         expect(importGroup!.total).toBe(1);
@@ -1221,7 +1078,7 @@ describe("buildApplyReport", () => {
           ],
         });
 
-        const report = buildApplyReport(plan, [versionMsg()]);
+        const report = buildApplyReport(plan, makeScanResult());
         const statuses = report.applyStatuses ?? [];
         const importStatus = statuses.find((s) => s.address === "random_string.imported");
         expect(importStatus).toBeDefined();
@@ -1240,7 +1097,7 @@ describe("buildApplyReport", () => {
           ],
         });
 
-        const report = buildApplyReport(plan, [versionMsg()]);
+        const report = buildApplyReport(plan, makeScanResult());
         const statuses = report.applyStatuses ?? [];
         expect(statuses).toHaveLength(1);
         expect(statuses[0]!.success).toBe(true);
@@ -1272,14 +1129,16 @@ describe("buildApplyReport", () => {
           ],
         });
 
-        const messages: UIMessage[] = [
-          versionMsg(),
-          forgetPlannedChangeMsg("null_resource.forgotten"),
-          applyStartMsg("null_resource.created", "create"),
-          applyCompleteMsg("null_resource.created", "create", 0.1, "id", "new-id"),
-        ];
+        const scanResult = makeScanResult({
+          plannedChanges: [
+            { address: "null_resource.forgotten", resourceType: "null_resource", module: "", action: "forget" },
+          ],
+          applyStatuses: [
+            { address: "null_resource.created", action: "create", success: true, elapsed: 0.1, idKey: "id", idValue: "new-id" },
+          ],
+        });
 
-        const report = buildApplyReport(plan, messages);
+        const report = buildApplyReport(plan, scanResult);
         const allAddresses = report.modules.flatMap((m) => m.resources.map((r) => r.address));
         expect(allAddresses).toContain("null_resource.forgotten");
         expect(allAddresses).toContain("null_resource.renamed");

@@ -1,7 +1,6 @@
 import type { BuildOptions } from "./builder/options.js";
 import type { RenderOptions } from "./renderer/options.js";
 import { parsePlan } from "./parser/index.js";
-import { parseUILog } from "./parser/index.js";
 import { buildReport } from "./builder/index.js";
 import { buildApplyReport } from "./builder/apply.js";
 import { buildReportFromSteps } from "./builder/report-from-steps.js";
@@ -10,6 +9,7 @@ import { renderReportSections } from "./renderer/report-sections.js";
 import { composeSections, DEFAULT_MAX_OUTPUT_LENGTH } from "./compositor/index.js";
 import { buildTruncationNotice } from "./compositor/truncation.js";
 import { STATUS_FAILURE } from "./model/status-icons.js";
+import { scanString } from "./jsonl-scanner/scan.js";
 
 export type Options = BuildOptions & RenderOptions;
 
@@ -49,8 +49,8 @@ export function applyToMarkdown(
   options?: Options,
 ): string {
   const plan = parsePlan(planJson);
-  const messages = parseUILog(applyJsonl);
-  const report = buildApplyReport(plan, messages, options);
+  const scanResult = scanString(applyJsonl);
+  const report = buildApplyReport(plan, scanResult, options);
   return renderReport(report, options);
 }
 
