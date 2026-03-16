@@ -2,21 +2,27 @@ name: CI
 
 on:
   push:
+    branches: [main]
   pull_request:
+
+permissions:
+  contents: read
+  pull-requests: write
+  issues: write
 
 jobs:
   ci:
-    name: Lint, typecheck, test
+    name: Lint, typecheck, test, bundle
     runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v4
 
-      - name: Set up Node.js 24
+      - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: "24"
-          cache: "npm"
+          node-version-file: .node-version
+          cache: npm
 
       - name: Install dependencies
         run: npm ci
@@ -30,10 +36,24 @@ jobs:
       - name: Test with coverage
         run: npm run test:coverage:ci
 
-      - name: Upload coverage report
+      - name: Integration test coverage
+        run: npm run test:integration:coverage
+
+      - name: Bundle
+        run: npm run bundle
+
+      - name: Check dist up to date
+        run: |
+          if [ -n "$(git status --porcelain dist/)" ]; then
+            echo "::error::dist/ is out of date. Run 'npm run bundle' and commit the result."
+            git diff dist/
+            exit 1
+          fi
+
+      - name: Report CI Status
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: ./
         with:
-          name: coverage
-          path: coverage/
-          retention-days: 14
+          steps: ${{ toJSON(steps) }}
+          workspace: ci
+          github-token: ${{ github.token }}
