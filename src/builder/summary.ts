@@ -1,11 +1,21 @@
 import type { ResourceChange } from "../model/resource.js";
 import type { PlanAction } from "../model/plan-action.js";
-import type { Summary, SummaryActionGroup, ResourceTypeCount } from "../model/summary.js";
+import type {
+  Summary,
+  SummaryActionGroup,
+  ResourceTypeCount,
+} from "../model/summary.js";
 import type { PlannedChange } from "../jsonl-scanner/types.js";
 
 /** Actions that count toward summary totals, in display order. */
 const SUMMARY_ACTIONS: readonly PlanAction[] = [
-  "create", "update", "replace", "delete", "move", "import", "forget",
+  "create",
+  "update",
+  "replace",
+  "delete",
+  "move",
+  "import",
+  "forget",
 ];
 
 /**
@@ -83,7 +93,9 @@ function buildActionGroups(
  * Produces the same `Summary` shape as `buildSummary` — the renderer
  * cannot distinguish a summary from plan JSON vs JSONL.
  */
-export function buildSummaryFromScan(changes: readonly PlannedChange[]): Summary {
+export function buildSummaryFromScan(
+  changes: readonly PlannedChange[],
+): Summary {
   return {
     actions: buildActionGroupsFromScan(changes, SUMMARY_ACTIONS),
     failures: [],

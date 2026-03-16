@@ -143,7 +143,11 @@ describe("buildApplyReport", () => {
 
       const scanResult = makeScanResult({
         applyStatuses: [
-          { address: "null_resource.failing", action: "create", success: false },
+          {
+            address: "null_resource.failing",
+            action: "create",
+            success: false,
+          },
         ],
       });
 
@@ -183,7 +187,11 @@ describe("buildApplyReport", () => {
 
       const scanResult = makeScanResult({
         applyStatuses: [
-          { address: "data.local_command.read_config", action: "read", success: true },
+          {
+            address: "data.local_command.read_config",
+            action: "read",
+            success: true,
+          },
         ],
       });
 
@@ -211,7 +219,8 @@ describe("buildApplyReport", () => {
           {
             severity: "error",
             summary: "Failed to read data source",
-            detail: "data.external.failing_query: query returned non-zero exit code",
+            detail:
+              "data.external.failing_query: query returned non-zero exit code",
             address: "data.external.failing_query",
           },
         ],
@@ -228,9 +237,13 @@ describe("buildApplyReport", () => {
       // The data source error MUST appear in diagnostics
       expect(report.diagnostics).toBeDefined();
       expect(report.diagnostics).toHaveLength(1);
-      expect(report.diagnostics![0]!.address).toBe("data.external.failing_query");
+      expect(report.diagnostics![0]!.address).toBe(
+        "data.external.failing_query",
+      );
       expect(report.diagnostics![0]!.severity).toBe("error");
-      expect(report.diagnostics![0]!.summary).toBe("Failed to read data source");
+      expect(report.diagnostics![0]!.summary).toBe(
+        "Failed to read data source",
+      );
       expect(report.diagnostics![0]!.source).toBe("apply");
     });
   });
@@ -260,9 +273,13 @@ describe("buildApplyReport", () => {
       const report = buildApplyReport(plan, scanResult);
 
       // Only the applied resource should be counted
-      const updateGroup = report.summary.actions.find((g) => g.action === "update");
+      const updateGroup = report.summary.actions.find(
+        (g) => g.action === "update",
+      );
       expect(updateGroup?.total).toBe(1);
-      expect(report.summary.actions.find((g) => g.action === "create")).toBeUndefined();
+      expect(
+        report.summary.actions.find((g) => g.action === "create"),
+      ).toBeUndefined();
       expect(report.summary.failures).toEqual([]);
     });
 
@@ -295,7 +312,11 @@ describe("buildApplyReport", () => {
 
       const scanResult = makeScanResult({
         applyStatuses: [
-          { address: "null_resource.deferred", action: "update", success: true },
+          {
+            address: "null_resource.deferred",
+            action: "update",
+            success: true,
+          },
         ],
       });
 
@@ -363,7 +384,11 @@ describe("buildApplyReport", () => {
 
       const scanResult = makeScanResult({
         applyStatuses: [
-          { address: "null_resource.failing", action: "create", success: false },
+          {
+            address: "null_resource.failing",
+            action: "create",
+            success: false,
+          },
         ],
         diagnostics: [
           {
@@ -390,7 +415,11 @@ describe("buildApplyReport", () => {
 
       const scanResult = makeScanResult({
         diagnostics: [
-          { severity: "warning", summary: "deprecated attribute", detail: "Use xyz instead" },
+          {
+            severity: "warning",
+            summary: "deprecated attribute",
+            detail: "Use xyz instead",
+          },
         ],
       });
 
@@ -425,9 +454,7 @@ describe("buildApplyReport", () => {
   describe("apply status extraction", () => {
     it("passes through success statuses from scan result", () => {
       const plan = makePlan({
-        resource_changes: [
-          resourceChange("null_resource.web", ["create"]),
-        ],
+        resource_changes: [resourceChange("null_resource.web", ["create"])],
       });
 
       const scanResult = makeScanResult({
@@ -468,7 +495,12 @@ describe("buildApplyReport", () => {
 
       const scanResult = makeScanResult({
         applyStatuses: [
-          { address: "null_resource.failing", action: "create", success: false, elapsed: 2.0 },
+          {
+            address: "null_resource.failing",
+            action: "create",
+            success: false,
+            elapsed: 2.0,
+          },
         ],
       });
 
@@ -587,7 +619,12 @@ describe("buildApplyReport", () => {
 
     it("leaves already-known output values unchanged", () => {
       const plan = makePlan({
-        output_changes: outputChange("known", ["update"], "before_val", "after_val"),
+        output_changes: outputChange(
+          "known",
+          ["update"],
+          "before_val",
+          "after_val",
+        ),
       });
 
       const scanResult = makeScanResult({
@@ -619,9 +656,7 @@ describe("buildApplyReport", () => {
   describe("empty and edge cases", () => {
     it("handles empty scan result", () => {
       const plan = makePlan({
-        resource_changes: [
-          resourceChange("null_resource.x", ["create"]),
-        ],
+        resource_changes: [resourceChange("null_resource.x", ["create"])],
       });
 
       const report = buildApplyReport(plan, makeScanResult());
@@ -651,9 +686,7 @@ describe("buildApplyReport", () => {
 
     it("handles scan result with unknown type lines gracefully", () => {
       const plan = makePlan({
-        resource_changes: [
-          resourceChange("null_resource.ok", ["create"]),
-        ],
+        resource_changes: [resourceChange("null_resource.ok", ["create"])],
       });
 
       const scanResult = makeScanResult({
@@ -726,9 +759,24 @@ describe("buildApplyReport", () => {
 
       const scanResult = makeScanResult({
         plannedChanges: [
-          { address: "null_resource.a", resourceType: "null_resource", module: "", action: "create" },
-          { address: "null_resource.b", resourceType: "null_resource", module: "", action: "create" },
-          { address: "null_resource.c", resourceType: "null_resource", module: "", action: "create" },
+          {
+            address: "null_resource.a",
+            resourceType: "null_resource",
+            module: "",
+            action: "create",
+          },
+          {
+            address: "null_resource.b",
+            resourceType: "null_resource",
+            module: "",
+            action: "create",
+          },
+          {
+            address: "null_resource.c",
+            resourceType: "null_resource",
+            module: "",
+            action: "create",
+          },
         ],
         applyStatuses: [
           { address: "null_resource.a", action: "create", success: true },
@@ -756,14 +804,17 @@ describe("buildApplyReport", () => {
 
     it("does not create not-started statuses when all planned resources were applied", () => {
       const plan = makePlan({
-        resource_changes: [
-          resourceChange("null_resource.a", ["create"]),
-        ],
+        resource_changes: [resourceChange("null_resource.a", ["create"])],
       });
 
       const scanResult = makeScanResult({
         plannedChanges: [
-          { address: "null_resource.a", resourceType: "null_resource", module: "", action: "create" },
+          {
+            address: "null_resource.a",
+            resourceType: "null_resource",
+            module: "",
+            action: "create",
+          },
         ],
         applyStatuses: [
           { address: "null_resource.a", action: "create", success: true },
@@ -778,17 +829,25 @@ describe("buildApplyReport", () => {
 
     it("does not create not-started for errored resources (they were started)", () => {
       const plan = makePlan({
-        resource_changes: [
-          resourceChange("null_resource.fail", ["create"]),
-        ],
+        resource_changes: [resourceChange("null_resource.fail", ["create"])],
       });
 
       const scanResult = makeScanResult({
         plannedChanges: [
-          { address: "null_resource.fail", resourceType: "null_resource", module: "", action: "create" },
+          {
+            address: "null_resource.fail",
+            resourceType: "null_resource",
+            module: "",
+            action: "create",
+          },
         ],
         applyStatuses: [
-          { address: "null_resource.fail", action: "create", success: false, elapsed: 1.0 },
+          {
+            address: "null_resource.fail",
+            action: "create",
+            success: false,
+            elapsed: 1.0,
+          },
         ],
       });
 
@@ -803,9 +862,7 @@ describe("buildApplyReport", () => {
 
     it("handles apply with no planned_change entries", () => {
       const plan = makePlan({
-        resource_changes: [
-          resourceChange("null_resource.a", ["create"]),
-        ],
+        resource_changes: [resourceChange("null_resource.a", ["create"])],
       });
 
       const scanResult = makeScanResult({
@@ -822,14 +879,17 @@ describe("buildApplyReport", () => {
 
     it("preserves correct action for not-started resources", () => {
       const plan = makePlan({
-        resource_changes: [
-          resourceChange("null_resource.del", ["delete"]),
-        ],
+        resource_changes: [resourceChange("null_resource.del", ["delete"])],
       });
 
       const scanResult = makeScanResult({
         plannedChanges: [
-          { address: "null_resource.del", resourceType: "null_resource", module: "", action: "delete" },
+          {
+            address: "null_resource.del",
+            resourceType: "null_resource",
+            module: "",
+            action: "delete",
+          },
         ],
       });
 
@@ -856,7 +916,12 @@ describe("buildApplyReport", () => {
 
         const scanResult = makeScanResult({
           plannedChanges: [
-            { address: "null_resource.ephemeral", resourceType: "null_resource", module: "", action: "forget" },
+            {
+              address: "null_resource.ephemeral",
+              resourceType: "null_resource",
+              module: "",
+              action: "forget",
+            },
           ],
         });
 
@@ -893,12 +958,19 @@ describe("buildApplyReport", () => {
 
         const scanResult = makeScanResult({
           plannedChanges: [
-            { address: "null_resource.ephemeral", resourceType: "null_resource", module: "", action: "forget" },
+            {
+              address: "null_resource.ephemeral",
+              resourceType: "null_resource",
+              module: "",
+              action: "forget",
+            },
           ],
         });
 
         const report = buildApplyReport(plan, scanResult);
-        const forgetGroup = report.summary.actions.find((g) => g.action === "forget");
+        const forgetGroup = report.summary.actions.find(
+          (g) => g.action === "forget",
+        );
         expect(forgetGroup).toBeDefined();
         expect(forgetGroup!.total).toBe(1);
       });
@@ -915,13 +987,20 @@ describe("buildApplyReport", () => {
 
         const scanResult = makeScanResult({
           plannedChanges: [
-            { address: "null_resource.ephemeral", resourceType: "null_resource", module: "", action: "forget" },
+            {
+              address: "null_resource.ephemeral",
+              resourceType: "null_resource",
+              module: "",
+              action: "forget",
+            },
           ],
         });
 
         const report = buildApplyReport(plan, scanResult);
         const statuses = report.applyStatuses ?? [];
-        const forgetStatus = statuses.find((s) => s.address === "null_resource.ephemeral");
+        const forgetStatus = statuses.find(
+          (s) => s.address === "null_resource.ephemeral",
+        );
         expect(forgetStatus).toBeDefined();
         expect(forgetStatus!.action).toBe("forget");
         expect(forgetStatus!.success).toBe(true);
@@ -939,7 +1018,12 @@ describe("buildApplyReport", () => {
 
         const scanResult = makeScanResult({
           plannedChanges: [
-            { address: "null_resource.ephemeral", resourceType: "null_resource", module: "", action: "forget" },
+            {
+              address: "null_resource.ephemeral",
+              resourceType: "null_resource",
+              module: "",
+              action: "forget",
+            },
           ],
         });
 
@@ -979,7 +1063,9 @@ describe("buildApplyReport", () => {
         });
 
         const report = buildApplyReport(plan, makeScanResult());
-        const moveGroup = report.summary.actions.find((g) => g.action === "move");
+        const moveGroup = report.summary.actions.find(
+          (g) => g.action === "move",
+        );
         expect(moveGroup).toBeDefined();
         expect(moveGroup!.total).toBe(1);
       });
@@ -997,7 +1083,9 @@ describe("buildApplyReport", () => {
 
         const report = buildApplyReport(plan, makeScanResult());
         const statuses = report.applyStatuses ?? [];
-        const moveStatus = statuses.find((s) => s.address === "null_resource.renamed");
+        const moveStatus = statuses.find(
+          (s) => s.address === "null_resource.renamed",
+        );
         expect(moveStatus).toBeDefined();
         expect(moveStatus!.action).toBe("move");
         expect(moveStatus!.success).toBe(true);
@@ -1050,7 +1138,9 @@ describe("buildApplyReport", () => {
         });
 
         const report = buildApplyReport(plan, makeScanResult());
-        const importGroup = report.summary.actions.find((g) => g.action === "import");
+        const importGroup = report.summary.actions.find(
+          (g) => g.action === "import",
+        );
         expect(importGroup).toBeDefined();
         expect(importGroup!.total).toBe(1);
       });
@@ -1068,7 +1158,9 @@ describe("buildApplyReport", () => {
 
         const report = buildApplyReport(plan, makeScanResult());
         const statuses = report.applyStatuses ?? [];
-        const importStatus = statuses.find((s) => s.address === "random_string.imported");
+        const importStatus = statuses.find(
+          (s) => s.address === "random_string.imported",
+        );
         expect(importStatus).toBeDefined();
         expect(importStatus!.action).toBe("import");
         expect(importStatus!.success).toBe(true);
@@ -1119,10 +1211,22 @@ describe("buildApplyReport", () => {
 
         const scanResult = makeScanResult({
           plannedChanges: [
-            { address: "null_resource.forgotten", resourceType: "null_resource", module: "", action: "forget" },
+            {
+              address: "null_resource.forgotten",
+              resourceType: "null_resource",
+              module: "",
+              action: "forget",
+            },
           ],
           applyStatuses: [
-            { address: "null_resource.created", action: "create", success: true, elapsed: 0.1, idKey: "id", idValue: "new-id" },
+            {
+              address: "null_resource.created",
+              action: "create",
+              success: true,
+              elapsed: 0.1,
+              idKey: "id",
+              idValue: "new-id",
+            },
           ],
         });
 
@@ -1134,9 +1238,15 @@ describe("buildApplyReport", () => {
         expect(allAddresses).toContain("null_resource.created");
 
         const statuses = report.applyStatuses ?? [];
-        expect(statuses.find((s) => s.address === "null_resource.forgotten")?.action).toBe("forget");
-        expect(statuses.find((s) => s.address === "null_resource.renamed")?.action).toBe("move");
-        expect(statuses.find((s) => s.address === "random_string.imported")?.action).toBe("import");
+        expect(
+          statuses.find((s) => s.address === "null_resource.forgotten")?.action,
+        ).toBe("forget");
+        expect(
+          statuses.find((s) => s.address === "null_resource.renamed")?.action,
+        ).toBe("move");
+        expect(
+          statuses.find((s) => s.address === "random_string.imported")?.action,
+        ).toBe("import");
         expect(statuses.every((s) => s.success)).toBe(true);
       });
     });

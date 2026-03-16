@@ -15,10 +15,7 @@ import { buildAttributeChanges } from "./attributes.js";
  * - `no-op` with `importing` → `import` (import block, no other changes)
  * - Other `no-op` → remains `no-op` (filtered out by caller)
  */
-function refineAction(
-  base: PlanAction,
-  rc: TFResourceChange,
-): PlanAction {
+function refineAction(base: PlanAction, rc: TFResourceChange): PlanAction {
   if (base !== "no-op") return base;
   if (rc.previous_address) return "move";
   if (rc.change.importing) return "import";
@@ -46,9 +43,15 @@ export function buildResourceChanges(
     const action = refineAction(determineAction(rc.change.actions), rc);
     if (action === "no-op") continue;
 
-    const address = rc.address ?? `${rc.type ?? "unknown"}.${rc.name ?? "unknown"}`;
+    const address =
+      rc.address ?? `${rc.type ?? "unknown"}.${rc.name ?? "unknown"}`;
 
-    const attributes = buildAttributeChanges(rc.change, address, configRefs, options);
+    const attributes = buildAttributeChanges(
+      rc.change,
+      address,
+      configRefs,
+      options,
+    );
 
     // Determine if all attributes are known after apply
     const allUnknownAfterApply = isAllUnknownAfterApply(rc, attributes);
@@ -88,9 +91,15 @@ export function buildDriftChanges(
     if (shouldSkip(rc)) continue;
 
     const action = refineAction(determineAction(rc.change.actions), rc);
-    const address = rc.address ?? `${rc.type ?? "unknown"}.${rc.name ?? "unknown"}`;
+    const address =
+      rc.address ?? `${rc.type ?? "unknown"}.${rc.name ?? "unknown"}`;
 
-    const attributes = buildAttributeChanges(rc.change, address, configRefs, options);
+    const attributes = buildAttributeChanges(
+      rc.change,
+      address,
+      configRefs,
+      options,
+    );
     const allUnknownAfterApply = isAllUnknownAfterApply(rc, attributes);
 
     result.push({
@@ -143,7 +152,9 @@ function isAllUnknownAfterApply(
  * Data source filtering is not needed here — the scanner only extracts
  * managed resource planned_change messages (data sources don't emit them).
  */
-export function buildResourcesFromScan(changes: readonly PlannedChange[]): ModelResourceChange[] {
+export function buildResourcesFromScan(
+  changes: readonly PlannedChange[],
+): ModelResourceChange[] {
   const result: ModelResourceChange[] = [];
 
   for (const change of changes) {

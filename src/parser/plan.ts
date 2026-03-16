@@ -16,9 +16,7 @@ export function parsePlan(json: string): Plan {
   } catch {
     // Do not include the underlying SyntaxError detail — Node.js 20+ embeds
     // a snippet of the raw input in the message, which may contain sensitive values.
-    throw new Error(
-      "Failed to parse plan JSON: input is not valid JSON",
-    );
+    throw new Error("Failed to parse plan JSON: input is not valid JSON");
   }
 
   if (typeof parsed !== "object" || parsed === null || Array.isArray(parsed)) {

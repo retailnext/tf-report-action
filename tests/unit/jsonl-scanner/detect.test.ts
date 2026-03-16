@@ -11,10 +11,7 @@ describe("isJsonLines", () => {
   });
 
   it("returns true if only one line has a type field", () => {
-    const lines = [
-      "This is plaintext",
-      '{"type":"version","ui":"1.0"}',
-    ];
+    const lines = ["This is plaintext", '{"type":"version","ui":"1.0"}'];
     expect(isJsonLines(lines)).toBe(true);
   });
 
@@ -45,10 +42,7 @@ describe("isJsonLines", () => {
   });
 
   it("skips invalid JSON and finds valid JSONL later", () => {
-    const lines = [
-      "garbage {{{",
-      '{"type":"log","@message":"hello"}',
-    ];
+    const lines = ["garbage {{{", '{"type":"log","@message":"hello"}'];
     expect(isJsonLines(lines)).toBe(true);
   });
 

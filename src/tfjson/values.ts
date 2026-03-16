@@ -8,7 +8,7 @@ import { JsonValue, AttributeValues, AttributeShadow, CtyType } from "./common";
  * StateValues is the top-level structure of a values representation. It is
  * used in Plan.planned_values (the expected state after apply) and inside
  * State.values (the current state before this plan).
- * 
+ *
  * The structure is the same in both contexts, but the completeness differs:
  *   - In planned_values: unknown values are omitted; this is what the world will
  *     look like after apply, with gaps for anything not yet determined.
@@ -45,7 +45,7 @@ export interface ValuesOutput {
    * deprecated is a deprecation message for this output, set when the module
    * author has marked the output as deprecated. Consumers should surface this
    * as a warning to callers of the module.
-   * 
+   *
    * OPENTOFU ONLY — Terraform does not support output deprecation.
    */
   deprecated?: string;
@@ -61,7 +61,7 @@ export interface ValuesOutput {
    * Primitive types are strings: "string", "number", "bool". Collection and
    * structural types are arrays: ["list","string"], ["map","number"],
    * ["set","string"], ["object",{"attr":"type",...}], ["tuple",[...]].
-   * 
+   *
    * Note: lists, sets, and tuples all serialize to JSON arrays; maps and
    * objects both serialize to JSON objects. The type descriptor is needed to
    * disambiguate.
@@ -138,7 +138,7 @@ export interface ValueResource {
    * hostname differs between tools (registry.terraform.io vs
    * registry.opentofu.org); do not hardcode either. Use for equality
    * comparisons only.
-   * 
+   *
    * Note: in state representations, the JSON tag is "provider_name" with no
    * omitempty — it is always present even if empty.
    */
@@ -173,7 +173,7 @@ export interface ValueResource {
    * depends_on is the list of addresses of other resources or modules that this
    * resource depends on (from the depends_on meta-argument). These are
    * relative to the containing module.
-   * 
+   *
    * Present in planned_values resources (OPENTOFU ONLY) and in prior_state
    * resources (BOTH tools, via jsonstate).
    */
@@ -184,7 +184,7 @@ export interface ValueResource {
    * state — i.e. it is scheduled for replacement on the next apply because a
    * previous apply partially succeeded. Tainted resources appear in
    * resource_changes with action_reason "replace_because_tainted".
-   * 
+   *
    * Present in prior_state resources only (BOTH tools, via jsonstate).
    * Not present in planned_values resources.
    */
@@ -196,7 +196,7 @@ export interface ValueResource {
    * previous plan cycle but whose deletion was interrupted). When set, this
    * is NOT the current live resource; the current object has a separate entry
    * with the same address but no deposed_key.
-   * 
+   *
    * Present in prior_state resources only (BOTH tools, via jsonstate).
    */
   deposed_key?: string;
@@ -206,7 +206,7 @@ export interface ValueResource {
    * the identity_values object conforms to. This is optional (undefined) because
    * zero (0) is a valid schema version but the field should be absent when no
    * identity schema exists.
-   * 
+   *
    * TERRAFORM ONLY — OpenTofu does not have a resource identity concept.
    */
   identity_schema_version?: number;
@@ -216,7 +216,7 @@ export interface ValueResource {
    * identity is a provider-defined set of attributes that uniquely identify
    * the resource in the provider's API. This is distinct from and
    * complementary to the resource's configuration attributes in values.
-   * 
+   *
    * TERRAFORM ONLY — OpenTofu does not have a resource identity concept.
    */
   identity?: AttributeValues;

@@ -14,7 +14,14 @@
  *    display reads only read the first `maxDisplayRead` bytes.
  */
 
-import { realpathSync, statSync, readFileSync, openSync, readSync, closeSync } from "node:fs";
+import {
+  realpathSync,
+  statSync,
+  readFileSync,
+  openSync,
+  readSync,
+  closeSync,
+} from "node:fs";
 import { dirname, isAbsolute, resolve } from "node:path";
 import type { ReaderOptions } from "./types.js";
 
@@ -41,7 +48,9 @@ export interface ReadError {
 export type FileReadOutcome = ReadResult | ReadError;
 
 /** Type guard to check if a result is a ReadError. */
-export function isReadError(result: FileReadOutcome | ValidatedPath): result is ReadError {
+export function isReadError(
+  result: FileReadOutcome | ValidatedPath,
+): result is ReadError {
   return "error" in result;
 }
 

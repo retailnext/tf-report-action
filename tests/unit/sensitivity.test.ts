@@ -1,5 +1,8 @@
 import { describe, it, expect } from "vitest";
-import { getHierarchicalPaths, isSensitive } from "../../src/sensitivity/index.js";
+import {
+  getHierarchicalPaths,
+  isSensitive,
+} from "../../src/sensitivity/index.js";
 
 describe("getHierarchicalPaths", () => {
   it("returns single element for a simple key", () => {
@@ -87,7 +90,10 @@ describe("isSensitive", () => {
   });
 
   it("returns false when sensitivity map has non-true values", () => {
-    const before = new Map([["key", "false"], ["key", null]]);
+    const before = new Map([
+      ["key", "false"],
+      ["key", null],
+    ]);
     expect(isSensitive("key", before, empty)).toBe(false);
   });
 });

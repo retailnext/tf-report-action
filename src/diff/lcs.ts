@@ -20,14 +20,19 @@ export function computeLcsPairs(before: string[], after: string[]): LcsPair[] {
   if (m * n > MAX_LCS_CELLS) return [];
 
   // Build DP table
-  const dp: number[][] = Array.from({ length: m + 1 }, () => new Array<number>(n + 1).fill(0));
+  const dp: number[][] = Array.from({ length: m + 1 }, () =>
+    new Array<number>(n + 1).fill(0),
+  );
 
   for (let i = 1; i <= m; i++) {
     for (let j = 1; j <= n; j++) {
       if (before[i - 1] === after[j - 1]) {
         (dp[i] as number[])[j] = (dp[i - 1]?.[j - 1] ?? 0) + 1;
       } else {
-        (dp[i] as number[])[j] = Math.max(dp[i - 1]?.[j] ?? 0, dp[i]?.[j - 1] ?? 0);
+        (dp[i] as number[])[j] = Math.max(
+          dp[i - 1]?.[j] ?? 0,
+          dp[i]?.[j - 1] ?? 0,
+        );
       }
     }
   }

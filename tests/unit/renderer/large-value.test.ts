@@ -12,7 +12,12 @@ describe("renderLargeValue", () => {
   });
 
   it("returns a details block for added value (before null)", () => {
-    const result = renderLargeValue("my_attr", null, '{"key": "value"}', makeCache());
+    const result = renderLargeValue(
+      "my_attr",
+      null,
+      '{"key": "value"}',
+      makeCache(),
+    );
     expect(result).toContain("<details>");
     expect(result).toContain("<summary>");
     expect(result).toContain("my_attr");
@@ -20,7 +25,12 @@ describe("renderLargeValue", () => {
   });
 
   it("returns a details block for removed value (after null)", () => {
-    const result = renderLargeValue("my_attr", '{"key": "old"}', null, makeCache());
+    const result = renderLargeValue(
+      "my_attr",
+      '{"key": "old"}',
+      null,
+      makeCache(),
+    );
     expect(result).toContain("<details>");
     expect(result).toContain("my_attr");
   });

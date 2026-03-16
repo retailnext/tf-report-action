@@ -5,7 +5,13 @@
  * steps context JSON, files on disk) and the pure transformation pipeline.
  */
 
-export type { StepData, Steps, StepResult, Env, ReaderOptions } from "./types.js";
+export type {
+  StepData,
+  Steps,
+  StepResult,
+  Env,
+  ReaderOptions,
+} from "./types.js";
 export {
   isStepResult,
   DEFAULT_MAX_FILE_SIZE,
@@ -21,7 +27,29 @@ export {
   OUTPUT_EXIT_CODE,
 } from "./types.js";
 export { parseSteps } from "./parse.js";
-export type { ReadResult, ReadError, FileReadOutcome, ValidatedPath } from "./reader.js";
-export { readForParse, readForDisplay, isReadError, getValidatedPath } from "./reader.js";
-export { readStepFile, readStepStdout, readStepStdoutForDisplay, readStepStderrForDisplay, getStepStdoutPath } from "./io.js";
-export { getStepOutcome, getExitCode, hasAnyFailedStep, hasAnyFailedKnownStep, buildStepOutcomes } from "./outcomes.js";
+export type {
+  ReadResult,
+  ReadError,
+  FileReadOutcome,
+  ValidatedPath,
+} from "./reader.js";
+export {
+  readForParse,
+  readForDisplay,
+  isReadError,
+  getValidatedPath,
+} from "./reader.js";
+export {
+  readStepFile,
+  readStepStdout,
+  readStepStdoutForDisplay,
+  readStepStderrForDisplay,
+  getStepStdoutPath,
+} from "./io.js";
+export {
+  getStepOutcome,
+  getExitCode,
+  hasAnyFailedStep,
+  hasAnyFailedKnownStep,
+  buildStepOutcomes,
+} from "./outcomes.js";

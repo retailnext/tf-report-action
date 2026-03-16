@@ -33,14 +33,19 @@ describe("buildLineDiff", () => {
   it("shows unchanged lines around a change", () => {
     const result = diff("line1\nline2\nline3", "line1\nchanged\nline3");
     expect(result[0]).toEqual({ kind: "unchanged", value: "line1" });
-    expect(result[result.length - 1]).toEqual({ kind: "unchanged", value: "line3" });
+    expect(result[result.length - 1]).toEqual({
+      kind: "unchanged",
+      value: "line3",
+    });
   });
 
   it("marks all lines as removed when after is empty string", () => {
     const result = diff("a\nb", "");
     // "a\nb" splits into ["a","b"]; "" splits into [""]
     // "" is "added" (the empty string line), a and b are "removed"
-    const removedValues = result.filter((e) => e.kind === "removed").map((e) => e.value);
+    const removedValues = result
+      .filter((e) => e.kind === "removed")
+      .map((e) => e.value);
     expect(removedValues).toContain("a");
     expect(removedValues).toContain("b");
   });

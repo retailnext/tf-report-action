@@ -9,7 +9,7 @@ import { CheckResult } from "./checks";
  * State represents the JSON state output, as embedded in Plan.prior_state and
  * also produced by `terraform show -json` / `tofu show -json` when given a
  * state file rather than a plan file.
- * 
+ *
  * The prior_state in a plan is the recorded state at the beginning of planning —
  * what was last successfully applied. It may differ from the current real-world
  * state; drifts between them appear in Plan.resource_drift.
@@ -36,7 +36,7 @@ export interface State {
    * output values as they were last recorded. Unlike planned_values, all
    * values in the prior state are fully known (the state is always a complete
    * snapshot).
-   * 
+   *
    * Undefined when the state is empty (no resources have been applied yet).
    */
   values?: StateValues;
@@ -44,10 +44,10 @@ export interface State {
   /**
    * checks contains the check/condition results that were recorded in this
    * state. This reflects the check statuses as of the last successful apply.
-   * 
+   *
    * Stability: In Terraform this is marked EXPERIMENTAL; in OpenTofu it is
    * considered stable.
-   * 
+   *
    * OPENTOFU ONLY in state output — Terraform does not embed checks in state
    * JSON. However, both tools include checks in the top-level plan output.
    */

@@ -31,9 +31,18 @@ import {
   DEFAULT_MAX_FILE_SIZE,
   DEFAULT_MAX_DISPLAY_READ,
 } from "../steps/types.js";
-import { readStepStdout, readStepStdoutForDisplay, getStepStdoutPath } from "../steps/io.js";
+import {
+  readStepStdout,
+  readStepStdoutForDisplay,
+  getStepStdoutPath,
+} from "../steps/io.js";
 import { getStepOutcome, buildStepOutcomes } from "../steps/outcomes.js";
-import { parsePlan, detectToolFromPlan, detectToolFromOutput, parseValidateOutput } from "../parser/index.js";
+import {
+  parsePlan,
+  detectToolFromPlan,
+  detectToolFromOutput,
+  parseValidateOutput,
+} from "../parser/index.js";
 import { buildReport } from "./index.js";
 import { buildApplyReport } from "./apply.js";
 import { buildSummaryFromScan } from "./summary.js";
@@ -114,7 +123,13 @@ export function buildReportFromSteps(
   const planStepId = options?.planStep ?? DEFAULT_PLAN_STEP;
   const showPlanStepId = options?.showPlanStep ?? DEFAULT_SHOW_PLAN_STEP;
   const applyStepId = options?.applyStep ?? DEFAULT_APPLY_STEP;
-  const knownStepIds = new Set([initStepId, validateStepId, planStepId, showPlanStepId, applyStepId]);
+  const knownStepIds = new Set([
+    initStepId,
+    validateStepId,
+    planStepId,
+    showPlanStepId,
+    applyStepId,
+  ]);
 
   // Reader options
   const readerOpts: ReaderOptions = {
@@ -146,8 +161,12 @@ export function buildReportFromSteps(
   const planStep = steps[planStepId];
   const showPlanStep = steps[showPlanStepId];
   const applyStep = steps[applyStepId];
-  const hasAnyIaCStep = initStep !== undefined || validateStep !== undefined
-    || planStep !== undefined || showPlanStep !== undefined || applyStep !== undefined;
+  const hasAnyIaCStep =
+    initStep !== undefined ||
+    validateStep !== undefined ||
+    planStep !== undefined ||
+    showPlanStep !== undefined ||
+    applyStep !== undefined;
 
   // ─── Phase 1: Process init/validate (issue collection) ──────────────
   if (initStep && getStepOutcome(initStep) === "failure") {
@@ -164,8 +183,14 @@ export function buildReportFromSteps(
   // Tier 1: show-plan JSON
   if (showPlanStep && getStepOutcome(showPlanStep) === "success") {
     showPlanParsed = tryProcessShowPlan(
-      showPlanStep, showPlanStepId, applyStep, applyStepId,
-      report, readerOpts, options, tool,
+      showPlanStep,
+      showPlanStepId,
+      applyStep,
+      applyStepId,
+      report,
+      readerOpts,
+      options,
+      tool,
     );
     if (showPlanParsed) {
       tool ??= report.tool;
@@ -180,7 +205,13 @@ export function buildReportFromSteps(
 
   // Apply step: JSONL or raw text
   if (applyStep && getStepOutcome(applyStep) !== "skipped") {
-    processApplyStep(applyStep, applyStepId, report, readerOpts, showPlanParsed);
+    processApplyStep(
+      applyStep,
+      applyStepId,
+      report,
+      readerOpts,
+      showPlanParsed,
+    );
     tool ??= report.tool;
   }
 
@@ -193,7 +224,10 @@ export function buildReportFromSteps(
   }
 
   // ─── Phase 4: Add warnings for limited data ──────────────────────
-  if (!showPlanParsed && (report.resources !== undefined || report.summary !== undefined)) {
+  if (
+    !showPlanParsed &&
+    (report.resources !== undefined || report.summary !== undefined)
+  ) {
     // JSONL-enriched report — has structure but no attribute detail
     report.warnings.push(
       `This report was generated without \`${expectedCommand(tool, "show-plan")}\` output. Resource attribute details are not available.`,
@@ -224,7 +258,9 @@ export function buildReportFromSteps(
   // When IaC content is present, show only IaC steps + failed unfamiliar
   if (hasAnyIaCStep) {
     const failedUnfamiliar = new Set(
-      report.issues.filter((i) => !knownStepIds.has(i.id) && i.isFailed).map((i) => i.id),
+      report.issues
+        .filter((i) => !knownStepIds.has(i.id) && i.isFailed)
+        .map((i) => i.id),
     );
     report.steps = report.steps.filter(
       (s) => knownStepIds.has(s.id) || failedUnfamiliar.has(s.id),
@@ -258,8 +294,8 @@ function processValidateStep(
     try {
       const validateOutput = parseValidateOutput(stdoutRead.content);
       if (validateOutput.diagnostics.length > 0) {
-        const diagnostics = validateOutput.diagnostics.map(
-          (d: UIDiagnostic) => uiDiagnosticToModel(d, "validate"),
+        const diagnostics = validateOutput.diagnostics.map((d: UIDiagnostic) =>
+          uiDiagnosticToModel(d, "validate"),
         );
         report.diagnostics = [...(report.diagnostics ?? []), ...diagnostics];
       }
@@ -305,10 +341,14 @@ function tryProcessShowPlan(
   } catch (err: unknown) {
     const errorDetail = err instanceof Error ? err.message : "unknown error";
     const commandHint = expectedCommand(tool, "show-plan");
-    report.issues.push(buildStepIssue(
-      showPlanStep, showPlanStepId, readerOpts,
-      `Plan output could not be parsed: ${errorDetail}. Expected output from \`${commandHint}\`.`,
-    ));
+    report.issues.push(
+      buildStepIssue(
+        showPlanStep,
+        showPlanStepId,
+        readerOpts,
+        `Plan output could not be parsed: ${errorDetail}. Expected output from \`${commandHint}\`.`,
+      ),
+    );
     return false;
   }
 
@@ -335,15 +375,25 @@ function tryProcessShowPlan(
   }
 
   // Merge enriched report fields into the progressive report
-  if (enrichedReport.summary !== undefined) report.summary = enrichedReport.summary;
-  if (enrichedReport.resources !== undefined) report.resources = enrichedReport.resources;
-  if (enrichedReport.driftResources !== undefined) report.driftResources = enrichedReport.driftResources;
-  if (enrichedReport.outputs !== undefined) report.outputs = enrichedReport.outputs;
-  const mergedDiags = [...(report.diagnostics ?? []), ...(enrichedReport.diagnostics ?? [])];
+  if (enrichedReport.summary !== undefined)
+    report.summary = enrichedReport.summary;
+  if (enrichedReport.resources !== undefined)
+    report.resources = enrichedReport.resources;
+  if (enrichedReport.driftResources !== undefined)
+    report.driftResources = enrichedReport.driftResources;
+  if (enrichedReport.outputs !== undefined)
+    report.outputs = enrichedReport.outputs;
+  const mergedDiags = [
+    ...(report.diagnostics ?? []),
+    ...(enrichedReport.diagnostics ?? []),
+  ];
   if (mergedDiags.length > 0) report.diagnostics = mergedDiags;
-  if (enrichedReport.applyStatuses !== undefined) report.applyStatuses = enrichedReport.applyStatuses;
-  if (enrichedReport.formatVersion) report.formatVersion = enrichedReport.formatVersion;
-  if (enrichedReport.toolVersion) report.toolVersion = enrichedReport.toolVersion;
+  if (enrichedReport.applyStatuses !== undefined)
+    report.applyStatuses = enrichedReport.applyStatuses;
+  if (enrichedReport.formatVersion)
+    report.formatVersion = enrichedReport.formatVersion;
+  if (enrichedReport.toolVersion)
+    report.toolVersion = enrichedReport.toolVersion;
   if (enrichedReport.timestamp) report.timestamp = enrichedReport.timestamp;
   report.operation = isApplyMode ? "apply" : "plan";
 
@@ -549,7 +599,10 @@ function enrichFromApplyJsonl(
 
   // Apply statuses
   if (scan.applyStatuses.length > 0) {
-    report.applyStatuses = [...(report.applyStatuses ?? []), ...scan.applyStatuses];
+    report.applyStatuses = [
+      ...(report.applyStatuses ?? []),
+      ...scan.applyStatuses,
+    ];
   }
 
   // Diagnostics from apply
@@ -562,7 +615,11 @@ function enrichFromApplyJsonl(
   }
 
   // If no show-plan and no plan JSONL provided resources, apply JSONL can fill in
-  if (!showPlanParsed && report.resources === undefined && scan.plannedChanges.length > 0) {
+  if (
+    !showPlanParsed &&
+    report.resources === undefined &&
+    scan.plannedChanges.length > 0
+  ) {
     report.summary = buildSummaryFromScan(scan.plannedChanges);
     report.resources = buildResourcesFromScan(scan.plannedChanges);
   }
@@ -610,7 +667,11 @@ function uiDiagnosticToModel(
 }
 
 /** Add scanner quality warnings to the report. */
-function addScannerWarnings(report: Report, scan: ScanResult, stepLabel: string): void {
+function addScannerWarnings(
+  report: Report,
+  scan: ScanResult,
+  stepLabel: string,
+): void {
   if (scan.unparseableLines > 0) {
     report.warnings.push(
       `${String(scan.unparseableLines)} line(s) in ${stepLabel} output could not be parsed as JSON`,

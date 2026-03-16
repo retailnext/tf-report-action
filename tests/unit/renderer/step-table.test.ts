@@ -31,9 +31,7 @@ describe("renderStepStatusTable", () => {
   });
 
   it("returns empty string when all steps are excluded", () => {
-    const steps: StepOutcome[] = [
-      { id: "init", outcome: "success" },
-    ];
+    const steps: StepOutcome[] = [{ id: "init", outcome: "success" }];
     const result = renderStepStatusTable(steps, new Set(["init"]));
     expect(result).toBe("");
   });

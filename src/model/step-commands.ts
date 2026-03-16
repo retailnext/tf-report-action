@@ -19,13 +19,21 @@ export type StepRole = "show-plan" | "plan" | "apply" | "validate" | "init";
  * When `tool` is `undefined` the tool prefix is omitted
  * (e.g., `show -json <tfplan>` instead of `tofu show -json <tfplan>`).
  */
-export function expectedCommand(tool: Tool | undefined, role: StepRole): string {
+export function expectedCommand(
+  tool: Tool | undefined,
+  role: StepRole,
+): string {
   const prefix = tool !== undefined ? `${tool} ` : "";
   switch (role) {
-    case "show-plan": return `${prefix}show -json <tfplan>`;
-    case "plan":      return `${prefix}plan -json -out=<tfplan>`;
-    case "apply":     return `${prefix}apply -json <tfplan>`;
-    case "validate":  return `${prefix}validate -json`;
-    case "init":      return `${prefix}init -json`;
+    case "show-plan":
+      return `${prefix}show -json <tfplan>`;
+    case "plan":
+      return `${prefix}plan -json -out=<tfplan>`;
+    case "apply":
+      return `${prefix}apply -json <tfplan>`;
+    case "validate":
+      return `${prefix}validate -json`;
+    case "init":
+      return `${prefix}init -json`;
   }
 }

@@ -6,7 +6,12 @@
  * its diagnostics. Returns undefined if the content is not a validate result.
  */
 
-import { STATUS_SUCCESS, STATUS_FAILURE, DIAGNOSTIC_WARNING, DIAGNOSTIC_ERROR } from "../model/status-icons.js";
+import {
+  STATUS_SUCCESS,
+  STATUS_FAILURE,
+  DIAGNOSTIC_WARNING,
+  DIAGNOSTIC_ERROR,
+} from "../model/status-icons.js";
 
 export function tryFormatValidateOutput(content: string): string | undefined {
   let parsed: unknown;
@@ -21,7 +26,11 @@ export function tryFormatValidateOutput(content: string): string | undefined {
   }
 
   const obj = parsed as Record<string, unknown>;
-  if (!("valid" in obj) || !("diagnostics" in obj) || !Array.isArray(obj["diagnostics"])) {
+  if (
+    !("valid" in obj) ||
+    !("diagnostics" in obj) ||
+    !Array.isArray(obj["diagnostics"])
+  ) {
     return undefined;
   }
 
@@ -37,21 +46,33 @@ export function tryFormatValidateOutput(content: string): string | undefined {
 
   if (diagnostics.length > 0) {
     for (const diag of diagnostics) {
-      const severity = typeof diag["severity"] === "string" ? diag["severity"] : "error";
-      const icon = severity === "warning" ? DIAGNOSTIC_WARNING : DIAGNOSTIC_ERROR;
-      const summary = typeof diag["summary"] === "string" ? diag["summary"] : "(unknown)";
+      const severity =
+        typeof diag["severity"] === "string" ? diag["severity"] : "error";
+      const icon =
+        severity === "warning" ? DIAGNOSTIC_WARNING : DIAGNOSTIC_ERROR;
+      const summary =
+        typeof diag["summary"] === "string" ? diag["summary"] : "(unknown)";
       const detail = typeof diag["detail"] === "string" ? diag["detail"] : "";
 
       output += `${icon} **${summary}**\n`;
       if (detail) {
-        const detailLines = detail.split("\n").map((l) => `> ${l}`).join("\n");
+        const detailLines = detail
+          .split("\n")
+          .map((l) => `> ${l}`)
+          .join("\n");
         output += `${detailLines}\n`;
       }
 
       const snippet = diag["snippet"] as Record<string, unknown> | undefined;
       if (snippet && typeof snippet["code"] === "string") {
-        const lineInfo = typeof snippet["start_line"] === "number" ? ` (line ${String(snippet["start_line"])})` : "";
-        const ctx = typeof snippet["context"] === "string" ? ` in ${snippet["context"]}` : "";
+        const lineInfo =
+          typeof snippet["start_line"] === "number"
+            ? ` (line ${String(snippet["start_line"])})`
+            : "";
+        const ctx =
+          typeof snippet["context"] === "string"
+            ? ` in ${snippet["context"]}`
+            : "";
         output += `> \`${snippet["code"]}\`${ctx}${lineInfo}\n`;
       }
       output += "\n";

@@ -44,9 +44,7 @@ describe("buildConfigRefs", () => {
   it("skips resources with no expressions", () => {
     const config: Config = {
       root_module: {
-        resources: [
-          { address: "null_resource.bare" },
-        ],
+        resources: [{ address: "null_resource.bare" }],
       },
     };
     const index = buildConfigRefs(config);
@@ -159,10 +157,7 @@ describe("buildConfigRefs", () => {
             address: "null_resource.arr",
             expressions: {
               // Array-form expression
-              items: [
-                { references: ["var.one"] },
-                { references: ["var.two"] },
-              ],
+              items: [{ references: ["var.one"] }, { references: ["var.two"] }],
             },
           },
         ],

@@ -8,7 +8,7 @@ import { Change } from "./plan";
  * ResourceChange describes a single planned change action for one resource
  * instance. It appears in Plan.resource_changes (what will be changed) and
  * Plan.resource_drift (what drifted from the saved state).
- * 
+ *
  * Address and related fields identify the resource instance. change describes
  * what will happen to it.
  */
@@ -18,7 +18,7 @@ export interface ResourceChange {
    *   "aws_instance.foo"
    *   "module.child.aws_instance.bar[0]"
    *   "module.child[\"key\"].aws_instance.baz"
-   * 
+   *
    * Treat the address string as opaque for routing purposes (do not parse it
    * to extract components — use the individual type, name, index, and
    * module_address fields instead).
@@ -68,7 +68,7 @@ export interface ResourceChange {
    *   - A number (integer) for count-based resources
    *   - A string for for_each-based resources
    *   - Undefined for resources with neither
-   * 
+   *
    * This corresponds to the [N] or ["key"] suffix in the resource address.
    */
   index?: string | number;
@@ -79,7 +79,7 @@ export interface ResourceChange {
    * expression depends on a value that is unknown. When index_unknown is true,
    * index will be undefined. Changes with unknown indices will typically appear
    * in deferred_changes rather than resource_changes.
-   * 
+   *
    * TERRAFORM ONLY — OpenTofu does not emit this field.
    */
   index_unknown?: boolean;
@@ -114,7 +114,7 @@ export interface ResourceChange {
    * NOT change the semantics of the change. The set of valid values may grow
    * in future versions; always treat unrecognized values as an unspecified
    * reason.
-   * 
+   *
    * See the ActionReason constants for valid values and their meanings.
    * Omitted when no additional context is available.
    */
@@ -125,15 +125,15 @@ export interface ResourceChange {
  * DeferredResourceChange is a resource change that could not be fully planned
  * in the current plan cycle. It wraps a ResourceChange with additional context
  * about why it was deferred.
- * 
+ *
  * Deferred changes arise when configuration values are not yet known at plan
  * time (e.g. an attribute that depends on the computed output of another
  * resource that hasn't been created yet). They require at least one additional
  * plan/apply cycle to resolve.
- * 
+ *
  * The resource_change inside a DeferredResourceChange may be incomplete — some
  * fields may be absent or approximate.
- * 
+ *
  * TERRAFORM ONLY — OpenTofu does not have a deferred changes mechanism. This
  * interface will never be populated when parsing OpenTofu plan output.
  */

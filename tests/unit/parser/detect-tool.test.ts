@@ -1,5 +1,8 @@
 import { describe, it, expect } from "vitest";
-import { detectToolFromPlan, detectToolFromOutput } from "../../../src/parser/detect-tool.js";
+import {
+  detectToolFromPlan,
+  detectToolFromOutput,
+} from "../../../src/parser/detect-tool.js";
 import type { Plan } from "../../../src/tfjson/plan.js";
 
 /** Minimal plan object with only the fields needed for tool detection. */
@@ -48,22 +51,26 @@ describe("detectToolFromPlan", () => {
 describe("detectToolFromOutput", () => {
   describe("JSONL version message detection", () => {
     it("returns 'tofu' from a version message with tofu field", () => {
-      const content = '{"@level":"info","@message":"OpenTofu 1.8.0","@module":"tofu.ui","@timestamp":"2024-01-01T00:00:00Z","type":"version","tofu":"1.8.0","ui":"1.2"}\n';
+      const content =
+        '{"@level":"info","@message":"OpenTofu 1.8.0","@module":"tofu.ui","@timestamp":"2024-01-01T00:00:00Z","type":"version","tofu":"1.8.0","ui":"1.2"}\n';
       expect(detectToolFromOutput(content)).toBe("tofu");
     });
 
     it("returns 'terraform' from a version message with terraform field", () => {
-      const content = '{"@level":"info","@message":"Terraform v1.9.0","@module":"terraform.ui","@timestamp":"2024-01-01T00:00:00Z","type":"version","terraform":"1.9.0","ui":"1.2"}\n';
+      const content =
+        '{"@level":"info","@message":"Terraform v1.9.0","@module":"terraform.ui","@timestamp":"2024-01-01T00:00:00Z","type":"version","terraform":"1.9.0","ui":"1.2"}\n';
       expect(detectToolFromOutput(content)).toBe("terraform");
     });
 
     it("detects tool from version message even with preceding blank lines", () => {
-      const content = '\n\n{"@level":"info","@message":"OpenTofu 1.8.0","@module":"tofu.ui","@timestamp":"2024-01-01T00:00:00Z","type":"version","tofu":"1.8.0","ui":"1.2"}\n';
+      const content =
+        '\n\n{"@level":"info","@message":"OpenTofu 1.8.0","@module":"tofu.ui","@timestamp":"2024-01-01T00:00:00Z","type":"version","tofu":"1.8.0","ui":"1.2"}\n';
       expect(detectToolFromOutput(content)).toBe("tofu");
     });
 
     it("prefers JSONL detection over raw text detection", () => {
-      const content = '{"@level":"info","@message":"Terraform v1.9.0","type":"version","terraform":"1.9.0","ui":"1.2"}\n{"type":"log","@message":"OpenTofu is great"}\n';
+      const content =
+        '{"@level":"info","@message":"Terraform v1.9.0","type":"version","terraform":"1.9.0","ui":"1.2"}\n{"type":"log","@message":"OpenTofu is great"}\n';
       expect(detectToolFromOutput(content)).toBe("terraform");
     });
   });

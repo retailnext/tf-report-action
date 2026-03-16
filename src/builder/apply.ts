@@ -72,7 +72,11 @@ export function buildApplyReport(
     appliedAddresses,
     completedAddresses,
   );
-  const allStatuses = [...scanResult.applyStatuses, ...stateOnlyStatuses, ...notStartedStatuses];
+  const allStatuses = [
+    ...scanResult.applyStatuses,
+    ...stateOnlyStatuses,
+    ...notStartedStatuses,
+  ];
 
   if (scanResult.outputsMessage) {
     resolveOutputValues(report, scanResult.outputsMessage);
@@ -82,10 +86,7 @@ export function buildApplyReport(
     scanResult.applyStatuses.filter((s) => !s.success).map((s) => s.address),
   );
 
-  report.summary = buildApplySummary(
-    report.resources ?? [],
-    failedAddresses,
-  );
+  report.summary = buildApplySummary(report.resources ?? [], failedAddresses);
 
   if (diagnostics.length > 0) {
     report.diagnostics = diagnostics;
@@ -146,7 +147,9 @@ function extractStateOnlyAddresses(plan: Plan): Map<string, PlanAction> {
  * State-only operations (forget, move, state-only import) always succeed —
  * they are instantaneous state mutations with no provider call and no hooks.
  */
-function buildStateOnlyStatuses(stateOnlyAddresses: Map<string, PlanAction>): ApplyStatus[] {
+function buildStateOnlyStatuses(
+  stateOnlyAddresses: Map<string, PlanAction>,
+): ApplyStatus[] {
   return [...stateOnlyAddresses.entries()].map(([address, action]) => ({
     address,
     action,
@@ -190,10 +193,13 @@ function buildNotStartedStatuses(
  * A resource is a "phantom" if its address does not appear in the
  * applied addresses set.
  */
-function filterPhantomResources(report: Report, appliedAddresses: Set<string>): void {
+function filterPhantomResources(
+  report: Report,
+  appliedAddresses: Set<string>,
+): void {
   if (!report.resources) return;
-  report.resources = report.resources.filter(
-    (r) => appliedAddresses.has(r.address),
+  report.resources = report.resources.filter((r) =>
+    appliedAddresses.has(r.address),
   );
 }
 
@@ -224,7 +230,10 @@ function replaceKnownAfterApply(report: Report): void {
  * For non-sensitive outputs, replaces sentinel values with the actual
  * resolved value. Sensitive outputs are never resolved (security invariant).
  */
-function resolveOutputValues(report: Report, outputsMessage: UIOutputsMessage): void {
+function resolveOutputValues(
+  report: Report,
+  outputsMessage: UIOutputsMessage,
+): void {
   for (const output of report.outputs ?? []) {
     const resolved = outputsMessage.outputs[output.name];
     if (!resolved) continue;
@@ -235,9 +244,8 @@ function resolveOutputValues(report: Report, outputsMessage: UIOutputsMessage): 
     if (output.isKnownAfterApply) {
       const val = resolved.value;
       if (val !== undefined && val !== null) {
-        output.after = typeof val === "string"
-          ? val
-          : JSON.stringify(val, null, 2);
+        output.after =
+          typeof val === "string" ? val : JSON.stringify(val, null, 2);
       }
     }
   }

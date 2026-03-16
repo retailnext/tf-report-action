@@ -79,7 +79,9 @@ export function renderReportSections(
 function renderRawStdoutSections(report: Report): Section[] {
   const sections: Section[] = [];
   for (const raw of report.rawStdout) {
-    const truncNote = raw.truncated ? "\n\n> **Note:** Output was truncated." : "";
+    const truncNote = raw.truncated
+      ? "\n\n> **Note:** Output was truncated."
+      : "";
     const full = `<details><summary>${raw.label}</summary>\n\n\`\`\`\n${raw.content}\n\`\`\`${truncNote}\n\n</details>\n\n`;
     sections.push({ id: `raw-${raw.stepId}`, full });
   }

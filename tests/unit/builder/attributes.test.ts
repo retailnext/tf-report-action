@@ -115,7 +115,10 @@ describe("buildAttributeChanges", () => {
   it("detects large JSON value", () => {
     const largeObj = JSON.stringify({ a: 1, b: 2, c: 3 });
     const result = buildAttributeChanges(
-      makeChange({ before: { data: largeObj }, after: { data: largeObj + "x" } }),
+      makeChange({
+        before: { data: largeObj },
+        after: { data: largeObj + "x" },
+      }),
       "null_resource.test",
       emptyConfigRefs,
       { showUnchangedAttributes: true },
@@ -128,7 +131,10 @@ describe("buildAttributeChanges", () => {
   it("detects large multiline value", () => {
     const multiline = "line1\nline2\nline3\nline4\nline5";
     const result = buildAttributeChanges(
-      makeChange({ before: { content: multiline }, after: { content: multiline + "\nline6" } }),
+      makeChange({
+        before: { content: multiline },
+        after: { content: multiline + "\nline6" },
+      }),
       "null_resource.test",
       emptyConfigRefs,
       {},

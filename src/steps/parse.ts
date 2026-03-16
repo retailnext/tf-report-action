@@ -46,9 +46,7 @@ export function parseSteps(json: string): Steps {
  */
 function validateStepData(stepId: string, raw: unknown): StepData {
   if (typeof raw !== "object" || raw === null || Array.isArray(raw)) {
-    throw new Error(
-      `Steps context: step "${stepId}" must be an object`,
-    );
+    throw new Error(`Steps context: step "${stepId}" must be an object`);
   }
 
   const obj = raw as Record<string, unknown>;

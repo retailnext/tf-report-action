@@ -9,16 +9,16 @@ import { CheckStatus } from "./constants";
  * state. Each entry represents one "checkable object" — a resource with
  * precondition/postcondition blocks, a standalone check block, or an input
  * variable with a validation block.
- * 
+ *
  * The checks array is populated at plan time with whatever information is
  * available; many checks will be in "unknown" status until apply time when all
  * values are resolved.
- * 
+ *
  * Stability note:
  *   - In Terraform, the checks schema is marked EXPERIMENTAL. Details may change
  *     in future versions, even minor releases. Build defensively.
  *   - In OpenTofu, the checks schema is considered stable.
- * 
+ *
  * BOTH tools emit checks in plans and state. OpenTofu also embeds checks in the
  * prior_state field of a plan.
  */
@@ -34,7 +34,7 @@ export interface CheckResult {
    * instances. If any instance fails, the object status is "fail"; if any
    * instance errors, the object status is "error"; otherwise it reflects the
    * collective result.
-   * 
+   *
    * Valid values: "pass", "fail", "error", "unknown".
    */
   status: CheckStatus;
@@ -42,13 +42,13 @@ export interface CheckResult {
   /**
    * instances lists the per-instance check results for this object. An object
    * may have multiple instances when count or for_each is used.
-   * 
+   *
    * If instances is empty or undefined:
    *   - When status is "pass" or "error": the object has zero instances (e.g.
    *     count = 0), so there is nothing to check but the object exists.
    *   - When status is "unknown": an error prevented evaluation of count or
    *     for_each, so the number of instances could not be determined.
-   * 
+   *
    * UI note (from both tools' documentation): prefer listing instances rather
    * than top-level objects; if an object has zero instances, show the top-level
    * object as a placeholder to indicate it was evaluated.
@@ -67,7 +67,7 @@ export interface CheckAddress {
    *   - "output_value"  — module output with precondition
    *   - "check"         — standalone check block (both tools)
    *   - "var"           — input variable validation (OPENTOFU ONLY)
-   * 
+   *
    * Treat unrecognized kind values defensively; new kinds may be added in
    * future versions.
    */
@@ -128,7 +128,7 @@ export interface CheckInstance {
    * problems is populated when status is "fail" or "error". Each entry
    * contains the result of evaluating the error_message expression from one
    * failing or erroring condition block.
-   * 
+   *
    * Omitted (undefined) when status is "pass" or "unknown".
    */
   problems?: CheckProblem[];

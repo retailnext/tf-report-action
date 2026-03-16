@@ -30,7 +30,8 @@ describe("formatRawOutput", () => {
   });
 
   it("shows 🚨 for error-level JSON Lines messages", () => {
-    const input = '{"@level":"error","@message":"Error occurred","type":"diagnostic","diagnostic":{"severity":"error","summary":"Something broke","detail":"details here"}}';
+    const input =
+      '{"@level":"error","@message":"Error occurred","type":"diagnostic","diagnostic":{"severity":"error","summary":"Something broke","detail":"details here"}}';
     const result = formatRawOutput(input);
     expect(result).toContain("🚨");
     // Inside <summary>, <code> tags are used instead of backticks
@@ -164,7 +165,8 @@ describe("formatRawOutput", () => {
   });
 
   it("wraps messages with extra fields in details/summary with <br> spacing", () => {
-    const input = '{"@level":"info","@message":"Plan: 1 to add","type":"change_summary","changes":{"add":1,"change":0,"remove":0}}';
+    const input =
+      '{"@level":"info","@message":"Plan: 1 to add","type":"change_summary","changes":{"add":1,"change":0,"remove":0}}';
     const result = formatRawOutput(input);
     expect(result).toContain("<details>");
     expect(result).toContain("<summary>");

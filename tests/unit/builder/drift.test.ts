@@ -115,7 +115,11 @@ describe("buildReport — drift grouping", () => {
 
     expect(report.driftResources).toHaveLength(3);
     expect(report.driftResources![0]!.address).toBe("null_resource.root_drift");
-    expect(report.driftResources![1]!.address).toBe("module.network.aws_vpc.main");
-    expect(report.driftResources![2]!.address).toBe("module.network.aws_subnet.a");
+    expect(report.driftResources![1]!.address).toBe(
+      "module.network.aws_vpc.main",
+    );
+    expect(report.driftResources![2]!.address).toBe(
+      "module.network.aws_subnet.a",
+    );
   });
 });

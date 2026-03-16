@@ -11,7 +11,9 @@ function jsonl(...objects: Record<string, unknown>[]): string {
   return objects.map((o) => JSON.stringify(o)).join("\n");
 }
 
-function versionMessage(tool: "tofu" | "terraform" = "tofu"): Record<string, unknown> {
+function versionMessage(
+  tool: "tofu" | "terraform" = "tofu",
+): Record<string, unknown> {
   return {
     "@level": "info",
     "@message": `${tool} 1.8.0`,
@@ -51,7 +53,9 @@ function plannedChangeMessage(
 }
 
 function changeSummaryMessage(
-  add: number, change: number, remove: number,
+  add: number,
+  change: number,
+  remove: number,
   operation: "plan" | "apply" | "destroy" = "plan",
 ): Record<string, unknown> {
   return {
@@ -112,7 +116,10 @@ function applyCompleteMessage(
   };
 }
 
-function applyErroredMessage(addr: string, action: string): Record<string, unknown> {
+function applyErroredMessage(
+  addr: string,
+  action: string,
+): Record<string, unknown> {
   return {
     "@level": "info",
     "@message": `${addr}: Apply errored`,
@@ -205,7 +212,12 @@ describe("scanString", () => {
       versionMessage(),
       plannedChangeMessage("null_resource.a", "create"),
       plannedChangeMessage("null_resource.b", "delete"),
-      plannedChangeMessage("module.child.null_resource.c", "update", "null_resource", "module.child"),
+      plannedChangeMessage(
+        "module.child.null_resource.c",
+        "update",
+        "null_resource",
+        "module.child",
+      ),
     );
     const result = scanString(content);
     expect(result.plannedChanges).toHaveLength(3);
@@ -276,8 +288,16 @@ describe("scanString", () => {
 
   it("extracts diagnostics", () => {
     const content = jsonl(
-      diagnosticMessage("error", "Missing required argument", "The 'name' argument is required."),
-      diagnosticMessage("warning", "Deprecated attribute", "Use 'new_name' instead."),
+      diagnosticMessage(
+        "error",
+        "Missing required argument",
+        "The 'name' argument is required.",
+      ),
+      diagnosticMessage(
+        "warning",
+        "Deprecated attribute",
+        "Use 'new_name' instead.",
+      ),
     );
     const result = scanString(content);
     expect(result.diagnostics).toHaveLength(2);
@@ -307,7 +327,7 @@ describe("scanString", () => {
         },
         snippet: {
           context: 'resource "aws_instance" "web"',
-          code: '  ami = var.ami_id',
+          code: "  ami = var.ami_id",
           start_line: 10,
           highlight_start_offset: 8,
           highlight_end_offset: 18,
@@ -318,7 +338,7 @@ describe("scanString", () => {
     const result = scanString(content);
     expect(result.diagnostics).toHaveLength(1);
     expect(result.diagnostics[0]?.range?.filename).toBe("main.tf");
-    expect(result.diagnostics[0]?.snippet?.code).toBe('  ami = var.ami_id');
+    expect(result.diagnostics[0]?.snippet?.code).toBe("  ami = var.ami_id");
   });
 
   it("does not set diagnostic source (scanner is step-unaware)", () => {
@@ -344,9 +364,7 @@ describe("scanString", () => {
   });
 
   it("extracts apply_errored statuses", () => {
-    const content = jsonl(
-      applyErroredMessage("null_resource.fail", "create"),
-    );
+    const content = jsonl(applyErroredMessage("null_resource.fail", "create"));
     const result = scanString(content);
     expect(result.applyStatuses).toHaveLength(1);
     expect(result.applyStatuses[0]).toEqual({
@@ -391,17 +409,26 @@ describe("scanString", () => {
   it("counts skippable types as parsed", () => {
     const content = jsonl(
       {
-        "@level": "info", "@message": "log msg", "@module": "tofu.ui",
-        "@timestamp": "2024-01-01T00:00:00Z", type: "log",
+        "@level": "info",
+        "@message": "log msg",
+        "@module": "tofu.ui",
+        "@timestamp": "2024-01-01T00:00:00Z",
+        type: "log",
       },
       {
-        "@level": "info", "@message": "start", "@module": "tofu.ui",
-        "@timestamp": "2024-01-01T00:00:00Z", type: "apply_start",
+        "@level": "info",
+        "@message": "start",
+        "@module": "tofu.ui",
+        "@timestamp": "2024-01-01T00:00:00Z",
+        type: "apply_start",
         hook: { resource: { addr: "a" }, action: "create" },
       },
       {
-        "@level": "info", "@message": "progress", "@module": "tofu.ui",
-        "@timestamp": "2024-01-01T00:00:00Z", type: "apply_progress",
+        "@level": "info",
+        "@message": "progress",
+        "@module": "tofu.ui",
+        "@timestamp": "2024-01-01T00:00:00Z",
+        type: "apply_progress",
         hook: { resource: { addr: "a" }, action: "create", elapsed_seconds: 5 },
       },
     );
@@ -413,9 +440,7 @@ describe("scanString", () => {
   });
 
   it("counts unknown type lines", () => {
-    const content = jsonl(
-      { type: "totally_new_type", data: 42 },
-    );
+    const content = jsonl({ type: "totally_new_type", data: 42 });
     const result = scanString(content);
     expect(result.unknownTypeLines).toBe(1);
     expect(result.parsedLines).toBe(0);
@@ -482,7 +507,9 @@ describe("scanString", () => {
 
   it("handles malformed planned_change gracefully (missing resource)", () => {
     const content = jsonl({
-      "@level": "info", "@message": "x", "@module": "tofu.ui",
+      "@level": "info",
+      "@message": "x",
+      "@module": "tofu.ui",
       "@timestamp": "2024-01-01T00:00:00Z",
       type: "planned_change",
       change: { action: "create" },
@@ -495,7 +522,9 @@ describe("scanString", () => {
 
   it("handles malformed diagnostic gracefully (missing severity)", () => {
     const content = jsonl({
-      "@level": "info", "@message": "x", "@module": "tofu.ui",
+      "@level": "info",
+      "@message": "x",
+      "@module": "tofu.ui",
       "@timestamp": "2024-01-01T00:00:00Z",
       type: "diagnostic",
       diagnostic: { summary: "test" },
@@ -511,7 +540,10 @@ describe("scanString", () => {
 describe("scanFile", () => {
   function writeTempFile(content: string): string {
     const tmpDir = os.tmpdir();
-    const filePath = path.join(tmpDir, `scan-test-${String(Date.now())}-${String(Math.random())}.jsonl`);
+    const filePath = path.join(
+      tmpDir,
+      `scan-test-${String(Date.now())}-${String(Math.random())}.jsonl`,
+    );
     fs.writeFileSync(filePath, content, "utf8");
     return filePath;
   }

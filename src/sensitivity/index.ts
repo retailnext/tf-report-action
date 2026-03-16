@@ -55,7 +55,10 @@ export function isSensitive(
   }
 
   for (const path of getHierarchicalPaths(key)) {
-    if (beforeSensitive.get(path) === "true" || afterSensitive.get(path) === "true") {
+    if (
+      beforeSensitive.get(path) === "true" ||
+      afterSensitive.get(path) === "true"
+    ) {
       return true;
     }
   }

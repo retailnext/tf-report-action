@@ -21,7 +21,10 @@ export function renderWorkflowBody(report: Report): Section[] {
     const stepTable = renderStepStatusTable(report.steps);
     sections.push({ id: "step-table", full: `### Steps\n\n${stepTable}` });
   } else {
-    sections.push({ id: "no-steps", full: "No steps were found in the workflow context.\n\n" });
+    sections.push({
+      id: "no-steps",
+      full: "No steps were found in the workflow context.\n\n",
+    });
   }
 
   if (report.logsUrl !== undefined) {

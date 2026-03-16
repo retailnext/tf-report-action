@@ -104,8 +104,12 @@ function toScanResult(acc: ScanAccumulator): ScanResult {
     parsedLines: acc.parsedLines,
     unknownTypeLines: acc.unknownTypeLines,
     unparseableLines: acc.unparseableLines,
-    ...(acc.changeSummary !== undefined ? { changeSummary: acc.changeSummary } : {}),
-    ...(acc.outputsMessage !== undefined ? { outputsMessage: acc.outputsMessage } : {}),
+    ...(acc.changeSummary !== undefined
+      ? { changeSummary: acc.changeSummary }
+      : {}),
+    ...(acc.outputsMessage !== undefined
+      ? { outputsMessage: acc.outputsMessage }
+      : {}),
     ...(acc.tool !== undefined ? { tool: acc.tool } : {}),
   };
 }
@@ -253,7 +257,10 @@ function processLine(acc: ScanAccumulator, rawLine: string): void {
 // ─── Message Processors ─────────────────────────────────────────────────────
 
 /** Extracts tool info from the `version` message. */
-function processVersion(acc: ScanAccumulator, obj: Record<string, unknown>): void {
+function processVersion(
+  acc: ScanAccumulator,
+  obj: Record<string, unknown>,
+): void {
   if (typeof obj["tofu"] === "string") {
     acc.tool = "tofu";
   } else if (typeof obj["terraform"] === "string") {
@@ -290,14 +297,19 @@ function processPlannedChange(
     resourceType: typeof resourceType === "string" ? resourceType : "",
     module: typeof module === "string" ? module : "",
     action: uiActionToPlanAction(action),
-    ...(typeof changeObj["reason"] === "string" ? { reason: changeObj["reason"] } : {}),
+    ...(typeof changeObj["reason"] === "string"
+      ? { reason: changeObj["reason"] }
+      : {}),
   };
 
   acc[target].push(entry);
 }
 
 /** Extracts summary counts from the `change_summary` message. */
-function processChangeSummary(acc: ScanAccumulator, obj: Record<string, unknown>): void {
+function processChangeSummary(
+  acc: ScanAccumulator,
+  obj: Record<string, unknown>,
+): void {
   const changes = obj["changes"];
   if (typeof changes !== "object" || changes === null) return;
 
@@ -306,7 +318,10 @@ function processChangeSummary(acc: ScanAccumulator, obj: Record<string, unknown>
 }
 
 /** Extracts a successful apply outcome from the `apply_complete` message. */
-function processApplyComplete(acc: ScanAccumulator, obj: Record<string, unknown>): void {
+function processApplyComplete(
+  acc: ScanAccumulator,
+  obj: Record<string, unknown>,
+): void {
   const hook = obj["hook"];
   if (typeof hook !== "object" || hook === null) return;
 
@@ -327,8 +342,12 @@ function processApplyComplete(acc: ScanAccumulator, obj: Record<string, unknown>
     ...(typeof hookObj["elapsed_seconds"] === "number"
       ? { elapsed: hookObj["elapsed_seconds"] }
       : {}),
-    ...(typeof hookObj["id_key"] === "string" ? { idKey: hookObj["id_key"] } : {}),
-    ...(typeof hookObj["id_value"] === "string" ? { idValue: hookObj["id_value"] } : {}),
+    ...(typeof hookObj["id_key"] === "string"
+      ? { idKey: hookObj["id_key"] }
+      : {}),
+    ...(typeof hookObj["id_value"] === "string"
+      ? { idValue: hookObj["id_value"] }
+      : {}),
   };
 
   // Last outcome per address wins (handles replace = delete + create)
@@ -341,7 +360,10 @@ function processApplyComplete(acc: ScanAccumulator, obj: Record<string, unknown>
 }
 
 /** Extracts a failed apply outcome from the `apply_errored` message. */
-function processApplyErrored(acc: ScanAccumulator, obj: Record<string, unknown>): void {
+function processApplyErrored(
+  acc: ScanAccumulator,
+  obj: Record<string, unknown>,
+): void {
   const hook = obj["hook"];
   if (typeof hook !== "object" || hook === null) return;
 
@@ -379,7 +401,10 @@ function processApplyErrored(acc: ScanAccumulator, obj: Record<string, unknown>)
  * Note: `source` is NOT set here. The scanner is step-unaware; the builder
  * sets `source: "plan"` or `source: "apply"` after scanning.
  */
-function processDiagnostic(acc: ScanAccumulator, obj: Record<string, unknown>): void {
+function processDiagnostic(
+  acc: ScanAccumulator,
+  obj: Record<string, unknown>,
+): void {
   const diagnostic = obj["diagnostic"];
   if (typeof diagnostic !== "object" || diagnostic === null) return;
 
@@ -400,7 +425,8 @@ function processDiagnostic(acc: ScanAccumulator, obj: Record<string, unknown>): 
     summary,
     detail: typeof diagObj["detail"] === "string" ? diagObj["detail"] : "",
   };
-  if (typeof diagObj["address"] === "string") base["address"] = diagObj["address"];
+  if (typeof diagObj["address"] === "string")
+    base["address"] = diagObj["address"];
   if (isRange(range)) base["range"] = range;
   if (isSnippet(snippet)) base["snippet"] = snippet;
 
@@ -410,7 +436,10 @@ function processDiagnostic(acc: ScanAccumulator, obj: Record<string, unknown>): 
 }
 
 /** Stores the `outputs` message (last one wins). */
-function processOutputs(acc: ScanAccumulator, obj: Record<string, unknown>): void {
+function processOutputs(
+  acc: ScanAccumulator,
+  obj: Record<string, unknown>,
+): void {
   // Trust the wire format — the full UIOutputsMessage structure is preserved
   // for downstream processing by the builder.
   acc.outputsMessage = obj as unknown as UIOutputsMessage;
@@ -458,12 +487,16 @@ function uiActionToPlanAction(action: string): PlanAction {
 function isRange(value: unknown): value is Diagnostic["range"] {
   if (typeof value !== "object" || value === null) return false;
   const obj = value as Record<string, unknown>;
-  return typeof obj["filename"] === "string" && typeof obj["start"] === "object";
+  return (
+    typeof obj["filename"] === "string" && typeof obj["start"] === "object"
+  );
 }
 
 /** Checks if a value looks like a UIDiagnosticSnippet. */
 function isSnippet(value: unknown): value is Diagnostic["snippet"] {
   if (typeof value !== "object" || value === null) return false;
   const obj = value as Record<string, unknown>;
-  return typeof obj["code"] === "string" && typeof obj["start_line"] === "number";
+  return (
+    typeof obj["code"] === "string" && typeof obj["start_line"] === "number"
+  );
 }

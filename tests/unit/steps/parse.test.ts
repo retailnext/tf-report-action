@@ -46,7 +46,11 @@ describe("parseSteps", () => {
     it("parses multiple steps", () => {
       const json = JSON.stringify({
         init: { outcome: "success", conclusion: "success", outputs: {} },
-        plan: { outcome: "failure", conclusion: "failure", outputs: { exit_code: "1" } },
+        plan: {
+          outcome: "failure",
+          conclusion: "failure",
+          outputs: { exit_code: "1" },
+        },
         apply: { outcome: "skipped", conclusion: "skipped" },
       });
       const result = parseSteps(json);
@@ -178,17 +182,13 @@ describe("parseSteps", () => {
     });
 
     it("throws when conclusion is not a string", () => {
-      expect(() =>
-        parseSteps('{"build": {"conclusion": true}}'),
-      ).toThrow(
+      expect(() => parseSteps('{"build": {"conclusion": true}}')).toThrow(
         'Steps context: step "build" field "conclusion" must be a string',
       );
     });
 
     it("throws when outputs is not an object", () => {
-      expect(() =>
-        parseSteps('{"build": {"outputs": "string"}}'),
-      ).toThrow(
+      expect(() => parseSteps('{"build": {"outputs": "string"}}')).toThrow(
         'Steps context: step "build" field "outputs" must be an object',
       );
     });
@@ -263,10 +263,22 @@ describe("parseSteps", () => {
     it("parses mixed terraform and non-terraform steps", () => {
       const json = JSON.stringify({
         checkout: { outcome: "success", conclusion: "success", outputs: {} },
-        init: { outcome: "success", conclusion: "success", outputs: { exit_code: "0" } },
-        plan: { outcome: "success", conclusion: "success", outputs: { exit_code: "2" } },
+        init: {
+          outcome: "success",
+          conclusion: "success",
+          outputs: { exit_code: "0" },
+        },
+        plan: {
+          outcome: "success",
+          conclusion: "success",
+          outputs: { exit_code: "2" },
+        },
         "show-plan": { outcome: "success", conclusion: "success", outputs: {} },
-        "post-comment": { outcome: "success", conclusion: "success", outputs: {} },
+        "post-comment": {
+          outcome: "success",
+          conclusion: "success",
+          outputs: {},
+        },
       });
       const result = parseSteps(json);
       expect(Object.keys(result)).toHaveLength(5);

@@ -2,7 +2,11 @@ export type { PlanAction, ACTION_SYMBOLS } from "./plan-action.js";
 export type { AttributeChange } from "./attribute.js";
 export type { ResourceChange } from "./resource.js";
 export type { OutputChange } from "./output.js";
-export type { Summary, SummaryActionGroup, ResourceTypeCount } from "./summary.js";
+export type {
+  Summary,
+  SummaryActionGroup,
+  ResourceTypeCount,
+} from "./summary.js";
 export type { Report, RawStepStdout, Tool } from "./report.js";
 export type { Diagnostic } from "./diagnostic.js";
 export type { ApplyStatus } from "./apply-status.js";

@@ -1,4 +1,7 @@
-import type { UIDiagnosticRange, UIDiagnosticSnippet } from "../tfjson/machine-readable-ui.js";
+import type {
+  UIDiagnosticRange,
+  UIDiagnosticSnippet,
+} from "../tfjson/machine-readable-ui.js";
 
 /**
  * Diagnostic represents an error or warning message emitted during an

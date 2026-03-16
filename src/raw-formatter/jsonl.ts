@@ -18,7 +18,13 @@ export interface JsonLinesMsg {
 }
 
 /** Envelope keys excluded when flattening extra fields. */
-const ENVELOPE_KEYS = new Set(["@level", "@message", "@module", "@timestamp", "type"]);
+const ENVELOPE_KEYS = new Set([
+  "@level",
+  "@message",
+  "@module",
+  "@timestamp",
+  "type",
+]);
 
 /**
  * Dot-flatten a JSON value into sorted `key=value` pairs.
@@ -78,9 +84,12 @@ export function escapeHtml(text: string): string {
 /** Return the appropriate icon for a JSON Lines @level value. */
 export function levelIcon(level: string): string {
   switch (level) {
-    case "error": return DIAGNOSTIC_ERROR;
-    case "warn": return DIAGNOSTIC_WARNING;
-    default: return "";
+    case "error":
+      return DIAGNOSTIC_ERROR;
+    case "warn":
+      return DIAGNOSTIC_WARNING;
+    default:
+      return "";
   }
 }
 
@@ -95,12 +104,16 @@ export function levelIcon(level: string): string {
  */
 export function formatJsonLinesMessage(msg: JsonLinesMsg): string {
   const level = typeof msg["@level"] === "string" ? msg["@level"] : "info";
-  const message = typeof msg["@message"] === "string" ? msg["@message"] : "(no message)";
+  const message =
+    typeof msg["@message"] === "string" ? msg["@message"] : "(no message)";
   const icon = levelIcon(level);
   const prefix = icon ? `${icon} ` : "";
   const typeStr = typeof msg.type === "string" ? msg.type : "";
 
-  const fields = flattenJsonFields(msg as Record<string, unknown>, ENVELOPE_KEYS);
+  const fields = flattenJsonFields(
+    msg as Record<string, unknown>,
+    ENVELOPE_KEYS,
+  );
 
   if (fields.length === 0) {
     const typeSuffix = typeStr ? ` \`type=${typeStr}\`` : "";
@@ -130,7 +143,11 @@ export function tryFormatJsonLines(content: string): string | undefined {
   for (const line of lines) {
     try {
       const parsed = JSON.parse(line) as unknown;
-      if (typeof parsed !== "object" || parsed === null || Array.isArray(parsed)) {
+      if (
+        typeof parsed !== "object" ||
+        parsed === null ||
+        Array.isArray(parsed)
+      ) {
         return undefined;
       }
       messages.push(parsed as JsonLinesMsg);
@@ -170,14 +187,21 @@ export function tryFormatJsonLines(content: string): string | undefined {
       const level = typeof msg["@level"] === "string" ? msg["@level"] : "debug";
       counts.set(level, (counts.get(level) ?? 0) + 1);
     }
-    const countParts = [...counts.entries()].map(([l, c]) => `${String(c)} ${l}`);
+    const countParts = [...counts.entries()].map(
+      ([l, c]) => `${String(c)} ${l}`,
+    );
     const inner = debugTrace
       .map((msg) => {
-        const message = typeof msg["@message"] === "string" ? msg["@message"] : "(no message)";
+        const message =
+          typeof msg["@message"] === "string"
+            ? msg["@message"]
+            : "(no message)";
         return `\`${message}\``;
       })
       .join("\n\n");
-    parts.push(`<details>\n<summary>${countParts.join(", ")} message(s) omitted</summary>\n<br>\n\n${inner}\n\n</details>`);
+    parts.push(
+      `<details>\n<summary>${countParts.join(", ")} message(s) omitted</summary>\n<br>\n\n${inner}\n\n</details>`,
+    );
   }
 
   return parts.join("\n\n") + "\n";

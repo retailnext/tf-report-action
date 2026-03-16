@@ -8,7 +8,9 @@ export type ConfigRefIndex = Map<string, Map<string, string[]>>;
  * Builds an index of attribute → reference expressions from plan.configuration.
  * Used to show "known after apply: <reference>" labels.
  */
-export function buildConfigRefs(config: Config | undefined | null): ConfigRefIndex {
+export function buildConfigRefs(
+  config: Config | undefined | null,
+): ConfigRefIndex {
   const index: ConfigRefIndex = new Map();
   if (!config) return index;
 
@@ -16,7 +18,10 @@ export function buildConfigRefs(config: Config | undefined | null): ConfigRefInd
   return index;
 }
 
-function walkModule(module: ConfigModule | undefined, index: ConfigRefIndex): void {
+function walkModule(
+  module: ConfigModule | undefined,
+  index: ConfigRefIndex,
+): void {
   if (!module) return;
 
   for (const resource of module.resources ?? []) {
@@ -56,7 +61,9 @@ function collectRefs(expr: ConfigExpression): string[] {
     // Check if it looks like an Expression (has references field)
     const asExpr = expr as { references?: string[]; constant_value?: unknown };
     if (asExpr.references !== undefined) {
-      return asExpr.references.filter((r): r is string => typeof r === "string");
+      return asExpr.references.filter(
+        (r): r is string => typeof r === "string",
+      );
     }
     // It's a nested block — recurse into its values
     const refs: string[] = [];

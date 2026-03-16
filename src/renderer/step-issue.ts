@@ -30,9 +30,10 @@ export function renderStepIssue(issue: StepIssue): Section {
   }
 
   if (issue.stdout !== undefined) {
-    const displayContent = issue.stdoutTruncated === true
-      ? issue.stdout + "\n… (truncated)"
-      : issue.stdout;
+    const displayContent =
+      issue.stdoutTruncated === true
+        ? issue.stdout + "\n… (truncated)"
+        : issue.stdout;
     const formatted = formatRawOutput(displayContent);
     content += `<details open>\n<summary>stdout</summary>\n\n${formatted}\n\n</details>\n\n`;
   } else if (issue.stdoutError !== undefined) {
@@ -40,17 +41,20 @@ export function renderStepIssue(issue: StepIssue): Section {
   }
 
   if (issue.stderr !== undefined) {
-    const displayContent = issue.stderrTruncated === true
-      ? issue.stderr + "\n… (truncated)"
-      : issue.stderr;
+    const displayContent =
+      issue.stderrTruncated === true
+        ? issue.stderr + "\n… (truncated)"
+        : issue.stderr;
     content += `<details open>\n<summary>stderr</summary>\n\n\`\`\`\n${displayContent}\n\`\`\`\n\n</details>\n\n`;
   } else if (issue.stderrError !== undefined) {
     content += `> ${DIAGNOSTIC_WARNING} stderr not available: ${issue.stderrError}\n\n`;
   }
 
   if (
-    issue.stdout === undefined && issue.stderr === undefined
-    && issue.stdoutError === undefined && issue.stderrError === undefined
+    issue.stdout === undefined &&
+    issue.stderr === undefined &&
+    issue.stdoutError === undefined &&
+    issue.stderrError === undefined
   ) {
     content += "No output captured.\n\n";
   }

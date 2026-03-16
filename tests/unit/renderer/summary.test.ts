@@ -1,7 +1,10 @@
 import { describe, it, expect } from "vitest";
 import { renderSummary } from "../../../src/renderer/summary.js";
 import { MarkdownWriter } from "../../../src/renderer/writer.js";
-import type { Summary, SummaryActionGroup } from "../../../src/model/summary.js";
+import type {
+  Summary,
+  SummaryActionGroup,
+} from "../../../src/model/summary.js";
 
 function render(summary: Summary, isApply = false): string {
   const writer = new MarkdownWriter();
@@ -13,7 +16,10 @@ function makeGroup(
   action: SummaryActionGroup["action"],
   types: Record<string, number>,
 ): SummaryActionGroup {
-  const resourceTypes = Object.entries(types).map(([type, count]) => ({ type, count }));
+  const resourceTypes = Object.entries(types).map(([type, count]) => ({
+    type,
+    count,
+  }));
   const total = resourceTypes.reduce((s, rt) => s + rt.count, 0);
   return { action, resourceTypes, total };
 }
@@ -124,9 +130,7 @@ describe("renderSummary — apply (past tense)", () => {
   it("renders failure subtotals per action", () => {
     const summary: Summary = {
       actions: [],
-      failures: [
-        makeGroup("create", { aws_instance: 2, aws_s3_bucket: 1 }),
-      ],
+      failures: [makeGroup("create", { aws_instance: 2, aws_s3_bucket: 1 })],
     };
     const md = render(summary, true);
     expect(md).toContain("|  | **Add failed** | **3** |");

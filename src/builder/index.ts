@@ -27,7 +27,9 @@ export function buildReport(plan: Plan, options: BuildOptions = {}): Report {
     warnings: [],
     rawStdout: [],
     operation: "plan",
-    ...(plan.terraform_version !== undefined ? { toolVersion: plan.terraform_version } : {}),
+    ...(plan.terraform_version !== undefined
+      ? { toolVersion: plan.terraform_version }
+      : {}),
     formatVersion: plan.format_version,
     ...(plan.timestamp !== undefined ? { timestamp: plan.timestamp } : {}),
     summary,

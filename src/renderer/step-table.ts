@@ -29,9 +29,11 @@ export function renderStepStatusTable(
   const hasExitCodes = filtered.some((s) => s.exitCode !== undefined);
 
   if (hasExitCodes) {
-    let table = "| Step | Outcome | Exit Code |\n|------|--------|----------|\n";
+    let table =
+      "| Step | Outcome | Exit Code |\n|------|--------|----------|\n";
     for (const step of filtered) {
-      const exitCode = step.exitCode !== undefined ? `\`${step.exitCode}\`` : "";
+      const exitCode =
+        step.exitCode !== undefined ? `\`${step.exitCode}\`` : "";
       table += `| \`${step.id}\` | ${step.outcome} | ${exitCode} |\n`;
     }
     return table + "\n";

@@ -9,7 +9,11 @@ import { MarkdownWriter } from "./writer.js";
 import type { RenderOptions } from "./options.js";
 import type { DiffEntry } from "../diff/types.js";
 import { ACTION_SYMBOLS } from "../model/plan-action.js";
-import { STATUS_FAILURE, DIAGNOSTIC_ERROR, DIAGNOSTIC_WARNING } from "../model/status-icons.js";
+import {
+  STATUS_FAILURE,
+  DIAGNOSTIC_ERROR,
+  DIAGNOSTIC_WARNING,
+} from "../model/status-icons.js";
 import { formatDiff } from "./diff-format.js";
 import { renderLargeValue } from "./large-value.js";
 import { deriveInstanceName } from "./address.js";
@@ -54,7 +58,8 @@ export function renderResource(
     summaryText += ` ${STATUS_FAILURE}`;
   }
 
-  const shouldOpen = applyContext !== undefined &&
+  const shouldOpen =
+    applyContext !== undefined &&
     (applyContext.failed || applyContext.diagnostics.length > 0);
   writer.detailsOpen(summaryText, shouldOpen);
   writer.codeFence(resource.address);
@@ -99,7 +104,12 @@ export function renderResource(
 
     // Render large attributes as collapsibles
     for (const attr of largeAttrs) {
-      const block = renderLargeValue(attr.name, attr.before, attr.after, diffCache);
+      const block = renderLargeValue(
+        attr.name,
+        attr.before,
+        attr.after,
+        diffCache,
+      );
       if (block) {
         writer.raw(block);
       }
@@ -108,10 +118,15 @@ export function renderResource(
 
   // Render inline diagnostics (errors then warnings)
   if (applyContext && applyContext.diagnostics.length > 0) {
-    const errors = applyContext.diagnostics.filter((d) => d.severity === "error");
-    const warnings = applyContext.diagnostics.filter((d) => d.severity === "warning");
+    const errors = applyContext.diagnostics.filter(
+      (d) => d.severity === "error",
+    );
+    const warnings = applyContext.diagnostics.filter(
+      (d) => d.severity === "warning",
+    );
     for (const diag of [...errors, ...warnings]) {
-      const prefix = diag.severity === "error" ? DIAGNOSTIC_ERROR : DIAGNOSTIC_WARNING;
+      const prefix =
+        diag.severity === "error" ? DIAGNOSTIC_ERROR : DIAGNOSTIC_WARNING;
       writer.paragraph(`${prefix} **${diag.summary}**`);
       if (diag.detail) {
         writer.codeFence(diag.detail);

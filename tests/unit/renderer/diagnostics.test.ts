@@ -86,9 +86,7 @@ describe("renderDiagnostics", () => {
   });
 
   it("uses H3 headings by default", () => {
-    const md = render([
-      { severity: "warning", summary: "Warn", detail: "" },
-    ]);
+    const md = render([{ severity: "warning", summary: "Warn", detail: "" }]);
     expect(md).toContain("### Warnings");
   });
 });

@@ -1,6 +1,6 @@
 /**
  * Common type definitions shared across the tfjson package.
- * 
+ *
  * These types handle the JSON representation of Terraform/OpenTofu plans,
  * providing precise TypeScript types that eliminate the need for `any`.
  */
@@ -30,7 +30,7 @@ export interface JsonObject {
  *   - A 2-element array for parameterized types: ["list", <elementType>]
  *   - A 2-element array with object for object types: ["object", {attr: type, ...}]
  *   - A 2-element array with array for tuple types: ["tuple", [type, type, ...]]
- * 
+ *
  * This recursive definition captures all possible cty type descriptors.
  */
 export type CtyPrimitive = "string" | "number" | "bool" | "dynamic";
@@ -47,7 +47,7 @@ export type CtyType =
  * AttributeValues represents the JSON-encoded attribute values of a resource
  * or other configuration object. Each key is an attribute name; values are
  * arbitrary JSON values whose structure depends on the resource type's schema.
- * 
+ *
  * Unknown values (attributes not yet determined at plan time) are represented
  * as null or omitted. Sensitive values are also represented as null. Consult
  * AttributeShadow fields (after_unknown, before_sensitive, after_sensitive)
@@ -64,19 +64,16 @@ export interface AttributeValues {
  *   - Leaf values are `true` when the attribute is unknown/sensitive
  *   - Leaf values are `false` or omitted when the attribute is known/non-sensitive
  *   - Container types (objects, arrays) recurse with the same pattern
- * 
+ *
  * This type is based on the `unknownAsBool()` and `SensitiveAsBool()` functions
  * in both tools' source code, which produce this structure.
- * 
+ *
  * Examples:
  *   - `true` — a primitive leaf value is unknown/sensitive
  *   - `{ "name": true, "tags": { "env": true } }` — nested object with some unknown/sensitive leaves
  *   - `[true, false, true]` — array where elements 0 and 2 are unknown/sensitive
  */
-export type AttributeShadow =
-  | boolean
-  | AttributeShadowMap
-  | AttributeShadow[];
+export type AttributeShadow = boolean | AttributeShadowMap | AttributeShadow[];
 
 export interface AttributeShadowMap {
   [key: string]: AttributeShadow;
@@ -86,7 +83,7 @@ export interface AttributeShadowMap {
  * ChangeActions represents the exact set of valid action combinations that
  * can appear in a Change's actions field. This is a discriminated union of
  * tuples, ensuring type safety for consumers checking what action will occur.
- * 
+ *
  * Valid combinations:
  *   - ["no-op"] — no change
  *   - ["create"] — create new resource
@@ -115,11 +112,11 @@ export type ChangeActions =
  *   - An Expression object (constant_value or references)
  *   - A nested block object (for block arguments) containing more expressions
  *   - An array of nested block objects (for repeatable block arguments)
- * 
+ *
  * This recursive definition handles the arbitrary nesting depth of HCL blocks.
  */
 export type ConfigExpression =
-  | { constant_value?: JsonValue; references?: string[] }  // Expression
+  | { constant_value?: JsonValue; references?: string[] } // Expression
   | ConfigExpressionBlock
   | ConfigExpressionBlock[];
 

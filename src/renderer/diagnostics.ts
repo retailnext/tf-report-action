@@ -36,7 +36,8 @@ export function renderDiagnostics(
 }
 
 function renderDiagnostic(diag: Diagnostic, writer: MarkdownWriter): void {
-  const prefix = diag.severity === "error" ? DIAGNOSTIC_ERROR : DIAGNOSTIC_WARNING;
+  const prefix =
+    diag.severity === "error" ? DIAGNOSTIC_ERROR : DIAGNOSTIC_WARNING;
   const addressSuffix =
     diag.address !== undefined ? ` — \`${diag.address}\`` : "";
   writer.paragraph(`${prefix} **${diag.summary}**${addressSuffix}`);
@@ -62,9 +63,10 @@ function renderSnippet(
   filename: string | undefined,
   writer: MarkdownWriter,
 ): void {
-  const location = filename !== undefined
-    ? `\`${snippet.code}\` in ${snippet.context} (line ${String(snippet.start_line)})`
-    : `\`${snippet.code}\` in ${snippet.context}`;
+  const location =
+    filename !== undefined
+      ? `\`${snippet.code}\` in ${snippet.context} (line ${String(snippet.start_line)})`
+      : `\`${snippet.code}\` in ${snippet.context}`;
   writer.blockquote(location);
 
   if (snippet.values.length > 0) {

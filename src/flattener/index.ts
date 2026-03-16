@@ -36,7 +36,11 @@ function flattenInto(
     for (let i = 0; i < value.length; i++) {
       const child = value[i];
       if (child !== undefined) {
-        flattenInto(child, prefix === "" ? `[${String(i)}]` : `${prefix}[${String(i)}]`, result);
+        flattenInto(
+          child,
+          prefix === "" ? `[${String(i)}]` : `${prefix}[${String(i)}]`,
+          result,
+        );
       }
     }
   } else {

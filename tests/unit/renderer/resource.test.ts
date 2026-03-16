@@ -39,7 +39,9 @@ describe("renderResource", () => {
   });
 
   it("shows resource type and name in summary", () => {
-    const output = render(makeResource({ address: "null_resource.example", type: "null_resource" }));
+    const output = render(
+      makeResource({ address: "null_resource.example", type: "null_resource" }),
+    );
     expect(output).toContain("null_resource");
     expect(output).toContain("example");
   });
@@ -55,11 +57,15 @@ describe("renderResource", () => {
   });
 
   it("renders full module address in code fence", () => {
-    const output = render(makeResource({
-      address: 'module.parent["2"].module.child.null_resource.item[1]',
-      type: "null_resource",
-    }));
-    expect(output).toContain('```\nmodule.parent["2"].module.child.null_resource.item[1]\n```');
+    const output = render(
+      makeResource({
+        address: 'module.parent["2"].module.child.null_resource.item[1]',
+        type: "null_resource",
+      }),
+    );
+    expect(output).toContain(
+      '```\nmodule.parent["2"].module.child.null_resource.item[1]\n```',
+    );
   });
 
   it("shows delete symbol for delete action", () => {
@@ -79,7 +85,9 @@ describe("renderResource", () => {
   });
 
   it("shows moved-from address when present", () => {
-    const output = render(makeResource({ movedFromAddress: "null_resource.old" }));
+    const output = render(
+      makeResource({ movedFromAddress: "null_resource.old" }),
+    );
     expect(output).toContain("null_resource.old");
     expect(output).toContain("Moved from");
   });
@@ -90,12 +98,16 @@ describe("renderResource", () => {
   });
 
   it("shows 'No attribute changes' when attributes empty and not allUnknown", () => {
-    const output = render(makeResource({ attributes: [], hasAttributeDetail: true }));
+    const output = render(
+      makeResource({ attributes: [], hasAttributeDetail: true }),
+    );
     expect(output).toContain("No attribute changes");
   });
 
   it("omits 'No attribute changes' when hasAttributeDetail is false", () => {
-    const output = render(makeResource({ attributes: [], hasAttributeDetail: false }));
+    const output = render(
+      makeResource({ attributes: [], hasAttributeDetail: false }),
+    );
     expect(output).not.toContain("No attribute changes");
   });
 
@@ -247,16 +259,26 @@ describe("renderResource", () => {
 
 describe("renderResource — apply context", () => {
   it("renders <details open> and ❌ indicator when failed", () => {
-    const output = render(makeResource(), {}, { failed: true, diagnostics: [] });
+    const output = render(
+      makeResource(),
+      {},
+      { failed: true, diagnostics: [] },
+    );
     expect(output).toContain("<details open>");
     expect(output).toContain("❌");
   });
 
   it("renders <details open> when resource has diagnostics (not failed)", () => {
-    const output = render(makeResource(), {}, {
-      failed: false,
-      diagnostics: [{ severity: "warning", summary: "Deprecated", detail: "" }],
-    });
+    const output = render(
+      makeResource(),
+      {},
+      {
+        failed: false,
+        diagnostics: [
+          { severity: "warning", summary: "Deprecated", detail: "" },
+        ],
+      },
+    );
     expect(output).toContain("<details open>");
     expect(output).not.toContain("❌");
   });
@@ -268,46 +290,66 @@ describe("renderResource — apply context", () => {
   });
 
   it("renders inline error diagnostics after attributes", () => {
-    const output = render(makeResource(), {}, {
-      failed: true,
-      diagnostics: [{
-        severity: "error",
-        summary: "Invalid AMI ID",
-        detail: "The image id does not exist",
-      }],
-    });
+    const output = render(
+      makeResource(),
+      {},
+      {
+        failed: true,
+        diagnostics: [
+          {
+            severity: "error",
+            summary: "Invalid AMI ID",
+            detail: "The image id does not exist",
+          },
+        ],
+      },
+    );
     expect(output).toContain("🚨 **Invalid AMI ID**");
     expect(output).toContain("The image id does not exist");
   });
 
   it("renders inline warning diagnostics after attributes", () => {
-    const output = render(makeResource(), {}, {
-      failed: false,
-      diagnostics: [{
-        severity: "warning",
-        summary: "Argument is deprecated",
-        detail: "Use new_arg instead",
-      }],
-    });
+    const output = render(
+      makeResource(),
+      {},
+      {
+        failed: false,
+        diagnostics: [
+          {
+            severity: "warning",
+            summary: "Argument is deprecated",
+            detail: "Use new_arg instead",
+          },
+        ],
+      },
+    );
     expect(output).toContain("⚠️ **Argument is deprecated**");
     expect(output).toContain("Use new_arg instead");
   });
 
   it("renders errors before warnings in inline diagnostics", () => {
-    const output = render(makeResource(), {}, {
-      failed: true,
-      diagnostics: [
-        { severity: "warning", summary: "warn1", detail: "" },
-        { severity: "error", summary: "err1", detail: "" },
-      ],
-    });
+    const output = render(
+      makeResource(),
+      {},
+      {
+        failed: true,
+        diagnostics: [
+          { severity: "warning", summary: "warn1", detail: "" },
+          { severity: "error", summary: "err1", detail: "" },
+        ],
+      },
+    );
     const errIdx = output.indexOf("err1");
     const warnIdx = output.indexOf("warn1");
     expect(errIdx).toBeLessThan(warnIdx);
   });
 
   it("does not render diagnostics section when apply context has empty diagnostics", () => {
-    const output = render(makeResource(), {}, { failed: false, diagnostics: [] });
+    const output = render(
+      makeResource(),
+      {},
+      { failed: false, diagnostics: [] },
+    );
     expect(output).not.toContain("🚨");
     expect(output).not.toContain("⚠️");
   });

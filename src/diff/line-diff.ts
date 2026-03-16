@@ -27,7 +27,10 @@ export function buildLineDiff(
   return result;
 }
 
-function buildDiffFromSequences(before: string[], after: string[]): DiffEntry[] {
+function buildDiffFromSequences(
+  before: string[],
+  after: string[],
+): DiffEntry[] {
   const pairs = computeLcsPairs(before, after);
   const result: DiffEntry[] = [];
 

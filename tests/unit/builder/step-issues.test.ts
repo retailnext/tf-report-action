@@ -26,7 +26,10 @@ const opts: ReaderOptions = {
 describe("buildStepIssue", () => {
   it("builds an issue for a failed step with stdout and stderr", () => {
     const stdoutPath = writeFixture("fail-stdout.txt", "command output");
-    const stderrPath = writeFixture("fail-stderr.txt", "Error: something broke");
+    const stderrPath = writeFixture(
+      "fail-stderr.txt",
+      "Error: something broke",
+    );
     const step: StepData = {
       outcome: "failure",
       outputs: { stdout_file: stdoutPath, stderr_file: stderrPath },
@@ -48,7 +51,12 @@ describe("buildStepIssue", () => {
       outputs: { stdout_file: stdoutPath },
     };
 
-    const issue = buildStepIssue(step, "show-plan", opts, "Plan output could not be parsed");
+    const issue = buildStepIssue(
+      step,
+      "show-plan",
+      opts,
+      "Plan output could not be parsed",
+    );
     expect(issue.id).toBe("show-plan");
     expect(issue.heading).toBe("`show-plan`: output could not be parsed");
     expect(issue.isFailed).toBe(false);

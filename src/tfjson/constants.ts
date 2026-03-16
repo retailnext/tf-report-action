@@ -1,6 +1,6 @@
 /**
  * Constants for Terraform/OpenTofu JSON plan representations.
- * 
+ *
  * All string constants are defined as const objects with union types derived
  * from them, providing both runtime values and compile-time type checking.
  */
@@ -21,7 +21,7 @@ export const ResourceMode = {
   Ephemeral: "ephemeral",
 } as const;
 
-export type ResourceMode = typeof ResourceMode[keyof typeof ResourceMode];
+export type ResourceMode = (typeof ResourceMode)[keyof typeof ResourceMode];
 
 // ─── Change Actions ─────────────────────────────────────────────────────────
 
@@ -34,7 +34,7 @@ export const Action = {
   Forget: "forget",
 } as const;
 
-export type Action = typeof Action[keyof typeof Action];
+export type Action = (typeof Action)[keyof typeof Action];
 
 // ─── Action Reasons ─────────────────────────────────────────────────────────
 
@@ -58,21 +58,23 @@ export const ActionReason = {
   ReadBecauseConfigUnknown: "read_because_config_unknown",
   ReadBecauseDependencyPending: "read_because_dependency_pending",
   ReadBecauseCheckNested: "read_because_check_nested",
-  
+
   // OPENTOFU ONLY
   DeleteBecauseEnabledFalse: "delete_because_enabled_false",
-  ForgotBecauseLifecycleDestroyInState: "forgot_because_lifecycle_destroy_in_state",
-  ForgotBecauseLifecycleDestroyInConfig: "forgot_because_lifecycle_destroy_in_config",
+  ForgotBecauseLifecycleDestroyInState:
+    "forgot_because_lifecycle_destroy_in_state",
+  ForgotBecauseLifecycleDestroyInConfig:
+    "forgot_because_lifecycle_destroy_in_config",
 } as const;
 
-export type ActionReason = typeof ActionReason[keyof typeof ActionReason];
+export type ActionReason = (typeof ActionReason)[keyof typeof ActionReason];
 
 // ─── Deferred Reasons (Terraform only) ──────────────────────────────────────
 
 /**
  * DeferredReason indicates why a resource change or action invocation was
  * deferred to a future plan/apply cycle.
- * 
+ *
  * TERRAFORM ONLY — OpenTofu does not have deferred changes.
  */
 export const DeferredReason = {
@@ -84,7 +86,8 @@ export const DeferredReason = {
   AbsentPrereq: "absent_prereq",
 } as const;
 
-export type DeferredReason = typeof DeferredReason[keyof typeof DeferredReason];
+export type DeferredReason =
+  (typeof DeferredReason)[keyof typeof DeferredReason];
 
 // ─── Check Statuses ─────────────────────────────────────────────────────────
 
@@ -98,7 +101,7 @@ export const CheckStatus = {
   Unknown: "unknown",
 } as const;
 
-export type CheckStatus = typeof CheckStatus[keyof typeof CheckStatus];
+export type CheckStatus = (typeof CheckStatus)[keyof typeof CheckStatus];
 
 // ─── Check Address Kinds ────────────────────────────────────────────────────
 
@@ -109,7 +112,7 @@ export const CheckKind = {
   Resource: "resource",
   OutputValue: "output_value",
   Check: "check",
-  Var: "var",  // OPENTOFU ONLY
+  Var: "var", // OPENTOFU ONLY
 } as const;
 
-export type CheckKind = typeof CheckKind[keyof typeof CheckKind];
+export type CheckKind = (typeof CheckKind)[keyof typeof CheckKind];

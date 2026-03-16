@@ -1,6 +1,6 @@
 /**
  * Action invocation types for Terraform JSON plans.
- * 
+ *
  * TERRAFORM ONLY — OpenTofu does not have action blocks or action invocations.
  * All types in this file will be unpopulated when parsing OpenTofu plan output.
  */
@@ -13,15 +13,15 @@ import { AttributeValues, AttributeShadow } from "./common";
  * operations (e.g. sending notifications, triggering deployments) that are
  * distinct from resource lifecycle management — they do not create or manage
  * state.
- * 
+ *
  * Action invocations can be triggered in two ways:
  *  1. By a resource's lifecycle event (create, update, or delete) via a
  *     lifecycle action_trigger block — represented by lifecycle_action_trigger.
  *  2. Directly (e.g. via an invoke_action block) — represented by
  *     invoke_action_trigger.
- * 
+ *
  * Exactly one of lifecycle_action_trigger or invoke_action_trigger will be non-null.
- * 
+ *
  * TERRAFORM ONLY — OpenTofu does not have action blocks or action invocations.
  */
 export interface ActionInvocation {
@@ -133,11 +133,11 @@ export interface InvokeActionTrigger {}
  * DeferredActionInvocation is an action invocation that could not be fully
  * planned in the current plan cycle. Like DeferredResourceChange, it wraps
  * the action invocation with the reason for deferral.
- * 
+ *
  * Deferred action invocations arise when the action's configuration depends on
  * values not yet known at plan time, or when a prerequisite resource was itself
  * deferred.
- * 
+ *
  * TERRAFORM ONLY — OpenTofu does not have action blocks or deferred planning.
  */
 export interface DeferredActionInvocation {

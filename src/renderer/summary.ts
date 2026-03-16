@@ -49,8 +49,7 @@ export function renderSummary(
   isApply = false,
 ): void {
   const labels = isApply ? APPLY_LABELS : PLAN_LABELS;
-  const hasContent =
-    summary.actions.length > 0 || summary.failures.length > 0;
+  const hasContent = summary.actions.length > 0 || summary.failures.length > 0;
 
   if (!hasContent) {
     writer.paragraph("_No changes._");

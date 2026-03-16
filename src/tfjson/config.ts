@@ -9,7 +9,7 @@ import { Expression } from "./expression";
  * Config is the configuration representation embedded in Plan.configuration. It
  * describes the parsed (pre-evaluation) configuration files — the .tf source
  * as written, with expressions captured rather than resolved values.
- * 
+ *
  * This is useful for understanding the structure of the configuration and the
  * expressions that produce planned values, rather than just the planned values
  * themselves.
@@ -19,7 +19,7 @@ export interface Config {
    * provider_config is a map from opaque provider configuration key to
    * provider configuration object. The key format is unspecified — treat it as
    * opaque and use it only for lookups from ConfigResource.provider_config_key.
-   * 
+   *
    * When a provider is configured in a child module but used by a parent, the
    * resource's provider_config_key may not match any key in this map (the
    * provider config lives in the child module's config sub-tree).
@@ -62,7 +62,7 @@ export interface ProviderConfig {
    * version_constraint is the version constraint string from the required_providers
    * block or the provider block's version argument, e.g. "~> 4.0". Omitted
    * when no version constraint is specified.
-   * 
+   *
    * BOTH tools emit this field (both tools' source code includes it in
    * providerConfig).
    */
@@ -78,7 +78,7 @@ export interface ProviderConfig {
    * expressions is the block-expressions representation of the provider
    * configuration body. Each key is an argument name; values are either an
    * Expression object (for simple arguments) or nested block structures.
-   * 
+   *
    * These are pre-evaluation: they capture what is written in the provider
    * block, not the resolved values. Use the Expression type to parse
    * individual entries, but note that nested block arguments are represented
@@ -118,7 +118,7 @@ export interface ConfigModule {
   /**
    * variables is a map from variable name to variable configuration,
    * describing all input variables declared in this module.
-   * 
+   *
    * OPENTOFU ONLY — Terraform does not include variables in the configuration
    * representation. When parsing Terraform plan output, this map will always
    * be undefined/empty.
@@ -129,7 +129,7 @@ export interface ConfigModule {
    * actions is a list of action blocks declared in this module. Actions are
    * provider-defined operations that can be triggered by resource lifecycle
    * events or directly invoked. This is a relatively new Terraform feature.
-   * 
+   *
    * TERRAFORM ONLY — OpenTofu does not have action blocks.
    */
   actions?: ConfigAction[];
@@ -143,7 +143,7 @@ export interface ModuleCall {
   /**
    * source is the source address of the child module as written in the
    * module block, e.g. "./modules/vpc" or "hashicorp/consul/aws".
-   * 
+   *
    * OPENTOFU uses this field name. For maximum compatibility, check both
    * source and resolved_source; use whichever is non-empty.
    */
@@ -152,10 +152,10 @@ export interface ModuleCall {
   /**
    * resolved_source is the fully-resolved source address of the child module,
    * after registry lookups and version resolution have been performed.
-   * 
+   *
    * TERRAFORM uses this field name. For maximum compatibility, check both
    * source and resolved_source; use whichever is non-empty.
-   * 
+   *
    * Note: both tools' source has a "source" field, but Terraform renamed it
    * to "resolved_source" to clarify that it is post-resolution.
    */
@@ -184,7 +184,7 @@ export interface ModuleCall {
    * module is the recursive configuration of the child module. This is
    * undefined when the module's configuration is not available (e.g. if the
    * module source could not be resolved).
-   * 
+   *
    * Note: In OpenTofu source, this field is a pointer (*module); in Terraform
    * source, it is an embedded value (module). The unified TypeScript interface
    * uses optional (?) for both.
@@ -195,7 +195,7 @@ export interface ModuleCall {
    * version_constraint is the version constraint for registry modules, e.g.
    * "~> 3.0". Omitted for local path modules and when no version constraint
    * is specified.
-   * 
+   *
    * OPENTOFU ONLY — Terraform does not emit this field in the configuration
    * representation.
    */
@@ -204,7 +204,7 @@ export interface ModuleCall {
   /**
    * depends_on is the list of dependency addresses from the module block's
    * depends_on meta-argument.
-   * 
+   *
    * OPENTOFU ONLY — Terraform does not emit this field in the configuration
    * representation.
    */
@@ -260,7 +260,7 @@ export interface ConfigResource {
    * configuration body. Each key is an argument name; values are either an
    * Expression object (for simple scalar arguments) or nested objects/arrays
    * for block arguments.
-   * 
+   *
    * Note: expressions inside dynamic blocks are NOT included here.
    */
   expressions?: ConfigExpressions;
@@ -268,7 +268,7 @@ export interface ConfigResource {
   /**
    * schema_version is the version of the resource type schema that the
    * expressions object conforms to.
-   * 
+   *
    * In OpenTofu, this may be undefined (omitted when zero or unconstrained).
    * In Terraform, it is always present as a number.
    */
@@ -290,7 +290,7 @@ export interface ConfigResource {
    * depends_on is the list of addresses from the resource block's depends_on
    * meta-argument. These are the explicit dependencies declared by the module
    * author.
-   * 
+   *
    * OPENTOFU ONLY — Terraform does not emit this field in the configuration
    * representation.
    */
@@ -312,7 +312,7 @@ export interface ConfigOutput {
    * ephemeral indicates whether this output was declared as ephemeral. An
    * ephemeral output's value exists only during the plan/apply cycle and is
    * not persisted to state.
-   * 
+   *
    * OPENTOFU ONLY — Terraform does not have ephemeral output support.
    */
   ephemeral?: boolean;
@@ -321,7 +321,7 @@ export interface ConfigOutput {
    * deprecated is a deprecation message for this output, set when the module
    * author has marked the output as deprecated. This message should be
    * surfaced to callers of the module as a warning.
-   * 
+   *
    * OPENTOFU ONLY — Terraform does not support output deprecation.
    */
   deprecated?: string;
@@ -330,7 +330,7 @@ export interface ConfigOutput {
    * expression is the configuration expression that produces this output's
    * value. This is a pre-evaluation snapshot; it captures what is written in
    * the output block, not the resolved value.
-   * 
+   *
    * Note: In OpenTofu source this field may be undefined for outputs with no
    * value expression; in Terraform it is always present. The TypeScript
    * interface uses optional (?) for safety.
@@ -340,14 +340,14 @@ export interface ConfigOutput {
   /**
    * depends_on is the list of addresses from the output block's depends_on
    * meta-argument.
-   * 
+   *
    * OPENTOFU ONLY — Terraform does not emit this field.
    */
   depends_on?: string[];
 
   /**
    * description is the author-provided description string for this output.
-   * 
+   *
    * OPENTOFU ONLY — Terraform does not emit this field in the configuration
    * representation.
    */
@@ -356,7 +356,7 @@ export interface ConfigOutput {
 
 /**
  * ConfigVariable represents a single variable block in a module's configuration.
- * 
+ *
  * OPENTOFU ONLY — Terraform does not include variables in the configuration
  * representation (Plan.configuration). When parsing Terraform plan output, the
  * ConfigModule.variables map will always be undefined/empty.
@@ -416,7 +416,7 @@ export interface ConfigVariable {
  * deployment) that can be invoked directly or triggered by resource lifecycle
  * events (create, update, delete). They are separate from resource lifecycle
  * and do not manage state.
- * 
+ *
  * TERRAFORM ONLY — OpenTofu does not have action blocks.
  */
 export interface ConfigAction {

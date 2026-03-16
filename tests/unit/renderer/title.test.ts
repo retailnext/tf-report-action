@@ -1,5 +1,8 @@
 import { describe, it, expect } from "vitest";
-import { renderTitle, renderWorkspaceMarker } from "../../../src/renderer/title.js";
+import {
+  renderTitle,
+  renderWorkspaceMarker,
+} from "../../../src/renderer/title.js";
 import type { Report } from "../../../src/model/report.js";
 
 function makeReport(overrides: Partial<Report> = {}): Report {
@@ -31,7 +34,10 @@ describe("renderTitle", () => {
 
 describe("renderWorkspaceMarker", () => {
   it("returns a fixed section with HTML comment containing workspace", () => {
-    const report = makeReport({ title: "Terraform Plan", workspace: "production" });
+    const report = makeReport({
+      title: "Terraform Plan",
+      workspace: "production",
+    });
     const section = renderWorkspaceMarker(report);
     expect(section).toBeDefined();
     expect(section!.id).toBe("marker");

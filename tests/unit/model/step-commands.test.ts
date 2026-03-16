@@ -7,24 +7,33 @@ describe("expectedCommand", () => {
   const roles: StepRole[] = ["show-plan", "plan", "apply", "validate", "init"];
   const tools: (Tool | undefined)[] = ["tofu", "terraform", undefined];
 
-  it.each(roles)("returns a non-empty string for role '%s' with each tool", (role) => {
-    for (const tool of tools) {
-      const result = expectedCommand(tool, role);
-      expect(result.length).toBeGreaterThan(0);
-    }
-  });
+  it.each(roles)(
+    "returns a non-empty string for role '%s' with each tool",
+    (role) => {
+      for (const tool of tools) {
+        const result = expectedCommand(tool, role);
+        expect(result.length).toBeGreaterThan(0);
+      }
+    },
+  );
 
   describe("with tool = 'tofu'", () => {
     it("returns 'tofu show -json <tfplan>' for show-plan", () => {
-      expect(expectedCommand("tofu", "show-plan")).toBe("tofu show -json <tfplan>");
+      expect(expectedCommand("tofu", "show-plan")).toBe(
+        "tofu show -json <tfplan>",
+      );
     });
 
     it("returns 'tofu plan -json -out=<tfplan>' for plan", () => {
-      expect(expectedCommand("tofu", "plan")).toBe("tofu plan -json -out=<tfplan>");
+      expect(expectedCommand("tofu", "plan")).toBe(
+        "tofu plan -json -out=<tfplan>",
+      );
     });
 
     it("returns 'tofu apply -json <tfplan>' for apply", () => {
-      expect(expectedCommand("tofu", "apply")).toBe("tofu apply -json <tfplan>");
+      expect(expectedCommand("tofu", "apply")).toBe(
+        "tofu apply -json <tfplan>",
+      );
     });
 
     it("returns 'tofu validate -json' for validate", () => {
@@ -38,21 +47,29 @@ describe("expectedCommand", () => {
 
   describe("with tool = 'terraform'", () => {
     it("returns 'terraform show -json <tfplan>' for show-plan", () => {
-      expect(expectedCommand("terraform", "show-plan")).toBe("terraform show -json <tfplan>");
+      expect(expectedCommand("terraform", "show-plan")).toBe(
+        "terraform show -json <tfplan>",
+      );
     });
 
     it("returns 'terraform apply -json <tfplan>' for apply", () => {
-      expect(expectedCommand("terraform", "apply")).toBe("terraform apply -json <tfplan>");
+      expect(expectedCommand("terraform", "apply")).toBe(
+        "terraform apply -json <tfplan>",
+      );
     });
   });
 
   describe("with tool = undefined", () => {
     it("omits tool prefix for show-plan", () => {
-      expect(expectedCommand(undefined, "show-plan")).toBe("show -json <tfplan>");
+      expect(expectedCommand(undefined, "show-plan")).toBe(
+        "show -json <tfplan>",
+      );
     });
 
     it("omits tool prefix for plan", () => {
-      expect(expectedCommand(undefined, "plan")).toBe("plan -json -out=<tfplan>");
+      expect(expectedCommand(undefined, "plan")).toBe(
+        "plan -json -out=<tfplan>",
+      );
     });
 
     it("omits tool prefix for apply", () => {

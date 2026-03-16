@@ -44,7 +44,8 @@ export function renderLargeValue(
 
   const codeContent = diff
     .map((e) => {
-      const prefix = e.kind === "removed" ? "-" : e.kind === "added" ? "+" : " ";
+      const prefix =
+        e.kind === "removed" ? "-" : e.kind === "added" ? "+" : " ";
       return `${prefix} ${e.value}`;
     })
     .join("\n");

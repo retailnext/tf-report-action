@@ -12,7 +12,11 @@
 
 import type { Report } from "../model/report.js";
 import type { Summary } from "../model/summary.js";
-import { STATUS_SUCCESS, STATUS_FAILURE, DIAGNOSTIC_WARNING } from "../model/status-icons.js";
+import {
+  STATUS_SUCCESS,
+  STATUS_FAILURE,
+  DIAGNOSTIC_WARNING,
+} from "../model/status-icons.js";
 
 /**
  * Build a title for any Report shape. Inspects available data (error,
@@ -51,11 +55,19 @@ export function buildTitle(report: Report): string {
 
   // 3–7. Has summary (from show-plan JSON or JSONL scanner)
   if (report.summary) {
-    return buildSummaryTitle(report.summary, report.operation ?? "plan", wsPrefix, hasAnyStepFailure);
+    return buildSummaryTitle(
+      report.summary,
+      report.operation ?? "plan",
+      wsPrefix,
+      hasAnyStepFailure,
+    );
   }
 
   // 8. All steps skipped
-  if (report.steps.length > 0 && report.steps.every((s) => s.outcome === "skipped")) {
+  if (
+    report.steps.length > 0 &&
+    report.steps.every((s) => s.outcome === "skipped")
+  ) {
     return `${DIAGNOSTIC_WARNING} ${wsPrefix}All Steps Skipped`;
   }
 
@@ -66,7 +78,9 @@ export function buildTitle(report: Report): string {
   }
 
   // Include operation label when known (e.g., "Plan Succeeded", "Apply Succeeded")
-  const opLabel = report.operation ? `${operationLabel(report.operation)} ` : "";
+  const opLabel = report.operation
+    ? `${operationLabel(report.operation)} `
+    : "";
   return `${STATUS_SUCCESS} ${wsPrefix}${opLabel}Succeeded`;
 }
 
@@ -109,7 +123,8 @@ function buildSummaryTitle(
   hasAnyStepFailure: boolean,
 ): string {
   const hasFailures = summary.failures.length > 0;
-  const icon = hasFailures || hasAnyStepFailure ? STATUS_FAILURE : STATUS_SUCCESS;
+  const icon =
+    hasFailures || hasAnyStepFailure ? STATUS_FAILURE : STATUS_SUCCESS;
 
   if (operation === "apply" || operation === "destroy") {
     const parts = buildApplyCountParts(summary);
@@ -140,10 +155,14 @@ function buildSummaryTitle(
 /** Returns a human-readable operation label. */
 function operationLabel(operation: string | undefined): string {
   switch (operation) {
-    case "apply": return "Apply";
-    case "destroy": return "Destroy";
-    case "plan": return "Plan";
-    default: return "";
+    case "apply":
+      return "Apply";
+    case "destroy":
+      return "Destroy";
+    case "plan":
+      return "Plan";
+    default:
+      return "";
   }
 }
 
@@ -153,10 +172,9 @@ function operationLabel(operation: string | undefined): string {
  */
 function hasIacFailure(report: Report): boolean {
   const iacRoles = new Set(["plan", "apply", "show-plan", "validate", "init"]);
-  return report.steps.some(
-    (s) => s.outcome === "failure" && iacRoles.has(s.id),
-  ) || report.issues.some(
-    (i) => i.isFailed && iacRoles.has(i.id),
+  return (
+    report.steps.some((s) => s.outcome === "failure" && iacRoles.has(s.id)) ||
+    report.issues.some((i) => i.isFailed && iacRoles.has(i.id))
   );
 }
 
@@ -178,7 +196,10 @@ function singleFailedStepLabel(report: Report): string {
   return "Failed";
 }
 
-function formatCountParts(counts: Map<string, number>, prefix: string): string[] {
+function formatCountParts(
+  counts: Map<string, number>,
+  prefix: string,
+): string[] {
   const parts: string[] = [];
   for (const [label, count] of counts) {
     parts.push(`${String(count)} ${prefix}${label}`);
@@ -188,26 +209,42 @@ function formatCountParts(counts: Map<string, number>, prefix: string): string[]
 
 function planActionLabel(action: string): string {
   switch (action) {
-    case "create": return "add";
-    case "update": return "change";
-    case "delete": return "destroy";
-    case "replace": return "replace";
-    case "import": return "import";
-    case "move": return "move";
-    case "forget": return "forget";
-    default: return action;
+    case "create":
+      return "add";
+    case "update":
+      return "change";
+    case "delete":
+      return "destroy";
+    case "replace":
+      return "replace";
+    case "import":
+      return "import";
+    case "move":
+      return "move";
+    case "forget":
+      return "forget";
+    default:
+      return action;
   }
 }
 
 function applyActionLabel(action: string): string {
   switch (action) {
-    case "create": return "added";
-    case "update": return "changed";
-    case "delete": return "destroyed";
-    case "replace": return "replaced";
-    case "import": return "imported";
-    case "move": return "moved";
-    case "forget": return "forgotten";
-    default: return action;
+    case "create":
+      return "added";
+    case "update":
+      return "changed";
+    case "delete":
+      return "destroyed";
+    case "replace":
+      return "replaced";
+    case "import":
+      return "imported";
+    case "move":
+      return "moved";
+    case "forget":
+      return "forgotten";
+    default:
+      return action;
   }
 }

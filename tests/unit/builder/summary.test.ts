@@ -1,5 +1,8 @@
 import { describe, it, expect } from "vitest";
-import { buildSummary, buildApplySummary } from "../../../src/builder/summary.js";
+import {
+  buildSummary,
+  buildApplySummary,
+} from "../../../src/builder/summary.js";
 import type { ResourceChange } from "../../../src/model/resource.js";
 
 function makeResource(
@@ -72,7 +75,11 @@ describe("buildSummary", () => {
       makeResource("forget"),
     ]);
     expect(summary.actions).toHaveLength(3);
-    expect(summary.actions.map((a) => a.action)).toEqual(["move", "import", "forget"]);
+    expect(summary.actions.map((a) => a.action)).toEqual([
+      "move",
+      "import",
+      "forget",
+    ]);
   });
 
   it("sorts resource types by count desc, then alphabetically", () => {
@@ -86,7 +93,11 @@ describe("buildSummary", () => {
     const summary = buildSummary(resources);
     const types = summary.actions[0]!.resourceTypes.map((rt) => rt.type);
     // aws_instance and aws_lambda_function both have 2 → alphabetical
-    expect(types).toEqual(["aws_instance", "aws_lambda_function", "aws_s3_bucket"]);
+    expect(types).toEqual([
+      "aws_instance",
+      "aws_lambda_function",
+      "aws_s3_bucket",
+    ]);
   });
 
   it("plan summary always has empty failures", () => {

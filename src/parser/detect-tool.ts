@@ -49,7 +49,9 @@ export function detectToolFromPlan(plan: Plan): Tool | undefined {
  * 2. **Raw text patterns**: the first 4 KiB is searched (case-insensitively)
  *    for `"opentofu"` or `"terraform"`.
  */
-export function detectToolFromOutput(content: string | undefined): Tool | undefined {
+export function detectToolFromOutput(
+  content: string | undefined,
+): Tool | undefined {
   if (content === undefined || content.length === 0) return undefined;
 
   // Strategy 1: JSONL version message
@@ -85,7 +87,11 @@ function detectFromVersionMessage(content: string): Tool | undefined {
       continue;
     }
 
-    if (typeof parsed !== "object" || parsed === null || Array.isArray(parsed)) {
+    if (
+      typeof parsed !== "object" ||
+      parsed === null ||
+      Array.isArray(parsed)
+    ) {
       continue;
     }
 

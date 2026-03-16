@@ -79,8 +79,7 @@ describe("emoji governance", () => {
         if (seen.has(normalized)) {
           const prevName = seen.get(normalized) ?? "unknown";
           expect.fail(
-            `"${symbol}" is used for both "${prevName}" ` +
-              `and "${name}"`,
+            `"${symbol}" is used for both "${prevName}" ` + `and "${name}"`,
           );
         }
         seen.set(normalized, name);
@@ -104,12 +103,15 @@ describe("emoji governance", () => {
           const line = lines[i]!;
           for (const m of findSymbols(line)) {
             const codepoints = Array.from(m)
-              .map(
-                (c) => {
-                  const cp = c.codePointAt(0);
-                  return "U+" + (cp !== undefined ? cp.toString(16).toUpperCase().padStart(4, "0") : "0000");
-                },
-              )
+              .map((c) => {
+                const cp = c.codePointAt(0);
+                return (
+                  "U+" +
+                  (cp !== undefined
+                    ? cp.toString(16).toUpperCase().padStart(4, "0")
+                    : "0000")
+                );
+              })
               .join(" ");
             violations.push(`${rel}:${String(i + 1)}: ${m} (${codepoints})`);
           }
@@ -166,7 +168,7 @@ function stripComments(source: string): string {
  * and non-ASCII math symbol found in a line.
  */
 function* findSymbols(line: string): Generator<string> {
-  const emojiRe = /[\p{Extended_Pictographic}--[\x23\x2a\x30-\x39]]/vg;
+  const emojiRe = /[\p{Extended_Pictographic}--[\x23\x2a\x30-\x39]]/gv;
   for (const m of line.matchAll(emojiRe)) {
     yield m[0];
   }

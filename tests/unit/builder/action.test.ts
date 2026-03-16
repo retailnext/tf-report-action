@@ -40,16 +40,24 @@ describe("determineAction", () => {
 
   it("maps unknown single action to 'unknown'", () => {
     // Cast to test unknown handling
-    expect(determineAction(["open"] as Parameters<typeof determineAction>[0])).toBe("unknown");
+    expect(
+      determineAction(["open"] as Parameters<typeof determineAction>[0]),
+    ).toBe("unknown");
   });
 
   it("maps unrecognized two-action combination to 'replace' (fallback)", () => {
     // ["update","delete"] is not a valid ChangeActions but any two-element
     // array maps to "replace" at runtime since all valid 2-tuples are replace variants.
-    expect(determineAction(["update", "delete"] as Parameters<typeof determineAction>[0])).toBe("replace");
+    expect(
+      determineAction(["update", "delete"] as Parameters<
+        typeof determineAction
+      >[0]),
+    ).toBe("replace");
   });
 
   it("maps empty actions array to 'unknown'", () => {
-    expect(determineAction([] as unknown as Parameters<typeof determineAction>[0])).toBe("unknown");
+    expect(
+      determineAction([] as unknown as Parameters<typeof determineAction>[0]),
+    ).toBe("unknown");
   });
 });

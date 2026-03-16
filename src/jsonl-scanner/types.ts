@@ -12,7 +12,10 @@ import type { Diagnostic } from "../model/diagnostic.js";
 import type { ApplyStatus } from "../model/apply-status.js";
 import type { Tool } from "../model/report.js";
 import type { PlanAction } from "../model/plan-action.js";
-import type { UIChangeSummary, UIOutputsMessage } from "../tfjson/machine-readable-ui.js";
+import type {
+  UIChangeSummary,
+  UIOutputsMessage,
+} from "../tfjson/machine-readable-ui.js";
 
 /**
  * A planned resource change extracted from a `planned_change` or

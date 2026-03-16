@@ -42,7 +42,14 @@ describe("buildReport", () => {
           mode: "managed",
           type: "null_resource",
           name: "root",
-          change: { actions: ["create"], before: null, after: {}, before_sensitive: false, after_sensitive: false, after_unknown: false },
+          change: {
+            actions: ["create"],
+            before: null,
+            after: {},
+            before_sensitive: false,
+            after_sensitive: false,
+            after_unknown: false,
+          },
         },
         {
           address: "module.child.null_resource.nested",
@@ -50,7 +57,14 @@ describe("buildReport", () => {
           mode: "managed",
           type: "null_resource",
           name: "nested",
-          change: { actions: ["create"], before: null, after: {}, before_sensitive: false, after_sensitive: false, after_unknown: false },
+          change: {
+            actions: ["create"],
+            before: null,
+            after: {},
+            before_sensitive: false,
+            after_sensitive: false,
+            after_unknown: false,
+          },
         },
       ],
     });
@@ -58,7 +72,9 @@ describe("buildReport", () => {
     const report = buildReport(plan);
     expect(report.resources).toHaveLength(2);
     expect(report.resources![0]!.address).toBe("null_resource.root");
-    expect(report.resources![1]!.address).toBe("module.child.null_resource.nested");
+    expect(report.resources![1]!.address).toBe(
+      "module.child.null_resource.nested",
+    );
   });
 
   it("preserves input order for resources from different modules", () => {
@@ -70,7 +86,14 @@ describe("buildReport", () => {
           mode: "managed",
           type: "null_resource",
           name: "nested",
-          change: { actions: ["create"], before: null, after: {}, before_sensitive: false, after_sensitive: false, after_unknown: false },
+          change: {
+            actions: ["create"],
+            before: null,
+            after: {},
+            before_sensitive: false,
+            after_sensitive: false,
+            after_unknown: false,
+          },
         },
         {
           address: "null_resource.root",
@@ -78,14 +101,23 @@ describe("buildReport", () => {
           mode: "managed",
           type: "null_resource",
           name: "root",
-          change: { actions: ["create"], before: null, after: {}, before_sensitive: false, after_sensitive: false, after_unknown: false },
+          change: {
+            actions: ["create"],
+            before: null,
+            after: {},
+            before_sensitive: false,
+            after_sensitive: false,
+            after_unknown: false,
+          },
         },
       ],
     });
 
     const report = buildReport(plan);
     expect(report.resources).toHaveLength(2);
-    expect(report.resources![0]!.address).toBe("module.child.null_resource.nested");
+    expect(report.resources![0]!.address).toBe(
+      "module.child.null_resource.nested",
+    );
     expect(report.resources![1]!.address).toBe("null_resource.root");
   });
 
@@ -97,21 +129,39 @@ describe("buildReport", () => {
           mode: "managed",
           type: "null_resource",
           name: "a",
-          change: { actions: ["create"], before: null, after: {}, before_sensitive: false, after_sensitive: false, after_unknown: false },
+          change: {
+            actions: ["create"],
+            before: null,
+            after: {},
+            before_sensitive: false,
+            after_sensitive: false,
+            after_unknown: false,
+          },
         },
         {
           address: "null_resource.b",
           mode: "managed",
           type: "null_resource",
           name: "b",
-          change: { actions: ["delete"], before: {}, after: null, before_sensitive: false, after_sensitive: false, after_unknown: false },
+          change: {
+            actions: ["delete"],
+            before: {},
+            after: null,
+            before_sensitive: false,
+            after_sensitive: false,
+            after_unknown: false,
+          },
         },
       ],
     });
 
     const report = buildReport(plan);
-    const createGroup = report.summary.actions.find((g) => g.action === "create");
-    const deleteGroup = report.summary.actions.find((g) => g.action === "delete");
+    const createGroup = report.summary.actions.find(
+      (g) => g.action === "create",
+    );
+    const deleteGroup = report.summary.actions.find(
+      (g) => g.action === "delete",
+    );
     expect(createGroup?.total).toBe(1);
     expect(deleteGroup?.total).toBe(1);
     expect(report.summary.failures).toEqual([]);
@@ -125,7 +175,14 @@ describe("buildReport", () => {
           mode: "data",
           type: "null_data_source",
           name: "test",
-          change: { actions: ["read"], before: null, after: {}, before_sensitive: false, after_sensitive: false, after_unknown: false },
+          change: {
+            actions: ["read"],
+            before: null,
+            after: {},
+            before_sensitive: false,
+            after_sensitive: false,
+            after_unknown: false,
+          },
         },
       ],
     });
@@ -179,6 +236,8 @@ describe("buildReport", () => {
     const resWithout = reportWithout.resources![0]!;
     const resWith = reportWith.resources![0]!;
 
-    expect(resWithout.attributes.length).toBeLessThan(resWith.attributes.length);
+    expect(resWithout.attributes.length).toBeLessThan(
+      resWith.attributes.length,
+    );
   });
 });

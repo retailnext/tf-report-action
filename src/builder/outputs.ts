@@ -20,12 +20,9 @@ export function buildOutputChanges(plan: Plan): OutputChange[] {
 
     // Determine if sensitive: before_sensitive or after_sensitive being `true` at root
     const isSensitive =
-      change.before_sensitive === true ||
-      change.after_sensitive === true;
+      change.before_sensitive === true || change.after_sensitive === true;
 
-    const before = isSensitive
-      ? null
-      : valueToString(change.before ?? null);
+    const before = isSensitive ? null : valueToString(change.before ?? null);
 
     let after: string | null;
     let isKnownAfterApply = false;

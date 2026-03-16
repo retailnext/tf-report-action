@@ -6,7 +6,10 @@ import {
   buildFailureCountParts,
 } from "../../../src/builder/title.js";
 import type { Report } from "../../../src/model/report.js";
-import type { Summary, SummaryActionGroup } from "../../../src/model/summary.js";
+import type {
+  Summary,
+  SummaryActionGroup,
+} from "../../../src/model/summary.js";
 
 function makeSummary(
   actions: SummaryActionGroup[] = [],
@@ -52,7 +55,9 @@ describe("buildTitle", () => {
       ]),
       operation: "plan",
     });
-    expect(buildTitle(report)).toBe("✅ Plan: 2 to add, 1 to change, 3 to destroy");
+    expect(buildTitle(report)).toBe(
+      "✅ Plan: 2 to add, 1 to change, 3 to destroy",
+    );
   });
 
   it("returns 'No Changes' when no actions and no failures", () => {
@@ -291,10 +296,10 @@ describe("buildFailureCountParts", () => {
   });
 
   it("returns total failed count", () => {
-    const summary = makeSummary([], [
-      makeActionGroup("create", 2),
-      makeActionGroup("update", 1),
-    ]);
+    const summary = makeSummary(
+      [],
+      [makeActionGroup("create", 2), makeActionGroup("update", 1)],
+    );
     expect(buildFailureCountParts(summary)).toEqual(["3 failed"]);
   });
 });

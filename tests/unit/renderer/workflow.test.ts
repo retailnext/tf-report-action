@@ -45,7 +45,9 @@ describe("renderWorkflowBody", () => {
     const link = sections.find((s) => s.id === "logs-link");
     expect(link).toBeDefined();
     expect(link!.full).toContain("[View workflow run logs]");
-    expect(link!.full).toContain("https://github.com/owner/repo/actions/runs/123");
+    expect(link!.full).toContain(
+      "https://github.com/owner/repo/actions/runs/123",
+    );
   });
 
   it("does not include logs link when logsUrl is not set", () => {

@@ -121,9 +121,7 @@ describe("composeSections", () => {
 
   describe("budget edge cases", () => {
     it("fits section at exactly the remaining budget", () => {
-      const sections: Section[] = [
-        { id: "a", full: "12345" },
-      ];
+      const sections: Section[] = [{ id: "a", full: "12345" }];
       const result = composeSections(sections, 5);
       expect(result.output).toBe("12345");
       expect(result.degradedCount).toBe(0);
@@ -131,18 +129,14 @@ describe("composeSections", () => {
     });
 
     it("degrades when one character over budget", () => {
-      const sections: Section[] = [
-        { id: "a", full: "123456", compact: "123" },
-      ];
+      const sections: Section[] = [{ id: "a", full: "123456", compact: "123" }];
       const result = composeSections(sections, 5);
       expect(result.output).toBe("123");
       expect(result.degradedIds).toEqual(["a"]);
     });
 
     it("handles zero budget", () => {
-      const sections: Section[] = [
-        { id: "a", full: "text", compact: "" },
-      ];
+      const sections: Section[] = [{ id: "a", full: "text", compact: "" }];
       const result = composeSections(sections, 0);
       expect(result.output).toBe("");
       expect(result.degradedIds).toEqual(["a"]);

@@ -63,7 +63,8 @@ export const UIChangeAction = {
   Forget: "forget",
 } as const;
 
-export type UIChangeAction = typeof UIChangeAction[keyof typeof UIChangeAction];
+export type UIChangeAction =
+  (typeof UIChangeAction)[keyof typeof UIChangeAction];
 
 // ─── Change Reason (UI) ────────────────────────────────────────────────────
 
@@ -90,7 +91,8 @@ export const UIChangeReason = {
   ReadBecauseCheckNested: "read_because_check_nested",
 } as const;
 
-export type UIChangeReason = typeof UIChangeReason[keyof typeof UIChangeReason];
+export type UIChangeReason =
+  (typeof UIChangeReason)[keyof typeof UIChangeReason];
 
 // ─── Diagnostic ─────────────────────────────────────────────────────────────
 
@@ -127,7 +129,10 @@ export interface UIDiagnosticSnippet {
   /** Byte offset within `code` where the highlighted region ends. */
   readonly highlight_end_offset: number;
   /** Expression values referenced in the diagnostic. */
-  readonly values: readonly { readonly traversal: string; readonly statement: string }[];
+  readonly values: readonly {
+    readonly traversal: string;
+    readonly statement: string;
+  }[];
 }
 
 /**

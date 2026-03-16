@@ -74,7 +74,9 @@ describe("renderStepIssue", () => {
     };
     const section = renderStepIssue(issue);
     expect(section.full).toContain("<summary>stderr</summary>");
-    expect(section.full).toContain("```\nError: Failed to install provider\n```");
+    expect(section.full).toContain(
+      "```\nError: Failed to install provider\n```",
+    );
   });
 
   it("appends truncation indicator to stderr when stderrTruncated is true", () => {
@@ -108,7 +110,9 @@ describe("renderStepIssue", () => {
       stderrError: "permission denied",
     };
     const section = renderStepIssue(issue);
-    expect(section.full).toContain("⚠️ stderr not available: permission denied");
+    expect(section.full).toContain(
+      "⚠️ stderr not available: permission denied",
+    );
   });
 
   it("renders both stdout and stderr when both are present", () => {

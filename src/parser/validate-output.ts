@@ -19,9 +19,7 @@ export function parseValidateOutput(json: string): ValidateOutput {
   try {
     parsed = JSON.parse(json) as unknown;
   } catch {
-    throw new Error(
-      "Failed to parse validate output: input is not valid JSON",
-    );
+    throw new Error("Failed to parse validate output: input is not valid JSON");
   }
 
   if (typeof parsed !== "object" || parsed === null || Array.isArray(parsed)) {

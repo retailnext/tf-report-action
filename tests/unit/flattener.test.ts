@@ -93,7 +93,10 @@ describe("flatten", () => {
 
   it("handles multiple levels with arrays and objects", () => {
     const result = flatten({
-      tags: [{ key: "env", value: "prod" }, { key: "app", value: "web" }],
+      tags: [
+        { key: "env", value: "prod" },
+        { key: "app", value: "web" },
+      ],
     });
     expect(result.get("tags[0].key")).toBe("env");
     expect(result.get("tags[0].value")).toBe("prod");

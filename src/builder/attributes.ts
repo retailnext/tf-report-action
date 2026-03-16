@@ -18,7 +18,9 @@ const LARGE_LINE_THRESHOLD = 3;
  * Converts an AttributeShadow value to a flat map suitable for sensitivity/unknown checks.
  * If the shadow is a boolean `true`, stores empty-string key with "true" to signal root-level.
  */
-function shadowToMap(shadow: AttributeShadow | undefined): Map<string, string | null> {
+function shadowToMap(
+  shadow: AttributeShadow | undefined,
+): Map<string, string | null> {
   if (shadow === undefined) return new Map();
   if (typeof shadow === "boolean") {
     const m = new Map<string, string | null>();
@@ -53,7 +55,11 @@ function isUnknownAfterApply(
 function isLargeValue(value: string | null): boolean {
   if (value === null) return false;
   const trimmed = value.trim();
-  if (trimmed.startsWith("{") || trimmed.startsWith("[") || trimmed.startsWith("<")) {
+  if (
+    trimmed.startsWith("{") ||
+    trimmed.startsWith("[") ||
+    trimmed.startsWith("<")
+  ) {
     return true;
   }
   let count = 0;
@@ -106,8 +112,12 @@ export function buildAttributeChanges(
   }
 
   // We'll flatten the before/after objects to get nested keys
-  const beforeFlat = before ? flatten(before as unknown as import("../tfjson/common.js").JsonValue) : new Map<string, string | null>();
-  const afterFlat = after ? flatten(after as unknown as import("../tfjson/common.js").JsonValue) : new Map<string, string | null>();
+  const beforeFlat = before
+    ? flatten(before as unknown as import("../tfjson/common.js").JsonValue)
+    : new Map<string, string | null>();
+  const afterFlat = after
+    ? flatten(after as unknown as import("../tfjson/common.js").JsonValue)
+    : new Map<string, string | null>();
 
   // Collect all flattened keys
   const flatKeys = new Set<string>();
@@ -128,7 +138,10 @@ export function buildAttributeChanges(
 
     if (sensitive) {
       beforeVal = beforeFlat.has(key) ? SENSITIVE_MASK : null;
-      afterVal = afterFlat.has(key) || isUnknownAfterApply(key, unknownMap) ? SENSITIVE_MASK : null;
+      afterVal =
+        afterFlat.has(key) || isUnknownAfterApply(key, unknownMap)
+          ? SENSITIVE_MASK
+          : null;
     } else {
       beforeVal = beforeFlat.has(key) ? (beforeFlat.get(key) ?? null) : null;
 
@@ -146,12 +159,19 @@ export function buildAttributeChanges(
     // Sensitive attributes with an actual value on either side are always included —
     // masking collapses both before and after to "(sensitive)", so we cannot use the
     // masked values to detect whether the underlying value actually changed.
-    const hasSensitiveValue = sensitive && (beforeFlat.has(key) || afterFlat.has(key));
-    if (!options.showUnchangedAttributes && beforeVal === afterVal && !isKnownAfterApply && !hasSensitiveValue) {
+    const hasSensitiveValue =
+      sensitive && (beforeFlat.has(key) || afterFlat.has(key));
+    if (
+      !options.showUnchangedAttributes &&
+      beforeVal === afterVal &&
+      !isKnownAfterApply &&
+      !hasSensitiveValue
+    ) {
       continue;
     }
 
-    const large = isLargeValue(sensitive ? null : beforeVal) ||
+    const large =
+      isLargeValue(sensitive ? null : beforeVal) ||
       isLargeValue(sensitive || isKnownAfterApply ? null : afterVal);
 
     result.push({
