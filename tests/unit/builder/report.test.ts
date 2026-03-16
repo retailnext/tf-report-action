@@ -14,7 +14,7 @@ describe("buildReport", () => {
   it("builds a report from an empty plan", () => {
     const report = buildReport(basePlan());
     expect(report.summary).toEqual({ actions: [], failures: [] });
-    expect(report.modules).toEqual([]);
+    expect(report.resources).toEqual([]);
     expect(report.outputs).toEqual([]);
   });
 
@@ -33,7 +33,7 @@ describe("buildReport", () => {
     expect(report.formatVersion).toBe("1.2");
   });
 
-  it("groups resources by module address", () => {
+  it("includes resources from different modules in a flat list", () => {
     const plan = basePlan({
       resource_changes: [
         {
@@ -56,17 +56,12 @@ describe("buildReport", () => {
     });
 
     const report = buildReport(plan);
-    expect(report.modules).toHaveLength(2);
-
-    const root = report.modules.find((m) => m.moduleAddress === "");
-    const child = report.modules.find((m) => m.moduleAddress === "module.child");
-    expect(root).toBeDefined();
-    expect(child).toBeDefined();
-    expect(root!.resources).toHaveLength(1);
-    expect(child!.resources).toHaveLength(1);
+    expect(report.resources).toHaveLength(2);
+    expect(report.resources![0]!.address).toBe("null_resource.root");
+    expect(report.resources![1]!.address).toBe("module.child.null_resource.nested");
   });
 
-  it("puts root module first when sorting", () => {
+  it("preserves input order for resources from different modules", () => {
     const plan = basePlan({
       resource_changes: [
         {
@@ -89,7 +84,9 @@ describe("buildReport", () => {
     });
 
     const report = buildReport(plan);
-    expect(report.modules[0]!.moduleAddress).toBe("");
+    expect(report.resources).toHaveLength(2);
+    expect(report.resources![0]!.address).toBe("module.child.null_resource.nested");
+    expect(report.resources![1]!.address).toBe("null_resource.root");
   });
 
   it("builds summary counts from resource changes", () => {
@@ -134,7 +131,7 @@ describe("buildReport", () => {
     });
 
     const report = buildReport(plan);
-    expect(report.modules).toHaveLength(0);
+    expect(report.resources).toHaveLength(0);
     expect(report.summary).toEqual({ actions: [], failures: [] });
   });
 
@@ -179,8 +176,8 @@ describe("buildReport", () => {
     const reportWithout = buildReport(plan, { showUnchangedAttributes: false });
     const reportWith = buildReport(plan, { showUnchangedAttributes: true });
 
-    const resWithout = reportWithout.modules[0]!.resources[0]!;
-    const resWith = reportWith.modules[0]!.resources[0]!;
+    const resWithout = reportWithout.resources![0]!;
+    const resWith = reportWith.resources![0]!;
 
     expect(resWithout.attributes.length).toBeLessThan(resWith.attributes.length);
   });

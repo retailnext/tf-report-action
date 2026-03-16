@@ -1,4 +1,5 @@
 import type { Report } from "../model/report.js";
+import type { ResourceChange } from "../model/resource.js";
 import type { RenderOptions } from "./options.js";
 import type { Section } from "../model/section.js";
 import type { Diagnostic } from "../model/diagnostic.js";
@@ -12,6 +13,47 @@ import { renderDiagnostics } from "./diagnostics.js";
 import { ACTION_SYMBOLS } from "../model/plan-action.js";
 import { MODULE_ICON, DRIFT_ICON } from "../model/status-icons.js";
 import { resolveTemplate } from "../template/index.js";
+import { deriveModuleAddress } from "./address.js";
+
+// Re-export address helpers for use by other renderer files and tests
+export { deriveModuleAddress, deriveInstanceName } from "./address.js";
+
+// ─── Markdown helpers ──────────────────────────────────────────────────────
+
+/**
+ * Lightweight grouping structure used only within the renderer.
+ * Not part of the public model — module grouping is a display concern.
+ */
+interface RendererModuleGroup {
+  readonly moduleAddress: string;
+  readonly resources: ResourceChange[];
+}
+
+/**
+ * Groups a flat resource array by derived module address for display.
+ * Sorted: root module first, then alphabetical by module address.
+ */
+function groupByModule(resources: readonly ResourceChange[]): RendererModuleGroup[] {
+  const map = new Map<string, ResourceChange[]>();
+
+  for (const resource of resources) {
+    const moduleAddr = deriveModuleAddress(resource.address, resource.type);
+    let group = map.get(moduleAddr);
+    if (!group) {
+      group = [];
+      map.set(moduleAddr, group);
+    }
+    group.push(resource);
+  }
+
+  return [...map.entries()]
+    .sort(([a], [b]) => {
+      if (a === "") return -1;
+      if (b === "") return 1;
+      return a.localeCompare(b);
+    })
+    .map(([moduleAddress, grouped]) => ({ moduleAddress, resources: grouped }));
+}
 
 /**
  * Ensure content ends with exactly two newlines (a trailing blank line).
@@ -25,14 +67,19 @@ function ensureTrailingBlankLine(content: string): string {
   return trimmed + "\n\n";
 }
 
+// ─── Structured rendering ──────────────────────────────────────────────────
+
 /**
  * Renders a Report's structured body as an array of compositable Sections.
  *
- * Each major part (summary, drift, module groups, outputs, diagnostics)
+ * Each major part (summary, drift, resource groups, outputs, diagnostics)
  * is a separate Section so the compositor can degrade or omit individual
  * sections under budget pressure.
  *
- * Requires that the report has `summary` or `modules` populated (i.e.,
+ * Resources are grouped by module address (derived from each resource's
+ * `address` and `type`) for display — this is purely a rendering concern.
+ *
+ * Requires that the report has `summary` or `resources` populated (i.e.,
  * from show-plan JSON or JSONL enrichment).
  */
 export function renderStructuredSections(
@@ -44,9 +91,9 @@ export function renderStructuredSections(
   const isApply = isApplyReport(report);
   const summaryHeading = isApply ? "Apply Summary" : "Plan Summary";
   const summary = report.summary;
-  const modules = report.modules ?? [];
+  const resources = report.resources ?? [];
   const outputs = report.outputs ?? [];
-  const driftModules = report.driftModules ?? [];
+  const driftResources = report.driftResources ?? [];
   const sections: Section[] = [];
 
   // Build apply context maps
@@ -88,19 +135,20 @@ export function renderStructuredSections(
   }
 
   // Drift section
-  if (driftModules.length > 0) {
+  if (driftResources.length > 0) {
     const writer = new MarkdownWriter();
-    renderDriftSection(driftModules, writer, options, diffCache);
+    renderDriftSection(driftResources, writer, options, diffCache);
     sections.push({ id: "drift", full: ensureTrailingBlankLine(writer.build()) });
   }
 
   // Resource changes — one section per module group for granular budget control
-  if (modules.length > 0) {
+  const moduleGroups = groupByModule(resources);
+  if (moduleGroups.length > 0) {
     const writer = new MarkdownWriter();
     writer.heading("Resource Changes", 2);
     sections.push({ id: "resource-changes-heading", full: ensureTrailingBlankLine(writer.build()), fixed: true });
 
-    for (const moduleGroup of modules) {
+    for (const moduleGroup of moduleGroups) {
       const moduleLabel =
         moduleGroup.moduleAddress === ""
           ? "root"
@@ -114,11 +162,6 @@ export function renderStructuredSections(
           ? buildApplyContext(resource.address, failedAddresses, diagByAddress)
           : undefined;
         renderResource(resource, mw, options, diffCache, applyContext);
-      }
-
-      if (moduleGroup.outputs.length > 0) {
-        mw.heading("Outputs", 4);
-        renderOutputTable(moduleGroup.outputs, mw);
       }
 
       sections.push({
@@ -199,7 +242,7 @@ function extractNonResourceDiagnostics(
   if (!report.diagnostics) return [];
 
   const resourceAddresses = new Set(
-    (report.modules ?? []).flatMap((m) => m.resources.map((r) => r.address)),
+    (report.resources ?? []).map((r) => r.address),
   );
 
   return report.diagnostics.filter(
@@ -252,17 +295,14 @@ function renderOutputTable(
  * as the changes section but under a distinct heading.
  */
 function renderDriftSection(
-  driftModules: readonly import("../model/module-group.js").ModuleGroup[],
+  driftResources: readonly ResourceChange[],
   writer: MarkdownWriter,
   options: RenderOptions,
   diffCache: Map<string, DiffEntry[]>,
 ): void {
-  const driftCount = driftModules.reduce(
-    (sum, m) => sum + m.resources.length,
-    0,
-  );
-  writer.heading(`${DRIFT_ICON} Resource Drift (${String(driftCount)} detected)`, 2);
+  writer.heading(`${DRIFT_ICON} Resource Drift (${String(driftResources.length)} detected)`, 2);
 
+  const driftModules = groupByModule(driftResources);
   for (const moduleGroup of driftModules) {
     const moduleLabel =
       moduleGroup.moduleAddress === ""

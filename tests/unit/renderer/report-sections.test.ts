@@ -14,9 +14,9 @@ describe("renderReportSections", () => {
         toolVersion: "1.5.0",
         formatVersion: "1.2",
         summary: { actions: [], failures: [] },
-        modules: [],
+        resources: [],
         outputs: [],
-        driftModules: [],
+        driftResources: [],
         workspace: "staging",
       };
       const sections = renderReportSections(report);
@@ -51,9 +51,9 @@ describe("renderReportSections", () => {
         toolVersion: "1.5.0",
         formatVersion: "1.2",
         summary: { actions: [], failures: [] },
-        modules: [],
+        resources: [],
         outputs: [],
-        driftModules: [],
+        driftResources: [],
       };
       const sections = renderReportSections(report);
       const ids = sections.map((s) => s.id);

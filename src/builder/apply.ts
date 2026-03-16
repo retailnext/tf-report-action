@@ -83,7 +83,7 @@ export function buildApplyReport(
   );
 
   report.summary = buildApplySummary(
-    (report.modules ?? []).flatMap((m) => m.resources),
+    report.resources ?? [],
     failedAddresses,
   );
 
@@ -188,16 +188,13 @@ function buildNotStartedStatuses(
 /**
  * Removes resources from the report that were not actually applied.
  * A resource is a "phantom" if its address does not appear in the
- * applied addresses set. Empty module groups are also removed.
+ * applied addresses set.
  */
 function filterPhantomResources(report: Report, appliedAddresses: Set<string>): void {
-  if (!report.modules) return;
-  for (const group of report.modules) {
-    group.resources = group.resources.filter(
-      (r) => appliedAddresses.has(r.address),
-    );
-  }
-  report.modules = report.modules.filter((m) => m.resources.length > 0);
+  if (!report.resources) return;
+  report.resources = report.resources.filter(
+    (r) => appliedAddresses.has(r.address),
+  );
 }
 
 /**
@@ -207,12 +204,10 @@ function filterPhantomResources(report: Report, appliedAddresses: Set<string>): 
  * resolved values, so we indicate they're not available.
  */
 function replaceKnownAfterApply(report: Report): void {
-  for (const group of report.modules ?? []) {
-    for (const resource of group.resources) {
-      for (const attr of resource.attributes) {
-        if (attr.isKnownAfterApply) {
-          attr.after = VALUE_NOT_IN_PLAN;
-        }
+  for (const resource of report.resources ?? []) {
+    for (const attr of resource.attributes) {
+      if (attr.isKnownAfterApply) {
+        attr.after = VALUE_NOT_IN_PLAN;
       }
     }
   }

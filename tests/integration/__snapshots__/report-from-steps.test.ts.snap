@@ -24,8 +24,6 @@ exports[`reportFromSteps integration — apply-no-show fixtures > terraform/appl
 terraform_data.success
 \`\`\`
 
-_No attribute changes._
-
 </details>
 
 <details>
@@ -35,8 +33,6 @@ _No attribute changes._
 null_resource.will_fail
 \`\`\`
 
-_No attribute changes._
-
 </details>
 
 <details>
@@ -45,8 +41,6 @@ _No attribute changes._
 \`\`\`
 terraform_data.depends_on_fail
 \`\`\`
-
-_No attribute changes._
 
 </details>
 
@@ -346,8 +340,6 @@ Exit code: \`1\`
 null_resource.will_fail
 \`\`\`
 
-_No attribute changes._
-
 🚨 **local-exec provisioner error**
 
 \`\`\`
@@ -362,8 +354,6 @@ Error running command 'exit 1': exit status 1. Output:
 \`\`\`
 terraform_data.depends_on_fail
 \`\`\`
-
-_No attribute changes._
 
 </details>
 
@@ -394,8 +384,6 @@ exports[`reportFromSteps integration — apply-no-show fixtures > terraform/defe
 terraform_data.independent
 \`\`\`
 
-_No attribute changes._
-
 </details>
 
 <details>
@@ -404,19 +392,6 @@ _No attribute changes._
 \`\`\`
 local_file.config
 \`\`\`
-
-_No attribute changes._
-
-</details>
-
-<details>
-<summary>👁 <strong>local_command</strong> read_config</summary>
-
-\`\`\`
-data.local_command.read_config
-\`\`\`
-
-_No attribute changes._
 
 </details>
 
@@ -427,8 +402,6 @@ _No attribute changes._
 terraform_data.worker_b
 \`\`\`
 
-_No attribute changes._
-
 </details>
 
 <details>
@@ -437,8 +410,6 @@ _No attribute changes._
 \`\`\`
 terraform_data.worker_c
 \`\`\`
-
-_No attribute changes._
 
 </details>
 
@@ -449,7 +420,16 @@ _No attribute changes._
 terraform_data.worker_a
 \`\`\`
 
-_No attribute changes._
+</details>
+
+### 📦 Module: \`data\`
+
+<details>
+<summary>👁 <strong>local_command</strong> read_config</summary>
+
+\`\`\`
+data.local_command.read_config
+\`\`\`
 
 </details>
 
@@ -481,8 +461,6 @@ exports[`reportFromSteps integration — apply-no-show fixtures > terraform/defe
 terraform_data.independent
 \`\`\`
 
-_No attribute changes._
-
 </details>
 
 <details>
@@ -491,19 +469,6 @@ _No attribute changes._
 \`\`\`
 local_file.metadata
 \`\`\`
-
-_No attribute changes._
-
-</details>
-
-<details>
-<summary>👁 <strong>local_command</strong> read_config</summary>
-
-\`\`\`
-data.local_command.read_config
-\`\`\`
-
-_No attribute changes._
 
 </details>
 
@@ -514,8 +479,6 @@ _No attribute changes._
 terraform_data.worker_a
 \`\`\`
 
-_No attribute changes._
-
 </details>
 
 <details>
@@ -524,8 +487,6 @@ _No attribute changes._
 \`\`\`
 terraform_data.worker_b
 \`\`\`
-
-_No attribute changes._
 
 </details>
 
@@ -536,7 +497,16 @@ _No attribute changes._
 terraform_data.worker_c
 \`\`\`
 
-_No attribute changes._
+</details>
+
+### 📦 Module: \`data\`
+
+<details>
+<summary>👁 <strong>local_command</strong> read_config</summary>
+
+\`\`\`
+data.local_command.read_config
+\`\`\`
 
 </details>
 
@@ -568,19 +538,6 @@ exports[`reportFromSteps integration — apply-no-show fixtures > terraform/defe
 local_file.config
 \`\`\`
 
-_No attribute changes._
-
-</details>
-
-<details>
-<summary>👁 <strong>local_command</strong> read_config</summary>
-
-\`\`\`
-data.local_command.read_config
-\`\`\`
-
-_No attribute changes._
-
 </details>
 
 <details>
@@ -589,8 +546,6 @@ _No attribute changes._
 \`\`\`
 terraform_data.worker_a
 \`\`\`
-
-_No attribute changes._
 
 </details>
 
@@ -601,8 +556,6 @@ _No attribute changes._
 terraform_data.worker_b
 \`\`\`
 
-_No attribute changes._
-
 </details>
 
 <details>
@@ -612,7 +565,16 @@ _No attribute changes._
 terraform_data.worker_c
 \`\`\`
 
-_No attribute changes._
+</details>
+
+### 📦 Module: \`data\`
+
+<details>
+<summary>👁 <strong>local_command</strong> read_config</summary>
+
+\`\`\`
+data.local_command.read_config
+\`\`\`
 
 </details>
 
@@ -642,8 +604,6 @@ exports[`reportFromSteps integration — apply-no-show fixtures > terraform/impo
 random_string.existing
 \`\`\`
 
-_No attribute changes._
-
 </details>
 
 "
@@ -671,8 +631,6 @@ exports[`reportFromSteps integration — apply-no-show fixtures > terraform/impo
 \`\`\`
 random_string.imported
 \`\`\`
-
-_No attribute changes._
 
 </details>
 
@@ -702,8 +660,6 @@ exports[`reportFromSteps integration — apply-no-show fixtures > terraform/loca
 local_file.readme
 \`\`\`
 
-_No attribute changes._
-
 </details>
 
 "
@@ -731,8 +687,6 @@ exports[`reportFromSteps integration — apply-no-show fixtures > terraform/loca
 \`\`\`
 local_file.readme
 \`\`\`
-
-_No attribute changes._
 
 </details>
 
@@ -762,8 +716,6 @@ exports[`reportFromSteps integration — apply-no-show fixtures > terraform/move
 null_resource.original
 \`\`\`
 
-_No attribute changes._
-
 </details>
 
 "
@@ -792,8 +744,6 @@ exports[`reportFromSteps integration — apply-no-show fixtures > terraform/move
 null_resource.renamed
 \`\`\`
 
-_No attribute changes._
-
 </details>
 
 "
@@ -816,37 +766,31 @@ exports[`reportFromSteps integration — apply-no-show fixtures > terraform/nest
 ### 📦 Module: \`module.parent["1"].module.child\`
 
 <details>
-<summary>➕ <strong>null_resource</strong> parent</summary>
+<summary>➕ <strong>null_resource</strong> item[0]</summary>
 
 \`\`\`
 module.parent["1"].module.child.null_resource.item[0]
 \`\`\`
-
-_No attribute changes._
 
 </details>
 
 ### 📦 Module: \`module.parent["2"].module.child\`
 
 <details>
-<summary>➕ <strong>null_resource</strong> parent</summary>
+<summary>➕ <strong>null_resource</strong> item[0]</summary>
 
 \`\`\`
 module.parent["2"].module.child.null_resource.item[0]
 \`\`\`
 
-_No attribute changes._
-
 </details>
 
 <details>
-<summary>➕ <strong>null_resource</strong> parent</summary>
+<summary>➕ <strong>null_resource</strong> item[1]</summary>
 
 \`\`\`
 module.parent["2"].module.child.null_resource.item[1]
 \`\`\`
-
-_No attribute changes._
 
 </details>
 
@@ -872,59 +816,49 @@ exports[`reportFromSteps integration — apply-no-show fixtures > terraform/nest
 ### 📦 Module: \`module.parent["2"].module.child\`
 
 <details>
-<summary>🗑️ <strong>null_resource</strong> parent</summary>
+<summary>🗑️ <strong>null_resource</strong> item[1]</summary>
 
 \`\`\`
 module.parent["2"].module.child.null_resource.item[1]
 \`\`\`
 
-_No attribute changes._
-
 </details>
 
 <details>
-<summary>🗑️ <strong>null_resource</strong> parent</summary>
+<summary>🗑️ <strong>null_resource</strong> item[0]</summary>
 
 \`\`\`
 module.parent["2"].module.child.null_resource.item[0]
 \`\`\`
-
-_No attribute changes._
 
 </details>
 
 ### 📦 Module: \`module.parent["3"].module.child\`
 
 <details>
-<summary>➕ <strong>null_resource</strong> parent</summary>
+<summary>➕ <strong>null_resource</strong> item[0]</summary>
 
 \`\`\`
 module.parent["3"].module.child.null_resource.item[0]
 \`\`\`
 
-_No attribute changes._
-
 </details>
 
 <details>
-<summary>➕ <strong>null_resource</strong> parent</summary>
+<summary>➕ <strong>null_resource</strong> item[2]</summary>
 
 \`\`\`
 module.parent["3"].module.child.null_resource.item[2]
 \`\`\`
 
-_No attribute changes._
-
 </details>
 
 <details>
-<summary>➕ <strong>null_resource</strong> parent</summary>
+<summary>➕ <strong>null_resource</strong> item[1]</summary>
 
 \`\`\`
 module.parent["3"].module.child.null_resource.item[1]
 \`\`\`
-
-_No attribute changes._
 
 </details>
 
@@ -954,8 +888,6 @@ exports[`reportFromSteps integration — apply-no-show fixtures > terraform/no-d
 null_resource.example
 \`\`\`
 
-_No attribute changes._
-
 </details>
 
 "
@@ -983,8 +915,6 @@ exports[`reportFromSteps integration — apply-no-show fixtures > terraform/no-d
 \`\`\`
 null_resource.example
 \`\`\`
-
-_No attribute changes._
 
 </details>
 
@@ -1061,8 +991,6 @@ exports[`reportFromSteps integration — apply-no-show fixtures > terraform/no-o
 null_resource.stable
 \`\`\`
 
-_No attribute changes._
-
 </details>
 
 "
@@ -1122,8 +1050,6 @@ exports[`reportFromSteps integration — apply-no-show fixtures > terraform/null
 terraform_data.meta
 \`\`\`
 
-_No attribute changes._
-
 </details>
 
 <details>
@@ -1133,8 +1059,6 @@ _No attribute changes._
 null_resource.alpha
 \`\`\`
 
-_No attribute changes._
-
 </details>
 
 <details>
@@ -1143,8 +1067,6 @@ _No attribute changes._
 \`\`\`
 null_resource.beta
 \`\`\`
-
-_No attribute changes._
 
 </details>
 
@@ -1178,8 +1100,6 @@ exports[`reportFromSteps integration — apply-no-show fixtures > terraform/null
 terraform_data.meta
 \`\`\`
 
-_No attribute changes._
-
 </details>
 
 <details>
@@ -1189,8 +1109,6 @@ _No attribute changes._
 null_resource.beta
 \`\`\`
 
-_No attribute changes._
-
 </details>
 
 <details>
@@ -1199,8 +1117,6 @@ _No attribute changes._
 \`\`\`
 null_resource.alpha
 \`\`\`
-
-_No attribute changes._
 
 </details>
 
@@ -1229,8 +1145,6 @@ exports[`reportFromSteps integration — apply-no-show fixtures > terraform/plan
 \`\`\`
 null_resource.baseline
 \`\`\`
-
-_No attribute changes._
 
 </details>
 
@@ -1441,8 +1355,6 @@ Exit code: \`1\`
 null_resource.baseline
 \`\`\`
 
-_No attribute changes._
-
 </details>
 
 "
@@ -1470,8 +1382,6 @@ exports[`reportFromSteps integration — apply-no-show fixtures > terraform/rand
 \`\`\`
 random_string.token
 \`\`\`
-
-_No attribute changes._
 
 </details>
 
@@ -1501,8 +1411,6 @@ exports[`reportFromSteps integration — apply-no-show fixtures > terraform/rand
 random_string.token
 \`\`\`
 
-_No attribute changes._
-
 </details>
 
 "
@@ -1531,8 +1439,6 @@ exports[`reportFromSteps integration — apply-no-show fixtures > terraform/remo
 null_resource.ephemeral
 \`\`\`
 
-_No attribute changes._
-
 </details>
 
 <details>
@@ -1541,8 +1447,6 @@ _No attribute changes._
 \`\`\`
 null_resource.keeper
 \`\`\`
-
-_No attribute changes._
 
 </details>
 
@@ -1581,8 +1485,6 @@ After applying this plan, Terraform will no longer manage these objects. You wil
 null_resource.ephemeral
 \`\`\`
 
-_No attribute changes._
-
 </details>
 
 "
@@ -1610,8 +1512,6 @@ exports[`reportFromSteps integration — apply-no-show fixtures > terraform/sens
 \`\`\`
 local_sensitive_file.secret
 \`\`\`
-
-_No attribute changes._
 
 </details>
 
@@ -1641,8 +1541,6 @@ exports[`reportFromSteps integration — apply-no-show fixtures > terraform/sens
 local_sensitive_file.secret
 \`\`\`
 
-_No attribute changes._
-
 </details>
 
 "
@@ -1670,8 +1568,6 @@ exports[`reportFromSteps integration — apply-no-show fixtures > terraform/vali
 \`\`\`
 null_resource.baseline
 \`\`\`
-
-_No attribute changes._
 
 </details>
 
@@ -1776,8 +1672,6 @@ exports[`reportFromSteps integration — apply-no-show fixtures > terraform/with
 null_resource.root
 \`\`\`
 
-_No attribute changes._
-
 </details>
 
 ### 📦 Module: \`module.naming\`
@@ -1788,8 +1682,6 @@ _No attribute changes._
 \`\`\`
 module.naming.random_string.suffix
 \`\`\`
-
-_No attribute changes._
 
 </details>
 
@@ -1820,8 +1712,6 @@ exports[`reportFromSteps integration — apply-no-show fixtures > terraform/with
 null_resource.root
 \`\`\`
 
-_No attribute changes._
-
 </details>
 
 ### 📦 Module: \`module.naming\`
@@ -1832,8 +1722,6 @@ _No attribute changes._
 \`\`\`
 module.naming.random_string.suffix
 \`\`\`
-
-_No attribute changes._
 
 </details>
 
@@ -1864,8 +1752,6 @@ exports[`reportFromSteps integration — apply-no-show fixtures > tofu/apply-err
 terraform_data.success
 \`\`\`
 
-_No attribute changes._
-
 </details>
 
 <details>
@@ -1875,8 +1761,6 @@ _No attribute changes._
 null_resource.will_fail
 \`\`\`
 
-_No attribute changes._
-
 </details>
 
 <details>
@@ -1885,8 +1769,6 @@ _No attribute changes._
 \`\`\`
 terraform_data.depends_on_fail
 \`\`\`
-
-_No attribute changes._
 
 </details>
 
@@ -2186,8 +2068,6 @@ Exit code: \`1\`
 null_resource.will_fail
 \`\`\`
 
-_No attribute changes._
-
 🚨 **local-exec provisioner error**
 
 \`\`\`
@@ -2202,8 +2082,6 @@ Error running command 'exit 1': exit status 1. Output:
 \`\`\`
 terraform_data.depends_on_fail
 \`\`\`
-
-_No attribute changes._
 
 </details>
 
@@ -2234,8 +2112,6 @@ exports[`reportFromSteps integration — apply-no-show fixtures > tofu/deferred-
 terraform_data.independent
 \`\`\`
 
-_No attribute changes._
-
 </details>
 
 <details>
@@ -2244,19 +2120,6 @@ _No attribute changes._
 \`\`\`
 local_file.config
 \`\`\`
-
-_No attribute changes._
-
-</details>
-
-<details>
-<summary>👁 <strong>local_command</strong> read_config</summary>
-
-\`\`\`
-data.local_command.read_config
-\`\`\`
-
-_No attribute changes._
 
 </details>
 
@@ -2267,8 +2130,6 @@ _No attribute changes._
 terraform_data.worker_b
 \`\`\`
 
-_No attribute changes._
-
 </details>
 
 <details>
@@ -2277,8 +2138,6 @@ _No attribute changes._
 \`\`\`
 terraform_data.worker_c
 \`\`\`
-
-_No attribute changes._
 
 </details>
 
@@ -2289,7 +2148,16 @@ _No attribute changes._
 terraform_data.worker_a
 \`\`\`
 
-_No attribute changes._
+</details>
+
+### 📦 Module: \`data\`
+
+<details>
+<summary>👁 <strong>local_command</strong> read_config</summary>
+
+\`\`\`
+data.local_command.read_config
+\`\`\`
 
 </details>
 
@@ -2321,8 +2189,6 @@ exports[`reportFromSteps integration — apply-no-show fixtures > tofu/deferred-
 terraform_data.independent
 \`\`\`
 
-_No attribute changes._
-
 </details>
 
 <details>
@@ -2331,19 +2197,6 @@ _No attribute changes._
 \`\`\`
 local_file.metadata
 \`\`\`
-
-_No attribute changes._
-
-</details>
-
-<details>
-<summary>👁 <strong>local_command</strong> read_config</summary>
-
-\`\`\`
-data.local_command.read_config
-\`\`\`
-
-_No attribute changes._
 
 </details>
 
@@ -2354,8 +2207,6 @@ _No attribute changes._
 terraform_data.worker_b
 \`\`\`
 
-_No attribute changes._
-
 </details>
 
 <details>
@@ -2364,8 +2215,6 @@ _No attribute changes._
 \`\`\`
 terraform_data.worker_a
 \`\`\`
-
-_No attribute changes._
 
 </details>
 
@@ -2376,7 +2225,16 @@ _No attribute changes._
 terraform_data.worker_c
 \`\`\`
 
-_No attribute changes._
+</details>
+
+### 📦 Module: \`data\`
+
+<details>
+<summary>👁 <strong>local_command</strong> read_config</summary>
+
+\`\`\`
+data.local_command.read_config
+\`\`\`
 
 </details>
 
@@ -2408,19 +2266,6 @@ exports[`reportFromSteps integration — apply-no-show fixtures > tofu/deferred-
 local_file.config
 \`\`\`
 
-_No attribute changes._
-
-</details>
-
-<details>
-<summary>👁 <strong>local_command</strong> read_config</summary>
-
-\`\`\`
-data.local_command.read_config
-\`\`\`
-
-_No attribute changes._
-
 </details>
 
 <details>
@@ -2429,8 +2274,6 @@ _No attribute changes._
 \`\`\`
 terraform_data.worker_a
 \`\`\`
-
-_No attribute changes._
 
 </details>
 
@@ -2441,8 +2284,6 @@ _No attribute changes._
 terraform_data.worker_c
 \`\`\`
 
-_No attribute changes._
-
 </details>
 
 <details>
@@ -2452,7 +2293,16 @@ _No attribute changes._
 terraform_data.worker_b
 \`\`\`
 
-_No attribute changes._
+</details>
+
+### 📦 Module: \`data\`
+
+<details>
+<summary>👁 <strong>local_command</strong> read_config</summary>
+
+\`\`\`
+data.local_command.read_config
+\`\`\`
 
 </details>
 
@@ -2482,8 +2332,6 @@ exports[`reportFromSteps integration — apply-no-show fixtures > tofu/import-re
 random_string.existing
 \`\`\`
 
-_No attribute changes._
-
 </details>
 
 "
@@ -2511,8 +2359,6 @@ exports[`reportFromSteps integration — apply-no-show fixtures > tofu/import-re
 \`\`\`
 random_string.imported
 \`\`\`
-
-_No attribute changes._
 
 </details>
 
@@ -2542,8 +2388,6 @@ exports[`reportFromSteps integration — apply-no-show fixtures > tofu/local-fil
 local_file.readme
 \`\`\`
 
-_No attribute changes._
-
 </details>
 
 "
@@ -2571,8 +2415,6 @@ exports[`reportFromSteps integration — apply-no-show fixtures > tofu/local-fil
 \`\`\`
 local_file.readme
 \`\`\`
-
-_No attribute changes._
 
 </details>
 
@@ -2602,8 +2444,6 @@ exports[`reportFromSteps integration — apply-no-show fixtures > tofu/moved-res
 null_resource.original
 \`\`\`
 
-_No attribute changes._
-
 </details>
 
 "
@@ -2632,8 +2472,6 @@ exports[`reportFromSteps integration — apply-no-show fixtures > tofu/moved-res
 null_resource.renamed
 \`\`\`
 
-_No attribute changes._
-
 </details>
 
 "
@@ -2656,37 +2494,31 @@ exports[`reportFromSteps integration — apply-no-show fixtures > tofu/nested-mo
 ### 📦 Module: \`module.parent["1"].module.child\`
 
 <details>
-<summary>➕ <strong>null_resource</strong> parent</summary>
+<summary>➕ <strong>null_resource</strong> item[0]</summary>
 
 \`\`\`
 module.parent["1"].module.child.null_resource.item[0]
 \`\`\`
-
-_No attribute changes._
 
 </details>
 
 ### 📦 Module: \`module.parent["2"].module.child\`
 
 <details>
-<summary>➕ <strong>null_resource</strong> parent</summary>
+<summary>➕ <strong>null_resource</strong> item[1]</summary>
 
 \`\`\`
 module.parent["2"].module.child.null_resource.item[1]
 \`\`\`
 
-_No attribute changes._
-
 </details>
 
 <details>
-<summary>➕ <strong>null_resource</strong> parent</summary>
+<summary>➕ <strong>null_resource</strong> item[0]</summary>
 
 \`\`\`
 module.parent["2"].module.child.null_resource.item[0]
 \`\`\`
-
-_No attribute changes._
 
 </details>
 
@@ -2712,59 +2544,49 @@ exports[`reportFromSteps integration — apply-no-show fixtures > tofu/nested-mo
 ### 📦 Module: \`module.parent["2"].module.child\`
 
 <details>
-<summary>🗑️ <strong>null_resource</strong> parent</summary>
+<summary>🗑️ <strong>null_resource</strong> item[0]</summary>
 
 \`\`\`
 module.parent["2"].module.child.null_resource.item[0]
 \`\`\`
 
-_No attribute changes._
-
 </details>
 
 <details>
-<summary>🗑️ <strong>null_resource</strong> parent</summary>
+<summary>🗑️ <strong>null_resource</strong> item[1]</summary>
 
 \`\`\`
 module.parent["2"].module.child.null_resource.item[1]
 \`\`\`
-
-_No attribute changes._
 
 </details>
 
 ### 📦 Module: \`module.parent["3"].module.child\`
 
 <details>
-<summary>➕ <strong>null_resource</strong> parent</summary>
+<summary>➕ <strong>null_resource</strong> item[1]</summary>
 
 \`\`\`
 module.parent["3"].module.child.null_resource.item[1]
 \`\`\`
 
-_No attribute changes._
-
 </details>
 
 <details>
-<summary>➕ <strong>null_resource</strong> parent</summary>
+<summary>➕ <strong>null_resource</strong> item[0]</summary>
 
 \`\`\`
 module.parent["3"].module.child.null_resource.item[0]
 \`\`\`
 
-_No attribute changes._
-
 </details>
 
 <details>
-<summary>➕ <strong>null_resource</strong> parent</summary>
+<summary>➕ <strong>null_resource</strong> item[2]</summary>
 
 \`\`\`
 module.parent["3"].module.child.null_resource.item[2]
 \`\`\`
-
-_No attribute changes._
 
 </details>
 
@@ -2794,8 +2616,6 @@ exports[`reportFromSteps integration — apply-no-show fixtures > tofu/no-detail
 null_resource.example
 \`\`\`
 
-_No attribute changes._
-
 </details>
 
 "
@@ -2823,8 +2643,6 @@ exports[`reportFromSteps integration — apply-no-show fixtures > tofu/no-detail
 \`\`\`
 null_resource.example
 \`\`\`
-
-_No attribute changes._
 
 </details>
 
@@ -2901,8 +2719,6 @@ exports[`reportFromSteps integration — apply-no-show fixtures > tofu/no-op/0/a
 null_resource.stable
 \`\`\`
 
-_No attribute changes._
-
 </details>
 
 "
@@ -2962,8 +2778,6 @@ exports[`reportFromSteps integration — apply-no-show fixtures > tofu/null-life
 terraform_data.meta
 \`\`\`
 
-_No attribute changes._
-
 </details>
 
 <details>
@@ -2973,8 +2787,6 @@ _No attribute changes._
 null_resource.beta
 \`\`\`
 
-_No attribute changes._
-
 </details>
 
 <details>
@@ -2983,8 +2795,6 @@ _No attribute changes._
 \`\`\`
 null_resource.alpha
 \`\`\`
-
-_No attribute changes._
 
 </details>
 
@@ -3018,8 +2828,6 @@ exports[`reportFromSteps integration — apply-no-show fixtures > tofu/null-life
 terraform_data.meta
 \`\`\`
 
-_No attribute changes._
-
 </details>
 
 <details>
@@ -3029,8 +2837,6 @@ _No attribute changes._
 null_resource.beta
 \`\`\`
 
-_No attribute changes._
-
 </details>
 
 <details>
@@ -3039,8 +2845,6 @@ _No attribute changes._
 \`\`\`
 null_resource.alpha
 \`\`\`
-
-_No attribute changes._
 
 </details>
 
@@ -3069,8 +2873,6 @@ exports[`reportFromSteps integration — apply-no-show fixtures > tofu/plan-erro
 \`\`\`
 null_resource.baseline
 \`\`\`
-
-_No attribute changes._
 
 </details>
 
@@ -3281,8 +3083,6 @@ Exit code: \`1\`
 null_resource.baseline
 \`\`\`
 
-_No attribute changes._
-
 </details>
 
 "
@@ -3310,8 +3110,6 @@ exports[`reportFromSteps integration — apply-no-show fixtures > tofu/random-re
 \`\`\`
 random_string.token
 \`\`\`
-
-_No attribute changes._
 
 </details>
 
@@ -3341,8 +3139,6 @@ exports[`reportFromSteps integration — apply-no-show fixtures > tofu/random-re
 random_string.token
 \`\`\`
 
-_No attribute changes._
-
 </details>
 
 "
@@ -3371,8 +3167,6 @@ exports[`reportFromSteps integration — apply-no-show fixtures > tofu/removed-r
 null_resource.ephemeral
 \`\`\`
 
-_No attribute changes._
-
 </details>
 
 <details>
@@ -3381,8 +3175,6 @@ _No attribute changes._
 \`\`\`
 null_resource.keeper
 \`\`\`
-
-_No attribute changes._
 
 </details>
 
@@ -3420,8 +3212,6 @@ In case you want to manage the resource again, you will have to import it.
 null_resource.ephemeral
 \`\`\`
 
-_No attribute changes._
-
 </details>
 
 "
@@ -3449,8 +3239,6 @@ exports[`reportFromSteps integration — apply-no-show fixtures > tofu/sensitive
 \`\`\`
 local_sensitive_file.secret
 \`\`\`
-
-_No attribute changes._
 
 </details>
 
@@ -3480,8 +3268,6 @@ exports[`reportFromSteps integration — apply-no-show fixtures > tofu/sensitive
 local_sensitive_file.secret
 \`\`\`
 
-_No attribute changes._
-
 </details>
 
 "
@@ -3509,8 +3295,6 @@ exports[`reportFromSteps integration — apply-no-show fixtures > tofu/validate-
 \`\`\`
 null_resource.baseline
 \`\`\`
-
-_No attribute changes._
 
 </details>
 
@@ -3615,8 +3399,6 @@ exports[`reportFromSteps integration — apply-no-show fixtures > tofu/with-modu
 null_resource.root
 \`\`\`
 
-_No attribute changes._
-
 </details>
 
 ### 📦 Module: \`module.naming\`
@@ -3627,8 +3409,6 @@ _No attribute changes._
 \`\`\`
 module.naming.random_string.suffix
 \`\`\`
-
-_No attribute changes._
 
 </details>
 
@@ -3659,8 +3439,6 @@ exports[`reportFromSteps integration — apply-no-show fixtures > tofu/with-modu
 null_resource.root
 \`\`\`
 
-_No attribute changes._
-
 </details>
 
 ### 📦 Module: \`module.naming\`
@@ -3671,8 +3449,6 @@ _No attribute changes._
 \`\`\`
 module.naming.random_string.suffix
 \`\`\`
-
-_No attribute changes._
 
 </details>
 
@@ -3703,8 +3479,6 @@ exports[`reportFromSteps integration — apply-only fixtures > terraform/apply-e
 terraform_data.success
 \`\`\`
 
-_No attribute changes._
-
 </details>
 
 <details>
@@ -3714,8 +3488,6 @@ _No attribute changes._
 null_resource.will_fail
 \`\`\`
 
-_No attribute changes._
-
 </details>
 
 <details>
@@ -3724,8 +3496,6 @@ _No attribute changes._
 \`\`\`
 terraform_data.depends_on_fail
 \`\`\`
-
-_No attribute changes._
 
 </details>
 
@@ -4025,8 +3795,6 @@ Exit code: \`1\`
 null_resource.will_fail
 \`\`\`
 
-_No attribute changes._
-
 🚨 **local-exec provisioner error**
 
 \`\`\`
@@ -4041,8 +3809,6 @@ Error running command 'exit 1': exit status 1. Output:
 \`\`\`
 terraform_data.depends_on_fail
 \`\`\`
-
-_No attribute changes._
 
 </details>
 
@@ -4073,8 +3839,6 @@ exports[`reportFromSteps integration — apply-only fixtures > terraform/deferre
 terraform_data.independent
 \`\`\`
 
-_No attribute changes._
-
 </details>
 
 <details>
@@ -4083,19 +3847,6 @@ _No attribute changes._
 \`\`\`
 local_file.config
 \`\`\`
-
-_No attribute changes._
-
-</details>
-
-<details>
-<summary>👁 <strong>local_command</strong> read_config</summary>
-
-\`\`\`
-data.local_command.read_config
-\`\`\`
-
-_No attribute changes._
 
 </details>
 
@@ -4106,8 +3857,6 @@ _No attribute changes._
 terraform_data.worker_b
 \`\`\`
 
-_No attribute changes._
-
 </details>
 
 <details>
@@ -4116,8 +3865,6 @@ _No attribute changes._
 \`\`\`
 terraform_data.worker_c
 \`\`\`
-
-_No attribute changes._
 
 </details>
 
@@ -4128,7 +3875,16 @@ _No attribute changes._
 terraform_data.worker_a
 \`\`\`
 
-_No attribute changes._
+</details>
+
+### 📦 Module: \`data\`
+
+<details>
+<summary>👁 <strong>local_command</strong> read_config</summary>
+
+\`\`\`
+data.local_command.read_config
+\`\`\`
 
 </details>
 
@@ -4160,8 +3916,6 @@ exports[`reportFromSteps integration — apply-only fixtures > terraform/deferre
 terraform_data.independent
 \`\`\`
 
-_No attribute changes._
-
 </details>
 
 <details>
@@ -4170,19 +3924,6 @@ _No attribute changes._
 \`\`\`
 local_file.metadata
 \`\`\`
-
-_No attribute changes._
-
-</details>
-
-<details>
-<summary>👁 <strong>local_command</strong> read_config</summary>
-
-\`\`\`
-data.local_command.read_config
-\`\`\`
-
-_No attribute changes._
 
 </details>
 
@@ -4193,8 +3934,6 @@ _No attribute changes._
 terraform_data.worker_a
 \`\`\`
 
-_No attribute changes._
-
 </details>
 
 <details>
@@ -4203,8 +3942,6 @@ _No attribute changes._
 \`\`\`
 terraform_data.worker_b
 \`\`\`
-
-_No attribute changes._
 
 </details>
 
@@ -4215,7 +3952,16 @@ _No attribute changes._
 terraform_data.worker_c
 \`\`\`
 
-_No attribute changes._
+</details>
+
+### 📦 Module: \`data\`
+
+<details>
+<summary>👁 <strong>local_command</strong> read_config</summary>
+
+\`\`\`
+data.local_command.read_config
+\`\`\`
 
 </details>
 
@@ -4247,19 +3993,6 @@ exports[`reportFromSteps integration — apply-only fixtures > terraform/deferre
 local_file.config
 \`\`\`
 
-_No attribute changes._
-
-</details>
-
-<details>
-<summary>👁 <strong>local_command</strong> read_config</summary>
-
-\`\`\`
-data.local_command.read_config
-\`\`\`
-
-_No attribute changes._
-
 </details>
 
 <details>
@@ -4268,8 +4001,6 @@ _No attribute changes._
 \`\`\`
 terraform_data.worker_a
 \`\`\`
-
-_No attribute changes._
 
 </details>
 
@@ -4280,8 +4011,6 @@ _No attribute changes._
 terraform_data.worker_b
 \`\`\`
 
-_No attribute changes._
-
 </details>
 
 <details>
@@ -4291,7 +4020,16 @@ _No attribute changes._
 terraform_data.worker_c
 \`\`\`
 
-_No attribute changes._
+</details>
+
+### 📦 Module: \`data\`
+
+<details>
+<summary>👁 <strong>local_command</strong> read_config</summary>
+
+\`\`\`
+data.local_command.read_config
+\`\`\`
 
 </details>
 
@@ -4320,8 +4058,6 @@ exports[`reportFromSteps integration — apply-only fixtures > terraform/import-
 \`\`\`
 random_string.existing
 \`\`\`
-
-_No attribute changes._
 
 </details>
 
@@ -4365,8 +4101,6 @@ exports[`reportFromSteps integration — apply-only fixtures > terraform/local-f
 local_file.readme
 \`\`\`
 
-_No attribute changes._
-
 </details>
 
 "
@@ -4395,8 +4129,6 @@ exports[`reportFromSteps integration — apply-only fixtures > terraform/local-f
 local_file.readme
 \`\`\`
 
-_No attribute changes._
-
 </details>
 
 "
@@ -4424,8 +4156,6 @@ exports[`reportFromSteps integration — apply-only fixtures > terraform/moved-r
 \`\`\`
 null_resource.original
 \`\`\`
-
-_No attribute changes._
 
 </details>
 
@@ -4463,37 +4193,31 @@ exports[`reportFromSteps integration — apply-only fixtures > terraform/nested-
 ### 📦 Module: \`module.parent["1"].module.child\`
 
 <details>
-<summary>➕ <strong>null_resource</strong> parent</summary>
+<summary>➕ <strong>null_resource</strong> item[0]</summary>
 
 \`\`\`
 module.parent["1"].module.child.null_resource.item[0]
 \`\`\`
-
-_No attribute changes._
 
 </details>
 
 ### 📦 Module: \`module.parent["2"].module.child\`
 
 <details>
-<summary>➕ <strong>null_resource</strong> parent</summary>
+<summary>➕ <strong>null_resource</strong> item[0]</summary>
 
 \`\`\`
 module.parent["2"].module.child.null_resource.item[0]
 \`\`\`
 
-_No attribute changes._
-
 </details>
 
 <details>
-<summary>➕ <strong>null_resource</strong> parent</summary>
+<summary>➕ <strong>null_resource</strong> item[1]</summary>
 
 \`\`\`
 module.parent["2"].module.child.null_resource.item[1]
 \`\`\`
-
-_No attribute changes._
 
 </details>
 
@@ -4519,59 +4243,49 @@ exports[`reportFromSteps integration — apply-only fixtures > terraform/nested-
 ### 📦 Module: \`module.parent["2"].module.child\`
 
 <details>
-<summary>🗑️ <strong>null_resource</strong> parent</summary>
+<summary>🗑️ <strong>null_resource</strong> item[1]</summary>
 
 \`\`\`
 module.parent["2"].module.child.null_resource.item[1]
 \`\`\`
 
-_No attribute changes._
-
 </details>
 
 <details>
-<summary>🗑️ <strong>null_resource</strong> parent</summary>
+<summary>🗑️ <strong>null_resource</strong> item[0]</summary>
 
 \`\`\`
 module.parent["2"].module.child.null_resource.item[0]
 \`\`\`
-
-_No attribute changes._
 
 </details>
 
 ### 📦 Module: \`module.parent["3"].module.child\`
 
 <details>
-<summary>➕ <strong>null_resource</strong> parent</summary>
+<summary>➕ <strong>null_resource</strong> item[0]</summary>
 
 \`\`\`
 module.parent["3"].module.child.null_resource.item[0]
 \`\`\`
 
-_No attribute changes._
-
 </details>
 
 <details>
-<summary>➕ <strong>null_resource</strong> parent</summary>
+<summary>➕ <strong>null_resource</strong> item[2]</summary>
 
 \`\`\`
 module.parent["3"].module.child.null_resource.item[2]
 \`\`\`
 
-_No attribute changes._
-
 </details>
 
 <details>
-<summary>➕ <strong>null_resource</strong> parent</summary>
+<summary>➕ <strong>null_resource</strong> item[1]</summary>
 
 \`\`\`
 module.parent["3"].module.child.null_resource.item[1]
 \`\`\`
-
-_No attribute changes._
 
 </details>
 
@@ -4601,8 +4315,6 @@ exports[`reportFromSteps integration — apply-only fixtures > terraform/no-deta
 null_resource.example
 \`\`\`
 
-_No attribute changes._
-
 </details>
 
 "
@@ -4630,8 +4342,6 @@ exports[`reportFromSteps integration — apply-only fixtures > terraform/no-deta
 \`\`\`
 null_resource.example
 \`\`\`
-
-_No attribute changes._
 
 </details>
 
@@ -4678,8 +4388,6 @@ exports[`reportFromSteps integration — apply-only fixtures > terraform/no-op/0
 \`\`\`
 null_resource.stable
 \`\`\`
-
-_No attribute changes._
 
 </details>
 
@@ -4738,8 +4446,6 @@ exports[`reportFromSteps integration — apply-only fixtures > terraform/null-li
 terraform_data.meta
 \`\`\`
 
-_No attribute changes._
-
 </details>
 
 <details>
@@ -4749,8 +4455,6 @@ _No attribute changes._
 null_resource.alpha
 \`\`\`
 
-_No attribute changes._
-
 </details>
 
 <details>
@@ -4759,8 +4463,6 @@ _No attribute changes._
 \`\`\`
 null_resource.beta
 \`\`\`
-
-_No attribute changes._
 
 </details>
 
@@ -4794,8 +4496,6 @@ exports[`reportFromSteps integration — apply-only fixtures > terraform/null-li
 terraform_data.meta
 \`\`\`
 
-_No attribute changes._
-
 </details>
 
 <details>
@@ -4805,8 +4505,6 @@ _No attribute changes._
 null_resource.beta
 \`\`\`
 
-_No attribute changes._
-
 </details>
 
 <details>
@@ -4815,8 +4513,6 @@ _No attribute changes._
 \`\`\`
 null_resource.alpha
 \`\`\`
-
-_No attribute changes._
 
 </details>
 
@@ -4845,8 +4541,6 @@ exports[`reportFromSteps integration — apply-only fixtures > terraform/plan-er
 \`\`\`
 null_resource.baseline
 \`\`\`
-
-_No attribute changes._
 
 </details>
 
@@ -4890,8 +4584,6 @@ exports[`reportFromSteps integration — apply-only fixtures > terraform/random-
 random_string.token
 \`\`\`
 
-_No attribute changes._
-
 </details>
 
 "
@@ -4919,8 +4611,6 @@ exports[`reportFromSteps integration — apply-only fixtures > terraform/random-
 \`\`\`
 random_string.token
 \`\`\`
-
-_No attribute changes._
 
 </details>
 
@@ -4950,8 +4640,6 @@ exports[`reportFromSteps integration — apply-only fixtures > terraform/removed
 null_resource.ephemeral
 \`\`\`
 
-_No attribute changes._
-
 </details>
 
 <details>
@@ -4960,8 +4648,6 @@ _No attribute changes._
 \`\`\`
 null_resource.keeper
 \`\`\`
-
-_No attribute changes._
 
 </details>
 
@@ -4991,8 +4677,6 @@ exports[`reportFromSteps integration — apply-only fixtures > terraform/removed
 null_resource.ephemeral
 \`\`\`
 
-_No attribute changes._
-
 </details>
 
 "
@@ -5020,8 +4704,6 @@ exports[`reportFromSteps integration — apply-only fixtures > terraform/sensiti
 \`\`\`
 local_sensitive_file.secret
 \`\`\`
-
-_No attribute changes._
 
 </details>
 
@@ -5051,8 +4733,6 @@ exports[`reportFromSteps integration — apply-only fixtures > terraform/sensiti
 local_sensitive_file.secret
 \`\`\`
 
-_No attribute changes._
-
 </details>
 
 "
@@ -5080,8 +4760,6 @@ exports[`reportFromSteps integration — apply-only fixtures > terraform/validat
 \`\`\`
 null_resource.baseline
 \`\`\`
-
-_No attribute changes._
 
 </details>
 
@@ -5183,8 +4861,6 @@ exports[`reportFromSteps integration — apply-only fixtures > terraform/with-mo
 null_resource.root
 \`\`\`
 
-_No attribute changes._
-
 </details>
 
 ### 📦 Module: \`module.naming\`
@@ -5195,8 +4871,6 @@ _No attribute changes._
 \`\`\`
 module.naming.random_string.suffix
 \`\`\`
-
-_No attribute changes._
 
 </details>
 
@@ -5227,8 +4901,6 @@ exports[`reportFromSteps integration — apply-only fixtures > terraform/with-mo
 null_resource.root
 \`\`\`
 
-_No attribute changes._
-
 </details>
 
 ### 📦 Module: \`module.naming\`
@@ -5239,8 +4911,6 @@ _No attribute changes._
 \`\`\`
 module.naming.random_string.suffix
 \`\`\`
-
-_No attribute changes._
 
 </details>
 
@@ -5271,8 +4941,6 @@ exports[`reportFromSteps integration — apply-only fixtures > tofu/apply-error/
 terraform_data.success
 \`\`\`
 
-_No attribute changes._
-
 </details>
 
 <details>
@@ -5282,8 +4950,6 @@ _No attribute changes._
 null_resource.will_fail
 \`\`\`
 
-_No attribute changes._
-
 </details>
 
 <details>
@@ -5292,8 +4958,6 @@ _No attribute changes._
 \`\`\`
 terraform_data.depends_on_fail
 \`\`\`
-
-_No attribute changes._
 
 </details>
 
@@ -5593,8 +5257,6 @@ Exit code: \`1\`
 null_resource.will_fail
 \`\`\`
 
-_No attribute changes._
-
 🚨 **local-exec provisioner error**
 
 \`\`\`
@@ -5609,8 +5271,6 @@ Error running command 'exit 1': exit status 1. Output:
 \`\`\`
 terraform_data.depends_on_fail
 \`\`\`
-
-_No attribute changes._
 
 </details>
 
@@ -5641,8 +5301,6 @@ exports[`reportFromSteps integration — apply-only fixtures > tofu/deferred-dat
 terraform_data.independent
 \`\`\`
 
-_No attribute changes._
-
 </details>
 
 <details>
@@ -5651,19 +5309,6 @@ _No attribute changes._
 \`\`\`
 local_file.config
 \`\`\`
-
-_No attribute changes._
-
-</details>
-
-<details>
-<summary>👁 <strong>local_command</strong> read_config</summary>
-
-\`\`\`
-data.local_command.read_config
-\`\`\`
-
-_No attribute changes._
 
 </details>
 
@@ -5674,8 +5319,6 @@ _No attribute changes._
 terraform_data.worker_b
 \`\`\`
 
-_No attribute changes._
-
 </details>
 
 <details>
@@ -5684,8 +5327,6 @@ _No attribute changes._
 \`\`\`
 terraform_data.worker_c
 \`\`\`
-
-_No attribute changes._
 
 </details>
 
@@ -5696,7 +5337,16 @@ _No attribute changes._
 terraform_data.worker_a
 \`\`\`
 
-_No attribute changes._
+</details>
+
+### 📦 Module: \`data\`
+
+<details>
+<summary>👁 <strong>local_command</strong> read_config</summary>
+
+\`\`\`
+data.local_command.read_config
+\`\`\`
 
 </details>
 
@@ -5728,8 +5378,6 @@ exports[`reportFromSteps integration — apply-only fixtures > tofu/deferred-dat
 terraform_data.independent
 \`\`\`
 
-_No attribute changes._
-
 </details>
 
 <details>
@@ -5738,19 +5386,6 @@ _No attribute changes._
 \`\`\`
 local_file.metadata
 \`\`\`
-
-_No attribute changes._
-
-</details>
-
-<details>
-<summary>👁 <strong>local_command</strong> read_config</summary>
-
-\`\`\`
-data.local_command.read_config
-\`\`\`
-
-_No attribute changes._
 
 </details>
 
@@ -5761,8 +5396,6 @@ _No attribute changes._
 terraform_data.worker_b
 \`\`\`
 
-_No attribute changes._
-
 </details>
 
 <details>
@@ -5771,8 +5404,6 @@ _No attribute changes._
 \`\`\`
 terraform_data.worker_a
 \`\`\`
-
-_No attribute changes._
 
 </details>
 
@@ -5783,7 +5414,16 @@ _No attribute changes._
 terraform_data.worker_c
 \`\`\`
 
-_No attribute changes._
+</details>
+
+### 📦 Module: \`data\`
+
+<details>
+<summary>👁 <strong>local_command</strong> read_config</summary>
+
+\`\`\`
+data.local_command.read_config
+\`\`\`
 
 </details>
 
@@ -5815,19 +5455,6 @@ exports[`reportFromSteps integration — apply-only fixtures > tofu/deferred-dat
 local_file.config
 \`\`\`
 
-_No attribute changes._
-
-</details>
-
-<details>
-<summary>👁 <strong>local_command</strong> read_config</summary>
-
-\`\`\`
-data.local_command.read_config
-\`\`\`
-
-_No attribute changes._
-
 </details>
 
 <details>
@@ -5836,8 +5463,6 @@ _No attribute changes._
 \`\`\`
 terraform_data.worker_a
 \`\`\`
-
-_No attribute changes._
 
 </details>
 
@@ -5848,8 +5473,6 @@ _No attribute changes._
 terraform_data.worker_c
 \`\`\`
 
-_No attribute changes._
-
 </details>
 
 <details>
@@ -5859,7 +5482,16 @@ _No attribute changes._
 terraform_data.worker_b
 \`\`\`
 
-_No attribute changes._
+</details>
+
+### 📦 Module: \`data\`
+
+<details>
+<summary>👁 <strong>local_command</strong> read_config</summary>
+
+\`\`\`
+data.local_command.read_config
+\`\`\`
 
 </details>
 
@@ -5888,8 +5520,6 @@ exports[`reportFromSteps integration — apply-only fixtures > tofu/import-resou
 \`\`\`
 random_string.existing
 \`\`\`
-
-_No attribute changes._
 
 </details>
 
@@ -5933,8 +5563,6 @@ exports[`reportFromSteps integration — apply-only fixtures > tofu/local-files/
 local_file.readme
 \`\`\`
 
-_No attribute changes._
-
 </details>
 
 "
@@ -5963,8 +5591,6 @@ exports[`reportFromSteps integration — apply-only fixtures > tofu/local-files/
 local_file.readme
 \`\`\`
 
-_No attribute changes._
-
 </details>
 
 "
@@ -5992,8 +5618,6 @@ exports[`reportFromSteps integration — apply-only fixtures > tofu/moved-resour
 \`\`\`
 null_resource.original
 \`\`\`
-
-_No attribute changes._
 
 </details>
 
@@ -6031,37 +5655,31 @@ exports[`reportFromSteps integration — apply-only fixtures > tofu/nested-modul
 ### 📦 Module: \`module.parent["1"].module.child\`
 
 <details>
-<summary>➕ <strong>null_resource</strong> parent</summary>
+<summary>➕ <strong>null_resource</strong> item[0]</summary>
 
 \`\`\`
 module.parent["1"].module.child.null_resource.item[0]
 \`\`\`
-
-_No attribute changes._
 
 </details>
 
 ### 📦 Module: \`module.parent["2"].module.child\`
 
 <details>
-<summary>➕ <strong>null_resource</strong> parent</summary>
+<summary>➕ <strong>null_resource</strong> item[1]</summary>
 
 \`\`\`
 module.parent["2"].module.child.null_resource.item[1]
 \`\`\`
 
-_No attribute changes._
-
 </details>
 
 <details>
-<summary>➕ <strong>null_resource</strong> parent</summary>
+<summary>➕ <strong>null_resource</strong> item[0]</summary>
 
 \`\`\`
 module.parent["2"].module.child.null_resource.item[0]
 \`\`\`
-
-_No attribute changes._
 
 </details>
 
@@ -6087,59 +5705,49 @@ exports[`reportFromSteps integration — apply-only fixtures > tofu/nested-modul
 ### 📦 Module: \`module.parent["2"].module.child\`
 
 <details>
-<summary>🗑️ <strong>null_resource</strong> parent</summary>
+<summary>🗑️ <strong>null_resource</strong> item[0]</summary>
 
 \`\`\`
 module.parent["2"].module.child.null_resource.item[0]
 \`\`\`
 
-_No attribute changes._
-
 </details>
 
 <details>
-<summary>🗑️ <strong>null_resource</strong> parent</summary>
+<summary>🗑️ <strong>null_resource</strong> item[1]</summary>
 
 \`\`\`
 module.parent["2"].module.child.null_resource.item[1]
 \`\`\`
-
-_No attribute changes._
 
 </details>
 
 ### 📦 Module: \`module.parent["3"].module.child\`
 
 <details>
-<summary>➕ <strong>null_resource</strong> parent</summary>
+<summary>➕ <strong>null_resource</strong> item[1]</summary>
 
 \`\`\`
 module.parent["3"].module.child.null_resource.item[1]
 \`\`\`
 
-_No attribute changes._
-
 </details>
 
 <details>
-<summary>➕ <strong>null_resource</strong> parent</summary>
+<summary>➕ <strong>null_resource</strong> item[0]</summary>
 
 \`\`\`
 module.parent["3"].module.child.null_resource.item[0]
 \`\`\`
 
-_No attribute changes._
-
 </details>
 
 <details>
-<summary>➕ <strong>null_resource</strong> parent</summary>
+<summary>➕ <strong>null_resource</strong> item[2]</summary>
 
 \`\`\`
 module.parent["3"].module.child.null_resource.item[2]
 \`\`\`
-
-_No attribute changes._
 
 </details>
 
@@ -6169,8 +5777,6 @@ exports[`reportFromSteps integration — apply-only fixtures > tofu/no-detailed-
 null_resource.example
 \`\`\`
 
-_No attribute changes._
-
 </details>
 
 "
@@ -6198,8 +5804,6 @@ exports[`reportFromSteps integration — apply-only fixtures > tofu/no-detailed-
 \`\`\`
 null_resource.example
 \`\`\`
-
-_No attribute changes._
 
 </details>
 
@@ -6246,8 +5850,6 @@ exports[`reportFromSteps integration — apply-only fixtures > tofu/no-op/0/appl
 \`\`\`
 null_resource.stable
 \`\`\`
-
-_No attribute changes._
 
 </details>
 
@@ -6306,8 +5908,6 @@ exports[`reportFromSteps integration — apply-only fixtures > tofu/null-lifecyc
 terraform_data.meta
 \`\`\`
 
-_No attribute changes._
-
 </details>
 
 <details>
@@ -6317,8 +5917,6 @@ _No attribute changes._
 null_resource.beta
 \`\`\`
 
-_No attribute changes._
-
 </details>
 
 <details>
@@ -6327,8 +5925,6 @@ _No attribute changes._
 \`\`\`
 null_resource.alpha
 \`\`\`
-
-_No attribute changes._
 
 </details>
 
@@ -6362,8 +5958,6 @@ exports[`reportFromSteps integration — apply-only fixtures > tofu/null-lifecyc
 terraform_data.meta
 \`\`\`
 
-_No attribute changes._
-
 </details>
 
 <details>
@@ -6373,8 +5967,6 @@ _No attribute changes._
 null_resource.beta
 \`\`\`
 
-_No attribute changes._
-
 </details>
 
 <details>
@@ -6383,8 +5975,6 @@ _No attribute changes._
 \`\`\`
 null_resource.alpha
 \`\`\`
-
-_No attribute changes._
 
 </details>
 
@@ -6413,8 +6003,6 @@ exports[`reportFromSteps integration — apply-only fixtures > tofu/plan-error/0
 \`\`\`
 null_resource.baseline
 \`\`\`
-
-_No attribute changes._
 
 </details>
 
@@ -6458,8 +6046,6 @@ exports[`reportFromSteps integration — apply-only fixtures > tofu/random-repla
 random_string.token
 \`\`\`
 
-_No attribute changes._
-
 </details>
 
 "
@@ -6487,8 +6073,6 @@ exports[`reportFromSteps integration — apply-only fixtures > tofu/random-repla
 \`\`\`
 random_string.token
 \`\`\`
-
-_No attribute changes._
 
 </details>
 
@@ -6518,8 +6102,6 @@ exports[`reportFromSteps integration — apply-only fixtures > tofu/removed-reso
 null_resource.ephemeral
 \`\`\`
 
-_No attribute changes._
-
 </details>
 
 <details>
@@ -6528,8 +6110,6 @@ _No attribute changes._
 \`\`\`
 null_resource.keeper
 \`\`\`
-
-_No attribute changes._
 
 </details>
 
@@ -6559,8 +6139,6 @@ exports[`reportFromSteps integration — apply-only fixtures > tofu/removed-reso
 null_resource.ephemeral
 \`\`\`
 
-_No attribute changes._
-
 </details>
 
 "
@@ -6588,8 +6166,6 @@ exports[`reportFromSteps integration — apply-only fixtures > tofu/sensitive-va
 \`\`\`
 local_sensitive_file.secret
 \`\`\`
-
-_No attribute changes._
 
 </details>
 
@@ -6619,8 +6195,6 @@ exports[`reportFromSteps integration — apply-only fixtures > tofu/sensitive-va
 local_sensitive_file.secret
 \`\`\`
 
-_No attribute changes._
-
 </details>
 
 "
@@ -6648,8 +6222,6 @@ exports[`reportFromSteps integration — apply-only fixtures > tofu/validate-err
 \`\`\`
 null_resource.baseline
 \`\`\`
-
-_No attribute changes._
 
 </details>
 
@@ -6751,8 +6323,6 @@ exports[`reportFromSteps integration — apply-only fixtures > tofu/with-modules
 null_resource.root
 \`\`\`
 
-_No attribute changes._
-
 </details>
 
 ### 📦 Module: \`module.naming\`
@@ -6763,8 +6333,6 @@ _No attribute changes._
 \`\`\`
 module.naming.random_string.suffix
 \`\`\`
-
-_No attribute changes._
 
 </details>
 
@@ -6795,8 +6363,6 @@ exports[`reportFromSteps integration — apply-only fixtures > tofu/with-modules
 null_resource.root
 \`\`\`
 
-_No attribute changes._
-
 </details>
 
 ### 📦 Module: \`module.naming\`
@@ -6807,8 +6373,6 @@ _No attribute changes._
 \`\`\`
 module.naming.random_string.suffix
 \`\`\`
-
-_No attribute changes._
 
 </details>
 
@@ -8626,7 +8190,7 @@ exports[`reportFromSteps integration — generated fixtures > terraform/nested-m
 ### 📦 Module: \`module.parent["1"].module.child\`
 
 <details>
-<summary>➕ <strong>null_resource</strong> item</summary>
+<summary>➕ <strong>null_resource</strong> item[0]</summary>
 
 \`\`\`
 module.parent["1"].module.child.null_resource.item[0]
@@ -8643,7 +8207,7 @@ module.parent["1"].module.child.null_resource.item[0]
 ### 📦 Module: \`module.parent["2"].module.child\`
 
 <details>
-<summary>➕ <strong>null_resource</strong> item</summary>
+<summary>➕ <strong>null_resource</strong> item[0]</summary>
 
 \`\`\`
 module.parent["2"].module.child.null_resource.item[0]
@@ -8658,7 +8222,7 @@ module.parent["2"].module.child.null_resource.item[0]
 </details>
 
 <details>
-<summary>➕ <strong>null_resource</strong> item</summary>
+<summary>➕ <strong>null_resource</strong> item[1]</summary>
 
 \`\`\`
 module.parent["2"].module.child.null_resource.item[1]
@@ -8690,7 +8254,7 @@ exports[`reportFromSteps integration — generated fixtures > terraform/nested-m
 ### 📦 Module: \`module.parent["1"].module.child\`
 
 <details>
-<summary>➕ <strong>null_resource</strong> item</summary>
+<summary>➕ <strong>null_resource</strong> item[0]</summary>
 
 \`\`\`
 module.parent["1"].module.child.null_resource.item[0]
@@ -8707,7 +8271,7 @@ module.parent["1"].module.child.null_resource.item[0]
 ### 📦 Module: \`module.parent["2"].module.child\`
 
 <details>
-<summary>➕ <strong>null_resource</strong> item</summary>
+<summary>➕ <strong>null_resource</strong> item[0]</summary>
 
 \`\`\`
 module.parent["2"].module.child.null_resource.item[0]
@@ -8722,7 +8286,7 @@ module.parent["2"].module.child.null_resource.item[0]
 </details>
 
 <details>
-<summary>➕ <strong>null_resource</strong> item</summary>
+<summary>➕ <strong>null_resource</strong> item[1]</summary>
 
 \`\`\`
 module.parent["2"].module.child.null_resource.item[1]
@@ -8757,7 +8321,7 @@ exports[`reportFromSteps integration — generated fixtures > terraform/nested-m
 ### 📦 Module: \`module.parent["2"].module.child\`
 
 <details>
-<summary>🗑️ <strong>null_resource</strong> item</summary>
+<summary>🗑️ <strong>null_resource</strong> item[0]</summary>
 
 \`\`\`
 module.parent["2"].module.child.null_resource.item[0]
@@ -8772,7 +8336,7 @@ module.parent["2"].module.child.null_resource.item[0]
 </details>
 
 <details>
-<summary>🗑️ <strong>null_resource</strong> item</summary>
+<summary>🗑️ <strong>null_resource</strong> item[1]</summary>
 
 \`\`\`
 module.parent["2"].module.child.null_resource.item[1]
@@ -8789,7 +8353,7 @@ module.parent["2"].module.child.null_resource.item[1]
 ### 📦 Module: \`module.parent["3"].module.child\`
 
 <details>
-<summary>➕ <strong>null_resource</strong> item</summary>
+<summary>➕ <strong>null_resource</strong> item[0]</summary>
 
 \`\`\`
 module.parent["3"].module.child.null_resource.item[0]
@@ -8804,7 +8368,7 @@ module.parent["3"].module.child.null_resource.item[0]
 </details>
 
 <details>
-<summary>➕ <strong>null_resource</strong> item</summary>
+<summary>➕ <strong>null_resource</strong> item[1]</summary>
 
 \`\`\`
 module.parent["3"].module.child.null_resource.item[1]
@@ -8819,7 +8383,7 @@ module.parent["3"].module.child.null_resource.item[1]
 </details>
 
 <details>
-<summary>➕ <strong>null_resource</strong> item</summary>
+<summary>➕ <strong>null_resource</strong> item[2]</summary>
 
 \`\`\`
 module.parent["3"].module.child.null_resource.item[2]
@@ -8853,7 +8417,7 @@ exports[`reportFromSteps integration — generated fixtures > terraform/nested-m
 ### 📦 Module: \`module.parent["2"].module.child\`
 
 <details>
-<summary>🗑️ <strong>null_resource</strong> item</summary>
+<summary>🗑️ <strong>null_resource</strong> item[0]</summary>
 
 \`\`\`
 module.parent["2"].module.child.null_resource.item[0]
@@ -8868,7 +8432,7 @@ module.parent["2"].module.child.null_resource.item[0]
 </details>
 
 <details>
-<summary>🗑️ <strong>null_resource</strong> item</summary>
+<summary>🗑️ <strong>null_resource</strong> item[1]</summary>
 
 \`\`\`
 module.parent["2"].module.child.null_resource.item[1]
@@ -8885,7 +8449,7 @@ module.parent["2"].module.child.null_resource.item[1]
 ### 📦 Module: \`module.parent["3"].module.child\`
 
 <details>
-<summary>➕ <strong>null_resource</strong> item</summary>
+<summary>➕ <strong>null_resource</strong> item[0]</summary>
 
 \`\`\`
 module.parent["3"].module.child.null_resource.item[0]
@@ -8900,7 +8464,7 @@ module.parent["3"].module.child.null_resource.item[0]
 </details>
 
 <details>
-<summary>➕ <strong>null_resource</strong> item</summary>
+<summary>➕ <strong>null_resource</strong> item[1]</summary>
 
 \`\`\`
 module.parent["3"].module.child.null_resource.item[1]
@@ -8915,7 +8479,7 @@ module.parent["3"].module.child.null_resource.item[1]
 </details>
 
 <details>
-<summary>➕ <strong>null_resource</strong> item</summary>
+<summary>➕ <strong>null_resource</strong> item[2]</summary>
 
 \`\`\`
 module.parent["3"].module.child.null_resource.item[2]
@@ -9794,8 +9358,6 @@ Exit code: \`1\`
 null_resource.baseline
 \`\`\`
 
-_No attribute changes._
-
 </details>
 
 "
@@ -10004,8 +9566,6 @@ Exit code: \`1\`
 \`\`\`
 null_resource.baseline
 \`\`\`
-
-_No attribute changes._
 
 </details>
 
@@ -12817,7 +12377,7 @@ exports[`reportFromSteps integration — generated fixtures > tofu/nested-module
 ### 📦 Module: \`module.parent["1"].module.child\`
 
 <details>
-<summary>➕ <strong>null_resource</strong> item</summary>
+<summary>➕ <strong>null_resource</strong> item[0]</summary>
 
 \`\`\`
 module.parent["1"].module.child.null_resource.item[0]
@@ -12834,7 +12394,7 @@ module.parent["1"].module.child.null_resource.item[0]
 ### 📦 Module: \`module.parent["2"].module.child\`
 
 <details>
-<summary>➕ <strong>null_resource</strong> item</summary>
+<summary>➕ <strong>null_resource</strong> item[0]</summary>
 
 \`\`\`
 module.parent["2"].module.child.null_resource.item[0]
@@ -12849,7 +12409,7 @@ module.parent["2"].module.child.null_resource.item[0]
 </details>
 
 <details>
-<summary>➕ <strong>null_resource</strong> item</summary>
+<summary>➕ <strong>null_resource</strong> item[1]</summary>
 
 \`\`\`
 module.parent["2"].module.child.null_resource.item[1]
@@ -12881,7 +12441,7 @@ exports[`reportFromSteps integration — generated fixtures > tofu/nested-module
 ### 📦 Module: \`module.parent["1"].module.child\`
 
 <details>
-<summary>➕ <strong>null_resource</strong> item</summary>
+<summary>➕ <strong>null_resource</strong> item[0]</summary>
 
 \`\`\`
 module.parent["1"].module.child.null_resource.item[0]
@@ -12898,7 +12458,7 @@ module.parent["1"].module.child.null_resource.item[0]
 ### 📦 Module: \`module.parent["2"].module.child\`
 
 <details>
-<summary>➕ <strong>null_resource</strong> item</summary>
+<summary>➕ <strong>null_resource</strong> item[0]</summary>
 
 \`\`\`
 module.parent["2"].module.child.null_resource.item[0]
@@ -12913,7 +12473,7 @@ module.parent["2"].module.child.null_resource.item[0]
 </details>
 
 <details>
-<summary>➕ <strong>null_resource</strong> item</summary>
+<summary>➕ <strong>null_resource</strong> item[1]</summary>
 
 \`\`\`
 module.parent["2"].module.child.null_resource.item[1]
@@ -12948,7 +12508,7 @@ exports[`reportFromSteps integration — generated fixtures > tofu/nested-module
 ### 📦 Module: \`module.parent["2"].module.child\`
 
 <details>
-<summary>🗑️ <strong>null_resource</strong> item</summary>
+<summary>🗑️ <strong>null_resource</strong> item[0]</summary>
 
 \`\`\`
 module.parent["2"].module.child.null_resource.item[0]
@@ -12963,7 +12523,7 @@ module.parent["2"].module.child.null_resource.item[0]
 </details>
 
 <details>
-<summary>🗑️ <strong>null_resource</strong> item</summary>
+<summary>🗑️ <strong>null_resource</strong> item[1]</summary>
 
 \`\`\`
 module.parent["2"].module.child.null_resource.item[1]
@@ -12980,7 +12540,7 @@ module.parent["2"].module.child.null_resource.item[1]
 ### 📦 Module: \`module.parent["3"].module.child\`
 
 <details>
-<summary>➕ <strong>null_resource</strong> item</summary>
+<summary>➕ <strong>null_resource</strong> item[0]</summary>
 
 \`\`\`
 module.parent["3"].module.child.null_resource.item[0]
@@ -12995,7 +12555,7 @@ module.parent["3"].module.child.null_resource.item[0]
 </details>
 
 <details>
-<summary>➕ <strong>null_resource</strong> item</summary>
+<summary>➕ <strong>null_resource</strong> item[1]</summary>
 
 \`\`\`
 module.parent["3"].module.child.null_resource.item[1]
@@ -13010,7 +12570,7 @@ module.parent["3"].module.child.null_resource.item[1]
 </details>
 
 <details>
-<summary>➕ <strong>null_resource</strong> item</summary>
+<summary>➕ <strong>null_resource</strong> item[2]</summary>
 
 \`\`\`
 module.parent["3"].module.child.null_resource.item[2]
@@ -13044,7 +12604,7 @@ exports[`reportFromSteps integration — generated fixtures > tofu/nested-module
 ### 📦 Module: \`module.parent["2"].module.child\`
 
 <details>
-<summary>🗑️ <strong>null_resource</strong> item</summary>
+<summary>🗑️ <strong>null_resource</strong> item[0]</summary>
 
 \`\`\`
 module.parent["2"].module.child.null_resource.item[0]
@@ -13059,7 +12619,7 @@ module.parent["2"].module.child.null_resource.item[0]
 </details>
 
 <details>
-<summary>🗑️ <strong>null_resource</strong> item</summary>
+<summary>🗑️ <strong>null_resource</strong> item[1]</summary>
 
 \`\`\`
 module.parent["2"].module.child.null_resource.item[1]
@@ -13076,7 +12636,7 @@ module.parent["2"].module.child.null_resource.item[1]
 ### 📦 Module: \`module.parent["3"].module.child\`
 
 <details>
-<summary>➕ <strong>null_resource</strong> item</summary>
+<summary>➕ <strong>null_resource</strong> item[0]</summary>
 
 \`\`\`
 module.parent["3"].module.child.null_resource.item[0]
@@ -13091,7 +12651,7 @@ module.parent["3"].module.child.null_resource.item[0]
 </details>
 
 <details>
-<summary>➕ <strong>null_resource</strong> item</summary>
+<summary>➕ <strong>null_resource</strong> item[1]</summary>
 
 \`\`\`
 module.parent["3"].module.child.null_resource.item[1]
@@ -13106,7 +12666,7 @@ module.parent["3"].module.child.null_resource.item[1]
 </details>
 
 <details>
-<summary>➕ <strong>null_resource</strong> item</summary>
+<summary>➕ <strong>null_resource</strong> item[2]</summary>
 
 \`\`\`
 module.parent["3"].module.child.null_resource.item[2]
@@ -13985,8 +13545,6 @@ Exit code: \`1\`
 null_resource.baseline
 \`\`\`
 
-_No attribute changes._
-
 </details>
 
 "
@@ -14195,8 +13753,6 @@ Exit code: \`1\`
 \`\`\`
 null_resource.baseline
 \`\`\`
-
-_No attribute changes._
 
 </details>
 
@@ -15330,8 +14886,6 @@ exports[`reportFromSteps integration — no-show fixtures (Tier 3) > terraform/a
 terraform_data.success
 \`\`\`
 
-_No attribute changes._
-
 </details>
 
 <details>
@@ -15341,8 +14895,6 @@ _No attribute changes._
 null_resource.will_fail
 \`\`\`
 
-_No attribute changes._
-
 </details>
 
 <details>
@@ -15351,8 +14903,6 @@ _No attribute changes._
 \`\`\`
 terraform_data.depends_on_fail
 \`\`\`
-
-_No attribute changes._
 
 </details>
 
@@ -15384,8 +14934,6 @@ exports[`reportFromSteps integration — no-show fixtures (Tier 3) > terraform/a
 null_resource.will_fail
 \`\`\`
 
-_No attribute changes._
-
 </details>
 
 <details>
@@ -15394,8 +14942,6 @@ _No attribute changes._
 \`\`\`
 terraform_data.depends_on_fail
 \`\`\`
-
-_No attribute changes._
 
 </details>
 
@@ -15426,8 +14972,6 @@ exports[`reportFromSteps integration — no-show fixtures (Tier 3) > terraform/d
 terraform_data.independent
 \`\`\`
 
-_No attribute changes._
-
 </details>
 
 <details>
@@ -15436,19 +14980,6 @@ _No attribute changes._
 \`\`\`
 local_file.config
 \`\`\`
-
-_No attribute changes._
-
-</details>
-
-<details>
-<summary>👁 <strong>local_command</strong> read_config</summary>
-
-\`\`\`
-data.local_command.read_config
-\`\`\`
-
-_No attribute changes._
 
 </details>
 
@@ -15459,8 +14990,6 @@ _No attribute changes._
 terraform_data.worker_b
 \`\`\`
 
-_No attribute changes._
-
 </details>
 
 <details>
@@ -15469,8 +14998,6 @@ _No attribute changes._
 \`\`\`
 terraform_data.worker_c
 \`\`\`
-
-_No attribute changes._
 
 </details>
 
@@ -15481,7 +15008,16 @@ _No attribute changes._
 terraform_data.worker_a
 \`\`\`
 
-_No attribute changes._
+</details>
+
+### 📦 Module: \`data\`
+
+<details>
+<summary>👁 <strong>local_command</strong> read_config</summary>
+
+\`\`\`
+data.local_command.read_config
+\`\`\`
 
 </details>
 
@@ -15513,8 +15049,6 @@ exports[`reportFromSteps integration — no-show fixtures (Tier 3) > terraform/d
 terraform_data.independent
 \`\`\`
 
-_No attribute changes._
-
 </details>
 
 <details>
@@ -15523,19 +15057,6 @@ _No attribute changes._
 \`\`\`
 local_file.metadata
 \`\`\`
-
-_No attribute changes._
-
-</details>
-
-<details>
-<summary>👁 <strong>local_command</strong> read_config</summary>
-
-\`\`\`
-data.local_command.read_config
-\`\`\`
-
-_No attribute changes._
 
 </details>
 
@@ -15546,8 +15067,6 @@ _No attribute changes._
 terraform_data.worker_a
 \`\`\`
 
-_No attribute changes._
-
 </details>
 
 <details>
@@ -15556,8 +15075,6 @@ _No attribute changes._
 \`\`\`
 terraform_data.worker_b
 \`\`\`
-
-_No attribute changes._
 
 </details>
 
@@ -15568,7 +15085,16 @@ _No attribute changes._
 terraform_data.worker_c
 \`\`\`
 
-_No attribute changes._
+</details>
+
+### 📦 Module: \`data\`
+
+<details>
+<summary>👁 <strong>local_command</strong> read_config</summary>
+
+\`\`\`
+data.local_command.read_config
+\`\`\`
 
 </details>
 
@@ -15600,19 +15126,6 @@ exports[`reportFromSteps integration — no-show fixtures (Tier 3) > terraform/d
 local_file.config
 \`\`\`
 
-_No attribute changes._
-
-</details>
-
-<details>
-<summary>👁 <strong>local_command</strong> read_config</summary>
-
-\`\`\`
-data.local_command.read_config
-\`\`\`
-
-_No attribute changes._
-
 </details>
 
 <details>
@@ -15621,8 +15134,6 @@ _No attribute changes._
 \`\`\`
 terraform_data.worker_a
 \`\`\`
-
-_No attribute changes._
 
 </details>
 
@@ -15633,8 +15144,6 @@ _No attribute changes._
 terraform_data.worker_b
 \`\`\`
 
-_No attribute changes._
-
 </details>
 
 <details>
@@ -15644,7 +15153,16 @@ _No attribute changes._
 terraform_data.worker_c
 \`\`\`
 
-_No attribute changes._
+</details>
+
+### 📦 Module: \`data\`
+
+<details>
+<summary>👁 <strong>local_command</strong> read_config</summary>
+
+\`\`\`
+data.local_command.read_config
+\`\`\`
 
 </details>
 
@@ -15674,8 +15192,6 @@ exports[`reportFromSteps integration — no-show fixtures (Tier 3) > terraform/i
 random_string.existing
 \`\`\`
 
-_No attribute changes._
-
 </details>
 
 "
@@ -15703,8 +15219,6 @@ exports[`reportFromSteps integration — no-show fixtures (Tier 3) > terraform/i
 \`\`\`
 random_string.imported
 \`\`\`
-
-_No attribute changes._
 
 </details>
 
@@ -15734,8 +15248,6 @@ exports[`reportFromSteps integration — no-show fixtures (Tier 3) > terraform/l
 local_file.readme
 \`\`\`
 
-_No attribute changes._
-
 </details>
 
 "
@@ -15763,8 +15275,6 @@ exports[`reportFromSteps integration — no-show fixtures (Tier 3) > terraform/l
 \`\`\`
 local_file.readme
 \`\`\`
-
-_No attribute changes._
 
 </details>
 
@@ -15794,8 +15304,6 @@ exports[`reportFromSteps integration — no-show fixtures (Tier 3) > terraform/m
 null_resource.original
 \`\`\`
 
-_No attribute changes._
-
 </details>
 
 "
@@ -15824,8 +15332,6 @@ exports[`reportFromSteps integration — no-show fixtures (Tier 3) > terraform/m
 null_resource.renamed
 \`\`\`
 
-_No attribute changes._
-
 </details>
 
 "
@@ -15848,37 +15354,31 @@ exports[`reportFromSteps integration — no-show fixtures (Tier 3) > terraform/n
 ### 📦 Module: \`module.parent["1"].module.child\`
 
 <details>
-<summary>➕ <strong>null_resource</strong> parent</summary>
+<summary>➕ <strong>null_resource</strong> item[0]</summary>
 
 \`\`\`
 module.parent["1"].module.child.null_resource.item[0]
 \`\`\`
-
-_No attribute changes._
 
 </details>
 
 ### 📦 Module: \`module.parent["2"].module.child\`
 
 <details>
-<summary>➕ <strong>null_resource</strong> parent</summary>
+<summary>➕ <strong>null_resource</strong> item[0]</summary>
 
 \`\`\`
 module.parent["2"].module.child.null_resource.item[0]
 \`\`\`
 
-_No attribute changes._
-
 </details>
 
 <details>
-<summary>➕ <strong>null_resource</strong> parent</summary>
+<summary>➕ <strong>null_resource</strong> item[1]</summary>
 
 \`\`\`
 module.parent["2"].module.child.null_resource.item[1]
 \`\`\`
-
-_No attribute changes._
 
 </details>
 
@@ -15904,59 +15404,49 @@ exports[`reportFromSteps integration — no-show fixtures (Tier 3) > terraform/n
 ### 📦 Module: \`module.parent["2"].module.child\`
 
 <details>
-<summary>🗑️ <strong>null_resource</strong> parent</summary>
+<summary>🗑️ <strong>null_resource</strong> item[1]</summary>
 
 \`\`\`
 module.parent["2"].module.child.null_resource.item[1]
 \`\`\`
 
-_No attribute changes._
-
 </details>
 
 <details>
-<summary>🗑️ <strong>null_resource</strong> parent</summary>
+<summary>🗑️ <strong>null_resource</strong> item[0]</summary>
 
 \`\`\`
 module.parent["2"].module.child.null_resource.item[0]
 \`\`\`
-
-_No attribute changes._
 
 </details>
 
 ### 📦 Module: \`module.parent["3"].module.child\`
 
 <details>
-<summary>➕ <strong>null_resource</strong> parent</summary>
+<summary>➕ <strong>null_resource</strong> item[0]</summary>
 
 \`\`\`
 module.parent["3"].module.child.null_resource.item[0]
 \`\`\`
 
-_No attribute changes._
-
 </details>
 
 <details>
-<summary>➕ <strong>null_resource</strong> parent</summary>
+<summary>➕ <strong>null_resource</strong> item[2]</summary>
 
 \`\`\`
 module.parent["3"].module.child.null_resource.item[2]
 \`\`\`
 
-_No attribute changes._
-
 </details>
 
 <details>
-<summary>➕ <strong>null_resource</strong> parent</summary>
+<summary>➕ <strong>null_resource</strong> item[1]</summary>
 
 \`\`\`
 module.parent["3"].module.child.null_resource.item[1]
 \`\`\`
-
-_No attribute changes._
 
 </details>
 
@@ -15986,8 +15476,6 @@ exports[`reportFromSteps integration — no-show fixtures (Tier 3) > terraform/n
 null_resource.example
 \`\`\`
 
-_No attribute changes._
-
 </details>
 
 "
@@ -16015,8 +15503,6 @@ exports[`reportFromSteps integration — no-show fixtures (Tier 3) > terraform/n
 \`\`\`
 null_resource.example
 \`\`\`
-
-_No attribute changes._
 
 </details>
 
@@ -16083,8 +15569,6 @@ exports[`reportFromSteps integration — no-show fixtures (Tier 3) > terraform/n
 null_resource.stable
 \`\`\`
 
-_No attribute changes._
-
 </details>
 
 "
@@ -16142,8 +15626,6 @@ exports[`reportFromSteps integration — no-show fixtures (Tier 3) > terraform/n
 terraform_data.meta
 \`\`\`
 
-_No attribute changes._
-
 </details>
 
 <details>
@@ -16153,8 +15635,6 @@ _No attribute changes._
 null_resource.alpha
 \`\`\`
 
-_No attribute changes._
-
 </details>
 
 <details>
@@ -16163,8 +15643,6 @@ _No attribute changes._
 \`\`\`
 null_resource.beta
 \`\`\`
-
-_No attribute changes._
 
 </details>
 
@@ -16198,8 +15676,6 @@ exports[`reportFromSteps integration — no-show fixtures (Tier 3) > terraform/n
 terraform_data.meta
 \`\`\`
 
-_No attribute changes._
-
 </details>
 
 <details>
@@ -16209,8 +15685,6 @@ _No attribute changes._
 null_resource.beta
 \`\`\`
 
-_No attribute changes._
-
 </details>
 
 <details>
@@ -16219,8 +15693,6 @@ _No attribute changes._
 \`\`\`
 null_resource.alpha
 \`\`\`
-
-_No attribute changes._
 
 </details>
 
@@ -16249,8 +15721,6 @@ exports[`reportFromSteps integration — no-show fixtures (Tier 3) > terraform/p
 \`\`\`
 null_resource.baseline
 \`\`\`
-
-_No attribute changes._
 
 </details>
 
@@ -16461,8 +15931,6 @@ Exit code: \`1\`
 null_resource.baseline
 \`\`\`
 
-_No attribute changes._
-
 </details>
 
 "
@@ -16490,8 +15958,6 @@ exports[`reportFromSteps integration — no-show fixtures (Tier 3) > terraform/r
 \`\`\`
 random_string.token
 \`\`\`
-
-_No attribute changes._
 
 </details>
 
@@ -16521,8 +15987,6 @@ exports[`reportFromSteps integration — no-show fixtures (Tier 3) > terraform/r
 random_string.token
 \`\`\`
 
-_No attribute changes._
-
 </details>
 
 "
@@ -16551,8 +16015,6 @@ exports[`reportFromSteps integration — no-show fixtures (Tier 3) > terraform/r
 null_resource.ephemeral
 \`\`\`
 
-_No attribute changes._
-
 </details>
 
 <details>
@@ -16561,8 +16023,6 @@ _No attribute changes._
 \`\`\`
 null_resource.keeper
 \`\`\`
-
-_No attribute changes._
 
 </details>
 
@@ -16601,8 +16061,6 @@ After applying this plan, Terraform will no longer manage these objects. You wil
 null_resource.ephemeral
 \`\`\`
 
-_No attribute changes._
-
 </details>
 
 "
@@ -16630,8 +16088,6 @@ exports[`reportFromSteps integration — no-show fixtures (Tier 3) > terraform/s
 \`\`\`
 local_sensitive_file.secret
 \`\`\`
-
-_No attribute changes._
 
 </details>
 
@@ -16661,8 +16117,6 @@ exports[`reportFromSteps integration — no-show fixtures (Tier 3) > terraform/s
 local_sensitive_file.secret
 \`\`\`
 
-_No attribute changes._
-
 </details>
 
 "
@@ -16690,8 +16144,6 @@ exports[`reportFromSteps integration — no-show fixtures (Tier 3) > terraform/v
 \`\`\`
 null_resource.baseline
 \`\`\`
-
-_No attribute changes._
 
 </details>
 
@@ -16795,8 +16247,6 @@ exports[`reportFromSteps integration — no-show fixtures (Tier 3) > terraform/w
 null_resource.root
 \`\`\`
 
-_No attribute changes._
-
 </details>
 
 ### 📦 Module: \`module.naming\`
@@ -16807,8 +16257,6 @@ _No attribute changes._
 \`\`\`
 module.naming.random_string.suffix
 \`\`\`
-
-_No attribute changes._
 
 </details>
 
@@ -16839,8 +16287,6 @@ exports[`reportFromSteps integration — no-show fixtures (Tier 3) > terraform/w
 null_resource.root
 \`\`\`
 
-_No attribute changes._
-
 </details>
 
 ### 📦 Module: \`module.naming\`
@@ -16851,8 +16297,6 @@ _No attribute changes._
 \`\`\`
 module.naming.random_string.suffix
 \`\`\`
-
-_No attribute changes._
 
 </details>
 
@@ -16883,8 +16327,6 @@ exports[`reportFromSteps integration — no-show fixtures (Tier 3) > tofu/apply-
 terraform_data.success
 \`\`\`
 
-_No attribute changes._
-
 </details>
 
 <details>
@@ -16894,8 +16336,6 @@ _No attribute changes._
 null_resource.will_fail
 \`\`\`
 
-_No attribute changes._
-
 </details>
 
 <details>
@@ -16904,8 +16344,6 @@ _No attribute changes._
 \`\`\`
 terraform_data.depends_on_fail
 \`\`\`
-
-_No attribute changes._
 
 </details>
 
@@ -16937,8 +16375,6 @@ exports[`reportFromSteps integration — no-show fixtures (Tier 3) > tofu/apply-
 null_resource.will_fail
 \`\`\`
 
-_No attribute changes._
-
 </details>
 
 <details>
@@ -16947,8 +16383,6 @@ _No attribute changes._
 \`\`\`
 terraform_data.depends_on_fail
 \`\`\`
-
-_No attribute changes._
 
 </details>
 
@@ -16979,8 +16413,6 @@ exports[`reportFromSteps integration — no-show fixtures (Tier 3) > tofu/deferr
 terraform_data.independent
 \`\`\`
 
-_No attribute changes._
-
 </details>
 
 <details>
@@ -16989,19 +16421,6 @@ _No attribute changes._
 \`\`\`
 local_file.config
 \`\`\`
-
-_No attribute changes._
-
-</details>
-
-<details>
-<summary>👁 <strong>local_command</strong> read_config</summary>
-
-\`\`\`
-data.local_command.read_config
-\`\`\`
-
-_No attribute changes._
 
 </details>
 
@@ -17012,8 +16431,6 @@ _No attribute changes._
 terraform_data.worker_b
 \`\`\`
 
-_No attribute changes._
-
 </details>
 
 <details>
@@ -17022,8 +16439,6 @@ _No attribute changes._
 \`\`\`
 terraform_data.worker_c
 \`\`\`
-
-_No attribute changes._
 
 </details>
 
@@ -17034,7 +16449,16 @@ _No attribute changes._
 terraform_data.worker_a
 \`\`\`
 
-_No attribute changes._
+</details>
+
+### 📦 Module: \`data\`
+
+<details>
+<summary>👁 <strong>local_command</strong> read_config</summary>
+
+\`\`\`
+data.local_command.read_config
+\`\`\`
 
 </details>
 
@@ -17066,8 +16490,6 @@ exports[`reportFromSteps integration — no-show fixtures (Tier 3) > tofu/deferr
 terraform_data.independent
 \`\`\`
 
-_No attribute changes._
-
 </details>
 
 <details>
@@ -17076,19 +16498,6 @@ _No attribute changes._
 \`\`\`
 local_file.metadata
 \`\`\`
-
-_No attribute changes._
-
-</details>
-
-<details>
-<summary>👁 <strong>local_command</strong> read_config</summary>
-
-\`\`\`
-data.local_command.read_config
-\`\`\`
-
-_No attribute changes._
 
 </details>
 
@@ -17099,8 +16508,6 @@ _No attribute changes._
 terraform_data.worker_b
 \`\`\`
 
-_No attribute changes._
-
 </details>
 
 <details>
@@ -17109,8 +16516,6 @@ _No attribute changes._
 \`\`\`
 terraform_data.worker_a
 \`\`\`
-
-_No attribute changes._
 
 </details>
 
@@ -17121,7 +16526,16 @@ _No attribute changes._
 terraform_data.worker_c
 \`\`\`
 
-_No attribute changes._
+</details>
+
+### 📦 Module: \`data\`
+
+<details>
+<summary>👁 <strong>local_command</strong> read_config</summary>
+
+\`\`\`
+data.local_command.read_config
+\`\`\`
 
 </details>
 
@@ -17153,19 +16567,6 @@ exports[`reportFromSteps integration — no-show fixtures (Tier 3) > tofu/deferr
 local_file.config
 \`\`\`
 
-_No attribute changes._
-
-</details>
-
-<details>
-<summary>👁 <strong>local_command</strong> read_config</summary>
-
-\`\`\`
-data.local_command.read_config
-\`\`\`
-
-_No attribute changes._
-
 </details>
 
 <details>
@@ -17174,8 +16575,6 @@ _No attribute changes._
 \`\`\`
 terraform_data.worker_a
 \`\`\`
-
-_No attribute changes._
 
 </details>
 
@@ -17186,8 +16585,6 @@ _No attribute changes._
 terraform_data.worker_c
 \`\`\`
 
-_No attribute changes._
-
 </details>
 
 <details>
@@ -17197,7 +16594,16 @@ _No attribute changes._
 terraform_data.worker_b
 \`\`\`
 
-_No attribute changes._
+</details>
+
+### 📦 Module: \`data\`
+
+<details>
+<summary>👁 <strong>local_command</strong> read_config</summary>
+
+\`\`\`
+data.local_command.read_config
+\`\`\`
 
 </details>
 
@@ -17227,8 +16633,6 @@ exports[`reportFromSteps integration — no-show fixtures (Tier 3) > tofu/import
 random_string.existing
 \`\`\`
 
-_No attribute changes._
-
 </details>
 
 "
@@ -17256,8 +16660,6 @@ exports[`reportFromSteps integration — no-show fixtures (Tier 3) > tofu/import
 \`\`\`
 random_string.imported
 \`\`\`
-
-_No attribute changes._
 
 </details>
 
@@ -17287,8 +16689,6 @@ exports[`reportFromSteps integration — no-show fixtures (Tier 3) > tofu/local-
 local_file.readme
 \`\`\`
 
-_No attribute changes._
-
 </details>
 
 "
@@ -17316,8 +16716,6 @@ exports[`reportFromSteps integration — no-show fixtures (Tier 3) > tofu/local-
 \`\`\`
 local_file.readme
 \`\`\`
-
-_No attribute changes._
 
 </details>
 
@@ -17347,8 +16745,6 @@ exports[`reportFromSteps integration — no-show fixtures (Tier 3) > tofu/moved-
 null_resource.original
 \`\`\`
 
-_No attribute changes._
-
 </details>
 
 "
@@ -17377,8 +16773,6 @@ exports[`reportFromSteps integration — no-show fixtures (Tier 3) > tofu/moved-
 null_resource.renamed
 \`\`\`
 
-_No attribute changes._
-
 </details>
 
 "
@@ -17401,37 +16795,31 @@ exports[`reportFromSteps integration — no-show fixtures (Tier 3) > tofu/nested
 ### 📦 Module: \`module.parent["1"].module.child\`
 
 <details>
-<summary>➕ <strong>null_resource</strong> parent</summary>
+<summary>➕ <strong>null_resource</strong> item[0]</summary>
 
 \`\`\`
 module.parent["1"].module.child.null_resource.item[0]
 \`\`\`
-
-_No attribute changes._
 
 </details>
 
 ### 📦 Module: \`module.parent["2"].module.child\`
 
 <details>
-<summary>➕ <strong>null_resource</strong> parent</summary>
+<summary>➕ <strong>null_resource</strong> item[1]</summary>
 
 \`\`\`
 module.parent["2"].module.child.null_resource.item[1]
 \`\`\`
 
-_No attribute changes._
-
 </details>
 
 <details>
-<summary>➕ <strong>null_resource</strong> parent</summary>
+<summary>➕ <strong>null_resource</strong> item[0]</summary>
 
 \`\`\`
 module.parent["2"].module.child.null_resource.item[0]
 \`\`\`
-
-_No attribute changes._
 
 </details>
 
@@ -17457,59 +16845,49 @@ exports[`reportFromSteps integration — no-show fixtures (Tier 3) > tofu/nested
 ### 📦 Module: \`module.parent["2"].module.child\`
 
 <details>
-<summary>🗑️ <strong>null_resource</strong> parent</summary>
+<summary>🗑️ <strong>null_resource</strong> item[0]</summary>
 
 \`\`\`
 module.parent["2"].module.child.null_resource.item[0]
 \`\`\`
 
-_No attribute changes._
-
 </details>
 
 <details>
-<summary>🗑️ <strong>null_resource</strong> parent</summary>
+<summary>🗑️ <strong>null_resource</strong> item[1]</summary>
 
 \`\`\`
 module.parent["2"].module.child.null_resource.item[1]
 \`\`\`
-
-_No attribute changes._
 
 </details>
 
 ### 📦 Module: \`module.parent["3"].module.child\`
 
 <details>
-<summary>➕ <strong>null_resource</strong> parent</summary>
+<summary>➕ <strong>null_resource</strong> item[1]</summary>
 
 \`\`\`
 module.parent["3"].module.child.null_resource.item[1]
 \`\`\`
 
-_No attribute changes._
-
 </details>
 
 <details>
-<summary>➕ <strong>null_resource</strong> parent</summary>
+<summary>➕ <strong>null_resource</strong> item[0]</summary>
 
 \`\`\`
 module.parent["3"].module.child.null_resource.item[0]
 \`\`\`
 
-_No attribute changes._
-
 </details>
 
 <details>
-<summary>➕ <strong>null_resource</strong> parent</summary>
+<summary>➕ <strong>null_resource</strong> item[2]</summary>
 
 \`\`\`
 module.parent["3"].module.child.null_resource.item[2]
 \`\`\`
-
-_No attribute changes._
 
 </details>
 
@@ -17539,8 +16917,6 @@ exports[`reportFromSteps integration — no-show fixtures (Tier 3) > tofu/no-det
 null_resource.example
 \`\`\`
 
-_No attribute changes._
-
 </details>
 
 "
@@ -17568,8 +16944,6 @@ exports[`reportFromSteps integration — no-show fixtures (Tier 3) > tofu/no-det
 \`\`\`
 null_resource.example
 \`\`\`
-
-_No attribute changes._
 
 </details>
 
@@ -17636,8 +17010,6 @@ exports[`reportFromSteps integration — no-show fixtures (Tier 3) > tofu/no-op/
 null_resource.stable
 \`\`\`
 
-_No attribute changes._
-
 </details>
 
 "
@@ -17695,8 +17067,6 @@ exports[`reportFromSteps integration — no-show fixtures (Tier 3) > tofu/null-l
 terraform_data.meta
 \`\`\`
 
-_No attribute changes._
-
 </details>
 
 <details>
@@ -17706,8 +17076,6 @@ _No attribute changes._
 null_resource.beta
 \`\`\`
 
-_No attribute changes._
-
 </details>
 
 <details>
@@ -17716,8 +17084,6 @@ _No attribute changes._
 \`\`\`
 null_resource.alpha
 \`\`\`
-
-_No attribute changes._
 
 </details>
 
@@ -17751,8 +17117,6 @@ exports[`reportFromSteps integration — no-show fixtures (Tier 3) > tofu/null-l
 terraform_data.meta
 \`\`\`
 
-_No attribute changes._
-
 </details>
 
 <details>
@@ -17762,8 +17126,6 @@ _No attribute changes._
 null_resource.beta
 \`\`\`
 
-_No attribute changes._
-
 </details>
 
 <details>
@@ -17772,8 +17134,6 @@ _No attribute changes._
 \`\`\`
 null_resource.alpha
 \`\`\`
-
-_No attribute changes._
 
 </details>
 
@@ -17802,8 +17162,6 @@ exports[`reportFromSteps integration — no-show fixtures (Tier 3) > tofu/plan-e
 \`\`\`
 null_resource.baseline
 \`\`\`
-
-_No attribute changes._
 
 </details>
 
@@ -18014,8 +17372,6 @@ Exit code: \`1\`
 null_resource.baseline
 \`\`\`
 
-_No attribute changes._
-
 </details>
 
 "
@@ -18043,8 +17399,6 @@ exports[`reportFromSteps integration — no-show fixtures (Tier 3) > tofu/random
 \`\`\`
 random_string.token
 \`\`\`
-
-_No attribute changes._
 
 </details>
 
@@ -18074,8 +17428,6 @@ exports[`reportFromSteps integration — no-show fixtures (Tier 3) > tofu/random
 random_string.token
 \`\`\`
 
-_No attribute changes._
-
 </details>
 
 "
@@ -18104,8 +17456,6 @@ exports[`reportFromSteps integration — no-show fixtures (Tier 3) > tofu/remove
 null_resource.ephemeral
 \`\`\`
 
-_No attribute changes._
-
 </details>
 
 <details>
@@ -18114,8 +17464,6 @@ _No attribute changes._
 \`\`\`
 null_resource.keeper
 \`\`\`
-
-_No attribute changes._
 
 </details>
 
@@ -18153,8 +17501,6 @@ In case you want to manage the resource again, you will have to import it.
 null_resource.ephemeral
 \`\`\`
 
-_No attribute changes._
-
 </details>
 
 "
@@ -18182,8 +17528,6 @@ exports[`reportFromSteps integration — no-show fixtures (Tier 3) > tofu/sensit
 \`\`\`
 local_sensitive_file.secret
 \`\`\`
-
-_No attribute changes._
 
 </details>
 
@@ -18213,8 +17557,6 @@ exports[`reportFromSteps integration — no-show fixtures (Tier 3) > tofu/sensit
 local_sensitive_file.secret
 \`\`\`
 
-_No attribute changes._
-
 </details>
 
 "
@@ -18242,8 +17584,6 @@ exports[`reportFromSteps integration — no-show fixtures (Tier 3) > tofu/valida
 \`\`\`
 null_resource.baseline
 \`\`\`
-
-_No attribute changes._
 
 </details>
 
@@ -18347,8 +17687,6 @@ exports[`reportFromSteps integration — no-show fixtures (Tier 3) > tofu/with-m
 null_resource.root
 \`\`\`
 
-_No attribute changes._
-
 </details>
 
 ### 📦 Module: \`module.naming\`
@@ -18359,8 +17697,6 @@ _No attribute changes._
 \`\`\`
 module.naming.random_string.suffix
 \`\`\`
-
-_No attribute changes._
 
 </details>
 
@@ -18391,8 +17727,6 @@ exports[`reportFromSteps integration — no-show fixtures (Tier 3) > tofu/with-m
 null_resource.root
 \`\`\`
 
-_No attribute changes._
-
 </details>
 
 ### 📦 Module: \`module.naming\`
@@ -18403,8 +17737,6 @@ _No attribute changes._
 \`\`\`
 module.naming.random_string.suffix
 \`\`\`
-
-_No attribute changes._
 
 </details>
 
@@ -19106,7 +18438,7 @@ exports[`reportFromSteps integration — plan-only fixtures > terraform/nested-m
 ### 📦 Module: \`module.parent["1"].module.child\`
 
 <details>
-<summary>➕ <strong>null_resource</strong> item</summary>
+<summary>➕ <strong>null_resource</strong> item[0]</summary>
 
 \`\`\`
 module.parent["1"].module.child.null_resource.item[0]
@@ -19123,7 +18455,7 @@ module.parent["1"].module.child.null_resource.item[0]
 ### 📦 Module: \`module.parent["2"].module.child\`
 
 <details>
-<summary>➕ <strong>null_resource</strong> item</summary>
+<summary>➕ <strong>null_resource</strong> item[0]</summary>
 
 \`\`\`
 module.parent["2"].module.child.null_resource.item[0]
@@ -19138,7 +18470,7 @@ module.parent["2"].module.child.null_resource.item[0]
 </details>
 
 <details>
-<summary>➕ <strong>null_resource</strong> item</summary>
+<summary>➕ <strong>null_resource</strong> item[1]</summary>
 
 \`\`\`
 module.parent["2"].module.child.null_resource.item[1]
@@ -19172,7 +18504,7 @@ exports[`reportFromSteps integration — plan-only fixtures > terraform/nested-m
 ### 📦 Module: \`module.parent["2"].module.child\`
 
 <details>
-<summary>🗑️ <strong>null_resource</strong> item</summary>
+<summary>🗑️ <strong>null_resource</strong> item[0]</summary>
 
 \`\`\`
 module.parent["2"].module.child.null_resource.item[0]
@@ -19187,7 +18519,7 @@ module.parent["2"].module.child.null_resource.item[0]
 </details>
 
 <details>
-<summary>🗑️ <strong>null_resource</strong> item</summary>
+<summary>🗑️ <strong>null_resource</strong> item[1]</summary>
 
 \`\`\`
 module.parent["2"].module.child.null_resource.item[1]
@@ -19204,7 +18536,7 @@ module.parent["2"].module.child.null_resource.item[1]
 ### 📦 Module: \`module.parent["3"].module.child\`
 
 <details>
-<summary>➕ <strong>null_resource</strong> item</summary>
+<summary>➕ <strong>null_resource</strong> item[0]</summary>
 
 \`\`\`
 module.parent["3"].module.child.null_resource.item[0]
@@ -19219,7 +18551,7 @@ module.parent["3"].module.child.null_resource.item[0]
 </details>
 
 <details>
-<summary>➕ <strong>null_resource</strong> item</summary>
+<summary>➕ <strong>null_resource</strong> item[1]</summary>
 
 \`\`\`
 module.parent["3"].module.child.null_resource.item[1]
@@ -19234,7 +18566,7 @@ module.parent["3"].module.child.null_resource.item[1]
 </details>
 
 <details>
-<summary>➕ <strong>null_resource</strong> item</summary>
+<summary>➕ <strong>null_resource</strong> item[2]</summary>
 
 \`\`\`
 module.parent["3"].module.child.null_resource.item[2]
@@ -19787,8 +19119,6 @@ Exit code: \`1\`
 \`\`\`
 null_resource.baseline
 \`\`\`
-
-_No attribute changes._
 
 </details>
 
@@ -20981,7 +20311,7 @@ exports[`reportFromSteps integration — plan-only fixtures > tofu/nested-module
 ### 📦 Module: \`module.parent["1"].module.child\`
 
 <details>
-<summary>➕ <strong>null_resource</strong> item</summary>
+<summary>➕ <strong>null_resource</strong> item[0]</summary>
 
 \`\`\`
 module.parent["1"].module.child.null_resource.item[0]
@@ -20998,7 +20328,7 @@ module.parent["1"].module.child.null_resource.item[0]
 ### 📦 Module: \`module.parent["2"].module.child\`
 
 <details>
-<summary>➕ <strong>null_resource</strong> item</summary>
+<summary>➕ <strong>null_resource</strong> item[0]</summary>
 
 \`\`\`
 module.parent["2"].module.child.null_resource.item[0]
@@ -21013,7 +20343,7 @@ module.parent["2"].module.child.null_resource.item[0]
 </details>
 
 <details>
-<summary>➕ <strong>null_resource</strong> item</summary>
+<summary>➕ <strong>null_resource</strong> item[1]</summary>
 
 \`\`\`
 module.parent["2"].module.child.null_resource.item[1]
@@ -21047,7 +20377,7 @@ exports[`reportFromSteps integration — plan-only fixtures > tofu/nested-module
 ### 📦 Module: \`module.parent["2"].module.child\`
 
 <details>
-<summary>🗑️ <strong>null_resource</strong> item</summary>
+<summary>🗑️ <strong>null_resource</strong> item[0]</summary>
 
 \`\`\`
 module.parent["2"].module.child.null_resource.item[0]
@@ -21062,7 +20392,7 @@ module.parent["2"].module.child.null_resource.item[0]
 </details>
 
 <details>
-<summary>🗑️ <strong>null_resource</strong> item</summary>
+<summary>🗑️ <strong>null_resource</strong> item[1]</summary>
 
 \`\`\`
 module.parent["2"].module.child.null_resource.item[1]
@@ -21079,7 +20409,7 @@ module.parent["2"].module.child.null_resource.item[1]
 ### 📦 Module: \`module.parent["3"].module.child\`
 
 <details>
-<summary>➕ <strong>null_resource</strong> item</summary>
+<summary>➕ <strong>null_resource</strong> item[0]</summary>
 
 \`\`\`
 module.parent["3"].module.child.null_resource.item[0]
@@ -21094,7 +20424,7 @@ module.parent["3"].module.child.null_resource.item[0]
 </details>
 
 <details>
-<summary>➕ <strong>null_resource</strong> item</summary>
+<summary>➕ <strong>null_resource</strong> item[1]</summary>
 
 \`\`\`
 module.parent["3"].module.child.null_resource.item[1]
@@ -21109,7 +20439,7 @@ module.parent["3"].module.child.null_resource.item[1]
 </details>
 
 <details>
-<summary>➕ <strong>null_resource</strong> item</summary>
+<summary>➕ <strong>null_resource</strong> item[2]</summary>
 
 \`\`\`
 module.parent["3"].module.child.null_resource.item[2]
@@ -21662,8 +20992,6 @@ Exit code: \`1\`
 \`\`\`
 null_resource.baseline
 \`\`\`
-
-_No attribute changes._
 
 </details>
 

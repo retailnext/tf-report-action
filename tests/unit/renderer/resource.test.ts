@@ -8,12 +8,11 @@ import type { DiffEntry } from "../../../src/diff/types.js";
 function makeResource(overrides: Partial<ResourceChange> = {}): ResourceChange {
   return {
     address: "null_resource.test",
-    moduleAddress: null,
     type: "null_resource",
-    name: "test",
     action: "create",
     actionReason: null,
     attributes: [],
+    hasAttributeDetail: true,
     importId: null,
     movedFromAddress: null,
     allUnknownAfterApply: false,
@@ -40,7 +39,7 @@ describe("renderResource", () => {
   });
 
   it("shows resource type and name in summary", () => {
-    const output = render(makeResource({ type: "null_resource", name: "example" }));
+    const output = render(makeResource({ address: "null_resource.example", type: "null_resource" }));
     expect(output).toContain("null_resource");
     expect(output).toContain("example");
   });
@@ -58,9 +57,7 @@ describe("renderResource", () => {
   it("renders full module address in code fence", () => {
     const output = render(makeResource({
       address: 'module.parent["2"].module.child.null_resource.item[1]',
-      moduleAddress: 'module.parent["2"].module.child',
       type: "null_resource",
-      name: "item",
     }));
     expect(output).toContain('```\nmodule.parent["2"].module.child.null_resource.item[1]\n```');
   });
@@ -93,8 +90,13 @@ describe("renderResource", () => {
   });
 
   it("shows 'No attribute changes' when attributes empty and not allUnknown", () => {
-    const output = render(makeResource({ attributes: [] }));
+    const output = render(makeResource({ attributes: [], hasAttributeDetail: true }));
     expect(output).toContain("No attribute changes");
+  });
+
+  it("omits 'No attribute changes' when hasAttributeDetail is false", () => {
+    const output = render(makeResource({ attributes: [], hasAttributeDetail: false }));
+    expect(output).not.toContain("No attribute changes");
   });
 
   it("renders attribute table for small attributes", () => {

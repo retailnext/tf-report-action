@@ -1,4 +1,4 @@
-import type { ModuleGroup } from "./module-group.js";
+import type { ResourceChange } from "./resource.js";
 import type { Summary } from "./summary.js";
 import type { OutputChange } from "./output.js";
 import type { Diagnostic } from "./diagnostic.js";
@@ -119,18 +119,20 @@ export interface Report {
   summary?: Summary;
 
   /**
-   * Resources grouped by module. Root module resources have
-   * `moduleAddress === ""`. Resources from JSONL have no attributes;
-   * resources from show-plan JSON have full attribute detail.
+   * Flat list of resource changes. Resources from show-plan JSON have full
+   * attribute detail (`hasAttributeDetail: true`); resources from JSONL
+   * scanning have action and address only (`hasAttributeDetail: false`).
+   * The renderer groups by module address (derived from address + type)
+   * for display.
    */
-  modules?: ModuleGroup[];
+  resources?: ResourceChange[];
 
   /**
-   * Resources whose real-world state has drifted from the prior state,
-   * grouped by module. Populated from plan JSON `resource_drift` or
-   * JSONL `resource_drift` messages.
+   * Resources whose real-world state has drifted from the prior state.
+   * Populated from plan JSON `resource_drift` or JSONL `resource_drift`
+   * messages. The renderer groups by module for display.
    */
-  driftModules?: ModuleGroup[];
+  driftResources?: ResourceChange[];
 
   /** Top-level output changes (not inside any module). */
   outputs?: OutputChange[];

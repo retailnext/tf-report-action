@@ -37,7 +37,7 @@ import { parsePlan, detectToolFromPlan, detectToolFromOutput, parseValidateOutpu
 import { buildReport } from "./index.js";
 import { buildApplyReport } from "./apply.js";
 import { buildSummaryFromScan } from "./summary.js";
-import { buildModulesFromScan } from "./resources.js";
+import { buildResourcesFromScan } from "./resources.js";
 import { scanString, scanFile } from "../jsonl-scanner/scan.js";
 import { isJsonLines } from "../jsonl-scanner/detect.js";
 import { buildStepIssue } from "./step-issues.js";
@@ -193,7 +193,7 @@ export function buildReportFromSteps(
   }
 
   // ─── Phase 4: Add warnings for limited data ──────────────────────
-  if (!showPlanParsed && (report.modules !== undefined || report.summary !== undefined)) {
+  if (!showPlanParsed && (report.resources !== undefined || report.summary !== undefined)) {
     // JSONL-enriched report — has structure but no attribute detail
     report.warnings.push(
       `This report was generated without \`${expectedCommand(tool, "show-plan")}\` output. Resource attribute details are not available.`,
@@ -336,8 +336,8 @@ function tryProcessShowPlan(
 
   // Merge enriched report fields into the progressive report
   if (enrichedReport.summary !== undefined) report.summary = enrichedReport.summary;
-  if (enrichedReport.modules !== undefined) report.modules = enrichedReport.modules;
-  if (enrichedReport.driftModules !== undefined) report.driftModules = enrichedReport.driftModules;
+  if (enrichedReport.resources !== undefined) report.resources = enrichedReport.resources;
+  if (enrichedReport.driftResources !== undefined) report.driftResources = enrichedReport.driftResources;
   if (enrichedReport.outputs !== undefined) report.outputs = enrichedReport.outputs;
   const mergedDiags = [...(report.diagnostics ?? []), ...(enrichedReport.diagnostics ?? [])];
   if (mergedDiags.length > 0) report.diagnostics = mergedDiags;
@@ -446,15 +446,15 @@ function enrichFromPlanJsonl(
   // If show-plan was already parsed, it has richer data — skip summary/modules
   if (showPlanParsed) return;
 
-  // Tier 2: build summary and modules from JSONL
+  // Tier 2: build summary and resources from JSONL
   if (scan.plannedChanges.length > 0) {
     report.summary = buildSummaryFromScan(scan.plannedChanges);
-    report.modules = buildModulesFromScan(scan.plannedChanges);
+    report.resources = buildResourcesFromScan(scan.plannedChanges);
   }
 
   // Drift
   if (scan.driftChanges.length > 0) {
-    report.driftModules = buildModulesFromScan(scan.driftChanges);
+    report.driftResources = buildResourcesFromScan(scan.driftChanges);
   }
 
   // Operation
@@ -561,15 +561,15 @@ function enrichFromApplyJsonl(
     report.diagnostics = [...(report.diagnostics ?? []), ...applyDiags];
   }
 
-  // If no show-plan and no plan JSONL provided modules, apply JSONL can fill in
-  if (!showPlanParsed && report.modules === undefined && scan.plannedChanges.length > 0) {
+  // If no show-plan and no plan JSONL provided resources, apply JSONL can fill in
+  if (!showPlanParsed && report.resources === undefined && scan.plannedChanges.length > 0) {
     report.summary = buildSummaryFromScan(scan.plannedChanges);
-    report.modules = buildModulesFromScan(scan.plannedChanges);
+    report.resources = buildResourcesFromScan(scan.plannedChanges);
   }
 
   // Drift from apply JSONL (supplement plan data)
-  if (scan.driftChanges.length > 0 && report.driftModules === undefined) {
-    report.driftModules = buildModulesFromScan(scan.driftChanges);
+  if (scan.driftChanges.length > 0 && report.driftResources === undefined) {
+    report.driftResources = buildResourcesFromScan(scan.driftChanges);
   }
 
   // Operation detection from change_summary

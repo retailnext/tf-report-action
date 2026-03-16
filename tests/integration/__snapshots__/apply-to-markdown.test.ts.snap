@@ -743,7 +743,7 @@ exports[`applyToMarkdown integration > terraform/nested-modules/0 > renders with
 ### 📦 Module: \`module.parent["1"].module.child\`
 
 <details>
-<summary>➕ <strong>null_resource</strong> item</summary>
+<summary>➕ <strong>null_resource</strong> item[0]</summary>
 
 \`\`\`
 module.parent["1"].module.child.null_resource.item[0]
@@ -760,7 +760,7 @@ module.parent["1"].module.child.null_resource.item[0]
 ### 📦 Module: \`module.parent["2"].module.child\`
 
 <details>
-<summary>➕ <strong>null_resource</strong> item</summary>
+<summary>➕ <strong>null_resource</strong> item[0]</summary>
 
 \`\`\`
 module.parent["2"].module.child.null_resource.item[0]
@@ -775,7 +775,7 @@ module.parent["2"].module.child.null_resource.item[0]
 </details>
 
 <details>
-<summary>➕ <strong>null_resource</strong> item</summary>
+<summary>➕ <strong>null_resource</strong> item[1]</summary>
 
 \`\`\`
 module.parent["2"].module.child.null_resource.item[1]
@@ -818,7 +818,7 @@ exports[`applyToMarkdown integration > terraform/nested-modules/1 > renders with
 ### 📦 Module: \`module.parent["2"].module.child\`
 
 <details>
-<summary>🗑️ <strong>null_resource</strong> item</summary>
+<summary>🗑️ <strong>null_resource</strong> item[0]</summary>
 
 \`\`\`
 module.parent["2"].module.child.null_resource.item[0]
@@ -833,7 +833,7 @@ module.parent["2"].module.child.null_resource.item[0]
 </details>
 
 <details>
-<summary>🗑️ <strong>null_resource</strong> item</summary>
+<summary>🗑️ <strong>null_resource</strong> item[1]</summary>
 
 \`\`\`
 module.parent["2"].module.child.null_resource.item[1]
@@ -850,7 +850,7 @@ module.parent["2"].module.child.null_resource.item[1]
 ### 📦 Module: \`module.parent["3"].module.child\`
 
 <details>
-<summary>➕ <strong>null_resource</strong> item</summary>
+<summary>➕ <strong>null_resource</strong> item[0]</summary>
 
 \`\`\`
 module.parent["3"].module.child.null_resource.item[0]
@@ -865,7 +865,7 @@ module.parent["3"].module.child.null_resource.item[0]
 </details>
 
 <details>
-<summary>➕ <strong>null_resource</strong> item</summary>
+<summary>➕ <strong>null_resource</strong> item[1]</summary>
 
 \`\`\`
 module.parent["3"].module.child.null_resource.item[1]
@@ -880,7 +880,7 @@ module.parent["3"].module.child.null_resource.item[1]
 </details>
 
 <details>
-<summary>➕ <strong>null_resource</strong> item</summary>
+<summary>➕ <strong>null_resource</strong> item[2]</summary>
 
 \`\`\`
 module.parent["3"].module.child.null_resource.item[2]
@@ -2486,7 +2486,7 @@ exports[`applyToMarkdown integration > tofu/nested-modules/0 > renders without e
 ### 📦 Module: \`module.parent["1"].module.child\`
 
 <details>
-<summary>➕ <strong>null_resource</strong> item</summary>
+<summary>➕ <strong>null_resource</strong> item[0]</summary>
 
 \`\`\`
 module.parent["1"].module.child.null_resource.item[0]
@@ -2503,7 +2503,7 @@ module.parent["1"].module.child.null_resource.item[0]
 ### 📦 Module: \`module.parent["2"].module.child\`
 
 <details>
-<summary>➕ <strong>null_resource</strong> item</summary>
+<summary>➕ <strong>null_resource</strong> item[0]</summary>
 
 \`\`\`
 module.parent["2"].module.child.null_resource.item[0]
@@ -2518,7 +2518,7 @@ module.parent["2"].module.child.null_resource.item[0]
 </details>
 
 <details>
-<summary>➕ <strong>null_resource</strong> item</summary>
+<summary>➕ <strong>null_resource</strong> item[1]</summary>
 
 \`\`\`
 module.parent["2"].module.child.null_resource.item[1]
@@ -2561,7 +2561,7 @@ exports[`applyToMarkdown integration > tofu/nested-modules/1 > renders without e
 ### 📦 Module: \`module.parent["2"].module.child\`
 
 <details>
-<summary>🗑️ <strong>null_resource</strong> item</summary>
+<summary>🗑️ <strong>null_resource</strong> item[0]</summary>
 
 \`\`\`
 module.parent["2"].module.child.null_resource.item[0]
@@ -2576,7 +2576,7 @@ module.parent["2"].module.child.null_resource.item[0]
 </details>
 
 <details>
-<summary>🗑️ <strong>null_resource</strong> item</summary>
+<summary>🗑️ <strong>null_resource</strong> item[1]</summary>
 
 \`\`\`
 module.parent["2"].module.child.null_resource.item[1]
@@ -2593,7 +2593,7 @@ module.parent["2"].module.child.null_resource.item[1]
 ### 📦 Module: \`module.parent["3"].module.child\`
 
 <details>
-<summary>➕ <strong>null_resource</strong> item</summary>
+<summary>➕ <strong>null_resource</strong> item[0]</summary>
 
 \`\`\`
 module.parent["3"].module.child.null_resource.item[0]
@@ -2608,7 +2608,7 @@ module.parent["3"].module.child.null_resource.item[0]
 </details>
 
 <details>
-<summary>➕ <strong>null_resource</strong> item</summary>
+<summary>➕ <strong>null_resource</strong> item[1]</summary>
 
 \`\`\`
 module.parent["3"].module.child.null_resource.item[1]
@@ -2623,7 +2623,7 @@ module.parent["3"].module.child.null_resource.item[1]
 </details>
 
 <details>
-<summary>➕ <strong>null_resource</strong> item</summary>
+<summary>➕ <strong>null_resource</strong> item[2]</summary>
 
 \`\`\`
 module.parent["3"].module.child.null_resource.item[2]

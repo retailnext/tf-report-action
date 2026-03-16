@@ -67,7 +67,6 @@ describe("buildDriftChanges", () => {
     expect(result).toHaveLength(1);
     expect(result[0]!.address).toBe("aws_instance.web");
     expect(result[0]!.type).toBe("aws_instance");
-    expect(result[0]!.name).toBe("web");
     expect(result[0]!.action).toBe("update");
   });
 
@@ -87,7 +86,7 @@ describe("buildDriftChanges", () => {
 });
 
 describe("buildReport — drift grouping", () => {
-  it("groups drift resources by module in buildReport output", () => {
+  it("returns drift resources as a flat array in buildReport output", () => {
     const plan: Plan = {
       format_version: "1.2",
       resource_drift: [
@@ -114,17 +113,9 @@ describe("buildReport — drift grouping", () => {
 
     const report = buildReport(plan);
 
-    expect(report.driftModules).toHaveLength(2);
-
-    // Root module comes first
-    const rootModule = report.driftModules[0]!;
-    expect(rootModule.moduleAddress).toBe("");
-    expect(rootModule.resources).toHaveLength(1);
-    expect(rootModule.resources[0]!.address).toBe("null_resource.root_drift");
-
-    // Named module second
-    const networkModule = report.driftModules[1]!;
-    expect(networkModule.moduleAddress).toBe("module.network");
-    expect(networkModule.resources).toHaveLength(2);
+    expect(report.driftResources).toHaveLength(3);
+    expect(report.driftResources![0]!.address).toBe("null_resource.root_drift");
+    expect(report.driftResources![1]!.address).toBe("module.network.aws_vpc.main");
+    expect(report.driftResources![2]!.address).toBe("module.network.aws_subnet.a");
   });
 });

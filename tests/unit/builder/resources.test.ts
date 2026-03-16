@@ -56,7 +56,6 @@ describe("buildResourceChanges", () => {
     const result = buildResourceChanges(plan, emptyConfigRefs, {});
     expect(result[0]!.address).toBe("unknown.unknown");
     expect(result[0]!.type).toBe("unknown");
-    expect(result[0]!.name).toBe("unknown");
   });
 
   it("captures importId from change.importing.id", () => {

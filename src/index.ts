@@ -121,7 +121,6 @@ export type { Summary } from "./model/summary.js";
 export type { ResourceChange } from "./model/resource.js";
 export type { AttributeChange } from "./model/attribute.js";
 export type { OutputChange } from "./model/output.js";
-export type { ModuleGroup } from "./model/module-group.js";
 export type { PlanAction } from "./model/plan-action.js";
 export type { Diagnostic } from "./model/diagnostic.js";
 export type { ApplyStatus } from "./model/apply-status.js";

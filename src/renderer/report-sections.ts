@@ -56,7 +56,7 @@ export function renderReportSections(
   if (report.error !== undefined) {
     // Error report
     sections.push(...renderErrorBody(report));
-  } else if (report.summary !== undefined || report.modules !== undefined) {
+  } else if (report.summary !== undefined || report.resources !== undefined) {
     // Structured body (from show-plan JSON or JSONL enrichment)
     // Strip title — already handled by renderTitle() above
     // eslint-disable-next-line @typescript-eslint/no-unused-vars

@@ -9,12 +9,11 @@ function makeResource(
 ): ResourceChange {
   return {
     address: `${type}.${name ?? action}`,
-    moduleAddress: null,
     type,
-    name: name ?? action,
     action,
     actionReason: null,
     attributes: [],
+    hasAttributeDetail: true,
     importId: null,
     movedFromAddress: null,
     allUnknownAfterApply: false,

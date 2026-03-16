@@ -27,7 +27,7 @@ Follow these boundaries strictly — do not add cross-cutting logic.
 | Module | Responsibility |
 |---|---|
 | `src/tfjson/` | Type definitions for the plan JSON wire format and machine-readable UI log format. **Never modify** files copied from tfplanjson; new type files may be added. |
-| `src/model/` | Shared TypeScript interfaces and constants: `Report` discriminated union, `StepIssue`, `StepOutcome`, `Section`, `CompositionResult`, sentinels, status icons. **No executable logic.** |
+| `src/model/` | Shared TypeScript interfaces and constants: `Report`, `ResourceChange`, `StepIssue`, `StepOutcome`, `Section`, `CompositionResult`, sentinels, status icons. **No executable logic.** |
 | `src/env/` | `Env` type alias (`Record<string, string \| undefined>`). DI abstraction over `process.env`. |
 
 ### Layer 1 — Pure algorithms (depend only on Layer 0)
@@ -51,14 +51,14 @@ Follow these boundaries strictly — do not add cross-cutting logic.
 
 | Module | Responsibility |
 |---|---|
-| `src/builder/` | Build `Report` (any variant) from parsed input. Plan → StructuredReport, Plan+UIMessages → StructuredReport (apply), steps context → any Report variant (tier detection, step issue collection, title generation). |
+| `src/builder/` | Build `Report` from parsed input. Plan JSON → Report with flat resource arrays and full attribute detail, JSONL → Report with flat resource arrays but no attribute detail, steps context → progressively enriched Report (tier detection, step issue collection, title generation). |
 | `src/compositor/` | Budget-aware section assembly. Composes markdown sections within an output size limit, progressively degrading from full → compact → omit. Truncation notice helper. |
 
 ### Layer 4 — Rendering (depends on Layers 0–3)
 
 | Module | Responsibility |
 |---|---|
-| `src/renderer/` | Render any `Report` variant to markdown. StructuredReport → full markdown string, TextFallbackReport/WorkflowReport/ErrorReport → Section arrays. Title, step issue, step table, and variant-specific body renderers. |
+| `src/renderer/` | Render any `Report` variant to markdown. Groups resources by module address (derived from address + type) for display — module grouping is a renderer concern. StructuredReport → full markdown string, TextFallbackReport/WorkflowReport/ErrorReport → Section arrays. Title, step issue, step table, and variant-specific body renderers. |
 
 ### Layer 5 — Entry points
 

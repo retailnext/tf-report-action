@@ -12,9 +12,9 @@ function emptyReport(overrides: Partial<Report> = {}): Report {
     formatVersion: "1.2",
     timestamp: null,
     summary: emptySummary,
-    modules: [],
+    resources: [],
     outputs: [],
-    driftModules: [],
+    driftResources: [],
     ...overrides,
   };
 }
@@ -64,21 +64,16 @@ describe("renderReport — apply-specific rendering", () => {
   it("renders resource-specific diagnostics inline on the resource", () => {
     const report = emptyReport({
       operation: "apply",
-      modules: [{
-        moduleAddress: "",
-        resources: [{
-          address: "null_resource.broken",
-          moduleAddress: null,
-          type: "null_resource",
-          name: "broken",
-          action: "create",
-          actionReason: null,
-          attributes: [],
-          importId: null,
-          movedFromAddress: null,
-          allUnknownAfterApply: false,
-        }],
-        outputs: [],
+      resources: [{
+        address: "null_resource.broken",
+        type: "null_resource",
+        action: "create",
+        actionReason: null,
+        attributes: [],
+        hasAttributeDetail: true,
+        importId: null,
+        movedFromAddress: null,
+        allUnknownAfterApply: false,
       }],
       diagnostics: [
         {
@@ -104,21 +99,16 @@ describe("renderReport — apply-specific rendering", () => {
   it("opens <details> for failed resources", () => {
     const report = emptyReport({
       operation: "apply",
-      modules: [{
-        moduleAddress: "",
-        resources: [{
-          address: "null_resource.broken",
-          moduleAddress: null,
-          type: "null_resource",
-          name: "broken",
-          action: "create",
-          actionReason: null,
-          attributes: [],
-          importId: null,
-          movedFromAddress: null,
-          allUnknownAfterApply: false,
-        }],
-        outputs: [],
+      resources: [{
+        address: "null_resource.broken",
+        type: "null_resource",
+        action: "create",
+        actionReason: null,
+        attributes: [],
+        hasAttributeDetail: true,
+        importId: null,
+        movedFromAddress: null,
+        allUnknownAfterApply: false,
       }],
       applyStatuses: [
         { address: "null_resource.broken", action: "create", success: false },
@@ -216,18 +206,17 @@ describe("renderReport — apply-specific rendering", () => {
 describe("renderReport — drift section", () => {
   const driftResource = {
     address: "aws_instance.web",
-    moduleAddress: null,
     type: "aws_instance",
-    name: "web",
     action: "update" as const,
     actionReason: null,
     attributes: [],
+    hasAttributeDetail: true,
     importId: null,
     movedFromAddress: null,
     allUnknownAfterApply: false,
   };
 
-  it("does not render drift section when driftModules is empty", () => {
+  it("does not render drift section when driftResources is empty", () => {
     const report = emptyReport();
     const md = renderReport(report);
     expect(md).not.toContain("Resource Drift");
@@ -236,13 +225,7 @@ describe("renderReport — drift section", () => {
 
   it("renders drift section with correct heading and count", () => {
     const report = emptyReport({
-      driftModules: [
-        {
-          moduleAddress: "",
-          resources: [driftResource],
-          outputs: [],
-        },
-      ],
+      driftResources: [driftResource],
     });
     const md = renderReport(report);
     expect(md).toContain("🔀 Resource Drift (1 detected)");
@@ -250,19 +233,9 @@ describe("renderReport — drift section", () => {
 
   it("renders drift resources within module groups", () => {
     const report = emptyReport({
-      driftModules: [
-        {
-          moduleAddress: "",
-          resources: [driftResource],
-          outputs: [],
-        },
-        {
-          moduleAddress: "module.network",
-          resources: [
-            { ...driftResource, address: "module.network.aws_vpc.main", moduleAddress: "module.network", type: "aws_vpc", name: "main" },
-          ],
-          outputs: [],
-        },
+      driftResources: [
+        driftResource,
+        { ...driftResource, address: "module.network.aws_vpc.main", type: "aws_vpc" },
       ],
     });
     const md = renderReport(report);
@@ -275,31 +248,18 @@ describe("renderReport — drift section", () => {
 
   it("drift section appears between summary and resource changes", () => {
     const report = emptyReport({
-      modules: [
-        {
-          moduleAddress: "",
-          resources: [{
-            address: "null_resource.planned",
-            moduleAddress: null,
-            type: "null_resource",
-            name: "planned",
-            action: "create",
-            actionReason: null,
-            attributes: [],
-            importId: null,
-            movedFromAddress: null,
-            allUnknownAfterApply: false,
-          }],
-          outputs: [],
-        },
-      ],
-      driftModules: [
-        {
-          moduleAddress: "",
-          resources: [driftResource],
-          outputs: [],
-        },
-      ],
+      resources: [{
+        address: "null_resource.planned",
+        type: "null_resource",
+        action: "create",
+        actionReason: null,
+        attributes: [],
+        hasAttributeDetail: true,
+        importId: null,
+        movedFromAddress: null,
+        allUnknownAfterApply: false,
+      }],
+      driftResources: [driftResource],
     });
     const md = renderReport(report);
     const summaryIdx = md.indexOf("Plan Summary");

@@ -126,9 +126,7 @@ describe("buildApplyReport", () => {
 
       const report = buildApplyReport(plan, scanResult);
 
-      const allAddresses = report.modules.flatMap((m) =>
-        m.resources.map((r) => r.address),
-      );
+      const allAddresses = report.resources!.map((r) => r.address);
       expect(allAddresses).toContain("null_resource.real");
       expect(allAddresses).not.toContain("null_resource.phantom");
     });
@@ -150,9 +148,7 @@ describe("buildApplyReport", () => {
       });
 
       const report = buildApplyReport(plan, scanResult);
-      const allAddresses = report.modules.flatMap((m) =>
-        m.resources.map((r) => r.address),
-      );
+      const allAddresses = report.resources!.map((r) => r.address);
       expect(allAddresses).toContain("null_resource.failing");
     });
 
@@ -172,7 +168,7 @@ describe("buildApplyReport", () => {
 
       // No apply statuses — all resources are phantoms
       const report = buildApplyReport(plan, makeScanResult());
-      expect(report.modules).toHaveLength(0);
+      expect(report.resources!).toHaveLength(0);
     });
 
     it("data sources are always excluded from resource changes", () => {
@@ -192,9 +188,7 @@ describe("buildApplyReport", () => {
       });
 
       const report = buildApplyReport(plan, scanResult);
-      const allAddresses = report.modules.flatMap((m) =>
-        m.resources.map((r) => r.address),
-      );
+      const allAddresses = report.resources!.map((r) => r.address);
       expect(allAddresses).not.toContain("data.local_command.read_config");
     });
 
@@ -226,9 +220,7 @@ describe("buildApplyReport", () => {
       const report = buildApplyReport(plan, scanResult);
 
       // Data source must NOT appear in resource changes
-      const allAddresses = report.modules.flatMap((m) =>
-        m.resources.map((r) => r.address),
-      );
+      const allAddresses = report.resources!.map((r) => r.address);
       expect(allAddresses).not.toContain("data.external.failing_query");
       // But the managed resource should still be present
       expect(allAddresses).toContain("null_resource.keeper");
@@ -308,7 +300,7 @@ describe("buildApplyReport", () => {
       });
 
       const report = buildApplyReport(plan, scanResult);
-      const resource = report.modules[0]?.resources[0];
+      const resource = report.resources?.[0];
       expect(resource).toBeDefined();
 
       const idAttr = resource?.attributes.find((a) => a.name === "id");
@@ -350,7 +342,7 @@ describe("buildApplyReport", () => {
       });
 
       const report = buildApplyReport(plan, scanResult);
-      const idAttr = report.modules[0]?.resources[0]?.attributes.find(
+      const idAttr = report.resources?.[0]?.attributes.find(
         (a) => a.name === "id",
       );
       expect(idAttr?.before).toBe("1");
@@ -633,7 +625,7 @@ describe("buildApplyReport", () => {
       });
 
       const report = buildApplyReport(plan, makeScanResult());
-      expect(report.modules).toHaveLength(0);
+      expect(report.resources!).toHaveLength(0);
       expect(report.summary).toEqual({ actions: [], failures: [] });
       expect(report.diagnostics).toBeUndefined();
       expect(report.applyStatuses).toBeUndefined();
@@ -642,7 +634,7 @@ describe("buildApplyReport", () => {
     it("handles plan with no resource changes", () => {
       const plan = makePlan();
       const report = buildApplyReport(plan, makeScanResult());
-      expect(report.modules).toHaveLength(0);
+      expect(report.resources!).toHaveLength(0);
       expect(report.summary).toEqual({ actions: [], failures: [] });
     });
 
@@ -674,9 +666,7 @@ describe("buildApplyReport", () => {
       });
 
       const report = buildApplyReport(plan, scanResult);
-      const allAddresses = report.modules.flatMap((m) =>
-        m.resources.map((r) => r.address),
-      );
+      const allAddresses = report.resources!.map((r) => r.address);
       expect(allAddresses).toContain("null_resource.ok");
     });
   });
@@ -710,9 +700,7 @@ describe("buildApplyReport", () => {
       const report = buildApplyReport(plan, scanResult);
 
       // Resource should be present (not phantom)
-      const allAddresses = report.modules.flatMap((m) =>
-        m.resources.map((r) => r.address),
-      );
+      const allAddresses = report.resources!.map((r) => r.address);
       expect(allAddresses).toContain("null_resource.replaced");
 
       // Final status should reflect the create (last outcome)
@@ -873,7 +861,7 @@ describe("buildApplyReport", () => {
         });
 
         const report = buildApplyReport(plan, scanResult);
-        const allAddresses = report.modules.flatMap((m) => m.resources.map((r) => r.address));
+        const allAddresses = report.resources!.map((r) => r.address);
         expect(allAddresses).toContain("null_resource.ephemeral");
       });
 
@@ -889,7 +877,7 @@ describe("buildApplyReport", () => {
 
         // No planned changes in scan result — detection must come from plan JSON
         const report = buildApplyReport(plan, makeScanResult());
-        const allAddresses = report.modules.flatMap((m) => m.resources.map((r) => r.address));
+        const allAddresses = report.resources!.map((r) => r.address);
         expect(allAddresses).toContain("null_resource.ephemeral");
       });
 
@@ -975,7 +963,7 @@ describe("buildApplyReport", () => {
         });
 
         const report = buildApplyReport(plan, makeScanResult());
-        const allAddresses = report.modules.flatMap((m) => m.resources.map((r) => r.address));
+        const allAddresses = report.resources!.map((r) => r.address);
         expect(allAddresses).toContain("null_resource.renamed");
       });
 
@@ -1046,7 +1034,7 @@ describe("buildApplyReport", () => {
         });
 
         const report = buildApplyReport(plan, makeScanResult());
-        const allAddresses = report.modules.flatMap((m) => m.resources.map((r) => r.address));
+        const allAddresses = report.resources!.map((r) => r.address);
         expect(allAddresses).toContain("random_string.imported");
       });
 
@@ -1139,7 +1127,7 @@ describe("buildApplyReport", () => {
         });
 
         const report = buildApplyReport(plan, scanResult);
-        const allAddresses = report.modules.flatMap((m) => m.resources.map((r) => r.address));
+        const allAddresses = report.resources!.map((r) => r.address);
         expect(allAddresses).toContain("null_resource.forgotten");
         expect(allAddresses).toContain("null_resource.renamed");
         expect(allAddresses).toContain("random_string.imported");

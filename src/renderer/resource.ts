@@ -12,6 +12,7 @@ import { ACTION_SYMBOLS } from "../model/plan-action.js";
 import { STATUS_FAILURE, DIAGNOSTIC_ERROR, DIAGNOSTIC_WARNING } from "../model/status-icons.js";
 import { formatDiff } from "./diff-format.js";
 import { renderLargeValue } from "./large-value.js";
+import { deriveInstanceName } from "./address.js";
 
 /**
  * Per-resource apply context passed when rendering apply reports.
@@ -42,7 +43,7 @@ export function renderResource(
     .filter((a) => !a.isSensitive && a.before !== a.after)
     .map((a) => a.name);
 
-  let summaryText = `${symbol} <strong>${MarkdownWriter.escapeCell(resource.type)}</strong> ${MarkdownWriter.escapeCell(resource.name)}`;
+  let summaryText = `${symbol} <strong>${MarkdownWriter.escapeCell(resource.type)}</strong> ${MarkdownWriter.escapeCell(deriveInstanceName(resource.address, resource.type))}`;
 
   if (resource.action === "update" && changedAttrs.length > 0) {
     const hint = changedAttrs.slice(0, 5).join(", ");
@@ -72,9 +73,9 @@ export function renderResource(
 
   if (resource.allUnknownAfterApply) {
     writer.paragraph("_(all values known after apply)_");
-  } else if (resource.attributes.length === 0) {
+  } else if (resource.attributes.length === 0 && resource.hasAttributeDetail) {
     writer.paragraph("_No attribute changes._");
-  } else {
+  } else if (resource.attributes.length > 0) {
     // Render small attributes table
     if (smallAttrs.length > 0) {
       writer.tableHeader(["Attribute", "Before", "After"]);
