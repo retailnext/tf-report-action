@@ -6,7 +6,10 @@ import { buildApplyReport } from "./builder/apply.js";
 import { buildReportFromSteps } from "./builder/report-from-steps.js";
 import { renderReport } from "./renderer/index.js";
 import { renderReportSections } from "./renderer/report-sections.js";
-import { composeSections, DEFAULT_MAX_OUTPUT_LENGTH } from "./compositor/index.js";
+import {
+  composeSections,
+  DEFAULT_MAX_OUTPUT_LENGTH,
+} from "./compositor/index.js";
 import { buildTruncationNotice } from "./compositor/truncation.js";
 import { STATUS_FAILURE } from "./model/status-icons.js";
 import { scanString } from "./jsonl-scanner/scan.js";
@@ -107,7 +110,9 @@ function reportFromStepsInner(
 }
 
 /** Extract logsUrl from the report. */
-function getLogsUrl(report: import("./model/report.js").Report): string | undefined {
+function getLogsUrl(
+  report: import("./model/report.js").Report,
+): string | undefined {
   return report.logsUrl;
 }
 

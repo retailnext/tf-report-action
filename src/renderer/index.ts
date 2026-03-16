@@ -12,7 +12,6 @@ import type { ApplyContext } from "./resource.js";
 import { renderDiagnostics } from "./diagnostics.js";
 import { ACTION_SYMBOLS } from "../model/plan-action.js";
 import { MODULE_ICON, DRIFT_ICON } from "../model/status-icons.js";
-import { resolveTemplate } from "../template/index.js";
 import { deriveModuleAddress } from "./address.js";
 
 // Re-export address helpers for use by other renderer files and tests
@@ -33,7 +32,9 @@ interface RendererModuleGroup {
  * Groups a flat resource array by derived module address for display.
  * Sorted: root module first, then alphabetical by module address.
  */
-function groupByModule(resources: readonly ResourceChange[]): RendererModuleGroup[] {
+function groupByModule(
+  resources: readonly ResourceChange[],
+): RendererModuleGroup[] {
   const map = new Map<string, ResourceChange[]>();
 
   for (const resource of resources) {
@@ -86,7 +87,6 @@ export function renderStructuredSections(
   report: Report,
   options: RenderOptions = {},
 ): Section[] {
-  const template = resolveTemplate(options.template ?? "default");
   const diffCache = new Map<string, DiffEntry[]>();
   const isApply = isApplyReport(report);
   const summaryHeading = isApply ? "Apply Summary" : "Plan Summary";
@@ -117,28 +117,32 @@ export function renderStructuredSections(
     if (summary) {
       renderSummary(summary, writer, isApply);
     }
-    if (template.name === "summary" && report.diagnostics !== undefined && report.diagnostics.length > 0) {
-      renderDiagnostics(report.diagnostics, writer, 2);
-    }
-    sections.push({ id: "summary", full: ensureTrailingBlankLine(writer.build()), fixed: true });
-  }
-
-  if (template.name === "summary") {
-    return sections;
+    sections.push({
+      id: "summary",
+      full: ensureTrailingBlankLine(writer.build()),
+      fixed: true,
+    });
   }
 
   // Non-resource diagnostics (between summary and resource changes)
   if (nonResourceDiags.length > 0) {
     const writer = new MarkdownWriter();
     renderDiagnostics(nonResourceDiags, writer, 2);
-    sections.push({ id: "non-resource-diagnostics", full: ensureTrailingBlankLine(writer.build()), fixed: true });
+    sections.push({
+      id: "non-resource-diagnostics",
+      full: ensureTrailingBlankLine(writer.build()),
+      fixed: true,
+    });
   }
 
   // Drift section
   if (driftResources.length > 0) {
     const writer = new MarkdownWriter();
     renderDriftSection(driftResources, writer, options, diffCache);
-    sections.push({ id: "drift", full: ensureTrailingBlankLine(writer.build()) });
+    sections.push({
+      id: "drift",
+      full: ensureTrailingBlankLine(writer.build()),
+    });
   }
 
   // Resource changes — one section per module group for granular budget control
@@ -146,7 +150,11 @@ export function renderStructuredSections(
   if (moduleGroups.length > 0) {
     const writer = new MarkdownWriter();
     writer.heading("Resource Changes", 2);
-    sections.push({ id: "resource-changes-heading", full: ensureTrailingBlankLine(writer.build()), fixed: true });
+    sections.push({
+      id: "resource-changes-heading",
+      full: ensureTrailingBlankLine(writer.build()),
+      fixed: true,
+    });
 
     for (const moduleGroup of moduleGroups) {
       const moduleLabel =
@@ -177,7 +185,10 @@ export function renderStructuredSections(
     const writer = new MarkdownWriter();
     writer.heading("Outputs", 2);
     renderOutputTable(outputs, writer);
-    sections.push({ id: "outputs", full: ensureTrailingBlankLine(writer.build()) });
+    sections.push({
+      id: "outputs",
+      full: ensureTrailingBlankLine(writer.build()),
+    });
   }
 
   return sections;
@@ -190,7 +201,10 @@ export function renderStructuredSections(
  * API (`planToMarkdown`, `applyToMarkdown`) where the output is not
  * budget-constrained.
  */
-export function renderReport(report: Report, options: RenderOptions = {}): string {
+export function renderReport(
+  report: Report,
+  options: RenderOptions = {},
+): string {
   return renderStructuredSections(report, options)
     .map((s) => s.full)
     .join("");
@@ -236,9 +250,7 @@ function buildDiagnosticMap(report: Report): Map<string, Diagnostic[]> {
  * Extracts diagnostics that are not resource-specific: those without
  * an address, or whose address doesn't match any resource in the report.
  */
-function extractNonResourceDiagnostics(
-  report: Report,
-): Diagnostic[] {
+function extractNonResourceDiagnostics(report: Report): Diagnostic[] {
   if (!report.diagnostics) return [];
 
   const resourceAddresses = new Set(
@@ -300,7 +312,10 @@ function renderDriftSection(
   options: RenderOptions,
   diffCache: Map<string, DiffEntry[]>,
 ): void {
-  writer.heading(`${DRIFT_ICON} Resource Drift (${String(driftResources.length)} detected)`, 2);
+  writer.heading(
+    `${DRIFT_ICON} Resource Drift (${String(driftResources.length)} detected)`,
+    2,
+  );
 
   const driftModules = groupByModule(driftResources);
   for (const moduleGroup of driftModules) {

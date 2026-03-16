@@ -6,11 +6,6 @@ export interface RenderOptions {
    */
   title?: string;
   /**
-   * Template to use: "default" (full report) or "summary" (summary only).
-   * Default: "default".
-   */
-  template?: string;
-  /**
    * Whether to show unchanged attributes in resource detail tables.
    * Default: false.
    */

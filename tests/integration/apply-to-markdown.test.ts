@@ -16,7 +16,6 @@ beforeAll(() => {
 
 const OPTION_VARIANTS: { name: string; options: Options }[] = [
   { name: "default", options: {} },
-  { name: "summary-template", options: { template: "summary" } },
 ];
 
 describe("applyToMarkdown integration", () => {
@@ -44,12 +43,8 @@ describe("applyToMarkdown integration", () => {
       // terraform_data.worker_b and worker_c should NOT appear as resource
       // change summaries. They may appear as data values inside attribute
       // diffs or output values, which is expected.
-      expect(result).not.toMatch(
-        /terraform_data.*worker_b/,
-      );
-      expect(result).not.toMatch(
-        /terraform_data.*worker_c/,
-      );
+      expect(result).not.toMatch(/terraform_data.*worker_b/);
+      expect(result).not.toMatch(/terraform_data.*worker_c/);
     });
 
     it("includes actually-applied resources", () => {
@@ -81,7 +76,9 @@ describe("applyToMarkdown integration", () => {
   });
 
   describe("removed-resource/1 forget operation (Terraform)", () => {
-    const fixture = fixtures.find((f) => f.label === "terraform/removed-resource/1");
+    const fixture = fixtures.find(
+      (f) => f.label === "terraform/removed-resource/1",
+    );
 
     it("includes the forgotten resource in apply output", () => {
       expect(fixture).toBeDefined();
@@ -140,7 +137,10 @@ describe("applyToMarkdown integration", () => {
     });
   });
 
-  for (const toolLabel of ["terraform/moved-resource/1", "tofu/moved-resource/1"]) {
+  for (const toolLabel of [
+    "terraform/moved-resource/1",
+    "tofu/moved-resource/1",
+  ]) {
     describe(`${toolLabel} move operation`, () => {
       const fixture = fixtures.find((f) => f.label === toolLabel);
 
@@ -172,7 +172,10 @@ describe("applyToMarkdown integration", () => {
     });
   }
 
-  for (const toolLabel of ["terraform/import-resource/1", "tofu/import-resource/1"]) {
+  for (const toolLabel of [
+    "terraform/import-resource/1",
+    "tofu/import-resource/1",
+  ]) {
     describe(`${toolLabel} state-only import`, () => {
       const fixture = fixtures.find((f) => f.label === toolLabel);
 
@@ -205,9 +208,7 @@ describe("applyToMarkdown integration", () => {
   }
 
   describe("apply-error/1 error handling", () => {
-    const fixture = fixtures.find(
-      (f) => f.label === "terraform/apply-error/1",
-    );
+    const fixture = fixtures.find((f) => f.label === "terraform/apply-error/1");
 
     it("shows failed resource with error indicator", () => {
       expect(fixture).toBeDefined();
@@ -222,9 +223,7 @@ describe("applyToMarkdown integration", () => {
       // terraform_data.depends_on_fail is a phantom — planned but never applied.
       // It should not appear as a resource change (but may appear as part of
       // output names like "depends_on_fail_output").
-      expect(result).not.toMatch(
-        /terraform_data.*depends_on_fail/,
-      );
+      expect(result).not.toMatch(/terraform_data.*depends_on_fail/);
     });
 
     it("includes inline error diagnostic for failed resource", () => {
@@ -238,10 +237,7 @@ describe("applyToMarkdown integration", () => {
 // ---------- Security: sensitive values must never appear in output ----------
 
 describe("applyToMarkdown — sensitive value masking", () => {
-  const FORBIDDEN_STRINGS = [
-    "initial-secret-value",
-    "updated-secret-value",
-  ];
+  const FORBIDDEN_STRINGS = ["initial-secret-value", "updated-secret-value"];
 
   for (const { label, planJson, applyJsonl } of fixtures) {
     if (!label.includes("sensitive-values")) continue;

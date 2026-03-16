@@ -15,7 +15,6 @@ export default defineConfig({
         "src/**/*.d.ts",
         // Type-only files with no executable code
         "src/diff/types.ts",
-        "src/template/types.ts",
         "src/builder/options.ts",
         "src/renderer/options.ts",
       ],

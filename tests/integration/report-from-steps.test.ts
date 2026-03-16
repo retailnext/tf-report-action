@@ -108,7 +108,9 @@ describe("reportFromSteps integration — plan-only fixtures", () => {
         expect(result).not.toContain("Apply Summary");
         expect(result).not.toContain("Apply Output");
         // Should have plan-related content (structured or fallback)
-        expect(result).toMatch(/Plan Summary|No Changes|Plan Output|Plan|No readable output/);
+        expect(result).toMatch(
+          /Plan Summary|No Changes|Plan Output|Plan|No readable output/,
+        );
       });
     });
   }
@@ -169,7 +171,9 @@ describe("reportFromSteps integration — apply-no-show fixtures", () => {
         };
         const result = reportFromSteps(resolved, options);
         // Should have structured content, raw output blocks, or at minimum step statuses
-        expect(result).toMatch(/Plan Summary|Apply Summary|Plan Output|Apply Output|No readable output|raw command output|stdout_file output missing|failed|attribute details|Steps/);
+        expect(result).toMatch(
+          /Plan Summary|Apply Summary|Plan Output|Apply Output|No readable output|raw command output|stdout_file output missing|failed|attribute details|Steps/,
+        );
       });
     });
   }
@@ -210,11 +214,12 @@ describe("reportFromSteps integration — apply-only fixtures", () => {
 
 describe("reportFromSteps — action classification", () => {
   it("no-op/1: truly unchanged resource produces 'No Changes' with no resource section", () => {
-    const fixture = planOnlyFixtures.find((f) =>
-      f.label.includes("no-op/1"),
-    );
+    const fixture = planOnlyFixtures.find((f) => f.label.includes("no-op/1"));
     expect(fixture).toBeDefined();
-    const resolved = resolveStepFilePaths(fixture!.stepsJson, fixture!.fixtureDir);
+    const resolved = resolveStepFilePaths(
+      fixture!.stepsJson,
+      fixture!.fixtureDir,
+    );
     const result = reportFromSteps(resolved, {
       allowedDirs: [fixture!.fixtureDir],
       env: NO_GITHUB_ENV,
@@ -223,11 +228,17 @@ describe("reportFromSteps — action classification", () => {
     expect(result).not.toContain("Resource Changes");
   });
 
-  for (const toolLabel of ["terraform/moved-resource/1/plan-only", "tofu/moved-resource/1/plan-only"]) {
+  for (const toolLabel of [
+    "terraform/moved-resource/1/plan-only",
+    "tofu/moved-resource/1/plan-only",
+  ]) {
     it(`${toolLabel}: moved resource shows 🚚 Move in summary`, () => {
       const fixture = planOnlyFixtures.find((f) => f.label === toolLabel);
       expect(fixture).toBeDefined();
-      const resolved = resolveStepFilePaths(fixture!.stepsJson, fixture!.fixtureDir);
+      const resolved = resolveStepFilePaths(
+        fixture!.stepsJson,
+        fixture!.fixtureDir,
+      );
       const result = reportFromSteps(resolved, {
         allowedDirs: [fixture!.fixtureDir],
         env: NO_GITHUB_ENV,
@@ -239,11 +250,17 @@ describe("reportFromSteps — action classification", () => {
     });
   }
 
-  for (const toolLabel of ["terraform/import-resource/1/plan-only", "tofu/import-resource/1/plan-only"]) {
+  for (const toolLabel of [
+    "terraform/import-resource/1/plan-only",
+    "tofu/import-resource/1/plan-only",
+  ]) {
     it(`${toolLabel}: imported resource shows 📥 Import in summary`, () => {
       const fixture = planOnlyFixtures.find((f) => f.label === toolLabel);
       expect(fixture).toBeDefined();
-      const resolved = resolveStepFilePaths(fixture!.stepsJson, fixture!.fixtureDir);
+      const resolved = resolveStepFilePaths(
+        fixture!.stepsJson,
+        fixture!.fixtureDir,
+      );
       const result = reportFromSteps(resolved, {
         allowedDirs: [fixture!.fixtureDir],
         env: NO_GITHUB_ENV,
@@ -256,11 +273,14 @@ describe("reportFromSteps — action classification", () => {
   }
 
   it("terraform/removed-resource/1: forgotten resource shows 👋 Forget in summary", () => {
-    const fixture = planOnlyFixtures.find((f) =>
-      f.label === "terraform/removed-resource/1/plan-only",
+    const fixture = planOnlyFixtures.find(
+      (f) => f.label === "terraform/removed-resource/1/plan-only",
     );
     expect(fixture).toBeDefined();
-    const resolved = resolveStepFilePaths(fixture!.stepsJson, fixture!.fixtureDir);
+    const resolved = resolveStepFilePaths(
+      fixture!.stepsJson,
+      fixture!.fixtureDir,
+    );
     const result = reportFromSteps(resolved, {
       allowedDirs: [fixture!.fixtureDir],
       env: NO_GITHUB_ENV,
@@ -272,11 +292,14 @@ describe("reportFromSteps — action classification", () => {
   });
 
   it("tofu/removed-resource/1: forgotten resource shows 👋 Forget in summary", () => {
-    const fixture = planOnlyFixtures.find((f) =>
-      f.label === "tofu/removed-resource/1/plan-only",
+    const fixture = planOnlyFixtures.find(
+      (f) => f.label === "tofu/removed-resource/1/plan-only",
     );
     expect(fixture).toBeDefined();
-    const resolved = resolveStepFilePaths(fixture!.stepsJson, fixture!.fixtureDir);
+    const resolved = resolveStepFilePaths(
+      fixture!.stepsJson,
+      fixture!.fixtureDir,
+    );
     const result = reportFromSteps(resolved, {
       allowedDirs: [fixture!.fixtureDir],
       env: NO_GITHUB_ENV,
@@ -291,12 +314,18 @@ describe("reportFromSteps — action classification", () => {
 // ---------- Targeted assertions for removed-resource/1 apply (forget) ----------
 
 describe("reportFromSteps — forget in apply output", () => {
-  for (const toolLabel of ["terraform/removed-resource/1", "tofu/removed-resource/1"]) {
+  for (const toolLabel of [
+    "terraform/removed-resource/1",
+    "tofu/removed-resource/1",
+  ]) {
     describe(toolLabel, () => {
       it("shows forgotten resource (not 'No Changes') in apply report", () => {
         const fixture = generatedFixtures.find((f) => f.label === toolLabel);
         expect(fixture).toBeDefined();
-        const resolved = resolveStepFilePaths(fixture!.stepsJson, fixture!.fixtureDir);
+        const resolved = resolveStepFilePaths(
+          fixture!.stepsJson,
+          fixture!.fixtureDir,
+        );
         const result = reportFromSteps(resolved, {
           allowedDirs: [fixture!.fixtureDir],
           env: NO_GITHUB_ENV,
@@ -308,7 +337,10 @@ describe("reportFromSteps — forget in apply output", () => {
       it("shows 👋 Forgotten in Apply Summary", () => {
         const fixture = generatedFixtures.find((f) => f.label === toolLabel);
         expect(fixture).toBeDefined();
-        const resolved = resolveStepFilePaths(fixture!.stepsJson, fixture!.fixtureDir);
+        const resolved = resolveStepFilePaths(
+          fixture!.stepsJson,
+          fixture!.fixtureDir,
+        );
         const result = reportFromSteps(resolved, {
           allowedDirs: [fixture!.fixtureDir],
           env: NO_GITHUB_ENV,
@@ -320,7 +352,10 @@ describe("reportFromSteps — forget in apply output", () => {
       it("uses Apply Summary heading", () => {
         const fixture = generatedFixtures.find((f) => f.label === toolLabel);
         expect(fixture).toBeDefined();
-        const resolved = resolveStepFilePaths(fixture!.stepsJson, fixture!.fixtureDir);
+        const resolved = resolveStepFilePaths(
+          fixture!.stepsJson,
+          fixture!.fixtureDir,
+        );
         const result = reportFromSteps(resolved, {
           allowedDirs: [fixture!.fixtureDir],
           env: NO_GITHUB_ENV,
@@ -335,12 +370,18 @@ describe("reportFromSteps — forget in apply output", () => {
 // ---------- Targeted assertions for state-only operations in apply output ----------
 
 describe("reportFromSteps — state-only operations in apply output", () => {
-  for (const toolLabel of ["terraform/moved-resource/1", "tofu/moved-resource/1"]) {
+  for (const toolLabel of [
+    "terraform/moved-resource/1",
+    "tofu/moved-resource/1",
+  ]) {
     describe(`${toolLabel} move operation`, () => {
       it("shows moved resource (not 'No Changes') in apply report", () => {
         const fixture = generatedFixtures.find((f) => f.label === toolLabel);
         expect(fixture).toBeDefined();
-        const resolved = resolveStepFilePaths(fixture!.stepsJson, fixture!.fixtureDir);
+        const resolved = resolveStepFilePaths(
+          fixture!.stepsJson,
+          fixture!.fixtureDir,
+        );
         const result = reportFromSteps(resolved, {
           allowedDirs: [fixture!.fixtureDir],
           env: NO_GITHUB_ENV,
@@ -352,7 +393,10 @@ describe("reportFromSteps — state-only operations in apply output", () => {
       it("shows 🚚 Moved in Apply Summary", () => {
         const fixture = generatedFixtures.find((f) => f.label === toolLabel);
         expect(fixture).toBeDefined();
-        const resolved = resolveStepFilePaths(fixture!.stepsJson, fixture!.fixtureDir);
+        const resolved = resolveStepFilePaths(
+          fixture!.stepsJson,
+          fixture!.fixtureDir,
+        );
         const result = reportFromSteps(resolved, {
           allowedDirs: [fixture!.fixtureDir],
           env: NO_GITHUB_ENV,
@@ -364,7 +408,10 @@ describe("reportFromSteps — state-only operations in apply output", () => {
       it("uses Apply Summary heading", () => {
         const fixture = generatedFixtures.find((f) => f.label === toolLabel);
         expect(fixture).toBeDefined();
-        const resolved = resolveStepFilePaths(fixture!.stepsJson, fixture!.fixtureDir);
+        const resolved = resolveStepFilePaths(
+          fixture!.stepsJson,
+          fixture!.fixtureDir,
+        );
         const result = reportFromSteps(resolved, {
           allowedDirs: [fixture!.fixtureDir],
           env: NO_GITHUB_ENV,
@@ -375,12 +422,18 @@ describe("reportFromSteps — state-only operations in apply output", () => {
     });
   }
 
-  for (const toolLabel of ["terraform/import-resource/1", "tofu/import-resource/1"]) {
+  for (const toolLabel of [
+    "terraform/import-resource/1",
+    "tofu/import-resource/1",
+  ]) {
     describe(`${toolLabel} state-only import`, () => {
       it("shows imported resource (not 'No Changes') in apply report", () => {
         const fixture = generatedFixtures.find((f) => f.label === toolLabel);
         expect(fixture).toBeDefined();
-        const resolved = resolveStepFilePaths(fixture!.stepsJson, fixture!.fixtureDir);
+        const resolved = resolveStepFilePaths(
+          fixture!.stepsJson,
+          fixture!.fixtureDir,
+        );
         const result = reportFromSteps(resolved, {
           allowedDirs: [fixture!.fixtureDir],
           env: NO_GITHUB_ENV,
@@ -392,7 +445,10 @@ describe("reportFromSteps — state-only operations in apply output", () => {
       it("shows 📥 Imported in Apply Summary", () => {
         const fixture = generatedFixtures.find((f) => f.label === toolLabel);
         expect(fixture).toBeDefined();
-        const resolved = resolveStepFilePaths(fixture!.stepsJson, fixture!.fixtureDir);
+        const resolved = resolveStepFilePaths(
+          fixture!.stepsJson,
+          fixture!.fixtureDir,
+        );
         const result = reportFromSteps(resolved, {
           allowedDirs: [fixture!.fixtureDir],
           env: NO_GITHUB_ENV,
@@ -404,7 +460,10 @@ describe("reportFromSteps — state-only operations in apply output", () => {
       it("uses Apply Summary heading", () => {
         const fixture = generatedFixtures.find((f) => f.label === toolLabel);
         expect(fixture).toBeDefined();
-        const resolved = resolveStepFilePaths(fixture!.stepsJson, fixture!.fixtureDir);
+        const resolved = resolveStepFilePaths(
+          fixture!.stepsJson,
+          fixture!.fixtureDir,
+        );
         const result = reportFromSteps(resolved, {
           allowedDirs: [fixture!.fixtureDir],
           env: NO_GITHUB_ENV,
@@ -444,7 +503,10 @@ describe("reportFromSteps integration — error fixture scenarios", () => {
       f.label.includes("validate-error/1"),
     );
     expect(fixture).toBeDefined();
-    const resolved = resolveStepFilePaths(fixture!.stepsJson, fixture!.fixtureDir);
+    const resolved = resolveStepFilePaths(
+      fixture!.stepsJson,
+      fixture!.fixtureDir,
+    );
     const result = reportFromSteps(resolved, {
       allowedDirs: [fixture!.fixtureDir],
       env: NO_GITHUB_ENV,
@@ -460,7 +522,10 @@ describe("reportFromSteps integration — error fixture scenarios", () => {
       f.label.includes("validate-error/1"),
     );
     expect(fixture).toBeDefined();
-    const resolved = resolveStepFilePaths(fixture!.stepsJson, fixture!.fixtureDir);
+    const resolved = resolveStepFilePaths(
+      fixture!.stepsJson,
+      fixture!.fixtureDir,
+    );
     const result = reportFromSteps(resolved, {
       allowedDirs: [fixture!.fixtureDir],
       workspace: "my-ws",
@@ -475,7 +540,10 @@ describe("reportFromSteps integration — error fixture scenarios", () => {
       f.label.includes("plan-error/1"),
     );
     expect(fixture).toBeDefined();
-    const resolved = resolveStepFilePaths(fixture!.stepsJson, fixture!.fixtureDir);
+    const resolved = resolveStepFilePaths(
+      fixture!.stepsJson,
+      fixture!.fixtureDir,
+    );
     const result = reportFromSteps(resolved, {
       allowedDirs: [fixture!.fixtureDir],
       env: NO_GITHUB_ENV,
@@ -491,7 +559,10 @@ describe("reportFromSteps integration — error fixture scenarios", () => {
       f.label.includes("plan-error/1"),
     );
     expect(fixture).toBeDefined();
-    const resolved = resolveStepFilePaths(fixture!.stepsJson, fixture!.fixtureDir);
+    const resolved = resolveStepFilePaths(
+      fixture!.stepsJson,
+      fixture!.fixtureDir,
+    );
     const result = reportFromSteps(resolved, {
       allowedDirs: [fixture!.fixtureDir],
       env: NO_GITHUB_ENV,
@@ -505,7 +576,10 @@ describe("reportFromSteps integration — error fixture scenarios", () => {
       f.label.includes("validate-error/1"),
     );
     expect(fixture).toBeDefined();
-    const resolved = resolveStepFilePaths(fixture!.stepsJson, fixture!.fixtureDir);
+    const resolved = resolveStepFilePaths(
+      fixture!.stepsJson,
+      fixture!.fixtureDir,
+    );
     const result = reportFromSteps(resolved, {
       allowedDirs: [fixture!.fixtureDir],
       env: NO_GITHUB_ENV,
@@ -518,11 +592,14 @@ describe("reportFromSteps integration — error fixture scenarios", () => {
 
   it("no-show fixture with readable plan stdout produces JSONL-enriched report", () => {
     // Pick a normal (non-error) fixture's no-show variant
-    const fixture = noShowFixtures.find((f) =>
-      f.label.includes("null-lifecycle") && !f.label.includes("0/"),
+    const fixture = noShowFixtures.find(
+      (f) => f.label.includes("null-lifecycle") && !f.label.includes("0/"),
     );
     expect(fixture).toBeDefined();
-    const resolved = resolveStepFilePaths(fixture!.stepsJson, fixture!.fixtureDir);
+    const resolved = resolveStepFilePaths(
+      fixture!.stepsJson,
+      fixture!.fixtureDir,
+    );
     const result = reportFromSteps(resolved, {
       allowedDirs: [fixture!.fixtureDir],
       env: NO_GITHUB_ENV,
@@ -538,7 +615,10 @@ describe("reportFromSteps integration — error fixture scenarios", () => {
       f.label.includes("null-lifecycle"),
     );
     expect(fixture).toBeDefined();
-    const resolved = resolveStepFilePaths(fixture!.stepsJson, fixture!.fixtureDir);
+    const resolved = resolveStepFilePaths(
+      fixture!.stepsJson,
+      fixture!.fixtureDir,
+    );
     const result = reportFromSteps(resolved, {
       allowedDirs: [fixture!.fixtureDir],
       maxOutputLength: 500,
@@ -552,7 +632,10 @@ describe("reportFromSteps integration — error fixture scenarios", () => {
       f.label.includes("null-lifecycle"),
     );
     expect(fixture).toBeDefined();
-    const resolved = resolveStepFilePaths(fixture!.stepsJson, fixture!.fixtureDir);
+    const resolved = resolveStepFilePaths(
+      fixture!.stepsJson,
+      fixture!.fixtureDir,
+    );
     const result = reportFromSteps(resolved, {
       allowedDirs: [fixture!.fixtureDir],
       maxOutputLength: 200,
@@ -562,7 +645,9 @@ describe("reportFromSteps integration — error fixture scenarios", () => {
         GITHUB_RUN_ATTEMPT: "2",
       },
     });
-    expect(result).toContain("https://github.com/owner/repo/actions/runs/99999/attempts/2");
+    expect(result).toContain(
+      "https://github.com/owner/repo/actions/runs/99999/attempts/2",
+    );
   });
 
   it("no-json-flags: shows structured plan from show-plan even though apply was not -json", () => {
@@ -570,7 +655,10 @@ describe("reportFromSteps integration — error fixture scenarios", () => {
       f.label.includes("no-json-flags/0"),
     );
     expect(fixture).toBeDefined();
-    const resolved = resolveStepFilePaths(fixture!.stepsJson, fixture!.fixtureDir);
+    const resolved = resolveStepFilePaths(
+      fixture!.stepsJson,
+      fixture!.fixtureDir,
+    );
     const result = reportFromSteps(resolved, {
       allowedDirs: [fixture!.fixtureDir],
       env: NO_GITHUB_ENV,
@@ -585,11 +673,14 @@ describe("reportFromSteps integration — error fixture scenarios", () => {
   });
 
   it("apply-no-show: shows JSONL-enriched apply report (no show-plan)", () => {
-    const fixture = applyNoShowFixtures.find((f) =>
-      f.label.includes("null-lifecycle") && f.label.includes("/2/"),
+    const fixture = applyNoShowFixtures.find(
+      (f) => f.label.includes("null-lifecycle") && f.label.includes("/2/"),
     );
     expect(fixture).toBeDefined();
-    const resolved = resolveStepFilePaths(fixture!.stepsJson, fixture!.fixtureDir);
+    const resolved = resolveStepFilePaths(
+      fixture!.stepsJson,
+      fixture!.fixtureDir,
+    );
     const result = reportFromSteps(resolved, {
       allowedDirs: [fixture!.fixtureDir],
       env: NO_GITHUB_ENV,
@@ -599,11 +690,14 @@ describe("reportFromSteps integration — error fixture scenarios", () => {
   });
 
   it("apply-only: shows only apply output with no plan section", () => {
-    const fixture = applyOnlyFixtures.find((f) =>
-      f.label.includes("null-lifecycle") && f.label.includes("/2/"),
+    const fixture = applyOnlyFixtures.find(
+      (f) => f.label.includes("null-lifecycle") && f.label.includes("/2/"),
     );
     expect(fixture).toBeDefined();
-    const resolved = resolveStepFilePaths(fixture!.stepsJson, fixture!.fixtureDir);
+    const resolved = resolveStepFilePaths(
+      fixture!.stepsJson,
+      fixture!.fixtureDir,
+    );
     const result = reportFromSteps(resolved, {
       allowedDirs: [fixture!.fixtureDir],
       env: NO_GITHUB_ENV,
@@ -621,7 +715,10 @@ describe("reportFromSteps integration — targeted scenarios", () => {
   it("includes logs URL when GitHub env vars are set and output is truncated", () => {
     const fixture = generatedFixtures[0];
     expect(fixture).toBeDefined();
-    const resolved = resolveStepFilePaths(fixture!.stepsJson, fixture!.fixtureDir);
+    const resolved = resolveStepFilePaths(
+      fixture!.stepsJson,
+      fixture!.fixtureDir,
+    );
     const options: ReportOptions = {
       allowedDirs: [fixture!.fixtureDir],
       maxOutputLength: 500,
@@ -632,13 +729,18 @@ describe("reportFromSteps integration — targeted scenarios", () => {
       },
     };
     const result = reportFromSteps(resolved, options);
-    expect(result).toContain("https://github.com/owner/repo/actions/runs/12345/attempts/1");
+    expect(result).toContain(
+      "https://github.com/owner/repo/actions/runs/12345/attempts/1",
+    );
   });
 
   it("includes workspace dedup marker when workspace is set", () => {
     const fixture = generatedFixtures[0];
     expect(fixture).toBeDefined();
-    const resolved = resolveStepFilePaths(fixture!.stepsJson, fixture!.fixtureDir);
+    const resolved = resolveStepFilePaths(
+      fixture!.stepsJson,
+      fixture!.fixtureDir,
+    );
     const options: ReportOptions = {
       allowedDirs: [fixture!.fixtureDir],
       workspace: "my-workspace",
@@ -652,7 +754,10 @@ describe("reportFromSteps integration — targeted scenarios", () => {
   it("handles budget pressure by truncating output", () => {
     const fixture = generatedFixtures[0];
     expect(fixture).toBeDefined();
-    const resolved = resolveStepFilePaths(fixture!.stepsJson, fixture!.fixtureDir);
+    const resolved = resolveStepFilePaths(
+      fixture!.stepsJson,
+      fixture!.fixtureDir,
+    );
     const options: ReportOptions = {
       allowedDirs: [fixture!.fixtureDir],
       maxOutputLength: 500,
@@ -663,9 +768,14 @@ describe("reportFromSteps integration — targeted scenarios", () => {
   });
 
   it("produces Tier 1 report for fixtures with show-plan.stdout", () => {
-    const fixture = generatedFixtures.find((f) => f.label.includes("null-lifecycle"));
+    const fixture = generatedFixtures.find((f) =>
+      f.label.includes("null-lifecycle"),
+    );
     expect(fixture).toBeDefined();
-    const resolved = resolveStepFilePaths(fixture!.stepsJson, fixture!.fixtureDir);
+    const resolved = resolveStepFilePaths(
+      fixture!.stepsJson,
+      fixture!.fixtureDir,
+    );
     const options: ReportOptions = {
       allowedDirs: [fixture!.fixtureDir],
       env: NO_GITHUB_ENV,
@@ -680,7 +790,10 @@ describe("reportFromSteps integration — targeted scenarios", () => {
       (f) => f.label.includes("null-lifecycle") && f.label.endsWith("/2"),
     );
     if (fixture == null) return;
-    const resolved = resolveStepFilePaths(fixture.stepsJson, fixture.fixtureDir);
+    const resolved = resolveStepFilePaths(
+      fixture.stepsJson,
+      fixture.fixtureDir,
+    );
     const options: ReportOptions = {
       allowedDirs: [fixture.fixtureDir],
       env: NO_GITHUB_ENV,
@@ -690,11 +803,14 @@ describe("reportFromSteps integration — targeted scenarios", () => {
   });
 
   it("shows error details for apply-error fixtures", () => {
-    const fixture = generatedFixtures.find(
-      (f) => f.label.includes("apply-error/1"),
+    const fixture = generatedFixtures.find((f) =>
+      f.label.includes("apply-error/1"),
     );
     if (fixture == null) return;
-    const resolved = resolveStepFilePaths(fixture.stepsJson, fixture.fixtureDir);
+    const resolved = resolveStepFilePaths(
+      fixture.stepsJson,
+      fixture.fixtureDir,
+    );
     const options: ReportOptions = {
       allowedDirs: [fixture.fixtureDir],
       env: NO_GITHUB_ENV,
@@ -724,9 +840,14 @@ describe("reportFromSteps integration — targeted scenarios", () => {
 
 describe("reportFromSteps integration — rendering quality", () => {
   it("plan-error/1: title clearly says Plan Failed", () => {
-    const fixture = generatedFixtures.find((f) => f.label.includes("plan-error/1"));
+    const fixture = generatedFixtures.find((f) =>
+      f.label.includes("plan-error/1"),
+    );
     expect(fixture).toBeDefined();
-    const resolved = resolveStepFilePaths(fixture!.stepsJson, fixture!.fixtureDir);
+    const resolved = resolveStepFilePaths(
+      fixture!.stepsJson,
+      fixture!.fixtureDir,
+    );
     const result = reportFromSteps(resolved, {
       allowedDirs: [fixture!.fixtureDir],
       env: NO_GITHUB_ENV,
@@ -736,9 +857,14 @@ describe("reportFromSteps integration — rendering quality", () => {
   });
 
   it("validate-error/1/no-show: shows graphically formatted diagnostics, not raw JSON", () => {
-    const fixture = noShowFixtures.find((f) => f.label.includes("validate-error/1"));
+    const fixture = noShowFixtures.find((f) =>
+      f.label.includes("validate-error/1"),
+    );
     expect(fixture).toBeDefined();
-    const resolved = resolveStepFilePaths(fixture!.stepsJson, fixture!.fixtureDir);
+    const resolved = resolveStepFilePaths(
+      fixture!.stepsJson,
+      fixture!.fixtureDir,
+    );
     const result = reportFromSteps(resolved, {
       allowedDirs: [fixture!.fixtureDir],
       env: NO_GITHUB_ENV,
@@ -756,7 +882,10 @@ describe("reportFromSteps integration — rendering quality", () => {
       f.label.includes("random-replace/1"),
     );
     expect(fixture).toBeDefined();
-    const resolved = resolveStepFilePaths(fixture!.stepsJson, fixture!.fixtureDir);
+    const resolved = resolveStepFilePaths(
+      fixture!.stepsJson,
+      fixture!.fixtureDir,
+    );
     const result = reportFromSteps(resolved, {
       allowedDirs: [fixture!.fixtureDir],
       env: NO_GITHUB_ENV,
@@ -772,7 +901,10 @@ describe("reportFromSteps integration — rendering quality", () => {
       f.label.includes("apply-error/1"),
     );
     expect(fixture).toBeDefined();
-    const resolved = resolveStepFilePaths(fixture!.stepsJson, fixture!.fixtureDir);
+    const resolved = resolveStepFilePaths(
+      fixture!.stepsJson,
+      fixture!.fixtureDir,
+    );
     const result = reportFromSteps(resolved, {
       allowedDirs: [fixture!.fixtureDir],
       env: NO_GITHUB_ENV,
@@ -786,7 +918,10 @@ describe("reportFromSteps integration — rendering quality", () => {
       f.label.includes("deferred-data-source/2"),
     );
     expect(fixture).toBeDefined();
-    const resolved = resolveStepFilePaths(fixture!.stepsJson, fixture!.fixtureDir);
+    const resolved = resolveStepFilePaths(
+      fixture!.stepsJson,
+      fixture!.fixtureDir,
+    );
     const result = reportFromSteps(resolved, {
       allowedDirs: [fixture!.fixtureDir],
       env: NO_GITHUB_ENV,
@@ -803,7 +938,10 @@ describe("reportFromSteps integration — rendering quality", () => {
       f.label.includes("parse-failure"),
     );
     expect(fixture).toBeDefined();
-    const resolved = resolveStepFilePaths(fixture!.stepsJson, fixture!.fixtureDir);
+    const resolved = resolveStepFilePaths(
+      fixture!.stepsJson,
+      fixture!.fixtureDir,
+    );
     const result = reportFromSteps(resolved, {
       allowedDirs: [fixture!.fixtureDir],
       env: NO_GITHUB_ENV,
@@ -811,7 +949,9 @@ describe("reportFromSteps integration — rendering quality", () => {
     // Title should NOT show ❌ — all steps succeeded
     expect(result).toMatch(/^## ✅/);
     // Should mention parse failure for show-plan
-    expect(result).toMatch(/show-plan.*could not be parsed|output could not be parsed/);
+    expect(result).toMatch(
+      /show-plan.*could not be parsed|output could not be parsed/,
+    );
     // File read errors should appear as warnings
     expect(result).toContain("plan stdout:");
   });
@@ -821,7 +961,10 @@ describe("reportFromSteps integration — rendering quality", () => {
       f.label.includes("missing-outputs"),
     );
     expect(fixture).toBeDefined();
-    const resolved = resolveStepFilePaths(fixture!.stepsJson, fixture!.fixtureDir);
+    const resolved = resolveStepFilePaths(
+      fixture!.stepsJson,
+      fixture!.fixtureDir,
+    );
     const result = reportFromSteps(resolved, {
       allowedDirs: [fixture!.fixtureDir],
       env: NO_GITHUB_ENV,
@@ -841,7 +984,10 @@ describe("reportFromSteps integration — rendering quality", () => {
       f.label.includes("unrelated-workflow"),
     );
     expect(fixture).toBeDefined();
-    const resolved = resolveStepFilePaths(fixture!.stepsJson, fixture!.fixtureDir);
+    const resolved = resolveStepFilePaths(
+      fixture!.stepsJson,
+      fixture!.fixtureDir,
+    );
     const result = reportFromSteps(resolved, {
       allowedDirs: [fixture!.fixtureDir],
       env: NO_GITHUB_ENV,
@@ -855,7 +1001,10 @@ describe("reportFromSteps integration — rendering quality", () => {
       f.label.includes("successful-workflow"),
     );
     expect(fixture).toBeDefined();
-    const resolved = resolveStepFilePaths(fixture!.stepsJson, fixture!.fixtureDir);
+    const resolved = resolveStepFilePaths(
+      fixture!.stepsJson,
+      fixture!.fixtureDir,
+    );
     const result = reportFromSteps(resolved, {
       allowedDirs: [fixture!.fixtureDir],
       env: NO_GITHUB_ENV,
@@ -876,10 +1025,7 @@ describe("reportFromSteps — sensitive value masking", () => {
    * Note: content_md5 hashes are NOT included — Terraform does not mark them
    * as sensitive, so they legitimately appear in attribute diffs.
    */
-  const FORBIDDEN_STRINGS = [
-    "initial-secret-value",
-    "updated-secret-value",
-  ];
+  const FORBIDDEN_STRINGS = ["initial-secret-value", "updated-secret-value"];
 
   function assertNoSecretLeaks(result: string, context: string): void {
     for (const secret of FORBIDDEN_STRINGS) {
@@ -891,7 +1037,10 @@ describe("reportFromSteps — sensitive value masking", () => {
   for (const fixture of generatedFixtures) {
     if (!fixture.label.includes("sensitive-values")) continue;
     it(`${fixture.label}: no sensitive values in full-workflow output`, () => {
-      const resolved = resolveStepFilePaths(fixture.stepsJson, fixture.fixtureDir);
+      const resolved = resolveStepFilePaths(
+        fixture.stepsJson,
+        fixture.fixtureDir,
+      );
       const result = reportFromSteps(resolved, {
         allowedDirs: [fixture.fixtureDir],
         env: NO_GITHUB_ENV,
@@ -904,7 +1053,10 @@ describe("reportFromSteps — sensitive value masking", () => {
   for (const fixture of planOnlyFixtures) {
     if (!fixture.label.includes("sensitive-values")) continue;
     it(`${fixture.label}: no sensitive values in plan-only output`, () => {
-      const resolved = resolveStepFilePaths(fixture.stepsJson, fixture.fixtureDir);
+      const resolved = resolveStepFilePaths(
+        fixture.stepsJson,
+        fixture.fixtureDir,
+      );
       const result = reportFromSteps(resolved, {
         allowedDirs: [fixture.fixtureDir],
         env: NO_GITHUB_ENV,
@@ -917,7 +1069,10 @@ describe("reportFromSteps — sensitive value masking", () => {
   for (const fixture of noShowFixtures) {
     if (!fixture.label.includes("sensitive-values")) continue;
     it(`${fixture.label}: no sensitive values in no-show fallback output`, () => {
-      const resolved = resolveStepFilePaths(fixture.stepsJson, fixture.fixtureDir);
+      const resolved = resolveStepFilePaths(
+        fixture.stepsJson,
+        fixture.fixtureDir,
+      );
       const result = reportFromSteps(resolved, {
         allowedDirs: [fixture.fixtureDir],
         env: NO_GITHUB_ENV,
@@ -930,7 +1085,10 @@ describe("reportFromSteps — sensitive value masking", () => {
   for (const fixture of applyNoShowFixtures) {
     if (!fixture.label.includes("sensitive-values")) continue;
     it(`${fixture.label}: no sensitive values in apply-no-show fallback output`, () => {
-      const resolved = resolveStepFilePaths(fixture.stepsJson, fixture.fixtureDir);
+      const resolved = resolveStepFilePaths(
+        fixture.stepsJson,
+        fixture.fixtureDir,
+      );
       const result = reportFromSteps(resolved, {
         allowedDirs: [fixture.fixtureDir],
         env: NO_GITHUB_ENV,
@@ -943,7 +1101,10 @@ describe("reportFromSteps — sensitive value masking", () => {
   for (const fixture of applyOnlyFixtures) {
     if (!fixture.label.includes("sensitive-values")) continue;
     it(`${fixture.label}: no sensitive values in apply-only output`, () => {
-      const resolved = resolveStepFilePaths(fixture.stepsJson, fixture.fixtureDir);
+      const resolved = resolveStepFilePaths(
+        fixture.stepsJson,
+        fixture.fixtureDir,
+      );
       const result = reportFromSteps(resolved, {
         allowedDirs: [fixture.fixtureDir],
         env: NO_GITHUB_ENV,

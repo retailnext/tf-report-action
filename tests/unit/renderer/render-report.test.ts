@@ -64,17 +64,19 @@ describe("renderReport — apply-specific rendering", () => {
   it("renders resource-specific diagnostics inline on the resource", () => {
     const report = emptyReport({
       operation: "apply",
-      resources: [{
-        address: "null_resource.broken",
-        type: "null_resource",
-        action: "create",
-        actionReason: null,
-        attributes: [],
-        hasAttributeDetail: true,
-        importId: null,
-        movedFromAddress: null,
-        allUnknownAfterApply: false,
-      }],
+      resources: [
+        {
+          address: "null_resource.broken",
+          type: "null_resource",
+          action: "create",
+          actionReason: null,
+          attributes: [],
+          hasAttributeDetail: true,
+          importId: null,
+          movedFromAddress: null,
+          allUnknownAfterApply: false,
+        },
+      ],
       diagnostics: [
         {
           severity: "error",
@@ -99,17 +101,19 @@ describe("renderReport — apply-specific rendering", () => {
   it("opens <details> for failed resources", () => {
     const report = emptyReport({
       operation: "apply",
-      resources: [{
-        address: "null_resource.broken",
-        type: "null_resource",
-        action: "create",
-        actionReason: null,
-        attributes: [],
-        hasAttributeDetail: true,
-        importId: null,
-        movedFromAddress: null,
-        allUnknownAfterApply: false,
-      }],
+      resources: [
+        {
+          address: "null_resource.broken",
+          type: "null_resource",
+          action: "create",
+          actionReason: null,
+          attributes: [],
+          hasAttributeDetail: true,
+          importId: null,
+          movedFromAddress: null,
+          allUnknownAfterApply: false,
+        },
+      ],
       applyStatuses: [
         { address: "null_resource.broken", action: "create", success: false },
       ],
@@ -155,31 +159,17 @@ describe("renderReport — apply-specific rendering", () => {
     expect(md).toContain("<code>(value not in plan)</code>");
   });
 
-  it("summary template renders all diagnostics in top-level section", () => {
-    const report = emptyReport({
-      operation: "apply",
-      diagnostics: [
-        { severity: "warning", summary: "Deprecated", detail: "" },
-        { severity: "error", summary: "Something failed", detail: "details", address: "null_resource.x" },
-      ],
-      applyStatuses: [
-        { address: "a.b", action: "update", success: true },
-      ],
-    });
-    const md = renderReport(report, { template: "summary" });
-    expect(md).toContain("## Apply Summary");
-    // Summary template puts ALL diagnostics in top-level section
-    expect(md).toContain("⚠️ **Deprecated**");
-    expect(md).toContain("🚨 **Something failed**");
-    // No resource outcomes table
-    expect(md).not.toContain("### Resource Outcomes");
-  });
-
   it("uses past-tense labels in apply summary", () => {
     const report = emptyReport({
       operation: "apply",
       summary: {
-        actions: [{ action: "create", resourceTypes: [{ type: "null_resource", count: 1 }], total: 1 }],
+        actions: [
+          {
+            action: "create",
+            resourceTypes: [{ type: "null_resource", count: 1 }],
+            total: 1,
+          },
+        ],
         failures: [],
       },
       applyStatuses: [
@@ -193,7 +183,13 @@ describe("renderReport — apply-specific rendering", () => {
   it("uses present-tense labels in plan summary", () => {
     const report = emptyReport({
       summary: {
-        actions: [{ action: "create", resourceTypes: [{ type: "null_resource", count: 1 }], total: 1 }],
+        actions: [
+          {
+            action: "create",
+            resourceTypes: [{ type: "null_resource", count: 1 }],
+            total: 1,
+          },
+        ],
         failures: [],
       },
     });
@@ -235,7 +231,11 @@ describe("renderReport — drift section", () => {
     const report = emptyReport({
       driftResources: [
         driftResource,
-        { ...driftResource, address: "module.network.aws_vpc.main", type: "aws_vpc" },
+        {
+          ...driftResource,
+          address: "module.network.aws_vpc.main",
+          type: "aws_vpc",
+        },
       ],
     });
     const md = renderReport(report);
@@ -248,17 +248,19 @@ describe("renderReport — drift section", () => {
 
   it("drift section appears between summary and resource changes", () => {
     const report = emptyReport({
-      resources: [{
-        address: "null_resource.planned",
-        type: "null_resource",
-        action: "create",
-        actionReason: null,
-        attributes: [],
-        hasAttributeDetail: true,
-        importId: null,
-        movedFromAddress: null,
-        allUnknownAfterApply: false,
-      }],
+      resources: [
+        {
+          address: "null_resource.planned",
+          type: "null_resource",
+          action: "create",
+          actionReason: null,
+          attributes: [],
+          hasAttributeDetail: true,
+          importId: null,
+          movedFromAddress: null,
+          allUnknownAfterApply: false,
+        },
+      ],
       driftResources: [driftResource],
     });
     const md = renderReport(report);

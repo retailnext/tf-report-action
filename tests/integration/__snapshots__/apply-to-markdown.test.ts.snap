@@ -63,18 +63,6 @@ terraform_data.success
 "
 `;
 
-exports[`applyToMarkdown integration > terraform/apply-error/0 > renders without error and matches snapshot [summary-template] 1`] = `
-"## Apply Summary
-
-| Action | Resource | Count |
-| --- | --- | --- |
-| ➕ Added | terraform_data | 2 |
-|  | null_resource | 1 |
-|  | **Added** | **3** |
-
-"
-`;
-
 exports[`applyToMarkdown integration > terraform/apply-error/1 > renders without error and matches snapshot [default] 1`] = `
 "## Apply Summary
 
@@ -113,24 +101,6 @@ Error running command 'exit 1': exit status 1. Output:
 | --- | --- | --- | --- |
 | depends_on_fail_output | 🔧 | <code>6991765980908842876</code> | <code>(value not in plan)</code> |
 | success_output | ⬜ | <code>stable</code> | <code>stable</code> |
-
-"
-`;
-
-exports[`applyToMarkdown integration > terraform/apply-error/1 > renders without error and matches snapshot [summary-template] 1`] = `
-"## Apply Summary
-
-| Action | Resource | Count |
-| --- | --- | --- |
-| ❌ Replace failed | null_resource | 1 |
-|  | **Replace failed** | **1** |
-
-## Errors
-
-🚨 **local-exec provisioner error** — \`null_resource.will_fail\`
-
-> Error running command 'exit 1': exit status 1. Output: 
-> \`  provisioner "local-exec" {\` in resource "null_resource" "will_fail" (line 24)
 
 "
 `;
@@ -241,18 +211,6 @@ _(all values known after apply)_
 "
 `;
 
-exports[`applyToMarkdown integration > terraform/deferred-data-source/0 > renders without error and matches snapshot [summary-template] 1`] = `
-"## Apply Summary
-
-| Action | Resource | Count |
-| --- | --- | --- |
-| ➕ Added | terraform_data | 4 |
-|  | local_file | 1 |
-|  | **Added** | **5** |
-
-"
-`;
-
 exports[`applyToMarkdown integration > terraform/deferred-data-source/1 > renders without error and matches snapshot [default] 1`] = `
 "## Apply Summary
 
@@ -310,19 +268,6 @@ terraform_data.independent
 | Output | Action | Before | After |
 | --- | --- | --- | --- |
 | config_value | 🔧 | <code>{"worker_a":"alpha","worker_b":"bravo","worker_c":"charlie"}</code> | <code>{"worker_a":"alpha","worker_b":"bravo","worker_c":"charlie"}</code> |
-
-"
-`;
-
-exports[`applyToMarkdown integration > terraform/deferred-data-source/1 > renders without error and matches snapshot [summary-template] 1`] = `
-"## Apply Summary
-
-| Action | Resource | Count |
-| --- | --- | --- |
-| ➕ Added | local_file | 1 |
-|  | **Added** | **1** |
-| 🔧 Changed | terraform_data | 1 |
-|  | **Changed** | **1** |
 
 "
 `;
@@ -395,19 +340,6 @@ _(all values known after apply)_
 "
 `;
 
-exports[`applyToMarkdown integration > terraform/deferred-data-source/2 > renders without error and matches snapshot [summary-template] 1`] = `
-"## Apply Summary
-
-| Action | Resource | Count |
-| --- | --- | --- |
-| 🔧 Changed | terraform_data | 1 |
-|  | **Changed** | **1** |
-| ± Replaced | local_file | 1 |
-|  | **Replaced** | **1** |
-
-"
-`;
-
 exports[`applyToMarkdown integration > terraform/import-resource/0 > renders without error and matches snapshot [default] 1`] = `
 "## Apply Summary
 
@@ -447,17 +379,6 @@ random_string.existing
 "
 `;
 
-exports[`applyToMarkdown integration > terraform/import-resource/0 > renders without error and matches snapshot [summary-template] 1`] = `
-"## Apply Summary
-
-| Action | Resource | Count |
-| --- | --- | --- |
-| ➕ Added | random_string | 1 |
-|  | **Added** | **1** |
-
-"
-`;
-
 exports[`applyToMarkdown integration > terraform/import-resource/1 > renders without error and matches snapshot [default] 1`] = `
 "## Apply Summary
 
@@ -482,17 +403,6 @@ random_string.imported
 _No attribute changes._
 
 </details>
-
-"
-`;
-
-exports[`applyToMarkdown integration > terraform/import-resource/1 > renders without error and matches snapshot [summary-template] 1`] = `
-"## Apply Summary
-
-| Action | Resource | Count |
-| --- | --- | --- |
-| 📥 Imported | random_string | 1 |
-|  | **Imported** | **1** |
 
 "
 `;
@@ -558,17 +468,6 @@ Line 12: end of file
 | Output | Action | Before | After |
 | --- | --- | --- | --- |
 | readme_path | ➕ |  | <code>./output/readme.txt</code> |
-
-"
-`;
-
-exports[`applyToMarkdown integration > terraform/local-files/0 > renders without error and matches snapshot [summary-template] 1`] = `
-"## Apply Summary
-
-| Action | Resource | Count |
-| --- | --- | --- |
-| ➕ Added | local_file | 1 |
-|  | **Added** | **1** |
 
 "
 `;
@@ -640,17 +539,6 @@ local_file.readme
 "
 `;
 
-exports[`applyToMarkdown integration > terraform/local-files/1 > renders without error and matches snapshot [summary-template] 1`] = `
-"## Apply Summary
-
-| Action | Resource | Count |
-| --- | --- | --- |
-| ± Replaced | local_file | 1 |
-|  | **Replaced** | **1** |
-
-"
-`;
-
 exports[`applyToMarkdown integration > terraform/moved-resource/0 > renders without error and matches snapshot [default] 1`] = `
 "## Apply Summary
 
@@ -680,17 +568,6 @@ null_resource.original
 "
 `;
 
-exports[`applyToMarkdown integration > terraform/moved-resource/0 > renders without error and matches snapshot [summary-template] 1`] = `
-"## Apply Summary
-
-| Action | Resource | Count |
-| --- | --- | --- |
-| ➕ Added | null_resource | 1 |
-|  | **Added** | **1** |
-
-"
-`;
-
 exports[`applyToMarkdown integration > terraform/moved-resource/1 > renders without error and matches snapshot [default] 1`] = `
 "## Apply Summary
 
@@ -715,17 +592,6 @@ null_resource.renamed
 _No attribute changes._
 
 </details>
-
-"
-`;
-
-exports[`applyToMarkdown integration > terraform/moved-resource/1 > renders without error and matches snapshot [summary-template] 1`] = `
-"## Apply Summary
-
-| Action | Resource | Count |
-| --- | --- | --- |
-| 🚚 Moved | null_resource | 1 |
-|  | **Moved** | **1** |
 
 "
 `;
@@ -788,17 +654,6 @@ module.parent["2"].module.child.null_resource.item[1]
 | triggers.label |  | <code><ins style="background:#dfd">2</ins></code> |
 
 </details>
-
-"
-`;
-
-exports[`applyToMarkdown integration > terraform/nested-modules/0 > renders without error and matches snapshot [summary-template] 1`] = `
-"## Apply Summary
-
-| Action | Resource | Count |
-| --- | --- | --- |
-| ➕ Added | null_resource | 3 |
-|  | **Added** | **3** |
 
 "
 `;
@@ -897,19 +752,6 @@ module.parent["3"].module.child.null_resource.item[2]
 "
 `;
 
-exports[`applyToMarkdown integration > terraform/nested-modules/1 > renders without error and matches snapshot [summary-template] 1`] = `
-"## Apply Summary
-
-| Action | Resource | Count |
-| --- | --- | --- |
-| ➕ Added | null_resource | 3 |
-|  | **Added** | **3** |
-| 🗑️ Destroyed | null_resource | 2 |
-|  | **Destroyed** | **2** |
-
-"
-`;
-
 exports[`applyToMarkdown integration > terraform/no-detailed-exitcode/0 > renders without error and matches snapshot [default] 1`] = `
 "## Apply Summary
 
@@ -935,17 +777,6 @@ null_resource.example
 | triggers.value |  | <code><ins style="background:#dfd">hello</ins></code> |
 
 </details>
-
-"
-`;
-
-exports[`applyToMarkdown integration > terraform/no-detailed-exitcode/0 > renders without error and matches snapshot [summary-template] 1`] = `
-"## Apply Summary
-
-| Action | Resource | Count |
-| --- | --- | --- |
-| ➕ Added | null_resource | 1 |
-|  | **Added** | **1** |
 
 "
 `;
@@ -979,17 +810,6 @@ null_resource.example
 "
 `;
 
-exports[`applyToMarkdown integration > terraform/no-detailed-exitcode/1 > renders without error and matches snapshot [summary-template] 1`] = `
-"## Apply Summary
-
-| Action | Resource | Count |
-| --- | --- | --- |
-| 🗑️ Destroyed | null_resource | 1 |
-|  | **Destroyed** | **1** |
-
-"
-`;
-
 exports[`applyToMarkdown integration > terraform/no-op/0 > renders without error and matches snapshot [default] 1`] = `
 "## Apply Summary
 
@@ -1019,17 +839,6 @@ null_resource.stable
 "
 `;
 
-exports[`applyToMarkdown integration > terraform/no-op/0 > renders without error and matches snapshot [summary-template] 1`] = `
-"## Apply Summary
-
-| Action | Resource | Count |
-| --- | --- | --- |
-| ➕ Added | null_resource | 1 |
-|  | **Added** | **1** |
-
-"
-`;
-
 exports[`applyToMarkdown integration > terraform/no-op/1 > renders without error and matches snapshot [default] 1`] = `
 "## Apply Summary
 
@@ -1038,23 +847,7 @@ _No changes._
 "
 `;
 
-exports[`applyToMarkdown integration > terraform/no-op/1 > renders without error and matches snapshot [summary-template] 1`] = `
-"## Apply Summary
-
-_No changes._
-
-"
-`;
-
 exports[`applyToMarkdown integration > terraform/null-lifecycle/0 > renders without error and matches snapshot [default] 1`] = `
-"## Apply Summary
-
-_No changes._
-
-"
-`;
-
-exports[`applyToMarkdown integration > terraform/null-lifecycle/0 > renders without error and matches snapshot [summary-template] 1`] = `
 "## Apply Summary
 
 _No changes._
@@ -1123,18 +916,6 @@ terraform_data.meta
 "
 `;
 
-exports[`applyToMarkdown integration > terraform/null-lifecycle/1 > renders without error and matches snapshot [summary-template] 1`] = `
-"## Apply Summary
-
-| Action | Resource | Count |
-| --- | --- | --- |
-| ➕ Added | null_resource | 2 |
-|  | terraform_data | 1 |
-|  | **Added** | **3** |
-
-"
-`;
-
 exports[`applyToMarkdown integration > terraform/null-lifecycle/2 > renders without error and matches snapshot [default] 1`] = `
 "## Apply Summary
 
@@ -1197,21 +978,6 @@ terraform_data.meta
 "
 `;
 
-exports[`applyToMarkdown integration > terraform/null-lifecycle/2 > renders without error and matches snapshot [summary-template] 1`] = `
-"## Apply Summary
-
-| Action | Resource | Count |
-| --- | --- | --- |
-| 🔧 Changed | terraform_data | 1 |
-|  | **Changed** | **1** |
-| ± Replaced | null_resource | 1 |
-|  | **Replaced** | **1** |
-| 🗑️ Destroyed | null_resource | 1 |
-|  | **Destroyed** | **1** |
-
-"
-`;
-
 exports[`applyToMarkdown integration > terraform/plan-error/0 > renders without error and matches snapshot [default] 1`] = `
 "## Apply Summary
 
@@ -1237,17 +1003,6 @@ null_resource.baseline
 | triggers.value |  | <code><ins style="background:#dfd">v1</ins></code> |
 
 </details>
-
-"
-`;
-
-exports[`applyToMarkdown integration > terraform/plan-error/0 > renders without error and matches snapshot [summary-template] 1`] = `
-"## Apply Summary
-
-| Action | Resource | Count |
-| --- | --- | --- |
-| ➕ Added | null_resource | 1 |
-|  | **Added** | **1** |
 
 "
 `;
@@ -1298,17 +1053,6 @@ random_string.token
 "
 `;
 
-exports[`applyToMarkdown integration > terraform/random-replace/0 > renders without error and matches snapshot [summary-template] 1`] = `
-"## Apply Summary
-
-| Action | Resource | Count |
-| --- | --- | --- |
-| ➕ Added | random_string | 1 |
-|  | **Added** | **1** |
-
-"
-`;
-
 exports[`applyToMarkdown integration > terraform/random-replace/1 > renders without error and matches snapshot [default] 1`] = `
 "## Apply Summary
 
@@ -1341,17 +1085,6 @@ random_string.token
 | Output | Action | Before | After |
 | --- | --- | --- | --- |
 | token_length | ⬜ | <code>16</code> | <code>16</code> |
-
-"
-`;
-
-exports[`applyToMarkdown integration > terraform/random-replace/1 > renders without error and matches snapshot [summary-template] 1`] = `
-"## Apply Summary
-
-| Action | Resource | Count |
-| --- | --- | --- |
-| ± Replaced | random_string | 1 |
-|  | **Replaced** | **1** |
 
 "
 `;
@@ -1399,17 +1132,6 @@ null_resource.keeper
 "
 `;
 
-exports[`applyToMarkdown integration > terraform/removed-resource/0 > renders without error and matches snapshot [summary-template] 1`] = `
-"## Apply Summary
-
-| Action | Resource | Count |
-| --- | --- | --- |
-| ➕ Added | null_resource | 2 |
-|  | **Added** | **2** |
-
-"
-`;
-
 exports[`applyToMarkdown integration > terraform/removed-resource/1 > renders without error and matches snapshot [default] 1`] = `
 "## Apply Summary
 
@@ -1435,17 +1157,6 @@ null_resource.ephemeral
 | triggers.version | 1 | <code><del style="background:#fdd">1</del></code> |
 
 </details>
-
-"
-`;
-
-exports[`applyToMarkdown integration > terraform/removed-resource/1 > renders without error and matches snapshot [summary-template] 1`] = `
-"## Apply Summary
-
-| Action | Resource | Count |
-| --- | --- | --- |
-| 👋 Forgotten | null_resource | 1 |
-|  | **Forgotten** | **1** |
 
 "
 `;
@@ -1496,17 +1207,6 @@ local_sensitive_file.secret
 "
 `;
 
-exports[`applyToMarkdown integration > terraform/sensitive-values/0 > renders without error and matches snapshot [summary-template] 1`] = `
-"## Apply Summary
-
-| Action | Resource | Count |
-| --- | --- | --- |
-| ➕ Added | local_sensitive_file | 1 |
-|  | **Added** | **1** |
-
-"
-`;
-
 exports[`applyToMarkdown integration > terraform/sensitive-values/1 > renders without error and matches snapshot [default] 1`] = `
 "## Apply Summary
 
@@ -1550,17 +1250,6 @@ local_sensitive_file.secret
 "
 `;
 
-exports[`applyToMarkdown integration > terraform/sensitive-values/1 > renders without error and matches snapshot [summary-template] 1`] = `
-"## Apply Summary
-
-| Action | Resource | Count |
-| --- | --- | --- |
-| ± Replaced | local_sensitive_file | 1 |
-|  | **Replaced** | **1** |
-
-"
-`;
-
 exports[`applyToMarkdown integration > terraform/validate-error/0 > renders without error and matches snapshot [default] 1`] = `
 "## Apply Summary
 
@@ -1586,17 +1275,6 @@ null_resource.baseline
 | triggers.value |  | <code><ins style="background:#dfd">v1</ins></code> |
 
 </details>
-
-"
-`;
-
-exports[`applyToMarkdown integration > terraform/validate-error/0 > renders without error and matches snapshot [summary-template] 1`] = `
-"## Apply Summary
-
-| Action | Resource | Count |
-| --- | --- | --- |
-| ➕ Added | null_resource | 1 |
-|  | **Added** | **1** |
 
 "
 `;
@@ -1665,18 +1343,6 @@ module.naming.random_string.suffix
 "
 `;
 
-exports[`applyToMarkdown integration > terraform/with-modules/0 > renders without error and matches snapshot [summary-template] 1`] = `
-"## Apply Summary
-
-| Action | Resource | Count |
-| --- | --- | --- |
-| ➕ Added | null_resource | 1 |
-|  | random_string | 1 |
-|  | **Added** | **2** |
-
-"
-`;
-
 exports[`applyToMarkdown integration > terraform/with-modules/1 > renders without error and matches snapshot [default] 1`] = `
 "## Apply Summary
 
@@ -1727,18 +1393,6 @@ module.naming.random_string.suffix
 | --- | --- | --- | --- |
 | generated_name | 🔧 | <code>fixture-dx12h5s0</code> | <code>fixture-updated-bmat2t36</code> |
 | root_id | 🔧 | <code>1416987651343215284</code> | <code>1603630222204103251</code> |
-
-"
-`;
-
-exports[`applyToMarkdown integration > terraform/with-modules/1 > renders without error and matches snapshot [summary-template] 1`] = `
-"## Apply Summary
-
-| Action | Resource | Count |
-| --- | --- | --- |
-| ± Replaced | null_resource | 1 |
-|  | random_string | 1 |
-|  | **Replaced** | **2** |
 
 "
 `;
@@ -1806,18 +1460,6 @@ terraform_data.success
 "
 `;
 
-exports[`applyToMarkdown integration > tofu/apply-error/0 > renders without error and matches snapshot [summary-template] 1`] = `
-"## Apply Summary
-
-| Action | Resource | Count |
-| --- | --- | --- |
-| ➕ Added | terraform_data | 2 |
-|  | null_resource | 1 |
-|  | **Added** | **3** |
-
-"
-`;
-
 exports[`applyToMarkdown integration > tofu/apply-error/1 > renders without error and matches snapshot [default] 1`] = `
 "## Apply Summary
 
@@ -1856,24 +1498,6 @@ Error running command 'exit 1': exit status 1. Output:
 | --- | --- | --- | --- |
 | depends_on_fail_output | 🔧 | <code>6572019016639558200</code> | <code>(value not in plan)</code> |
 | success_output | ⬜ | <code>stable</code> | <code>stable</code> |
-
-"
-`;
-
-exports[`applyToMarkdown integration > tofu/apply-error/1 > renders without error and matches snapshot [summary-template] 1`] = `
-"## Apply Summary
-
-| Action | Resource | Count |
-| --- | --- | --- |
-| ❌ Replace failed | null_resource | 1 |
-|  | **Replace failed** | **1** |
-
-## Errors
-
-🚨 **local-exec provisioner error** — \`null_resource.will_fail\`
-
-> Error running command 'exit 1': exit status 1. Output: 
-> \`  provisioner "local-exec" {\` in resource "null_resource" "will_fail" (line 24)
 
 "
 `;
@@ -1984,18 +1608,6 @@ _(all values known after apply)_
 "
 `;
 
-exports[`applyToMarkdown integration > tofu/deferred-data-source/0 > renders without error and matches snapshot [summary-template] 1`] = `
-"## Apply Summary
-
-| Action | Resource | Count |
-| --- | --- | --- |
-| ➕ Added | terraform_data | 4 |
-|  | local_file | 1 |
-|  | **Added** | **5** |
-
-"
-`;
-
 exports[`applyToMarkdown integration > tofu/deferred-data-source/1 > renders without error and matches snapshot [default] 1`] = `
 "## Apply Summary
 
@@ -2053,19 +1665,6 @@ terraform_data.independent
 | Output | Action | Before | After |
 | --- | --- | --- | --- |
 | config_value | 🔧 | <code>{"worker_a":"alpha","worker_b":"bravo","worker_c":"charlie"}</code> | <code>{"worker_a":"alpha","worker_b":"bravo","worker_c":"charlie"}</code> |
-
-"
-`;
-
-exports[`applyToMarkdown integration > tofu/deferred-data-source/1 > renders without error and matches snapshot [summary-template] 1`] = `
-"## Apply Summary
-
-| Action | Resource | Count |
-| --- | --- | --- |
-| ➕ Added | local_file | 1 |
-|  | **Added** | **1** |
-| 🔧 Changed | terraform_data | 1 |
-|  | **Changed** | **1** |
 
 "
 `;
@@ -2138,19 +1737,6 @@ _(all values known after apply)_
 "
 `;
 
-exports[`applyToMarkdown integration > tofu/deferred-data-source/2 > renders without error and matches snapshot [summary-template] 1`] = `
-"## Apply Summary
-
-| Action | Resource | Count |
-| --- | --- | --- |
-| 🔧 Changed | terraform_data | 1 |
-|  | **Changed** | **1** |
-| ± Replaced | local_file | 1 |
-|  | **Replaced** | **1** |
-
-"
-`;
-
 exports[`applyToMarkdown integration > tofu/import-resource/0 > renders without error and matches snapshot [default] 1`] = `
 "## Apply Summary
 
@@ -2190,17 +1776,6 @@ random_string.existing
 "
 `;
 
-exports[`applyToMarkdown integration > tofu/import-resource/0 > renders without error and matches snapshot [summary-template] 1`] = `
-"## Apply Summary
-
-| Action | Resource | Count |
-| --- | --- | --- |
-| ➕ Added | random_string | 1 |
-|  | **Added** | **1** |
-
-"
-`;
-
 exports[`applyToMarkdown integration > tofu/import-resource/1 > renders without error and matches snapshot [default] 1`] = `
 "## Apply Summary
 
@@ -2225,17 +1800,6 @@ random_string.imported
 _No attribute changes._
 
 </details>
-
-"
-`;
-
-exports[`applyToMarkdown integration > tofu/import-resource/1 > renders without error and matches snapshot [summary-template] 1`] = `
-"## Apply Summary
-
-| Action | Resource | Count |
-| --- | --- | --- |
-| 📥 Imported | random_string | 1 |
-|  | **Imported** | **1** |
 
 "
 `;
@@ -2301,17 +1865,6 @@ Line 12: end of file
 | Output | Action | Before | After |
 | --- | --- | --- | --- |
 | readme_path | ➕ |  | <code>./output/readme.txt</code> |
-
-"
-`;
-
-exports[`applyToMarkdown integration > tofu/local-files/0 > renders without error and matches snapshot [summary-template] 1`] = `
-"## Apply Summary
-
-| Action | Resource | Count |
-| --- | --- | --- |
-| ➕ Added | local_file | 1 |
-|  | **Added** | **1** |
 
 "
 `;
@@ -2383,17 +1936,6 @@ local_file.readme
 "
 `;
 
-exports[`applyToMarkdown integration > tofu/local-files/1 > renders without error and matches snapshot [summary-template] 1`] = `
-"## Apply Summary
-
-| Action | Resource | Count |
-| --- | --- | --- |
-| ± Replaced | local_file | 1 |
-|  | **Replaced** | **1** |
-
-"
-`;
-
 exports[`applyToMarkdown integration > tofu/moved-resource/0 > renders without error and matches snapshot [default] 1`] = `
 "## Apply Summary
 
@@ -2423,17 +1965,6 @@ null_resource.original
 "
 `;
 
-exports[`applyToMarkdown integration > tofu/moved-resource/0 > renders without error and matches snapshot [summary-template] 1`] = `
-"## Apply Summary
-
-| Action | Resource | Count |
-| --- | --- | --- |
-| ➕ Added | null_resource | 1 |
-|  | **Added** | **1** |
-
-"
-`;
-
 exports[`applyToMarkdown integration > tofu/moved-resource/1 > renders without error and matches snapshot [default] 1`] = `
 "## Apply Summary
 
@@ -2458,17 +1989,6 @@ null_resource.renamed
 _No attribute changes._
 
 </details>
-
-"
-`;
-
-exports[`applyToMarkdown integration > tofu/moved-resource/1 > renders without error and matches snapshot [summary-template] 1`] = `
-"## Apply Summary
-
-| Action | Resource | Count |
-| --- | --- | --- |
-| 🚚 Moved | null_resource | 1 |
-|  | **Moved** | **1** |
 
 "
 `;
@@ -2531,17 +2051,6 @@ module.parent["2"].module.child.null_resource.item[1]
 | triggers.label |  | <code><ins style="background:#dfd">2</ins></code> |
 
 </details>
-
-"
-`;
-
-exports[`applyToMarkdown integration > tofu/nested-modules/0 > renders without error and matches snapshot [summary-template] 1`] = `
-"## Apply Summary
-
-| Action | Resource | Count |
-| --- | --- | --- |
-| ➕ Added | null_resource | 3 |
-|  | **Added** | **3** |
 
 "
 `;
@@ -2640,19 +2149,6 @@ module.parent["3"].module.child.null_resource.item[2]
 "
 `;
 
-exports[`applyToMarkdown integration > tofu/nested-modules/1 > renders without error and matches snapshot [summary-template] 1`] = `
-"## Apply Summary
-
-| Action | Resource | Count |
-| --- | --- | --- |
-| ➕ Added | null_resource | 3 |
-|  | **Added** | **3** |
-| 🗑️ Destroyed | null_resource | 2 |
-|  | **Destroyed** | **2** |
-
-"
-`;
-
 exports[`applyToMarkdown integration > tofu/no-detailed-exitcode/0 > renders without error and matches snapshot [default] 1`] = `
 "## Apply Summary
 
@@ -2678,17 +2174,6 @@ null_resource.example
 | triggers.value |  | <code><ins style="background:#dfd">hello</ins></code> |
 
 </details>
-
-"
-`;
-
-exports[`applyToMarkdown integration > tofu/no-detailed-exitcode/0 > renders without error and matches snapshot [summary-template] 1`] = `
-"## Apply Summary
-
-| Action | Resource | Count |
-| --- | --- | --- |
-| ➕ Added | null_resource | 1 |
-|  | **Added** | **1** |
 
 "
 `;
@@ -2722,17 +2207,6 @@ null_resource.example
 "
 `;
 
-exports[`applyToMarkdown integration > tofu/no-detailed-exitcode/1 > renders without error and matches snapshot [summary-template] 1`] = `
-"## Apply Summary
-
-| Action | Resource | Count |
-| --- | --- | --- |
-| 🗑️ Destroyed | null_resource | 1 |
-|  | **Destroyed** | **1** |
-
-"
-`;
-
 exports[`applyToMarkdown integration > tofu/no-op/0 > renders without error and matches snapshot [default] 1`] = `
 "## Apply Summary
 
@@ -2762,17 +2236,6 @@ null_resource.stable
 "
 `;
 
-exports[`applyToMarkdown integration > tofu/no-op/0 > renders without error and matches snapshot [summary-template] 1`] = `
-"## Apply Summary
-
-| Action | Resource | Count |
-| --- | --- | --- |
-| ➕ Added | null_resource | 1 |
-|  | **Added** | **1** |
-
-"
-`;
-
 exports[`applyToMarkdown integration > tofu/no-op/1 > renders without error and matches snapshot [default] 1`] = `
 "## Apply Summary
 
@@ -2781,23 +2244,7 @@ _No changes._
 "
 `;
 
-exports[`applyToMarkdown integration > tofu/no-op/1 > renders without error and matches snapshot [summary-template] 1`] = `
-"## Apply Summary
-
-_No changes._
-
-"
-`;
-
 exports[`applyToMarkdown integration > tofu/null-lifecycle/0 > renders without error and matches snapshot [default] 1`] = `
-"## Apply Summary
-
-_No changes._
-
-"
-`;
-
-exports[`applyToMarkdown integration > tofu/null-lifecycle/0 > renders without error and matches snapshot [summary-template] 1`] = `
 "## Apply Summary
 
 _No changes._
@@ -2866,18 +2313,6 @@ terraform_data.meta
 "
 `;
 
-exports[`applyToMarkdown integration > tofu/null-lifecycle/1 > renders without error and matches snapshot [summary-template] 1`] = `
-"## Apply Summary
-
-| Action | Resource | Count |
-| --- | --- | --- |
-| ➕ Added | null_resource | 2 |
-|  | terraform_data | 1 |
-|  | **Added** | **3** |
-
-"
-`;
-
 exports[`applyToMarkdown integration > tofu/null-lifecycle/2 > renders without error and matches snapshot [default] 1`] = `
 "## Apply Summary
 
@@ -2940,21 +2375,6 @@ terraform_data.meta
 "
 `;
 
-exports[`applyToMarkdown integration > tofu/null-lifecycle/2 > renders without error and matches snapshot [summary-template] 1`] = `
-"## Apply Summary
-
-| Action | Resource | Count |
-| --- | --- | --- |
-| 🔧 Changed | terraform_data | 1 |
-|  | **Changed** | **1** |
-| ± Replaced | null_resource | 1 |
-|  | **Replaced** | **1** |
-| 🗑️ Destroyed | null_resource | 1 |
-|  | **Destroyed** | **1** |
-
-"
-`;
-
 exports[`applyToMarkdown integration > tofu/plan-error/0 > renders without error and matches snapshot [default] 1`] = `
 "## Apply Summary
 
@@ -2980,17 +2400,6 @@ null_resource.baseline
 | triggers.value |  | <code><ins style="background:#dfd">v1</ins></code> |
 
 </details>
-
-"
-`;
-
-exports[`applyToMarkdown integration > tofu/plan-error/0 > renders without error and matches snapshot [summary-template] 1`] = `
-"## Apply Summary
-
-| Action | Resource | Count |
-| --- | --- | --- |
-| ➕ Added | null_resource | 1 |
-|  | **Added** | **1** |
 
 "
 `;
@@ -3041,17 +2450,6 @@ random_string.token
 "
 `;
 
-exports[`applyToMarkdown integration > tofu/random-replace/0 > renders without error and matches snapshot [summary-template] 1`] = `
-"## Apply Summary
-
-| Action | Resource | Count |
-| --- | --- | --- |
-| ➕ Added | random_string | 1 |
-|  | **Added** | **1** |
-
-"
-`;
-
 exports[`applyToMarkdown integration > tofu/random-replace/1 > renders without error and matches snapshot [default] 1`] = `
 "## Apply Summary
 
@@ -3084,17 +2482,6 @@ random_string.token
 | Output | Action | Before | After |
 | --- | --- | --- | --- |
 | token_length | ⬜ | <code>16</code> | <code>16</code> |
-
-"
-`;
-
-exports[`applyToMarkdown integration > tofu/random-replace/1 > renders without error and matches snapshot [summary-template] 1`] = `
-"## Apply Summary
-
-| Action | Resource | Count |
-| --- | --- | --- |
-| ± Replaced | random_string | 1 |
-|  | **Replaced** | **1** |
 
 "
 `;
@@ -3142,17 +2529,6 @@ null_resource.keeper
 "
 `;
 
-exports[`applyToMarkdown integration > tofu/removed-resource/0 > renders without error and matches snapshot [summary-template] 1`] = `
-"## Apply Summary
-
-| Action | Resource | Count |
-| --- | --- | --- |
-| ➕ Added | null_resource | 2 |
-|  | **Added** | **2** |
-
-"
-`;
-
 exports[`applyToMarkdown integration > tofu/removed-resource/1 > renders without error and matches snapshot [default] 1`] = `
 "## Apply Summary
 
@@ -3178,17 +2554,6 @@ null_resource.ephemeral
 | triggers.version | 1 | <code><del style="background:#fdd">1</del></code> |
 
 </details>
-
-"
-`;
-
-exports[`applyToMarkdown integration > tofu/removed-resource/1 > renders without error and matches snapshot [summary-template] 1`] = `
-"## Apply Summary
-
-| Action | Resource | Count |
-| --- | --- | --- |
-| 👋 Forgotten | null_resource | 1 |
-|  | **Forgotten** | **1** |
 
 "
 `;
@@ -3239,17 +2604,6 @@ local_sensitive_file.secret
 "
 `;
 
-exports[`applyToMarkdown integration > tofu/sensitive-values/0 > renders without error and matches snapshot [summary-template] 1`] = `
-"## Apply Summary
-
-| Action | Resource | Count |
-| --- | --- | --- |
-| ➕ Added | local_sensitive_file | 1 |
-|  | **Added** | **1** |
-
-"
-`;
-
 exports[`applyToMarkdown integration > tofu/sensitive-values/1 > renders without error and matches snapshot [default] 1`] = `
 "## Apply Summary
 
@@ -3293,17 +2647,6 @@ local_sensitive_file.secret
 "
 `;
 
-exports[`applyToMarkdown integration > tofu/sensitive-values/1 > renders without error and matches snapshot [summary-template] 1`] = `
-"## Apply Summary
-
-| Action | Resource | Count |
-| --- | --- | --- |
-| ± Replaced | local_sensitive_file | 1 |
-|  | **Replaced** | **1** |
-
-"
-`;
-
 exports[`applyToMarkdown integration > tofu/validate-error/0 > renders without error and matches snapshot [default] 1`] = `
 "## Apply Summary
 
@@ -3329,17 +2672,6 @@ null_resource.baseline
 | triggers.value |  | <code><ins style="background:#dfd">v1</ins></code> |
 
 </details>
-
-"
-`;
-
-exports[`applyToMarkdown integration > tofu/validate-error/0 > renders without error and matches snapshot [summary-template] 1`] = `
-"## Apply Summary
-
-| Action | Resource | Count |
-| --- | --- | --- |
-| ➕ Added | null_resource | 1 |
-|  | **Added** | **1** |
 
 "
 `;
@@ -3408,18 +2740,6 @@ module.naming.random_string.suffix
 "
 `;
 
-exports[`applyToMarkdown integration > tofu/with-modules/0 > renders without error and matches snapshot [summary-template] 1`] = `
-"## Apply Summary
-
-| Action | Resource | Count |
-| --- | --- | --- |
-| ➕ Added | null_resource | 1 |
-|  | random_string | 1 |
-|  | **Added** | **2** |
-
-"
-`;
-
 exports[`applyToMarkdown integration > tofu/with-modules/1 > renders without error and matches snapshot [default] 1`] = `
 "## Apply Summary
 
@@ -3470,18 +2790,6 @@ module.naming.random_string.suffix
 | --- | --- | --- | --- |
 | generated_name | 🔧 | <code>fixture-3r4wm4cq</code> | <code>fixture-updated-2zar5q4q</code> |
 | root_id | 🔧 | <code>7773149748109350</code> | <code>6653873194553917674</code> |
-
-"
-`;
-
-exports[`applyToMarkdown integration > tofu/with-modules/1 > renders without error and matches snapshot [summary-template] 1`] = `
-"## Apply Summary
-
-| Action | Resource | Count |
-| --- | --- | --- |
-| ± Replaced | null_resource | 1 |
-|  | random_string | 1 |
-|  | **Replaced** | **2** |
 
 "
 `;

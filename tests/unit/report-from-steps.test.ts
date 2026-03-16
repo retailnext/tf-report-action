@@ -456,7 +456,9 @@ describe("workspace marker", () => {
     );
     expect(result).toContain("a--\\>b");
     // Must not contain unescaped --> inside the comment
-    expect(result).not.toMatch(/<!-- tf-report-action:"[^"]*(?<!\\)-->"[^>]*-->/);
+    expect(result).not.toMatch(
+      /<!-- tf-report-action:"[^"]*(?<!\\)-->"[^>]*-->/,
+    );
   });
 
   it("escapes --!> in workspace name", () => {
@@ -619,7 +621,10 @@ describe("output size limits", () => {
 describe("failed init/validate", () => {
   it("shows workflow issue section when init step failed", () => {
     const planFile = writeFile("init-fail-plan.json", MINIMAL_PLAN);
-    const stderrFile = writeFile("init-stderr.txt", "Error: provider not found");
+    const stderrFile = writeFile(
+      "init-stderr.txt",
+      "Error: provider not found",
+    );
     const result = reportFromSteps(
       stepsJson({
         init: {

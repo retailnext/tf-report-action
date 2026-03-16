@@ -16,7 +16,6 @@
  *   --format <html|markdown>     Output format (default: "html")
  *   --output <path>              Output file ("-" for stdout; default: temp file for html, stdout for markdown)
  *   --title <text>               Heading title for the report
- *   --template <default|summary> Output template (default: "default")
  *   --show-unchanged             Show unchanged attributes
  *   --diff-format <inline|simple> Diff style (default: "inline")
  *   --workspace <name>           Workspace name (for title and dedup marker)
@@ -53,7 +52,6 @@ Options:
   --output <path>               Output file ("-" for stdout)
                                 Default: temp file for html, stdout for markdown
   --title <text>                Heading title for the report
-  --template <default|summary>  Output template (default: "default")
   --show-unchanged              Show unchanged resource attributes
   --diff-format <inline|simple> Diff format for attribute changes (default: "inline")
   --workspace <name>            Workspace name for title and dedup marker
@@ -100,7 +98,9 @@ function parseArgs(argv: string[]): ParsedArgs {
       case "--format": {
         const val = argv[++i];
         if (val !== "html" && val !== "markdown") {
-          process.stderr.write(`Error: --format must be "html" or "markdown", got "${val}"\n`);
+          process.stderr.write(
+            `Error: --format must be "html" or "markdown", got "${val}"\n`,
+          );
           process.exit(1);
         }
         format = val;
@@ -112,9 +112,6 @@ function parseArgs(argv: string[]): ParsedArgs {
         break;
       case "--title":
         options.title = argv[++i];
-        break;
-      case "--template":
-        options.template = argv[++i];
         break;
       case "--show-unchanged":
         options.showUnchangedAttributes = true;
@@ -129,7 +126,10 @@ function parseArgs(argv: string[]): ParsedArgs {
         // Parse a GitHub Actions run URL into env vars for the library
         const url = argv[++i];
         if (url) {
-          const match = /github\.com\/([^/]+\/[^/]+)\/actions\/runs\/(\d+)(?:\/attempts\/(\d+))?/.exec(url);
+          const match =
+            /github\.com\/([^/]+\/[^/]+)\/actions\/runs\/(\d+)(?:\/attempts\/(\d+))?/.exec(
+              url,
+            );
           if (match) {
             reportOptions.env = {
               GITHUB_REPOSITORY: match[1],
@@ -141,7 +141,9 @@ function parseArgs(argv: string[]): ParsedArgs {
         break;
       }
       case "--allowed-dirs":
-        reportOptions.allowedDirs = (argv[++i] ?? "").split(",").filter(Boolean);
+        reportOptions.allowedDirs = (argv[++i] ?? "")
+          .split(",")
+          .filter(Boolean);
         break;
       case "--max-output-length": {
         const val = parseInt(argv[++i] ?? "", 10);
@@ -164,7 +166,8 @@ function parseArgs(argv: string[]): ParsedArgs {
   return { file, format, output, gallery, noOpen, options, reportOptions };
 }
 
-const { file, format, output, gallery, noOpen, options, reportOptions } = parseArgs(args);
+const { file, format, output, gallery, noOpen, options, reportOptions } =
+  parseArgs(args);
 
 // Markdown format always implies --no-open (no browser to open for raw text)
 const effectiveNoOpen = noOpen || format === "markdown" || output !== null;
@@ -175,10 +178,7 @@ const effectiveNoOpen = noOpen || format === "markdown" || output !== null;
 
 /** Escape a string for safe embedding in a JS template literal inside HTML. */
 function escapeForTemplateLiteral(s: string): string {
-  return s
-    .replace(/\\/g, "\\\\")
-    .replace(/`/g, "\\`")
-    .replace(/\$\{/g, "\\${");
+  return s.replace(/\\/g, "\\\\").replace(/`/g, "\\`").replace(/\$\{/g, "\\${");
 }
 
 /** Build a self-contained HTML page that renders the given markdown via CDN libs. */
@@ -270,7 +270,9 @@ async function writeOutput(
             : "xdg-open";
       execSync(`${opener} ${outPath}`);
     } catch {
-      process.stderr.write(`Could not open browser automatically. Open: file://${outPath}\n`);
+      process.stderr.write(
+        `Could not open browser automatically. Open: file://${outPath}\n`,
+      );
     }
   }
 
@@ -283,11 +285,14 @@ async function writeOutput(
 
 if (gallery) {
   if (format === "markdown") {
-    process.stderr.write("Error: --gallery only supports HTML output. Remove --format markdown.\n");
+    process.stderr.write(
+      "Error: --gallery only supports HTML output. Remove --format markdown.\n",
+    );
     process.exit(1);
   }
 
-  const { resolve, dirname, join, isAbsolute, relative } = await import("node:path");
+  const { resolve, dirname, join, isAbsolute, relative } =
+    await import("node:path");
   const { readdirSync } = await import("node:fs");
 
   const repoRoot = resolve(import.meta.dirname, "..");
@@ -299,7 +304,11 @@ if (gallery) {
       const full = join(dir, entry.name);
       if (entry.isDirectory()) {
         results.push(...findStepsFiles(full));
-      } else if (entry.isFile() && entry.name.endsWith(".json") && entry.name.includes("steps")) {
+      } else if (
+        entry.isFile() &&
+        entry.name.endsWith(".json") &&
+        entry.name.includes("steps")
+      ) {
         results.push(full);
       }
     }
@@ -314,7 +323,9 @@ if (gallery) {
     process.exit(1);
   }
 
-  process.stderr.write(`Found ${allStepsFiles.length} fixture steps files. Rendering...\n`);
+  process.stderr.write(
+    `Found ${allStepsFiles.length} fixture steps files. Rendering...\n`,
+  );
 
   // Render each fixture and collect { path, markdown }
   const entries: Array<{ path: string; markdown: string }> = [];
@@ -325,7 +336,10 @@ if (gallery) {
     try {
       json = readFileSync(absPath, "utf-8");
     } catch {
-      entries.push({ path: relPath, markdown: `> ⚠️ Failed to read ${relPath}` });
+      entries.push({
+        path: relPath,
+        markdown: `> ⚠️ Failed to read ${relPath}`,
+      });
       continue;
     }
 
@@ -341,16 +355,23 @@ if (gallery) {
       const md = reportFromSteps(json, opts);
       entries.push({ path: relPath, markdown: md });
     } catch {
-      entries.push({ path: relPath, markdown: `> ⚠️ reportFromSteps threw for ${relPath}` });
+      entries.push({
+        path: relPath,
+        markdown: `> ⚠️ reportFromSteps threw for ${relPath}`,
+      });
     }
   }
 
-  process.stderr.write(`Rendered ${entries.length} fixtures. Building gallery HTML...\n`);
+  process.stderr.write(
+    `Rendered ${entries.length} fixtures. Building gallery HTML...\n`,
+  );
 
-  const galleryDataJson = JSON.stringify(entries.map(e => ({
-    path: e.path,
-    markdown: e.markdown,
-  })));
+  const galleryDataJson = JSON.stringify(
+    entries.map((e) => ({
+      path: e.path,
+      markdown: e.markdown,
+    })),
+  );
 
   const galleryHtml = buildGalleryHtml(galleryDataJson);
   const outPath = output ?? "/tmp/tf-plan-gallery.html";
@@ -376,11 +397,15 @@ if (gallery) {
               : "xdg-open";
         execSync(`${opener} ${outPath}`);
       } catch {
-        process.stderr.write(`Could not open browser automatically. Open: file://${outPath}\n`);
+        process.stderr.write(
+          `Could not open browser automatically. Open: file://${outPath}\n`,
+        );
       }
     }
 
-    process.stderr.write(`Gallery written to ${outPath} (${entries.length} fixtures)\n`);
+    process.stderr.write(
+      `Gallery written to ${outPath} (${entries.length} fixtures)\n`,
+    );
   }
 }
 
@@ -400,7 +425,7 @@ function buildGalleryHtml(entriesJson: string): string {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>tf-plan-md Fixture Gallery</title>
+  <title>tf-report-action Fixture Gallery</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
@@ -704,7 +729,10 @@ function resolveRelativeFilePaths(
   joinFn: (...segments: string[]) => string,
   isAbsoluteFn: (p: string) => boolean,
 ): string {
-  const steps = JSON.parse(json) as Record<string, { outputs?: Record<string, string> }>;
+  const steps = JSON.parse(json) as Record<
+    string,
+    { outputs?: Record<string, string> }
+  >;
   for (const stepData of Object.values(steps)) {
     if (stepData.outputs == null) continue;
     for (const key of ["stdout_file", "stderr_file"]) {

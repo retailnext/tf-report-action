@@ -22,9 +22,11 @@ beforeAll(() => {
  */
 const OPTION_VARIANTS: { name: string; options: Options }[] = [
   { name: "default", options: {} },
-  { name: "showUnchangedAttributes", options: { showUnchangedAttributes: true } },
+  {
+    name: "showUnchangedAttributes",
+    options: { showUnchangedAttributes: true },
+  },
   { name: "diffFormat-simple", options: { diffFormat: "simple" } },
-  { name: "summary-template", options: { template: "summary" } },
 ];
 
 describe("planToMarkdown integration", () => {
@@ -43,10 +45,7 @@ describe("planToMarkdown integration", () => {
 // ---------- Security: sensitive values must never appear in output ----------
 
 describe("planToMarkdown — sensitive value masking", () => {
-  const FORBIDDEN_STRINGS = [
-    "initial-secret-value",
-    "updated-secret-value",
-  ];
+  const FORBIDDEN_STRINGS = ["initial-secret-value", "updated-secret-value"];
 
   for (const { label, json } of fixtures) {
     if (!label.includes("sensitive-values")) continue;

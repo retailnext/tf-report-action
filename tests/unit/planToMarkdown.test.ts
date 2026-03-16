@@ -147,7 +147,9 @@ describe("planToMarkdown", () => {
 
     it("shows non-sensitive attributes normally", () => {
       // username is not sensitive and unchanged — only shown with showUnchangedAttributes
-      const resultWithAll = planToMarkdown(SENSITIVE_PLAN, { showUnchangedAttributes: true });
+      const resultWithAll = planToMarkdown(SENSITIVE_PLAN, {
+        showUnchangedAttributes: true,
+      });
       expect(resultWithAll).toContain("username");
     });
   });
@@ -170,13 +172,6 @@ describe("planToMarkdown", () => {
   });
 
   describe("options", () => {
-    it("uses summary template when specified", () => {
-      const result = planToMarkdown(CREATE_PLAN, { template: "summary" });
-      expect(result).toContain("Plan Summary");
-      // Summary template should not have resource details
-      expect(result).not.toContain("<details>");
-    });
-
     it("includes custom title heading when title is provided", () => {
       const result = planToMarkdown(EMPTY_PLAN, { title: "My Custom Title" });
       expect(result).toContain("My Custom Title");
@@ -227,8 +222,12 @@ describe("planToMarkdown", () => {
           },
         ],
       });
-      const withoutUnchanged = planToMarkdown(plan, { showUnchangedAttributes: false });
-      const withUnchanged = planToMarkdown(plan, { showUnchangedAttributes: true });
+      const withoutUnchanged = planToMarkdown(plan, {
+        showUnchangedAttributes: false,
+      });
+      const withUnchanged = planToMarkdown(plan, {
+        showUnchangedAttributes: true,
+      });
 
       expect(withoutUnchanged).not.toContain('"same"');
       expect(withUnchanged).toContain("unchanged");
