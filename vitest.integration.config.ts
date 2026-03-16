@@ -25,7 +25,6 @@ export default defineConfig({
         "src/env/**",
         "src/**/*.d.ts",
         "src/diff/types.ts",
-        "src/template/types.ts",
         "src/builder/options.ts",
         "src/renderer/options.ts",
         // Error-path branches in the parser are covered by unit tests, not integration tests.
@@ -40,6 +39,12 @@ export default defineConfig({
         "src/steps/index.ts",
         "src/compositor/index.ts",
         "src/compositor/types.ts",
+        // The action module is the GitHub Action entry point — it is exercised
+        // by unit tests with mocked clients, not integration tests.
+        "src/action/**",
+        // The GitHub API client requires real HTTP calls and cannot be exercised
+        // by integration tests that use fixture data.
+        "src/github/**",
       ],
       thresholds: {
         lines: 90,

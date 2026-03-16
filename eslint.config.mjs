@@ -55,12 +55,18 @@ export default tseslint.config(
     // flags (isSensitive, isKnownAfterApply) for logic, never string comparison.
     files: ["src/renderer/**/*.ts"],
     rules: {
-      "no-restricted-imports": ["error", {
-        paths: [{
-          name: "../model/sentinels.js",
-          message: "Renderer must not import sentinel strings. Use boolean flags (isSensitive, isKnownAfterApply) instead of string comparison.",
-        }],
-      }],
+      "no-restricted-imports": [
+        "error",
+        {
+          paths: [
+            {
+              name: "../model/sentinels.js",
+              message:
+                "Renderer must not import sentinel strings. Use boolean flags (isSensitive, isKnownAfterApply) instead of string comparison.",
+            },
+          ],
+        },
+      ],
     },
   },
   {
@@ -71,6 +77,71 @@ export default tseslint.config(
       "@typescript-eslint/consistent-indexed-object-style": "off",
       "@typescript-eslint/no-empty-object-type": "off",
       "@typescript-eslint/explicit-module-boundary-types": "off",
+    },
+  },
+  {
+    // The action layer may only import from entry points, model, github, and env.
+    // It must not reach into internal library modules.
+    files: ["src/action/**/*.ts"],
+    rules: {
+      "no-restricted-imports": [
+        "error",
+        {
+          patterns: [
+            {
+              group: [
+                "../builder/*",
+                "../renderer/*",
+                "../compositor/*",
+                "../diff/*",
+                "../flattener/*",
+                "../sensitivity/*",
+                "../raw-formatter/*",
+                "../parser/*",
+                "../steps/*",
+                "../jsonl-scanner/*",
+                "../tfjson/*",
+              ],
+              message:
+                "The action layer may only import from src/index.js, src/model/, src/github/, and src/env/.",
+            },
+          ],
+        },
+      ],
+    },
+  },
+  {
+    // The GitHub API client may only import from model (if needed).
+    // It must not reach into any library internals.
+    files: ["src/github/**/*.ts"],
+    rules: {
+      "no-restricted-imports": [
+        "error",
+        {
+          patterns: [
+            {
+              group: [
+                "../builder/*",
+                "../renderer/*",
+                "../compositor/*",
+                "../diff/*",
+                "../flattener/*",
+                "../sensitivity/*",
+                "../raw-formatter/*",
+                "../parser/*",
+                "../steps/*",
+                "../jsonl-scanner/*",
+                "../tfjson/*",
+                "../action/*",
+                "../env/*",
+                "../index.js",
+              ],
+              message:
+                "The GitHub client may only import from src/model/ (if needed).",
+            },
+          ],
+        },
+      ],
     },
   },
   {
