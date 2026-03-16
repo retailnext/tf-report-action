@@ -1,5 +1,7 @@
 node_modules/
 dist/
+!dist/index.js
+!dist/index.js.map
 coverage/
 
 # Fixture generation temp dirs and Terraform artifacts

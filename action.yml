@@ -1,0 +1,50 @@
+name: "TF Report Action"
+description: >-
+  Reports OpenTofu/Terraform workflow status as PR comments or status issues
+  with rich plan/apply detail
+author: "retailnext"
+inputs:
+  steps:
+    description: "JSON string of workflow steps (use ${{ toJSON(steps) }})"
+    required: true
+  workspace:
+    description: >-
+      Workspace name used in the comment title, status issue title, and
+      deduplication marker. If not provided, defaults to
+      GITHUB_WORKFLOW/GITHUB_JOB.
+    required: false
+  target-step:
+    description: >-
+      Optional step ID to focus the report on. When specified, the report
+      treats this step being skipped or failing as a serious error that is
+      prominently reported. Most useful for non-IaC use cases.
+    required: false
+  github-token:
+    description: >-
+      GitHub token for API calls. In PR context, requires pull-requests: write.
+      In non-PR context (status issues), requires issues: write. Both are
+      needed if the workflow triggers on both push and pull_request.
+    required: true
+  init-step:
+    description: "Step ID for the init step"
+    required: false
+    default: "init"
+  validate-step:
+    description: "Step ID for the validate step"
+    required: false
+    default: "validate"
+  plan-step:
+    description: "Step ID for the plan step"
+    required: false
+    default: "plan"
+  show-plan-step:
+    description: "Step ID for the show-plan step"
+    required: false
+    default: "show-plan"
+  apply-step:
+    description: "Step ID for the apply step"
+    required: false
+    default: "apply"
+runs:
+  using: "node24"
+  main: "dist/index.js"
