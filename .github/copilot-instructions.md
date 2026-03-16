@@ -299,59 +299,57 @@ reading a file from `tests/fixtures/generated/<tool>/<workspace>/<N>/show-plan.s
 
 ## Development Tools
 
-### `scripts/render-plan.ts` — local HTML preview
+### `scripts/render.ts` — local render tool
 
-`scripts/render-plan.ts` is a developer tool that renders a plan JSON file to a
-browser-viewable HTML page. It calls `planToMarkdown()` (or `applyToMarkdown()` when
-`--apply` is provided), writes the result to `/tmp/tf-plan-preview.html` (using
-**marked** and **DOMPurify** from jsDelivr CDN), and opens the file in the default browser.
+`scripts/render.ts` renders a steps.json file to markdown or a browser-viewable HTML
+page. It uses `reportFromSteps()` as its sole rendering API. Output format is
+controlled by `--format` (default: `html`).
 
 ```bash
-# Render a fixture plan
-npm run render -- tests/fixtures/generated/terraform/null-lifecycle/2/show-plan.stdout
+# Render a fixture to HTML and open in browser
+npm run render -- tests/fixtures/generated/terraform/null-lifecycle/2/steps.json
 
-# Render an apply report (plan + apply output)
-npm run render -- show-plan.stdout --apply apply.stdout --title "PR #42"
+# Render to markdown on stdout
+npm run render -- steps.json --format markdown --output -
 
-# Render from steps context (most common in CI integration)
-npm run render -- --steps tests/fixtures/generated/terraform/null-lifecycle/2/steps.json
+# Render to a markdown file
+npm run render -- steps.json --format markdown --output report.md
 
 # With options
-npm run render -- show-plan.stdout --title "PR #42" --template summary
-npm run render -- show-plan.stdout --show-unchanged --diff-format simple
+npm run render -- steps.json --title "PR #42" --template summary --no-open
 
 # Open the fixture gallery (all fixtures rendered in a navigable HTML page)
 npm run gallery -- --no-open
 
 # From stdin
-cat show-plan.stdout | npm run render --
+cat steps.json | npm run render -- -
 ```
 
 **Supported flags** (each maps 1:1 to an `Options` field or a render-script behaviour):
 
 | Flag | `Options` field / behaviour | Default |
 |---|---|---|
-| `--steps <file>` | Steps JSON file; uses `reportFromSteps` instead of `planToMarkdown` | _(plan-only mode)_ |
-| `--apply <file>` | Reads apply JSON Lines; calls `applyToMarkdown` instead of `planToMarkdown` | _(plan-only mode)_ |
+| `--format <html\|markdown>` | Output format; `markdown` implies `--no-open` | `"html"` |
+| `--output <path>` / `-o` | Output file; `"-"` for stdout | temp file (html), stdout (markdown) |
 | `--title <text>` | `title` | _(none)_ |
 | `--template <default\|summary>` | `template` | `"default"` |
 | `--show-unchanged` | `showUnchangedAttributes` | `false` |
 | `--diff-format <inline\|simple>` | `diffFormat` | `"inline"` |
 | `--workspace <name>` | `workspace` (for title and dedup marker) | _(none)_ |
 | `--logs-url <url>` | Parses a GitHub Actions run URL into `env` vars | _(none)_ |
-| `--allowed-dirs <dirs>` | Comma-separated allowed directories for file reading | _(runner temp)_ |
+| `--allowed-dirs <dirs>` | Comma-separated allowed directories for file reading | _(directory of input file)_ |
 | `--max-output-length <n>` | Maximum output length in characters | `64512` (63 KiB) |
-| `--gallery` | Render all fixture steps JSONs into a navigable gallery HTML page | _(off)_ |
+| `--gallery` | Render all fixture steps JSONs into a navigable gallery HTML page (HTML only) | _(off)_ |
 | `--no-open` | Suppress browser opening (write HTML only) | _(browser opens by default)_ |
 
 The **gallery** (`npm run gallery`) renders all fixture steps JSON files into a single
 HTML page with keyboard navigation (←/→ arrows), text filtering, and a "Copy Markdown"
 button for each fixture. It uses marked.js and DOMPurify loaded from CDN — no npm UI
-dependencies are added to the project.
+dependencies are added to the project. Gallery mode only supports HTML output.
 
 **Maintenance rule:** When `Options` (defined across `src/renderer/options.ts` and
 `src/builder/options.ts`) gains, loses, or renames a field, update `parseArgs()` in
-`scripts/render-plan.ts` to keep the CLI flags in sync. The flag table above must
+`scripts/render.ts` to keep the CLI flags in sync. The flag table above must
 also be kept current.
 
 **Agent constraint — browser opening is forbidden:** Agents must **never** run any
@@ -360,7 +358,8 @@ command that causes the user's browser to open. This includes:
 - Any shell command invoking `open`, `xdg-open`, or `start` with a file or URL
 - Any other script or tool that has a side effect of opening a browser window
 
-When running `npm run render` as part of any task, always append `--no-open`:
+When running `npm run render` as part of any task, always append `--no-open` and use
+`--format markdown` to get raw markdown output:
 ```bash
-npm run render -- show-plan.stdout --no-open
+npm -s run render -- steps.json --format markdown --no-open --output -
 ```

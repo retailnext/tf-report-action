@@ -1,38 +1,37 @@
 #!/usr/bin/env tsx
 /**
- * scripts/render-plan.ts
+ * scripts/render.ts
  *
- * Renders a Terraform/OpenTofu plan JSON file to a browser-viewable HTML
- * preview. Writes to /tmp/tf-plan-preview.html and opens it in the default
- * browser (unless --no-open is passed).
+ * Renders a steps.json file to markdown or a browser-viewable HTML preview.
+ * Uses `reportFromSteps` as the sole rendering API.
  *
  * Usage:
- *   npm run render -- path/to/show-plan.stdout
- *   npm run render -- show-plan.stdout --template summary --title "My PR"
- *   npm run render -- show-plan.stdout --apply apply.stdout --title "PR #42"
- *   npm run render -- --steps path/to/steps.json --workspace myws
- *   cat show-plan.stdout | npm run render --
+ *   npm run render -- path/to/steps.json
+ *   npm run render -- steps.json --format markdown --output -
+ *   npm run render -- steps.json --format markdown --output report.md
+ *   npm run render -- - < steps.json
+ *   npm run render -- --gallery
  *
  * Flags:
- *   --steps <file>              Steps JSON file (uses reportFromSteps)
- *   --apply <file>              Apply JSONL file (renders apply report)
- *   --title <text>              Heading title for the report
- *   --template <default|summary>  Output template (default: "default")
- *   --show-unchanged            Show unchanged attributes
+ *   --format <html|markdown>     Output format (default: "html")
+ *   --output <path>              Output file ("-" for stdout; default: temp file for html, stdout for markdown)
+ *   --title <text>               Heading title for the report
+ *   --template <default|summary> Output template (default: "default")
+ *   --show-unchanged             Show unchanged attributes
  *   --diff-format <inline|simple> Diff style (default: "inline")
- *   --workspace <name>          Workspace name (for title and dedup marker)
- *   --logs-url <url>            Logs URL for truncation notices
- *   --allowed-dirs <dirs>       Comma-separated allowed directories for file reading
- *   --max-output-length <n>     Maximum output length in characters
+ *   --workspace <name>           Workspace name (for title and dedup marker)
+ *   --logs-url <url>             Logs URL for truncation notices
+ *   --allowed-dirs <dirs>        Comma-separated allowed directories for file reading
+ *   --max-output-length <n>      Maximum output length in characters
  *   --gallery                    Render all fixture steps JSONs into a gallery HTML page
- *   --no-open                   Write the HTML file but do not open a browser
- *   --help                      Show this help text
+ *   --no-open                    Write the HTML file but do not open a browser
+ *   --help                       Show this help text
  */
 
 import { readFileSync } from "node:fs";
 import { writeFile } from "node:fs/promises";
 import { execSync } from "node:child_process";
-import { planToMarkdown, applyToMarkdown, reportFromSteps } from "../src/index.js";
+import { reportFromSteps } from "../src/index.js";
 import type { Options, ReportOptions } from "../src/index.js";
 
 // ---------------------------------------------------------------------------
@@ -42,41 +41,44 @@ import type { Options, ReportOptions } from "../src/index.js";
 const args = process.argv.slice(2);
 
 if (args.includes("--help") || args.includes("-h")) {
-  console.log(`Usage: npm run render -- [plan.json] [options]
+  console.log(`Usage: npm run render -- <steps.json> [options]
+         npm run render -- - [options]        (read from stdin)
+         npm run render -- --gallery [options]
 
-Renders a Terraform/OpenTofu plan JSON file to a browser HTML preview.
-Reads the plan from the given file path, or from stdin if the path is "-" or omitted.
+Renders a steps.json file using reportFromSteps. Output can be HTML (default)
+or raw markdown.
 
 Options:
-  --steps <file>                  Steps JSON file (uses reportFromSteps instead of low-level API)
-  --apply <file>                  Apply JSONL file (renders apply report instead of plan)
-  --title <text>                  Heading title for the report
-  --template <default|summary>    Output template (default: "default")
-  --show-unchanged                Show unchanged resource attributes
-  --diff-format <inline|simple>   Diff format for attribute changes (default: "inline")
-  --workspace <name>              Workspace name for title and dedup marker
-  --logs-url <url>                Logs URL for truncation notices (parses into env vars)
-  --allowed-dirs <dirs>           Comma-separated allowed directories for file reading
-  --max-output-length <n>         Maximum output length in characters
-  --gallery                       Render all fixture steps JSONs into a browsable gallery
-  --no-open                       Write the HTML file but do not open a browser
-  --help                          Show this help text
+  --format <html|markdown>      Output format (default: "html")
+  --output <path>               Output file ("-" for stdout)
+                                Default: temp file for html, stdout for markdown
+  --title <text>                Heading title for the report
+  --template <default|summary>  Output template (default: "default")
+  --show-unchanged              Show unchanged resource attributes
+  --diff-format <inline|simple> Diff format for attribute changes (default: "inline")
+  --workspace <name>            Workspace name for title and dedup marker
+  --logs-url <url>              Logs URL for truncation notices (parses into env vars)
+  --allowed-dirs <dirs>         Comma-separated allowed directories for file reading
+  --max-output-length <n>       Maximum output length in characters
+  --gallery                     Render all fixture steps JSONs into a browsable gallery
+  --no-open                     Write the HTML file but do not open a browser
+  --help                        Show this help text
 
 Examples:
-  npm run render -- tests/fixtures/generated/terraform/null-lifecycle/2/show-plan.stdout
-  npm run render -- show-plan.stdout --template summary --title "PR #42"
-  npm run render -- show-plan.stdout --apply apply.stdout --title "PR #42"
-  npm run render -- --steps tests/fixtures/generated/terraform/null-lifecycle/2/steps.json
-  npm run render -- --steps steps.json --workspace myws --no-open
-  cat show-plan.stdout | npm run render --
+  npm run render -- tests/fixtures/generated/terraform/null-lifecycle/2/steps.json
+  npm run render -- steps.json --format markdown --output -
+  npm run render -- steps.json --format markdown --output report.md
+  npm run render -- steps.json --workspace myws --no-open
+  npm run render -- --gallery --no-open
+  cat steps.json | npm run render -- -
 `);
   process.exit(0);
 }
 
 interface ParsedArgs {
   file: string | null;
-  applyFile: string | null;
-  stepsFile: string | null;
+  format: "html" | "markdown";
+  output: string | null;
   gallery: boolean;
   noOpen: boolean;
   options: Options;
@@ -87,19 +89,26 @@ function parseArgs(argv: string[]): ParsedArgs {
   const options: Options = {};
   const reportOptions: Partial<ReportOptions> = {};
   let file: string | null = null;
-  let applyFile: string | null = null;
-  let stepsFile: string | null = null;
+  let format: "html" | "markdown" = "html";
+  let output: string | null = null;
   let gallery = false;
   let noOpen = false;
 
   for (let i = 0; i < argv.length; i++) {
     const arg = argv[i];
     switch (arg) {
-      case "--steps":
-        stepsFile = argv[++i] ?? null;
+      case "--format": {
+        const val = argv[++i];
+        if (val !== "html" && val !== "markdown") {
+          process.stderr.write(`Error: --format must be "html" or "markdown", got "${val}"\n`);
+          process.exit(1);
+        }
+        format = val;
         break;
-      case "--apply":
-        applyFile = argv[++i] ?? null;
+      }
+      case "--output":
+      case "-o":
+        output = argv[++i] ?? null;
         break;
       case "--title":
         options.title = argv[++i];
@@ -152,10 +161,13 @@ function parseArgs(argv: string[]): ParsedArgs {
     }
   }
 
-  return { file, applyFile, stepsFile, gallery, noOpen, options, reportOptions };
+  return { file, format, output, gallery, noOpen, options, reportOptions };
 }
 
-const { file, applyFile, stepsFile, gallery, noOpen, options, reportOptions } = parseArgs(args);
+const { file, format, output, gallery, noOpen, options, reportOptions } = parseArgs(args);
+
+// Markdown format always implies --no-open (no browser to open for raw text)
+const effectiveNoOpen = noOpen || format === "markdown" || output !== null;
 
 // ---------------------------------------------------------------------------
 // Shared: Build HTML and write to /tmp
@@ -169,10 +181,10 @@ function escapeForTemplateLiteral(s: string): string {
     .replace(/\$\{/g, "\\${");
 }
 
-async function renderAndWrite(markdown: string, title: string | undefined, suppressOpen: boolean): Promise<void> {
+/** Build a self-contained HTML page that renders the given markdown via CDN libs. */
+function buildSingleHtml(markdown: string, title: string | undefined): string {
   const escapedMarkdown = escapeForTemplateLiteral(markdown);
-
-  const html = `<!DOCTYPE html>
+  return `<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -219,18 +231,36 @@ async function renderAndWrite(markdown: string, title: string | undefined, suppr
   </script>
 </body>
 </html>`;
+}
 
-  const outPath = "/tmp/tf-plan-preview.html";
+/** Write output in the requested format and optionally open a browser. */
+async function writeOutput(
+  markdown: string,
+  title: string | undefined,
+  fmt: "html" | "markdown",
+  outputPath: string | null,
+  suppressOpen: boolean,
+): Promise<void> {
+  const content = fmt === "html" ? buildSingleHtml(markdown, title) : markdown;
+  const ext = fmt === "html" ? ".html" : ".md";
+
+  // Determine where to write
+  if (outputPath === "-" || (outputPath === null && fmt === "markdown")) {
+    process.stdout.write(content);
+    return;
+  }
+
+  const outPath = outputPath ?? `/tmp/tf-plan-preview${ext}`;
 
   try {
-    await writeFile(outPath, html, "utf-8");
+    await writeFile(outPath, content, "utf-8");
   } catch (err) {
     const msg = err instanceof Error ? err.message : String(err);
-    process.stderr.write(`Error writing HTML file: ${msg}\n`);
+    process.stderr.write(`Error writing output file: ${msg}\n`);
     process.exit(1);
   }
 
-  if (!suppressOpen) {
+  if (!suppressOpen && fmt === "html") {
     try {
       const opener =
         process.platform === "darwin"
@@ -244,7 +274,7 @@ async function renderAndWrite(markdown: string, title: string | undefined, suppr
     }
   }
 
-  console.log(`Preview written to ${outPath}`);
+  process.stderr.write(`Output written to ${outPath}\n`);
 }
 
 // ---------------------------------------------------------------------------
@@ -252,8 +282,13 @@ async function renderAndWrite(markdown: string, title: string | undefined, suppr
 // ---------------------------------------------------------------------------
 
 if (gallery) {
+  if (format === "markdown") {
+    process.stderr.write("Error: --gallery only supports HTML output. Remove --format markdown.\n");
+    process.exit(1);
+  }
+
   const { resolve, dirname, join, isAbsolute, relative } = await import("node:path");
-  const { readdirSync, statSync } = await import("node:fs");
+  const { readdirSync } = await import("node:fs");
 
   const repoRoot = resolve(import.meta.dirname, "..");
 
@@ -279,7 +314,7 @@ if (gallery) {
     process.exit(1);
   }
 
-  console.log(`Found ${allStepsFiles.length} fixture steps files. Rendering...`);
+  process.stderr.write(`Found ${allStepsFiles.length} fixture steps files. Rendering...\n`);
 
   // Render each fixture and collect { path, markdown }
   const entries: Array<{ path: string; markdown: string }> = [];
@@ -310,7 +345,7 @@ if (gallery) {
     }
   }
 
-  console.log(`Rendered ${entries.length} fixtures. Building gallery HTML...`);
+  process.stderr.write(`Rendered ${entries.length} fixtures. Building gallery HTML...\n`);
 
   const galleryDataJson = JSON.stringify(entries.map(e => ({
     path: e.path,
@@ -318,32 +353,35 @@ if (gallery) {
   })));
 
   const galleryHtml = buildGalleryHtml(galleryDataJson);
-  const outPath = "/tmp/tf-plan-gallery.html";
+  const outPath = output ?? "/tmp/tf-plan-gallery.html";
 
-  try {
-    await writeFile(outPath, galleryHtml, "utf-8");
-  } catch (err) {
-    const msg = err instanceof Error ? err.message : String(err);
-    process.stderr.write(`Error writing gallery HTML: ${msg}\n`);
-    process.exit(1);
-  }
-
-  if (!noOpen) {
+  if (outPath === "-") {
+    process.stdout.write(galleryHtml);
+  } else {
     try {
-      const opener =
-        process.platform === "darwin"
-          ? "open"
-          : process.platform === "win32"
-            ? "start"
-            : "xdg-open";
-      execSync(`${opener} ${outPath}`);
-    } catch {
-      process.stderr.write(`Could not open browser automatically. Open: file://${outPath}\n`);
+      await writeFile(outPath, galleryHtml, "utf-8");
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      process.stderr.write(`Error writing gallery HTML: ${msg}\n`);
+      process.exit(1);
     }
-  }
 
-  console.log(`Gallery written to ${outPath} (${entries.length} fixtures)`);
-  process.exit(0);
+    if (!effectiveNoOpen) {
+      try {
+        const opener =
+          process.platform === "darwin"
+            ? "open"
+            : process.platform === "win32"
+              ? "start"
+              : "xdg-open";
+        execSync(`${opener} ${outPath}`);
+      } catch {
+        process.stderr.write(`Could not open browser automatically. Open: file://${outPath}\n`);
+      }
+    }
+
+    process.stderr.write(`Gallery written to ${outPath} (${entries.length} fixtures)\n`);
+  }
 }
 
 function buildGalleryHtml(entriesJson: string): string {
@@ -656,43 +694,6 @@ function buildGalleryHtml(entriesJson: string): string {
 </html>`;
 }
 
-// ---------------------------------------------------------------------------
-// Steps mode (--steps)
-// ---------------------------------------------------------------------------
-
-if (stepsFile !== null) {
-  let stepsJson: string;
-  try {
-    stepsJson = readFileSync(stepsFile, "utf-8");
-  } catch (err) {
-    const msg = err instanceof Error ? err.message : String(err);
-    process.stderr.write(`Error reading steps file: ${msg}\n`);
-    process.exit(1);
-  }
-
-  const { dirname, resolve, join, isAbsolute } = await import("node:path");
-
-  const stepsOpts: ReportOptions = {
-    ...options,
-    ...reportOptions,
-  };
-
-  // Default allowed-dirs to the directory containing the steps file
-  const stepsDir = resolve(dirname(stepsFile));
-  if (!stepsOpts.allowedDirs) {
-    stepsOpts.allowedDirs = [stepsDir];
-  }
-
-  // Resolve relative stdout_file/stderr_file paths against the steps file
-  // directory. The reader rejects relative paths for security, so callers
-  // that deal with local fixture files must resolve them first.
-  stepsJson = resolveRelativeFilePaths(stepsJson, stepsDir, join, isAbsolute);
-
-  const markdown = reportFromSteps(stepsJson, stepsOpts);
-  await renderAndWrite(markdown, options.title, noOpen);
-  process.exit(0);
-}
-
 /**
  * Resolve relative stdout_file/stderr_file paths in a steps JSON string.
  * Paths are resolved against `baseDir`. Absolute paths are left unchanged.
@@ -717,44 +718,47 @@ function resolveRelativeFilePaths(
 }
 
 // ---------------------------------------------------------------------------
-// Legacy mode: direct plan JSON / apply JSONL
+// Single steps.json mode
 // ---------------------------------------------------------------------------
 
-let planJson: string;
-try {
+if (!gallery) {
+  const { dirname, resolve, join, isAbsolute } = await import("node:path");
+
+  let stepsJson: string;
+  let stepsDir: string;
+
   if (file === null || file === "-") {
-    planJson = readFileSync(process.stdin.fd, "utf-8");
+    // Read from stdin
+    stepsJson = readFileSync(process.stdin.fd, "utf-8");
+    stepsDir = "";
   } else {
-    planJson = readFileSync(file, "utf-8");
+    try {
+      stepsJson = readFileSync(file, "utf-8");
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      process.stderr.write(`Error reading steps file: ${msg}\n`);
+      process.exit(1);
+    }
+    stepsDir = resolve(dirname(file));
   }
-} catch (err) {
-  const msg = err instanceof Error ? err.message : String(err);
-  process.stderr.write(`Error reading input: ${msg}\n`);
-  process.exit(1);
-}
 
-let applyJsonl: string | null = null;
-if (applyFile !== null) {
-  try {
-    applyJsonl = readFileSync(applyFile, "utf-8");
-  } catch (err) {
-    const msg = err instanceof Error ? err.message : String(err);
-    process.stderr.write(`Error reading apply file: ${msg}\n`);
-    process.exit(1);
+  const stepsOpts: ReportOptions = {
+    ...options,
+    ...reportOptions,
+  };
+
+  // Default allowed-dirs to the directory containing the steps file
+  if (!stepsOpts.allowedDirs && stepsDir) {
+    stepsOpts.allowedDirs = [stepsDir];
   }
-}
 
-let markdown: string;
-try {
-  if (applyJsonl !== null) {
-    markdown = applyToMarkdown(planJson, applyJsonl, options);
-  } else {
-    markdown = planToMarkdown(planJson, options);
+  // Resolve relative stdout_file/stderr_file paths against the steps file
+  // directory. The reader rejects relative paths for security, so callers
+  // that deal with local fixture files must resolve them first.
+  if (stepsDir) {
+    stepsJson = resolveRelativeFilePaths(stepsJson, stepsDir, join, isAbsolute);
   }
-} catch (err) {
-  const msg = err instanceof Error ? err.message : String(err);
-  process.stderr.write(`Error rendering plan: ${msg}\n`);
-  process.exit(1);
-}
 
-await renderAndWrite(markdown, options.title, noOpen);
+  const markdown = reportFromSteps(stepsJson, stepsOpts);
+  await writeOutput(markdown, options.title, format, output, effectiveNoOpen);
+}
