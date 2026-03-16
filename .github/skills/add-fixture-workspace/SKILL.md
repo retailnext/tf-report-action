@@ -1,6 +1,6 @@
 ---
 name: add-fixture-workspace
-description: Step-by-step process for adding a new fixture workspace or a new stage to an existing fixture workspace in the tf-plan-md project. Use this when asked to add test fixtures, add fixture workspaces, or add new stages to existing fixtures.
+description: Step-by-step process for adding a new fixture workspace or a new stage to an existing fixture workspace in the tf-report-action project. Use this when asked to add test fixtures, add fixture workspaces, or add new stages to existing fixtures.
 ---
 
 Fixture workspaces provide real Terraform/OpenTofu plan JSON files for integration tests.
@@ -9,7 +9,7 @@ so that multi-step lifecycle changes (create → update → destroy) can be capt
 
 ## Directory Structure
 
-```
+```text
 tests/fixtures/
   <workspace-name>/
     workspace.conf  (optional — workspace-level options)
@@ -50,11 +50,11 @@ tests/fixtures/
 
 Only use providers and resource types that create no real cloud resources:
 
-| Provider / Resource | Use for |
-|---|---|
-| `hashicorp/null` | Resource lifecycle (create/update triggers/destroy) |
-| `hashicorp/random` | Replacement scenarios (changing keepers forces new value) |
-| `hashicorp/local` | Attribute change scenarios (changing file content) |
+| Provider / Resource         | Use for                                                           |
+| --------------------------- | ----------------------------------------------------------------- |
+| `hashicorp/null`            | Resource lifecycle (create/update triggers/destroy)               |
+| `hashicorp/random`          | Replacement scenarios (changing keepers forces new value)         |
+| `hashicorp/local`           | Attribute change scenarios (changing file content)                |
 | `terraform_data` (built-in) | Deferred data, dependency chains — no provider declaration needed |
 
 ## Adding a New Workspace
@@ -77,6 +77,7 @@ Only use providers and resource types that create no real cloud resources:
    [Expected Failures](#expected-failures) section below.
 
 5. Document the scenario at the top of `0/main.tf` in a comment block:
+
    ```hcl
    # Fixture: <name>
    # Stage 0: <what this stage demonstrates>
@@ -84,6 +85,7 @@ Only use providers and resource types that create no real cloud resources:
    ```
 
 6. Run the generation script to produce fixture outputs:
+
    ```bash
    bash scripts/generate-fixtures.sh --workspace <name>
    ```
@@ -104,6 +106,7 @@ Only use providers and resource types that create no real cloud resources:
 3. Update the scenario comment in `0/main.tf` to document the new stage.
 
 4. Regenerate:
+
    ```bash
    bash scripts/generate-fixtures.sh --workspace <name>
    ```
@@ -113,6 +116,7 @@ Only use providers and resource types that create no real cloud resources:
 ## What to Commit
 
 ✅ Commit:
+
 - `tests/fixtures/<name>/<stage>/*.tf` and any supporting HCL files
 - `tests/fixtures/<name>/<stage>/expect-fail` (if present)
 - `tests/fixtures/<name>/workspace.conf` (if present)
@@ -121,6 +125,7 @@ Only use providers and resource types that create no real cloud resources:
 - `tests/fixtures/generated/**/*.stderr` (stderr output, when non-empty)
 
 ❌ Do NOT commit:
+
 - `.terraform/` directories
 - `*.tfstate` or `*.tfstate.backup` files
 - `*.tfplan` (binary plan files)
@@ -133,17 +138,18 @@ These are all listed in `.gitignore`.
 Some fixture stages intentionally produce command failures (e.g. an apply that errors
 out). To declare this, create a file named `expect-fail` in the stage directory:
 
-```
+```text
 tests/fixtures/<workspace>/<stage>/expect-fail
 ```
 
 List one command name per line: `init`, `validate`, `plan`, or `apply`. Example:
 
-```
+```text
 apply
 ```
 
 **Behavior:**
+
 - If a listed command exits non-zero → the script continues normally and captures
   the output (including error JSONL). This is the test data for error-handling tests.
 - If a listed command exits zero → the script aborts with an error (the expectation
@@ -152,6 +158,7 @@ apply
   failure).
 
 **Command dependency chain when a command fails:**
+
 - `init` failure → `validate`, `plan`, `show`, and `apply` are all skipped
 - `plan` failure → `show` and `apply` are skipped
 - `validate` failure → does **not** block `plan` or `apply`

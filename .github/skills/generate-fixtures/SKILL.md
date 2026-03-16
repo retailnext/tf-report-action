@@ -21,11 +21,13 @@ If either is missing, install it before proceeding.
 ## Running the Script
 
 **Regenerate all fixtures (both tools, all workspaces):**
+
 ```bash
 bash scripts/generate-fixtures.sh
 ```
 
 **Regenerate a single workspace (still runs both tools):**
+
 ```bash
 bash scripts/generate-fixtures.sh --workspace <name>
 ```
@@ -42,10 +44,10 @@ For each workspace × each tool (`terraform` and `tofu`):
    - `no-detailed-exitcode=true` — run plan without `-detailed-exitcode`
 3. For each stage N (0, 1, 2, … in ascending order):
    a. Copies `.tf` files and supporting HCL from `tests/fixtures/<workspace>/<N>/`
-      into the temporary directory (files not present in stage N are carried forward
-      from the previous stage)
+   into the temporary directory (files not present in stage N are carried forward
+   from the previous stage)
    b. Reads the optional `expect-fail` file (see below) to determine which commands
-      are expected to return non-zero exit codes
+   are expected to return non-zero exit codes
    c. Runs `<tool> init [-json]` → writes stdout to `init.stdout`, stderr to `init.stderr`
    d. Runs `<tool> validate [-json]` → writes to `validate.stdout` / `validate.stderr`
    e. Runs `<tool> plan [-json] [-detailed-exitcode] -out=tfplan` → writes to `plan.stdout` / `plan.stderr`
@@ -58,6 +60,7 @@ For each workspace × each tool (`terraform` and `tofu`):
 ### `-detailed-exitcode` handling
 
 By default, `plan` is run with `-detailed-exitcode`. This means:
+
 - Exit code 0 = no changes
 - Exit code 1 = error
 - Exit code 2 = changes present (treated as success)
@@ -74,6 +77,7 @@ A stage directory may contain an `expect-fail` file listing commands expected to
 - An unlisted command that exits non-zero → script aborts (unexpected failure)
 
 When a prerequisite command fails, dependent commands are skipped:
+
 - `init` failure → skip `validate`, `plan`, `show`, `apply`
 - `plan` failure → skip `show`, `apply`
 - `validate` failure → does NOT block `plan` or `apply`
@@ -85,7 +89,8 @@ to the generated output directory.
 ## Output Location
 
 Generated files land at:
-```
+
+```text
 tests/fixtures/generated/
   <tool>/
     <workspace>/
@@ -112,16 +117,17 @@ tests/fixtures/generated/
 In addition to the canonical `steps.json`, the generation script produces four
 variant files that exercise different rendering tiers by omitting specific steps:
 
-| Variant | Omitted steps | Purpose |
-|---|---|---|
-| `plan-steps.json` | `apply` | Plan-only report (Tier 1 without apply) |
-| `no-show-steps.json` | `show-plan`, `apply` | Forces Tier 3 raw text fallback |
-| `apply-no-show-steps.json` | `show-plan` | Apply present but no structured plan |
-| `apply-only-steps.json` | `plan`, `show-plan` | Only init/validate/apply steps |
+| Variant                    | Omitted steps        | Purpose                                 |
+| -------------------------- | -------------------- | --------------------------------------- |
+| `plan-steps.json`          | `apply`              | Plan-only report (Tier 1 without apply) |
+| `no-show-steps.json`       | `show-plan`, `apply` | Forces Tier 3 raw text fallback         |
+| `apply-no-show-steps.json` | `show-plan`          | Apply present but no structured plan    |
+| `apply-only-steps.json`    | `plan`, `show-plan`  | Only init/validate/apply steps          |
 
 ### `steps.json` format
 
 Each stage generates a `steps.json` describing the outcome of each step:
+
 ```json
 {
   "init": {
@@ -160,16 +166,18 @@ These files **are** committed to the repository.
 1. Review the diffs to `tests/fixtures/generated/` to confirm the changes look correct.
 
 2. Run the integration coverage report to verify the fixtures meet coverage thresholds:
+
    ```bash
    npm run test:integration:coverage
    ```
 
 3. If the integration snapshot tests now fail, update the Vitest snapshots:
+
    ```bash
    npm run test:integration:coverage -- --update-snapshots
    ```
 
-4. Review the snapshot diffs carefully — they show the exact markdown output that
+4. Review the snapshot diffs carefully — they show the exact Markdown output that
    changed. Confirm every change is intentional.
 
 5. Commit the updated fixture files, any updated snapshot files, and any updated

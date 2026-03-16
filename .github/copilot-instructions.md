@@ -1,12 +1,13 @@
-# tf-plan-md — Copilot Instructions
+# tf-report-action — Copilot Instructions
 
 ## Project Purpose
 
-`tf-plan-md` is a TypeScript library that converts Terraform/OpenTofu plan and apply
-outputs into GitHub-comment-ready markdown strings. It is **not** a GitHub Action; it
-will be incorporated into one separately.
+`tf-report-action` is a GitHub Action that posts OpenTofu/Terraform workflow reports
+as PR comments or status issues. It converts plan and apply outputs into rich Markdown
+with attribute-level diffs, module grouping, and tiered degradation.
 
-It provides three entry points:
+The rendering engine provides three internal entry points:
+
 - `planToMarkdown(json, options?)` — converts plan JSON (from `show -json <planfile>`)
   into a plan report
 - `applyToMarkdown(planJson, applyJsonl, options?)` — converts plan JSON plus apply
@@ -14,6 +15,9 @@ It provides three entry points:
 - `reportFromSteps(stepsJson, options?)` — accepts a GitHub Actions steps context JSON
   and produces a report with tiered degradation (structured plan → raw text → general
   workflow table)
+
+The action entry point (`src/action/main.ts`) orchestrates input parsing, calls
+`reportFromSteps()`, and posts the result via the GitHub API.
 
 ---
 
@@ -24,69 +28,77 @@ Follow these boundaries strictly — do not add cross-cutting logic.
 
 ### Layer 0 — Foundation (zero project dependencies)
 
-| Module | Responsibility |
-|---|---|
-| `src/tfjson/` | Type definitions for the plan JSON wire format and machine-readable UI log format. **Never modify** files copied from tfplanjson; new type files may be added. |
-| `src/model/` | Shared TypeScript interfaces and constants: `Report`, `ResourceChange`, `StepIssue`, `StepOutcome`, `Section`, `CompositionResult`, sentinels, status icons. **No executable logic.** |
-| `src/env/` | `Env` type alias (`Record<string, string \| undefined>`). DI abstraction over `process.env`. |
+| Module        | Responsibility                                                                                                                                                                        |
+| ------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `src/tfjson/` | Type definitions for the plan JSON wire format and machine-readable UI log format. **Never modify** files copied from tfplanjson; new type files may be added.                        |
+| `src/model/`  | Shared TypeScript interfaces and constants: `Report`, `ResourceChange`, `StepIssue`, `StepOutcome`, `Section`, `CompositionResult`, sentinels, status icons. **No executable logic.** |
+| `src/env/`    | `Env` type alias (`Record<string, string \| undefined>`). DI abstraction over `process.env`.                                                                                          |
 
 ### Layer 1 — Pure algorithms (depend only on Layer 0)
 
-| Module | Responsibility |
-|---|---|
-| `src/diff/` | Pure LCS, line-diff, and char-diff algorithms. No markdown, no I/O. |
-| `src/flattener/` | Flatten nested `JsonValue` → `Map<string, string \| null>` with dotted-path keys. |
-| `src/sensitivity/` | Detect whether a flattened attribute path is sensitive. Pure predicate. |
-| `src/raw-formatter/` | Format raw command output (JSON Lines, validate results, plain text) into markdown fragments. |
-| `src/template/` | Select and apply rendering templates. |
+| Module               | Responsibility                                                                                |
+| -------------------- | --------------------------------------------------------------------------------------------- |
+| `src/diff/`          | Pure LCS, line-diff, and char-diff algorithms. No Markdown, no I/O.                           |
+| `src/flattener/`     | Flatten nested `JsonValue` → `Map<string, string \| null>` with dotted-path keys.             |
+| `src/sensitivity/`   | Detect whether a flattened attribute path is sensitive. Pure predicate.                       |
+| `src/raw-formatter/` | Format raw command output (JSON Lines, validate results, plain text) into Markdown fragments. |
 
 ### Layer 2 — I/O and parsing (depend on Layers 0–1)
 
-| Module | Responsibility |
-|---|---|
-| `src/parser/` | Parse Terraform/OpenTofu formats: plan JSON, apply JSONL, validate output. |
-| `src/steps/` | GitHub Actions steps context: parsing, secure file reading, step-data-aware I/O wrappers, outcome helpers. This is the I/O boundary between the external world and the pure transformation pipeline. |
+| Module        | Responsibility                                                                                                                                                                                       |
+| ------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `src/parser/` | Parse Terraform/OpenTofu formats: plan JSON, apply JSONL, validate output.                                                                                                                           |
+| `src/steps/`  | GitHub Actions steps context: parsing, secure file reading, step-data-aware I/O wrappers, outcome helpers. This is the I/O boundary between the external world and the pure transformation pipeline. |
 
 ### Layer 3 — Business logic (depend on Layers 0–2)
 
-| Module | Responsibility |
-|---|---|
-| `src/builder/` | Build `Report` from parsed input. Plan JSON → Report with flat resource arrays and full attribute detail, JSONL → Report with flat resource arrays but no attribute detail, steps context → progressively enriched Report (tier detection, step issue collection, title generation). |
-| `src/compositor/` | Budget-aware section assembly. Composes markdown sections within an output size limit, progressively degrading from full → compact → omit. Truncation notice helper. |
+| Module            | Responsibility                                                                                                                                                                                                                                                                       |
+| ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `src/builder/`    | Build `Report` from parsed input. Plan JSON → Report with flat resource arrays and full attribute detail, JSONL → Report with flat resource arrays but no attribute detail, steps context → progressively enriched Report (tier detection, step issue collection, title generation). |
+| `src/compositor/` | Budget-aware section assembly. Composes Markdown sections within an output size limit, progressively degrading from full → compact → omit. Truncation notice helper.                                                                                                                 |
 
 ### Layer 4 — Rendering (depends on Layers 0–3)
 
-| Module | Responsibility |
-|---|---|
-| `src/renderer/` | Render any `Report` variant to markdown. Groups resources by module address (derived from address + type) for display — module grouping is a renderer concern. StructuredReport → full markdown string, TextFallbackReport/WorkflowReport/ErrorReport → Section arrays. Title, step issue, step table, and variant-specific body renderers. |
+| Module          | Responsibility                                                                                                                                                                                                                                                                                                                              |
+| --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `src/renderer/` | Render any `Report` variant to Markdown. Groups resources by module address (derived from address + type) for display — module grouping is a renderer concern. StructuredReport → full Markdown string, TextFallbackReport/WorkflowReport/ErrorReport → Section arrays. Title, step issue, step table, and variant-specific body renderers. |
 
 ### Layer 5 — Entry points
 
-| Module | Responsibility |
-|---|---|
-| `src/index.ts` | Public API: `planToMarkdown`, `applyToMarkdown`, `reportFromSteps`. Three pipelines all following parse → build → render (→ compose). |
+| Module         | Responsibility                                                                                                                           |
+| -------------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
+| `src/index.ts` | Rendering API: `planToMarkdown`, `applyToMarkdown`, `reportFromSteps`. Three pipelines all following parse → build → render (→ compose). |
+
+### Layer 6 — Action (depends on Layers 0–5)
+
+| Module        | Responsibility                                                                                                                                                   |
+| ------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `src/action/` | Action entry point. Parses `INPUT_*` env vars, calls `reportFromSteps()`, posts results via GitHub API. Only module allowed to reference `process.env` directly. |
+| `src/github/` | GitHub REST API client with DI HTTP transport. Comment CRUD, issue search/create/update, pagination. No direct model dependency beyond types.                    |
 
 **Dependency rules (layered — import only from same or lower layer):**
 
-| Module | May import from (beyond `model/`) |
-|---|---|
-| `diff/` | _(nothing)_ |
-| `flattener/` | _(nothing)_ |
-| `sensitivity/` | _(nothing)_ |
-| `raw-formatter/` | _(nothing)_ |
-| `template/` | _(nothing)_ |
-| `env/` | _(nothing)_ |
-| `parser/` | `tfjson/` |
-| `steps/` | `env/` |
-| `builder/` | `tfjson/`, `flattener/`, `sensitivity/`, `steps/`, `env/`, `parser/` |
-| `compositor/` | _(nothing)_ |
-| `renderer/` | `diff/`, `template/`, `raw-formatter/` |
-| `index.ts` | `parser/`, `builder/`, `renderer/`, `compositor/`, `steps/`, `env/` |
+| Module           | May import from (beyond `model/`)                                    |
+| ---------------- | -------------------------------------------------------------------- |
+| `diff/`          | _(nothing)_                                                          |
+| `flattener/`     | _(nothing)_                                                          |
+| `sensitivity/`   | _(nothing)_                                                          |
+| `raw-formatter/` | _(nothing)_                                                          |
+| `env/`           | _(nothing)_                                                          |
+| `parser/`        | `tfjson/`                                                            |
+| `steps/`         | `env/`                                                               |
+| `builder/`       | `tfjson/`, `flattener/`, `sensitivity/`, `steps/`, `env/`, `parser/` |
+| `compositor/`    | _(nothing)_                                                          |
+| `renderer/`      | `diff/`, `raw-formatter/`                                            |
+| `index.ts`       | `parser/`, `builder/`, `renderer/`, `compositor/`, `steps/`, `env/`  |
+| `action/`        | `index.ts`, `model/`, `github/`, `env/`                              |
+| `github/`        | `model/` only                                                        |
 
 **Additional constraints:**
+
 - `model/` is universal — every module may import from it.
 - `tfjson/` is restricted — only `parser/` and `builder/` may import.
-- `builder/apply.ts` must NOT be re-exported from the builder barrel (circular dep risk).
+- `builder/apply.ts` must NOT be reexported from the builder barrel (circular dep risk).
 - `renderer/` must **not** import sentinel string constants from `model/sentinels.ts` —
   all display logic must use boolean flags (`isSensitive`, `isKnownAfterApply`). This
   is enforced by an ESLint `no-restricted-imports` rule.
@@ -104,10 +116,121 @@ Follow these boundaries strictly — do not add cross-cutting logic.
 - **Pure functions**: prefer pure, side-effect-free functions. Every module in `diff/`,
   `sensitivity/`, and `flattener/` must be fully side-effect-free.
 - **JSDoc on exported symbols**: every exported function, class, and interface must
-  have a JSDoc comment explaining *why* it exists, not just what it does.
+  have a JSDoc comment explaining _why_ it exists, not just what it does.
 - **No unnecessary comments**: do not write comments that simply restate the code.
 - **Error handling**: use descriptive `Error` messages with enough context to diagnose
   the problem (e.g. include the invalid value and what was expected).
+
+---
+
+## Node.js Version Management
+
+The **source of truth** for the project's Node.js major version is the `runs.using`
+field in `action.yml` (e.g. `node24`). No exact minor/patch version is pinned because
+GitHub-hosted runners ship whichever 24.x release they choose.
+
+The following files must all stay in sync with the major version derived from
+`action.yml`:
+
+| File                   | Must contain                                                                 |
+| ---------------------- | ---------------------------------------------------------------------------- |
+| `.node-version`        | `24\n` (major only, no minor/patch)                                          |
+| `package.json` engines | `">=24.0.0"`                                                                 |
+| `@types/node`          | `"^24.x.x"` (major must match)                                               |
+| CI workflow steps      | `node-version-file: .node-version` (never a hardcoded `node-version:` input) |
+
+A governance test (`tests/unit/governance/node-version.test.ts`) derives all
+expectations from `action.yml` and fails if any file is out of sync. When upgrading
+Node.js, update `action.yml` first, then let the governance test guide remaining
+changes.
+
+**Agent obligation**: Before making any changes, verify your local Node.js major
+version matches the project requirement. Run `node --version` and confirm the major
+matches.
+
+---
+
+## Bundling and Distribution
+
+`dist/index.js` and `dist/index.js.map` are **committed to the repository**. GitHub
+Actions requires the entry point to be checked in — there is no install step at
+action runtime.
+
+**When to bundle**: After any change to source code, configuration, or dependencies,
+run `npm run bundle` to regenerate the dist files. The CI workflow verifies dist is
+up to date.
+
+**Obligation**: You must run `npm run lint` and `npm run bundle` before committing
+or calling `report_progress`. Never call `report_progress` with a stale bundle or
+failing lint.
+
+---
+
+## Linting Obligation
+
+`npm run lint` is the single unified linting command. It runs:
+
+1. `npm run lint:es` — ESLint (source + tests)
+2. `npm run lint:markdown` — markdownlint-cli2 (all Markdown files)
+3. `npm run lint:text` — textlint (terminology checking)
+4. `npm run format:check` — Prettier (formatting verification)
+
+All four must pass before any commit or `report_progress` call. When only one
+specific linter needs debugging, run its sub-script directly.
+
+---
+
+## Coverage Obligation
+
+Both of these coverage checks must pass before any work is considered complete:
+
+- `npm run test:coverage:ci` — overall coverage thresholds:
+  90% lines/functions/statements, 85% branches
+- `npm run test:integration:coverage` — integration-only thresholds:
+  90% lines, 80% branches
+
+If coverage drops below these thresholds after a change, add tests until thresholds
+are satisfied. **Never reduce thresholds.**
+
+### Integration Test Coverage Exclusions
+
+**Only** `src/action/**` and `src/github/**` may be excluded from integration-only
+coverage measurement. These modules inherently require GitHub API interaction that
+cannot be exercised with fixture data. It is **forbidden** to add any other exclusion
+paths to `vitest.integration.config.ts`.
+
+---
+
+## Zero Runtime Dependencies
+
+The action must have **no runtime dependencies** — only Node.js built-in modules.
+All code is bundled into a single `dist/index.js` file. The `dependencies` field in
+`package.json` must be absent or empty `{}`. This is enforced by a governance test
+(`tests/unit/governance/no-runtime-deps.test.ts`).
+
+Do NOT use external runtime dependencies like `@actions/core`, `@actions/github`,
+`@octokit/rest`, or any other npm package at runtime. Use `node:https`, `node:fs`,
+etc. instead.
+
+---
+
+## Style Guide
+
+- **OpenTofu preference**: Use OpenTofu (`tofu`) in all examples and documentation
+  unless specifically demonstrating Terraform compatibility.
+- **`tofu_wrapper: false`**: Every `opentofu/setup-opentofu` step in examples must
+  include `tofu_wrapper: false` with this explanation comment:
+
+  ```yaml
+  # The wrapper is disabled because it fails to forward signals properly
+  # (opentofu/setup-opentofu#41), interferes with detailed exitcodes
+  # (opentofu/setup-opentofu#42), and is generally discouraged when using
+  # retailnext/exec-action to run OpenTofu.
+  tofu_wrapper: false
+  ```
+
+- **Action references**: Always use `@main` (e.g. `retailnext/tf-report-action@main`),
+  never version tags like `@v1`.
 
 ---
 
@@ -153,6 +276,7 @@ on the model interfaces — never compare rendered strings against sentinel valu
 
 The `PlanAction` type includes derived actions beyond the raw Terraform/OpenTofu
 action strings:
+
 - `"replace"` — derived from two-element action pairs (`create+delete` or `delete+create`)
 - `"move"` — derived from `no-op` with `previous_address` set (moved block)
 - `"import"` — derived from `no-op` with `importing` set (import block, no other changes)
@@ -185,7 +309,7 @@ referenced by exec-action step outputs:
 
 The `reportFromSteps(stepsJson, options?)` entry point accepts a JSON-encoded GitHub
 Actions steps context and produces a report. It **never throws** — all errors become
-markdown content. Output is bounded by `maxOutputLength` (default 63 KiB).
+Markdown content. Output is bounded by `maxOutputLength` (default 63 KiB).
 
 **Pipeline**: `parse steps → build Report → render Section[] → compose within budget`
 — the same parse → build → render → compose pattern as the other two entry points.
@@ -195,12 +319,14 @@ markdown content. Output is bounded by `maxOutputLength` (default 63 KiB).
 `planStep`, `showPlanStep`, `applyStep`).
 
 **Report variants** (discriminated union on `kind`):
+
 - `StructuredReport` — Tier 1: full plan/apply detail from JSON
 - `TextFallbackReport` — Tier 3: raw command output, no structured plan data
 - `WorkflowReport` — Tier 4: just step statuses, no plan data
 - `ErrorReport` — pipeline/parse errors
 
 **Tiered degradation**:
+
 - **Tier 1**: show-plan JSON available → full structured report (plan or apply)
 - **Tier 3**: No show-plan, but plan/apply step present → raw text fallback with
   JSON Lines formatting where possible
@@ -248,8 +374,7 @@ them, because attribute values may be sensitive. This means:
   `SyntaxError` messages, which would expose plan contents.
 - Do not interpolate `before`, `after`, or any flattened attribute map entries into
   error strings.
-- Structural metadata (format version, field names, template names) is safe to include
-  in errors.
+- Structural metadata (format version, field names) is safe to include in errors.
 
 ---
 
@@ -285,6 +410,7 @@ them, because attribute values may be sensitive. This means:
 
 **Code review instructions:** When reviewing any change to files under
 `tests/integration/`, flag as a blocking issue if:
+
 - Any test constructs a plan JSON object or string inline (e.g. `{ format_version: "1.0", ... }`,
   `JSON.stringify({...})`, template literals containing plan-like JSON).
 - Any test imports or uses a helper that returns a hardcoded plan object.
@@ -301,7 +427,7 @@ reading a file from `tests/fixtures/generated/<tool>/<workspace>/<N>/show-plan.s
 
 ### `scripts/render.ts` — local render tool
 
-`scripts/render.ts` renders a steps.json file to markdown or a browser-viewable HTML
+`scripts/render.ts` renders a steps.json file to Markdown or a browser-viewable HTML
 page. It uses `reportFromSteps()` as its sole rendering API. Output format is
 controlled by `--format` (default: `html`).
 
@@ -309,14 +435,14 @@ controlled by `--format` (default: `html`).
 # Render a fixture to HTML and open in browser
 npm run render -- tests/fixtures/generated/terraform/null-lifecycle/2/steps.json
 
-# Render to markdown on stdout
+# Render to Markdown on stdout
 npm run render -- steps.json --format markdown --output -
 
-# Render to a markdown file
+# Render to a Markdown file
 npm run render -- steps.json --format markdown --output report.md
 
 # With options
-npm run render -- steps.json --title "PR #42" --template summary --no-open
+npm run render -- steps.json --title "PR #42" --no-open
 
 # Open the fixture gallery (all fixtures rendered in a navigable HTML page)
 npm run gallery -- --no-open
@@ -327,20 +453,19 @@ cat steps.json | npm run render -- -
 
 **Supported flags** (each maps 1:1 to an `Options` field or a render-script behaviour):
 
-| Flag | `Options` field / behaviour | Default |
-|---|---|---|
-| `--format <html\|markdown>` | Output format; `markdown` implies `--no-open` | `"html"` |
-| `--output <path>` / `-o` | Output file; `"-"` for stdout | temp file (html), stdout (markdown) |
-| `--title <text>` | `title` | _(none)_ |
-| `--template <default\|summary>` | `template` | `"default"` |
-| `--show-unchanged` | `showUnchangedAttributes` | `false` |
-| `--diff-format <inline\|simple>` | `diffFormat` | `"inline"` |
-| `--workspace <name>` | `workspace` (for title and dedup marker) | _(none)_ |
-| `--logs-url <url>` | Parses a GitHub Actions run URL into `env` vars | _(none)_ |
-| `--allowed-dirs <dirs>` | Comma-separated allowed directories for file reading | _(directory of input file)_ |
-| `--max-output-length <n>` | Maximum output length in characters | `64512` (63 KiB) |
-| `--gallery` | Render all fixture steps JSONs into a navigable gallery HTML page (HTML only) | _(off)_ |
-| `--no-open` | Suppress browser opening (write HTML only) | _(browser opens by default)_ |
+| Flag                             | `Options` field / behaviour                                                   | Default                             |
+| -------------------------------- | ----------------------------------------------------------------------------- | ----------------------------------- |
+| `--format <html\|markdown>`      | Output format; `markdown` implies `--no-open`                                 | `"html"`                            |
+| `--output <path>` / `-o`         | Output file; `"-"` for stdout                                                 | temp file (HTML), stdout (Markdown) |
+| `--title <text>`                 | `title`                                                                       | _(none)_                            |
+| `--show-unchanged`               | `showUnchangedAttributes`                                                     | `false`                             |
+| `--diff-format <inline\|simple>` | `diffFormat`                                                                  | `"inline"`                          |
+| `--workspace <name>`             | `workspace` (for title and dedup marker)                                      | _(none)_                            |
+| `--logs-url <url>`               | Parses a GitHub Actions run URL into `env` vars                               | _(none)_                            |
+| `--allowed-dirs <dirs>`          | Comma-separated allowed directories for file reading                          | _(directory of input file)_         |
+| `--max-output-length <n>`        | Maximum output length in characters                                           | `64512` (63 KiB)                    |
+| `--gallery`                      | Render all fixture steps JSONs into a navigable gallery HTML page (HTML only) | _(off)_                             |
+| `--no-open`                      | Suppress browser opening (write HTML only)                                    | _(browser opens by default)_        |
 
 The **gallery** (`npm run gallery`) renders all fixture steps JSON files into a single
 HTML page with keyboard navigation (←/→ arrows), text filtering, and a "Copy Markdown"
@@ -354,12 +479,14 @@ also be kept current.
 
 **Agent constraint — browser opening is forbidden:** Agents must **never** run any
 command that causes the user's browser to open. This includes:
+
 - `npm run render` (without `--no-open`) — always pass `--no-open` when running this script
 - Any shell command invoking `open`, `xdg-open`, or `start` with a file or URL
 - Any other script or tool that has a side effect of opening a browser window
 
 When running `npm run render` as part of any task, always append `--no-open` and use
-`--format markdown` to get raw markdown output:
+`--format markdown` to get raw Markdown output:
+
 ```bash
 npm -s run render -- steps.json --format markdown --no-open --output -
 ```
