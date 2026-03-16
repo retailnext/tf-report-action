@@ -34,6 +34,36 @@ describe("renderReportSections", () => {
       expect(title.fixed).toBe(true);
     });
 
+    it("renders warnings immediately after title, before step issues", () => {
+      const report: Report = {
+        title: "Plan Failed",
+        issues: [
+          {
+            id: "plan",
+            heading: "`plan` failed",
+            isFailed: true,
+            stdout: "error output",
+          },
+        ],
+        steps: [],
+        warnings: ["Missing show-plan output."],
+        rawStdout: [],
+        toolVersion: "1.5.0",
+        formatVersion: "1.2",
+        summary: { actions: [], failures: [] },
+        resources: [],
+        outputs: [],
+        driftResources: [],
+      };
+      const sections = renderReportSections(report);
+      const ids = sections.map((s) => s.id);
+      const titleIdx = ids.indexOf("title");
+      const warningIdx = ids.findIndex((id) => id.startsWith("warning-"));
+      const issueIdx = ids.indexOf("issue-plan");
+      expect(warningIdx).toBe(titleIdx + 1);
+      expect(issueIdx).toBeGreaterThan(warningIdx);
+    });
+
     it("renders step issues before the body", () => {
       const report: Report = {
         title: "Plan",

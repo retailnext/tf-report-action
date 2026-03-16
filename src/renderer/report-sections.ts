@@ -20,8 +20,8 @@ import { DIAGNOSTIC_WARNING } from "../model/status-icons.js";
 /**
  * Render a Report into an ordered array of Sections.
  *
- * Sections include: workspace marker (fixed), title (fixed), step issues,
- * warnings, and body sections determined by what report fields are populated.
+ * Sections include: workspace marker (fixed), title (fixed), warnings (fixed),
+ * step issues, and body sections determined by what report fields are populated.
  */
 export function renderReportSections(
   report: Report,
@@ -38,18 +38,18 @@ export function renderReportSections(
   // Title
   sections.push(renderTitle(report));
 
-  // Step issues
-  for (const issue of report.issues) {
-    sections.push(renderStepIssue(issue));
-  }
-
-  // Warnings (always rendered when present, before body)
+  // Warnings (always first after title when present)
   for (const warning of report.warnings) {
     sections.push({
       id: `warning-${warning.slice(0, 40)}`,
       full: `> ${DIAGNOSTIC_WARNING} **Warning:** ${warning}\n\n`,
       fixed: true,
     });
+  }
+
+  // Step issues
+  for (const issue of report.issues) {
+    sections.push(renderStepIssue(issue));
   }
 
   // Body sections — determined by which fields are populated

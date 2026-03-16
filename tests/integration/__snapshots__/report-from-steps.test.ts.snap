@@ -50,6 +50,8 @@ terraform_data.depends_on_fail
 exports[`reportFromSteps integration — apply-no-show fixtures > terraform/apply-error/1/apply-no-show > renders without error and matches snapshot 1`] = `
 "## ❌ Apply Failed
 
+> ⚠️ **Warning:** This report was generated without \`terraform show -json <tfplan>\` output. Resource attribute details are not available.
+
 ### ❌ \`apply\` failed
 
 Exit code: \`1\`
@@ -317,8 +319,6 @@ Exit code: \`1\`
 
 
 </details>
-
-> ⚠️ **Warning:** This report was generated without \`terraform show -json <tfplan>\` output. Resource attribute details are not available.
 
 ## Apply Summary
 
@@ -1154,6 +1154,8 @@ null_resource.baseline
 exports[`reportFromSteps integration — apply-no-show fixtures > terraform/plan-error/1/apply-no-show > renders without error and matches snapshot 1`] = `
 "## ❌ Plan Failed
 
+> ⚠️ **Warning:** This report was generated without \`terraform show -json <tfplan>\` output. Resource attribute details are not available.
+
 ### ❌ \`plan\` failed
 
 Exit code: \`1\`
@@ -1325,8 +1327,6 @@ Exit code: \`1\`
 
 
 </details>
-
-> ⚠️ **Warning:** This report was generated without \`terraform show -json <tfplan>\` output. Resource attribute details are not available.
 
 ## Plan Summary
 
@@ -1577,6 +1577,8 @@ null_resource.baseline
 exports[`reportFromSteps integration — apply-no-show fixtures > terraform/validate-error/1/apply-no-show > renders without error and matches snapshot 1`] = `
 "## ❌ Plan Failed
 
+> ⚠️ **Warning:** plan: stdout_file output missing in steps
+
 ### ❌ \`validate\` failed
 
 Exit code: \`1\`
@@ -1633,8 +1635,6 @@ Exit code: \`1\`
 </details>
 
 </details>
-
-> ⚠️ **Warning:** plan: stdout_file output missing in steps
 
 ### Steps
 
@@ -1777,6 +1777,8 @@ terraform_data.depends_on_fail
 
 exports[`reportFromSteps integration — apply-no-show fixtures > tofu/apply-error/1/apply-no-show > renders without error and matches snapshot 1`] = `
 "## ❌ Apply Failed
+
+> ⚠️ **Warning:** This report was generated without \`tofu show -json <tfplan>\` output. Resource attribute details are not available.
 
 ### ❌ \`apply\` failed
 
@@ -2045,8 +2047,6 @@ Exit code: \`1\`
 
 
 </details>
-
-> ⚠️ **Warning:** This report was generated without \`tofu show -json <tfplan>\` output. Resource attribute details are not available.
 
 ## Apply Summary
 
@@ -2882,6 +2882,8 @@ null_resource.baseline
 exports[`reportFromSteps integration — apply-no-show fixtures > tofu/plan-error/1/apply-no-show > renders without error and matches snapshot 1`] = `
 "## ❌ Plan Failed
 
+> ⚠️ **Warning:** This report was generated without \`tofu show -json <tfplan>\` output. Resource attribute details are not available.
+
 ### ❌ \`plan\` failed
 
 Exit code: \`1\`
@@ -3053,8 +3055,6 @@ Exit code: \`1\`
 
 
 </details>
-
-> ⚠️ **Warning:** This report was generated without \`tofu show -json <tfplan>\` output. Resource attribute details are not available.
 
 ## Plan Summary
 
@@ -3304,6 +3304,8 @@ null_resource.baseline
 exports[`reportFromSteps integration — apply-no-show fixtures > tofu/validate-error/1/apply-no-show > renders without error and matches snapshot 1`] = `
 "## ❌ Plan Failed
 
+> ⚠️ **Warning:** plan: stdout_file output missing in steps
+
 ### ❌ \`validate\` failed
 
 Exit code: \`1\`
@@ -3360,8 +3362,6 @@ Exit code: \`1\`
 </details>
 
 </details>
-
-> ⚠️ **Warning:** plan: stdout_file output missing in steps
 
 ### Steps
 
@@ -3504,6 +3504,8 @@ terraform_data.depends_on_fail
 
 exports[`reportFromSteps integration — apply-only fixtures > terraform/apply-error/1/apply-only > renders without error and matches snapshot 1`] = `
 "## ❌ Apply Failed
+
+> ⚠️ **Warning:** This report was generated without \`terraform show -json <tfplan>\` output. Resource attribute details are not available.
 
 ### ❌ \`apply\` failed
 
@@ -3772,8 +3774,6 @@ Exit code: \`1\`
 
 
 </details>
-
-> ⚠️ **Warning:** This report was generated without \`terraform show -json <tfplan>\` output. Resource attribute details are not available.
 
 ## Apply Summary
 
@@ -4967,6 +4967,8 @@ terraform_data.depends_on_fail
 exports[`reportFromSteps integration — apply-only fixtures > tofu/apply-error/1/apply-only > renders without error and matches snapshot 1`] = `
 "## ❌ Apply Failed
 
+> ⚠️ **Warning:** This report was generated without \`tofu show -json <tfplan>\` output. Resource attribute details are not available.
+
 ### ❌ \`apply\` failed
 
 Exit code: \`1\`
@@ -5234,8 +5236,6 @@ Exit code: \`1\`
 
 
 </details>
-
-> ⚠️ **Warning:** This report was generated without \`tofu show -json <tfplan>\` output. Resource attribute details are not available.
 
 ## Apply Summary
 
@@ -9157,6 +9157,8 @@ exports[`reportFromSteps integration — generated fixtures > terraform/plan-err
 "<!-- tf-report-action:"test-workspace" -->
 ## ❌ \`test-workspace\` Plan Failed
 
+> ⚠️ **Warning:** This report was generated without \`terraform show -json <tfplan>\` output. Resource attribute details are not available.
+
 ### ❌ \`plan\` failed
 
 Exit code: \`1\`
@@ -9328,8 +9330,6 @@ Exit code: \`1\`
 
 
 </details>
-
-> ⚠️ **Warning:** This report was generated without \`terraform show -json <tfplan>\` output. Resource attribute details are not available.
 
 ## Plan Summary
 
@@ -9366,6 +9366,8 @@ null_resource.baseline
 exports[`reportFromSteps integration — generated fixtures > terraform/plan-error/1 > renders without error and matches snapshot [default] 1`] = `
 "## ❌ Plan Failed
 
+> ⚠️ **Warning:** This report was generated without \`terraform show -json <tfplan>\` output. Resource attribute details are not available.
+
 ### ❌ \`plan\` failed
 
 Exit code: \`1\`
@@ -9537,8 +9539,6 @@ Exit code: \`1\`
 
 
 </details>
-
-> ⚠️ **Warning:** This report was generated without \`terraform show -json <tfplan>\` output. Resource attribute details are not available.
 
 ## Plan Summary
 
@@ -10173,6 +10173,8 @@ exports[`reportFromSteps integration — generated fixtures > terraform/validate
 "<!-- tf-report-action:"test-workspace" -->
 ## ❌ \`test-workspace\` Plan Failed
 
+> ⚠️ **Warning:** plan: stdout_file output missing in steps
+
 ### ❌ \`validate\` failed
 
 Exit code: \`1\`
@@ -10229,8 +10231,6 @@ Exit code: \`1\`
 </details>
 
 </details>
-
-> ⚠️ **Warning:** plan: stdout_file output missing in steps
 
 ### Steps
 
@@ -10248,6 +10248,8 @@ Exit code: \`1\`
 exports[`reportFromSteps integration — generated fixtures > terraform/validate-error/1 > renders without error and matches snapshot [default] 1`] = `
 "## ❌ Plan Failed
 
+> ⚠️ **Warning:** plan: stdout_file output missing in steps
+
 ### ❌ \`validate\` failed
 
 Exit code: \`1\`
@@ -10304,8 +10306,6 @@ Exit code: \`1\`
 </details>
 
 </details>
-
-> ⚠️ **Warning:** plan: stdout_file output missing in steps
 
 ### Steps
 
@@ -13344,6 +13344,8 @@ exports[`reportFromSteps integration — generated fixtures > tofu/plan-error/1 
 "<!-- tf-report-action:"test-workspace" -->
 ## ❌ \`test-workspace\` Plan Failed
 
+> ⚠️ **Warning:** This report was generated without \`tofu show -json <tfplan>\` output. Resource attribute details are not available.
+
 ### ❌ \`plan\` failed
 
 Exit code: \`1\`
@@ -13515,8 +13517,6 @@ Exit code: \`1\`
 
 
 </details>
-
-> ⚠️ **Warning:** This report was generated without \`tofu show -json <tfplan>\` output. Resource attribute details are not available.
 
 ## Plan Summary
 
@@ -13553,6 +13553,8 @@ null_resource.baseline
 exports[`reportFromSteps integration — generated fixtures > tofu/plan-error/1 > renders without error and matches snapshot [default] 1`] = `
 "## ❌ Plan Failed
 
+> ⚠️ **Warning:** This report was generated without \`tofu show -json <tfplan>\` output. Resource attribute details are not available.
+
 ### ❌ \`plan\` failed
 
 Exit code: \`1\`
@@ -13724,8 +13726,6 @@ Exit code: \`1\`
 
 
 </details>
-
-> ⚠️ **Warning:** This report was generated without \`tofu show -json <tfplan>\` output. Resource attribute details are not available.
 
 ## Plan Summary
 
@@ -14358,6 +14358,8 @@ exports[`reportFromSteps integration — generated fixtures > tofu/validate-erro
 "<!-- tf-report-action:"test-workspace" -->
 ## ❌ \`test-workspace\` Plan Failed
 
+> ⚠️ **Warning:** plan: stdout_file output missing in steps
+
 ### ❌ \`validate\` failed
 
 Exit code: \`1\`
@@ -14414,8 +14416,6 @@ Exit code: \`1\`
 </details>
 
 </details>
-
-> ⚠️ **Warning:** plan: stdout_file output missing in steps
 
 ### Steps
 
@@ -14433,6 +14433,8 @@ Exit code: \`1\`
 exports[`reportFromSteps integration — generated fixtures > tofu/validate-error/1 > renders without error and matches snapshot [default] 1`] = `
 "## ❌ Plan Failed
 
+> ⚠️ **Warning:** plan: stdout_file output missing in steps
+
 ### ❌ \`validate\` failed
 
 Exit code: \`1\`
@@ -14489,8 +14491,6 @@ Exit code: \`1\`
 </details>
 
 </details>
-
-> ⚠️ **Warning:** plan: stdout_file output missing in steps
 
 ### Steps
 
@@ -14776,6 +14776,8 @@ exports[`reportFromSteps integration — manual fixtures > manual/missing-output
 exports[`reportFromSteps integration — manual fixtures > manual/parse-failure > renders without error and matches snapshot 1`] = `
 "## ✅ Plan Succeeded
 
+> ⚠️ **Warning:** plan stdout: File not found or not accessible
+
 ### ⚠️ \`show-plan\`: output could not be parsed
 
 Exit code: \`0\`
@@ -14791,8 +14793,6 @@ this is not valid JSON for a plan
 \`\`\`
 
 </details>
-
-> ⚠️ **Warning:** plan stdout: File not found or not accessible
 
 ### Steps
 
@@ -15730,6 +15730,8 @@ null_resource.baseline
 exports[`reportFromSteps integration — no-show fixtures (Tier 3) > terraform/plan-error/1/no-show > renders without error and matches snapshot 1`] = `
 "## ❌ Plan Failed
 
+> ⚠️ **Warning:** This report was generated without \`terraform show -json <tfplan>\` output. Resource attribute details are not available.
+
 ### ❌ \`plan\` failed
 
 Exit code: \`1\`
@@ -15901,8 +15903,6 @@ Exit code: \`1\`
 
 
 </details>
-
-> ⚠️ **Warning:** This report was generated without \`terraform show -json <tfplan>\` output. Resource attribute details are not available.
 
 ## Plan Summary
 
@@ -16153,6 +16153,8 @@ null_resource.baseline
 exports[`reportFromSteps integration — no-show fixtures (Tier 3) > terraform/validate-error/1/no-show > renders without error and matches snapshot 1`] = `
 "## ❌ Plan Failed
 
+> ⚠️ **Warning:** plan: stdout_file output missing in steps
+
 ### ❌ \`validate\` failed
 
 Exit code: \`1\`
@@ -16209,8 +16211,6 @@ Exit code: \`1\`
 </details>
 
 </details>
-
-> ⚠️ **Warning:** plan: stdout_file output missing in steps
 
 ### Steps
 
@@ -17171,6 +17171,8 @@ null_resource.baseline
 exports[`reportFromSteps integration — no-show fixtures (Tier 3) > tofu/plan-error/1/no-show > renders without error and matches snapshot 1`] = `
 "## ❌ Plan Failed
 
+> ⚠️ **Warning:** This report was generated without \`tofu show -json <tfplan>\` output. Resource attribute details are not available.
+
 ### ❌ \`plan\` failed
 
 Exit code: \`1\`
@@ -17342,8 +17344,6 @@ Exit code: \`1\`
 
 
 </details>
-
-> ⚠️ **Warning:** This report was generated without \`tofu show -json <tfplan>\` output. Resource attribute details are not available.
 
 ## Plan Summary
 
@@ -17593,6 +17593,8 @@ null_resource.baseline
 exports[`reportFromSteps integration — no-show fixtures (Tier 3) > tofu/validate-error/1/no-show > renders without error and matches snapshot 1`] = `
 "## ❌ Plan Failed
 
+> ⚠️ **Warning:** plan: stdout_file output missing in steps
+
 ### ❌ \`validate\` failed
 
 Exit code: \`1\`
@@ -17649,8 +17651,6 @@ Exit code: \`1\`
 </details>
 
 </details>
-
-> ⚠️ **Warning:** plan: stdout_file output missing in steps
 
 ### Steps
 
@@ -18919,6 +18919,8 @@ null_resource.baseline
 exports[`reportFromSteps integration — plan-only fixtures > terraform/plan-error/1/plan-only > renders plan report and matches snapshot 1`] = `
 "## ❌ Plan Failed
 
+> ⚠️ **Warning:** This report was generated without \`terraform show -json <tfplan>\` output. Resource attribute details are not available.
+
 ### ❌ \`plan\` failed
 
 Exit code: \`1\`
@@ -19090,8 +19092,6 @@ Exit code: \`1\`
 
 
 </details>
-
-> ⚠️ **Warning:** This report was generated without \`terraform show -json <tfplan>\` output. Resource attribute details are not available.
 
 ## Plan Summary
 
@@ -19423,6 +19423,8 @@ null_resource.baseline
 exports[`reportFromSteps integration — plan-only fixtures > terraform/validate-error/1/plan-only > renders plan report and matches snapshot 1`] = `
 "## ❌ Plan Failed
 
+> ⚠️ **Warning:** plan: stdout_file output missing in steps
+
 ### ❌ \`validate\` failed
 
 Exit code: \`1\`
@@ -19479,8 +19481,6 @@ Exit code: \`1\`
 </details>
 
 </details>
-
-> ⚠️ **Warning:** plan: stdout_file output missing in steps
 
 ### Steps
 
@@ -20792,6 +20792,8 @@ null_resource.baseline
 exports[`reportFromSteps integration — plan-only fixtures > tofu/plan-error/1/plan-only > renders plan report and matches snapshot 1`] = `
 "## ❌ Plan Failed
 
+> ⚠️ **Warning:** This report was generated without \`tofu show -json <tfplan>\` output. Resource attribute details are not available.
+
 ### ❌ \`plan\` failed
 
 Exit code: \`1\`
@@ -20963,8 +20965,6 @@ Exit code: \`1\`
 
 
 </details>
-
-> ⚠️ **Warning:** This report was generated without \`tofu show -json <tfplan>\` output. Resource attribute details are not available.
 
 ## Plan Summary
 
@@ -21295,6 +21295,8 @@ null_resource.baseline
 exports[`reportFromSteps integration — plan-only fixtures > tofu/validate-error/1/plan-only > renders plan report and matches snapshot 1`] = `
 "## ❌ Plan Failed
 
+> ⚠️ **Warning:** plan: stdout_file output missing in steps
+
 ### ❌ \`validate\` failed
 
 Exit code: \`1\`
@@ -21351,8 +21353,6 @@ Exit code: \`1\`
 </details>
 
 </details>
-
-> ⚠️ **Warning:** plan: stdout_file output missing in steps
 
 ### Steps
 
