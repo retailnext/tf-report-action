@@ -196,10 +196,24 @@ are satisfied. **Never reduce thresholds.**
 
 ### Integration Test Coverage Exclusions
 
-**Only** `src/action/**` and `src/github/**` may be excluded from integration-only
-coverage measurement. These modules inherently require GitHub API interaction that
-cannot be exercised with fixture data. It is **forbidden** to add any other exclusion
-paths to `vitest.integration.config.ts`.
+The integration-only coverage config (`vitest.integration.config.ts`) may exclude
+modules that **cannot** be meaningfully exercised by fixture-driven integration tests.
+Allowed exclusion categories:
+
+- **Type-only / no-logic modules** — `tfjson/`, `model/`, `env/`, `*.d.ts`,
+  interface-only files (`builder/options.ts`, `renderer/options.ts`, `diff/types.ts`,
+  `compositor/types.ts`)
+- **Error-path-only modules** — `parser/`, `steps/parse.ts`, `steps/reader.ts` —
+  integration tests supply valid plan JSON from real tool runs; error paths are
+  exercised by unit tests
+- **Barrel reexports** — `steps/index.ts`, `compositor/index.ts`
+- **Requires live API** — `action/`, `github/` — require GitHub API interaction that
+  cannot be exercised with fixture data
+
+Every exclusion must include a comment in `vitest.integration.config.ts` explaining
+**why** the module cannot be covered by integration tests. Do not exclude modules
+that have logic exercisable through `planToMarkdown`, `applyToMarkdown`, or
+`reportFromSteps` with fixture data.
 
 ---
 

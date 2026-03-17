@@ -161,7 +161,7 @@ apply
 
 - `init` failure → `validate`, `plan`, `show`, and `apply` are all skipped
 - `plan` failure → `show` and `apply` are skipped
-- `validate` failure → does **not** block `plan` or `apply`
+- `validate` failure → skip `plan`, `show`, `apply`
 - `apply` failure → terminal (no downstream commands)
 
 Skipped commands produce no output files.

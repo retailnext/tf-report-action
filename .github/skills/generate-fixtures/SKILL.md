@@ -80,7 +80,7 @@ When a prerequisite command fails, dependent commands are skipped:
 
 - `init` failure → skip `validate`, `plan`, `show`, `apply`
 - `plan` failure → skip `show`, `apply`
-- `validate` failure → does NOT block `plan` or `apply`
+- `validate` failure → skip `plan`, `show`, `apply`
 - `apply` failure → terminal
 
 Skipped commands produce no output files. The `expect-fail` file itself is NOT copied
