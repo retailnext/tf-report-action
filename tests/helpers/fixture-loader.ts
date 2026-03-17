@@ -14,6 +14,7 @@
 import { readFileSync, readdirSync, existsSync } from "node:fs";
 import { join, dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+import { expect } from "vitest";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
@@ -295,4 +296,30 @@ export function resolveStepFilePaths(
     }
   }
   return JSON.stringify(steps);
+}
+
+/**
+ * Asserts that rendered Markdown output does not mention the wrong tool in
+ * backtick-quoted commands. The expected tool is extracted from the fixture
+ * label's first path segment (`"terraform"` or `"tofu"`).
+ *
+ * Call this from existing snapshot tests that already have the rendered result
+ * in scope — no re-rendering needed.
+ *
+ * Labels that do not start with a recognized tool name (e.g. manual fixtures)
+ * are silently skipped.
+ */
+export function assertCorrectToolName(result: string, label: string): void {
+  const tool = label.split("/")[0];
+  if (tool !== "terraform" && tool !== "tofu") return;
+
+  const wrongTool = tool === "terraform" ? "tofu" : "terraform";
+
+  // Match backtick-quoted commands like `tofu show` or `terraform state pull`
+  const wrongPattern = new RegExp("`" + wrongTool + " [a-z]", "g");
+  const matches = result.match(wrongPattern);
+  expect(
+    matches,
+    `${label}: output mentions wrong tool "${wrongTool}" in command references: ${String(matches?.join(", "))}`,
+  ).toBeNull();
 }

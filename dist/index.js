@@ -73,8 +73,8 @@ function parseValidateOutput(json) {
 
 // src/parser/detect-tool.ts
 function detectToolFromPlan(plan) {
-  if (plan.timestamp !== void 0) return "tofu";
   if (plan.applyable !== void 0) return "terraform";
+  if (plan.timestamp !== void 0) return "tofu";
   const version = plan.terraform_version;
   if (version !== void 0) {
     const lower = version.toLowerCase();

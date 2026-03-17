@@ -16,16 +16,20 @@ import type { Tool } from "../model/report.js";
  * Detect the IaC tool from a parsed Plan object.
  *
  * Uses tool-specific fields documented in `tfjson/plan.ts`:
- * - `timestamp` present → OpenTofu (`"tofu"`)
- * - `applyable` present → Terraform (`"terraform"`)
+ * - `applyable` present → Terraform (`"terraform"`) — this field is Terraform-only
+ * - `timestamp` present (without `applyable`) → OpenTofu (`"tofu"`)
  * - Falls back to inspecting the `terraform_version` string for "tofu"
+ *
+ * Note: `applyable` is checked first because Terraform 1.14+ emits both
+ * `applyable` and `timestamp`, while OpenTofu emits only `timestamp`.
  */
 export function detectToolFromPlan(plan: Plan): Tool | undefined {
-  // OpenTofu-only field
-  if (plan.timestamp !== undefined) return "tofu";
-
-  // Terraform-only field
+  // Terraform-only field — checked first because Terraform 1.14+ also
+  // emits timestamp, making that field ambiguous.
   if (plan.applyable !== undefined) return "terraform";
+
+  // OpenTofu-only when applyable is absent
+  if (plan.timestamp !== undefined) return "tofu";
 
   // Heuristic: OpenTofu uses the `terraform_version` key but the value
   // is an OpenTofu version string (the tool name is NOT in the string,

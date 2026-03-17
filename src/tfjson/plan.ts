@@ -30,8 +30,8 @@ import {
  * emitted by only one tool are documented as OPENTOFU ONLY or TERRAFORM ONLY.
  *
  * To determine which tool generated a plan, look for tool-specific fields:
- *   - timestamp present → likely OpenTofu
- *   - applyable present (non-zero) → likely Terraform
+ *   - applyable present → Terraform (checked first — Terraform-only)
+ *   - timestamp present (without applyable) → likely OpenTofu
  *   - terraform_version will contain the actual version string of whichever tool
  *     generated the plan (OpenTofu keeps the "terraform_version" key for
  *     compatibility but the value will be an OpenTofu version string).
@@ -170,7 +170,8 @@ export interface Plan {
    * timestamp is the UTC time at which this plan was generated, in ISO 8601
    * format (e.g. "2023-08-25T00:00:00Z").
    *
-   * OPENTOFU ONLY — Terraform does not include a timestamp in plan output.
+   * Originally OpenTofu-only, but Terraform 1.14+ also includes this field.
+   * Use `applyable` (Terraform-only) to distinguish the tools.
    */
   timestamp?: string;
 

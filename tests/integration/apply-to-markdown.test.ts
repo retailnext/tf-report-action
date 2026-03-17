@@ -1,7 +1,10 @@
 import { describe, it, expect, beforeAll } from "vitest";
 import { applyToMarkdown } from "../../src/index.js";
 import type { Options } from "../../src/index.js";
-import { discoverApplyFixtures } from "../helpers/fixture-loader.js";
+import {
+  discoverApplyFixtures,
+  assertCorrectToolName,
+} from "../helpers/fixture-loader.js";
 
 const fixtures = discoverApplyFixtures();
 
@@ -25,6 +28,7 @@ describe("applyToMarkdown integration", () => {
         it(`renders without error and matches snapshot [${name}]`, () => {
           const result = applyToMarkdown(planJson, applyJsonl, options);
           expect(result).toMatchSnapshot();
+          assertCorrectToolName(result, label);
         });
       }
     });

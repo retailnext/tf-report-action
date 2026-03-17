@@ -1,7 +1,10 @@
 import { describe, it, expect, beforeAll } from "vitest";
 import { planToMarkdown } from "../../src/index.js";
 import type { Options } from "../../src/index.js";
-import { discoverPlanFixtures } from "../helpers/fixture-loader.js";
+import {
+  discoverPlanFixtures,
+  assertCorrectToolName,
+} from "../helpers/fixture-loader.js";
 
 const fixtures = discoverPlanFixtures();
 
@@ -36,6 +39,7 @@ describe("planToMarkdown integration", () => {
         it(`renders without error and matches snapshot [${name}]`, () => {
           const result = planToMarkdown(json, options);
           expect(result).toMatchSnapshot();
+          assertCorrectToolName(result, label);
         });
       }
     });

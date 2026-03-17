@@ -10,6 +10,7 @@ import {
   discoverNoStateStepsFixtures,
   discoverManualStepsFixtures,
   resolveStepFilePaths,
+  assertCorrectToolName,
 } from "../helpers/fixture-loader.js";
 
 // ---------- Generated fixtures (full workflow — Tier 1 with apply) ----------
@@ -67,6 +68,7 @@ describe("reportFromSteps integration — generated fixtures", () => {
         };
         const result = reportFromSteps(resolved, options);
         expect(result).toMatchSnapshot();
+        assertCorrectToolName(result, label);
       });
 
       it("renders with workspace and matches snapshot", () => {
@@ -96,6 +98,7 @@ describe("reportFromSteps integration — plan-only fixtures", () => {
         };
         const result = reportFromSteps(resolved, options);
         expect(result).toMatchSnapshot();
+        assertCorrectToolName(result, label);
       });
 
       it("produces plan output (not apply)", () => {
@@ -130,6 +133,7 @@ describe("reportFromSteps integration — no-show fixtures (Tier 3)", () => {
         };
         const result = reportFromSteps(resolved, options);
         expect(result).toMatchSnapshot();
+        assertCorrectToolName(result, label);
       });
 
       it("produces structured output from JSONL (Tier 2 enrichment)", () => {
@@ -162,6 +166,7 @@ describe("reportFromSteps integration — apply-no-show fixtures", () => {
         };
         const result = reportFromSteps(resolved, options);
         expect(result).toMatchSnapshot();
+        assertCorrectToolName(result, label);
       });
 
       it("includes structured or raw output", () => {
@@ -193,6 +198,7 @@ describe("reportFromSteps integration — apply-only fixtures", () => {
         };
         const result = reportFromSteps(resolved, options);
         expect(result).toMatchSnapshot();
+        assertCorrectToolName(result, label);
       });
 
       it("produces output for apply-only fixture", () => {
@@ -491,6 +497,7 @@ describe("reportFromSteps integration — manual fixtures", () => {
         };
         const result = reportFromSteps(resolved, options);
         expect(result).toMatchSnapshot();
+        assertCorrectToolName(result, label);
       });
     });
   }
@@ -1117,6 +1124,7 @@ describe("reportFromSteps — state enrichment", () => {
       };
       const result = reportFromSteps(resolved, options);
       expect(result).toMatchSnapshot();
+      assertCorrectToolName(result, label);
     });
   }
 });

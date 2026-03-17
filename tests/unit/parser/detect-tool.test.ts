@@ -32,6 +32,14 @@ describe("detectToolFromPlan", () => {
     expect(detectToolFromPlan(plan)).toBe("tofu");
   });
 
+  it("returns 'terraform' when both applyable and timestamp are present", () => {
+    const plan = makePlan({
+      applyable: true,
+      timestamp: "2024-01-01T00:00:00Z",
+    });
+    expect(detectToolFromPlan(plan)).toBe("terraform");
+  });
+
   it("returns 'tofu' when terraform_version contains 'tofu'", () => {
     const plan = makePlan({ terraform_version: "1.8.0-dev+tofu" });
     expect(detectToolFromPlan(plan)).toBe("tofu");

@@ -446,6 +446,13 @@ them, because attribute values may be sensitive. This means:
   error strings.
 - Structural metadata (format version, field names) is safe to include in errors.
 
+Error and warning messages must **never** hardcode tool names (`"tofu"`,
+`"terraform"`). Always use `expectedCommand(tool, role)` from
+`src/model/step-commands.ts` or pass the detected `tool` value. This ensures
+messages automatically reflect the tool that produced the input. Integration
+tests enforce this: every fixture's rendered output is checked for mentions of
+the wrong tool via `assertCorrectToolName()` in `tests/helpers/fixture-loader.ts`.
+
 ---
 
 ## Testing
