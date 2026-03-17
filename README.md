@@ -1,4 +1,4 @@
-# TF Report Action
+# `tf-report-action`
 
 Reports OpenTofu/Terraform workflow status as PR comments or status issues with
 rich plan and apply detail.
@@ -9,15 +9,15 @@ rich plan and apply detail.
   by module
 - **Apply reports** — shows only actually-changed resources with per-resource outcomes
   and diagnostics
-- **Tiered degradation** — structured plan → raw text fallback → general workflow table,
-  depending on available data
+- **Progressive enrichment** — structured plan → raw text fallback → general workflow
+  table, progressively enriched with whatever data is available
 - **PR comments** — automatically posts and updates comments on pull requests with
   workspace-based deduplication
 - **Status issues** — creates and maintains status issues for non-PR workflows
   (push to main, scheduled runs)
 - **Auto-discovery** — automatically identifies init, validate, plan, show-plan, and
   apply steps from the workflow context
-- **Budget-aware** — intelligently truncates output to fit within GitHub's 65,536
+- **Limit-aware** — intelligently truncates output to fit within GitHub's 65,536
   character limit while preserving the most important information
 - **Zero runtime dependencies** — uses only Node.js built-in modules
 
@@ -42,10 +42,6 @@ jobs:
       - name: Set up OpenTofu
         uses: opentofu/setup-opentofu@v1
         with:
-          # The wrapper is disabled because it fails to forward signals properly
-          # (opentofu/setup-opentofu#41), interferes with detailed exitcodes
-          # (opentofu/setup-opentofu#42), and is generally discouraged when using
-          # retailnext/exec-action to run OpenTofu.
           tofu_wrapper: false
 
       - name: Init
@@ -77,76 +73,33 @@ jobs:
 
 ## Usage Examples
 
-### PR Plan Workflow (Basic)
+### Comprehensive Workflow (PR Plan + Merge Apply)
 
-For the simplest setup without structured plan output:
+A single workflow that plans on pull requests and applies on merge to main.
+All steps use `-json` where available for the richest output. The `workspace`
+input identifies the report for deduplication.
 
-```yaml
-- name: Init
-  id: init
-  uses: retailnext/exec-action@main
-  with:
-    command: tofu init -no-color
+On PRs, the action posts a comment with the plan. On push to main, it creates
+or updates a status issue with the apply result.
 
-- name: Plan
-  id: plan
-  uses: retailnext/exec-action@main
-  with:
-    command: tofu plan -no-color
-    success_exit_codes: "0,2"
-
-- name: Report
-  if: always()
-  uses: retailnext/tf-report-action@main
-  with:
-    steps: ${{ toJSON(steps) }}
-    github-token: ${{ github.token }}
-```
-
-### Show-Plan Pattern for Richest Output
-
-Adding a `show-plan` step that outputs plan JSON enables attribute-level diffs
-with inline character highlighting:
+<!-- textlint-disable terminology -->
 
 ```yaml
-- name: Plan
-  id: plan
-  uses: retailnext/exec-action@main
-  with:
-    command: tofu plan -no-color -out=tfplan
-    success_exit_codes: "0,2"
-
-- name: Show Plan
-  id: show-plan
-  uses: retailnext/exec-action@main
-  with:
-    command: tofu show -json tfplan
-
-- name: Report
-  if: always()
-  uses: retailnext/tf-report-action@main
-  with:
-    steps: ${{ toJSON(steps) }}
-    github-token: ${{ github.token }}
-```
-
-### Apply with Environment Protection
-
-```yaml
-name: Apply
+name: Infrastructure
 
 on:
+  pull_request:
   push:
     branches: [main]
 
 permissions:
   contents: read
+  pull-requests: write
   issues: write
 
 jobs:
-  apply:
+  deploy:
     runs-on: ubuntu-latest
-    environment: production
     steps:
       - uses: actions/checkout@v4
 
@@ -161,11 +114,31 @@ jobs:
         with:
           command: tofu init -no-color
 
-      - name: Apply
-        id: apply
+      - name: Validate
+        id: validate
         uses: retailnext/exec-action@main
         with:
-          command: tofu apply -auto-approve -no-color -json
+          command: tofu validate -json -no-color
+
+      - name: Plan
+        id: plan
+        uses: retailnext/exec-action@main
+        with:
+          command: tofu plan -no-color -json -detailed-exitcode -out=tfplan
+          success_exit_codes: "0,2"
+
+      - name: Show Plan
+        id: show-plan
+        uses: retailnext/exec-action@main
+        with:
+          command: tofu show -json tfplan
+
+      - name: Apply
+        id: apply
+        if: github.event_name == 'push'
+        uses: retailnext/exec-action@main
+        with:
+          command: tofu apply -auto-approve -json tfplan
 
       - name: Report
         if: always()
@@ -176,13 +149,92 @@ jobs:
           github-token: ${{ github.token }}
 ```
 
-### Status Issues on Main Branch Pushes
+<!-- textlint-enable terminology -->
 
-When triggered outside a PR context, the action creates or updates a status
-issue instead of posting a PR comment:
+### Multiple Workspaces via Matrix
+
+When managing multiple workspaces from the same repository, use a matrix to run
+each workspace in its own working directory. Each workspace gets a separate PR
+comment, identified by its deduplication marker.
+
+<!-- textlint-disable terminology -->
 
 ```yaml
-name: Deploy
+name: Infrastructure
+
+on:
+  pull_request:
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  plan:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        workspace:
+          - name: staging
+            directory: envs/staging
+          - name: production
+            directory: envs/production
+    defaults:
+      run:
+        working-directory: ${{ matrix.workspace.directory }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up OpenTofu
+        uses: opentofu/setup-opentofu@v1
+        with:
+          tofu_wrapper: false
+
+      - name: Init
+        id: init
+        uses: retailnext/exec-action@main
+        with:
+          command: tofu init -no-color
+          working_directory: ${{ matrix.workspace.directory }}
+
+      - name: Plan
+        id: plan
+        uses: retailnext/exec-action@main
+        with:
+          command: tofu plan -no-color -json -detailed-exitcode -out=tfplan
+          success_exit_codes: "0,2"
+          working_directory: ${{ matrix.workspace.directory }}
+
+      - name: Show Plan
+        id: show-plan
+        uses: retailnext/exec-action@main
+        with:
+          command: tofu show -json tfplan
+          working_directory: ${{ matrix.workspace.directory }}
+
+      - name: Report
+        if: always()
+        uses: retailnext/tf-report-action@main
+        with:
+          steps: ${{ toJSON(steps) }}
+          workspace: ${{ matrix.workspace.name }}
+          github-token: ${{ github.token }}
+```
+
+<!-- textlint-enable terminology -->
+
+### Reporting Non-IaC Workflows with `target-step`
+
+The action can report on any workflow, not just Terraform/OpenTofu. The
+`target-step` input focuses the report on a specific step — if that step is
+skipped or fails, the report prominently surfaces the failure.
+
+When no recognized IaC steps are found, the action renders a general workflow
+step status table showing each step's outcome, exit code, and duration.
+
+```yaml
+name: Database Migration
 
 on:
   push:
@@ -193,110 +245,31 @@ permissions:
   issues: write
 
 jobs:
-  deploy:
+  migrate:
     runs-on: ubuntu-latest
     steps:
-      # ... init, plan, apply steps ...
+      - uses: actions/checkout@v4
+
+      - name: Run Migrations
+        id: migrate
+        uses: retailnext/exec-action@main
+        with:
+          command: npm run db:migrate
+
+      - name: Verify Schema
+        id: verify
+        uses: retailnext/exec-action@main
+        with:
+          command: npm run db:verify
 
       - name: Report
         if: always()
         uses: retailnext/tf-report-action@main
         with:
           steps: ${{ toJSON(steps) }}
-          workspace: production
+          target-step: migrate
+          workspace: db-migrations
           github-token: ${{ github.token }}
-```
-
-The action searches for an existing issue with the matching workspace marker
-and updates it. If none exists, it creates a new one with the title
-``:bar_chart: `production` Status``.
-
-### Multiple Workspaces in a Single Job
-
-Use the `workspace` input to distinguish reports when running multiple
-workspaces in the same job:
-
-```yaml
-- name: Plan Staging
-  id: plan-staging
-  uses: retailnext/exec-action@main
-  with:
-    command: tofu plan -no-color -var-file=staging.tfvars
-
-- name: Report Staging
-  if: always()
-  uses: retailnext/tf-report-action@main
-  with:
-    steps: ${{ toJSON(steps) }}
-    workspace: staging
-    github-token: ${{ github.token }}
-
-- name: Plan Production
-  id: plan-production
-  uses: retailnext/exec-action@main
-  with:
-    command: tofu plan -no-color -var-file=production.tfvars
-
-- name: Report Production
-  if: always()
-  uses: retailnext/tf-report-action@main
-  with:
-    steps: ${{ toJSON(steps) }}
-    workspace: production
-    github-token: ${{ github.token }}
-```
-
-Each workspace gets its own comment, identified by a unique deduplication
-marker.
-
-### Custom Step IDs
-
-If your workflow uses non-default step IDs, override them:
-
-```yaml
-- name: Initialize
-  id: tf-init
-  uses: retailnext/exec-action@main
-  with:
-    command: tofu init -no-color
-
-- name: Create Plan
-  id: tf-plan
-  uses: retailnext/exec-action@main
-  with:
-    command: tofu plan -no-color
-    success_exit_codes: "0,2"
-
-- name: Report
-  if: always()
-  uses: retailnext/tf-report-action@main
-  with:
-    steps: ${{ toJSON(steps) }}
-    github-token: ${{ github.token }}
-    init-step: tf-init
-    plan-step: tf-plan
-```
-
-### Target Step for Non-IaC Use Cases
-
-The `target-step` input focuses the report on a specific step. When specified,
-the report treats that step being skipped or failing as a serious error that
-is prominently reported:
-
-```yaml
-- name: Database Migration
-  id: migrate
-  uses: retailnext/exec-action@main
-  with:
-    command: npm run migrate
-
-- name: Report
-  if: always()
-  uses: retailnext/tf-report-action@main
-  with:
-    steps: ${{ toJSON(steps) }}
-    target-step: migrate
-    github-token: ${{ github.token }}
 ```
 
 ## Inputs
@@ -307,7 +280,7 @@ is prominently reported:
 | `workspace`      | No       | `GITHUB_WORKFLOW/GITHUB_JOB` | Workspace name for comment title, status issue title, and deduplication marker |
 | `target-step`    | No       | —                            | Step ID to focus the report on; skipped/failed status is prominently reported  |
 | `github-token`   | Yes      | —                            | GitHub token for API calls                                                     |
-| `init-step`      | No       | `init`                       | Step ID for the init step                                                      |
+| `init-step`      | No       | `init`                       | Step ID for the init step (override when your workflow uses non-default IDs)   |
 | `validate-step`  | No       | `validate`                   | Step ID for the validate step                                                  |
 | `plan-step`      | No       | `plan`                       | Step ID for the plan step                                                      |
 | `show-plan-step` | No       | `show-plan`                  | Step ID for the show-plan step                                                 |
@@ -322,18 +295,21 @@ looks for steps matching the configured step IDs (defaulting to `init`,
 `validate`, `plan`, `show-plan`, and `apply`) and determines which operations
 were performed.
 
-### Tiered Degradation
+### Progressive Enrichment
 
-The report quality depends on what data is available:
+The action progressively enriches the report with whatever data is available:
 
 1. **Tier 1 — Structured report**: When a `show-plan` step provides plan JSON,
    the action renders a full report with attribute-level diffs, module grouping,
-   and inline character highlighting.
+   and inline character highlighting. Adding `-json` to plan and apply steps
+   further enriches the report with diagnostics, drift detection, and
+   per-resource apply outcomes.
 2. **Tier 3 — Raw text fallback**: When no show-plan JSON is available but plan
    or apply steps ran, the action formats their raw output with JSON Lines
    parsing where possible.
 3. **Tier 4 — Workflow table**: When no recognized IaC steps are found, the
-   action renders a general workflow step status table.
+   action renders a general workflow step status table. This is the mode used
+   when reporting non-IaC workflows via `target-step`.
 
 ### Comment Lifecycle
 
@@ -365,7 +341,7 @@ The `contents: read` permission is always needed to check out the repository.
 ## Size Limits
 
 GitHub enforces a 65,536 character limit on comment and issue bodies. The action
-automatically manages this budget:
+automatically manages output within this limit:
 
 - The rendering engine uses a compositor that progressively degrades sections
   (full → compact → omit) to fit within the limit
