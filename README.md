@@ -42,6 +42,9 @@ jobs:
       - name: Set up OpenTofu
         uses: opentofu/setup-opentofu@v1
         with:
+          # The wrapper is disabled because it interferes with signal forwarding
+          # (opentofu/setup-opentofu#41), detailed exitcodes (opentofu/setup-opentofu#42),
+          # and is generally discouraged when using retailnext/exec-action.
           tofu_wrapper: false
 
       - name: Init
@@ -112,6 +115,9 @@ jobs:
       - name: Set up OpenTofu
         uses: opentofu/setup-opentofu@v1
         with:
+          # The wrapper is disabled because it interferes with signal forwarding
+          # (opentofu/setup-opentofu#41), detailed exitcodes (opentofu/setup-opentofu#42),
+          # and is generally discouraged when using retailnext/exec-action.
           tofu_wrapper: false
 
       - name: Init
@@ -195,6 +201,9 @@ jobs:
       - name: Set up OpenTofu
         uses: opentofu/setup-opentofu@v1
         with:
+          # The wrapper is disabled because it interferes with signal forwarding
+          # (opentofu/setup-opentofu#41), detailed exitcodes (opentofu/setup-opentofu#42),
+          # and is generally discouraged when using retailnext/exec-action.
           tofu_wrapper: false
 
       - name: Init
