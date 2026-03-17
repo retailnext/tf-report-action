@@ -44,7 +44,9 @@ export function renderResource(
 
   // Build summary text
   const changedAttrs = resource.attributes
-    .filter((a) => !a.isSensitive && a.before !== a.after)
+    .filter(
+      (a) => !a.isSensitive && !a.isKnownAfterApply && a.before !== a.after,
+    )
     .map((a) => a.name);
 
   let summaryText = `${symbol} <strong>${MarkdownWriter.escapeCell(resource.type)}</strong> ${MarkdownWriter.escapeCell(deriveInstanceName(resource.address, resource.type))}`;

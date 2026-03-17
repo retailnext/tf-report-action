@@ -49,9 +49,8 @@ export function buildStepOutcomes(
     .map(([id, step]) => {
       const outcome = getStepOutcome(step);
       const exitCode = getExitCode(step);
-      const result: StepOutcome = { id, outcome };
-      if (exitCode !== undefined)
-        (result as { exitCode: string }).exitCode = exitCode;
-      return result;
+      return exitCode !== undefined
+        ? { id, outcome, exitCode }
+        : { id, outcome };
     });
 }

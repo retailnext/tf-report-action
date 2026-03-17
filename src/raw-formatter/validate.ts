@@ -28,14 +28,18 @@ export function tryFormatValidateOutput(content: string): string | undefined {
   const obj = parsed as Record<string, unknown>;
   if (
     !("valid" in obj) ||
+    typeof obj["valid"] !== "boolean" ||
     !("diagnostics" in obj) ||
     !Array.isArray(obj["diagnostics"])
   ) {
     return undefined;
   }
 
-  const valid = obj["valid"] as boolean;
-  const diagnostics = obj["diagnostics"] as Record<string, unknown>[];
+  const valid = obj["valid"];
+  const diagnostics = obj["diagnostics"].filter(
+    (d): d is Record<string, unknown> =>
+      typeof d === "object" && d !== null && !Array.isArray(d),
+  );
 
   let output = "";
   if (valid) {

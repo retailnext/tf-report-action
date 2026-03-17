@@ -4,7 +4,7 @@
  */
 
 import type { Change } from "../tfjson/plan.js";
-import type { AttributeValues, AttributeShadow } from "../tfjson/common.js";
+import type { AttributeShadow } from "../tfjson/common.js";
 import type { AttributeChange } from "../model/attribute.js";
 import type { BuildOptions } from "./options.js";
 import type { ConfigRefIndex } from "./config-refs.js";
@@ -91,27 +91,7 @@ export function buildAttributeChanges(
   // Check if entire resource is unknown after apply
   const allUnknown = unknownMap.get("") === "true";
 
-  // Collect all attribute keys from before and after
-  const allKeys = new Set<string>();
-
-  function collectKeys(values: AttributeValues | null): void {
-    if (!values) return;
-    for (const [k] of Object.entries(values)) {
-      allKeys.add(k);
-    }
-  }
-
-  collectKeys(before);
-  collectKeys(after);
-
-  // Also add keys from unknownMap that may not be in before/after
-  for (const [k] of unknownMap) {
-    if (k !== "" && unknownMap.get(k) === "true") {
-      allKeys.add(k.split(".")[0]?.split("[")[0] ?? k);
-    }
-  }
-
-  // We'll flatten the before/after objects to get nested keys
+  // Flatten the before/after objects to get nested keys
   const beforeFlat = before
     ? flatten(before as unknown as import("../tfjson/common.js").JsonValue)
     : new Map<string, string | null>();

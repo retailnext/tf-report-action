@@ -116,12 +116,16 @@ export function readForDisplay(
   try {
     const buffer = Buffer.alloc(bytesToRead);
     const fd = openSync(realPath, "r");
+    let bytesRead: number;
     try {
-      readSync(fd, buffer, 0, bytesToRead, 0);
+      bytesRead = readSync(fd, buffer, 0, bytesToRead, 0);
     } finally {
       closeSync(fd);
     }
-    return { content: buffer.toString("utf-8"), truncated };
+    return {
+      content: buffer.subarray(0, bytesRead).toString("utf-8"),
+      truncated,
+    };
   } catch {
     return { error: "Failed to read file" };
   }

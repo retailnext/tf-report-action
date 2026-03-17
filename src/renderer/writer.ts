@@ -3,6 +3,8 @@
  * used under the MIT License.
  */
 
+import { escapeHtml } from "../raw-formatter/jsonl.js";
+
 /**
  * A fluent markdown writer with helper methods for common markdown constructs.
  * All methods return `this` for chaining.
@@ -101,8 +103,16 @@ export class MarkdownWriter {
     return value.replace(/\\/g, "\\\\").replace(/\|/g, "\\|");
   }
 
-  /** Wraps value in `<code>` tags. */
+  /**
+   * Escape characters that have special meaning in HTML.
+   * Delegates to the shared `escapeHtml` utility from `raw-formatter/jsonl`.
+   */
+  static escapeHtml(text: string): string {
+    return escapeHtml(text);
+  }
+
+  /** Wraps value in `<code>` tags, HTML-escaping the content. */
   static inlineCode(value: string): string {
-    return `<code>${value}</code>`;
+    return `<code>${escapeHtml(value)}</code>`;
   }
 }

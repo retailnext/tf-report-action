@@ -6564,7 +6564,7 @@ terraform_data.worker_c
 
 | Output | Action | Before | After |
 | --- | --- | --- | --- |
-| config_value | ➕ |  | <code>{"worker_a":"alpha","worker_b":"bravo","worker_c":"charlie"}</code> |
+| config_value | ➕ |  | <code>{&quot;worker_a&quot;:&quot;alpha&quot;,&quot;worker_b&quot;:&quot;bravo&quot;,&quot;worker_c&quot;:&quot;charlie&quot;}</code> |
 
 "
 `;
@@ -6761,7 +6761,7 @@ terraform_data.worker_c
 
 | Output | Action | Before | After |
 | --- | --- | --- | --- |
-| config_value | ➕ |  | <code>{"worker_a":"alpha","worker_b":"bravo","worker_c":"charlie"}</code> |
+| config_value | ➕ |  | <code>{&quot;worker_a&quot;:&quot;alpha&quot;,&quot;worker_b&quot;:&quot;bravo&quot;,&quot;worker_c&quot;:&quot;charlie&quot;}</code> |
 
 "
 `;
@@ -6837,7 +6837,7 @@ terraform_data.independent
 
 | Output | Action | Before | After |
 | --- | --- | --- | --- |
-| config_value | 🔧 | <code>{"worker_a":"alpha","worker_b":"bravo","worker_c":"charlie"}</code> | <code>{"worker_a":"alpha","worker_b":"bravo","worker_c":"charlie"}</code> |
+| config_value | 🔧 | <code>{&quot;worker_a&quot;:&quot;alpha&quot;,&quot;worker_b&quot;:&quot;bravo&quot;,&quot;worker_c&quot;:&quot;charlie&quot;}</code> | <code>{&quot;worker_a&quot;:&quot;alpha&quot;,&quot;worker_b&quot;:&quot;bravo&quot;,&quot;worker_c&quot;:&quot;charlie&quot;}</code> |
 
 "
 `;
@@ -6912,7 +6912,7 @@ terraform_data.independent
 
 | Output | Action | Before | After |
 | --- | --- | --- | --- |
-| config_value | 🔧 | <code>{"worker_a":"alpha","worker_b":"bravo","worker_c":"charlie"}</code> | <code>{"worker_a":"alpha","worker_b":"bravo","worker_c":"charlie"}</code> |
+| config_value | 🔧 | <code>{&quot;worker_a&quot;:&quot;alpha&quot;,&quot;worker_b&quot;:&quot;bravo&quot;,&quot;worker_c&quot;:&quot;charlie&quot;}</code> | <code>{&quot;worker_a&quot;:&quot;alpha&quot;,&quot;worker_b&quot;:&quot;bravo&quot;,&quot;worker_c&quot;:&quot;charlie&quot;}</code> |
 
 "
 `;
@@ -7007,7 +7007,7 @@ terraform_data.worker_a
 
 | Output | Action | Before | After |
 | --- | --- | --- | --- |
-| config_value | 🔧 | <code>{"worker_a":"alpha","worker_b":"bravo","worker_c":"charlie"}</code> | <code>{"worker_a":"ALPHA","worker_b":"bravo","worker_c":"charlie"}</code> |
+| config_value | 🔧 | <code>{&quot;worker_a&quot;:&quot;alpha&quot;,&quot;worker_b&quot;:&quot;bravo&quot;,&quot;worker_c&quot;:&quot;charlie&quot;}</code> | <code>{&quot;worker_a&quot;:&quot;ALPHA&quot;,&quot;worker_b&quot;:&quot;bravo&quot;,&quot;worker_c&quot;:&quot;charlie&quot;}</code> |
 
 "
 `;
@@ -7101,7 +7101,7 @@ terraform_data.worker_a
 
 | Output | Action | Before | After |
 | --- | --- | --- | --- |
-| config_value | 🔧 | <code>{"worker_a":"alpha","worker_b":"bravo","worker_c":"charlie"}</code> | <code>{"worker_a":"ALPHA","worker_b":"bravo","worker_c":"charlie"}</code> |
+| config_value | 🔧 | <code>{&quot;worker_a&quot;:&quot;alpha&quot;,&quot;worker_b&quot;:&quot;bravo&quot;,&quot;worker_c&quot;:&quot;charlie&quot;}</code> | <code>{&quot;worker_a&quot;:&quot;ALPHA&quot;,&quot;worker_b&quot;:&quot;bravo&quot;,&quot;worker_c&quot;:&quot;charlie&quot;}</code> |
 
 "
 `;
@@ -10711,7 +10711,7 @@ terraform_data.worker_c
 
 | Output | Action | Before | After |
 | --- | --- | --- | --- |
-| config_value | ➕ |  | <code>{"worker_a":"alpha","worker_b":"bravo","worker_c":"charlie"}</code> |
+| config_value | ➕ |  | <code>{&quot;worker_a&quot;:&quot;alpha&quot;,&quot;worker_b&quot;:&quot;bravo&quot;,&quot;worker_c&quot;:&quot;charlie&quot;}</code> |
 
 "
 `;
@@ -10908,7 +10908,7 @@ terraform_data.worker_c
 
 | Output | Action | Before | After |
 | --- | --- | --- | --- |
-| config_value | ➕ |  | <code>{"worker_a":"alpha","worker_b":"bravo","worker_c":"charlie"}</code> |
+| config_value | ➕ |  | <code>{&quot;worker_a&quot;:&quot;alpha&quot;,&quot;worker_b&quot;:&quot;bravo&quot;,&quot;worker_c&quot;:&quot;charlie&quot;}</code> |
 
 "
 `;
@@ -10984,7 +10984,7 @@ terraform_data.independent
 
 | Output | Action | Before | After |
 | --- | --- | --- | --- |
-| config_value | 🔧 | <code>{"worker_a":"alpha","worker_b":"bravo","worker_c":"charlie"}</code> | <code>{"worker_a":"alpha","worker_b":"bravo","worker_c":"charlie"}</code> |
+| config_value | 🔧 | <code>{&quot;worker_a&quot;:&quot;alpha&quot;,&quot;worker_b&quot;:&quot;bravo&quot;,&quot;worker_c&quot;:&quot;charlie&quot;}</code> | <code>{&quot;worker_a&quot;:&quot;alpha&quot;,&quot;worker_b&quot;:&quot;bravo&quot;,&quot;worker_c&quot;:&quot;charlie&quot;}</code> |
 
 "
 `;
@@ -11059,7 +11059,7 @@ terraform_data.independent
 
 | Output | Action | Before | After |
 | --- | --- | --- | --- |
-| config_value | 🔧 | <code>{"worker_a":"alpha","worker_b":"bravo","worker_c":"charlie"}</code> | <code>{"worker_a":"alpha","worker_b":"bravo","worker_c":"charlie"}</code> |
+| config_value | 🔧 | <code>{&quot;worker_a&quot;:&quot;alpha&quot;,&quot;worker_b&quot;:&quot;bravo&quot;,&quot;worker_c&quot;:&quot;charlie&quot;}</code> | <code>{&quot;worker_a&quot;:&quot;alpha&quot;,&quot;worker_b&quot;:&quot;bravo&quot;,&quot;worker_c&quot;:&quot;charlie&quot;}</code> |
 
 "
 `;
@@ -11154,7 +11154,7 @@ terraform_data.worker_a
 
 | Output | Action | Before | After |
 | --- | --- | --- | --- |
-| config_value | 🔧 | <code>{"worker_a":"alpha","worker_b":"bravo","worker_c":"charlie"}</code> | <code>{"worker_a":"ALPHA","worker_b":"bravo","worker_c":"charlie"}</code> |
+| config_value | 🔧 | <code>{&quot;worker_a&quot;:&quot;alpha&quot;,&quot;worker_b&quot;:&quot;bravo&quot;,&quot;worker_c&quot;:&quot;charlie&quot;}</code> | <code>{&quot;worker_a&quot;:&quot;ALPHA&quot;,&quot;worker_b&quot;:&quot;bravo&quot;,&quot;worker_c&quot;:&quot;charlie&quot;}</code> |
 
 "
 `;
@@ -11248,7 +11248,7 @@ terraform_data.worker_a
 
 | Output | Action | Before | After |
 | --- | --- | --- | --- |
-| config_value | 🔧 | <code>{"worker_a":"alpha","worker_b":"bravo","worker_c":"charlie"}</code> | <code>{"worker_a":"ALPHA","worker_b":"bravo","worker_c":"charlie"}</code> |
+| config_value | 🔧 | <code>{&quot;worker_a&quot;:&quot;alpha&quot;,&quot;worker_b&quot;:&quot;bravo&quot;,&quot;worker_c&quot;:&quot;charlie&quot;}</code> | <code>{&quot;worker_a&quot;:&quot;ALPHA&quot;,&quot;worker_b&quot;:&quot;bravo&quot;,&quot;worker_c&quot;:&quot;charlie&quot;}</code> |
 
 "
 `;
@@ -16511,7 +16511,7 @@ null_resource.will_fail
 </details>
 
 <details>
-<summary>🔧 <strong>terraform_data</strong> depends_on_fail — changed: input, output</summary>
+<summary>🔧 <strong>terraform_data</strong> depends_on_fail</summary>
 
 \`\`\`
 terraform_data.depends_on_fail
@@ -16680,7 +16680,7 @@ local_file.metadata
 </details>
 
 <details>
-<summary>🔧 <strong>terraform_data</strong> independent — changed: input, output</summary>
+<summary>🔧 <strong>terraform_data</strong> independent — changed: input</summary>
 
 \`\`\`
 terraform_data.independent
@@ -16694,7 +16694,7 @@ terraform_data.independent
 </details>
 
 <details>
-<summary>🔧 <strong>terraform_data</strong> worker_a — changed: input, output</summary>
+<summary>🔧 <strong>terraform_data</strong> worker_a</summary>
 
 \`\`\`
 terraform_data.worker_a
@@ -16705,7 +16705,7 @@ _(all values known after apply)_
 </details>
 
 <details>
-<summary>🔧 <strong>terraform_data</strong> worker_b — changed: input, output</summary>
+<summary>🔧 <strong>terraform_data</strong> worker_b</summary>
 
 \`\`\`
 terraform_data.worker_b
@@ -16716,7 +16716,7 @@ _(all values known after apply)_
 </details>
 
 <details>
-<summary>🔧 <strong>terraform_data</strong> worker_c — changed: input, output</summary>
+<summary>🔧 <strong>terraform_data</strong> worker_c</summary>
 
 \`\`\`
 terraform_data.worker_c
@@ -16730,7 +16730,7 @@ _(all values known after apply)_
 
 | Output | Action | Before | After |
 | --- | --- | --- | --- |
-| config_value | 🔧 | <code>{"worker_a":"alpha","worker_b":"bravo","worker_c":"charlie"}</code> | <code>(known after apply)</code> |
+| config_value | 🔧 | <code>{&quot;worker_a&quot;:&quot;alpha&quot;,&quot;worker_b&quot;:&quot;bravo&quot;,&quot;worker_c&quot;:&quot;charlie&quot;}</code> | <code>(known after apply)</code> |
 
 "
 `;
@@ -16786,7 +16786,7 @@ local_file.config
 </details>
 
 <details>
-<summary>🔧 <strong>terraform_data</strong> worker_a — changed: input, output</summary>
+<summary>🔧 <strong>terraform_data</strong> worker_a</summary>
 
 \`\`\`
 terraform_data.worker_a
@@ -16797,7 +16797,7 @@ _(all values known after apply)_
 </details>
 
 <details>
-<summary>🔧 <strong>terraform_data</strong> worker_b — changed: input, output</summary>
+<summary>🔧 <strong>terraform_data</strong> worker_b</summary>
 
 \`\`\`
 terraform_data.worker_b
@@ -16808,7 +16808,7 @@ _(all values known after apply)_
 </details>
 
 <details>
-<summary>🔧 <strong>terraform_data</strong> worker_c — changed: input, output</summary>
+<summary>🔧 <strong>terraform_data</strong> worker_c</summary>
 
 \`\`\`
 terraform_data.worker_c
@@ -16822,7 +16822,7 @@ _(all values known after apply)_
 
 | Output | Action | Before | After |
 | --- | --- | --- | --- |
-| config_value | 🔧 | <code>{"worker_a":"alpha","worker_b":"bravo","worker_c":"charlie"}</code> | <code>(known after apply)</code> |
+| config_value | 🔧 | <code>{&quot;worker_a&quot;:&quot;alpha&quot;,&quot;worker_b&quot;:&quot;bravo&quot;,&quot;worker_c&quot;:&quot;charlie&quot;}</code> | <code>(known after apply)</code> |
 
 "
 `;
@@ -17733,7 +17733,7 @@ null_resource.beta
 </details>
 
 <details>
-<summary>🔧 <strong>terraform_data</strong> meta — changed: input, output</summary>
+<summary>🔧 <strong>terraform_data</strong> meta — changed: input</summary>
 
 \`\`\`
 terraform_data.meta
@@ -18171,7 +18171,7 @@ null_resource.will_fail
 </details>
 
 <details>
-<summary>🔧 <strong>terraform_data</strong> depends_on_fail — changed: input, output</summary>
+<summary>🔧 <strong>terraform_data</strong> depends_on_fail</summary>
 
 \`\`\`
 terraform_data.depends_on_fail
@@ -18340,7 +18340,7 @@ local_file.metadata
 </details>
 
 <details>
-<summary>🔧 <strong>terraform_data</strong> independent — changed: input, output</summary>
+<summary>🔧 <strong>terraform_data</strong> independent — changed: input</summary>
 
 \`\`\`
 terraform_data.independent
@@ -18354,7 +18354,7 @@ terraform_data.independent
 </details>
 
 <details>
-<summary>🔧 <strong>terraform_data</strong> worker_a — changed: input, output</summary>
+<summary>🔧 <strong>terraform_data</strong> worker_a</summary>
 
 \`\`\`
 terraform_data.worker_a
@@ -18365,7 +18365,7 @@ _(all values known after apply)_
 </details>
 
 <details>
-<summary>🔧 <strong>terraform_data</strong> worker_b — changed: input, output</summary>
+<summary>🔧 <strong>terraform_data</strong> worker_b</summary>
 
 \`\`\`
 terraform_data.worker_b
@@ -18376,7 +18376,7 @@ _(all values known after apply)_
 </details>
 
 <details>
-<summary>🔧 <strong>terraform_data</strong> worker_c — changed: input, output</summary>
+<summary>🔧 <strong>terraform_data</strong> worker_c</summary>
 
 \`\`\`
 terraform_data.worker_c
@@ -18390,7 +18390,7 @@ _(all values known after apply)_
 
 | Output | Action | Before | After |
 | --- | --- | --- | --- |
-| config_value | 🔧 | <code>{"worker_a":"alpha","worker_b":"bravo","worker_c":"charlie"}</code> | <code>(known after apply)</code> |
+| config_value | 🔧 | <code>{&quot;worker_a&quot;:&quot;alpha&quot;,&quot;worker_b&quot;:&quot;bravo&quot;,&quot;worker_c&quot;:&quot;charlie&quot;}</code> | <code>(known after apply)</code> |
 
 "
 `;
@@ -18446,7 +18446,7 @@ local_file.config
 </details>
 
 <details>
-<summary>🔧 <strong>terraform_data</strong> worker_a — changed: input, output</summary>
+<summary>🔧 <strong>terraform_data</strong> worker_a</summary>
 
 \`\`\`
 terraform_data.worker_a
@@ -18457,7 +18457,7 @@ _(all values known after apply)_
 </details>
 
 <details>
-<summary>🔧 <strong>terraform_data</strong> worker_b — changed: input, output</summary>
+<summary>🔧 <strong>terraform_data</strong> worker_b</summary>
 
 \`\`\`
 terraform_data.worker_b
@@ -18468,7 +18468,7 @@ _(all values known after apply)_
 </details>
 
 <details>
-<summary>🔧 <strong>terraform_data</strong> worker_c — changed: input, output</summary>
+<summary>🔧 <strong>terraform_data</strong> worker_c</summary>
 
 \`\`\`
 terraform_data.worker_c
@@ -18482,7 +18482,7 @@ _(all values known after apply)_
 
 | Output | Action | Before | After |
 | --- | --- | --- | --- |
-| config_value | 🔧 | <code>{"worker_a":"alpha","worker_b":"bravo","worker_c":"charlie"}</code> | <code>(known after apply)</code> |
+| config_value | 🔧 | <code>{&quot;worker_a&quot;:&quot;alpha&quot;,&quot;worker_b&quot;:&quot;bravo&quot;,&quot;worker_c&quot;:&quot;charlie&quot;}</code> | <code>(known after apply)</code> |
 
 "
 `;
@@ -19393,7 +19393,7 @@ null_resource.beta
 </details>
 
 <details>
-<summary>🔧 <strong>terraform_data</strong> meta — changed: input, output</summary>
+<summary>🔧 <strong>terraform_data</strong> meta — changed: input</summary>
 
 \`\`\`
 terraform_data.meta
@@ -20226,7 +20226,7 @@ _(all values known after apply)_
 
 | Output | Action | Before | After |
 | --- | --- | --- | --- |
-| config_value | ➕ |  | <code>{"worker_a":"alpha","worker_b":"bravo","worker_c":"charlie"}</code> |
+| config_value | ➕ |  | <code>{&quot;worker_a&quot;:&quot;alpha&quot;,&quot;worker_b&quot;:&quot;bravo&quot;,&quot;worker_c&quot;:&quot;charlie&quot;}</code> |
 
 "
 `;
@@ -20274,7 +20274,7 @@ local_file.metadata
 </details>
 
 <details>
-<summary>🔧 <strong>terraform_data</strong> independent — changed: input, output</summary>
+<summary>🔧 <strong>terraform_data</strong> independent — changed: input</summary>
 
 \`\`\`
 terraform_data.independent
@@ -20291,7 +20291,7 @@ terraform_data.independent
 
 | Output | Action | Before | After |
 | --- | --- | --- | --- |
-| config_value | 🔧 | <code>{"worker_a":"alpha","worker_b":"bravo","worker_c":"charlie"}</code> | <code>{"worker_a":"alpha","worker_b":"bravo","worker_c":"charlie"}</code> |
+| config_value | 🔧 | <code>{&quot;worker_a&quot;:&quot;alpha&quot;,&quot;worker_b&quot;:&quot;bravo&quot;,&quot;worker_c&quot;:&quot;charlie&quot;}</code> | <code>{&quot;worker_a&quot;:&quot;alpha&quot;,&quot;worker_b&quot;:&quot;bravo&quot;,&quot;worker_c&quot;:&quot;charlie&quot;}</code> |
 
 "
 `;
@@ -20349,7 +20349,7 @@ local_file.config
 </details>
 
 <details>
-<summary>🔧 <strong>terraform_data</strong> worker_a — changed: input, output</summary>
+<summary>🔧 <strong>terraform_data</strong> worker_a</summary>
 
 \`\`\`
 terraform_data.worker_a
@@ -20363,7 +20363,7 @@ _(all values known after apply)_
 
 | Output | Action | Before | After |
 | --- | --- | --- | --- |
-| config_value | 🔧 | <code>{"worker_a":"alpha","worker_b":"bravo","worker_c":"charlie"}</code> | <code>{"worker_a":"ALPHA","worker_b":"bravo","worker_c":"charlie"}</code> |
+| config_value | 🔧 | <code>{&quot;worker_a&quot;:&quot;alpha&quot;,&quot;worker_b&quot;:&quot;bravo&quot;,&quot;worker_c&quot;:&quot;charlie&quot;}</code> | <code>{&quot;worker_a&quot;:&quot;ALPHA&quot;,&quot;worker_b&quot;:&quot;bravo&quot;,&quot;worker_c&quot;:&quot;charlie&quot;}</code> |
 
 "
 `;
@@ -21291,7 +21291,7 @@ null_resource.beta
 </details>
 
 <details>
-<summary>🔧 <strong>terraform_data</strong> meta — changed: input, output</summary>
+<summary>🔧 <strong>terraform_data</strong> meta — changed: input</summary>
 
 \`\`\`
 terraform_data.meta
@@ -22133,7 +22133,7 @@ _(all values known after apply)_
 
 | Output | Action | Before | After |
 | --- | --- | --- | --- |
-| config_value | ➕ |  | <code>{"worker_a":"alpha","worker_b":"bravo","worker_c":"charlie"}</code> |
+| config_value | ➕ |  | <code>{&quot;worker_a&quot;:&quot;alpha&quot;,&quot;worker_b&quot;:&quot;bravo&quot;,&quot;worker_c&quot;:&quot;charlie&quot;}</code> |
 
 "
 `;
@@ -22181,7 +22181,7 @@ local_file.metadata
 </details>
 
 <details>
-<summary>🔧 <strong>terraform_data</strong> independent — changed: input, output</summary>
+<summary>🔧 <strong>terraform_data</strong> independent — changed: input</summary>
 
 \`\`\`
 terraform_data.independent
@@ -22198,7 +22198,7 @@ terraform_data.independent
 
 | Output | Action | Before | After |
 | --- | --- | --- | --- |
-| config_value | 🔧 | <code>{"worker_a":"alpha","worker_b":"bravo","worker_c":"charlie"}</code> | <code>{"worker_a":"alpha","worker_b":"bravo","worker_c":"charlie"}</code> |
+| config_value | 🔧 | <code>{&quot;worker_a&quot;:&quot;alpha&quot;,&quot;worker_b&quot;:&quot;bravo&quot;,&quot;worker_c&quot;:&quot;charlie&quot;}</code> | <code>{&quot;worker_a&quot;:&quot;alpha&quot;,&quot;worker_b&quot;:&quot;bravo&quot;,&quot;worker_c&quot;:&quot;charlie&quot;}</code> |
 
 "
 `;
@@ -22256,7 +22256,7 @@ local_file.config
 </details>
 
 <details>
-<summary>🔧 <strong>terraform_data</strong> worker_a — changed: input, output</summary>
+<summary>🔧 <strong>terraform_data</strong> worker_a</summary>
 
 \`\`\`
 terraform_data.worker_a
@@ -22270,7 +22270,7 @@ _(all values known after apply)_
 
 | Output | Action | Before | After |
 | --- | --- | --- | --- |
-| config_value | 🔧 | <code>{"worker_a":"alpha","worker_b":"bravo","worker_c":"charlie"}</code> | <code>{"worker_a":"ALPHA","worker_b":"bravo","worker_c":"charlie"}</code> |
+| config_value | 🔧 | <code>{&quot;worker_a&quot;:&quot;alpha&quot;,&quot;worker_b&quot;:&quot;bravo&quot;,&quot;worker_c&quot;:&quot;charlie&quot;}</code> | <code>{&quot;worker_a&quot;:&quot;ALPHA&quot;,&quot;worker_b&quot;:&quot;bravo&quot;,&quot;worker_c&quot;:&quot;charlie&quot;}</code> |
 
 "
 `;
@@ -23198,7 +23198,7 @@ null_resource.beta
 </details>
 
 <details>
-<summary>🔧 <strong>terraform_data</strong> meta — changed: input, output</summary>
+<summary>🔧 <strong>terraform_data</strong> meta — changed: input</summary>
 
 \`\`\`
 terraform_data.meta

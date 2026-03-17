@@ -303,20 +303,6 @@ function buildAttributeChanges(change, address, configRefs, options) {
   const afterSensitiveMap = shadowToMap(change.after_sensitive);
   const unknownMap = shadowToMap(change.after_unknown);
   const allUnknown = unknownMap.get("") === "true";
-  const allKeys = /* @__PURE__ */ new Set();
-  function collectKeys(values) {
-    if (!values) return;
-    for (const [k] of Object.entries(values)) {
-      allKeys.add(k);
-    }
-  }
-  collectKeys(before);
-  collectKeys(after);
-  for (const [k] of unknownMap) {
-    if (k !== "" && unknownMap.get(k) === "true") {
-      allKeys.add(k.split(".")[0]?.split("[")[0] ?? k);
-    }
-  }
   const beforeFlat = before ? flatten(before) : /* @__PURE__ */ new Map();
   const afterFlat = after ? flatten(after) : /* @__PURE__ */ new Map();
   const flatKeys = /* @__PURE__ */ new Set();
@@ -947,10 +933,7 @@ function buildStepOutcomes(steps, excludeIds) {
   return Object.entries(steps).filter(([id]) => !excludeIds?.has(id)).map(([id, step]) => {
     const outcome = getStepOutcome(step);
     const exitCode = getExitCode(step);
-    const result = { id, outcome };
-    if (exitCode !== void 0)
-      result.exitCode = exitCode;
-    return result;
+    return exitCode !== void 0 ? { id, outcome, exitCode } : { id, outcome };
   });
 }
 
@@ -996,12 +979,16 @@ function readForDisplay(filePath, options) {
   try {
     const buffer = Buffer.alloc(bytesToRead);
     const fd = openSync(realPath, "r");
+    let bytesRead;
     try {
-      readSync(fd, buffer, 0, bytesToRead, 0);
+      bytesRead = readSync(fd, buffer, 0, bytesToRead, 0);
     } finally {
       closeSync(fd);
     }
-    return { content: buffer.toString("utf-8"), truncated };
+    return {
+      content: buffer.subarray(0, bytesRead).toString("utf-8"),
+      truncated
+    };
   } catch {
     return { error: "Failed to read file" };
   }
@@ -2011,6 +1998,139 @@ function hasUnresolvedKnownAfterApply(report) {
   return false;
 }
 
+// src/raw-formatter/jsonl.ts
+var ENVELOPE_KEYS = /* @__PURE__ */ new Set([
+  "@level",
+  "@message",
+  "@module",
+  "@timestamp",
+  "type"
+]);
+function flattenJsonFields(obj, skipKeys) {
+  const pairs = [];
+  function walk(value, prefix) {
+    if (value === null || value === void 0) {
+      pairs.push([prefix, String(value)]);
+    } else if (typeof value === "object" && !Array.isArray(value)) {
+      const record = value;
+      for (const key of Object.keys(record)) {
+        walk(record[key], prefix ? `${prefix}.${key}` : key);
+      }
+    } else if (Array.isArray(value)) {
+      for (let i = 0; i < value.length; i++) {
+        walk(value[i], `${prefix}.${String(i)}`);
+      }
+    } else {
+      let str = typeof value === "string" ? value : JSON.stringify(value);
+      if (str.length > 80) {
+        str = str.slice(0, 77) + "...";
+      }
+      pairs.push([prefix, str]);
+    }
+  }
+  for (const [key, value] of Object.entries(obj)) {
+    if (skipKeys.has(key)) continue;
+    walk(value, key);
+  }
+  pairs.sort((a, b) => a[0].localeCompare(b[0]));
+  return pairs.map(([k, v]) => `\`${k}=${v}\``);
+}
+function escapeHtml(text) {
+  return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+}
+function levelIcon(level) {
+  switch (level) {
+    case "error":
+      return DIAGNOSTIC_ERROR;
+    case "warn":
+      return DIAGNOSTIC_WARNING;
+    default:
+      return "";
+  }
+}
+function formatJsonLinesMessage(msg) {
+  const level = typeof msg["@level"] === "string" ? msg["@level"] : "info";
+  const message = typeof msg["@message"] === "string" ? msg["@message"] : "(no message)";
+  const icon = levelIcon(level);
+  const prefix = icon ? `${icon} ` : "";
+  const typeStr = typeof msg.type === "string" ? msg.type : "";
+  const fields = flattenJsonFields(
+    msg,
+    ENVELOPE_KEYS
+  );
+  if (fields.length === 0) {
+    const typeSuffix2 = typeStr ? ` \`type=${typeStr}\`` : "";
+    return `${prefix}\`${message}\`${typeSuffix2}`;
+  }
+  const escapedMsg = escapeHtml(message);
+  const typeSuffix = typeStr ? ` <code>type=${escapeHtml(typeStr)}</code>` : "";
+  const fieldLines = fields.join("\n\n");
+  return `<details>
+<summary>${prefix}<code>${escapedMsg}</code>${typeSuffix}</summary>
+<br>
+
+${fieldLines}
+
+</details>`;
+}
+function tryFormatJsonLines(content) {
+  const lines = content.split("\n").filter((l) => l.trim() !== "");
+  if (lines.length === 0) return void 0;
+  const messages = [];
+  for (const line of lines) {
+    try {
+      const parsed = JSON.parse(line);
+      if (typeof parsed !== "object" || parsed === null || Array.isArray(parsed)) {
+        return void 0;
+      }
+      messages.push(parsed);
+    } catch {
+      return void 0;
+    }
+  }
+  if (!messages.some((m) => typeof m["@message"] === "string")) {
+    return void 0;
+  }
+  const infoAndAbove = [];
+  const debugTrace = [];
+  for (const msg of messages) {
+    const level = typeof msg["@level"] === "string" ? msg["@level"] : "info";
+    if (level === "trace" || level === "debug") {
+      debugTrace.push(msg);
+    } else {
+      infoAndAbove.push(msg);
+    }
+  }
+  const parts = [];
+  for (const msg of infoAndAbove) {
+    parts.push(formatJsonLinesMessage(msg));
+  }
+  if (debugTrace.length > 0) {
+    const counts = /* @__PURE__ */ new Map();
+    for (const msg of debugTrace) {
+      const level = typeof msg["@level"] === "string" ? msg["@level"] : "debug";
+      counts.set(level, (counts.get(level) ?? 0) + 1);
+    }
+    const countParts = [...counts.entries()].map(
+      ([l, c]) => `${String(c)} ${l}`
+    );
+    const inner = debugTrace.map((msg) => {
+      const message = typeof msg["@message"] === "string" ? msg["@message"] : "(no message)";
+      return `\`${message}\``;
+    }).join("\n\n");
+    parts.push(
+      `<details>
+<summary>${countParts.join(", ")} message(s) omitted</summary>
+<br>
+
+${inner}
+
+</details>`
+    );
+  }
+  return parts.join("\n\n") + "\n";
+}
+
 // src/renderer/writer.ts
 var MarkdownWriter = class {
   lines = [];
@@ -2088,9 +2208,16 @@ var MarkdownWriter = class {
   static escapeCell(value) {
     return value.replace(/\\/g, "\\\\").replace(/\|/g, "\\|");
   }
-  /** Wraps value in `<code>` tags. */
+  /**
+   * Escape characters that have special meaning in HTML.
+   * Delegates to the shared `escapeHtml` utility from `raw-formatter/jsonl`.
+   */
+  static escapeHtml(text) {
+    return escapeHtml(text);
+  }
+  /** Wraps value in `<code>` tags, HTML-escaping the content. */
   static inlineCode(value) {
-    return `<code>${value}</code>`;
+    return `<code>${escapeHtml(value)}</code>`;
   }
 };
 
@@ -2400,7 +2527,9 @@ function deriveInstanceName(address, type) {
 function renderResource(resource, writer, options, diffCache, applyContext) {
   const symbol = ACTION_SYMBOLS[resource.action];
   const diffFormat = options.diffFormat ?? "inline";
-  const changedAttrs = resource.attributes.filter((a) => !a.isSensitive && a.before !== a.after).map((a) => a.name);
+  const changedAttrs = resource.attributes.filter(
+    (a) => !a.isSensitive && !a.isKnownAfterApply && a.before !== a.after
+  ).map((a) => a.name);
   let summaryText = `${symbol} <strong>${MarkdownWriter.escapeCell(resource.type)}</strong> ${MarkdownWriter.escapeCell(deriveInstanceName(resource.address, resource.type))}`;
   if (resource.action === "update" && changedAttrs.length > 0) {
     const hint = changedAttrs.slice(0, 5).join(", ");
@@ -2732,11 +2861,13 @@ function tryFormatValidateOutput(content) {
     return void 0;
   }
   const obj = parsed;
-  if (!("valid" in obj) || !("diagnostics" in obj) || !Array.isArray(obj["diagnostics"])) {
+  if (!("valid" in obj) || typeof obj["valid"] !== "boolean" || !("diagnostics" in obj) || !Array.isArray(obj["diagnostics"])) {
     return void 0;
   }
   const valid = obj["valid"];
-  const diagnostics = obj["diagnostics"];
+  const diagnostics = obj["diagnostics"].filter(
+    (d) => typeof d === "object" && d !== null && !Array.isArray(d)
+  );
   let output = "";
   if (valid) {
     output += `${STATUS_SUCCESS} Configuration is valid
@@ -2779,139 +2910,6 @@ ${content}
 
 </details>`;
   return output;
-}
-
-// src/raw-formatter/jsonl.ts
-var ENVELOPE_KEYS = /* @__PURE__ */ new Set([
-  "@level",
-  "@message",
-  "@module",
-  "@timestamp",
-  "type"
-]);
-function flattenJsonFields(obj, skipKeys) {
-  const pairs = [];
-  function walk(value, prefix) {
-    if (value === null || value === void 0) {
-      pairs.push([prefix, String(value)]);
-    } else if (typeof value === "object" && !Array.isArray(value)) {
-      const record = value;
-      for (const key of Object.keys(record)) {
-        walk(record[key], prefix ? `${prefix}.${key}` : key);
-      }
-    } else if (Array.isArray(value)) {
-      for (let i = 0; i < value.length; i++) {
-        walk(value[i], `${prefix}.${String(i)}`);
-      }
-    } else {
-      let str = typeof value === "string" ? value : JSON.stringify(value);
-      if (str.length > 80) {
-        str = str.slice(0, 77) + "...";
-      }
-      pairs.push([prefix, str]);
-    }
-  }
-  for (const [key, value] of Object.entries(obj)) {
-    if (skipKeys.has(key)) continue;
-    walk(value, key);
-  }
-  pairs.sort((a, b) => a[0].localeCompare(b[0]));
-  return pairs.map(([k, v]) => `\`${k}=${v}\``);
-}
-function escapeHtml(text) {
-  return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
-}
-function levelIcon(level) {
-  switch (level) {
-    case "error":
-      return DIAGNOSTIC_ERROR;
-    case "warn":
-      return DIAGNOSTIC_WARNING;
-    default:
-      return "";
-  }
-}
-function formatJsonLinesMessage(msg) {
-  const level = typeof msg["@level"] === "string" ? msg["@level"] : "info";
-  const message = typeof msg["@message"] === "string" ? msg["@message"] : "(no message)";
-  const icon = levelIcon(level);
-  const prefix = icon ? `${icon} ` : "";
-  const typeStr = typeof msg.type === "string" ? msg.type : "";
-  const fields = flattenJsonFields(
-    msg,
-    ENVELOPE_KEYS
-  );
-  if (fields.length === 0) {
-    const typeSuffix2 = typeStr ? ` \`type=${typeStr}\`` : "";
-    return `${prefix}\`${message}\`${typeSuffix2}`;
-  }
-  const escapedMsg = escapeHtml(message);
-  const typeSuffix = typeStr ? ` <code>type=${escapeHtml(typeStr)}</code>` : "";
-  const fieldLines = fields.join("\n\n");
-  return `<details>
-<summary>${prefix}<code>${escapedMsg}</code>${typeSuffix}</summary>
-<br>
-
-${fieldLines}
-
-</details>`;
-}
-function tryFormatJsonLines(content) {
-  const lines = content.split("\n").filter((l) => l.trim() !== "");
-  if (lines.length === 0) return void 0;
-  const messages = [];
-  for (const line of lines) {
-    try {
-      const parsed = JSON.parse(line);
-      if (typeof parsed !== "object" || parsed === null || Array.isArray(parsed)) {
-        return void 0;
-      }
-      messages.push(parsed);
-    } catch {
-      return void 0;
-    }
-  }
-  if (!messages.some((m) => typeof m["@message"] === "string")) {
-    return void 0;
-  }
-  const infoAndAbove = [];
-  const debugTrace = [];
-  for (const msg of messages) {
-    const level = typeof msg["@level"] === "string" ? msg["@level"] : "info";
-    if (level === "trace" || level === "debug") {
-      debugTrace.push(msg);
-    } else {
-      infoAndAbove.push(msg);
-    }
-  }
-  const parts = [];
-  for (const msg of infoAndAbove) {
-    parts.push(formatJsonLinesMessage(msg));
-  }
-  if (debugTrace.length > 0) {
-    const counts = /* @__PURE__ */ new Map();
-    for (const msg of debugTrace) {
-      const level = typeof msg["@level"] === "string" ? msg["@level"] : "debug";
-      counts.set(level, (counts.get(level) ?? 0) + 1);
-    }
-    const countParts = [...counts.entries()].map(
-      ([l, c]) => `${String(c)} ${l}`
-    );
-    const inner = debugTrace.map((msg) => {
-      const message = typeof msg["@message"] === "string" ? msg["@message"] : "(no message)";
-      return `\`${message}\``;
-    }).join("\n\n");
-    parts.push(
-      `<details>
-<summary>${countParts.join(", ")} message(s) omitted</summary>
-<br>
-
-${inner}
-
-</details>`
-    );
-  }
-  return parts.join("\n\n") + "\n";
 }
 
 // src/raw-formatter/index.ts
@@ -3066,9 +3064,9 @@ function renderReportSections(report, options) {
     sections.push(marker);
   }
   sections.push(renderTitle(report));
-  for (const warning of report.warnings) {
+  for (const [i, warning] of report.warnings.entries()) {
     sections.push({
-      id: `warning-${warning.slice(0, 40)}`,
+      id: `warning-${String(i)}`,
       full: `> ${DIAGNOSTIC_WARNING} **Warning:** ${warning}
 
 `,

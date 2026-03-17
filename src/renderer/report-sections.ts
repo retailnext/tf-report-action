@@ -39,9 +39,9 @@ export function renderReportSections(
   sections.push(renderTitle(report));
 
   // Warnings (always first after title when present)
-  for (const warning of report.warnings) {
+  for (const [i, warning] of report.warnings.entries()) {
     sections.push({
-      id: `warning-${warning.slice(0, 40)}`,
+      id: `warning-${String(i)}`,
       full: `> ${DIAGNOSTIC_WARNING} **Warning:** ${warning}\n\n`,
       fixed: true,
     });
