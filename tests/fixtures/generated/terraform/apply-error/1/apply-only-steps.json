@@ -1,0 +1,1 @@
+{"init":{"outcome":"success","conclusion":"success","outputs":{"exit_code":"0","stdout_file":"init.stdout"}},"validate":{"outcome":"success","conclusion":"success","outputs":{"exit_code":"0","stdout_file":"validate.stdout"}},"apply":{"outcome":"failure","conclusion":"failure","outputs":{"exit_code":"1","stdout_file":"apply.stdout"}}}

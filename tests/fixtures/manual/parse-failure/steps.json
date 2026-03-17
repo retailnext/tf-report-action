@@ -1,0 +1,26 @@
+{
+  "init": {
+    "outcome": "success",
+    "conclusion": "success",
+    "outputs": {
+      "exit_code": "0",
+      "stdout_file": "init.stdout"
+    }
+  },
+  "plan": {
+    "outcome": "success",
+    "conclusion": "success",
+    "outputs": {
+      "exit_code": "2",
+      "stdout_file": "plan.stdout"
+    }
+  },
+  "show-plan": {
+    "outcome": "success",
+    "conclusion": "success",
+    "outputs": {
+      "exit_code": "0",
+      "stdout_file": "show-plan.stdout"
+    }
+  }
+}

@@ -1,85 +1,150 @@
-// See: https://eslint.org/docs/latest/use/configure/configuration-files
+import eslint from "@eslint/js";
+import tseslint from "typescript-eslint";
+import importPlugin from "eslint-plugin-import-x";
 
-import { fixupPluginRules } from '@eslint/compat'
-import { FlatCompat } from '@eslint/eslintrc'
-import js from '@eslint/js'
-import typescriptEslint from '@typescript-eslint/eslint-plugin'
-import tsParser from '@typescript-eslint/parser'
-import _import from 'eslint-plugin-import'
-import jest from 'eslint-plugin-jest'
-import prettier from 'eslint-plugin-prettier'
-import globals from 'globals'
-
-const compat = new FlatCompat({
-  baseDirectory: import.meta.dirname,
-  recommendedConfig: js.configs.recommended,
-  allConfig: js.configs.all
-})
-
-export default [
+export default tseslint.config(
+  eslint.configs.recommended,
+  ...tseslint.configs.strictTypeChecked,
+  ...tseslint.configs.stylisticTypeChecked,
   {
-    ignores: ['**/coverage', '**/dist', '**/linter', '**/node_modules']
-  },
-  ...compat.extends(
-    'eslint:recommended',
-    'plugin:@typescript-eslint/eslint-recommended',
-    'plugin:@typescript-eslint/recommended',
-    'plugin:jest/recommended',
-    'plugin:prettier/recommended'
-  ),
-  {
-    plugins: {
-      import: fixupPluginRules(_import),
-      jest,
-      prettier,
-      '@typescript-eslint': typescriptEslint
-    },
-
     languageOptions: {
-      globals: {
-        ...globals.node,
-        ...globals.jest,
-        Atomics: 'readonly',
-        SharedArrayBuffer: 'readonly'
-      },
-
-      parser: tsParser,
-      ecmaVersion: 2023,
-      sourceType: 'module',
-
       parserOptions: {
-        projectService: {
-          allowDefaultProject: [
-            '__tests__/*.ts',
-            'eslint.config.mjs',
-            'jest.config.js',
-            'rollup.config.ts',
-            'scripts/*.ts'
-          ]
-        },
-        tsconfigRootDir: import.meta.dirname
-      }
+        // tsconfig.test.json includes both src/**/*.ts and tests/**/*.ts,
+        // making it the single source of truth for all linted files.
+        project: "./tsconfig.test.json",
+        tsconfigRootDir: import.meta.dirname,
+      },
     },
-
-    settings: {
-      'import/resolver': {
-        typescript: {
-          alwaysTryTypes: true,
-          project: 'tsconfig.json'
-        }
-      }
+    plugins: {
+      "import-x": importPlugin,
     },
-
     rules: {
-      camelcase: 'off',
-      'eslint-comments/no-use': 'off',
-      'eslint-comments/no-unused-disable': 'off',
-      'i18n-text/no-en': 'off',
-      'import/no-namespace': 'off',
-      'no-console': 'off',
-      'no-shadow': 'off',
-      'no-unused-vars': 'off',
-      'prettier/prettier': 'error'
-    }
-  }
-]
+      // Require .js extensions on all relative ESM imports
+      "import-x/extensions": ["error", "ignorePackages", { js: "always" }],
+
+      // Prefer explicit return types on exported functions for readability
+      "@typescript-eslint/explicit-module-boundary-types": "error",
+
+      // These are fine in well-typed code
+      "@typescript-eslint/no-unnecessary-condition": "error",
+
+      // Allow void as a statement (e.g. fire-and-forget patterns)
+      "@typescript-eslint/no-confusing-void-expression": "off",
+
+      // non-nullable-type-assertion-style conflicts with no-non-null-assertion:
+      // the former wants "!", the latter forbids it. Disable the former.
+      "@typescript-eslint/non-nullable-type-assertion-style": "off",
+    },
+  },
+  {
+    // Test files don't need explicit return types; relax several strict rules
+    files: ["tests/**/*.ts"],
+    rules: {
+      "@typescript-eslint/explicit-module-boundary-types": "off",
+      "@typescript-eslint/no-unsafe-assignment": "off",
+      "@typescript-eslint/no-unsafe-call": "off",
+      "@typescript-eslint/no-unsafe-member-access": "off",
+      "@typescript-eslint/no-explicit-any": "off",
+      // Test assertions commonly use ! to access array elements after asserting length
+      "@typescript-eslint/no-non-null-assertion": "off",
+    },
+  },
+  {
+    // Sentinel string constants must only be used in the builder layer (where they
+    // are assigned as display text). The renderer and other modules must use boolean
+    // flags (isSensitive, isKnownAfterApply) for logic, never string comparison.
+    files: ["src/renderer/**/*.ts"],
+    rules: {
+      "no-restricted-imports": [
+        "error",
+        {
+          paths: [
+            {
+              name: "../model/sentinels.js",
+              message:
+                "Renderer must not import sentinel strings. Use boolean flags (isSensitive, isKnownAfterApply) instead of string comparison.",
+            },
+          ],
+        },
+      ],
+    },
+  },
+  {
+    // tfjson/ is copied external code — skip linting it
+    files: ["src/tfjson/**/*.ts"],
+    rules: {
+      "import-x/extensions": "off",
+      "@typescript-eslint/consistent-indexed-object-style": "off",
+      "@typescript-eslint/no-empty-object-type": "off",
+      "@typescript-eslint/explicit-module-boundary-types": "off",
+    },
+  },
+  {
+    // The action layer may only import from entry points, model, github, and env.
+    // It must not reach into internal library modules.
+    files: ["src/action/**/*.ts"],
+    rules: {
+      "no-restricted-imports": [
+        "error",
+        {
+          patterns: [
+            {
+              group: [
+                "../builder/*",
+                "../renderer/*",
+                "../compositor/*",
+                "../diff/*",
+                "../flattener/*",
+                "../sensitivity/*",
+                "../raw-formatter/*",
+                "../parser/*",
+                "../steps/*",
+                "../jsonl-scanner/*",
+                "../tfjson/*",
+              ],
+              message:
+                "The action layer may only import from src/index.js, src/model/, src/github/, and src/env/.",
+            },
+          ],
+        },
+      ],
+    },
+  },
+  {
+    // The GitHub API client may only import from model (if needed).
+    // It must not reach into any library internals.
+    files: ["src/github/**/*.ts"],
+    rules: {
+      "no-restricted-imports": [
+        "error",
+        {
+          patterns: [
+            {
+              group: [
+                "../builder/*",
+                "../renderer/*",
+                "../compositor/*",
+                "../diff/*",
+                "../flattener/*",
+                "../sensitivity/*",
+                "../raw-formatter/*",
+                "../parser/*",
+                "../steps/*",
+                "../jsonl-scanner/*",
+                "../tfjson/*",
+                "../action/*",
+                "../env/*",
+                "../index.js",
+              ],
+              message:
+                "The GitHub client may only import from src/model/ (if needed).",
+            },
+          ],
+        },
+      ],
+    },
+  },
+  {
+    ignores: ["dist/**", "coverage/**", "node_modules/**"],
+  },
+);

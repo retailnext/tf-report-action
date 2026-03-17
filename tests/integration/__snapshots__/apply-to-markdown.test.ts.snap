@@ -1,0 +1,2795 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`applyToMarkdown integration > terraform/apply-error/0 > renders without error and matches snapshot [default] 1`] = `
+"## Apply Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Added | terraform_data | 2 |
+|  | null_resource | 1 |
+|  | **Added** | **3** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>➕ <strong>null_resource</strong> will_fail</summary>
+
+\`\`\`
+null_resource.will_fail
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | <code></code> | <code>(value not in plan)</code> |
+| triggers.value |  | <code><ins style="background:#dfd">v1</ins></code> |
+
+</details>
+
+<details>
+<summary>➕ <strong>terraform_data</strong> depends_on_fail</summary>
+
+\`\`\`
+terraform_data.depends_on_fail
+\`\`\`
+
+_(all values known after apply)_
+
+</details>
+
+<details>
+<summary>➕ <strong>terraform_data</strong> success</summary>
+
+\`\`\`
+terraform_data.success
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | <code></code> | <code>(value not in plan)</code> |
+| input |  | <code><ins style="background:#dfd">stable</ins></code> |
+| output | <code></code> | <code>(value not in plan)</code> |
+
+</details>
+
+## Outputs
+
+| Output | Action | Before | After |
+| --- | --- | --- | --- |
+| depends_on_fail_output | ➕ |  | <code>6991765980908842876</code> |
+| success_output | ➕ |  | <code>stable</code> |
+
+"
+`;
+
+exports[`applyToMarkdown integration > terraform/apply-error/1 > renders without error and matches snapshot [default] 1`] = `
+"## Apply Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| ❌ Replace failed | null_resource | 1 |
+|  | **Replace failed** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details open>
+<summary>± <strong>null_resource</strong> will_fail ❌</summary>
+
+\`\`\`
+null_resource.will_fail
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | <code>6991765980908842876</code> | <code>(value not in plan)</code> |
+| triggers.value | v1 | <code>v<ins style="background:#dfd">2</ins><del style="background:#fdd">1</del></code> |
+
+🚨 **local-exec provisioner error**
+
+\`\`\`
+Error running command 'exit 1': exit status 1. Output: 
+\`\`\`
+
+</details>
+
+## Outputs
+
+| Output | Action | Before | After |
+| --- | --- | --- | --- |
+| depends_on_fail_output | 🔧 | <code>6991765980908842876</code> | <code>(value not in plan)</code> |
+| success_output | ⬜ | <code>stable</code> | <code>stable</code> |
+
+"
+`;
+
+exports[`applyToMarkdown integration > terraform/deferred-data-source/0 > renders without error and matches snapshot [default] 1`] = `
+"## Apply Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Added | terraform_data | 4 |
+|  | local_file | 1 |
+|  | **Added** | **5** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>➕ <strong>local_file</strong> config</summary>
+
+\`\`\`
+local_file.config
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| content_base64sha256 | <code></code> | <code>(value not in plan)</code> |
+| content_base64sha512 | <code></code> | <code>(value not in plan)</code> |
+| content_md5 | <code></code> | <code>(value not in plan)</code> |
+| content_sha1 | <code></code> | <code>(value not in plan)</code> |
+| content_sha256 | <code></code> | <code>(value not in plan)</code> |
+| content_sha512 | <code></code> | <code>(value not in plan)</code> |
+| directory_permission |  | <code><ins style="background:#dfd">0777</ins></code> |
+| file_permission |  | <code><ins style="background:#dfd">0777</ins></code> |
+| filename |  | <code><ins style="background:#dfd">./config.json</ins></code> |
+| id | <code></code> | <code>(value not in plan)</code> |
+| sensitive_content | <code></code> | <code>(sensitive)</code> |
+
+<details>
+<summary>Large value: content</summary>
+
+\`\`\`
+{
+  "worker_a": "alpha",
+  "worker_b": "bravo",
+  "worker_c": "charlie"
+}
+\`\`\`
+
+</details>
+
+</details>
+
+<details>
+<summary>➕ <strong>terraform_data</strong> independent</summary>
+
+\`\`\`
+terraform_data.independent
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | <code></code> | <code>(value not in plan)</code> |
+| input |  | <code><ins style="background:#dfd">v1</ins></code> |
+| output | <code></code> | <code>(value not in plan)</code> |
+
+</details>
+
+<details>
+<summary>➕ <strong>terraform_data</strong> worker_a</summary>
+
+\`\`\`
+terraform_data.worker_a
+\`\`\`
+
+_(all values known after apply)_
+
+</details>
+
+<details>
+<summary>➕ <strong>terraform_data</strong> worker_b</summary>
+
+\`\`\`
+terraform_data.worker_b
+\`\`\`
+
+_(all values known after apply)_
+
+</details>
+
+<details>
+<summary>➕ <strong>terraform_data</strong> worker_c</summary>
+
+\`\`\`
+terraform_data.worker_c
+\`\`\`
+
+_(all values known after apply)_
+
+</details>
+
+## Outputs
+
+| Output | Action | Before | After |
+| --- | --- | --- | --- |
+| config_value | ➕ |  | <code>{"worker_a":"alpha","worker_b":"bravo","worker_c":"charlie"}</code> |
+
+"
+`;
+
+exports[`applyToMarkdown integration > terraform/deferred-data-source/1 > renders without error and matches snapshot [default] 1`] = `
+"## Apply Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Added | local_file | 1 |
+|  | **Added** | **1** |
+| 🔧 Changed | terraform_data | 1 |
+|  | **Changed** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>➕ <strong>local_file</strong> metadata</summary>
+
+\`\`\`
+local_file.metadata
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| content |  | <code><ins style="background:#dfd">metadata-v1</ins></code> |
+| content_base64sha256 | <code></code> | <code>(value not in plan)</code> |
+| content_base64sha512 | <code></code> | <code>(value not in plan)</code> |
+| content_md5 | <code></code> | <code>(value not in plan)</code> |
+| content_sha1 | <code></code> | <code>(value not in plan)</code> |
+| content_sha256 | <code></code> | <code>(value not in plan)</code> |
+| content_sha512 | <code></code> | <code>(value not in plan)</code> |
+| directory_permission |  | <code><ins style="background:#dfd">0777</ins></code> |
+| file_permission |  | <code><ins style="background:#dfd">0777</ins></code> |
+| filename |  | <code><ins style="background:#dfd">./metadata.txt</ins></code> |
+| id | <code></code> | <code>(value not in plan)</code> |
+| sensitive_content | <code></code> | <code>(sensitive)</code> |
+
+</details>
+
+<details>
+<summary>🔧 <strong>terraform_data</strong> independent — changed: input, output</summary>
+
+\`\`\`
+terraform_data.independent
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| input | v1 | <code>v<ins style="background:#dfd">2</ins><del style="background:#fdd">1</del></code> |
+| output | <code>v1</code> | <code>(value not in plan)</code> |
+
+</details>
+
+## Outputs
+
+| Output | Action | Before | After |
+| --- | --- | --- | --- |
+| config_value | 🔧 | <code>{"worker_a":"alpha","worker_b":"bravo","worker_c":"charlie"}</code> | <code>{"worker_a":"alpha","worker_b":"bravo","worker_c":"charlie"}</code> |
+
+"
+`;
+
+exports[`applyToMarkdown integration > terraform/deferred-data-source/2 > renders without error and matches snapshot [default] 1`] = `
+"## Apply Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| 🔧 Changed | terraform_data | 1 |
+|  | **Changed** | **1** |
+| ± Replaced | local_file | 1 |
+|  | **Replaced** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>± <strong>local_file</strong> config</summary>
+
+\`\`\`
+local_file.config
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| content_base64sha256 | <code>BCZAB46RhMIHCDOD2wpy52CggN8HCuE2r+O9OQMaoFg=</code> | <code>(value not in plan)</code> |
+| content_base64sha512 | <code>SpHAEiR6BfvlF6vlTa1H+TRQidZGWJGkabpZCmP8dZp6l33CeZzLjVSVrhHJwMmOgKa2U2G6HttLqi+hX4JXVA==</code> | <code>(value not in plan)</code> |
+| content_md5 | <code>25c6ea643fb6d100efbd0631aea3d0e1</code> | <code>(value not in plan)</code> |
+| content_sha1 | <code>575f062d4b9fc3bf93d0ac0d9de725cf1bcdc3c9</code> | <code>(value not in plan)</code> |
+| content_sha256 | <code>042640078e9184c207083383db0a72e760a080df070ae136afe3bd39031aa058</code> | <code>(value not in plan)</code> |
+| content_sha512 | <code>4a91c012247a05fbe517abe54dad47f9345089d6465891a469ba590a63fc759a7a977dc2799ccb8d5495ae11c9c0c98e80a6b65361ba1edb4baa2fa15f825754</code> | <code>(value not in plan)</code> |
+| id | <code>575f062d4b9fc3bf93d0ac0d9de725cf1bcdc3c9</code> | <code>(value not in plan)</code> |
+| sensitive_content | <code>(sensitive)</code> | <code>(sensitive)</code> |
+
+<details>
+<summary>Large value: content (6 lines, 2 changes)</summary>
+
+\`\`\`diff
+  {
+-   "worker_a": "alpha",
++   "worker_a": "ALPHA",
+    "worker_b": "bravo",
+    "worker_c": "charlie"
+  }
+\`\`\`
+
+</details>
+
+</details>
+
+<details>
+<summary>🔧 <strong>terraform_data</strong> worker_a — changed: input, output</summary>
+
+\`\`\`
+terraform_data.worker_a
+\`\`\`
+
+_(all values known after apply)_
+
+</details>
+
+## Outputs
+
+| Output | Action | Before | After |
+| --- | --- | --- | --- |
+| config_value | 🔧 | <code>{"worker_a":"alpha","worker_b":"bravo","worker_c":"charlie"}</code> | <code>{"worker_a":"ALPHA","worker_b":"bravo","worker_c":"charlie"}</code> |
+
+"
+`;
+
+exports[`applyToMarkdown integration > terraform/import-resource/0 > renders without error and matches snapshot [default] 1`] = `
+"## Apply Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Added | random_string | 1 |
+|  | **Added** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>➕ <strong>random_string</strong> existing</summary>
+
+\`\`\`
+random_string.existing
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | <code></code> | <code>(value not in plan)</code> |
+| length |  | <code><ins style="background:#dfd">8</ins></code> |
+| lower |  | <code><ins style="background:#dfd">true</ins></code> |
+| min_lower |  | <code><ins style="background:#dfd">0</ins></code> |
+| min_numeric |  | <code><ins style="background:#dfd">0</ins></code> |
+| min_special |  | <code><ins style="background:#dfd">0</ins></code> |
+| min_upper |  | <code><ins style="background:#dfd">0</ins></code> |
+| number |  | <code><ins style="background:#dfd">true</ins></code> |
+| numeric |  | <code><ins style="background:#dfd">true</ins></code> |
+| result | <code></code> | <code>(value not in plan)</code> |
+| special |  | <code><ins style="background:#dfd">false</ins></code> |
+| upper |  | <code><ins style="background:#dfd">true</ins></code> |
+
+</details>
+
+"
+`;
+
+exports[`applyToMarkdown integration > terraform/import-resource/1 > renders without error and matches snapshot [default] 1`] = `
+"## Apply Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| 📥 Imported | random_string | 1 |
+|  | **Imported** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>📥 <strong>random_string</strong> imported</summary>
+
+\`\`\`
+random_string.imported
+\`\`\`
+
+**Import ID:** \`fixedval\`
+
+_No attribute changes._
+
+</details>
+
+"
+`;
+
+exports[`applyToMarkdown integration > terraform/local-files/0 > renders without error and matches snapshot [default] 1`] = `
+"## Apply Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Added | local_file | 1 |
+|  | **Added** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>➕ <strong>local_file</strong> readme</summary>
+
+\`\`\`
+local_file.readme
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| content_base64sha256 | <code></code> | <code>(value not in plan)</code> |
+| content_base64sha512 | <code></code> | <code>(value not in plan)</code> |
+| content_md5 | <code></code> | <code>(value not in plan)</code> |
+| content_sha1 | <code></code> | <code>(value not in plan)</code> |
+| content_sha256 | <code></code> | <code>(value not in plan)</code> |
+| content_sha512 | <code></code> | <code>(value not in plan)</code> |
+| directory_permission |  | <code><ins style="background:#dfd">0777</ins></code> |
+| file_permission |  | <code><ins style="background:#dfd">0777</ins></code> |
+| filename |  | <code><ins style="background:#dfd">./output/readme.txt</ins></code> |
+| id | <code></code> | <code>(value not in plan)</code> |
+| sensitive_content | <code></code> | <code>(sensitive)</code> |
+
+<details>
+<summary>Large value: content</summary>
+
+\`\`\`
+Project: tf-plan-md fixture
+Version: 1.0.0
+Status: active
+
+This file is managed by Terraform.
+It contains multiple lines of plain text
+so that the large-value renderer is exercised.
+
+Line 9: additional content
+Line 10: additional content
+Line 11: additional content
+Line 12: end of file
+
+\`\`\`
+
+</details>
+
+</details>
+
+## Outputs
+
+| Output | Action | Before | After |
+| --- | --- | --- | --- |
+| readme_path | ➕ |  | <code>./output/readme.txt</code> |
+
+"
+`;
+
+exports[`applyToMarkdown integration > terraform/local-files/1 > renders without error and matches snapshot [default] 1`] = `
+"## Apply Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| ± Replaced | local_file | 1 |
+|  | **Replaced** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>± <strong>local_file</strong> readme</summary>
+
+\`\`\`
+local_file.readme
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| content_base64sha256 | <code>AXQKgQqmnkjSkAFLpLknbozHZn4G8WV/av24/hj590c=</code> | <code>(value not in plan)</code> |
+| content_base64sha512 | <code>v4daqaHyZn5NbMRgqL1wyWC2Go2H2YGt8qrZ5SIcOt823qvTO0uTP0Qo+ZJzdGmFTKOMiLSIImIJTudrG7Qp/Q==</code> | <code>(value not in plan)</code> |
+| content_md5 | <code>374900018c431a33587acb053923c90a</code> | <code>(value not in plan)</code> |
+| content_sha1 | <code>1951ea3cba8b8157586130ebad80af2c86462821</code> | <code>(value not in plan)</code> |
+| content_sha256 | <code>01740a810aa69e48d290014ba4b9276e8cc7667e06f1657f6afdb8fe18f9f747</code> | <code>(value not in plan)</code> |
+| content_sha512 | <code>bf875aa9a1f2667e4d6cc460a8bd70c960b61a8d87d981adf2aad9e5221c3adf36deabd33b4b933f4428f992737469854ca38c88b4882262094ee76b1bb429fd</code> | <code>(value not in plan)</code> |
+| id | <code>1951ea3cba8b8157586130ebad80af2c86462821</code> | <code>(value not in plan)</code> |
+| sensitive_content | <code>(sensitive)</code> | <code>(sensitive)</code> |
+
+<details>
+<summary>Large value: content (18 lines, 9 changes)</summary>
+
+\`\`\`diff
+  Project: tf-plan-md fixture
+- Version: 1.0.0
++ Version: 2.0.0
+  Status: active
+  
+  This file is managed by Terraform.
+  It contains multiple lines of plain text
+  so that the large-value renderer is exercised.
+  
+- Line 9: additional content
++ Line 9: updated content
+  Line 10: additional content
+- Line 11: additional content
+- Line 12: end of file
++ Line 11: new line inserted here
++ Line 12: additional content
++ Line 13: end of file
+  
+\`\`\`
+
+</details>
+
+</details>
+
+## Outputs
+
+| Output | Action | Before | After |
+| --- | --- | --- | --- |
+| readme_path | ⬜ | <code>./output/readme.txt</code> | <code>./output/readme.txt</code> |
+
+"
+`;
+
+exports[`applyToMarkdown integration > terraform/moved-resource/0 > renders without error and matches snapshot [default] 1`] = `
+"## Apply Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Added | null_resource | 1 |
+|  | **Added** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>➕ <strong>null_resource</strong> original</summary>
+
+\`\`\`
+null_resource.original
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | <code></code> | <code>(value not in plan)</code> |
+| triggers.version |  | <code><ins style="background:#dfd">1</ins></code> |
+
+</details>
+
+"
+`;
+
+exports[`applyToMarkdown integration > terraform/moved-resource/1 > renders without error and matches snapshot [default] 1`] = `
+"## Apply Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| 🚚 Moved | null_resource | 1 |
+|  | **Moved** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>🚚 <strong>null_resource</strong> renamed</summary>
+
+\`\`\`
+null_resource.renamed
+\`\`\`
+
+**Moved from:** \`null_resource.original\`
+
+_No attribute changes._
+
+</details>
+
+"
+`;
+
+exports[`applyToMarkdown integration > terraform/nested-modules/0 > renders without error and matches snapshot [default] 1`] = `
+"## Apply Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Added | null_resource | 3 |
+|  | **Added** | **3** |
+
+## Resource Changes
+
+### 📦 Module: \`module.parent["1"].module.child\`
+
+<details>
+<summary>➕ <strong>null_resource</strong> item[0]</summary>
+
+\`\`\`
+module.parent["1"].module.child.null_resource.item[0]
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | <code></code> | <code>(value not in plan)</code> |
+| triggers.index |  | <code><ins style="background:#dfd">0</ins></code> |
+| triggers.label |  | <code><ins style="background:#dfd">1</ins></code> |
+
+</details>
+
+### 📦 Module: \`module.parent["2"].module.child\`
+
+<details>
+<summary>➕ <strong>null_resource</strong> item[0]</summary>
+
+\`\`\`
+module.parent["2"].module.child.null_resource.item[0]
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | <code></code> | <code>(value not in plan)</code> |
+| triggers.index |  | <code><ins style="background:#dfd">0</ins></code> |
+| triggers.label |  | <code><ins style="background:#dfd">2</ins></code> |
+
+</details>
+
+<details>
+<summary>➕ <strong>null_resource</strong> item[1]</summary>
+
+\`\`\`
+module.parent["2"].module.child.null_resource.item[1]
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | <code></code> | <code>(value not in plan)</code> |
+| triggers.index |  | <code><ins style="background:#dfd">1</ins></code> |
+| triggers.label |  | <code><ins style="background:#dfd">2</ins></code> |
+
+</details>
+
+"
+`;
+
+exports[`applyToMarkdown integration > terraform/nested-modules/1 > renders without error and matches snapshot [default] 1`] = `
+"## Apply Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Added | null_resource | 3 |
+|  | **Added** | **3** |
+| 🗑️ Destroyed | null_resource | 2 |
+|  | **Destroyed** | **2** |
+
+## Resource Changes
+
+### 📦 Module: \`module.parent["2"].module.child\`
+
+<details>
+<summary>🗑️ <strong>null_resource</strong> item[0]</summary>
+
+\`\`\`
+module.parent["2"].module.child.null_resource.item[0]
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | 7981753058476080146 | <code><del style="background:#fdd">7981753058476080146</del></code> |
+| triggers.index | 0 | <code><del style="background:#fdd">0</del></code> |
+| triggers.label | 2 | <code><del style="background:#fdd">2</del></code> |
+
+</details>
+
+<details>
+<summary>🗑️ <strong>null_resource</strong> item[1]</summary>
+
+\`\`\`
+module.parent["2"].module.child.null_resource.item[1]
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | 627674434284283849 | <code><del style="background:#fdd">627674434284283849</del></code> |
+| triggers.index | 1 | <code><del style="background:#fdd">1</del></code> |
+| triggers.label | 2 | <code><del style="background:#fdd">2</del></code> |
+
+</details>
+
+### 📦 Module: \`module.parent["3"].module.child\`
+
+<details>
+<summary>➕ <strong>null_resource</strong> item[0]</summary>
+
+\`\`\`
+module.parent["3"].module.child.null_resource.item[0]
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | <code></code> | <code>(value not in plan)</code> |
+| triggers.index |  | <code><ins style="background:#dfd">0</ins></code> |
+| triggers.label |  | <code><ins style="background:#dfd">3</ins></code> |
+
+</details>
+
+<details>
+<summary>➕ <strong>null_resource</strong> item[1]</summary>
+
+\`\`\`
+module.parent["3"].module.child.null_resource.item[1]
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | <code></code> | <code>(value not in plan)</code> |
+| triggers.index |  | <code><ins style="background:#dfd">1</ins></code> |
+| triggers.label |  | <code><ins style="background:#dfd">3</ins></code> |
+
+</details>
+
+<details>
+<summary>➕ <strong>null_resource</strong> item[2]</summary>
+
+\`\`\`
+module.parent["3"].module.child.null_resource.item[2]
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | <code></code> | <code>(value not in plan)</code> |
+| triggers.index |  | <code><ins style="background:#dfd">2</ins></code> |
+| triggers.label |  | <code><ins style="background:#dfd">3</ins></code> |
+
+</details>
+
+"
+`;
+
+exports[`applyToMarkdown integration > terraform/no-detailed-exitcode/0 > renders without error and matches snapshot [default] 1`] = `
+"## Apply Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Added | null_resource | 1 |
+|  | **Added** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>➕ <strong>null_resource</strong> example</summary>
+
+\`\`\`
+null_resource.example
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | <code></code> | <code>(value not in plan)</code> |
+| triggers.value |  | <code><ins style="background:#dfd">hello</ins></code> |
+
+</details>
+
+"
+`;
+
+exports[`applyToMarkdown integration > terraform/no-detailed-exitcode/1 > renders without error and matches snapshot [default] 1`] = `
+"## Apply Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| 🗑️ Destroyed | null_resource | 1 |
+|  | **Destroyed** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>🗑️ <strong>null_resource</strong> example</summary>
+
+\`\`\`
+null_resource.example
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | 7899722400445662255 | <code><del style="background:#fdd">7899722400445662255</del></code> |
+| triggers.value | hello | <code><del style="background:#fdd">hello</del></code> |
+
+</details>
+
+"
+`;
+
+exports[`applyToMarkdown integration > terraform/no-op/0 > renders without error and matches snapshot [default] 1`] = `
+"## Apply Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Added | null_resource | 1 |
+|  | **Added** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>➕ <strong>null_resource</strong> stable</summary>
+
+\`\`\`
+null_resource.stable
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | <code></code> | <code>(value not in plan)</code> |
+| triggers.version |  | <code><ins style="background:#dfd">1</ins></code> |
+
+</details>
+
+"
+`;
+
+exports[`applyToMarkdown integration > terraform/no-op/1 > renders without error and matches snapshot [default] 1`] = `
+"## Apply Summary
+
+_No changes._
+
+"
+`;
+
+exports[`applyToMarkdown integration > terraform/null-lifecycle/0 > renders without error and matches snapshot [default] 1`] = `
+"## Apply Summary
+
+_No changes._
+
+"
+`;
+
+exports[`applyToMarkdown integration > terraform/null-lifecycle/1 > renders without error and matches snapshot [default] 1`] = `
+"## Apply Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Added | null_resource | 2 |
+|  | terraform_data | 1 |
+|  | **Added** | **3** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>➕ <strong>null_resource</strong> alpha</summary>
+
+\`\`\`
+null_resource.alpha
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | <code></code> | <code>(value not in plan)</code> |
+| triggers.label |  | <code><ins style="background:#dfd">alpha</ins></code> |
+| triggers.version |  | <code><ins style="background:#dfd">1</ins></code> |
+
+</details>
+
+<details>
+<summary>➕ <strong>null_resource</strong> beta</summary>
+
+\`\`\`
+null_resource.beta
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | <code></code> | <code>(value not in plan)</code> |
+| triggers.label |  | <code><ins style="background:#dfd">beta</ins></code> |
+| triggers.version |  | <code><ins style="background:#dfd">1</ins></code> |
+
+</details>
+
+<details>
+<summary>➕ <strong>terraform_data</strong> meta</summary>
+
+\`\`\`
+terraform_data.meta
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | <code></code> | <code>(value not in plan)</code> |
+| input |  | <code><ins style="background:#dfd">v1</ins></code> |
+| output | <code></code> | <code>(value not in plan)</code> |
+
+</details>
+
+"
+`;
+
+exports[`applyToMarkdown integration > terraform/null-lifecycle/2 > renders without error and matches snapshot [default] 1`] = `
+"## Apply Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| 🔧 Changed | terraform_data | 1 |
+|  | **Changed** | **1** |
+| ± Replaced | null_resource | 1 |
+|  | **Replaced** | **1** |
+| 🗑️ Destroyed | null_resource | 1 |
+|  | **Destroyed** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>± <strong>null_resource</strong> alpha</summary>
+
+\`\`\`
+null_resource.alpha
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | <code>3122394909481910783</code> | <code>(value not in plan)</code> |
+| triggers.version | 1 | <code><ins style="background:#dfd">2</ins><del style="background:#fdd">1</del></code> |
+
+</details>
+
+<details>
+<summary>🗑️ <strong>null_resource</strong> beta</summary>
+
+\`\`\`
+null_resource.beta
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | 1440882242747354511 | <code><del style="background:#fdd">1440882242747354511</del></code> |
+| triggers.label | beta | <code><del style="background:#fdd">beta</del></code> |
+| triggers.version | 1 | <code><del style="background:#fdd">1</del></code> |
+
+</details>
+
+<details>
+<summary>🔧 <strong>terraform_data</strong> meta — changed: input, output</summary>
+
+\`\`\`
+terraform_data.meta
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| input | v1 | <code>v<ins style="background:#dfd">2</ins><del style="background:#fdd">1</del></code> |
+| output | <code>v1</code> | <code>(value not in plan)</code> |
+
+</details>
+
+"
+`;
+
+exports[`applyToMarkdown integration > terraform/plan-error/0 > renders without error and matches snapshot [default] 1`] = `
+"## Apply Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Added | null_resource | 1 |
+|  | **Added** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>➕ <strong>null_resource</strong> baseline</summary>
+
+\`\`\`
+null_resource.baseline
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | <code></code> | <code>(value not in plan)</code> |
+| triggers.value |  | <code><ins style="background:#dfd">v1</ins></code> |
+
+</details>
+
+"
+`;
+
+exports[`applyToMarkdown integration > terraform/random-replace/0 > renders without error and matches snapshot [default] 1`] = `
+"## Apply Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Added | random_string | 1 |
+|  | **Added** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>➕ <strong>random_string</strong> token</summary>
+
+\`\`\`
+random_string.token
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | <code></code> | <code>(value not in plan)</code> |
+| keepers.rotation |  | <code><ins style="background:#dfd">v1</ins></code> |
+| length |  | <code><ins style="background:#dfd">16</ins></code> |
+| lower |  | <code><ins style="background:#dfd">true</ins></code> |
+| min_lower |  | <code><ins style="background:#dfd">0</ins></code> |
+| min_numeric |  | <code><ins style="background:#dfd">0</ins></code> |
+| min_special |  | <code><ins style="background:#dfd">0</ins></code> |
+| min_upper |  | <code><ins style="background:#dfd">0</ins></code> |
+| number |  | <code><ins style="background:#dfd">true</ins></code> |
+| numeric |  | <code><ins style="background:#dfd">true</ins></code> |
+| result | <code></code> | <code>(value not in plan)</code> |
+| special |  | <code><ins style="background:#dfd">false</ins></code> |
+| upper |  | <code><ins style="background:#dfd">true</ins></code> |
+
+</details>
+
+## Outputs
+
+| Output | Action | Before | After |
+| --- | --- | --- | --- |
+| token_length | ➕ |  | <code>16</code> |
+
+"
+`;
+
+exports[`applyToMarkdown integration > terraform/random-replace/1 > renders without error and matches snapshot [default] 1`] = `
+"## Apply Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| ± Replaced | random_string | 1 |
+|  | **Replaced** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>± <strong>random_string</strong> token</summary>
+
+\`\`\`
+random_string.token
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | <code>8bxyyCcqLfN6esga</code> | <code>(value not in plan)</code> |
+| keepers.rotation | v1 | <code>v<ins style="background:#dfd">2</ins><del style="background:#fdd">1</del></code> |
+| result | <code>8bxyyCcqLfN6esga</code> | <code>(value not in plan)</code> |
+
+</details>
+
+## Outputs
+
+| Output | Action | Before | After |
+| --- | --- | --- | --- |
+| token_length | ⬜ | <code>16</code> | <code>16</code> |
+
+"
+`;
+
+exports[`applyToMarkdown integration > terraform/removed-resource/0 > renders without error and matches snapshot [default] 1`] = `
+"## Apply Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Added | null_resource | 2 |
+|  | **Added** | **2** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>➕ <strong>null_resource</strong> ephemeral</summary>
+
+\`\`\`
+null_resource.ephemeral
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | <code></code> | <code>(value not in plan)</code> |
+| triggers.version |  | <code><ins style="background:#dfd">1</ins></code> |
+
+</details>
+
+<details>
+<summary>➕ <strong>null_resource</strong> keeper</summary>
+
+\`\`\`
+null_resource.keeper
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | <code></code> | <code>(value not in plan)</code> |
+| triggers.version |  | <code><ins style="background:#dfd">1</ins></code> |
+
+</details>
+
+"
+`;
+
+exports[`applyToMarkdown integration > terraform/removed-resource/1 > renders without error and matches snapshot [default] 1`] = `
+"## Apply Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| 👋 Forgotten | null_resource | 1 |
+|  | **Forgotten** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>👋 <strong>null_resource</strong> ephemeral</summary>
+
+\`\`\`
+null_resource.ephemeral
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | 6679654430280065492 | <code><del style="background:#fdd">6679654430280065492</del></code> |
+| triggers.version | 1 | <code><del style="background:#fdd">1</del></code> |
+
+</details>
+
+"
+`;
+
+exports[`applyToMarkdown integration > terraform/sensitive-values/0 > renders without error and matches snapshot [default] 1`] = `
+"## Apply Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Added | local_sensitive_file | 1 |
+|  | **Added** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>➕ <strong>local_sensitive_file</strong> secret</summary>
+
+\`\`\`
+local_sensitive_file.secret
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| content | <code></code> | <code>(sensitive)</code> |
+| content_base64 | <code></code> | <code>(sensitive)</code> |
+| content_base64sha256 | <code></code> | <code>(value not in plan)</code> |
+| content_base64sha512 | <code></code> | <code>(value not in plan)</code> |
+| content_md5 | <code></code> | <code>(value not in plan)</code> |
+| content_sha1 | <code></code> | <code>(value not in plan)</code> |
+| content_sha256 | <code></code> | <code>(value not in plan)</code> |
+| content_sha512 | <code></code> | <code>(value not in plan)</code> |
+| directory_permission |  | <code><ins style="background:#dfd">0700</ins></code> |
+| file_permission |  | <code><ins style="background:#dfd">0700</ins></code> |
+| filename |  | <code><ins style="background:#dfd">./output/secret.txt</ins></code> |
+| id | <code></code> | <code>(value not in plan)</code> |
+
+</details>
+
+## Outputs
+
+| Output | Action | Before | After |
+| --- | --- | --- | --- |
+| secret_checksum | ➕ | <code>(sensitive)</code> | <code>(sensitive)</code> |
+| secret_path | ➕ |  | <code>./output/secret.txt</code> |
+
+"
+`;
+
+exports[`applyToMarkdown integration > terraform/sensitive-values/1 > renders without error and matches snapshot [default] 1`] = `
+"## Apply Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| ± Replaced | local_sensitive_file | 1 |
+|  | **Replaced** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>± <strong>local_sensitive_file</strong> secret</summary>
+
+\`\`\`
+local_sensitive_file.secret
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| content | <code>(sensitive)</code> | <code>(sensitive)</code> |
+| content_base64 | <code>(sensitive)</code> | <code>(sensitive)</code> |
+| content_base64sha256 | <code>tglbgl+ELKnIfsYFkBXQKZLLTwS6icynJuYOJcOo9bY=</code> | <code>(value not in plan)</code> |
+| content_base64sha512 | <code>Eo7RifRBpd27pi/st4ERjtqdT19zPyGc5afG7yxwwtDeKueSo9wvSeZdo2Ami5LjFA92F1wrQqtKWqljFWCLdQ==</code> | <code>(value not in plan)</code> |
+| content_md5 | <code>8ed8462ae2d0cac83f45c1288b82946d</code> | <code>(value not in plan)</code> |
+| content_sha1 | <code>ffae43b95440019e9bb698e9713dc5ac27be8dd5</code> | <code>(value not in plan)</code> |
+| content_sha256 | <code>b6095b825f842ca9c87ec6059015d02992cb4f04ba89cca726e60e25c3a8f5b6</code> | <code>(value not in plan)</code> |
+| content_sha512 | <code>128ed189f441a5ddbba62fecb781118eda9d4f5f733f219ce5a7c6ef2c70c2d0de2ae792a3dc2f49e65da360268b92e3140f76175c2b42ab4a5aa96315608b75</code> | <code>(value not in plan)</code> |
+| id | <code>ffae43b95440019e9bb698e9713dc5ac27be8dd5</code> | <code>(value not in plan)</code> |
+
+</details>
+
+## Outputs
+
+| Output | Action | Before | After |
+| --- | --- | --- | --- |
+| secret_checksum | 🔧 | <code>(sensitive)</code> | <code>(sensitive)</code> |
+| secret_path | ⬜ | <code>./output/secret.txt</code> | <code>./output/secret.txt</code> |
+
+"
+`;
+
+exports[`applyToMarkdown integration > terraform/validate-error/0 > renders without error and matches snapshot [default] 1`] = `
+"## Apply Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Added | null_resource | 1 |
+|  | **Added** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>➕ <strong>null_resource</strong> baseline</summary>
+
+\`\`\`
+null_resource.baseline
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | <code></code> | <code>(value not in plan)</code> |
+| triggers.value |  | <code><ins style="background:#dfd">v1</ins></code> |
+
+</details>
+
+"
+`;
+
+exports[`applyToMarkdown integration > terraform/with-modules/0 > renders without error and matches snapshot [default] 1`] = `
+"## Apply Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Added | null_resource | 1 |
+|  | random_string | 1 |
+|  | **Added** | **2** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>➕ <strong>null_resource</strong> root</summary>
+
+\`\`\`
+null_resource.root
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | <code></code> | <code>(value not in plan)</code> |
+| triggers.stage |  | <code><ins style="background:#dfd">0</ins></code> |
+
+</details>
+
+### 📦 Module: \`module.naming\`
+
+<details>
+<summary>➕ <strong>random_string</strong> suffix</summary>
+
+\`\`\`
+module.naming.random_string.suffix
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | <code></code> | <code>(value not in plan)</code> |
+| keepers.prefix |  | <code><ins style="background:#dfd">fixture</ins></code> |
+| length |  | <code><ins style="background:#dfd">8</ins></code> |
+| lower |  | <code><ins style="background:#dfd">true</ins></code> |
+| min_lower |  | <code><ins style="background:#dfd">0</ins></code> |
+| min_numeric |  | <code><ins style="background:#dfd">0</ins></code> |
+| min_special |  | <code><ins style="background:#dfd">0</ins></code> |
+| min_upper |  | <code><ins style="background:#dfd">0</ins></code> |
+| number |  | <code><ins style="background:#dfd">true</ins></code> |
+| numeric |  | <code><ins style="background:#dfd">true</ins></code> |
+| result | <code></code> | <code>(value not in plan)</code> |
+| special |  | <code><ins style="background:#dfd">false</ins></code> |
+| upper |  | <code><ins style="background:#dfd">false</ins></code> |
+
+</details>
+
+## Outputs
+
+| Output | Action | Before | After |
+| --- | --- | --- | --- |
+| generated_name | ➕ |  | <code>fixture-dx12h5s0</code> |
+| root_id | ➕ |  | <code>1416987651343215284</code> |
+
+"
+`;
+
+exports[`applyToMarkdown integration > terraform/with-modules/1 > renders without error and matches snapshot [default] 1`] = `
+"## Apply Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| ± Replaced | null_resource | 1 |
+|  | random_string | 1 |
+|  | **Replaced** | **2** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>± <strong>null_resource</strong> root</summary>
+
+\`\`\`
+null_resource.root
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | <code>1416987651343215284</code> | <code>(value not in plan)</code> |
+| triggers.stage | 0 | <code><ins style="background:#dfd">1</ins><del style="background:#fdd">0</del></code> |
+
+</details>
+
+### 📦 Module: \`module.naming\`
+
+<details>
+<summary>± <strong>random_string</strong> suffix</summary>
+
+\`\`\`
+module.naming.random_string.suffix
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | <code>dx12h5s0</code> | <code>(value not in plan)</code> |
+| keepers.prefix | fixture | <code>fixtur<ins style="background:#dfd">e-updat</ins>e<ins style="background:#dfd">d</ins></code> |
+| result | <code>dx12h5s0</code> | <code>(value not in plan)</code> |
+
+</details>
+
+## Outputs
+
+| Output | Action | Before | After |
+| --- | --- | --- | --- |
+| generated_name | 🔧 | <code>fixture-dx12h5s0</code> | <code>fixture-updated-bmat2t36</code> |
+| root_id | 🔧 | <code>1416987651343215284</code> | <code>1603630222204103251</code> |
+
+"
+`;
+
+exports[`applyToMarkdown integration > tofu/apply-error/0 > renders without error and matches snapshot [default] 1`] = `
+"## Apply Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Added | terraform_data | 2 |
+|  | null_resource | 1 |
+|  | **Added** | **3** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>➕ <strong>null_resource</strong> will_fail</summary>
+
+\`\`\`
+null_resource.will_fail
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | <code></code> | <code>(value not in plan)</code> |
+| triggers.value |  | <code><ins style="background:#dfd">v1</ins></code> |
+
+</details>
+
+<details>
+<summary>➕ <strong>terraform_data</strong> depends_on_fail</summary>
+
+\`\`\`
+terraform_data.depends_on_fail
+\`\`\`
+
+_(all values known after apply)_
+
+</details>
+
+<details>
+<summary>➕ <strong>terraform_data</strong> success</summary>
+
+\`\`\`
+terraform_data.success
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | <code></code> | <code>(value not in plan)</code> |
+| input |  | <code><ins style="background:#dfd">stable</ins></code> |
+| output | <code></code> | <code>(value not in plan)</code> |
+
+</details>
+
+## Outputs
+
+| Output | Action | Before | After |
+| --- | --- | --- | --- |
+| depends_on_fail_output | ➕ |  | <code>6572019016639558200</code> |
+| success_output | ➕ |  | <code>stable</code> |
+
+"
+`;
+
+exports[`applyToMarkdown integration > tofu/apply-error/1 > renders without error and matches snapshot [default] 1`] = `
+"## Apply Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| ❌ Replace failed | null_resource | 1 |
+|  | **Replace failed** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details open>
+<summary>± <strong>null_resource</strong> will_fail ❌</summary>
+
+\`\`\`
+null_resource.will_fail
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | <code>6572019016639558200</code> | <code>(value not in plan)</code> |
+| triggers.value | v1 | <code>v<ins style="background:#dfd">2</ins><del style="background:#fdd">1</del></code> |
+
+🚨 **local-exec provisioner error**
+
+\`\`\`
+Error running command 'exit 1': exit status 1. Output: 
+\`\`\`
+
+</details>
+
+## Outputs
+
+| Output | Action | Before | After |
+| --- | --- | --- | --- |
+| depends_on_fail_output | 🔧 | <code>6572019016639558200</code> | <code>(value not in plan)</code> |
+| success_output | ⬜ | <code>stable</code> | <code>stable</code> |
+
+"
+`;
+
+exports[`applyToMarkdown integration > tofu/deferred-data-source/0 > renders without error and matches snapshot [default] 1`] = `
+"## Apply Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Added | terraform_data | 4 |
+|  | local_file | 1 |
+|  | **Added** | **5** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>➕ <strong>local_file</strong> config</summary>
+
+\`\`\`
+local_file.config
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| content_base64sha256 | <code></code> | <code>(value not in plan)</code> |
+| content_base64sha512 | <code></code> | <code>(value not in plan)</code> |
+| content_md5 | <code></code> | <code>(value not in plan)</code> |
+| content_sha1 | <code></code> | <code>(value not in plan)</code> |
+| content_sha256 | <code></code> | <code>(value not in plan)</code> |
+| content_sha512 | <code></code> | <code>(value not in plan)</code> |
+| directory_permission |  | <code><ins style="background:#dfd">0777</ins></code> |
+| file_permission |  | <code><ins style="background:#dfd">0777</ins></code> |
+| filename |  | <code><ins style="background:#dfd">./config.json</ins></code> |
+| id | <code></code> | <code>(value not in plan)</code> |
+| sensitive_content | <code></code> | <code>(sensitive)</code> |
+
+<details>
+<summary>Large value: content</summary>
+
+\`\`\`
+{
+  "worker_a": "alpha",
+  "worker_b": "bravo",
+  "worker_c": "charlie"
+}
+\`\`\`
+
+</details>
+
+</details>
+
+<details>
+<summary>➕ <strong>terraform_data</strong> independent</summary>
+
+\`\`\`
+terraform_data.independent
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | <code></code> | <code>(value not in plan)</code> |
+| input |  | <code><ins style="background:#dfd">v1</ins></code> |
+| output | <code></code> | <code>(value not in plan)</code> |
+
+</details>
+
+<details>
+<summary>➕ <strong>terraform_data</strong> worker_a</summary>
+
+\`\`\`
+terraform_data.worker_a
+\`\`\`
+
+_(all values known after apply)_
+
+</details>
+
+<details>
+<summary>➕ <strong>terraform_data</strong> worker_b</summary>
+
+\`\`\`
+terraform_data.worker_b
+\`\`\`
+
+_(all values known after apply)_
+
+</details>
+
+<details>
+<summary>➕ <strong>terraform_data</strong> worker_c</summary>
+
+\`\`\`
+terraform_data.worker_c
+\`\`\`
+
+_(all values known after apply)_
+
+</details>
+
+## Outputs
+
+| Output | Action | Before | After |
+| --- | --- | --- | --- |
+| config_value | ➕ |  | <code>{"worker_a":"alpha","worker_b":"bravo","worker_c":"charlie"}</code> |
+
+"
+`;
+
+exports[`applyToMarkdown integration > tofu/deferred-data-source/1 > renders without error and matches snapshot [default] 1`] = `
+"## Apply Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Added | local_file | 1 |
+|  | **Added** | **1** |
+| 🔧 Changed | terraform_data | 1 |
+|  | **Changed** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>➕ <strong>local_file</strong> metadata</summary>
+
+\`\`\`
+local_file.metadata
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| content |  | <code><ins style="background:#dfd">metadata-v1</ins></code> |
+| content_base64sha256 | <code></code> | <code>(value not in plan)</code> |
+| content_base64sha512 | <code></code> | <code>(value not in plan)</code> |
+| content_md5 | <code></code> | <code>(value not in plan)</code> |
+| content_sha1 | <code></code> | <code>(value not in plan)</code> |
+| content_sha256 | <code></code> | <code>(value not in plan)</code> |
+| content_sha512 | <code></code> | <code>(value not in plan)</code> |
+| directory_permission |  | <code><ins style="background:#dfd">0777</ins></code> |
+| file_permission |  | <code><ins style="background:#dfd">0777</ins></code> |
+| filename |  | <code><ins style="background:#dfd">./metadata.txt</ins></code> |
+| id | <code></code> | <code>(value not in plan)</code> |
+| sensitive_content | <code></code> | <code>(sensitive)</code> |
+
+</details>
+
+<details>
+<summary>🔧 <strong>terraform_data</strong> independent — changed: input, output</summary>
+
+\`\`\`
+terraform_data.independent
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| input | v1 | <code>v<ins style="background:#dfd">2</ins><del style="background:#fdd">1</del></code> |
+| output | <code>v1</code> | <code>(value not in plan)</code> |
+
+</details>
+
+## Outputs
+
+| Output | Action | Before | After |
+| --- | --- | --- | --- |
+| config_value | 🔧 | <code>{"worker_a":"alpha","worker_b":"bravo","worker_c":"charlie"}</code> | <code>{"worker_a":"alpha","worker_b":"bravo","worker_c":"charlie"}</code> |
+
+"
+`;
+
+exports[`applyToMarkdown integration > tofu/deferred-data-source/2 > renders without error and matches snapshot [default] 1`] = `
+"## Apply Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| 🔧 Changed | terraform_data | 1 |
+|  | **Changed** | **1** |
+| ± Replaced | local_file | 1 |
+|  | **Replaced** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>± <strong>local_file</strong> config</summary>
+
+\`\`\`
+local_file.config
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| content_base64sha256 | <code>BCZAB46RhMIHCDOD2wpy52CggN8HCuE2r+O9OQMaoFg=</code> | <code>(value not in plan)</code> |
+| content_base64sha512 | <code>SpHAEiR6BfvlF6vlTa1H+TRQidZGWJGkabpZCmP8dZp6l33CeZzLjVSVrhHJwMmOgKa2U2G6HttLqi+hX4JXVA==</code> | <code>(value not in plan)</code> |
+| content_md5 | <code>25c6ea643fb6d100efbd0631aea3d0e1</code> | <code>(value not in plan)</code> |
+| content_sha1 | <code>575f062d4b9fc3bf93d0ac0d9de725cf1bcdc3c9</code> | <code>(value not in plan)</code> |
+| content_sha256 | <code>042640078e9184c207083383db0a72e760a080df070ae136afe3bd39031aa058</code> | <code>(value not in plan)</code> |
+| content_sha512 | <code>4a91c012247a05fbe517abe54dad47f9345089d6465891a469ba590a63fc759a7a977dc2799ccb8d5495ae11c9c0c98e80a6b65361ba1edb4baa2fa15f825754</code> | <code>(value not in plan)</code> |
+| id | <code>575f062d4b9fc3bf93d0ac0d9de725cf1bcdc3c9</code> | <code>(value not in plan)</code> |
+| sensitive_content | <code>(sensitive)</code> | <code>(sensitive)</code> |
+
+<details>
+<summary>Large value: content (6 lines, 2 changes)</summary>
+
+\`\`\`diff
+  {
+-   "worker_a": "alpha",
++   "worker_a": "ALPHA",
+    "worker_b": "bravo",
+    "worker_c": "charlie"
+  }
+\`\`\`
+
+</details>
+
+</details>
+
+<details>
+<summary>🔧 <strong>terraform_data</strong> worker_a — changed: input, output</summary>
+
+\`\`\`
+terraform_data.worker_a
+\`\`\`
+
+_(all values known after apply)_
+
+</details>
+
+## Outputs
+
+| Output | Action | Before | After |
+| --- | --- | --- | --- |
+| config_value | 🔧 | <code>{"worker_a":"alpha","worker_b":"bravo","worker_c":"charlie"}</code> | <code>{"worker_a":"ALPHA","worker_b":"bravo","worker_c":"charlie"}</code> |
+
+"
+`;
+
+exports[`applyToMarkdown integration > tofu/import-resource/0 > renders without error and matches snapshot [default] 1`] = `
+"## Apply Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Added | random_string | 1 |
+|  | **Added** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>➕ <strong>random_string</strong> existing</summary>
+
+\`\`\`
+random_string.existing
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | <code></code> | <code>(value not in plan)</code> |
+| length |  | <code><ins style="background:#dfd">8</ins></code> |
+| lower |  | <code><ins style="background:#dfd">true</ins></code> |
+| min_lower |  | <code><ins style="background:#dfd">0</ins></code> |
+| min_numeric |  | <code><ins style="background:#dfd">0</ins></code> |
+| min_special |  | <code><ins style="background:#dfd">0</ins></code> |
+| min_upper |  | <code><ins style="background:#dfd">0</ins></code> |
+| number |  | <code><ins style="background:#dfd">true</ins></code> |
+| numeric |  | <code><ins style="background:#dfd">true</ins></code> |
+| result | <code></code> | <code>(value not in plan)</code> |
+| special |  | <code><ins style="background:#dfd">false</ins></code> |
+| upper |  | <code><ins style="background:#dfd">true</ins></code> |
+
+</details>
+
+"
+`;
+
+exports[`applyToMarkdown integration > tofu/import-resource/1 > renders without error and matches snapshot [default] 1`] = `
+"## Apply Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| 📥 Imported | random_string | 1 |
+|  | **Imported** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>📥 <strong>random_string</strong> imported</summary>
+
+\`\`\`
+random_string.imported
+\`\`\`
+
+**Import ID:** \`fixedval\`
+
+_No attribute changes._
+
+</details>
+
+"
+`;
+
+exports[`applyToMarkdown integration > tofu/local-files/0 > renders without error and matches snapshot [default] 1`] = `
+"## Apply Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Added | local_file | 1 |
+|  | **Added** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>➕ <strong>local_file</strong> readme</summary>
+
+\`\`\`
+local_file.readme
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| content_base64sha256 | <code></code> | <code>(value not in plan)</code> |
+| content_base64sha512 | <code></code> | <code>(value not in plan)</code> |
+| content_md5 | <code></code> | <code>(value not in plan)</code> |
+| content_sha1 | <code></code> | <code>(value not in plan)</code> |
+| content_sha256 | <code></code> | <code>(value not in plan)</code> |
+| content_sha512 | <code></code> | <code>(value not in plan)</code> |
+| directory_permission |  | <code><ins style="background:#dfd">0777</ins></code> |
+| file_permission |  | <code><ins style="background:#dfd">0777</ins></code> |
+| filename |  | <code><ins style="background:#dfd">./output/readme.txt</ins></code> |
+| id | <code></code> | <code>(value not in plan)</code> |
+| sensitive_content | <code></code> | <code>(sensitive)</code> |
+
+<details>
+<summary>Large value: content</summary>
+
+\`\`\`
+Project: tf-plan-md fixture
+Version: 1.0.0
+Status: active
+
+This file is managed by Terraform.
+It contains multiple lines of plain text
+so that the large-value renderer is exercised.
+
+Line 9: additional content
+Line 10: additional content
+Line 11: additional content
+Line 12: end of file
+
+\`\`\`
+
+</details>
+
+</details>
+
+## Outputs
+
+| Output | Action | Before | After |
+| --- | --- | --- | --- |
+| readme_path | ➕ |  | <code>./output/readme.txt</code> |
+
+"
+`;
+
+exports[`applyToMarkdown integration > tofu/local-files/1 > renders without error and matches snapshot [default] 1`] = `
+"## Apply Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| ± Replaced | local_file | 1 |
+|  | **Replaced** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>± <strong>local_file</strong> readme</summary>
+
+\`\`\`
+local_file.readme
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| content_base64sha256 | <code>AXQKgQqmnkjSkAFLpLknbozHZn4G8WV/av24/hj590c=</code> | <code>(value not in plan)</code> |
+| content_base64sha512 | <code>v4daqaHyZn5NbMRgqL1wyWC2Go2H2YGt8qrZ5SIcOt823qvTO0uTP0Qo+ZJzdGmFTKOMiLSIImIJTudrG7Qp/Q==</code> | <code>(value not in plan)</code> |
+| content_md5 | <code>374900018c431a33587acb053923c90a</code> | <code>(value not in plan)</code> |
+| content_sha1 | <code>1951ea3cba8b8157586130ebad80af2c86462821</code> | <code>(value not in plan)</code> |
+| content_sha256 | <code>01740a810aa69e48d290014ba4b9276e8cc7667e06f1657f6afdb8fe18f9f747</code> | <code>(value not in plan)</code> |
+| content_sha512 | <code>bf875aa9a1f2667e4d6cc460a8bd70c960b61a8d87d981adf2aad9e5221c3adf36deabd33b4b933f4428f992737469854ca38c88b4882262094ee76b1bb429fd</code> | <code>(value not in plan)</code> |
+| id | <code>1951ea3cba8b8157586130ebad80af2c86462821</code> | <code>(value not in plan)</code> |
+| sensitive_content | <code>(sensitive)</code> | <code>(sensitive)</code> |
+
+<details>
+<summary>Large value: content (18 lines, 9 changes)</summary>
+
+\`\`\`diff
+  Project: tf-plan-md fixture
+- Version: 1.0.0
++ Version: 2.0.0
+  Status: active
+  
+  This file is managed by Terraform.
+  It contains multiple lines of plain text
+  so that the large-value renderer is exercised.
+  
+- Line 9: additional content
++ Line 9: updated content
+  Line 10: additional content
+- Line 11: additional content
+- Line 12: end of file
++ Line 11: new line inserted here
++ Line 12: additional content
++ Line 13: end of file
+  
+\`\`\`
+
+</details>
+
+</details>
+
+## Outputs
+
+| Output | Action | Before | After |
+| --- | --- | --- | --- |
+| readme_path | ⬜ | <code>./output/readme.txt</code> | <code>./output/readme.txt</code> |
+
+"
+`;
+
+exports[`applyToMarkdown integration > tofu/moved-resource/0 > renders without error and matches snapshot [default] 1`] = `
+"## Apply Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Added | null_resource | 1 |
+|  | **Added** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>➕ <strong>null_resource</strong> original</summary>
+
+\`\`\`
+null_resource.original
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | <code></code> | <code>(value not in plan)</code> |
+| triggers.version |  | <code><ins style="background:#dfd">1</ins></code> |
+
+</details>
+
+"
+`;
+
+exports[`applyToMarkdown integration > tofu/moved-resource/1 > renders without error and matches snapshot [default] 1`] = `
+"## Apply Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| 🚚 Moved | null_resource | 1 |
+|  | **Moved** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>🚚 <strong>null_resource</strong> renamed</summary>
+
+\`\`\`
+null_resource.renamed
+\`\`\`
+
+**Moved from:** \`null_resource.original\`
+
+_No attribute changes._
+
+</details>
+
+"
+`;
+
+exports[`applyToMarkdown integration > tofu/nested-modules/0 > renders without error and matches snapshot [default] 1`] = `
+"## Apply Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Added | null_resource | 3 |
+|  | **Added** | **3** |
+
+## Resource Changes
+
+### 📦 Module: \`module.parent["1"].module.child\`
+
+<details>
+<summary>➕ <strong>null_resource</strong> item[0]</summary>
+
+\`\`\`
+module.parent["1"].module.child.null_resource.item[0]
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | <code></code> | <code>(value not in plan)</code> |
+| triggers.index |  | <code><ins style="background:#dfd">0</ins></code> |
+| triggers.label |  | <code><ins style="background:#dfd">1</ins></code> |
+
+</details>
+
+### 📦 Module: \`module.parent["2"].module.child\`
+
+<details>
+<summary>➕ <strong>null_resource</strong> item[0]</summary>
+
+\`\`\`
+module.parent["2"].module.child.null_resource.item[0]
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | <code></code> | <code>(value not in plan)</code> |
+| triggers.index |  | <code><ins style="background:#dfd">0</ins></code> |
+| triggers.label |  | <code><ins style="background:#dfd">2</ins></code> |
+
+</details>
+
+<details>
+<summary>➕ <strong>null_resource</strong> item[1]</summary>
+
+\`\`\`
+module.parent["2"].module.child.null_resource.item[1]
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | <code></code> | <code>(value not in plan)</code> |
+| triggers.index |  | <code><ins style="background:#dfd">1</ins></code> |
+| triggers.label |  | <code><ins style="background:#dfd">2</ins></code> |
+
+</details>
+
+"
+`;
+
+exports[`applyToMarkdown integration > tofu/nested-modules/1 > renders without error and matches snapshot [default] 1`] = `
+"## Apply Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Added | null_resource | 3 |
+|  | **Added** | **3** |
+| 🗑️ Destroyed | null_resource | 2 |
+|  | **Destroyed** | **2** |
+
+## Resource Changes
+
+### 📦 Module: \`module.parent["2"].module.child\`
+
+<details>
+<summary>🗑️ <strong>null_resource</strong> item[0]</summary>
+
+\`\`\`
+module.parent["2"].module.child.null_resource.item[0]
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | 8808274807488808785 | <code><del style="background:#fdd">8808274807488808785</del></code> |
+| triggers.index | 0 | <code><del style="background:#fdd">0</del></code> |
+| triggers.label | 2 | <code><del style="background:#fdd">2</del></code> |
+
+</details>
+
+<details>
+<summary>🗑️ <strong>null_resource</strong> item[1]</summary>
+
+\`\`\`
+module.parent["2"].module.child.null_resource.item[1]
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | 9118133557213407955 | <code><del style="background:#fdd">9118133557213407955</del></code> |
+| triggers.index | 1 | <code><del style="background:#fdd">1</del></code> |
+| triggers.label | 2 | <code><del style="background:#fdd">2</del></code> |
+
+</details>
+
+### 📦 Module: \`module.parent["3"].module.child\`
+
+<details>
+<summary>➕ <strong>null_resource</strong> item[0]</summary>
+
+\`\`\`
+module.parent["3"].module.child.null_resource.item[0]
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | <code></code> | <code>(value not in plan)</code> |
+| triggers.index |  | <code><ins style="background:#dfd">0</ins></code> |
+| triggers.label |  | <code><ins style="background:#dfd">3</ins></code> |
+
+</details>
+
+<details>
+<summary>➕ <strong>null_resource</strong> item[1]</summary>
+
+\`\`\`
+module.parent["3"].module.child.null_resource.item[1]
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | <code></code> | <code>(value not in plan)</code> |
+| triggers.index |  | <code><ins style="background:#dfd">1</ins></code> |
+| triggers.label |  | <code><ins style="background:#dfd">3</ins></code> |
+
+</details>
+
+<details>
+<summary>➕ <strong>null_resource</strong> item[2]</summary>
+
+\`\`\`
+module.parent["3"].module.child.null_resource.item[2]
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | <code></code> | <code>(value not in plan)</code> |
+| triggers.index |  | <code><ins style="background:#dfd">2</ins></code> |
+| triggers.label |  | <code><ins style="background:#dfd">3</ins></code> |
+
+</details>
+
+"
+`;
+
+exports[`applyToMarkdown integration > tofu/no-detailed-exitcode/0 > renders without error and matches snapshot [default] 1`] = `
+"## Apply Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Added | null_resource | 1 |
+|  | **Added** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>➕ <strong>null_resource</strong> example</summary>
+
+\`\`\`
+null_resource.example
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | <code></code> | <code>(value not in plan)</code> |
+| triggers.value |  | <code><ins style="background:#dfd">hello</ins></code> |
+
+</details>
+
+"
+`;
+
+exports[`applyToMarkdown integration > tofu/no-detailed-exitcode/1 > renders without error and matches snapshot [default] 1`] = `
+"## Apply Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| 🗑️ Destroyed | null_resource | 1 |
+|  | **Destroyed** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>🗑️ <strong>null_resource</strong> example</summary>
+
+\`\`\`
+null_resource.example
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | 1177450297176059130 | <code><del style="background:#fdd">1177450297176059130</del></code> |
+| triggers.value | hello | <code><del style="background:#fdd">hello</del></code> |
+
+</details>
+
+"
+`;
+
+exports[`applyToMarkdown integration > tofu/no-op/0 > renders without error and matches snapshot [default] 1`] = `
+"## Apply Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Added | null_resource | 1 |
+|  | **Added** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>➕ <strong>null_resource</strong> stable</summary>
+
+\`\`\`
+null_resource.stable
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | <code></code> | <code>(value not in plan)</code> |
+| triggers.version |  | <code><ins style="background:#dfd">1</ins></code> |
+
+</details>
+
+"
+`;
+
+exports[`applyToMarkdown integration > tofu/no-op/1 > renders without error and matches snapshot [default] 1`] = `
+"## Apply Summary
+
+_No changes._
+
+"
+`;
+
+exports[`applyToMarkdown integration > tofu/null-lifecycle/0 > renders without error and matches snapshot [default] 1`] = `
+"## Apply Summary
+
+_No changes._
+
+"
+`;
+
+exports[`applyToMarkdown integration > tofu/null-lifecycle/1 > renders without error and matches snapshot [default] 1`] = `
+"## Apply Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Added | null_resource | 2 |
+|  | terraform_data | 1 |
+|  | **Added** | **3** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>➕ <strong>null_resource</strong> alpha</summary>
+
+\`\`\`
+null_resource.alpha
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | <code></code> | <code>(value not in plan)</code> |
+| triggers.label |  | <code><ins style="background:#dfd">alpha</ins></code> |
+| triggers.version |  | <code><ins style="background:#dfd">1</ins></code> |
+
+</details>
+
+<details>
+<summary>➕ <strong>null_resource</strong> beta</summary>
+
+\`\`\`
+null_resource.beta
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | <code></code> | <code>(value not in plan)</code> |
+| triggers.label |  | <code><ins style="background:#dfd">beta</ins></code> |
+| triggers.version |  | <code><ins style="background:#dfd">1</ins></code> |
+
+</details>
+
+<details>
+<summary>➕ <strong>terraform_data</strong> meta</summary>
+
+\`\`\`
+terraform_data.meta
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | <code></code> | <code>(value not in plan)</code> |
+| input |  | <code><ins style="background:#dfd">v1</ins></code> |
+| output | <code></code> | <code>(value not in plan)</code> |
+
+</details>
+
+"
+`;
+
+exports[`applyToMarkdown integration > tofu/null-lifecycle/2 > renders without error and matches snapshot [default] 1`] = `
+"## Apply Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| 🔧 Changed | terraform_data | 1 |
+|  | **Changed** | **1** |
+| ± Replaced | null_resource | 1 |
+|  | **Replaced** | **1** |
+| 🗑️ Destroyed | null_resource | 1 |
+|  | **Destroyed** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>± <strong>null_resource</strong> alpha</summary>
+
+\`\`\`
+null_resource.alpha
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | <code>4711048632592421421</code> | <code>(value not in plan)</code> |
+| triggers.version | 1 | <code><ins style="background:#dfd">2</ins><del style="background:#fdd">1</del></code> |
+
+</details>
+
+<details>
+<summary>🗑️ <strong>null_resource</strong> beta</summary>
+
+\`\`\`
+null_resource.beta
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | 6718987932080872497 | <code><del style="background:#fdd">6718987932080872497</del></code> |
+| triggers.label | beta | <code><del style="background:#fdd">beta</del></code> |
+| triggers.version | 1 | <code><del style="background:#fdd">1</del></code> |
+
+</details>
+
+<details>
+<summary>🔧 <strong>terraform_data</strong> meta — changed: input, output</summary>
+
+\`\`\`
+terraform_data.meta
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| input | v1 | <code>v<ins style="background:#dfd">2</ins><del style="background:#fdd">1</del></code> |
+| output | <code>v1</code> | <code>(value not in plan)</code> |
+
+</details>
+
+"
+`;
+
+exports[`applyToMarkdown integration > tofu/plan-error/0 > renders without error and matches snapshot [default] 1`] = `
+"## Apply Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Added | null_resource | 1 |
+|  | **Added** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>➕ <strong>null_resource</strong> baseline</summary>
+
+\`\`\`
+null_resource.baseline
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | <code></code> | <code>(value not in plan)</code> |
+| triggers.value |  | <code><ins style="background:#dfd">v1</ins></code> |
+
+</details>
+
+"
+`;
+
+exports[`applyToMarkdown integration > tofu/random-replace/0 > renders without error and matches snapshot [default] 1`] = `
+"## Apply Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Added | random_string | 1 |
+|  | **Added** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>➕ <strong>random_string</strong> token</summary>
+
+\`\`\`
+random_string.token
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | <code></code> | <code>(value not in plan)</code> |
+| keepers.rotation |  | <code><ins style="background:#dfd">v1</ins></code> |
+| length |  | <code><ins style="background:#dfd">16</ins></code> |
+| lower |  | <code><ins style="background:#dfd">true</ins></code> |
+| min_lower |  | <code><ins style="background:#dfd">0</ins></code> |
+| min_numeric |  | <code><ins style="background:#dfd">0</ins></code> |
+| min_special |  | <code><ins style="background:#dfd">0</ins></code> |
+| min_upper |  | <code><ins style="background:#dfd">0</ins></code> |
+| number |  | <code><ins style="background:#dfd">true</ins></code> |
+| numeric |  | <code><ins style="background:#dfd">true</ins></code> |
+| result | <code></code> | <code>(value not in plan)</code> |
+| special |  | <code><ins style="background:#dfd">false</ins></code> |
+| upper |  | <code><ins style="background:#dfd">true</ins></code> |
+
+</details>
+
+## Outputs
+
+| Output | Action | Before | After |
+| --- | --- | --- | --- |
+| token_length | ➕ |  | <code>16</code> |
+
+"
+`;
+
+exports[`applyToMarkdown integration > tofu/random-replace/1 > renders without error and matches snapshot [default] 1`] = `
+"## Apply Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| ± Replaced | random_string | 1 |
+|  | **Replaced** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>± <strong>random_string</strong> token</summary>
+
+\`\`\`
+random_string.token
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | <code>4SmmpS2VsTztR0vw</code> | <code>(value not in plan)</code> |
+| keepers.rotation | v1 | <code>v<ins style="background:#dfd">2</ins><del style="background:#fdd">1</del></code> |
+| result | <code>4SmmpS2VsTztR0vw</code> | <code>(value not in plan)</code> |
+
+</details>
+
+## Outputs
+
+| Output | Action | Before | After |
+| --- | --- | --- | --- |
+| token_length | ⬜ | <code>16</code> | <code>16</code> |
+
+"
+`;
+
+exports[`applyToMarkdown integration > tofu/removed-resource/0 > renders without error and matches snapshot [default] 1`] = `
+"## Apply Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Added | null_resource | 2 |
+|  | **Added** | **2** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>➕ <strong>null_resource</strong> ephemeral</summary>
+
+\`\`\`
+null_resource.ephemeral
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | <code></code> | <code>(value not in plan)</code> |
+| triggers.version |  | <code><ins style="background:#dfd">1</ins></code> |
+
+</details>
+
+<details>
+<summary>➕ <strong>null_resource</strong> keeper</summary>
+
+\`\`\`
+null_resource.keeper
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | <code></code> | <code>(value not in plan)</code> |
+| triggers.version |  | <code><ins style="background:#dfd">1</ins></code> |
+
+</details>
+
+"
+`;
+
+exports[`applyToMarkdown integration > tofu/removed-resource/1 > renders without error and matches snapshot [default] 1`] = `
+"## Apply Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| 👋 Forgotten | null_resource | 1 |
+|  | **Forgotten** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>👋 <strong>null_resource</strong> ephemeral</summary>
+
+\`\`\`
+null_resource.ephemeral
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | 2454178591280020709 | <code><del style="background:#fdd">2454178591280020709</del></code> |
+| triggers.version | 1 | <code><del style="background:#fdd">1</del></code> |
+
+</details>
+
+"
+`;
+
+exports[`applyToMarkdown integration > tofu/sensitive-values/0 > renders without error and matches snapshot [default] 1`] = `
+"## Apply Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Added | local_sensitive_file | 1 |
+|  | **Added** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>➕ <strong>local_sensitive_file</strong> secret</summary>
+
+\`\`\`
+local_sensitive_file.secret
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| content | <code></code> | <code>(sensitive)</code> |
+| content_base64 | <code></code> | <code>(sensitive)</code> |
+| content_base64sha256 | <code></code> | <code>(value not in plan)</code> |
+| content_base64sha512 | <code></code> | <code>(value not in plan)</code> |
+| content_md5 | <code></code> | <code>(value not in plan)</code> |
+| content_sha1 | <code></code> | <code>(value not in plan)</code> |
+| content_sha256 | <code></code> | <code>(value not in plan)</code> |
+| content_sha512 | <code></code> | <code>(value not in plan)</code> |
+| directory_permission |  | <code><ins style="background:#dfd">0700</ins></code> |
+| file_permission |  | <code><ins style="background:#dfd">0700</ins></code> |
+| filename |  | <code><ins style="background:#dfd">./output/secret.txt</ins></code> |
+| id | <code></code> | <code>(value not in plan)</code> |
+
+</details>
+
+## Outputs
+
+| Output | Action | Before | After |
+| --- | --- | --- | --- |
+| secret_checksum | ➕ | <code>(sensitive)</code> | <code>(sensitive)</code> |
+| secret_path | ➕ |  | <code>./output/secret.txt</code> |
+
+"
+`;
+
+exports[`applyToMarkdown integration > tofu/sensitive-values/1 > renders without error and matches snapshot [default] 1`] = `
+"## Apply Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| ± Replaced | local_sensitive_file | 1 |
+|  | **Replaced** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>± <strong>local_sensitive_file</strong> secret</summary>
+
+\`\`\`
+local_sensitive_file.secret
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| content | <code>(sensitive)</code> | <code>(sensitive)</code> |
+| content_base64 | <code>(sensitive)</code> | <code>(sensitive)</code> |
+| content_base64sha256 | <code>tglbgl+ELKnIfsYFkBXQKZLLTwS6icynJuYOJcOo9bY=</code> | <code>(value not in plan)</code> |
+| content_base64sha512 | <code>Eo7RifRBpd27pi/st4ERjtqdT19zPyGc5afG7yxwwtDeKueSo9wvSeZdo2Ami5LjFA92F1wrQqtKWqljFWCLdQ==</code> | <code>(value not in plan)</code> |
+| content_md5 | <code>8ed8462ae2d0cac83f45c1288b82946d</code> | <code>(value not in plan)</code> |
+| content_sha1 | <code>ffae43b95440019e9bb698e9713dc5ac27be8dd5</code> | <code>(value not in plan)</code> |
+| content_sha256 | <code>b6095b825f842ca9c87ec6059015d02992cb4f04ba89cca726e60e25c3a8f5b6</code> | <code>(value not in plan)</code> |
+| content_sha512 | <code>128ed189f441a5ddbba62fecb781118eda9d4f5f733f219ce5a7c6ef2c70c2d0de2ae792a3dc2f49e65da360268b92e3140f76175c2b42ab4a5aa96315608b75</code> | <code>(value not in plan)</code> |
+| id | <code>ffae43b95440019e9bb698e9713dc5ac27be8dd5</code> | <code>(value not in plan)</code> |
+
+</details>
+
+## Outputs
+
+| Output | Action | Before | After |
+| --- | --- | --- | --- |
+| secret_checksum | 🔧 | <code>(sensitive)</code> | <code>(sensitive)</code> |
+| secret_path | ⬜ | <code>./output/secret.txt</code> | <code>./output/secret.txt</code> |
+
+"
+`;
+
+exports[`applyToMarkdown integration > tofu/validate-error/0 > renders without error and matches snapshot [default] 1`] = `
+"## Apply Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Added | null_resource | 1 |
+|  | **Added** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>➕ <strong>null_resource</strong> baseline</summary>
+
+\`\`\`
+null_resource.baseline
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | <code></code> | <code>(value not in plan)</code> |
+| triggers.value |  | <code><ins style="background:#dfd">v1</ins></code> |
+
+</details>
+
+"
+`;
+
+exports[`applyToMarkdown integration > tofu/with-modules/0 > renders without error and matches snapshot [default] 1`] = `
+"## Apply Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Added | null_resource | 1 |
+|  | random_string | 1 |
+|  | **Added** | **2** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>➕ <strong>null_resource</strong> root</summary>
+
+\`\`\`
+null_resource.root
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | <code></code> | <code>(value not in plan)</code> |
+| triggers.stage |  | <code><ins style="background:#dfd">0</ins></code> |
+
+</details>
+
+### 📦 Module: \`module.naming\`
+
+<details>
+<summary>➕ <strong>random_string</strong> suffix</summary>
+
+\`\`\`
+module.naming.random_string.suffix
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | <code></code> | <code>(value not in plan)</code> |
+| keepers.prefix |  | <code><ins style="background:#dfd">fixture</ins></code> |
+| length |  | <code><ins style="background:#dfd">8</ins></code> |
+| lower |  | <code><ins style="background:#dfd">true</ins></code> |
+| min_lower |  | <code><ins style="background:#dfd">0</ins></code> |
+| min_numeric |  | <code><ins style="background:#dfd">0</ins></code> |
+| min_special |  | <code><ins style="background:#dfd">0</ins></code> |
+| min_upper |  | <code><ins style="background:#dfd">0</ins></code> |
+| number |  | <code><ins style="background:#dfd">true</ins></code> |
+| numeric |  | <code><ins style="background:#dfd">true</ins></code> |
+| result | <code></code> | <code>(value not in plan)</code> |
+| special |  | <code><ins style="background:#dfd">false</ins></code> |
+| upper |  | <code><ins style="background:#dfd">false</ins></code> |
+
+</details>
+
+## Outputs
+
+| Output | Action | Before | After |
+| --- | --- | --- | --- |
+| generated_name | ➕ |  | <code>fixture-3r4wm4cq</code> |
+| root_id | ➕ |  | <code>7773149748109350</code> |
+
+"
+`;
+
+exports[`applyToMarkdown integration > tofu/with-modules/1 > renders without error and matches snapshot [default] 1`] = `
+"## Apply Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| ± Replaced | null_resource | 1 |
+|  | random_string | 1 |
+|  | **Replaced** | **2** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>± <strong>null_resource</strong> root</summary>
+
+\`\`\`
+null_resource.root
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | <code>7773149748109350</code> | <code>(value not in plan)</code> |
+| triggers.stage | 0 | <code><ins style="background:#dfd">1</ins><del style="background:#fdd">0</del></code> |
+
+</details>
+
+### 📦 Module: \`module.naming\`
+
+<details>
+<summary>± <strong>random_string</strong> suffix</summary>
+
+\`\`\`
+module.naming.random_string.suffix
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | <code>3r4wm4cq</code> | <code>(value not in plan)</code> |
+| keepers.prefix | fixture | <code>fixtur<ins style="background:#dfd">e-updat</ins>e<ins style="background:#dfd">d</ins></code> |
+| result | <code>3r4wm4cq</code> | <code>(value not in plan)</code> |
+
+</details>
+
+## Outputs
+
+| Output | Action | Before | After |
+| --- | --- | --- | --- |
+| generated_name | 🔧 | <code>fixture-3r4wm4cq</code> | <code>fixture-updated-2zar5q4q</code> |
+| root_id | 🔧 | <code>7773149748109350</code> | <code>6653873194553917674</code> |
+
+"
+`;
