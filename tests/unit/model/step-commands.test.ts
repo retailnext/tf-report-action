@@ -4,7 +4,14 @@ import type { Tool } from "../../../src/model/report.js";
 import type { StepRole } from "../../../src/model/step-commands.js";
 
 describe("expectedCommand", () => {
-  const roles: StepRole[] = ["show-plan", "plan", "apply", "validate", "init"];
+  const roles: StepRole[] = [
+    "show-plan",
+    "plan",
+    "apply",
+    "validate",
+    "init",
+    "state",
+  ];
   const tools: (Tool | undefined)[] = ["tofu", "terraform", undefined];
 
   it.each(roles)(
@@ -42,6 +49,10 @@ describe("expectedCommand", () => {
 
     it("returns 'tofu init -json' for init", () => {
       expect(expectedCommand("tofu", "init")).toBe("tofu init -json");
+    });
+
+    it("returns 'tofu state pull' for state", () => {
+      expect(expectedCommand("tofu", "state")).toBe("tofu state pull");
     });
   });
 
@@ -82,6 +93,10 @@ describe("expectedCommand", () => {
 
     it("omits tool prefix for init", () => {
       expect(expectedCommand(undefined, "init")).toBe("init -json");
+    });
+
+    it("omits tool prefix for state", () => {
+      expect(expectedCommand(undefined, "state")).toBe("state pull");
     });
   });
 });

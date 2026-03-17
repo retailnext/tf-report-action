@@ -7,5 +7,6 @@
  */
 
 export { parsePlan } from "./plan.js";
+export { parseState } from "./state.js";
 export { parseValidateOutput } from "./validate-output.js";
 export { detectToolFromPlan, detectToolFromOutput } from "./detect-tool.js";

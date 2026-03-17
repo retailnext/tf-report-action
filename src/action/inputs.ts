@@ -19,6 +19,7 @@ export interface ActionInputs {
   planStepId: string;
   showPlanStepId: string;
   applyStepId: string;
+  stateStepId: string;
 }
 
 /**
@@ -69,5 +70,6 @@ export function parseInputs(env: Env): ActionInputs {
     planStepId: readInput(env, "plan-step-id") || "plan",
     showPlanStepId: readInput(env, "show-plan-step-id") || "show-plan",
     applyStepId: readInput(env, "apply-step-id") || "apply",
+    stateStepId: readInput(env, "state-step-id") || "state",
   };
 }

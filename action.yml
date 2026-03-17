@@ -45,6 +45,10 @@ inputs:
     description: "Step ID for the apply step"
     required: false
     default: "apply"
+  state-step-id:
+    description: "Step ID for the state step (post-apply state pull)"
+    required: false
+    default: "state"
 runs:
   using: "node24"
   main: "dist/index.js"

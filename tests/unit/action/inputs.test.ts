@@ -63,6 +63,7 @@ describe("parseInputs", () => {
     expect(result.planStepId).toBe("plan");
     expect(result.showPlanStepId).toBe("show-plan");
     expect(result.applyStepId).toBe("apply");
+    expect(result.stateStepId).toBe("state");
   });
 
   it("accepts custom step ID overrides", () => {
@@ -73,6 +74,7 @@ describe("parseInputs", () => {
       "INPUT_PLAN-STEP-ID": "my-plan",
       "INPUT_SHOW-PLAN-STEP-ID": "my-show",
       "INPUT_APPLY-STEP-ID": "my-apply",
+      "INPUT_STATE-STEP-ID": "my-state",
     };
     const result = parseInputs(env);
     expect(result.initStepId).toBe("my-init");
@@ -80,6 +82,7 @@ describe("parseInputs", () => {
     expect(result.planStepId).toBe("my-plan");
     expect(result.showPlanStepId).toBe("my-show");
     expect(result.applyStepId).toBe("my-apply");
+    expect(result.stateStepId).toBe("my-state");
   });
 
   it("returns undefined for target-step when not provided", () => {

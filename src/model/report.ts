@@ -149,6 +149,13 @@ export interface Report {
    */
   applyStatuses?: ApplyStatus[];
 
+  /**
+   * Whether state enrichment was applied to resolve unknown attribute values.
+   * Set to true when `enrichReportFromState()` successfully resolved at least
+   * one `isKnownAfterApply` attribute or output from post-apply state.
+   */
+  stateEnriched?: boolean;
+
   // ── Error state ─────────────────────────────────────────────────────────
 
   /** Pipeline error message. When set, the report is an error report. */

@@ -224,6 +224,7 @@ export async function run(
       planStepId: inputs.planStepId,
       showPlanStepId: inputs.showPlanStepId,
       applyStepId: inputs.applyStepId,
+      stateStepId: inputs.stateStepId,
     };
 
     if (env["RUNNER_TEMP"] !== undefined && env["RUNNER_TEMP"] !== "") {

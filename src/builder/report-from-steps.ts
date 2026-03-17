@@ -31,6 +31,7 @@ import {
   DEFAULT_PLAN_STEP,
   DEFAULT_SHOW_PLAN_STEP,
   DEFAULT_APPLY_STEP,
+  DEFAULT_STATE_STEP,
   DEFAULT_MAX_FILE_SIZE,
   DEFAULT_MAX_DISPLAY_READ,
 } from "../steps/types.js";
@@ -41,6 +42,9 @@ import { processValidateStep } from "./process-validate.js";
 import { tryProcessShowPlan } from "./process-show-plan.js";
 import { processPlanStep } from "./process-plan.js";
 import { processApplyStep } from "./process-apply.js";
+import { enrichReportFromState } from "./state-enrichment.js";
+import { parseState } from "../parser/state.js";
+import { readStepStdout } from "../steps/io.js";
 import { tmpdir } from "node:os";
 
 /**
@@ -78,6 +82,8 @@ export interface ReportOptions extends BuildOptions, RenderOptions {
   showPlanStepId?: string;
   /** Step ID for the apply step. Default: "apply" */
   applyStepId?: string;
+  /** Step ID for the state step (post-apply state pull). Default: "state" */
+  stateStepId?: string;
 }
 
 /** Create an empty Report with required fields initialized. */
@@ -118,12 +124,14 @@ export function buildReportFromSteps(
   const planStepId = options?.planStepId ?? DEFAULT_PLAN_STEP;
   const showPlanStepId = options?.showPlanStepId ?? DEFAULT_SHOW_PLAN_STEP;
   const applyStepId = options?.applyStepId ?? DEFAULT_APPLY_STEP;
+  const stateStepId = options?.stateStepId ?? DEFAULT_STATE_STEP;
   const knownStepIds = new Set([
     initStepId,
     validateStepId,
     planStepId,
     showPlanStepId,
     applyStepId,
+    stateStepId,
   ]);
 
   // Reader options
@@ -156,6 +164,7 @@ export function buildReportFromSteps(
   const planStep = steps[planStepId];
   const showPlanStep = steps[showPlanStepId];
   const applyStep = steps[applyStepId];
+  const stateStep = steps[stateStepId];
   const hasAnyIaCStep =
     initStep !== undefined ||
     validateStep !== undefined ||
@@ -210,6 +219,25 @@ export function buildReportFromSteps(
     tool ??= report.tool;
   }
 
+  // State enrichment: resolve (value not in plan) from post-apply state
+  if (
+    showPlanParsed &&
+    report.operation === "apply" &&
+    stateStep !== undefined &&
+    getStepOutcome(stateStep) === "success"
+  ) {
+    const stateRead = readStepStdout(stateStep, readerOpts);
+    if (stateRead.content !== undefined) {
+      try {
+        const state = parseState(stateRead.content);
+        enrichReportFromState(report, state);
+      } catch {
+        // State parse failure is non-fatal — fall through to the
+        // missing-state warning which covers the unresolved values.
+      }
+    }
+  }
+
   // ─── Phase 3: Unfamiliar step issues ──────────────────────────
   for (const [stepId, step] of Object.entries(steps)) {
     if (knownStepIds.has(stepId)) continue;
@@ -231,6 +259,18 @@ export function buildReportFromSteps(
     // Raw text fallback — no structured data at all
     report.warnings.push(
       `Report limited because \`${expectedCommand(tool, "show-plan")}\` output was not available. Showing raw command output.`,
+    );
+  }
+
+  // Missing state warning — only for structured apply reports with unresolved values
+  if (
+    showPlanParsed &&
+    report.operation === "apply" &&
+    !report.stateEnriched &&
+    hasUnresolvedKnownAfterApply(report)
+  ) {
+    report.warnings.push(
+      `Some attribute values could not be resolved because \`${expectedCommand(tool, "state")}\` output was not available. Add a \`state\` step after apply to see the actual values.`,
     );
   }
 
@@ -287,4 +327,17 @@ function buildLogsUrl(env: Env): string | undefined {
   if (!repo || !runId) return undefined;
   const attempt = env["GITHUB_RUN_ATTEMPT"] ?? "1";
   return `https://github.com/${repo}/actions/runs/${runId}/attempts/${attempt}`;
+}
+
+/** Returns true if the report has any unresolved isKnownAfterApply attributes or outputs. */
+function hasUnresolvedKnownAfterApply(report: Report): boolean {
+  for (const resource of report.resources ?? []) {
+    for (const attr of resource.attributes) {
+      if (attr.isKnownAfterApply) return true;
+    }
+  }
+  for (const output of report.outputs ?? []) {
+    if (output.isKnownAfterApply) return true;
+  }
+  return false;
 }

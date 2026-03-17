@@ -6,6 +6,7 @@ import {
   DEFAULT_PLAN_STEP,
   DEFAULT_SHOW_PLAN_STEP,
   DEFAULT_APPLY_STEP,
+  DEFAULT_STATE_STEP,
   DEFAULT_KNOWN_STEP_IDS,
   DEFAULT_MAX_FILE_SIZE,
   DEFAULT_MAX_DISPLAY_READ,
@@ -37,6 +38,7 @@ describe("default step IDs", () => {
     expect(DEFAULT_PLAN_STEP).toBe("plan");
     expect(DEFAULT_SHOW_PLAN_STEP).toBe("show-plan");
     expect(DEFAULT_APPLY_STEP).toBe("apply");
+    expect(DEFAULT_STATE_STEP).toBe("state");
   });
 
   it("DEFAULT_KNOWN_STEP_IDS contains all defaults", () => {
@@ -45,7 +47,8 @@ describe("default step IDs", () => {
     expect(DEFAULT_KNOWN_STEP_IDS.has("plan")).toBe(true);
     expect(DEFAULT_KNOWN_STEP_IDS.has("show-plan")).toBe(true);
     expect(DEFAULT_KNOWN_STEP_IDS.has("apply")).toBe(true);
-    expect(DEFAULT_KNOWN_STEP_IDS.size).toBe(5);
+    expect(DEFAULT_KNOWN_STEP_IDS.has("state")).toBe(true);
+    expect(DEFAULT_KNOWN_STEP_IDS.size).toBe(6);
   });
 });
 

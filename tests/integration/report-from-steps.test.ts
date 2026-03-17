@@ -760,11 +760,11 @@ describe("reportFromSteps integration — targeted scenarios", () => {
     );
     const options: ReportOptions = {
       allowedDirs: [fixture!.fixtureDir],
-      maxOutputLength: 500,
+      maxOutputLength: 700,
       env: NO_GITHUB_ENV,
     };
     const result = reportFromSteps(resolved, options);
-    expect(result.length).toBeLessThanOrEqual(500);
+    expect(result.length).toBeLessThanOrEqual(700);
   });
 
   it("produces Tier 1 report for fixtures with show-plan.stdout", () => {

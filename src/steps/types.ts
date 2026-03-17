@@ -124,6 +124,9 @@ export const DEFAULT_SHOW_PLAN_STEP = "show-plan";
 /** Default step ID for `terraform apply`. */
 export const DEFAULT_APPLY_STEP = "apply";
 
+/** Default step ID for `terraform state pull` / `tofu state pull`. */
+export const DEFAULT_STATE_STEP = "state";
+
 /**
  * The set of step IDs that are recognized as terraform/opentofu workflow
  * steps. Used to determine whether the steps context represents a
@@ -135,6 +138,7 @@ export const DEFAULT_KNOWN_STEP_IDS: ReadonlySet<string> = new Set([
   DEFAULT_PLAN_STEP,
   DEFAULT_SHOW_PLAN_STEP,
   DEFAULT_APPLY_STEP,
+  DEFAULT_STATE_STEP,
 ]);
 
 // ---------------------------------------------------------------------------

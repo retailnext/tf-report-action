@@ -7,7 +7,13 @@ import type { Tool } from "./report.js";
  * Not all roles are parsed today — this type is intentionally exhaustive so
  * that future parsers can reuse `expectedCommand()` without model changes.
  */
-export type StepRole = "show-plan" | "plan" | "apply" | "validate" | "init";
+export type StepRole =
+  | "show-plan"
+  | "plan"
+  | "apply"
+  | "validate"
+  | "init"
+  | "state";
 
 /**
  * Returns the expected CLI command (with `-json` flag) for a given step role.
@@ -35,5 +41,7 @@ export function expectedCommand(
       return `${prefix}validate -json`;
     case "init":
       return `${prefix}init -json`;
+    case "state":
+      return `${prefix}state pull`;
   }
 }
