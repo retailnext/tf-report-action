@@ -70,11 +70,11 @@ function makeResource(
 
 /** Create a minimal State with resources and outputs. */
 function makeState(
-  resources: Array<{
+  resources: {
     address: string;
     values?: Record<string, unknown>;
     sensitive_values?: Record<string, unknown>;
-  }>,
+  }[],
   outputs?: Record<string, { value?: unknown; sensitive: boolean }>,
 ): State {
   return {

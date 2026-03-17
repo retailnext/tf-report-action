@@ -1,0 +1,2 @@
+{"version":4,"terraform_version":"1.11.5","serial":1,"lineage":"2755934e-0f49-e751-7290-04937ae86f9a","outputs":{},"resources":[{"mode":"managed","type":"null_resource","name":"example","provider":"provider[\"registry.opentofu.org/hashicorp/null\"]","instances":[{"schema_version":0,"attributes":{"id":"2965469771341626916","triggers":{"value":"hello"}},"sensitive_attributes":[]}]}],"check_results":null}
+

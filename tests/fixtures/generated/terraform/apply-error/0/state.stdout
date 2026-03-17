@@ -1,0 +1,92 @@
+{
+  "version": 4,
+  "terraform_version": "1.14.6",
+  "serial": 4,
+  "lineage": "151daf8c-b60b-94ab-8689-c89318bc61a7",
+  "outputs": {
+    "depends_on_fail_output": {
+      "value": "4332809127533751978",
+      "type": "string"
+    },
+    "success_output": {
+      "value": "stable",
+      "type": "string"
+    }
+  },
+  "resources": [
+    {
+      "mode": "managed",
+      "type": "null_resource",
+      "name": "will_fail",
+      "provider": "provider[\"registry.terraform.io/hashicorp/null\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "id": "4332809127533751978",
+            "triggers": {
+              "value": "v1"
+            }
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "terraform_data",
+      "name": "depends_on_fail",
+      "provider": "provider[\"terraform.io/builtin/terraform\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "id": "d81e43ba-4987-8775-dcd0-72bced888f64",
+            "input": {
+              "value": "4332809127533751978",
+              "type": "string"
+            },
+            "output": {
+              "value": "4332809127533751978",
+              "type": "string"
+            },
+            "triggers_replace": null
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "dependencies": [
+            "null_resource.will_fail"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "terraform_data",
+      "name": "success",
+      "provider": "provider[\"terraform.io/builtin/terraform\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "id": "9a40de34-d775-6ee0-8fa3-a6b95561b021",
+            "input": {
+              "value": "stable",
+              "type": "string"
+            },
+            "output": {
+              "value": "stable",
+              "type": "string"
+            },
+            "triggers_replace": null
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0
+        }
+      ]
+    }
+  ],
+  "check_results": null
+}
+

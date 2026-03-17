@@ -1,0 +1,81 @@
+{
+  "version": 4,
+  "terraform_version": "1.14.6",
+  "serial": 10,
+  "lineage": "6e8e5926-36b7-a986-2c46-c2d43d8cfbec",
+  "outputs": {},
+  "resources": [
+    {
+      "module": "module.parent[\"1\"].module.child",
+      "mode": "managed",
+      "type": "null_resource",
+      "name": "item",
+      "provider": "provider[\"registry.terraform.io/hashicorp/null\"]",
+      "instances": [
+        {
+          "index_key": 0,
+          "schema_version": 0,
+          "attributes": {
+            "id": "2261356708475394088",
+            "triggers": {
+              "index": "0",
+              "label": "1"
+            }
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0
+        }
+      ]
+    },
+    {
+      "module": "module.parent[\"3\"].module.child",
+      "mode": "managed",
+      "type": "null_resource",
+      "name": "item",
+      "provider": "provider[\"registry.terraform.io/hashicorp/null\"]",
+      "instances": [
+        {
+          "index_key": 0,
+          "schema_version": 0,
+          "attributes": {
+            "id": "9007645374136769050",
+            "triggers": {
+              "index": "0",
+              "label": "3"
+            }
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0
+        },
+        {
+          "index_key": 1,
+          "schema_version": 0,
+          "attributes": {
+            "id": "1972443345129880455",
+            "triggers": {
+              "index": "1",
+              "label": "3"
+            }
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0
+        },
+        {
+          "index_key": 2,
+          "schema_version": 0,
+          "attributes": {
+            "id": "5632014247122928303",
+            "triggers": {
+              "index": "2",
+              "label": "3"
+            }
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0
+        }
+      ]
+    }
+  ],
+  "check_results": null
+}
+

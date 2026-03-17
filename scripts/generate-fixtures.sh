@@ -24,6 +24,8 @@
 #     show-plan.stderr     — show -json tfplan stderr
 #     apply.stdout         — apply -json stdout
 #     apply.stderr         — apply -json stderr
+#     state.stdout         — state pull stdout
+#     state.stderr         — state pull stderr
 #     steps.json           — steps context (references output files)
 #
 # Workspace options (via a `workspace.conf` file in the workspace root):
@@ -168,12 +170,12 @@ build_steps_json() {
   echo "$json" > "$out_dir/steps.json"
 
   # Also generate plan-steps.json — same as steps.json but without the apply
-  # step. This provides a plan-only fixture for every scenario.
+  # and state steps. This provides a plan-only fixture for every scenario.
   local plan_json="{"
   local pfirst=true
   while IFS='|' read -r step_id outcome conclusion exit_code_val stdout_file stderr_file; do
     [[ -z "$step_id" ]] && continue
-    [[ "$step_id" == "apply" ]] && continue
+    [[ "$step_id" == "apply" || "$step_id" == "state" ]] && continue
     if $pfirst; then pfirst=false; else plan_json+=","; fi
     plan_json+="\"${step_id}\":{\"outcome\":\"${outcome}\",\"conclusion\":\"${conclusion}\",\"outputs\":{\"exit_code\":\"${exit_code_val}\""
     if [[ -n "$stdout_file" && -s "$out_dir/$stdout_file" ]]; then
@@ -187,13 +189,13 @@ build_steps_json() {
   plan_json+="}"
   echo "$plan_json" > "$out_dir/plan-steps.json"
 
-  # Generate no-show-steps.json — omits show-plan and apply steps.
+  # Generate no-show-steps.json — omits show-plan, apply, and state steps.
   # Forces Tier 3 (text fallback) rendering in integration tests.
   local noshow_json="{"
   local nfirst=true
   while IFS='|' read -r step_id outcome conclusion exit_code_val stdout_file stderr_file; do
     [[ -z "$step_id" ]] && continue
-    [[ "$step_id" == "show-plan" || "$step_id" == "apply" ]] && continue
+    [[ "$step_id" == "show-plan" || "$step_id" == "apply" || "$step_id" == "state" ]] && continue
     if $nfirst; then nfirst=false; else noshow_json+=","; fi
     noshow_json+="\"${step_id}\":{\"outcome\":\"${outcome}\",\"conclusion\":\"${conclusion}\",\"outputs\":{\"exit_code\":\"${exit_code_val}\""
     if [[ -n "$stdout_file" && -s "$out_dir/$stdout_file" ]]; then
@@ -246,6 +248,26 @@ build_steps_json() {
   done < "$tmp_file"
   ao_json+="}"
   echo "$ao_json" > "$out_dir/apply-only-steps.json"
+
+  # Generate no-state-steps.json — has all steps except state.
+  # Exercises the "missing state" warning path for structured apply reports.
+  local ns_json="{"
+  local sfirst=true
+  while IFS='|' read -r step_id outcome conclusion exit_code_val stdout_file stderr_file; do
+    [[ -z "$step_id" ]] && continue
+    [[ "$step_id" == "state" ]] && continue
+    if $sfirst; then sfirst=false; else ns_json+=","; fi
+    ns_json+="\"${step_id}\":{\"outcome\":\"${outcome}\",\"conclusion\":\"${conclusion}\",\"outputs\":{\"exit_code\":\"${exit_code_val}\""
+    if [[ -n "$stdout_file" && -s "$out_dir/$stdout_file" ]]; then
+      ns_json+=",\"stdout_file\":\"${stdout_file}\""
+    fi
+    if [[ -n "$stderr_file" && -s "$out_dir/$stderr_file" ]]; then
+      ns_json+=",\"stderr_file\":\"${stderr_file}\""
+    fi
+    ns_json+="}}"
+  done < "$tmp_file"
+  ns_json+="}"
+  echo "$ns_json" > "$out_dir/no-state-steps.json"
 
   rm -f "$tmp_file"
 }
@@ -420,7 +442,7 @@ run_tool_workspace() {
     # -- apply --
     if $init_ok && $validate_ok && $plan_ok; then
       exit_code=0
-      "$tool" -chdir="$tool_tmp" apply $json_flag -auto-approve tfplan > "$out_dir/apply.stdout" 2> "$out_dir/apply.stderr" || exit_code=$?
+      "$tool" -chdir="$tool_tmp" apply $json_flag tfplan > "$out_dir/apply.stdout" 2> "$out_dir/apply.stderr" || exit_code=$?
       ef=""
       [[ "$expect_fail_list" == *":apply:"* ]] && ef="1"
       check_exit_code "apply" "$exit_code" "$ef" || return 1
@@ -428,6 +450,16 @@ run_tool_workspace() {
       record_step "$out_dir" "apply" "$outcome" "$outcome" "$exit_code" "apply.stdout" "apply.stderr"
     else
       record_step "$out_dir" "apply" "skipped" "skipped" "0" "" ""
+    fi
+
+    # -- state pull --
+    if $init_ok && $validate_ok && $plan_ok; then
+      exit_code=0
+      "$tool" -chdir="$tool_tmp" state pull > "$out_dir/state.stdout" 2> "$out_dir/state.stderr" || exit_code=$?
+      outcome=$(exit_to_outcome "$exit_code")
+      record_step "$out_dir" "state" "$outcome" "$outcome" "$exit_code" "state.stdout" "state.stderr"
+    else
+      record_step "$out_dir" "state" "skipped" "skipped" "0" "" ""
     fi
 
     # Generate steps.json
