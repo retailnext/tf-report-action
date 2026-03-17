@@ -236,25 +236,6 @@ etc. instead.
 
 ---
 
-## Attribution Policy
-
-This project's output style is inspired by [tfplan2md](https://github.com/oocx/tfplan2md)
-by oocx, used under the MIT License.
-
-Any file whose logic is substantially derived from tfplan2md must include the following
-header comment (after the licence header if present):
-
-```ts
-// Portions of this file are derived from tfplan2md by oocx
-// (https://github.com/oocx/tfplan2md), used under the MIT License.
-```
-
-Modules most likely to need this: `src/flattener/`, `src/sensitivity/`, `src/diff/`,
-`src/renderer/large-value.ts`, `src/renderer/diff-format.ts`, `src/renderer/writer.ts`,
-`src/renderer/resource.ts`, `src/renderer/summary.ts`, `src/builder/attributes.ts`.
-
----
-
 ## Sensitive Values
 
 Sensitive attribute values are **always masked** as `(sensitive)`. There is no option
