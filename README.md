@@ -21,6 +21,157 @@ rich plan and apply detail.
   character limit while preserving the most important information
 - **Zero runtime dependencies** — uses only Node.js built-in modules
 
+## Example Output
+
+The action posts a Markdown comment to your PR showing plan details with
+attribute-level diffs grouped by module. Click to expand:
+
+<!-- begin example output -->
+<!-- markdownlint-disable MD033 MD040 -->
+<details>
+<summary><strong>✅ <code>production</code> Plan: 3 to add, 2 to replace, 2 to destroy</strong></summary>
+
+<!-- textlint-disable terminology -->
+
+## Plan Summary
+
+| Action     | Resource      | Count |
+| ---------- | ------------- | ----- |
+| ➕ Add     | null_resource | 3     |
+|            | **Add**       | **3** |
+| ± Replace  | null_resource | 1     |
+|            | random_string | 1     |
+|            | **Replace**   | **2** |
+| 🗑️ Destroy | null_resource | 2     |
+|            | **Destroy**   | **2** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>± <strong>null_resource</strong> root</summary>
+
+```
+null_resource.root
+```
+
+| Attribute      | Before                           | After                                                                                 |
+| -------------- | -------------------------------- | ------------------------------------------------------------------------------------- |
+| id             | <code>4740972482117666024</code> | <code>(known after apply)</code>                                                      |
+| triggers.stage | 0                                | <code><ins style="background:#dfd">1</ins><del style="background:#fdd">0</del></code> |
+
+</details>
+
+### 📦 Module: `module.naming`
+
+<details>
+<summary>± <strong>random_string</strong> suffix</summary>
+
+```
+module.naming.random_string.suffix
+```
+
+| Attribute      | Before                | After                                                                                              |
+| -------------- | --------------------- | -------------------------------------------------------------------------------------------------- |
+| id             | <code>0aura6xr</code> | <code>(known after apply)</code>                                                                   |
+| keepers.prefix | fixture               | <code>fixtur<ins style="background:#dfd">e-updat</ins>e<ins style="background:#dfd">d</ins></code> |
+| result         | <code>0aura6xr</code> | <code>(known after apply)</code>                                                                   |
+
+</details>
+
+### 📦 Module: `module.parent["2"].module.child`
+
+<details>
+<summary>🗑️ <strong>null_resource</strong> item[0]</summary>
+
+```
+module.parent["2"].module.child.null_resource.item[0]
+```
+
+| Attribute      | Before              | After                                                               |
+| -------------- | ------------------- | ------------------------------------------------------------------- |
+| id             | 2081773518097729371 | <code><del style="background:#fdd">2081773518097729371</del></code> |
+| triggers.index | 0                   | <code><del style="background:#fdd">0</del></code>                   |
+| triggers.label | 2                   | <code><del style="background:#fdd">2</del></code>                   |
+
+</details>
+
+<details>
+<summary>🗑️ <strong>null_resource</strong> item[1]</summary>
+
+```
+module.parent["2"].module.child.null_resource.item[1]
+```
+
+| Attribute      | Before              | After                                                               |
+| -------------- | ------------------- | ------------------------------------------------------------------- |
+| id             | 8179146176311086127 | <code><del style="background:#fdd">8179146176311086127</del></code> |
+| triggers.index | 1                   | <code><del style="background:#fdd">1</del></code>                   |
+| triggers.label | 2                   | <code><del style="background:#fdd">2</del></code>                   |
+
+</details>
+
+### 📦 Module: `module.parent["3"].module.child`
+
+<details>
+<summary>➕ <strong>null_resource</strong> item[0]</summary>
+
+```
+module.parent["3"].module.child.null_resource.item[0]
+```
+
+| Attribute      | Before        | After                                             |
+| -------------- | ------------- | ------------------------------------------------- |
+| id             | <code></code> | <code>(known after apply)</code>                  |
+| triggers.index |               | <code><ins style="background:#dfd">0</ins></code> |
+| triggers.label |               | <code><ins style="background:#dfd">3</ins></code> |
+
+</details>
+
+<details>
+<summary>➕ <strong>null_resource</strong> item[1]</summary>
+
+```
+module.parent["3"].module.child.null_resource.item[1]
+```
+
+| Attribute      | Before        | After                                             |
+| -------------- | ------------- | ------------------------------------------------- |
+| id             | <code></code> | <code>(known after apply)</code>                  |
+| triggers.index |               | <code><ins style="background:#dfd">1</ins></code> |
+| triggers.label |               | <code><ins style="background:#dfd">3</ins></code> |
+
+</details>
+
+<details>
+<summary>➕ <strong>null_resource</strong> item[2]</summary>
+
+```
+module.parent["3"].module.child.null_resource.item[2]
+```
+
+| Attribute      | Before        | After                                             |
+| -------------- | ------------- | ------------------------------------------------- |
+| id             | <code></code> | <code>(known after apply)</code>                  |
+| triggers.index |               | <code><ins style="background:#dfd">2</ins></code> |
+| triggers.label |               | <code><ins style="background:#dfd">3</ins></code> |
+
+</details>
+
+## Outputs
+
+| Output         | Action | Before                           | After                            |
+| -------------- | ------ | -------------------------------- | -------------------------------- |
+| generated_name | 🔧     | <code>fixture-0aura6xr</code>    | <code>(known after apply)</code> |
+| root_id        | 🔧     | <code>4740972482117666024</code> | <code>(known after apply)</code> |
+
+<!-- textlint-enable terminology -->
+
+</details>
+<!-- markdownlint-enable MD033 MD040 -->
+<!-- end example output -->
+
 ## Quick Start
 
 ```yaml
