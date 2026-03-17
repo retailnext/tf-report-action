@@ -100,9 +100,18 @@ export class MarkdownWriter {
     return text;
   }
 
-  /** Escapes pipe characters in table cells. */
+  /** Escapes pipe characters in table cells (Markdown context, not HTML). */
   static escapeCell(value: string): string {
     return value.replace(/\\/g, "\\\\").replace(/\|/g, "\\|");
+  }
+
+  /**
+   * Escapes a value for use inside HTML tags within a Markdown table cell.
+   * Uses HTML entity encoding for pipe characters instead of Markdown backslash
+   * escaping, since backslash escapes are not interpreted inside HTML tags.
+   */
+  static escapeHtmlCell(value: string): string {
+    return escapeHtml(value).replace(/\|/g, "&#124;");
   }
 
   /**
@@ -116,5 +125,13 @@ export class MarkdownWriter {
   /** Wraps value in `<code>` tags, HTML-escaping the content. */
   static inlineCode(value: string): string {
     return `<code>${escapeHtml(value)}</code>`;
+  }
+
+  /**
+   * Wraps value in `<code>` tags with HTML escaping and table-safe pipe encoding.
+   * Use instead of `inlineCode(escapeCell(...))` in table cell contexts.
+   */
+  static inlineCodeCell(value: string): string {
+    return `<code>${escapeHtml(value).replace(/\|/g, "&#124;")}</code>`;
   }
 }

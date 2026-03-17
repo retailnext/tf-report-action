@@ -127,4 +127,55 @@ describe("parseValidateOutput", () => {
     });
     expect(parseValidateOutput(input).format_version).toBe("0.1");
   });
+
+  it("throws when valid field is missing", () => {
+    const input = JSON.stringify({
+      format_version: "1.0",
+      error_count: 0,
+      warning_count: 0,
+      diagnostics: [],
+    });
+    expect(() => parseValidateOutput(input)).toThrow(/valid/);
+  });
+
+  it("throws when valid field is not boolean", () => {
+    const input = JSON.stringify({
+      format_version: "1.0",
+      valid: "true",
+      error_count: 0,
+      warning_count: 0,
+      diagnostics: [],
+    });
+    expect(() => parseValidateOutput(input)).toThrow(/valid/);
+  });
+
+  it("throws when diagnostics field is missing", () => {
+    const input = JSON.stringify({
+      format_version: "1.0",
+      valid: true,
+      error_count: 0,
+      warning_count: 0,
+    });
+    expect(() => parseValidateOutput(input)).toThrow(/diagnostics/);
+  });
+
+  it("throws when diagnostics field is not an array", () => {
+    const input = JSON.stringify({
+      format_version: "1.0",
+      valid: true,
+      error_count: 0,
+      warning_count: 0,
+      diagnostics: "none",
+    });
+    expect(() => parseValidateOutput(input)).toThrow(/diagnostics/);
+  });
+
+  it("rejects plan JSON that has format_version but lacks valid/diagnostics", () => {
+    const planLike = JSON.stringify({
+      format_version: "1.2",
+      terraform_version: "1.14.6",
+      planned_values: {},
+    });
+    expect(() => parseValidateOutput(planLike)).toThrow(/valid/);
+  });
 });

@@ -76,6 +76,16 @@ function parseValidateOutput(json) {
       `Unsupported validate format_version: ${formatVersion} (major version ${String(major)} > 1)`
     );
   }
+  if (typeof obj["valid"] !== "boolean") {
+    throw new Error(
+      "Validate output is missing required field: valid (boolean)"
+    );
+  }
+  if (!Array.isArray(obj["diagnostics"])) {
+    throw new Error(
+      "Validate output is missing required field: diagnostics (array)"
+    );
+  }
   return parsed;
 }
 
@@ -1638,18 +1648,17 @@ function tryProcessShowPlan(showPlanStep, showPlanStepId, applyStep, applyStepId
   let enrichedReport;
   let isApplyMode = false;
   if (applyStep && getStepOutcome(applyStep) !== "skipped") {
+    isApplyMode = true;
     const applyRead = readStepStdout(applyStep, readerOpts);
     if (applyRead.content !== void 0) {
       try {
         const applyScan = scanString(applyRead.content);
         enrichedReport = buildApplyReport(plan, applyScan, options);
-        isApplyMode = true;
       } catch {
         enrichedReport = buildReport(plan, options);
       }
     } else {
       enrichedReport = buildReport(plan, options);
-      isApplyMode = true;
     }
   } else {
     enrichedReport = buildReport(plan, options);
@@ -2214,9 +2223,17 @@ var MarkdownWriter = class {
     text = text.replace(/([^\n])\n(#{1,6} )/g, "$1\n\n$2");
     return text;
   }
-  /** Escapes pipe characters in table cells. */
+  /** Escapes pipe characters in table cells (Markdown context, not HTML). */
   static escapeCell(value) {
     return value.replace(/\\/g, "\\\\").replace(/\|/g, "\\|");
+  }
+  /**
+   * Escapes a value for use inside HTML tags within a Markdown table cell.
+   * Uses HTML entity encoding for pipe characters instead of Markdown backslash
+   * escaping, since backslash escapes are not interpreted inside HTML tags.
+   */
+  static escapeHtmlCell(value) {
+    return escapeHtml(value).replace(/\|/g, "&#124;");
   }
   /**
    * Escape characters that have special meaning in HTML.
@@ -2228,6 +2245,13 @@ var MarkdownWriter = class {
   /** Wraps value in `<code>` tags, HTML-escaping the content. */
   static inlineCode(value) {
     return `<code>${escapeHtml(value)}</code>`;
+  }
+  /**
+   * Wraps value in `<code>` tags with HTML escaping and table-safe pipe encoding.
+   * Use instead of `inlineCode(escapeCell(...))` in table cell contexts.
+   */
+  static inlineCodeCell(value) {
+    return `<code>${escapeHtml(value).replace(/\|/g, "&#124;")}</code>`;
   }
 };
 
@@ -2375,7 +2399,7 @@ function formatDiff(before, after, format) {
   const a = after ?? "";
   if (b === "" && a === "") return "";
   if (b === a) {
-    return MarkdownWriter.inlineCode(MarkdownWriter.escapeCell(b));
+    return MarkdownWriter.inlineCodeCell(b);
   }
   if (format === "simple") {
     const parts = [];
@@ -2390,11 +2414,11 @@ function formatDiff(before, after, format) {
   for (let i = 0; i < maxLen; i++) {
     let flushBuffers2 = function() {
       if (delBuf) {
-        line += `<del style="background:#fdd">${MarkdownWriter.escapeCell(delBuf)}</del>`;
+        line += `<del style="background:#fdd">${MarkdownWriter.escapeHtmlCell(delBuf)}</del>`;
         delBuf = "";
       }
       if (insBuf) {
-        line += `<ins style="background:#dfd">${MarkdownWriter.escapeCell(insBuf)}</ins>`;
+        line += `<ins style="background:#dfd">${MarkdownWriter.escapeHtmlCell(insBuf)}</ins>`;
         insBuf = "";
       }
     };
@@ -2402,7 +2426,7 @@ function formatDiff(before, after, format) {
     const bl = beforeLines[i] ?? "";
     const al = afterLines[i] ?? "";
     if (bl === al) {
-      resultLines.push(MarkdownWriter.escapeCell(bl));
+      resultLines.push(MarkdownWriter.escapeHtmlCell(bl));
       continue;
     }
     const charDiff = buildCharDiff(bl, al);
@@ -2419,7 +2443,7 @@ function formatDiff(before, after, format) {
         insBuf += entry.value;
       } else {
         flushBuffers2();
-        line += MarkdownWriter.escapeCell(entry.value);
+        line += MarkdownWriter.escapeHtmlCell(entry.value);
       }
     }
     flushBuffers2();
@@ -2568,12 +2592,8 @@ function renderResource(resource, writer, options, diffCache, applyContext) {
       writer.tableHeader(["Attribute", "Before", "After"]);
       for (const attr of smallAttrs) {
         const skipDiff = attr.isSensitive || attr.isKnownAfterApply;
-        const beforeCell = skipDiff ? MarkdownWriter.inlineCode(
-          MarkdownWriter.escapeCell(attr.before ?? "")
-        ) : MarkdownWriter.escapeCell(attr.before ?? "");
-        const afterCell = skipDiff ? MarkdownWriter.inlineCode(
-          MarkdownWriter.escapeCell(attr.after ?? "")
-        ) : formatDiff(attr.before, attr.after, diffFormat);
+        const beforeCell = skipDiff ? MarkdownWriter.inlineCodeCell(attr.before ?? "") : MarkdownWriter.escapeCell(attr.before ?? "");
+        const afterCell = skipDiff ? MarkdownWriter.inlineCodeCell(attr.after ?? "") : formatDiff(attr.before, attr.after, diffFormat);
         writer.tableRow([
           MarkdownWriter.escapeCell(attr.name),
           beforeCell,
@@ -2810,8 +2830,8 @@ function renderOutputTable(outputs, writer) {
   writer.tableHeader(["Output", "Action", "Before", "After"]);
   for (const output of outputs) {
     const symbol = ACTION_SYMBOLS[output.action];
-    const before = output.isSensitive ? MarkdownWriter.inlineCode("(sensitive)") : output.before !== null ? MarkdownWriter.inlineCode(MarkdownWriter.escapeCell(output.before)) : "";
-    const after = output.isSensitive ? MarkdownWriter.inlineCode("(sensitive)") : output.after !== null ? MarkdownWriter.inlineCode(MarkdownWriter.escapeCell(output.after)) : "";
+    const before = output.isSensitive ? MarkdownWriter.inlineCode("(sensitive)") : output.before !== null ? MarkdownWriter.inlineCodeCell(output.before) : "";
+    const after = output.isSensitive ? MarkdownWriter.inlineCode("(sensitive)") : output.after !== null ? MarkdownWriter.inlineCodeCell(output.after) : "";
     writer.tableRow([
       MarkdownWriter.escapeCell(output.name),
       symbol,

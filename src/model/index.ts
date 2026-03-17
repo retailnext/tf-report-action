@@ -1,4 +1,5 @@
-export type { PlanAction, ACTION_SYMBOLS } from "./plan-action.js";
+export type { PlanAction } from "./plan-action.js";
+export { ACTION_SYMBOLS } from "./plan-action.js";
 export type { AttributeChange } from "./attribute.js";
 export type { ResourceChange } from "./resource.js";
 export type { OutputChange } from "./output.js";

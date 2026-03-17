@@ -18,9 +18,10 @@ describe("formatDiff", () => {
       expect(result).toBe("<code>hello</code>");
     });
 
-    it("escapes pipes in identical values", () => {
+    it("escapes pipes in identical values using HTML entities", () => {
       const result = formatDiff("a|b", "a|b", "inline");
-      expect(result).toContain("a\\|b");
+      expect(result).toContain("a&#124;b");
+      expect(result).not.toContain("a\\|b");
     });
   });
 

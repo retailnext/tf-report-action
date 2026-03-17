@@ -90,14 +90,10 @@ export function renderResource(
         // Sensitive and placeholder values are displayed as-is, never char-diffed
         const skipDiff = attr.isSensitive || attr.isKnownAfterApply;
         const beforeCell = skipDiff
-          ? MarkdownWriter.inlineCode(
-              MarkdownWriter.escapeCell(attr.before ?? ""),
-            )
+          ? MarkdownWriter.inlineCodeCell(attr.before ?? "")
           : MarkdownWriter.escapeCell(attr.before ?? "");
         const afterCell = skipDiff
-          ? MarkdownWriter.inlineCode(
-              MarkdownWriter.escapeCell(attr.after ?? ""),
-            )
+          ? MarkdownWriter.inlineCodeCell(attr.after ?? "")
           : formatDiff(attr.before, attr.after, diffFormat);
         writer.tableRow([
           MarkdownWriter.escapeCell(attr.name),

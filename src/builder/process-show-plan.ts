@@ -69,18 +69,17 @@ export function tryProcessShowPlan(
   let isApplyMode = false;
 
   if (applyStep && getStepOutcome(applyStep) !== "skipped") {
+    isApplyMode = true;
     const applyRead = readStepStdout(applyStep, readerOpts);
     if (applyRead.content !== undefined) {
       try {
         const applyScan = scanString(applyRead.content);
         enrichedReport = buildApplyReport(plan, applyScan, options);
-        isApplyMode = true;
       } catch {
         enrichedReport = buildReport(plan, options);
       }
     } else {
       enrichedReport = buildReport(plan, options);
-      isApplyMode = true; // apply step present even if no output
     }
   } else {
     enrichedReport = buildReport(plan, options);

@@ -43,5 +43,17 @@ export function parseValidateOutput(json: string): ValidateOutput {
     );
   }
 
+  if (typeof obj["valid"] !== "boolean") {
+    throw new Error(
+      "Validate output is missing required field: valid (boolean)",
+    );
+  }
+
+  if (!Array.isArray(obj["diagnostics"])) {
+    throw new Error(
+      "Validate output is missing required field: diagnostics (array)",
+    );
+  }
+
   return parsed as ValidateOutput;
 }

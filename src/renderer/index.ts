@@ -284,12 +284,12 @@ function renderOutputTable(
     const before = output.isSensitive
       ? MarkdownWriter.inlineCode("(sensitive)")
       : output.before !== null
-        ? MarkdownWriter.inlineCode(MarkdownWriter.escapeCell(output.before))
+        ? MarkdownWriter.inlineCodeCell(output.before)
         : "";
     const after = output.isSensitive
       ? MarkdownWriter.inlineCode("(sensitive)")
       : output.after !== null
-        ? MarkdownWriter.inlineCode(MarkdownWriter.escapeCell(output.after))
+        ? MarkdownWriter.inlineCodeCell(output.after)
         : "";
     writer.tableRow([
       MarkdownWriter.escapeCell(output.name),

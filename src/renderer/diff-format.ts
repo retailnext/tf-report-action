@@ -26,7 +26,7 @@ export function formatDiff(
   if (b === "" && a === "") return "";
 
   if (b === a) {
-    return MarkdownWriter.inlineCode(MarkdownWriter.escapeCell(b));
+    return MarkdownWriter.inlineCodeCell(b);
   }
 
   if (format === "simple") {
@@ -47,7 +47,7 @@ export function formatDiff(
     const al = afterLines[i] ?? "";
 
     if (bl === al) {
-      resultLines.push(MarkdownWriter.escapeCell(bl));
+      resultLines.push(MarkdownWriter.escapeHtmlCell(bl));
       continue;
     }
 
@@ -58,11 +58,11 @@ export function formatDiff(
 
     function flushBuffers(): void {
       if (delBuf) {
-        line += `<del style="background:#fdd">${MarkdownWriter.escapeCell(delBuf)}</del>`;
+        line += `<del style="background:#fdd">${MarkdownWriter.escapeHtmlCell(delBuf)}</del>`;
         delBuf = "";
       }
       if (insBuf) {
-        line += `<ins style="background:#dfd">${MarkdownWriter.escapeCell(insBuf)}</ins>`;
+        line += `<ins style="background:#dfd">${MarkdownWriter.escapeHtmlCell(insBuf)}</ins>`;
         insBuf = "";
       }
     }
@@ -79,7 +79,7 @@ export function formatDiff(
         insBuf += entry.value;
       } else {
         flushBuffers();
-        line += MarkdownWriter.escapeCell(entry.value);
+        line += MarkdownWriter.escapeHtmlCell(entry.value);
       }
     }
     flushBuffers();
