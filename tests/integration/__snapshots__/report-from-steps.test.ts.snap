@@ -14751,6 +14751,22 @@ module.naming.random_string.suffix
 "
 `;
 
+exports[`reportFromSteps integration — manual fixtures > manual/ci-workflow > renders without error and matches snapshot 1`] = `
+"## ✅ Succeeded
+
+### Steps
+
+| Step | Outcome |
+|------|--------|
+| \`checkout\` | success |
+| \`setup-node\` | success |
+| \`install\` | success |
+| \`ci\` | success |
+| \`check-dist\` | success |
+
+"
+`;
+
 exports[`reportFromSteps integration — manual fixtures > manual/missing-outputs > renders without error and matches snapshot 1`] = `
 "## ✅ Apply Succeeded
 

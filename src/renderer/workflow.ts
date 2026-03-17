@@ -27,12 +27,5 @@ export function renderWorkflowBody(report: Report): Section[] {
     });
   }
 
-  if (report.logsUrl !== undefined) {
-    sections.push({
-      id: "logs-link",
-      full: `[View workflow run logs](${report.logsUrl})\n`,
-    });
-  }
-
   return sections;
 }

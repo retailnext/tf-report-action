@@ -233,4 +233,70 @@ describe("reportFromSteps — manual error fixtures", () => {
       expect(result).toContain("Outcome");
     });
   });
+
+  describe("ci-workflow (all steps succeed, workspace + logs URL set)", () => {
+    const fixture = requireManualFixture("manual/ci-workflow");
+    const LOGS_URL =
+      "https://github.com/retailnext/tf-report-action/actions/runs/99999/attempts/1";
+
+    /** Simulate what main.ts does: reportFromSteps output + footer. */
+    function buildFullBody(report: string, isPr: boolean): string {
+      const footer = isPr
+        ? `\n---\n\n[View logs](${LOGS_URL})\n`
+        : `\n---\n\n[View logs](${LOGS_URL}) • Last updated: Jan 1, 2026 at 00:00 UTC\n`;
+      return report + footer;
+    }
+
+    it("contains exactly one logs link in PR context", () => {
+      const result = reportFromSteps(fixture.stepsJson, {
+        workspace: "ci",
+        env: {
+          GITHUB_REPOSITORY: "retailnext/tf-report-action",
+          GITHUB_RUN_ID: "99999",
+          GITHUB_RUN_ATTEMPT: "1",
+        },
+        allowedDirs: [fixture.fixtureDir],
+      });
+      const body = buildFullBody(result, true);
+      // Count occurrences of the logs URL — catches any link text variant
+      const urlMatches =
+        body.match(new RegExp(LOGS_URL.replace(/\//g, "\\/"), "g")) ?? [];
+      expect(
+        urlMatches.length,
+        "Expected exactly one logs URL in the full PR comment body",
+      ).toBe(1);
+    });
+
+    it("contains exactly one logs link in non-PR context", () => {
+      const result = reportFromSteps(fixture.stepsJson, {
+        workspace: "ci",
+        env: {
+          GITHUB_REPOSITORY: "retailnext/tf-report-action",
+          GITHUB_RUN_ID: "99999",
+          GITHUB_RUN_ATTEMPT: "1",
+        },
+        allowedDirs: [fixture.fixtureDir],
+      });
+      const body = buildFullBody(result, false);
+      const urlMatches =
+        body.match(new RegExp(LOGS_URL.replace(/\//g, "\\/"), "g")) ?? [];
+      expect(
+        urlMatches.length,
+        "Expected exactly one logs URL in the full issue comment body",
+      ).toBe(1);
+    });
+
+    it("uses the canonical link text [View logs]", () => {
+      const result = reportFromSteps(fixture.stepsJson, {
+        workspace: "ci",
+        env: {
+          GITHUB_REPOSITORY: "retailnext/tf-report-action",
+          GITHUB_RUN_ID: "99999",
+          GITHUB_RUN_ATTEMPT: "1",
+        },
+        allowedDirs: [fixture.fixtureDir],
+      });
+      expect(result).not.toContain("[View workflow run logs]");
+    });
+  });
 });

@@ -36,18 +36,14 @@ describe("renderWorkflowBody", () => {
     expect(noSteps!.full).toContain("No steps were found");
   });
 
-  it("includes logs link when logsUrl is provided", () => {
+  it("does not include a logs link (caller is responsible for the footer)", () => {
     const report = makeReport({
       steps: [{ id: "plan", outcome: "success" }],
       logsUrl: "https://github.com/owner/repo/actions/runs/123",
     });
     const sections = renderWorkflowBody(report);
-    const link = sections.find((s) => s.id === "logs-link");
-    expect(link).toBeDefined();
-    expect(link!.full).toContain("[View workflow run logs]");
-    expect(link!.full).toContain(
-      "https://github.com/owner/repo/actions/runs/123",
-    );
+    expect(sections.find((s) => s.id === "logs-link")).toBeUndefined();
+    expect(sections.some((s) => s.full.includes("View"))).toBe(false);
   });
 
   it("does not include logs link when logsUrl is not set", () => {

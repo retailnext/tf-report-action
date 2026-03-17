@@ -181,7 +181,7 @@ describe("tier 4 — general workflow", () => {
     expect(result).toContain("Succeeded");
   });
 
-  it("includes logs URL when env vars are present", () => {
+  it("includes logs URL in truncation notice when env vars are present", () => {
     const result = reportFromSteps(
       stepsJson({ checkout: { outcome: "success" } }),
       baseOpts({
@@ -189,6 +189,7 @@ describe("tier 4 — general workflow", () => {
           GITHUB_REPOSITORY: "owner/repo",
           GITHUB_RUN_ID: "12345",
         },
+        maxOutputLength: 1, // force truncation to surface the logsUrl
       }),
     );
     expect(result).toContain(
@@ -199,9 +200,9 @@ describe("tier 4 — general workflow", () => {
   it("omits logs URL when env vars are missing", () => {
     const result = reportFromSteps(
       stepsJson({ checkout: { outcome: "success" } }),
-      baseOpts({ env: {} }),
+      baseOpts({ env: {}, maxOutputLength: 1 }),
     );
-    expect(result).not.toContain("View workflow run logs");
+    expect(result).not.toContain("View logs");
   });
 
   it("uses GITHUB_RUN_ATTEMPT when set", () => {
@@ -213,6 +214,7 @@ describe("tier 4 — general workflow", () => {
           GITHUB_RUN_ID: "99",
           GITHUB_RUN_ATTEMPT: "3",
         },
+        maxOutputLength: 1,
       }),
     );
     expect(result).toContain("attempts/3");
@@ -756,6 +758,7 @@ describe("logs URL", () => {
           GITHUB_REPOSITORY: "myorg/myrepo",
           GITHUB_RUN_ID: "555",
         },
+        maxOutputLength: 1, // force truncation to surface the logsUrl
       }),
     );
     expect(result).toContain(
@@ -768,9 +771,10 @@ describe("logs URL", () => {
       stepsJson({ checkout: { outcome: "success" } }),
       baseOpts({
         env: { GITHUB_RUN_ID: "555" },
+        maxOutputLength: 1,
       }),
     );
-    expect(result).not.toContain("View workflow run logs");
+    expect(result).not.toContain("View logs");
   });
 
   it("omits link when GITHUB_RUN_ID is missing", () => {
@@ -778,9 +782,10 @@ describe("logs URL", () => {
       stepsJson({ checkout: { outcome: "success" } }),
       baseOpts({
         env: { GITHUB_REPOSITORY: "myorg/myrepo" },
+        maxOutputLength: 1,
       }),
     );
-    expect(result).not.toContain("View workflow run logs");
+    expect(result).not.toContain("View logs");
   });
 
   it("defaults attempt to 1 when GITHUB_RUN_ATTEMPT is not set", () => {
@@ -791,6 +796,7 @@ describe("logs URL", () => {
           GITHUB_REPOSITORY: "myorg/myrepo",
           GITHUB_RUN_ID: "555",
         },
+        maxOutputLength: 1,
       }),
     );
     expect(result).toContain("attempts/1");
@@ -805,6 +811,7 @@ describe("logs URL", () => {
           GITHUB_RUN_ID: "555",
           GITHUB_RUN_ATTEMPT: "7",
         },
+        maxOutputLength: 1,
       }),
     );
     expect(result).toContain("attempts/7");
