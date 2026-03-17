@@ -92,11 +92,23 @@ function parseArgs(argv: string[]): ParsedArgs {
   let gallery = false;
   let noOpen = false;
 
-  for (let i = 0; i < argv.length; i++) {
-    const arg = argv[i];
+  // Normalize --flag=value into ["--flag", "value"] so the switch/case
+  // handles both --flag value and --flag=value uniformly.
+  const normalized: string[] = [];
+  for (const arg of argv) {
+    const eqIdx = arg.indexOf("=");
+    if (arg.startsWith("--") && eqIdx > 2) {
+      normalized.push(arg.slice(0, eqIdx), arg.slice(eqIdx + 1));
+    } else {
+      normalized.push(arg);
+    }
+  }
+
+  for (let i = 0; i < normalized.length; i++) {
+    const arg = normalized[i];
     switch (arg) {
       case "--format": {
-        const val = argv[++i];
+        const val = normalized[++i];
         if (val !== "html" && val !== "markdown") {
           process.stderr.write(
             `Error: --format must be "html" or "markdown", got "${val}"\n`,
@@ -108,23 +120,23 @@ function parseArgs(argv: string[]): ParsedArgs {
       }
       case "--output":
       case "-o":
-        output = argv[++i] ?? null;
+        output = normalized[++i] ?? null;
         break;
       case "--title":
-        options.title = argv[++i];
+        options.title = normalized[++i];
         break;
       case "--show-unchanged":
         options.showUnchangedAttributes = true;
         break;
       case "--diff-format":
-        options.diffFormat = argv[++i] as "inline" | "simple";
+        options.diffFormat = normalized[++i] as "inline" | "simple";
         break;
       case "--workspace":
-        reportOptions.workspace = argv[++i];
+        reportOptions.workspace = normalized[++i];
         break;
       case "--logs-url": {
         // Parse a GitHub Actions run URL into env vars for the library
-        const url = argv[++i];
+        const url = normalized[++i];
         if (url) {
           const match =
             /github\.com\/([^/]+\/[^/]+)\/actions\/runs\/(\d+)(?:\/attempts\/(\d+))?/.exec(
@@ -141,12 +153,12 @@ function parseArgs(argv: string[]): ParsedArgs {
         break;
       }
       case "--allowed-dirs":
-        reportOptions.allowedDirs = (argv[++i] ?? "")
+        reportOptions.allowedDirs = (normalized[++i] ?? "")
           .split(",")
           .filter(Boolean);
         break;
       case "--max-output-length": {
-        const val = parseInt(argv[++i] ?? "", 10);
+        const val = parseInt(normalized[++i] ?? "", 10);
         if (!isNaN(val)) reportOptions.maxOutputLength = val;
         break;
       }
