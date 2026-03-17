@@ -219,11 +219,11 @@ export async function run(
       workspace: inputs.workspace,
       env,
       maxOutputLength,
-      initStep: inputs.initStep,
-      validateStep: inputs.validateStep,
-      planStep: inputs.planStep,
-      showPlanStep: inputs.showPlanStep,
-      applyStep: inputs.applyStep,
+      initStepId: inputs.initStepId,
+      validateStepId: inputs.validateStepId,
+      planStepId: inputs.planStepId,
+      showPlanStepId: inputs.showPlanStepId,
+      applyStepId: inputs.applyStepId,
     };
 
     if (env["RUNNER_TEMP"] !== undefined && env["RUNNER_TEMP"] !== "") {

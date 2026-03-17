@@ -79,15 +79,15 @@ export interface ReportOptions extends BuildOptions, RenderOptions {
    */
   maxDisplayRead?: number;
   /** Step ID for the init step. Default: "init" */
-  initStep?: string;
+  initStepId?: string;
   /** Step ID for the validate step. Default: "validate" */
-  validateStep?: string;
+  validateStepId?: string;
   /** Step ID for the plan step. Default: "plan" */
-  planStep?: string;
+  planStepId?: string;
   /** Step ID for the show-plan step. Default: "show-plan" */
-  showPlanStep?: string;
+  showPlanStepId?: string;
   /** Step ID for the apply step. Default: "apply" */
-  applyStep?: string;
+  applyStepId?: string;
 }
 
 /** Create an empty Report with required fields initialized. */
@@ -123,11 +123,11 @@ export function buildReportFromSteps(
   const logsUrl = buildLogsUrl(env);
 
   // Step IDs
-  const initStepId = options?.initStep ?? DEFAULT_INIT_STEP;
-  const validateStepId = options?.validateStep ?? DEFAULT_VALIDATE_STEP;
-  const planStepId = options?.planStep ?? DEFAULT_PLAN_STEP;
-  const showPlanStepId = options?.showPlanStep ?? DEFAULT_SHOW_PLAN_STEP;
-  const applyStepId = options?.applyStep ?? DEFAULT_APPLY_STEP;
+  const initStepId = options?.initStepId ?? DEFAULT_INIT_STEP;
+  const validateStepId = options?.validateStepId ?? DEFAULT_VALIDATE_STEP;
+  const planStepId = options?.planStepId ?? DEFAULT_PLAN_STEP;
+  const showPlanStepId = options?.showPlanStepId ?? DEFAULT_SHOW_PLAN_STEP;
+  const applyStepId = options?.applyStepId ?? DEFAULT_APPLY_STEP;
   const knownStepIds = new Set([
     initStepId,
     validateStepId,

@@ -336,8 +336,8 @@ Markdown content. Output is bounded by `maxOutputLength` (default 63 KiB).
 — the same parse → build → render → compose pattern as the other two entry points.
 
 **`ReportOptions`** extends `Options` with: `allowedDirs`, `maxOutputLength`, `workspace`,
-`env` (DI for `process.env`), and step ID overrides (`initStep`, `validateStep`,
-`planStep`, `showPlanStep`, `applyStep`).
+`env` (DI for `process.env`), and step ID overrides (`initStepId`, `validateStepId`,
+`planStepId`, `showPlanStepId`, `applyStepId`).
 
 **Report variants** (discriminated union on `kind`):
 

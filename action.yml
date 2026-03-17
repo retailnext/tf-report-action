@@ -25,23 +25,23 @@ inputs:
       In non-PR context (status issues), requires issues: write. Both are
       needed if the workflow triggers on both push and pull_request.
     required: true
-  init-step:
+  init-step-id:
     description: "Step ID for the init step"
     required: false
     default: "init"
-  validate-step:
+  validate-step-id:
     description: "Step ID for the validate step"
     required: false
     default: "validate"
-  plan-step:
+  plan-step-id:
     description: "Step ID for the plan step"
     required: false
     default: "plan"
-  show-plan-step:
+  show-plan-step-id:
     description: "Step ID for the show-plan step"
     required: false
     default: "show-plan"
-  apply-step:
+  apply-step-id:
     description: "Step ID for the apply step"
     required: false
     default: "apply"

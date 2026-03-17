@@ -289,17 +289,17 @@ jobs:
 
 ## Inputs
 
-| Input            | Required | Default                      | Description                                                                    |
-| ---------------- | -------- | ---------------------------- | ------------------------------------------------------------------------------ |
-| `steps`          | Yes      | —                            | JSON string of workflow steps (use `${{ toJSON(steps) }}`)                     |
-| `workspace`      | No       | `GITHUB_WORKFLOW/GITHUB_JOB` | Workspace name for comment title, status issue title, and deduplication marker |
-| `target-step`    | No       | —                            | Step ID to focus the report on; skipped/failed status is prominently reported  |
-| `github-token`   | Yes      | —                            | GitHub token for API calls                                                     |
-| `init-step`      | No       | `init`                       | Step ID for the init step (override when your workflow uses non-default IDs)   |
-| `validate-step`  | No       | `validate`                   | Step ID for the validate step                                                  |
-| `plan-step`      | No       | `plan`                       | Step ID for the plan step                                                      |
-| `show-plan-step` | No       | `show-plan`                  | Step ID for the show-plan step                                                 |
-| `apply-step`     | No       | `apply`                      | Step ID for the apply step                                                     |
+| Input               | Required | Default                      | Description                                                                    |
+| ------------------- | -------- | ---------------------------- | ------------------------------------------------------------------------------ |
+| `steps`             | Yes      | —                            | JSON string of workflow steps (use `${{ toJSON(steps) }}`)                     |
+| `workspace`         | No       | `GITHUB_WORKFLOW/GITHUB_JOB` | Workspace name for comment title, status issue title, and deduplication marker |
+| `target-step`       | No       | —                            | Step ID to focus the report on; skipped/failed status is prominently reported  |
+| `github-token`      | Yes      | —                            | GitHub token for API calls                                                     |
+| `init-step-id`      | No       | `init`                       | Step ID for the init step (override when your workflow uses non-default IDs)   |
+| `validate-step-id`  | No       | `validate`                   | Step ID for the validate step                                                  |
+| `plan-step-id`      | No       | `plan`                       | Step ID for the plan step                                                      |
+| `show-plan-step-id` | No       | `show-plan`                  | Step ID for the show-plan step                                                 |
+| `apply-step-id`     | No       | `apply`                      | Step ID for the apply step                                                     |
 
 ## How It Works
 

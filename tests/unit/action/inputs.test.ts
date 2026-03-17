@@ -58,28 +58,28 @@ describe("parseInputs", () => {
 
   it("uses default step IDs", () => {
     const result = parseInputs(baseEnv());
-    expect(result.initStep).toBe("init");
-    expect(result.validateStep).toBe("validate");
-    expect(result.planStep).toBe("plan");
-    expect(result.showPlanStep).toBe("show-plan");
-    expect(result.applyStep).toBe("apply");
+    expect(result.initStepId).toBe("init");
+    expect(result.validateStepId).toBe("validate");
+    expect(result.planStepId).toBe("plan");
+    expect(result.showPlanStepId).toBe("show-plan");
+    expect(result.applyStepId).toBe("apply");
   });
 
   it("accepts custom step ID overrides", () => {
     const env: Env = {
       ...baseEnv(),
-      "INPUT_INIT-STEP": "my-init",
-      "INPUT_VALIDATE-STEP": "my-validate",
-      "INPUT_PLAN-STEP": "my-plan",
-      "INPUT_SHOW-PLAN-STEP": "my-show",
-      "INPUT_APPLY-STEP": "my-apply",
+      "INPUT_INIT-STEP-ID": "my-init",
+      "INPUT_VALIDATE-STEP-ID": "my-validate",
+      "INPUT_PLAN-STEP-ID": "my-plan",
+      "INPUT_SHOW-PLAN-STEP-ID": "my-show",
+      "INPUT_APPLY-STEP-ID": "my-apply",
     };
     const result = parseInputs(env);
-    expect(result.initStep).toBe("my-init");
-    expect(result.validateStep).toBe("my-validate");
-    expect(result.planStep).toBe("my-plan");
-    expect(result.showPlanStep).toBe("my-show");
-    expect(result.applyStep).toBe("my-apply");
+    expect(result.initStepId).toBe("my-init");
+    expect(result.validateStepId).toBe("my-validate");
+    expect(result.planStepId).toBe("my-plan");
+    expect(result.showPlanStepId).toBe("my-show");
+    expect(result.applyStepId).toBe("my-apply");
   });
 
   it("returns undefined for target-step when not provided", () => {

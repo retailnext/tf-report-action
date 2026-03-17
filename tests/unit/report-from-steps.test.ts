@@ -327,7 +327,7 @@ describe("tier 1 — full structured plan", () => {
           outputs: { stdout_file: planFile },
         },
       }),
-      baseOpts({ showPlanStep: "my-show" }),
+      baseOpts({ showPlanStepId: "my-show" }),
     );
     expect(result).toContain("Plan:");
     expect(result).toContain("1 to add");
@@ -726,7 +726,7 @@ describe("failed init/validate", () => {
           outputs: { stdout_file: planFile },
         },
       }),
-      baseOpts({ initStep: "my-init" }),
+      baseOpts({ initStepId: "my-init" }),
     );
     expect(result).toContain("`my-init` failed");
   });

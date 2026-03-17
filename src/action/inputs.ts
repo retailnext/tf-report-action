@@ -14,11 +14,11 @@ export interface ActionInputs {
   workspace: string;
   targetStep: string | undefined;
   githubToken: string;
-  initStep: string;
-  validateStep: string;
-  planStep: string;
-  showPlanStep: string;
-  applyStep: string;
+  initStepId: string;
+  validateStepId: string;
+  planStepId: string;
+  showPlanStepId: string;
+  applyStepId: string;
 }
 
 /**
@@ -64,10 +64,10 @@ export function parseInputs(env: Env): ActionInputs {
     workspace,
     targetStep,
     githubToken,
-    initStep: readInput(env, "init-step") || "init",
-    validateStep: readInput(env, "validate-step") || "validate",
-    planStep: readInput(env, "plan-step") || "plan",
-    showPlanStep: readInput(env, "show-plan-step") || "show-plan",
-    applyStep: readInput(env, "apply-step") || "apply",
+    initStepId: readInput(env, "init-step-id") || "init",
+    validateStepId: readInput(env, "validate-step-id") || "validate",
+    planStepId: readInput(env, "plan-step-id") || "plan",
+    showPlanStepId: readInput(env, "show-plan-step-id") || "show-plan",
+    applyStepId: readInput(env, "apply-step-id") || "apply",
   };
 }
