@@ -31,6 +31,8 @@ export interface ApplyFixture {
   label: string;
   planJson: string;
   applyJsonl: string;
+  /** State JSON from `state.stdout`, if available. */
+  stateJson?: string;
 }
 
 /** A discovered fixture with the steps.json content and its directory. */
@@ -97,10 +99,15 @@ export function discoverApplyFixtures(): ApplyFixture[] {
       const applyContent = readFileSync(applyPath, "utf-8");
       // Skip fixtures where apply output is not JSONL (e.g., no-json-flags workspaces)
       if (!applyContent.startsWith("{")) return;
+      const statePath = join(stageDir, "state.stdout");
+      const stateJson = existsSync(statePath)
+        ? readFileSync(statePath, "utf-8")
+        : undefined;
       fixtures.push({
         label,
         planJson: readFileSync(planPath, "utf-8"),
         applyJsonl: applyContent,
+        stateJson,
       });
     }
   });
@@ -206,6 +213,27 @@ export function discoverApplyOnlyStepsFixtures(): StepsFixture[] {
     if (existsSync(stepsPath)) {
       fixtures.push({
         label: `${label}/apply-only`,
+        stepsJson: readFileSync(stepsPath, "utf-8"),
+        fixtureDir: resolve(stageDir),
+      });
+    }
+  });
+
+  return fixtures;
+}
+
+/**
+ * Discovers fixtures with `no-state-steps.json` — has all steps except state.
+ * Exercises the "missing state" warning path for structured apply reports.
+ */
+export function discoverNoStateStepsFixtures(): StepsFixture[] {
+  const fixtures: StepsFixture[] = [];
+
+  walkGeneratedStages((stageDir, label) => {
+    const stepsPath = join(stageDir, "no-state-steps.json");
+    if (existsSync(stepsPath)) {
+      fixtures.push({
+        label: `${label}/no-state`,
         stepsJson: readFileSync(stepsPath, "utf-8"),
         fixtureDir: resolve(stageDir),
       });

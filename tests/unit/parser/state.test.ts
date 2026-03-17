@@ -2,47 +2,42 @@ import { describe, it, expect } from "vitest";
 import { parseState } from "../../../src/parser/state.js";
 
 describe("parseState", () => {
-  it("parses valid state JSON", () => {
+  it("parses valid raw state JSON", () => {
     const state = parseState(
       JSON.stringify({
-        format_version: "1.0",
+        version: 4,
         terraform_version: "1.9.0",
-        values: {
-          root_module: {
-            resources: [],
-          },
-        },
+        serial: 1,
+        lineage: "abc",
+        resources: [],
+        outputs: {},
       }),
     );
-    expect(state.format_version).toBe("1.0");
-    expect(state.values?.root_module).toBeDefined();
+    expect(state.version).toBe(4);
+    expect(state.resources).toEqual([]);
   });
 
-  it("parses empty state (no values)", () => {
+  it("parses empty state (no resources)", () => {
     const state = parseState(
-      JSON.stringify({ format_version: "1.0", terraform_version: "1.9.0" }),
+      JSON.stringify({ version: 4, terraform_version: "1.9.0" }),
     );
-    expect(state.format_version).toBe("1.0");
-    expect(state.values).toBeUndefined();
+    expect(state.version).toBe(4);
+    expect(state.resources).toBeUndefined();
   });
 
-  it("accepts format_version 0.x", () => {
-    const state = parseState(
-      JSON.stringify({ format_version: "0.1" }),
-    );
-    expect(state.format_version).toBe("0.1");
+  it("accepts version 3", () => {
+    const state = parseState(JSON.stringify({ version: 3 }));
+    expect(state.version).toBe(3);
   });
 
-  it("throws on format_version > 1", () => {
-    expect(() =>
-      parseState(JSON.stringify({ format_version: "2.0" })),
-    ).toThrow("Unsupported state format_version");
+  it("throws on version > 4", () => {
+    expect(() => parseState(JSON.stringify({ version: 5 }))).toThrow(
+      "Unsupported state version",
+    );
   });
 
   it("throws on invalid JSON", () => {
-    expect(() => parseState("not json")).toThrow(
-      "input is not valid JSON",
-    );
+    expect(() => parseState("not json")).toThrow("input is not valid JSON");
   });
 
   it("throws on non-object input", () => {
@@ -51,9 +46,9 @@ describe("parseState", () => {
     );
   });
 
-  it("throws on missing format_version", () => {
-    expect(() => parseState(JSON.stringify({ values: {} }))).toThrow(
-      "missing required field: format_version",
+  it("throws on missing version", () => {
+    expect(() => parseState(JSON.stringify({ resources: [] }))).toThrow(
+      "missing required field: version",
     );
   });
 

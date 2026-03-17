@@ -4,8 +4,11 @@ import type { Report } from "../../../src/model/report.js";
 import type { ResourceChange } from "../../../src/model/resource.js";
 import type { OutputChange } from "../../../src/model/output.js";
 import type { AttributeChange } from "../../../src/model/attribute.js";
-import type { State } from "../../../src/tfjson/state.js";
-import { SENSITIVE_MASK, VALUE_NOT_IN_PLAN } from "../../../src/model/sentinels.js";
+import type { RawState } from "../../../src/parser/state.js";
+import {
+  SENSITIVE_MASK,
+  VALUE_NOT_IN_PLAN,
+} from "../../../src/model/sentinels.js";
 
 /** Create a minimal Report with the given resources and outputs. */
 function makeReport(
@@ -24,7 +27,10 @@ function makeReport(
 }
 
 /** Create an attribute with isKnownAfterApply = true. */
-function unknownAttr(name: string, overrides?: Partial<AttributeChange>): AttributeChange {
+function unknownAttr(
+  name: string,
+  overrides?: Partial<AttributeChange>,
+): AttributeChange {
   return {
     name,
     before: null,
@@ -68,36 +74,55 @@ function makeResource(
   };
 }
 
-/** Create a minimal State with resources and outputs. */
+/** Create a minimal RawState with resources and outputs. */
 function makeState(
   resources: {
     address: string;
     values?: Record<string, unknown>;
-    sensitive_values?: Record<string, unknown>;
+    sensitive_attrs?: string[];
   }[],
   outputs?: Record<string, { value?: unknown; sensitive: boolean }>,
-): State {
+): RawState {
   return {
-    format_version: "1.0",
-    values: {
-      root_module: {
-        resources: resources.map((r) => ({
-          address: r.address,
-          provider_name: "registry.opentofu.org/hashicorp/null",
-          schema_version: 0,
-          values: r.values,
-          sensitive_values: r.sensitive_values,
-        })),
-      },
-      outputs,
-    },
+    version: 4,
+    resources: resources.map((r) => {
+      // Parse address: "module.xxx.type.name" or "type.name"
+      const parts = r.address.split(".");
+      let mod: string | undefined;
+      let type: string;
+      let name: string;
+      // Find the resource type.name at the end
+      if (parts.length >= 3) {
+        name = parts[parts.length - 1]!;
+        type = parts[parts.length - 2]!;
+        mod = parts.slice(0, -2).join(".");
+      } else {
+        type = parts[0]!;
+        name = parts[1]!;
+      }
+      return {
+        ...(mod ? { module: mod } : {}),
+        mode: "managed",
+        type,
+        name,
+        instances: [
+          {
+            attributes: r.values,
+            sensitive_attributes: (r.sensitive_attrs ?? []).map((attr) => [
+              { type: "get_attr", value: attr },
+            ]),
+          },
+        ],
+      };
+    }),
+    outputs,
   };
 }
 
 /** Create a state with no resources (empty). */
-function emptyState(): State {
+function emptyState(): RawState {
   return {
-    format_version: "1.0",
+    version: 4,
   };
 }
 
@@ -125,7 +150,7 @@ describe("enrichReportFromState", () => {
       {
         address: "null_resource.test",
         values: { secret: "s3cr3t" },
-        sensitive_values: { secret: true },
+        sensitive_attrs: ["secret"],
       },
     ]);
 
@@ -192,8 +217,10 @@ describe("enrichReportFromState", () => {
       allUnknownAfterApply: true,
     });
     const report = makeReport([resource]);
-    // State has no matching resource
-    const state = makeState([]);
+    // State has a different resource — not the one we're looking for
+    const state = makeState([
+      { address: "null_resource.other", values: { id: "other" } },
+    ]);
 
     enrichReportFromState(report, state);
 
@@ -229,7 +256,7 @@ describe("enrichReportFromState", () => {
       {
         address: "null_resource.test",
         values: { id: "xyz", secret_key: "s3cr3t" },
-        sensitive_values: { secret_key: true },
+        sensitive_attrs: ["secret_key"],
       },
     ]);
 
@@ -334,26 +361,12 @@ describe("enrichReportFromState", () => {
     const resource = makeResource("module.child.null_resource.test", [attr]);
     const report = makeReport([resource]);
 
-    const state: State = {
-      format_version: "1.0",
-      values: {
-        root_module: {
-          child_modules: [
-            {
-              address: "module.child",
-              resources: [
-                {
-                  address: "module.child.null_resource.test",
-                  provider_name: "registry.opentofu.org/hashicorp/null",
-                  schema_version: 0,
-                  values: { id: "child-id" },
-                },
-              ],
-            },
-          ],
-        },
+    const state = makeState([
+      {
+        address: "module.child.null_resource.test",
+        values: { id: "child-id" },
       },
-    };
+    ]);
 
     enrichReportFromState(report, state);
 

@@ -234,6 +234,39 @@ describe("applyToMarkdown integration", () => {
   });
 });
 
+// ---------- State enrichment via applyToMarkdown ----------
+
+describe("applyToMarkdown — state enrichment", () => {
+  it("resolves unknown values when stateJson is provided", () => {
+    const fixture = fixtures.find((f) => f.label === "tofu/null-lifecycle/2");
+    expect(fixture).toBeDefined();
+    expect(fixture!.stateJson).toBeDefined();
+    const result = applyToMarkdown(fixture!.planJson, fixture!.applyJsonl, {
+      stateJson: fixture!.stateJson,
+    });
+    expect(result).not.toContain("(value not in plan)");
+  });
+
+  it("masks sensitive state values in applyToMarkdown", () => {
+    const fixture = fixtures.find((f) => f.label === "tofu/sensitive-values/1");
+    expect(fixture).toBeDefined();
+    expect(fixture!.stateJson).toBeDefined();
+    const result = applyToMarkdown(fixture!.planJson, fixture!.applyJsonl, {
+      stateJson: fixture!.stateJson,
+    });
+    expect(result).not.toContain("updated-secret-value");
+  });
+
+  // Snapshot with state enrichment for all fixtures that have state
+  for (const { label, planJson, applyJsonl, stateJson } of fixtures) {
+    if (stateJson === undefined) continue;
+    it(`state-enriched snapshot: ${label}`, () => {
+      const result = applyToMarkdown(planJson, applyJsonl, { stateJson });
+      expect(result).toMatchSnapshot();
+    });
+  }
+});
+
 // ---------- Security: sensitive values must never appear in output ----------
 
 describe("applyToMarkdown — sensitive value masking", () => {

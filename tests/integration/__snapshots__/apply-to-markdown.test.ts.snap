@@ -2793,3 +2793,3167 @@ module.naming.random_string.suffix
 
 "
 `;
+
+exports[`applyToMarkdown — state enrichment > state-enriched snapshot: terraform/apply-error/0 1`] = `
+"## Apply Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Added | terraform_data | 2 |
+|  | null_resource | 1 |
+|  | **Added** | **3** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>➕ <strong>null_resource</strong> will_fail</summary>
+
+\`\`\`
+null_resource.will_fail
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id |  | <code><ins style="background:#dfd">4332809127533751978</ins></code> |
+| triggers.value |  | <code><ins style="background:#dfd">v1</ins></code> |
+
+</details>
+
+<details>
+<summary>➕ <strong>terraform_data</strong> depends_on_fail</summary>
+
+\`\`\`
+terraform_data.depends_on_fail
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id |  | <code><ins style="background:#dfd">d81e43ba-4987-8775-dcd0-72bced888f64</ins></code> |
+
+<details>
+<summary>Large value: input</summary>
+
+\`\`\`
+{
+  "value": "4332809127533751978",
+  "type": "string"
+}
+\`\`\`
+
+</details>
+
+<details>
+<summary>Large value: output</summary>
+
+\`\`\`
+{
+  "value": "4332809127533751978",
+  "type": "string"
+}
+\`\`\`
+
+</details>
+
+</details>
+
+<details>
+<summary>➕ <strong>terraform_data</strong> success</summary>
+
+\`\`\`
+terraform_data.success
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id |  | <code><ins style="background:#dfd">9a40de34-d775-6ee0-8fa3-a6b95561b021</ins></code> |
+| input |  | <code><ins style="background:#dfd">stable</ins></code> |
+
+<details>
+<summary>Large value: output</summary>
+
+\`\`\`
+{
+  "value": "stable",
+  "type": "string"
+}
+\`\`\`
+
+</details>
+
+</details>
+
+## Outputs
+
+| Output | Action | Before | After |
+| --- | --- | --- | --- |
+| depends_on_fail_output | ➕ |  | <code>4332809127533751978</code> |
+| success_output | ➕ |  | <code>stable</code> |
+
+"
+`;
+
+exports[`applyToMarkdown — state enrichment > state-enriched snapshot: terraform/apply-error/1 1`] = `
+"## Apply Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| ❌ Replace failed | null_resource | 1 |
+|  | **Replace failed** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details open>
+<summary>± <strong>null_resource</strong> will_fail ❌</summary>
+
+\`\`\`
+null_resource.will_fail
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | 4332809127533751978 | <code>4<del style="background:#fdd">332</del><ins style="background:#dfd">5</ins>8<ins style="background:#dfd">600515</ins>0<del style="background:#fdd">9</del>1<del style="background:#fdd">27</del><ins style="background:#dfd">8</ins>5<ins style="background:#dfd">38</ins>3<ins style="background:#dfd">1</ins>3<del style="background:#fdd">75</del>1<del style="background:#fdd">978</del></code> |
+| triggers.value | v1 | <code>v<ins style="background:#dfd">2</ins><del style="background:#fdd">1</del></code> |
+
+🚨 **local-exec provisioner error**
+
+\`\`\`
+Error running command 'exit 1': exit status 1. Output: 
+\`\`\`
+
+</details>
+
+## Outputs
+
+| Output | Action | Before | After |
+| --- | --- | --- | --- |
+| depends_on_fail_output | 🔧 | <code>4332809127533751978</code> | <code>4332809127533751978</code> |
+| success_output | ⬜ | <code>stable</code> | <code>stable</code> |
+
+"
+`;
+
+exports[`applyToMarkdown — state enrichment > state-enriched snapshot: terraform/deferred-data-source/0 1`] = `
+"## Apply Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Added | terraform_data | 4 |
+|  | local_file | 1 |
+|  | **Added** | **5** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>➕ <strong>local_file</strong> config</summary>
+
+\`\`\`
+local_file.config
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| content_base64sha256 |  | <code><ins style="background:#dfd">BCZAB46RhMIHCDOD2wpy52CggN8HCuE2r+O9OQMaoFg=</ins></code> |
+| content_base64sha512 |  | <code><ins style="background:#dfd">SpHAEiR6BfvlF6vlTa1H+TRQidZGWJGkabpZCmP8dZp6l33CeZzLjVSVrhHJwMmOgKa2U2G6HttLqi+hX4JXVA==</ins></code> |
+| content_md5 |  | <code><ins style="background:#dfd">25c6ea643fb6d100efbd0631aea3d0e1</ins></code> |
+| content_sha1 |  | <code><ins style="background:#dfd">575f062d4b9fc3bf93d0ac0d9de725cf1bcdc3c9</ins></code> |
+| content_sha256 |  | <code><ins style="background:#dfd">042640078e9184c207083383db0a72e760a080df070ae136afe3bd39031aa058</ins></code> |
+| content_sha512 |  | <code><ins style="background:#dfd">4a91c012247a05fbe517abe54dad47f9345089d6465891a469ba590a63fc759a7a977dc2799ccb8d5495ae11c9c0c98e80a6b65361ba1edb4baa2fa15f825754</ins></code> |
+| directory_permission |  | <code><ins style="background:#dfd">0777</ins></code> |
+| file_permission |  | <code><ins style="background:#dfd">0777</ins></code> |
+| filename |  | <code><ins style="background:#dfd">./config.json</ins></code> |
+| id |  | <code><ins style="background:#dfd">575f062d4b9fc3bf93d0ac0d9de725cf1bcdc3c9</ins></code> |
+| sensitive_content | <code></code> | <code>(sensitive)</code> |
+
+<details>
+<summary>Large value: content</summary>
+
+\`\`\`
+{
+  "worker_a": "alpha",
+  "worker_b": "bravo",
+  "worker_c": "charlie"
+}
+\`\`\`
+
+</details>
+
+</details>
+
+<details>
+<summary>➕ <strong>terraform_data</strong> independent</summary>
+
+\`\`\`
+terraform_data.independent
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id |  | <code><ins style="background:#dfd">4c567a8d-c316-6ed2-4e29-593aab9cfdcc</ins></code> |
+| input |  | <code><ins style="background:#dfd">v1</ins></code> |
+
+<details>
+<summary>Large value: output</summary>
+
+\`\`\`
+{
+  "value": "v1",
+  "type": "string"
+}
+\`\`\`
+
+</details>
+
+</details>
+
+<details>
+<summary>➕ <strong>terraform_data</strong> worker_a</summary>
+
+\`\`\`
+terraform_data.worker_a
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id |  | <code><ins style="background:#dfd">24ca8397-e0c5-3010-c151-af812401fad0</ins></code> |
+
+<details>
+<summary>Large value: input</summary>
+
+\`\`\`
+{
+  "value": "alpha",
+  "type": "string"
+}
+\`\`\`
+
+</details>
+
+<details>
+<summary>Large value: output</summary>
+
+\`\`\`
+{
+  "value": "alpha",
+  "type": "string"
+}
+\`\`\`
+
+</details>
+
+</details>
+
+<details>
+<summary>➕ <strong>terraform_data</strong> worker_b</summary>
+
+\`\`\`
+terraform_data.worker_b
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id |  | <code><ins style="background:#dfd">16e8bad2-8b5a-091c-d056-85fef6baf29c</ins></code> |
+
+<details>
+<summary>Large value: input</summary>
+
+\`\`\`
+{
+  "value": "bravo",
+  "type": "string"
+}
+\`\`\`
+
+</details>
+
+<details>
+<summary>Large value: output</summary>
+
+\`\`\`
+{
+  "value": "bravo",
+  "type": "string"
+}
+\`\`\`
+
+</details>
+
+</details>
+
+<details>
+<summary>➕ <strong>terraform_data</strong> worker_c</summary>
+
+\`\`\`
+terraform_data.worker_c
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id |  | <code><ins style="background:#dfd">09ccf310-a86e-3d10-725a-881e4f24d297</ins></code> |
+
+<details>
+<summary>Large value: input</summary>
+
+\`\`\`
+{
+  "value": "charlie",
+  "type": "string"
+}
+\`\`\`
+
+</details>
+
+<details>
+<summary>Large value: output</summary>
+
+\`\`\`
+{
+  "value": "charlie",
+  "type": "string"
+}
+\`\`\`
+
+</details>
+
+</details>
+
+## Outputs
+
+| Output | Action | Before | After |
+| --- | --- | --- | --- |
+| config_value | ➕ |  | <code>{"worker_a":"alpha","worker_b":"bravo","worker_c":"charlie"}</code> |
+
+"
+`;
+
+exports[`applyToMarkdown — state enrichment > state-enriched snapshot: terraform/deferred-data-source/1 1`] = `
+"## Apply Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Added | local_file | 1 |
+|  | **Added** | **1** |
+| 🔧 Changed | terraform_data | 1 |
+|  | **Changed** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>➕ <strong>local_file</strong> metadata</summary>
+
+\`\`\`
+local_file.metadata
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| content |  | <code><ins style="background:#dfd">metadata-v1</ins></code> |
+| content_base64sha256 |  | <code><ins style="background:#dfd">jGQrlYWPzyUuhDtEvX/rAiW3dFFqg6iF9u8ejOHO61U=</ins></code> |
+| content_base64sha512 |  | <code><ins style="background:#dfd">3aWEXxinGJ7yTx4FwAtd2k1zuszr9Az5Hj8X4qyPVoraKjerVPuUWskpaDzy90JjWwZD20HIR4alu7Xqv+ulNQ==</ins></code> |
+| content_md5 |  | <code><ins style="background:#dfd">e5bb5bd2cffa161046d51e1cee55584c</ins></code> |
+| content_sha1 |  | <code><ins style="background:#dfd">93df9ef40895b13abbbfc8ae636c46e6af242e9d</ins></code> |
+| content_sha256 |  | <code><ins style="background:#dfd">8c642b95858fcf252e843b44bd7feb0225b774516a83a885f6ef1e8ce1ceeb55</ins></code> |
+| content_sha512 |  | <code><ins style="background:#dfd">dda5845f18a7189ef24f1e05c00b5dda4d73baccebf40cf91e3f17e2ac8f568ada2a37ab54fb945ac929683cf2f742635b0643db41c84786a5bbb5eabfeba535</ins></code> |
+| directory_permission |  | <code><ins style="background:#dfd">0777</ins></code> |
+| file_permission |  | <code><ins style="background:#dfd">0777</ins></code> |
+| filename |  | <code><ins style="background:#dfd">./metadata.txt</ins></code> |
+| id |  | <code><ins style="background:#dfd">93df9ef40895b13abbbfc8ae636c46e6af242e9d</ins></code> |
+| sensitive_content | <code></code> | <code>(sensitive)</code> |
+
+</details>
+
+<details>
+<summary>🔧 <strong>terraform_data</strong> independent — changed: input, output</summary>
+
+\`\`\`
+terraform_data.independent
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| input | v1 | <code>v<ins style="background:#dfd">2</ins><del style="background:#fdd">1</del></code> |
+
+<details>
+<summary>Large value: output (5 lines, 5 changes)</summary>
+
+\`\`\`diff
++ {
++   "value": "v2",
++   "type": "string"
++ }
+- v1
+\`\`\`
+
+</details>
+
+</details>
+
+## Outputs
+
+| Output | Action | Before | After |
+| --- | --- | --- | --- |
+| config_value | 🔧 | <code>{"worker_a":"alpha","worker_b":"bravo","worker_c":"charlie"}</code> | <code>{"worker_a":"alpha","worker_b":"bravo","worker_c":"charlie"}</code> |
+
+"
+`;
+
+exports[`applyToMarkdown — state enrichment > state-enriched snapshot: terraform/deferred-data-source/2 1`] = `
+"## Apply Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| 🔧 Changed | terraform_data | 1 |
+|  | **Changed** | **1** |
+| ± Replaced | local_file | 1 |
+|  | **Replaced** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>± <strong>local_file</strong> config</summary>
+
+\`\`\`
+local_file.config
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| content_base64sha256 | BCZAB46RhMIHCDOD2wpy52CggN8HCuE2r+O9OQMaoFg= | <code>B<del style="background:#fdd">CZAB46</del><ins style="background:#dfd">f3j</ins>R<del style="background:#fdd">hMIHCDOD2wpy</del><ins style="background:#dfd">V</ins>5<del style="background:#fdd">2CggN</del><ins style="background:#dfd">u</ins>8<del style="background:#fdd">H</del><ins style="background:#dfd">a</ins>C<ins style="background:#dfd">BqA</ins>u<ins style="background:#dfd">KjAxfqoXf2G8zqbDY</ins>E<ins style="background:#dfd">VXD</ins>2<del style="background:#fdd">r</del><ins style="background:#dfd">yfcz</ins>+<del style="background:#fdd">O9OQMaoFg</del><ins style="background:#dfd">Y</ins>=</code> |
+| content_base64sha512 | SpHAEiR6BfvlF6vlTa1H+TRQidZGWJGkabpZCmP8dZp6l33CeZzLjVSVrhHJwMmOgKa2U2G6HttLqi+hX4JXVA== | <code><del style="background:#fdd">Sp</del><ins style="background:#dfd">JOW4OjQ</ins>H<ins style="background:#dfd">k6xK/5WFV9YhJB4tG</ins>A<del style="background:#fdd">E</del><ins style="background:#dfd">Vk</ins>i<del style="background:#fdd">R6Bfv</del><ins style="background:#dfd">8YgUIo</ins>l<del style="background:#fdd">F</del>6<del style="background:#fdd">vlTa1</del>H<ins style="background:#dfd">Wz</ins>+<del style="background:#fdd">T</del><ins style="background:#dfd">90WpH</ins>R<del style="background:#fdd">QidZG</del><ins style="background:#dfd">q89/1</ins>W<del style="background:#fdd">JGk</del><ins style="background:#dfd">CAfrOB</ins>a<ins style="background:#dfd">qzzclQ</ins>b<del style="background:#fdd">pZCmP8</del>d<del style="background:#fdd">Zp6l33C</del>e<del style="background:#fdd">ZzL</del><ins style="background:#dfd">EymA0q9sHx</ins>j<del style="background:#fdd">VSVrhH</del><ins style="background:#dfd">w</ins>J<ins style="background:#dfd">bGo</ins>w<del style="background:#fdd">MmOgKa2U2G6HttLqi+hX4JXVA</del>==</code> |
+| content_md5 | 25c6ea643fb6d100efbd0631aea3d0e1 | <code><ins style="background:#dfd">9</ins>2<ins style="background:#dfd">3793</ins>5<del style="background:#fdd">c6e</del>a<del style="background:#fdd">6</del><ins style="background:#dfd">212917b</ins>4<ins style="background:#dfd">ee</ins>3<del style="background:#fdd">fb6d1</del>0<del style="background:#fdd">0efbd06</del><ins style="background:#dfd">28</ins>3<del style="background:#fdd">1aea</del>3<del style="background:#fdd">d0e</del><ins style="background:#dfd">985598</ins>1<ins style="background:#dfd">4</ins></code> |
+| content_sha1 | 575f062d4b9fc3bf93d0ac0d9de725cf1bcdc3c9 | <code><del style="background:#fdd">575</del><ins style="background:#dfd">c</ins>f<del style="background:#fdd">062d4b9</del><ins style="background:#dfd">8e</ins>f<del style="background:#fdd">c3</del>b<del style="background:#fdd">f93</del>d<del style="background:#fdd">0ac</del>0d<del style="background:#fdd">9de7</del><ins style="background:#dfd">2</ins>2<ins style="background:#dfd">850</ins>5<del style="background:#fdd">cf1</del><ins style="background:#dfd">7</ins>bcd<ins style="background:#dfd">aec</ins>c<ins style="background:#dfd">f69</ins>3<del style="background:#fdd">c</del><ins style="background:#dfd">88ebd5</ins>9<ins style="background:#dfd">806555</ins></code> |
+| content_sha256 | 042640078e9184c207083383db0a72e760a080df070ae136afe3bd39031aa058 | <code>0<ins style="background:#dfd">5fde3</ins>4<del style="background:#fdd">2</del><ins style="background:#dfd">55e</ins>6<del style="background:#fdd">40</del><ins style="background:#dfd">ef1a</ins>0<del style="background:#fdd">7</del>8<del style="background:#fdd">e9</del>1<ins style="background:#dfd">a</ins>8<del style="background:#fdd">4c2</del>0<del style="background:#fdd">70</del><ins style="background:#dfd">b</ins>8<del style="background:#fdd">33</del><ins style="background:#dfd">a</ins>8<del style="background:#fdd">3db</del><ins style="background:#dfd">c</ins>0<ins style="background:#dfd">c5f</ins>a<del style="background:#fdd">72e760</del>a<del style="background:#fdd">0</del>8<del style="background:#fdd">0</del><ins style="background:#dfd">5</ins>df<del style="background:#fdd">070ae13</del><ins style="background:#dfd">d8</ins>6<del style="background:#fdd">a</del>f<del style="background:#fdd">e</del>3<del style="background:#fdd">bd</del>3<ins style="background:#dfd">a</ins>9<ins style="background:#dfd">b</ins>0<del style="background:#fdd">3</del><ins style="background:#dfd">d81</ins>1<del style="background:#fdd">aa0</del><ins style="background:#dfd">5</ins>5<ins style="background:#dfd">c3db27dccfe6</ins><del style="background:#fdd">8</del></code> |
+| content_sha512 | 4a91c012247a05fbe517abe54dad47f9345089d6465891a469ba590a63fc759a7a977dc2799ccb8d5495ae11c9c0c98e80a6b65361ba1edb4baa2fa15f825754 | <code><del style="background:#fdd">4a91c012</del>24<del style="background:#fdd">7a05fb</del>e5<del style="background:#fdd">17a</del>b<del style="background:#fdd">e54d</del><ins style="background:#dfd">83</ins>a<del style="background:#fdd">d</del><ins style="background:#dfd">3</ins>4<ins style="background:#dfd">0</ins>7<del style="background:#fdd">f</del>93<ins style="background:#dfd">ac</ins>4<ins style="background:#dfd">aff9</ins>5<del style="background:#fdd">0</del>8<del style="background:#fdd">9</del><ins style="background:#dfd">557d621241e2</ins>d<ins style="background:#dfd">1805</ins>64<ins style="background:#dfd">8bc</ins>6<ins style="background:#dfd">20508a2</ins>5<ins style="background:#dfd">e</ins>8<del style="background:#fdd">9</del><ins style="background:#dfd">75b3fbdd</ins>1<ins style="background:#dfd">6</ins>a<ins style="background:#dfd">47</ins>46<del style="background:#fdd">9b</del>a<ins style="background:#dfd">f3dff5</ins>5<del style="background:#fdd">9</del><ins style="background:#dfd">82</ins>0<ins style="background:#dfd">1f</ins>a<del style="background:#fdd">63f</del>c<del style="background:#fdd">7</del><ins style="background:#dfd">e0</ins>5<del style="background:#fdd">9</del>a<del style="background:#fdd">7</del>a<ins style="background:#dfd">b3cdc</ins>9<del style="background:#fdd">77</del><ins style="background:#dfd">506d</ins>d<del style="background:#fdd">c2</del>7<del style="background:#fdd">99</del><ins style="background:#dfd">84</ins>c<del style="background:#fdd">c</del><ins style="background:#dfd">a6034a</ins>b<del style="background:#fdd">8</del>d<del style="background:#fdd">5495ae11</del><ins style="background:#dfd">b07</ins>c<del style="background:#fdd">9</del><ins style="background:#dfd">63</ins>c0<del style="background:#fdd">c</del>9<del style="background:#fdd">8e80a</del>6<del style="background:#fdd">b</del><ins style="background:#dfd">c</ins>6<del style="background:#fdd">5</del><ins style="background:#dfd">a</ins>3<del style="background:#fdd">61ba1edb4baa2fa15f825754</del></code> |
+| id | 575f062d4b9fc3bf93d0ac0d9de725cf1bcdc3c9 | <code><del style="background:#fdd">575</del><ins style="background:#dfd">c</ins>f<del style="background:#fdd">062d4b9</del><ins style="background:#dfd">8e</ins>f<del style="background:#fdd">c3</del>b<del style="background:#fdd">f93</del>d<del style="background:#fdd">0ac</del>0d<del style="background:#fdd">9de7</del><ins style="background:#dfd">2</ins>2<ins style="background:#dfd">850</ins>5<del style="background:#fdd">cf1</del><ins style="background:#dfd">7</ins>bcd<ins style="background:#dfd">aec</ins>c<ins style="background:#dfd">f69</ins>3<del style="background:#fdd">c</del><ins style="background:#dfd">88ebd5</ins>9<ins style="background:#dfd">806555</ins></code> |
+| sensitive_content | <code>(sensitive)</code> | <code>(sensitive)</code> |
+
+<details>
+<summary>Large value: content (6 lines, 2 changes)</summary>
+
+\`\`\`diff
+  {
+-   "worker_a": "alpha",
++   "worker_a": "ALPHA",
+    "worker_b": "bravo",
+    "worker_c": "charlie"
+  }
+\`\`\`
+
+</details>
+
+</details>
+
+<details>
+<summary>🔧 <strong>terraform_data</strong> worker_a — changed: input, output</summary>
+
+\`\`\`
+terraform_data.worker_a
+\`\`\`
+
+<details>
+<summary>Large value: input (5 lines, 5 changes)</summary>
+
+\`\`\`diff
++ {
++   "value": "ALPHA",
++   "type": "string"
++ }
+- alpha
+\`\`\`
+
+</details>
+
+<details>
+<summary>Large value: output (5 lines, 5 changes)</summary>
+
+\`\`\`diff
++ {
++   "value": "ALPHA",
++   "type": "string"
++ }
+- alpha
+\`\`\`
+
+</details>
+
+</details>
+
+## Outputs
+
+| Output | Action | Before | After |
+| --- | --- | --- | --- |
+| config_value | 🔧 | <code>{"worker_a":"alpha","worker_b":"bravo","worker_c":"charlie"}</code> | <code>{"worker_a":"ALPHA","worker_b":"bravo","worker_c":"charlie"}</code> |
+
+"
+`;
+
+exports[`applyToMarkdown — state enrichment > state-enriched snapshot: terraform/import-resource/0 1`] = `
+"## Apply Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Added | random_string | 1 |
+|  | **Added** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>➕ <strong>random_string</strong> existing</summary>
+
+\`\`\`
+random_string.existing
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id |  | <code><ins style="background:#dfd">ZNyQZKYy</ins></code> |
+| length |  | <code><ins style="background:#dfd">8</ins></code> |
+| lower |  | <code><ins style="background:#dfd">true</ins></code> |
+| min_lower |  | <code><ins style="background:#dfd">0</ins></code> |
+| min_numeric |  | <code><ins style="background:#dfd">0</ins></code> |
+| min_special |  | <code><ins style="background:#dfd">0</ins></code> |
+| min_upper |  | <code><ins style="background:#dfd">0</ins></code> |
+| number |  | <code><ins style="background:#dfd">true</ins></code> |
+| numeric |  | <code><ins style="background:#dfd">true</ins></code> |
+| result |  | <code><ins style="background:#dfd">ZNyQZKYy</ins></code> |
+| special |  | <code><ins style="background:#dfd">false</ins></code> |
+| upper |  | <code><ins style="background:#dfd">true</ins></code> |
+
+</details>
+
+"
+`;
+
+exports[`applyToMarkdown — state enrichment > state-enriched snapshot: terraform/import-resource/1 1`] = `
+"## Apply Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| 📥 Imported | random_string | 1 |
+|  | **Imported** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>📥 <strong>random_string</strong> imported</summary>
+
+\`\`\`
+random_string.imported
+\`\`\`
+
+**Import ID:** \`fixedval\`
+
+_No attribute changes._
+
+</details>
+
+"
+`;
+
+exports[`applyToMarkdown — state enrichment > state-enriched snapshot: terraform/local-files/0 1`] = `
+"## Apply Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Added | local_file | 1 |
+|  | **Added** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>➕ <strong>local_file</strong> readme</summary>
+
+\`\`\`
+local_file.readme
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| content_base64sha256 |  | <code><ins style="background:#dfd">AXQKgQqmnkjSkAFLpLknbozHZn4G8WV/av24/hj590c=</ins></code> |
+| content_base64sha512 |  | <code><ins style="background:#dfd">v4daqaHyZn5NbMRgqL1wyWC2Go2H2YGt8qrZ5SIcOt823qvTO0uTP0Qo+ZJzdGmFTKOMiLSIImIJTudrG7Qp/Q==</ins></code> |
+| content_md5 |  | <code><ins style="background:#dfd">374900018c431a33587acb053923c90a</ins></code> |
+| content_sha1 |  | <code><ins style="background:#dfd">1951ea3cba8b8157586130ebad80af2c86462821</ins></code> |
+| content_sha256 |  | <code><ins style="background:#dfd">01740a810aa69e48d290014ba4b9276e8cc7667e06f1657f6afdb8fe18f9f747</ins></code> |
+| content_sha512 |  | <code><ins style="background:#dfd">bf875aa9a1f2667e4d6cc460a8bd70c960b61a8d87d981adf2aad9e5221c3adf36deabd33b4b933f4428f992737469854ca38c88b4882262094ee76b1bb429fd</ins></code> |
+| directory_permission |  | <code><ins style="background:#dfd">0777</ins></code> |
+| file_permission |  | <code><ins style="background:#dfd">0777</ins></code> |
+| filename |  | <code><ins style="background:#dfd">./output/readme.txt</ins></code> |
+| id |  | <code><ins style="background:#dfd">1951ea3cba8b8157586130ebad80af2c86462821</ins></code> |
+| sensitive_content | <code></code> | <code>(sensitive)</code> |
+
+<details>
+<summary>Large value: content</summary>
+
+\`\`\`
+Project: tf-plan-md fixture
+Version: 1.0.0
+Status: active
+
+This file is managed by Terraform.
+It contains multiple lines of plain text
+so that the large-value renderer is exercised.
+
+Line 9: additional content
+Line 10: additional content
+Line 11: additional content
+Line 12: end of file
+
+\`\`\`
+
+</details>
+
+</details>
+
+## Outputs
+
+| Output | Action | Before | After |
+| --- | --- | --- | --- |
+| readme_path | ➕ |  | <code>./output/readme.txt</code> |
+
+"
+`;
+
+exports[`applyToMarkdown — state enrichment > state-enriched snapshot: terraform/local-files/1 1`] = `
+"## Apply Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| ± Replaced | local_file | 1 |
+|  | **Replaced** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>± <strong>local_file</strong> readme</summary>
+
+\`\`\`
+local_file.readme
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| content_base64sha256 | AXQKgQqmnkjSkAFLpLknbozHZn4G8WV/av24/hj590c= | <code><ins style="background:#dfd">a/DsrX1Uil</ins>A<del style="background:#fdd">XQK</del>g<del style="background:#fdd">Qqm</del><ins style="background:#dfd">5o6OO76G</ins>n<del style="background:#fdd">k</del><ins style="background:#dfd">Nyo58</ins>j<del style="background:#fdd">SkAFLpLknbozH</del>Z<del style="background:#fdd">n4G</del><ins style="background:#dfd">6JtPMceqPif2</ins>8<del style="background:#fdd">WV/av24/hj5</del>9<del style="background:#fdd">0c</del><ins style="background:#dfd">o</ins>=</code> |
+| content_base64sha512 | v4daqaHyZn5NbMRgqL1wyWC2Go2H2YGt8qrZ5SIcOt823qvTO0uTP0Qo+ZJzdGmFTKOMiLSIImIJTudrG7Qp/Q== | <code><del style="background:#fdd">v</del><ins style="background:#dfd">gFfhZsQde</ins>4<del style="background:#fdd">d</del><ins style="background:#dfd">SkQj</ins>a<del style="background:#fdd">qaHyZ</del><ins style="background:#dfd">T6Re</ins>n<del style="background:#fdd">5NbMRgqL1wy</del><ins style="background:#dfd">u</ins>W<del style="background:#fdd">C2</del><ins style="background:#dfd">X6ejrQkaSk</ins>G<del style="background:#fdd">o</del><ins style="background:#dfd">Vt</ins>2<del style="background:#fdd">H2YGt8qr</del><ins style="background:#dfd">A</ins>Z<del style="background:#fdd">5</del><ins style="background:#dfd">CDK6</ins>S<del style="background:#fdd">I</del><ins style="background:#dfd">h+N</ins>c<del style="background:#fdd">Ot8</del><ins style="background:#dfd">Z</ins>2<del style="background:#fdd">3qvT</del><ins style="background:#dfd">Wf</ins>O<ins style="background:#dfd">Xf</ins>0<del style="background:#fdd">u</del><ins style="background:#dfd">KYA</ins>T<del style="background:#fdd">P0Qo+ZJzdGm</del><ins style="background:#dfd">Yr</ins>F<del style="background:#fdd">TKOM</del>i<del style="background:#fdd">LSIImI</del><ins style="background:#dfd">1AgptXA2h3Yw</ins>J<del style="background:#fdd">T</del>u<del style="background:#fdd">drG7Qp/Q</del><ins style="background:#dfd">nyJDaKEgw</ins>==</code> |
+| content_md5 | 374900018c431a33587acb053923c90a | <code><del style="background:#fdd">3</del><ins style="background:#dfd">c6d224f0cba</ins>7<del style="background:#fdd">4</del><ins style="background:#dfd">ad</ins>9<ins style="background:#dfd">12</ins>00<ins style="background:#dfd">9</ins>0<ins style="background:#dfd">79</ins>18<del style="background:#fdd">c431a3358</del><ins style="background:#dfd">bf0</ins>7<del style="background:#fdd">acb</del>0<del style="background:#fdd">5</del>3<ins style="background:#dfd">6</ins><del style="background:#fdd">923c90a</del></code> |
+| content_sha1 | 1951ea3cba8b8157586130ebad80af2c86462821 | <code><ins style="background:#dfd">a4b02</ins>1<del style="background:#fdd">9</del><ins style="background:#dfd">c2</ins>5<ins style="background:#dfd">6faff444</ins>1<ins style="background:#dfd">5c44879fd</ins>e<del style="background:#fdd">a</del>3<del style="background:#fdd">c</del><ins style="background:#dfd">f</ins>ba<del style="background:#fdd">8b815</del><ins style="background:#dfd">0</ins>7<del style="background:#fdd">5861</del>3<del style="background:#fdd">0e</del>b<del style="background:#fdd">ad80af2</del>c<del style="background:#fdd">86</del><ins style="background:#dfd">b1</ins>4<del style="background:#fdd">62821</del></code> |
+| content_sha256 | 01740a810aa69e48d290014ba4b9276e8cc7667e06f1657f6afdb8fe18f9f747 | <code><ins style="background:#dfd">6bf</ins>0<del style="background:#fdd">1</del><ins style="background:#dfd">ecad</ins>7<ins style="background:#dfd">d5</ins>4<ins style="background:#dfd">8a5</ins>0<del style="background:#fdd">a81</del><ins style="background:#dfd">2</ins>0<del style="background:#fdd">aa</del><ins style="background:#dfd">e</ins>6<del style="background:#fdd">9</del><ins style="background:#dfd">8</ins>e<del style="background:#fdd">4</del>8<del style="background:#fdd">d290014</del><ins style="background:#dfd">e3</ins>b<del style="background:#fdd">a4</del>b<del style="background:#fdd">9276</del>e8<ins style="background:#dfd">69</ins>c<ins style="background:#dfd">d</ins>c<ins style="background:#dfd">a8e</ins>7<del style="background:#fdd">667</del><ins style="background:#dfd">c8d9</ins>e<del style="background:#fdd">06</del><ins style="background:#dfd">89b4</ins>f<ins style="background:#dfd">3</ins>1<del style="background:#fdd">65</del><ins style="background:#dfd">c7aa3e2</ins>7f6<del style="background:#fdd">a</del>f<ins style="background:#dfd">3</ins>d<ins style="background:#dfd">a</ins><del style="background:#fdd">b8fe18f9f747</del></code> |
+| content_sha512 | bf875aa9a1f2667e4d6cc460a8bd70c960b61a8d87d981adf2aad9e5221c3adf36deabd33b4b933f4428f992737469854ca38c88b4882262094ee76b1bb429fd | <code><del style="background:#fdd">bf</del>8<ins style="background:#dfd">05</ins>7<del style="background:#fdd">5aa9a</del><ins style="background:#dfd">e</ins>1<del style="background:#fdd">f26</del>6<del style="background:#fdd">7e4d</del>6<del style="background:#fdd">c</del>c4<del style="background:#fdd">60a8b</del><ins style="background:#dfd">1</ins>d7<del style="background:#fdd">0c960</del>b<ins style="background:#dfd">84a4423</ins>6<ins style="background:#dfd">93e9</ins>1<ins style="background:#dfd">7</ins>a<del style="background:#fdd">8d8</del>7<del style="background:#fdd">d</del><ins style="background:#dfd">b</ins>9<del style="background:#fdd">81</del><ins style="background:#dfd">65f</ins>a<del style="background:#fdd">df2</del><ins style="background:#dfd">7</ins>a<ins style="background:#dfd">3</ins>ad<ins style="background:#dfd">0</ins>9<del style="background:#fdd">e522</del>1<del style="background:#fdd">c3</del>a<del style="background:#fdd">df36de</del><ins style="background:#dfd">4</ins>a<ins style="background:#dfd">4195</ins>b<del style="background:#fdd">d</del><ins style="background:#dfd">7601908</ins>3<del style="background:#fdd">3</del><ins style="background:#dfd">2</ins>b<ins style="background:#dfd">a</ins>4<del style="background:#fdd">b933</del><ins style="background:#dfd">a1</ins>f<del style="background:#fdd">442</del>8<del style="background:#fdd">f</del><ins style="background:#dfd">d71</ins>9<ins style="background:#dfd">d</ins>9<del style="background:#fdd">2</del><ins style="background:#dfd">6</ins>7<del style="background:#fdd">37</del><ins style="background:#dfd">ce5dfd0a600</ins>4<del style="background:#fdd">69</del><ins style="background:#dfd">d</ins>8<del style="background:#fdd">54c</del>a<del style="background:#fdd">38</del>c<del style="background:#fdd">8</del><ins style="background:#dfd">5</ins>8b<del style="background:#fdd">488</del><ins style="background:#dfd">50</ins>2<del style="background:#fdd">2</del><ins style="background:#dfd">0a</ins>6<del style="background:#fdd">2</del><ins style="background:#dfd">d5c0da1dd8c</ins>09<del style="background:#fdd">4ee</del><ins style="background:#dfd">ba</ins>7<del style="background:#fdd">6b1bb42</del><ins style="background:#dfd">c8</ins>9<del style="background:#fdd">f</del><ins style="background:#dfd">0</ins>d<ins style="background:#dfd">a28483</ins></code> |
+| id | 1951ea3cba8b8157586130ebad80af2c86462821 | <code><ins style="background:#dfd">a4b02</ins>1<del style="background:#fdd">9</del><ins style="background:#dfd">c2</ins>5<ins style="background:#dfd">6faff444</ins>1<ins style="background:#dfd">5c44879fd</ins>e<del style="background:#fdd">a</del>3<del style="background:#fdd">c</del><ins style="background:#dfd">f</ins>ba<del style="background:#fdd">8b815</del><ins style="background:#dfd">0</ins>7<del style="background:#fdd">5861</del>3<del style="background:#fdd">0e</del>b<del style="background:#fdd">ad80af2</del>c<del style="background:#fdd">86</del><ins style="background:#dfd">b1</ins>4<del style="background:#fdd">62821</del></code> |
+| sensitive_content | <code>(sensitive)</code> | <code>(sensitive)</code> |
+
+<details>
+<summary>Large value: content (18 lines, 9 changes)</summary>
+
+\`\`\`diff
+  Project: tf-plan-md fixture
+- Version: 1.0.0
++ Version: 2.0.0
+  Status: active
+  
+  This file is managed by Terraform.
+  It contains multiple lines of plain text
+  so that the large-value renderer is exercised.
+  
+- Line 9: additional content
++ Line 9: updated content
+  Line 10: additional content
+- Line 11: additional content
+- Line 12: end of file
++ Line 11: new line inserted here
++ Line 12: additional content
++ Line 13: end of file
+  
+\`\`\`
+
+</details>
+
+</details>
+
+## Outputs
+
+| Output | Action | Before | After |
+| --- | --- | --- | --- |
+| readme_path | ⬜ | <code>./output/readme.txt</code> | <code>./output/readme.txt</code> |
+
+"
+`;
+
+exports[`applyToMarkdown — state enrichment > state-enriched snapshot: terraform/moved-resource/0 1`] = `
+"## Apply Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Added | null_resource | 1 |
+|  | **Added** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>➕ <strong>null_resource</strong> original</summary>
+
+\`\`\`
+null_resource.original
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id |  | <code><ins style="background:#dfd">4860003469770223308</ins></code> |
+| triggers.version |  | <code><ins style="background:#dfd">1</ins></code> |
+
+</details>
+
+"
+`;
+
+exports[`applyToMarkdown — state enrichment > state-enriched snapshot: terraform/moved-resource/1 1`] = `
+"## Apply Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| 🚚 Moved | null_resource | 1 |
+|  | **Moved** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>🚚 <strong>null_resource</strong> renamed</summary>
+
+\`\`\`
+null_resource.renamed
+\`\`\`
+
+**Moved from:** \`null_resource.original\`
+
+_No attribute changes._
+
+</details>
+
+"
+`;
+
+exports[`applyToMarkdown — state enrichment > state-enriched snapshot: terraform/nested-modules/0 1`] = `
+"## Apply Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Added | null_resource | 3 |
+|  | **Added** | **3** |
+
+## Resource Changes
+
+### 📦 Module: \`module.parent["1"].module.child\`
+
+<details>
+<summary>➕ <strong>null_resource</strong> item[0]</summary>
+
+\`\`\`
+module.parent["1"].module.child.null_resource.item[0]
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id |  | <code><ins style="background:#dfd">2261356708475394088</ins></code> |
+| triggers.index |  | <code><ins style="background:#dfd">0</ins></code> |
+| triggers.label |  | <code><ins style="background:#dfd">1</ins></code> |
+
+</details>
+
+### 📦 Module: \`module.parent["2"].module.child\`
+
+<details>
+<summary>➕ <strong>null_resource</strong> item[0]</summary>
+
+\`\`\`
+module.parent["2"].module.child.null_resource.item[0]
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id |  | <code><ins style="background:#dfd">215241195527216431</ins></code> |
+| triggers.index |  | <code><ins style="background:#dfd">0</ins></code> |
+| triggers.label |  | <code><ins style="background:#dfd">2</ins></code> |
+
+</details>
+
+<details>
+<summary>➕ <strong>null_resource</strong> item[1]</summary>
+
+\`\`\`
+module.parent["2"].module.child.null_resource.item[1]
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id |  | <code><ins style="background:#dfd">8849725476024636877</ins></code> |
+| triggers.index |  | <code><ins style="background:#dfd">1</ins></code> |
+| triggers.label |  | <code><ins style="background:#dfd">2</ins></code> |
+
+</details>
+
+"
+`;
+
+exports[`applyToMarkdown — state enrichment > state-enriched snapshot: terraform/nested-modules/1 1`] = `
+"## Apply Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Added | null_resource | 3 |
+|  | **Added** | **3** |
+| 🗑️ Destroyed | null_resource | 2 |
+|  | **Destroyed** | **2** |
+
+## Resource Changes
+
+### 📦 Module: \`module.parent["2"].module.child\`
+
+<details>
+<summary>🗑️ <strong>null_resource</strong> item[0]</summary>
+
+\`\`\`
+module.parent["2"].module.child.null_resource.item[0]
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | 215241195527216431 | <code><del style="background:#fdd">215241195527216431</del></code> |
+| triggers.index | 0 | <code><del style="background:#fdd">0</del></code> |
+| triggers.label | 2 | <code><del style="background:#fdd">2</del></code> |
+
+</details>
+
+<details>
+<summary>🗑️ <strong>null_resource</strong> item[1]</summary>
+
+\`\`\`
+module.parent["2"].module.child.null_resource.item[1]
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | 8849725476024636877 | <code><del style="background:#fdd">8849725476024636877</del></code> |
+| triggers.index | 1 | <code><del style="background:#fdd">1</del></code> |
+| triggers.label | 2 | <code><del style="background:#fdd">2</del></code> |
+
+</details>
+
+### 📦 Module: \`module.parent["3"].module.child\`
+
+<details>
+<summary>➕ <strong>null_resource</strong> item[0]</summary>
+
+\`\`\`
+module.parent["3"].module.child.null_resource.item[0]
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id |  | <code><ins style="background:#dfd">9007645374136769050</ins></code> |
+| triggers.index |  | <code><ins style="background:#dfd">0</ins></code> |
+| triggers.label |  | <code><ins style="background:#dfd">3</ins></code> |
+
+</details>
+
+<details>
+<summary>➕ <strong>null_resource</strong> item[1]</summary>
+
+\`\`\`
+module.parent["3"].module.child.null_resource.item[1]
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id |  | <code><ins style="background:#dfd">1972443345129880455</ins></code> |
+| triggers.index |  | <code><ins style="background:#dfd">1</ins></code> |
+| triggers.label |  | <code><ins style="background:#dfd">3</ins></code> |
+
+</details>
+
+<details>
+<summary>➕ <strong>null_resource</strong> item[2]</summary>
+
+\`\`\`
+module.parent["3"].module.child.null_resource.item[2]
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id |  | <code><ins style="background:#dfd">5632014247122928303</ins></code> |
+| triggers.index |  | <code><ins style="background:#dfd">2</ins></code> |
+| triggers.label |  | <code><ins style="background:#dfd">3</ins></code> |
+
+</details>
+
+"
+`;
+
+exports[`applyToMarkdown — state enrichment > state-enriched snapshot: terraform/no-detailed-exitcode/0 1`] = `
+"## Apply Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Added | null_resource | 1 |
+|  | **Added** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>➕ <strong>null_resource</strong> example</summary>
+
+\`\`\`
+null_resource.example
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id |  | <code><ins style="background:#dfd">7855964529757047604</ins></code> |
+| triggers.value |  | <code><ins style="background:#dfd">hello</ins></code> |
+
+</details>
+
+"
+`;
+
+exports[`applyToMarkdown — state enrichment > state-enriched snapshot: terraform/no-detailed-exitcode/1 1`] = `
+"## Apply Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| 🗑️ Destroyed | null_resource | 1 |
+|  | **Destroyed** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>🗑️ <strong>null_resource</strong> example</summary>
+
+\`\`\`
+null_resource.example
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | 7855964529757047604 | <code><del style="background:#fdd">7855964529757047604</del></code> |
+| triggers.value | hello | <code><del style="background:#fdd">hello</del></code> |
+
+</details>
+
+"
+`;
+
+exports[`applyToMarkdown — state enrichment > state-enriched snapshot: terraform/no-op/0 1`] = `
+"## Apply Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Added | null_resource | 1 |
+|  | **Added** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>➕ <strong>null_resource</strong> stable</summary>
+
+\`\`\`
+null_resource.stable
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id |  | <code><ins style="background:#dfd">350367460639428024</ins></code> |
+| triggers.version |  | <code><ins style="background:#dfd">1</ins></code> |
+
+</details>
+
+"
+`;
+
+exports[`applyToMarkdown — state enrichment > state-enriched snapshot: terraform/no-op/1 1`] = `
+"## Apply Summary
+
+_No changes._
+
+"
+`;
+
+exports[`applyToMarkdown — state enrichment > state-enriched snapshot: terraform/null-lifecycle/0 1`] = `
+"## Apply Summary
+
+_No changes._
+
+"
+`;
+
+exports[`applyToMarkdown — state enrichment > state-enriched snapshot: terraform/null-lifecycle/1 1`] = `
+"## Apply Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Added | null_resource | 2 |
+|  | terraform_data | 1 |
+|  | **Added** | **3** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>➕ <strong>null_resource</strong> alpha</summary>
+
+\`\`\`
+null_resource.alpha
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id |  | <code><ins style="background:#dfd">9003449445379571186</ins></code> |
+| triggers.label |  | <code><ins style="background:#dfd">alpha</ins></code> |
+| triggers.version |  | <code><ins style="background:#dfd">1</ins></code> |
+
+</details>
+
+<details>
+<summary>➕ <strong>null_resource</strong> beta</summary>
+
+\`\`\`
+null_resource.beta
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id |  | <code><ins style="background:#dfd">2675902031198324472</ins></code> |
+| triggers.label |  | <code><ins style="background:#dfd">beta</ins></code> |
+| triggers.version |  | <code><ins style="background:#dfd">1</ins></code> |
+
+</details>
+
+<details>
+<summary>➕ <strong>terraform_data</strong> meta</summary>
+
+\`\`\`
+terraform_data.meta
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id |  | <code><ins style="background:#dfd">3fbede02-6934-0e3b-dcea-3c77618ad1a0</ins></code> |
+| input |  | <code><ins style="background:#dfd">v1</ins></code> |
+
+<details>
+<summary>Large value: output</summary>
+
+\`\`\`
+{
+  "value": "v1",
+  "type": "string"
+}
+\`\`\`
+
+</details>
+
+</details>
+
+"
+`;
+
+exports[`applyToMarkdown — state enrichment > state-enriched snapshot: terraform/null-lifecycle/2 1`] = `
+"## Apply Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| 🔧 Changed | terraform_data | 1 |
+|  | **Changed** | **1** |
+| ± Replaced | null_resource | 1 |
+|  | **Replaced** | **1** |
+| 🗑️ Destroyed | null_resource | 1 |
+|  | **Destroyed** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>± <strong>null_resource</strong> alpha</summary>
+
+\`\`\`
+null_resource.alpha
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | 9003449445379571186 | <code><ins style="background:#dfd">20</ins>9<del style="background:#fdd">00344</del>9<ins style="background:#dfd">1</ins>4<del style="background:#fdd">4</del><ins style="background:#dfd">731</ins>5<ins style="background:#dfd">3</ins>3<ins style="background:#dfd">0105</ins>7<ins style="background:#dfd">9</ins>9<del style="background:#fdd">571186</del></code> |
+| triggers.version | 1 | <code><ins style="background:#dfd">2</ins><del style="background:#fdd">1</del></code> |
+
+</details>
+
+<details>
+<summary>🗑️ <strong>null_resource</strong> beta</summary>
+
+\`\`\`
+null_resource.beta
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | 2675902031198324472 | <code><del style="background:#fdd">2675902031198324472</del></code> |
+| triggers.label | beta | <code><del style="background:#fdd">beta</del></code> |
+| triggers.version | 1 | <code><del style="background:#fdd">1</del></code> |
+
+</details>
+
+<details>
+<summary>🔧 <strong>terraform_data</strong> meta — changed: input, output</summary>
+
+\`\`\`
+terraform_data.meta
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| input | v1 | <code>v<ins style="background:#dfd">2</ins><del style="background:#fdd">1</del></code> |
+
+<details>
+<summary>Large value: output (5 lines, 5 changes)</summary>
+
+\`\`\`diff
++ {
++   "value": "v2",
++   "type": "string"
++ }
+- v1
+\`\`\`
+
+</details>
+
+</details>
+
+"
+`;
+
+exports[`applyToMarkdown — state enrichment > state-enriched snapshot: terraform/plan-error/0 1`] = `
+"## Apply Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Added | null_resource | 1 |
+|  | **Added** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>➕ <strong>null_resource</strong> baseline</summary>
+
+\`\`\`
+null_resource.baseline
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id |  | <code><ins style="background:#dfd">6431622851989918759</ins></code> |
+| triggers.value |  | <code><ins style="background:#dfd">v1</ins></code> |
+
+</details>
+
+"
+`;
+
+exports[`applyToMarkdown — state enrichment > state-enriched snapshot: terraform/random-replace/0 1`] = `
+"## Apply Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Added | random_string | 1 |
+|  | **Added** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>➕ <strong>random_string</strong> token</summary>
+
+\`\`\`
+random_string.token
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id |  | <code><ins style="background:#dfd">dmxmVzpXZNmHMaBp</ins></code> |
+| keepers.rotation |  | <code><ins style="background:#dfd">v1</ins></code> |
+| length |  | <code><ins style="background:#dfd">16</ins></code> |
+| lower |  | <code><ins style="background:#dfd">true</ins></code> |
+| min_lower |  | <code><ins style="background:#dfd">0</ins></code> |
+| min_numeric |  | <code><ins style="background:#dfd">0</ins></code> |
+| min_special |  | <code><ins style="background:#dfd">0</ins></code> |
+| min_upper |  | <code><ins style="background:#dfd">0</ins></code> |
+| number |  | <code><ins style="background:#dfd">true</ins></code> |
+| numeric |  | <code><ins style="background:#dfd">true</ins></code> |
+| result |  | <code><ins style="background:#dfd">dmxmVzpXZNmHMaBp</ins></code> |
+| special |  | <code><ins style="background:#dfd">false</ins></code> |
+| upper |  | <code><ins style="background:#dfd">true</ins></code> |
+
+</details>
+
+## Outputs
+
+| Output | Action | Before | After |
+| --- | --- | --- | --- |
+| token_length | ➕ |  | <code>16</code> |
+
+"
+`;
+
+exports[`applyToMarkdown — state enrichment > state-enriched snapshot: terraform/random-replace/1 1`] = `
+"## Apply Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| ± Replaced | random_string | 1 |
+|  | **Replaced** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>± <strong>random_string</strong> token</summary>
+
+\`\`\`
+random_string.token
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | dmxmVzpXZNmHMaBp | <code><del style="background:#fdd">dm</del>x<del style="background:#fdd">mVzp</del><ins style="background:#dfd">vKXcJ8</ins>X<del style="background:#fdd">ZNmHMaB</del><ins style="background:#dfd">qr</ins>p<ins style="background:#dfd">hAknw</ins></code> |
+| keepers.rotation | v1 | <code>v<ins style="background:#dfd">2</ins><del style="background:#fdd">1</del></code> |
+| result | dmxmVzpXZNmHMaBp | <code><del style="background:#fdd">dm</del>x<del style="background:#fdd">mVzp</del><ins style="background:#dfd">vKXcJ8</ins>X<del style="background:#fdd">ZNmHMaB</del><ins style="background:#dfd">qr</ins>p<ins style="background:#dfd">hAknw</ins></code> |
+
+</details>
+
+## Outputs
+
+| Output | Action | Before | After |
+| --- | --- | --- | --- |
+| token_length | ⬜ | <code>16</code> | <code>16</code> |
+
+"
+`;
+
+exports[`applyToMarkdown — state enrichment > state-enriched snapshot: terraform/removed-resource/0 1`] = `
+"## Apply Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Added | null_resource | 2 |
+|  | **Added** | **2** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>➕ <strong>null_resource</strong> ephemeral</summary>
+
+\`\`\`
+null_resource.ephemeral
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id |  | <code><ins style="background:#dfd">516542138528642756</ins></code> |
+| triggers.version |  | <code><ins style="background:#dfd">1</ins></code> |
+
+</details>
+
+<details>
+<summary>➕ <strong>null_resource</strong> keeper</summary>
+
+\`\`\`
+null_resource.keeper
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id |  | <code><ins style="background:#dfd">6889918162378132282</ins></code> |
+| triggers.version |  | <code><ins style="background:#dfd">1</ins></code> |
+
+</details>
+
+"
+`;
+
+exports[`applyToMarkdown — state enrichment > state-enriched snapshot: terraform/removed-resource/1 1`] = `
+"## Apply Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| 👋 Forgotten | null_resource | 1 |
+|  | **Forgotten** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>👋 <strong>null_resource</strong> ephemeral</summary>
+
+\`\`\`
+null_resource.ephemeral
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | 516542138528642756 | <code><del style="background:#fdd">516542138528642756</del></code> |
+| triggers.version | 1 | <code><del style="background:#fdd">1</del></code> |
+
+</details>
+
+"
+`;
+
+exports[`applyToMarkdown — state enrichment > state-enriched snapshot: terraform/sensitive-values/0 1`] = `
+"## Apply Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Added | local_sensitive_file | 1 |
+|  | **Added** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>➕ <strong>local_sensitive_file</strong> secret</summary>
+
+\`\`\`
+local_sensitive_file.secret
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| content | <code></code> | <code>(sensitive)</code> |
+| content_base64 | <code></code> | <code>(sensitive)</code> |
+| content_base64sha256 |  | <code><ins style="background:#dfd">tglbgl+ELKnIfsYFkBXQKZLLTwS6icynJuYOJcOo9bY=</ins></code> |
+| content_base64sha512 |  | <code><ins style="background:#dfd">Eo7RifRBpd27pi/st4ERjtqdT19zPyGc5afG7yxwwtDeKueSo9wvSeZdo2Ami5LjFA92F1wrQqtKWqljFWCLdQ==</ins></code> |
+| content_md5 |  | <code><ins style="background:#dfd">8ed8462ae2d0cac83f45c1288b82946d</ins></code> |
+| content_sha1 |  | <code><ins style="background:#dfd">ffae43b95440019e9bb698e9713dc5ac27be8dd5</ins></code> |
+| content_sha256 |  | <code><ins style="background:#dfd">b6095b825f842ca9c87ec6059015d02992cb4f04ba89cca726e60e25c3a8f5b6</ins></code> |
+| content_sha512 |  | <code><ins style="background:#dfd">128ed189f441a5ddbba62fecb781118eda9d4f5f733f219ce5a7c6ef2c70c2d0de2ae792a3dc2f49e65da360268b92e3140f76175c2b42ab4a5aa96315608b75</ins></code> |
+| directory_permission |  | <code><ins style="background:#dfd">0700</ins></code> |
+| file_permission |  | <code><ins style="background:#dfd">0700</ins></code> |
+| filename |  | <code><ins style="background:#dfd">./output/secret.txt</ins></code> |
+| id |  | <code><ins style="background:#dfd">ffae43b95440019e9bb698e9713dc5ac27be8dd5</ins></code> |
+
+</details>
+
+## Outputs
+
+| Output | Action | Before | After |
+| --- | --- | --- | --- |
+| secret_checksum | ➕ | <code>(sensitive)</code> | <code>(sensitive)</code> |
+| secret_path | ➕ |  | <code>./output/secret.txt</code> |
+
+"
+`;
+
+exports[`applyToMarkdown — state enrichment > state-enriched snapshot: terraform/sensitive-values/1 1`] = `
+"## Apply Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| ± Replaced | local_sensitive_file | 1 |
+|  | **Replaced** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>± <strong>local_sensitive_file</strong> secret</summary>
+
+\`\`\`
+local_sensitive_file.secret
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| content | <code>(sensitive)</code> | <code>(sensitive)</code> |
+| content_base64 | <code>(sensitive)</code> | <code>(sensitive)</code> |
+| content_base64sha256 | tglbgl+ELKnIfsYFkBXQKZLLTwS6icynJuYOJcOo9bY= | <code><del style="background:#fdd">tglbgl+EL</del>K<del style="background:#fdd">nIfsY</del><ins style="background:#dfd">Dv</ins>F<del style="background:#fdd">kB</del><ins style="background:#dfd">/GlyAo</ins>X<del style="background:#fdd">QKZ</del>L<del style="background:#fdd">LTwS6ic</del><ins style="background:#dfd">Jn5</ins>y<del style="background:#fdd">nJ</del><ins style="background:#dfd">f2Aq5R</ins>u<del style="background:#fdd">YO</del><ins style="background:#dfd">mEmxgPyzoHH</ins>J<del style="background:#fdd">cO</del><ins style="background:#dfd">dRFwZBD</ins>o<del style="background:#fdd">9bY</del>=</code> |
+| content_base64sha512 | Eo7RifRBpd27pi/st4ERjtqdT19zPyGc5afG7yxwwtDeKueSo9wvSeZdo2Ami5LjFA92F1wrQqtKWqljFWCLdQ== | <code><del style="background:#fdd">Eo7RifRBpd27pi/</del><ins style="background:#dfd">hO1</ins>s<del style="background:#fdd">t4ER</del><ins style="background:#dfd">1</ins>j<ins style="background:#dfd">yY</ins>t<del style="background:#fdd">qdT1</del>9<del style="background:#fdd">z</del><ins style="background:#dfd">mLxtNLF8In</ins>P<del style="background:#fdd">y</del><ins style="background:#dfd">9Un</ins>G<del style="background:#fdd">c5afG7y</del><ins style="background:#dfd">0MX1H/nz4qdeBUNN</ins>x<del style="background:#fdd">ww</del><ins style="background:#dfd">o2qP</ins>t<del style="background:#fdd">DeK</del>u<del style="background:#fdd">eSo9</del><ins style="background:#dfd">3p4TLVW</ins>w<ins style="background:#dfd">hqCOEkNsL4x</ins>v<del style="background:#fdd">Se</del><ins style="background:#dfd">9P8/</ins>Z<del style="background:#fdd">do2</del><ins style="background:#dfd">k</ins>A<del style="background:#fdd">m</del><ins style="background:#dfd">V7</ins>i5<del style="background:#fdd">LjFA92F</del><ins style="background:#dfd">oZCp</ins>1<ins style="background:#dfd">S</ins>w<del style="background:#fdd">rQqtKWqljFWCLdQ</del>==</code> |
+| content_md5 | 8ed8462ae2d0cac83f45c1288b82946d | <code><del style="background:#fdd">8e</del><ins style="background:#dfd">43fd904</ins>d<del style="background:#fdd">8</del><ins style="background:#dfd">f</ins>4<del style="background:#fdd">62</del><ins style="background:#dfd">7</ins>a<ins style="background:#dfd">b4fc8</ins>e<ins style="background:#dfd">7570</ins>2<del style="background:#fdd">d0cac</del>83<del style="background:#fdd">f45c</del>12<del style="background:#fdd">88b8</del><ins style="background:#dfd">3ea</ins>2<ins style="background:#dfd">f</ins><del style="background:#fdd">946d</del></code> |
+| content_sha1 | ffae43b95440019e9bb698e9713dc5ac27be8dd5 | <code><del style="background:#fdd">ff</del><ins style="background:#dfd">e6bb28ad117</ins>a<del style="background:#fdd">e</del><ins style="background:#dfd">02</ins>4<ins style="background:#dfd">8accba6c</ins>3<del style="background:#fdd">b</del>9<del style="background:#fdd">54</del>40<del style="background:#fdd">019e9bb</del><ins style="background:#dfd">c2d</ins>6<del style="background:#fdd">9</del><ins style="background:#dfd">7</ins>8e<del style="background:#fdd">9713</del>dc<del style="background:#fdd">5</del>a<del style="background:#fdd">c</del><ins style="background:#dfd">3b</ins>2<del style="background:#fdd">7be8dd5</del></code> |
+| content_sha256 | b6095b825f842ca9c87ec6059015d02992cb4f04ba89cca726e60e25c3a8f5b6 | <code><ins style="background:#dfd">283</ins>b<ins style="background:#dfd">c5fc</ins>6<ins style="background:#dfd">972</ins>0<del style="background:#fdd">9</del><ins style="background:#dfd">28</ins>5<ins style="background:#dfd">c</ins>b<del style="background:#fdd">8</del><ins style="background:#dfd">267e7</ins>2<del style="background:#fdd">5</del><ins style="background:#dfd">7</ins>f<del style="background:#fdd">84</del><ins style="background:#dfd">60</ins>2<del style="background:#fdd">c</del>a<del style="background:#fdd">9c87</del>e<del style="background:#fdd">c60</del>5<del style="background:#fdd">90</del>1<del style="background:#fdd">5d02992cb4f04</del>ba<del style="background:#fdd">89cca7</del><ins style="background:#dfd">61</ins>26<del style="background:#fdd">e</del><ins style="background:#dfd">c</ins>60<ins style="background:#dfd">3f2c</ins>e<ins style="background:#dfd">81c7</ins>2<ins style="background:#dfd">5d44</ins>5c<ins style="background:#dfd">1904</ins>3a<del style="background:#fdd">8f5b6</del></code> |
+| content_sha512 | 128ed189f441a5ddbba62fecb781118eda9d4f5f733f219ce5a7c6ef2c70c2d0de2ae792a3dc2f49e65da360268b92e3140f76175c2b42ab4a5aa96315608b75 | <code><del style="background:#fdd">12</del>8<ins style="background:#dfd">4</ins>ed<del style="background:#fdd">189f441a5d</del><ins style="background:#dfd">6c</ins>d<del style="background:#fdd">bba</del>6<del style="background:#fdd">2fe</del><ins style="background:#dfd">3</ins>c<ins style="background:#dfd">98</ins>b7<del style="background:#fdd">81118e</del>d<del style="background:#fdd">a</del>9<ins style="background:#dfd">8bc6</ins>d<ins style="background:#dfd">3</ins>4<del style="background:#fdd">f5f733f2</del><ins style="background:#dfd">b</ins>1<del style="background:#fdd">9ce5a</del>7c<del style="background:#fdd">6ef</del><ins style="background:#dfd">2</ins>2<del style="background:#fdd">c</del>7<del style="background:#fdd">0c2</del><ins style="background:#dfd">3f</ins>d<del style="background:#fdd">0de</del><ins style="background:#dfd">5</ins>2<del style="background:#fdd">ae</del>7<del style="background:#fdd">92a</del><ins style="background:#dfd">1b4</ins>3<ins style="background:#dfd">17</ins>d<ins style="background:#dfd">47fe7</ins>c<del style="background:#fdd">2</del>f<del style="background:#fdd">4</del><ins style="background:#dfd">8a</ins>9<del style="background:#fdd">e6</del><ins style="background:#dfd">d781</ins>5<ins style="background:#dfd">0</ins>d<ins style="background:#dfd">371</ins>a36<del style="background:#fdd">026</del><ins style="background:#dfd">a</ins>8<ins style="background:#dfd">f</ins>b<ins style="background:#dfd">6ede</ins>9<del style="background:#fdd">2</del>e<ins style="background:#dfd">1</ins>3<del style="background:#fdd">14</del><ins style="background:#dfd">2d55b</ins>0<del style="background:#fdd">f7</del><ins style="background:#dfd">8</ins>6<ins style="background:#dfd">a08e</ins>1<del style="background:#fdd">75c</del>2<del style="background:#fdd">b</del>4<ins style="background:#dfd">36c</ins>2<del style="background:#fdd">ab</del><ins style="background:#dfd">f8c6ff</ins>4<del style="background:#fdd">a5aa9</del><ins style="background:#dfd">ff3f6</ins>6<del style="background:#fdd">3</del><ins style="background:#dfd">40</ins>15<ins style="background:#dfd">ee2e</ins>6<del style="background:#fdd">0</del>8<del style="background:#fdd">b</del><ins style="background:#dfd">642a</ins>75<ins style="background:#dfd">4b</ins></code> |
+| id | ffae43b95440019e9bb698e9713dc5ac27be8dd5 | <code><del style="background:#fdd">ff</del><ins style="background:#dfd">e6bb28ad117</ins>a<del style="background:#fdd">e</del><ins style="background:#dfd">02</ins>4<ins style="background:#dfd">8accba6c</ins>3<del style="background:#fdd">b</del>9<del style="background:#fdd">54</del>40<del style="background:#fdd">019e9bb</del><ins style="background:#dfd">c2d</ins>6<del style="background:#fdd">9</del><ins style="background:#dfd">7</ins>8e<del style="background:#fdd">9713</del>dc<del style="background:#fdd">5</del>a<del style="background:#fdd">c</del><ins style="background:#dfd">3b</ins>2<del style="background:#fdd">7be8dd5</del></code> |
+
+</details>
+
+## Outputs
+
+| Output | Action | Before | After |
+| --- | --- | --- | --- |
+| secret_checksum | 🔧 | <code>(sensitive)</code> | <code>(sensitive)</code> |
+| secret_path | ⬜ | <code>./output/secret.txt</code> | <code>./output/secret.txt</code> |
+
+"
+`;
+
+exports[`applyToMarkdown — state enrichment > state-enriched snapshot: terraform/validate-error/0 1`] = `
+"## Apply Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Added | null_resource | 1 |
+|  | **Added** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>➕ <strong>null_resource</strong> baseline</summary>
+
+\`\`\`
+null_resource.baseline
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id |  | <code><ins style="background:#dfd">8593158670709664542</ins></code> |
+| triggers.value |  | <code><ins style="background:#dfd">v1</ins></code> |
+
+</details>
+
+"
+`;
+
+exports[`applyToMarkdown — state enrichment > state-enriched snapshot: terraform/with-modules/0 1`] = `
+"## Apply Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Added | null_resource | 1 |
+|  | random_string | 1 |
+|  | **Added** | **2** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>➕ <strong>null_resource</strong> root</summary>
+
+\`\`\`
+null_resource.root
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id |  | <code><ins style="background:#dfd">9051395911231999837</ins></code> |
+| triggers.stage |  | <code><ins style="background:#dfd">0</ins></code> |
+
+</details>
+
+### 📦 Module: \`module.naming\`
+
+<details>
+<summary>➕ <strong>random_string</strong> suffix</summary>
+
+\`\`\`
+module.naming.random_string.suffix
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id |  | <code><ins style="background:#dfd">uzewi2ks</ins></code> |
+| keepers.prefix |  | <code><ins style="background:#dfd">fixture</ins></code> |
+| length |  | <code><ins style="background:#dfd">8</ins></code> |
+| lower |  | <code><ins style="background:#dfd">true</ins></code> |
+| min_lower |  | <code><ins style="background:#dfd">0</ins></code> |
+| min_numeric |  | <code><ins style="background:#dfd">0</ins></code> |
+| min_special |  | <code><ins style="background:#dfd">0</ins></code> |
+| min_upper |  | <code><ins style="background:#dfd">0</ins></code> |
+| number |  | <code><ins style="background:#dfd">true</ins></code> |
+| numeric |  | <code><ins style="background:#dfd">true</ins></code> |
+| result |  | <code><ins style="background:#dfd">uzewi2ks</ins></code> |
+| special |  | <code><ins style="background:#dfd">false</ins></code> |
+| upper |  | <code><ins style="background:#dfd">false</ins></code> |
+
+</details>
+
+## Outputs
+
+| Output | Action | Before | After |
+| --- | --- | --- | --- |
+| generated_name | ➕ |  | <code>fixture-uzewi2ks</code> |
+| root_id | ➕ |  | <code>9051395911231999837</code> |
+
+"
+`;
+
+exports[`applyToMarkdown — state enrichment > state-enriched snapshot: terraform/with-modules/1 1`] = `
+"## Apply Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| ± Replaced | null_resource | 1 |
+|  | random_string | 1 |
+|  | **Replaced** | **2** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>± <strong>null_resource</strong> root</summary>
+
+\`\`\`
+null_resource.root
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | 9051395911231999837 | <code><ins style="background:#dfd">6</ins>9<ins style="background:#dfd">240</ins>0<ins style="background:#dfd">1</ins>5<del style="background:#fdd">13</del><ins style="background:#dfd">74676</ins>9<del style="background:#fdd">5</del><ins style="background:#dfd">46</ins>91<ins style="background:#dfd">5</ins><del style="background:#fdd">1231999837</del></code> |
+| triggers.stage | 0 | <code><ins style="background:#dfd">1</ins><del style="background:#fdd">0</del></code> |
+
+</details>
+
+### 📦 Module: \`module.naming\`
+
+<details>
+<summary>± <strong>random_string</strong> suffix</summary>
+
+\`\`\`
+module.naming.random_string.suffix
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | uzewi2ks | <code><del style="background:#fdd">uzewi</del><ins style="background:#dfd">8</ins>2<ins style="background:#dfd">49pyvp</ins><del style="background:#fdd">ks</del></code> |
+| keepers.prefix | fixture | <code>fixtur<ins style="background:#dfd">e-updat</ins>e<ins style="background:#dfd">d</ins></code> |
+| result | uzewi2ks | <code><del style="background:#fdd">uzewi</del><ins style="background:#dfd">8</ins>2<ins style="background:#dfd">49pyvp</ins><del style="background:#fdd">ks</del></code> |
+
+</details>
+
+## Outputs
+
+| Output | Action | Before | After |
+| --- | --- | --- | --- |
+| generated_name | 🔧 | <code>fixture-uzewi2ks</code> | <code>fixture-updated-8249pyvp</code> |
+| root_id | 🔧 | <code>9051395911231999837</code> | <code>6924001574676946915</code> |
+
+"
+`;
+
+exports[`applyToMarkdown — state enrichment > state-enriched snapshot: tofu/apply-error/0 1`] = `
+"## Apply Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Added | terraform_data | 2 |
+|  | null_resource | 1 |
+|  | **Added** | **3** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>➕ <strong>null_resource</strong> will_fail</summary>
+
+\`\`\`
+null_resource.will_fail
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id |  | <code><ins style="background:#dfd">4493511080432904557</ins></code> |
+| triggers.value |  | <code><ins style="background:#dfd">v1</ins></code> |
+
+</details>
+
+<details>
+<summary>➕ <strong>terraform_data</strong> depends_on_fail</summary>
+
+\`\`\`
+terraform_data.depends_on_fail
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id |  | <code><ins style="background:#dfd">d368a952-4580-2914-e2aa-5d054fdf8174</ins></code> |
+
+<details>
+<summary>Large value: input</summary>
+
+\`\`\`
+{
+  "value": "4493511080432904557",
+  "type": "string"
+}
+\`\`\`
+
+</details>
+
+<details>
+<summary>Large value: output</summary>
+
+\`\`\`
+{
+  "value": "4493511080432904557",
+  "type": "string"
+}
+\`\`\`
+
+</details>
+
+</details>
+
+<details>
+<summary>➕ <strong>terraform_data</strong> success</summary>
+
+\`\`\`
+terraform_data.success
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id |  | <code><ins style="background:#dfd">9e0009be-97b1-68cc-33c8-c1f17e68a5c7</ins></code> |
+| input |  | <code><ins style="background:#dfd">stable</ins></code> |
+
+<details>
+<summary>Large value: output</summary>
+
+\`\`\`
+{
+  "value": "stable",
+  "type": "string"
+}
+\`\`\`
+
+</details>
+
+</details>
+
+## Outputs
+
+| Output | Action | Before | After |
+| --- | --- | --- | --- |
+| depends_on_fail_output | ➕ |  | <code>4493511080432904557</code> |
+| success_output | ➕ |  | <code>stable</code> |
+
+"
+`;
+
+exports[`applyToMarkdown — state enrichment > state-enriched snapshot: tofu/apply-error/1 1`] = `
+"## Apply Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| ❌ Replace failed | null_resource | 1 |
+|  | **Replace failed** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details open>
+<summary>± <strong>null_resource</strong> will_fail ❌</summary>
+
+\`\`\`
+null_resource.will_fail
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | 4493511080432904557 | <code><del style="background:#fdd">44</del><ins style="background:#dfd">91</ins>9<del style="background:#fdd">3</del><ins style="background:#dfd">57</ins>5<del style="background:#fdd">11</del><ins style="background:#dfd">8</ins>0<del style="background:#fdd">8</del><ins style="background:#dfd">9</ins>0<ins style="background:#dfd">7</ins>4<del style="background:#fdd">329</del>0<ins style="background:#dfd">1</ins>4<ins style="background:#dfd">2628</ins><del style="background:#fdd">557</del></code> |
+| triggers.value | v1 | <code>v<ins style="background:#dfd">2</ins><del style="background:#fdd">1</del></code> |
+
+🚨 **local-exec provisioner error**
+
+\`\`\`
+Error running command 'exit 1': exit status 1. Output: 
+\`\`\`
+
+</details>
+
+## Outputs
+
+| Output | Action | Before | After |
+| --- | --- | --- | --- |
+| depends_on_fail_output | 🔧 | <code>4493511080432904557</code> | <code>4493511080432904557</code> |
+| success_output | ⬜ | <code>stable</code> | <code>stable</code> |
+
+"
+`;
+
+exports[`applyToMarkdown — state enrichment > state-enriched snapshot: tofu/deferred-data-source/0 1`] = `
+"## Apply Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Added | terraform_data | 4 |
+|  | local_file | 1 |
+|  | **Added** | **5** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>➕ <strong>local_file</strong> config</summary>
+
+\`\`\`
+local_file.config
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| content_base64sha256 |  | <code><ins style="background:#dfd">BCZAB46RhMIHCDOD2wpy52CggN8HCuE2r+O9OQMaoFg=</ins></code> |
+| content_base64sha512 |  | <code><ins style="background:#dfd">SpHAEiR6BfvlF6vlTa1H+TRQidZGWJGkabpZCmP8dZp6l33CeZzLjVSVrhHJwMmOgKa2U2G6HttLqi+hX4JXVA==</ins></code> |
+| content_md5 |  | <code><ins style="background:#dfd">25c6ea643fb6d100efbd0631aea3d0e1</ins></code> |
+| content_sha1 |  | <code><ins style="background:#dfd">575f062d4b9fc3bf93d0ac0d9de725cf1bcdc3c9</ins></code> |
+| content_sha256 |  | <code><ins style="background:#dfd">042640078e9184c207083383db0a72e760a080df070ae136afe3bd39031aa058</ins></code> |
+| content_sha512 |  | <code><ins style="background:#dfd">4a91c012247a05fbe517abe54dad47f9345089d6465891a469ba590a63fc759a7a977dc2799ccb8d5495ae11c9c0c98e80a6b65361ba1edb4baa2fa15f825754</ins></code> |
+| directory_permission |  | <code><ins style="background:#dfd">0777</ins></code> |
+| file_permission |  | <code><ins style="background:#dfd">0777</ins></code> |
+| filename |  | <code><ins style="background:#dfd">./config.json</ins></code> |
+| id |  | <code><ins style="background:#dfd">575f062d4b9fc3bf93d0ac0d9de725cf1bcdc3c9</ins></code> |
+| sensitive_content | <code></code> | <code>(sensitive)</code> |
+
+<details>
+<summary>Large value: content</summary>
+
+\`\`\`
+{
+  "worker_a": "alpha",
+  "worker_b": "bravo",
+  "worker_c": "charlie"
+}
+\`\`\`
+
+</details>
+
+</details>
+
+<details>
+<summary>➕ <strong>terraform_data</strong> independent</summary>
+
+\`\`\`
+terraform_data.independent
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id |  | <code><ins style="background:#dfd">9a087003-b391-693b-f0f7-2a992260a99a</ins></code> |
+| input |  | <code><ins style="background:#dfd">v1</ins></code> |
+
+<details>
+<summary>Large value: output</summary>
+
+\`\`\`
+{
+  "value": "v1",
+  "type": "string"
+}
+\`\`\`
+
+</details>
+
+</details>
+
+<details>
+<summary>➕ <strong>terraform_data</strong> worker_a</summary>
+
+\`\`\`
+terraform_data.worker_a
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id |  | <code><ins style="background:#dfd">a5cdacb5-9d47-e80f-2906-6da25b03ecc2</ins></code> |
+
+<details>
+<summary>Large value: input</summary>
+
+\`\`\`
+{
+  "value": "alpha",
+  "type": "string"
+}
+\`\`\`
+
+</details>
+
+<details>
+<summary>Large value: output</summary>
+
+\`\`\`
+{
+  "value": "alpha",
+  "type": "string"
+}
+\`\`\`
+
+</details>
+
+</details>
+
+<details>
+<summary>➕ <strong>terraform_data</strong> worker_b</summary>
+
+\`\`\`
+terraform_data.worker_b
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id |  | <code><ins style="background:#dfd">a430c4a8-6c9c-7d8f-5305-3cb3420fa79c</ins></code> |
+
+<details>
+<summary>Large value: input</summary>
+
+\`\`\`
+{
+  "value": "bravo",
+  "type": "string"
+}
+\`\`\`
+
+</details>
+
+<details>
+<summary>Large value: output</summary>
+
+\`\`\`
+{
+  "value": "bravo",
+  "type": "string"
+}
+\`\`\`
+
+</details>
+
+</details>
+
+<details>
+<summary>➕ <strong>terraform_data</strong> worker_c</summary>
+
+\`\`\`
+terraform_data.worker_c
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id |  | <code><ins style="background:#dfd">c774e731-81d5-4781-2452-f4035fe4fc09</ins></code> |
+
+<details>
+<summary>Large value: input</summary>
+
+\`\`\`
+{
+  "value": "charlie",
+  "type": "string"
+}
+\`\`\`
+
+</details>
+
+<details>
+<summary>Large value: output</summary>
+
+\`\`\`
+{
+  "value": "charlie",
+  "type": "string"
+}
+\`\`\`
+
+</details>
+
+</details>
+
+## Outputs
+
+| Output | Action | Before | After |
+| --- | --- | --- | --- |
+| config_value | ➕ |  | <code>{"worker_a":"alpha","worker_b":"bravo","worker_c":"charlie"}</code> |
+
+"
+`;
+
+exports[`applyToMarkdown — state enrichment > state-enriched snapshot: tofu/deferred-data-source/1 1`] = `
+"## Apply Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Added | local_file | 1 |
+|  | **Added** | **1** |
+| 🔧 Changed | terraform_data | 1 |
+|  | **Changed** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>➕ <strong>local_file</strong> metadata</summary>
+
+\`\`\`
+local_file.metadata
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| content |  | <code><ins style="background:#dfd">metadata-v1</ins></code> |
+| content_base64sha256 |  | <code><ins style="background:#dfd">jGQrlYWPzyUuhDtEvX/rAiW3dFFqg6iF9u8ejOHO61U=</ins></code> |
+| content_base64sha512 |  | <code><ins style="background:#dfd">3aWEXxinGJ7yTx4FwAtd2k1zuszr9Az5Hj8X4qyPVoraKjerVPuUWskpaDzy90JjWwZD20HIR4alu7Xqv+ulNQ==</ins></code> |
+| content_md5 |  | <code><ins style="background:#dfd">e5bb5bd2cffa161046d51e1cee55584c</ins></code> |
+| content_sha1 |  | <code><ins style="background:#dfd">93df9ef40895b13abbbfc8ae636c46e6af242e9d</ins></code> |
+| content_sha256 |  | <code><ins style="background:#dfd">8c642b95858fcf252e843b44bd7feb0225b774516a83a885f6ef1e8ce1ceeb55</ins></code> |
+| content_sha512 |  | <code><ins style="background:#dfd">dda5845f18a7189ef24f1e05c00b5dda4d73baccebf40cf91e3f17e2ac8f568ada2a37ab54fb945ac929683cf2f742635b0643db41c84786a5bbb5eabfeba535</ins></code> |
+| directory_permission |  | <code><ins style="background:#dfd">0777</ins></code> |
+| file_permission |  | <code><ins style="background:#dfd">0777</ins></code> |
+| filename |  | <code><ins style="background:#dfd">./metadata.txt</ins></code> |
+| id |  | <code><ins style="background:#dfd">93df9ef40895b13abbbfc8ae636c46e6af242e9d</ins></code> |
+| sensitive_content | <code></code> | <code>(sensitive)</code> |
+
+</details>
+
+<details>
+<summary>🔧 <strong>terraform_data</strong> independent — changed: input, output</summary>
+
+\`\`\`
+terraform_data.independent
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| input | v1 | <code>v<ins style="background:#dfd">2</ins><del style="background:#fdd">1</del></code> |
+
+<details>
+<summary>Large value: output (5 lines, 5 changes)</summary>
+
+\`\`\`diff
++ {
++   "value": "v2",
++   "type": "string"
++ }
+- v1
+\`\`\`
+
+</details>
+
+</details>
+
+## Outputs
+
+| Output | Action | Before | After |
+| --- | --- | --- | --- |
+| config_value | 🔧 | <code>{"worker_a":"alpha","worker_b":"bravo","worker_c":"charlie"}</code> | <code>{"worker_a":"alpha","worker_b":"bravo","worker_c":"charlie"}</code> |
+
+"
+`;
+
+exports[`applyToMarkdown — state enrichment > state-enriched snapshot: tofu/deferred-data-source/2 1`] = `
+"## Apply Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| 🔧 Changed | terraform_data | 1 |
+|  | **Changed** | **1** |
+| ± Replaced | local_file | 1 |
+|  | **Replaced** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>± <strong>local_file</strong> config</summary>
+
+\`\`\`
+local_file.config
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| content_base64sha256 | BCZAB46RhMIHCDOD2wpy52CggN8HCuE2r+O9OQMaoFg= | <code>B<del style="background:#fdd">CZAB46</del><ins style="background:#dfd">f3j</ins>R<del style="background:#fdd">hMIHCDOD2wpy</del><ins style="background:#dfd">V</ins>5<del style="background:#fdd">2CggN</del><ins style="background:#dfd">u</ins>8<del style="background:#fdd">H</del><ins style="background:#dfd">a</ins>C<ins style="background:#dfd">BqA</ins>u<ins style="background:#dfd">KjAxfqoXf2G8zqbDY</ins>E<ins style="background:#dfd">VXD</ins>2<del style="background:#fdd">r</del><ins style="background:#dfd">yfcz</ins>+<del style="background:#fdd">O9OQMaoFg</del><ins style="background:#dfd">Y</ins>=</code> |
+| content_base64sha512 | SpHAEiR6BfvlF6vlTa1H+TRQidZGWJGkabpZCmP8dZp6l33CeZzLjVSVrhHJwMmOgKa2U2G6HttLqi+hX4JXVA== | <code><del style="background:#fdd">Sp</del><ins style="background:#dfd">JOW4OjQ</ins>H<ins style="background:#dfd">k6xK/5WFV9YhJB4tG</ins>A<del style="background:#fdd">E</del><ins style="background:#dfd">Vk</ins>i<del style="background:#fdd">R6Bfv</del><ins style="background:#dfd">8YgUIo</ins>l<del style="background:#fdd">F</del>6<del style="background:#fdd">vlTa1</del>H<ins style="background:#dfd">Wz</ins>+<del style="background:#fdd">T</del><ins style="background:#dfd">90WpH</ins>R<del style="background:#fdd">QidZG</del><ins style="background:#dfd">q89/1</ins>W<del style="background:#fdd">JGk</del><ins style="background:#dfd">CAfrOB</ins>a<ins style="background:#dfd">qzzclQ</ins>b<del style="background:#fdd">pZCmP8</del>d<del style="background:#fdd">Zp6l33C</del>e<del style="background:#fdd">ZzL</del><ins style="background:#dfd">EymA0q9sHx</ins>j<del style="background:#fdd">VSVrhH</del><ins style="background:#dfd">w</ins>J<ins style="background:#dfd">bGo</ins>w<del style="background:#fdd">MmOgKa2U2G6HttLqi+hX4JXVA</del>==</code> |
+| content_md5 | 25c6ea643fb6d100efbd0631aea3d0e1 | <code><ins style="background:#dfd">9</ins>2<ins style="background:#dfd">3793</ins>5<del style="background:#fdd">c6e</del>a<del style="background:#fdd">6</del><ins style="background:#dfd">212917b</ins>4<ins style="background:#dfd">ee</ins>3<del style="background:#fdd">fb6d1</del>0<del style="background:#fdd">0efbd06</del><ins style="background:#dfd">28</ins>3<del style="background:#fdd">1aea</del>3<del style="background:#fdd">d0e</del><ins style="background:#dfd">985598</ins>1<ins style="background:#dfd">4</ins></code> |
+| content_sha1 | 575f062d4b9fc3bf93d0ac0d9de725cf1bcdc3c9 | <code><del style="background:#fdd">575</del><ins style="background:#dfd">c</ins>f<del style="background:#fdd">062d4b9</del><ins style="background:#dfd">8e</ins>f<del style="background:#fdd">c3</del>b<del style="background:#fdd">f93</del>d<del style="background:#fdd">0ac</del>0d<del style="background:#fdd">9de7</del><ins style="background:#dfd">2</ins>2<ins style="background:#dfd">850</ins>5<del style="background:#fdd">cf1</del><ins style="background:#dfd">7</ins>bcd<ins style="background:#dfd">aec</ins>c<ins style="background:#dfd">f69</ins>3<del style="background:#fdd">c</del><ins style="background:#dfd">88ebd5</ins>9<ins style="background:#dfd">806555</ins></code> |
+| content_sha256 | 042640078e9184c207083383db0a72e760a080df070ae136afe3bd39031aa058 | <code>0<ins style="background:#dfd">5fde3</ins>4<del style="background:#fdd">2</del><ins style="background:#dfd">55e</ins>6<del style="background:#fdd">40</del><ins style="background:#dfd">ef1a</ins>0<del style="background:#fdd">7</del>8<del style="background:#fdd">e9</del>1<ins style="background:#dfd">a</ins>8<del style="background:#fdd">4c2</del>0<del style="background:#fdd">70</del><ins style="background:#dfd">b</ins>8<del style="background:#fdd">33</del><ins style="background:#dfd">a</ins>8<del style="background:#fdd">3db</del><ins style="background:#dfd">c</ins>0<ins style="background:#dfd">c5f</ins>a<del style="background:#fdd">72e760</del>a<del style="background:#fdd">0</del>8<del style="background:#fdd">0</del><ins style="background:#dfd">5</ins>df<del style="background:#fdd">070ae13</del><ins style="background:#dfd">d8</ins>6<del style="background:#fdd">a</del>f<del style="background:#fdd">e</del>3<del style="background:#fdd">bd</del>3<ins style="background:#dfd">a</ins>9<ins style="background:#dfd">b</ins>0<del style="background:#fdd">3</del><ins style="background:#dfd">d81</ins>1<del style="background:#fdd">aa0</del><ins style="background:#dfd">5</ins>5<ins style="background:#dfd">c3db27dccfe6</ins><del style="background:#fdd">8</del></code> |
+| content_sha512 | 4a91c012247a05fbe517abe54dad47f9345089d6465891a469ba590a63fc759a7a977dc2799ccb8d5495ae11c9c0c98e80a6b65361ba1edb4baa2fa15f825754 | <code><del style="background:#fdd">4a91c012</del>24<del style="background:#fdd">7a05fb</del>e5<del style="background:#fdd">17a</del>b<del style="background:#fdd">e54d</del><ins style="background:#dfd">83</ins>a<del style="background:#fdd">d</del><ins style="background:#dfd">3</ins>4<ins style="background:#dfd">0</ins>7<del style="background:#fdd">f</del>93<ins style="background:#dfd">ac</ins>4<ins style="background:#dfd">aff9</ins>5<del style="background:#fdd">0</del>8<del style="background:#fdd">9</del><ins style="background:#dfd">557d621241e2</ins>d<ins style="background:#dfd">1805</ins>64<ins style="background:#dfd">8bc</ins>6<ins style="background:#dfd">20508a2</ins>5<ins style="background:#dfd">e</ins>8<del style="background:#fdd">9</del><ins style="background:#dfd">75b3fbdd</ins>1<ins style="background:#dfd">6</ins>a<ins style="background:#dfd">47</ins>46<del style="background:#fdd">9b</del>a<ins style="background:#dfd">f3dff5</ins>5<del style="background:#fdd">9</del><ins style="background:#dfd">82</ins>0<ins style="background:#dfd">1f</ins>a<del style="background:#fdd">63f</del>c<del style="background:#fdd">7</del><ins style="background:#dfd">e0</ins>5<del style="background:#fdd">9</del>a<del style="background:#fdd">7</del>a<ins style="background:#dfd">b3cdc</ins>9<del style="background:#fdd">77</del><ins style="background:#dfd">506d</ins>d<del style="background:#fdd">c2</del>7<del style="background:#fdd">99</del><ins style="background:#dfd">84</ins>c<del style="background:#fdd">c</del><ins style="background:#dfd">a6034a</ins>b<del style="background:#fdd">8</del>d<del style="background:#fdd">5495ae11</del><ins style="background:#dfd">b07</ins>c<del style="background:#fdd">9</del><ins style="background:#dfd">63</ins>c0<del style="background:#fdd">c</del>9<del style="background:#fdd">8e80a</del>6<del style="background:#fdd">b</del><ins style="background:#dfd">c</ins>6<del style="background:#fdd">5</del><ins style="background:#dfd">a</ins>3<del style="background:#fdd">61ba1edb4baa2fa15f825754</del></code> |
+| id | 575f062d4b9fc3bf93d0ac0d9de725cf1bcdc3c9 | <code><del style="background:#fdd">575</del><ins style="background:#dfd">c</ins>f<del style="background:#fdd">062d4b9</del><ins style="background:#dfd">8e</ins>f<del style="background:#fdd">c3</del>b<del style="background:#fdd">f93</del>d<del style="background:#fdd">0ac</del>0d<del style="background:#fdd">9de7</del><ins style="background:#dfd">2</ins>2<ins style="background:#dfd">850</ins>5<del style="background:#fdd">cf1</del><ins style="background:#dfd">7</ins>bcd<ins style="background:#dfd">aec</ins>c<ins style="background:#dfd">f69</ins>3<del style="background:#fdd">c</del><ins style="background:#dfd">88ebd5</ins>9<ins style="background:#dfd">806555</ins></code> |
+| sensitive_content | <code>(sensitive)</code> | <code>(sensitive)</code> |
+
+<details>
+<summary>Large value: content (6 lines, 2 changes)</summary>
+
+\`\`\`diff
+  {
+-   "worker_a": "alpha",
++   "worker_a": "ALPHA",
+    "worker_b": "bravo",
+    "worker_c": "charlie"
+  }
+\`\`\`
+
+</details>
+
+</details>
+
+<details>
+<summary>🔧 <strong>terraform_data</strong> worker_a — changed: input, output</summary>
+
+\`\`\`
+terraform_data.worker_a
+\`\`\`
+
+<details>
+<summary>Large value: input (5 lines, 5 changes)</summary>
+
+\`\`\`diff
++ {
++   "value": "ALPHA",
++   "type": "string"
++ }
+- alpha
+\`\`\`
+
+</details>
+
+<details>
+<summary>Large value: output (5 lines, 5 changes)</summary>
+
+\`\`\`diff
++ {
++   "value": "ALPHA",
++   "type": "string"
++ }
+- alpha
+\`\`\`
+
+</details>
+
+</details>
+
+## Outputs
+
+| Output | Action | Before | After |
+| --- | --- | --- | --- |
+| config_value | 🔧 | <code>{"worker_a":"alpha","worker_b":"bravo","worker_c":"charlie"}</code> | <code>{"worker_a":"ALPHA","worker_b":"bravo","worker_c":"charlie"}</code> |
+
+"
+`;
+
+exports[`applyToMarkdown — state enrichment > state-enriched snapshot: tofu/import-resource/0 1`] = `
+"## Apply Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Added | random_string | 1 |
+|  | **Added** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>➕ <strong>random_string</strong> existing</summary>
+
+\`\`\`
+random_string.existing
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id |  | <code><ins style="background:#dfd">Ni0FnVnZ</ins></code> |
+| length |  | <code><ins style="background:#dfd">8</ins></code> |
+| lower |  | <code><ins style="background:#dfd">true</ins></code> |
+| min_lower |  | <code><ins style="background:#dfd">0</ins></code> |
+| min_numeric |  | <code><ins style="background:#dfd">0</ins></code> |
+| min_special |  | <code><ins style="background:#dfd">0</ins></code> |
+| min_upper |  | <code><ins style="background:#dfd">0</ins></code> |
+| number |  | <code><ins style="background:#dfd">true</ins></code> |
+| numeric |  | <code><ins style="background:#dfd">true</ins></code> |
+| result |  | <code><ins style="background:#dfd">Ni0FnVnZ</ins></code> |
+| special |  | <code><ins style="background:#dfd">false</ins></code> |
+| upper |  | <code><ins style="background:#dfd">true</ins></code> |
+
+</details>
+
+"
+`;
+
+exports[`applyToMarkdown — state enrichment > state-enriched snapshot: tofu/import-resource/1 1`] = `
+"## Apply Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| 📥 Imported | random_string | 1 |
+|  | **Imported** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>📥 <strong>random_string</strong> imported</summary>
+
+\`\`\`
+random_string.imported
+\`\`\`
+
+**Import ID:** \`fixedval\`
+
+_No attribute changes._
+
+</details>
+
+"
+`;
+
+exports[`applyToMarkdown — state enrichment > state-enriched snapshot: tofu/local-files/0 1`] = `
+"## Apply Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Added | local_file | 1 |
+|  | **Added** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>➕ <strong>local_file</strong> readme</summary>
+
+\`\`\`
+local_file.readme
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| content_base64sha256 |  | <code><ins style="background:#dfd">AXQKgQqmnkjSkAFLpLknbozHZn4G8WV/av24/hj590c=</ins></code> |
+| content_base64sha512 |  | <code><ins style="background:#dfd">v4daqaHyZn5NbMRgqL1wyWC2Go2H2YGt8qrZ5SIcOt823qvTO0uTP0Qo+ZJzdGmFTKOMiLSIImIJTudrG7Qp/Q==</ins></code> |
+| content_md5 |  | <code><ins style="background:#dfd">374900018c431a33587acb053923c90a</ins></code> |
+| content_sha1 |  | <code><ins style="background:#dfd">1951ea3cba8b8157586130ebad80af2c86462821</ins></code> |
+| content_sha256 |  | <code><ins style="background:#dfd">01740a810aa69e48d290014ba4b9276e8cc7667e06f1657f6afdb8fe18f9f747</ins></code> |
+| content_sha512 |  | <code><ins style="background:#dfd">bf875aa9a1f2667e4d6cc460a8bd70c960b61a8d87d981adf2aad9e5221c3adf36deabd33b4b933f4428f992737469854ca38c88b4882262094ee76b1bb429fd</ins></code> |
+| directory_permission |  | <code><ins style="background:#dfd">0777</ins></code> |
+| file_permission |  | <code><ins style="background:#dfd">0777</ins></code> |
+| filename |  | <code><ins style="background:#dfd">./output/readme.txt</ins></code> |
+| id |  | <code><ins style="background:#dfd">1951ea3cba8b8157586130ebad80af2c86462821</ins></code> |
+| sensitive_content | <code></code> | <code>(sensitive)</code> |
+
+<details>
+<summary>Large value: content</summary>
+
+\`\`\`
+Project: tf-plan-md fixture
+Version: 1.0.0
+Status: active
+
+This file is managed by Terraform.
+It contains multiple lines of plain text
+so that the large-value renderer is exercised.
+
+Line 9: additional content
+Line 10: additional content
+Line 11: additional content
+Line 12: end of file
+
+\`\`\`
+
+</details>
+
+</details>
+
+## Outputs
+
+| Output | Action | Before | After |
+| --- | --- | --- | --- |
+| readme_path | ➕ |  | <code>./output/readme.txt</code> |
+
+"
+`;
+
+exports[`applyToMarkdown — state enrichment > state-enriched snapshot: tofu/local-files/1 1`] = `
+"## Apply Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| ± Replaced | local_file | 1 |
+|  | **Replaced** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>± <strong>local_file</strong> readme</summary>
+
+\`\`\`
+local_file.readme
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| content_base64sha256 | AXQKgQqmnkjSkAFLpLknbozHZn4G8WV/av24/hj590c= | <code><ins style="background:#dfd">a/DsrX1Uil</ins>A<del style="background:#fdd">XQK</del>g<del style="background:#fdd">Qqm</del><ins style="background:#dfd">5o6OO76G</ins>n<del style="background:#fdd">k</del><ins style="background:#dfd">Nyo58</ins>j<del style="background:#fdd">SkAFLpLknbozH</del>Z<del style="background:#fdd">n4G</del><ins style="background:#dfd">6JtPMceqPif2</ins>8<del style="background:#fdd">WV/av24/hj5</del>9<del style="background:#fdd">0c</del><ins style="background:#dfd">o</ins>=</code> |
+| content_base64sha512 | v4daqaHyZn5NbMRgqL1wyWC2Go2H2YGt8qrZ5SIcOt823qvTO0uTP0Qo+ZJzdGmFTKOMiLSIImIJTudrG7Qp/Q== | <code><del style="background:#fdd">v</del><ins style="background:#dfd">gFfhZsQde</ins>4<del style="background:#fdd">d</del><ins style="background:#dfd">SkQj</ins>a<del style="background:#fdd">qaHyZ</del><ins style="background:#dfd">T6Re</ins>n<del style="background:#fdd">5NbMRgqL1wy</del><ins style="background:#dfd">u</ins>W<del style="background:#fdd">C2</del><ins style="background:#dfd">X6ejrQkaSk</ins>G<del style="background:#fdd">o</del><ins style="background:#dfd">Vt</ins>2<del style="background:#fdd">H2YGt8qr</del><ins style="background:#dfd">A</ins>Z<del style="background:#fdd">5</del><ins style="background:#dfd">CDK6</ins>S<del style="background:#fdd">I</del><ins style="background:#dfd">h+N</ins>c<del style="background:#fdd">Ot8</del><ins style="background:#dfd">Z</ins>2<del style="background:#fdd">3qvT</del><ins style="background:#dfd">Wf</ins>O<ins style="background:#dfd">Xf</ins>0<del style="background:#fdd">u</del><ins style="background:#dfd">KYA</ins>T<del style="background:#fdd">P0Qo+ZJzdGm</del><ins style="background:#dfd">Yr</ins>F<del style="background:#fdd">TKOM</del>i<del style="background:#fdd">LSIImI</del><ins style="background:#dfd">1AgptXA2h3Yw</ins>J<del style="background:#fdd">T</del>u<del style="background:#fdd">drG7Qp/Q</del><ins style="background:#dfd">nyJDaKEgw</ins>==</code> |
+| content_md5 | 374900018c431a33587acb053923c90a | <code><del style="background:#fdd">3</del><ins style="background:#dfd">c6d224f0cba</ins>7<del style="background:#fdd">4</del><ins style="background:#dfd">ad</ins>9<ins style="background:#dfd">12</ins>00<ins style="background:#dfd">9</ins>0<ins style="background:#dfd">79</ins>18<del style="background:#fdd">c431a3358</del><ins style="background:#dfd">bf0</ins>7<del style="background:#fdd">acb</del>0<del style="background:#fdd">5</del>3<ins style="background:#dfd">6</ins><del style="background:#fdd">923c90a</del></code> |
+| content_sha1 | 1951ea3cba8b8157586130ebad80af2c86462821 | <code><ins style="background:#dfd">a4b02</ins>1<del style="background:#fdd">9</del><ins style="background:#dfd">c2</ins>5<ins style="background:#dfd">6faff444</ins>1<ins style="background:#dfd">5c44879fd</ins>e<del style="background:#fdd">a</del>3<del style="background:#fdd">c</del><ins style="background:#dfd">f</ins>ba<del style="background:#fdd">8b815</del><ins style="background:#dfd">0</ins>7<del style="background:#fdd">5861</del>3<del style="background:#fdd">0e</del>b<del style="background:#fdd">ad80af2</del>c<del style="background:#fdd">86</del><ins style="background:#dfd">b1</ins>4<del style="background:#fdd">62821</del></code> |
+| content_sha256 | 01740a810aa69e48d290014ba4b9276e8cc7667e06f1657f6afdb8fe18f9f747 | <code><ins style="background:#dfd">6bf</ins>0<del style="background:#fdd">1</del><ins style="background:#dfd">ecad</ins>7<ins style="background:#dfd">d5</ins>4<ins style="background:#dfd">8a5</ins>0<del style="background:#fdd">a81</del><ins style="background:#dfd">2</ins>0<del style="background:#fdd">aa</del><ins style="background:#dfd">e</ins>6<del style="background:#fdd">9</del><ins style="background:#dfd">8</ins>e<del style="background:#fdd">4</del>8<del style="background:#fdd">d290014</del><ins style="background:#dfd">e3</ins>b<del style="background:#fdd">a4</del>b<del style="background:#fdd">9276</del>e8<ins style="background:#dfd">69</ins>c<ins style="background:#dfd">d</ins>c<ins style="background:#dfd">a8e</ins>7<del style="background:#fdd">667</del><ins style="background:#dfd">c8d9</ins>e<del style="background:#fdd">06</del><ins style="background:#dfd">89b4</ins>f<ins style="background:#dfd">3</ins>1<del style="background:#fdd">65</del><ins style="background:#dfd">c7aa3e2</ins>7f6<del style="background:#fdd">a</del>f<ins style="background:#dfd">3</ins>d<ins style="background:#dfd">a</ins><del style="background:#fdd">b8fe18f9f747</del></code> |
+| content_sha512 | bf875aa9a1f2667e4d6cc460a8bd70c960b61a8d87d981adf2aad9e5221c3adf36deabd33b4b933f4428f992737469854ca38c88b4882262094ee76b1bb429fd | <code><del style="background:#fdd">bf</del>8<ins style="background:#dfd">05</ins>7<del style="background:#fdd">5aa9a</del><ins style="background:#dfd">e</ins>1<del style="background:#fdd">f26</del>6<del style="background:#fdd">7e4d</del>6<del style="background:#fdd">c</del>c4<del style="background:#fdd">60a8b</del><ins style="background:#dfd">1</ins>d7<del style="background:#fdd">0c960</del>b<ins style="background:#dfd">84a4423</ins>6<ins style="background:#dfd">93e9</ins>1<ins style="background:#dfd">7</ins>a<del style="background:#fdd">8d8</del>7<del style="background:#fdd">d</del><ins style="background:#dfd">b</ins>9<del style="background:#fdd">81</del><ins style="background:#dfd">65f</ins>a<del style="background:#fdd">df2</del><ins style="background:#dfd">7</ins>a<ins style="background:#dfd">3</ins>ad<ins style="background:#dfd">0</ins>9<del style="background:#fdd">e522</del>1<del style="background:#fdd">c3</del>a<del style="background:#fdd">df36de</del><ins style="background:#dfd">4</ins>a<ins style="background:#dfd">4195</ins>b<del style="background:#fdd">d</del><ins style="background:#dfd">7601908</ins>3<del style="background:#fdd">3</del><ins style="background:#dfd">2</ins>b<ins style="background:#dfd">a</ins>4<del style="background:#fdd">b933</del><ins style="background:#dfd">a1</ins>f<del style="background:#fdd">442</del>8<del style="background:#fdd">f</del><ins style="background:#dfd">d71</ins>9<ins style="background:#dfd">d</ins>9<del style="background:#fdd">2</del><ins style="background:#dfd">6</ins>7<del style="background:#fdd">37</del><ins style="background:#dfd">ce5dfd0a600</ins>4<del style="background:#fdd">69</del><ins style="background:#dfd">d</ins>8<del style="background:#fdd">54c</del>a<del style="background:#fdd">38</del>c<del style="background:#fdd">8</del><ins style="background:#dfd">5</ins>8b<del style="background:#fdd">488</del><ins style="background:#dfd">50</ins>2<del style="background:#fdd">2</del><ins style="background:#dfd">0a</ins>6<del style="background:#fdd">2</del><ins style="background:#dfd">d5c0da1dd8c</ins>09<del style="background:#fdd">4ee</del><ins style="background:#dfd">ba</ins>7<del style="background:#fdd">6b1bb42</del><ins style="background:#dfd">c8</ins>9<del style="background:#fdd">f</del><ins style="background:#dfd">0</ins>d<ins style="background:#dfd">a28483</ins></code> |
+| id | 1951ea3cba8b8157586130ebad80af2c86462821 | <code><ins style="background:#dfd">a4b02</ins>1<del style="background:#fdd">9</del><ins style="background:#dfd">c2</ins>5<ins style="background:#dfd">6faff444</ins>1<ins style="background:#dfd">5c44879fd</ins>e<del style="background:#fdd">a</del>3<del style="background:#fdd">c</del><ins style="background:#dfd">f</ins>ba<del style="background:#fdd">8b815</del><ins style="background:#dfd">0</ins>7<del style="background:#fdd">5861</del>3<del style="background:#fdd">0e</del>b<del style="background:#fdd">ad80af2</del>c<del style="background:#fdd">86</del><ins style="background:#dfd">b1</ins>4<del style="background:#fdd">62821</del></code> |
+| sensitive_content | <code>(sensitive)</code> | <code>(sensitive)</code> |
+
+<details>
+<summary>Large value: content (18 lines, 9 changes)</summary>
+
+\`\`\`diff
+  Project: tf-plan-md fixture
+- Version: 1.0.0
++ Version: 2.0.0
+  Status: active
+  
+  This file is managed by Terraform.
+  It contains multiple lines of plain text
+  so that the large-value renderer is exercised.
+  
+- Line 9: additional content
++ Line 9: updated content
+  Line 10: additional content
+- Line 11: additional content
+- Line 12: end of file
++ Line 11: new line inserted here
++ Line 12: additional content
++ Line 13: end of file
+  
+\`\`\`
+
+</details>
+
+</details>
+
+## Outputs
+
+| Output | Action | Before | After |
+| --- | --- | --- | --- |
+| readme_path | ⬜ | <code>./output/readme.txt</code> | <code>./output/readme.txt</code> |
+
+"
+`;
+
+exports[`applyToMarkdown — state enrichment > state-enriched snapshot: tofu/moved-resource/0 1`] = `
+"## Apply Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Added | null_resource | 1 |
+|  | **Added** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>➕ <strong>null_resource</strong> original</summary>
+
+\`\`\`
+null_resource.original
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id |  | <code><ins style="background:#dfd">2365308153945174888</ins></code> |
+| triggers.version |  | <code><ins style="background:#dfd">1</ins></code> |
+
+</details>
+
+"
+`;
+
+exports[`applyToMarkdown — state enrichment > state-enriched snapshot: tofu/moved-resource/1 1`] = `
+"## Apply Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| 🚚 Moved | null_resource | 1 |
+|  | **Moved** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>🚚 <strong>null_resource</strong> renamed</summary>
+
+\`\`\`
+null_resource.renamed
+\`\`\`
+
+**Moved from:** \`null_resource.original\`
+
+_No attribute changes._
+
+</details>
+
+"
+`;
+
+exports[`applyToMarkdown — state enrichment > state-enriched snapshot: tofu/nested-modules/0 1`] = `
+"## Apply Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Added | null_resource | 3 |
+|  | **Added** | **3** |
+
+## Resource Changes
+
+### 📦 Module: \`module.parent["1"].module.child\`
+
+<details>
+<summary>➕ <strong>null_resource</strong> item[0]</summary>
+
+\`\`\`
+module.parent["1"].module.child.null_resource.item[0]
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id |  | <code><ins style="background:#dfd">210388911188771523</ins></code> |
+| triggers.index |  | <code><ins style="background:#dfd">0</ins></code> |
+| triggers.label |  | <code><ins style="background:#dfd">1</ins></code> |
+
+</details>
+
+### 📦 Module: \`module.parent["2"].module.child\`
+
+<details>
+<summary>➕ <strong>null_resource</strong> item[0]</summary>
+
+\`\`\`
+module.parent["2"].module.child.null_resource.item[0]
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id |  | <code><ins style="background:#dfd">6753776122250073574</ins></code> |
+| triggers.index |  | <code><ins style="background:#dfd">0</ins></code> |
+| triggers.label |  | <code><ins style="background:#dfd">2</ins></code> |
+
+</details>
+
+<details>
+<summary>➕ <strong>null_resource</strong> item[1]</summary>
+
+\`\`\`
+module.parent["2"].module.child.null_resource.item[1]
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id |  | <code><ins style="background:#dfd">8552908014982296967</ins></code> |
+| triggers.index |  | <code><ins style="background:#dfd">1</ins></code> |
+| triggers.label |  | <code><ins style="background:#dfd">2</ins></code> |
+
+</details>
+
+"
+`;
+
+exports[`applyToMarkdown — state enrichment > state-enriched snapshot: tofu/nested-modules/1 1`] = `
+"## Apply Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Added | null_resource | 3 |
+|  | **Added** | **3** |
+| 🗑️ Destroyed | null_resource | 2 |
+|  | **Destroyed** | **2** |
+
+## Resource Changes
+
+### 📦 Module: \`module.parent["2"].module.child\`
+
+<details>
+<summary>🗑️ <strong>null_resource</strong> item[0]</summary>
+
+\`\`\`
+module.parent["2"].module.child.null_resource.item[0]
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | 6753776122250073574 | <code><del style="background:#fdd">6753776122250073574</del></code> |
+| triggers.index | 0 | <code><del style="background:#fdd">0</del></code> |
+| triggers.label | 2 | <code><del style="background:#fdd">2</del></code> |
+
+</details>
+
+<details>
+<summary>🗑️ <strong>null_resource</strong> item[1]</summary>
+
+\`\`\`
+module.parent["2"].module.child.null_resource.item[1]
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | 8552908014982296967 | <code><del style="background:#fdd">8552908014982296967</del></code> |
+| triggers.index | 1 | <code><del style="background:#fdd">1</del></code> |
+| triggers.label | 2 | <code><del style="background:#fdd">2</del></code> |
+
+</details>
+
+### 📦 Module: \`module.parent["3"].module.child\`
+
+<details>
+<summary>➕ <strong>null_resource</strong> item[0]</summary>
+
+\`\`\`
+module.parent["3"].module.child.null_resource.item[0]
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id |  | <code><ins style="background:#dfd">1977484479306253068</ins></code> |
+| triggers.index |  | <code><ins style="background:#dfd">0</ins></code> |
+| triggers.label |  | <code><ins style="background:#dfd">3</ins></code> |
+
+</details>
+
+<details>
+<summary>➕ <strong>null_resource</strong> item[1]</summary>
+
+\`\`\`
+module.parent["3"].module.child.null_resource.item[1]
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id |  | <code><ins style="background:#dfd">2135486133361670065</ins></code> |
+| triggers.index |  | <code><ins style="background:#dfd">1</ins></code> |
+| triggers.label |  | <code><ins style="background:#dfd">3</ins></code> |
+
+</details>
+
+<details>
+<summary>➕ <strong>null_resource</strong> item[2]</summary>
+
+\`\`\`
+module.parent["3"].module.child.null_resource.item[2]
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id |  | <code><ins style="background:#dfd">6787008333299645953</ins></code> |
+| triggers.index |  | <code><ins style="background:#dfd">2</ins></code> |
+| triggers.label |  | <code><ins style="background:#dfd">3</ins></code> |
+
+</details>
+
+"
+`;
+
+exports[`applyToMarkdown — state enrichment > state-enriched snapshot: tofu/no-detailed-exitcode/0 1`] = `
+"## Apply Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Added | null_resource | 1 |
+|  | **Added** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>➕ <strong>null_resource</strong> example</summary>
+
+\`\`\`
+null_resource.example
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id |  | <code><ins style="background:#dfd">4564930799702674058</ins></code> |
+| triggers.value |  | <code><ins style="background:#dfd">hello</ins></code> |
+
+</details>
+
+"
+`;
+
+exports[`applyToMarkdown — state enrichment > state-enriched snapshot: tofu/no-detailed-exitcode/1 1`] = `
+"## Apply Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| 🗑️ Destroyed | null_resource | 1 |
+|  | **Destroyed** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>🗑️ <strong>null_resource</strong> example</summary>
+
+\`\`\`
+null_resource.example
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | 4564930799702674058 | <code><del style="background:#fdd">4564930799702674058</del></code> |
+| triggers.value | hello | <code><del style="background:#fdd">hello</del></code> |
+
+</details>
+
+"
+`;
+
+exports[`applyToMarkdown — state enrichment > state-enriched snapshot: tofu/no-op/0 1`] = `
+"## Apply Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Added | null_resource | 1 |
+|  | **Added** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>➕ <strong>null_resource</strong> stable</summary>
+
+\`\`\`
+null_resource.stable
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id |  | <code><ins style="background:#dfd">5130946690565723505</ins></code> |
+| triggers.version |  | <code><ins style="background:#dfd">1</ins></code> |
+
+</details>
+
+"
+`;
+
+exports[`applyToMarkdown — state enrichment > state-enriched snapshot: tofu/no-op/1 1`] = `
+"## Apply Summary
+
+_No changes._
+
+"
+`;
+
+exports[`applyToMarkdown — state enrichment > state-enriched snapshot: tofu/null-lifecycle/0 1`] = `
+"## Apply Summary
+
+_No changes._
+
+"
+`;
+
+exports[`applyToMarkdown — state enrichment > state-enriched snapshot: tofu/null-lifecycle/1 1`] = `
+"## Apply Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Added | null_resource | 2 |
+|  | terraform_data | 1 |
+|  | **Added** | **3** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>➕ <strong>null_resource</strong> alpha</summary>
+
+\`\`\`
+null_resource.alpha
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id |  | <code><ins style="background:#dfd">7642058594818671176</ins></code> |
+| triggers.label |  | <code><ins style="background:#dfd">alpha</ins></code> |
+| triggers.version |  | <code><ins style="background:#dfd">1</ins></code> |
+
+</details>
+
+<details>
+<summary>➕ <strong>null_resource</strong> beta</summary>
+
+\`\`\`
+null_resource.beta
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id |  | <code><ins style="background:#dfd">4178089655351764373</ins></code> |
+| triggers.label |  | <code><ins style="background:#dfd">beta</ins></code> |
+| triggers.version |  | <code><ins style="background:#dfd">1</ins></code> |
+
+</details>
+
+<details>
+<summary>➕ <strong>terraform_data</strong> meta</summary>
+
+\`\`\`
+terraform_data.meta
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id |  | <code><ins style="background:#dfd">6576fc7d-3037-bdf1-81b4-75239e92d5b7</ins></code> |
+| input |  | <code><ins style="background:#dfd">v1</ins></code> |
+
+<details>
+<summary>Large value: output</summary>
+
+\`\`\`
+{
+  "value": "v1",
+  "type": "string"
+}
+\`\`\`
+
+</details>
+
+</details>
+
+"
+`;
+
+exports[`applyToMarkdown — state enrichment > state-enriched snapshot: tofu/null-lifecycle/2 1`] = `
+"## Apply Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| 🔧 Changed | terraform_data | 1 |
+|  | **Changed** | **1** |
+| ± Replaced | null_resource | 1 |
+|  | **Replaced** | **1** |
+| 🗑️ Destroyed | null_resource | 1 |
+|  | **Destroyed** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>± <strong>null_resource</strong> alpha</summary>
+
+\`\`\`
+null_resource.alpha
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | 7642058594818671176 | <code><del style="background:#fdd">7</del><ins style="background:#dfd">1115244</ins>6<del style="background:#fdd">420</del>5<del style="background:#fdd">8</del>5<del style="background:#fdd">948</del><ins style="background:#dfd">2</ins>1<del style="background:#fdd">86</del>71<del style="background:#fdd">17</del><ins style="background:#dfd">90</ins>6<ins style="background:#dfd">54</ins></code> |
+| triggers.version | 1 | <code><ins style="background:#dfd">2</ins><del style="background:#fdd">1</del></code> |
+
+</details>
+
+<details>
+<summary>🗑️ <strong>null_resource</strong> beta</summary>
+
+\`\`\`
+null_resource.beta
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | 4178089655351764373 | <code><del style="background:#fdd">4178089655351764373</del></code> |
+| triggers.label | beta | <code><del style="background:#fdd">beta</del></code> |
+| triggers.version | 1 | <code><del style="background:#fdd">1</del></code> |
+
+</details>
+
+<details>
+<summary>🔧 <strong>terraform_data</strong> meta — changed: input, output</summary>
+
+\`\`\`
+terraform_data.meta
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| input | v1 | <code>v<ins style="background:#dfd">2</ins><del style="background:#fdd">1</del></code> |
+
+<details>
+<summary>Large value: output (5 lines, 5 changes)</summary>
+
+\`\`\`diff
++ {
++   "value": "v2",
++   "type": "string"
++ }
+- v1
+\`\`\`
+
+</details>
+
+</details>
+
+"
+`;
+
+exports[`applyToMarkdown — state enrichment > state-enriched snapshot: tofu/plan-error/0 1`] = `
+"## Apply Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Added | null_resource | 1 |
+|  | **Added** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>➕ <strong>null_resource</strong> baseline</summary>
+
+\`\`\`
+null_resource.baseline
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id |  | <code><ins style="background:#dfd">9155198719041811804</ins></code> |
+| triggers.value |  | <code><ins style="background:#dfd">v1</ins></code> |
+
+</details>
+
+"
+`;
+
+exports[`applyToMarkdown — state enrichment > state-enriched snapshot: tofu/random-replace/0 1`] = `
+"## Apply Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Added | random_string | 1 |
+|  | **Added** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>➕ <strong>random_string</strong> token</summary>
+
+\`\`\`
+random_string.token
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id |  | <code><ins style="background:#dfd">420s31BfW3AnA8C6</ins></code> |
+| keepers.rotation |  | <code><ins style="background:#dfd">v1</ins></code> |
+| length |  | <code><ins style="background:#dfd">16</ins></code> |
+| lower |  | <code><ins style="background:#dfd">true</ins></code> |
+| min_lower |  | <code><ins style="background:#dfd">0</ins></code> |
+| min_numeric |  | <code><ins style="background:#dfd">0</ins></code> |
+| min_special |  | <code><ins style="background:#dfd">0</ins></code> |
+| min_upper |  | <code><ins style="background:#dfd">0</ins></code> |
+| number |  | <code><ins style="background:#dfd">true</ins></code> |
+| numeric |  | <code><ins style="background:#dfd">true</ins></code> |
+| result |  | <code><ins style="background:#dfd">420s31BfW3AnA8C6</ins></code> |
+| special |  | <code><ins style="background:#dfd">false</ins></code> |
+| upper |  | <code><ins style="background:#dfd">true</ins></code> |
+
+</details>
+
+## Outputs
+
+| Output | Action | Before | After |
+| --- | --- | --- | --- |
+| token_length | ➕ |  | <code>16</code> |
+
+"
+`;
+
+exports[`applyToMarkdown — state enrichment > state-enriched snapshot: tofu/random-replace/1 1`] = `
+"## Apply Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| ± Replaced | random_string | 1 |
+|  | **Replaced** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>± <strong>random_string</strong> token</summary>
+
+\`\`\`
+random_string.token
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | 420s31BfW3AnA8C6 | <code><ins style="background:#dfd">MZWuLSMt</ins>4<del style="background:#fdd">20s31Bf</del>W<del style="background:#fdd">3A</del><ins style="background:#dfd">eo</ins>n<ins style="background:#dfd">lfG</ins><del style="background:#fdd">A8C6</del></code> |
+| keepers.rotation | v1 | <code>v<ins style="background:#dfd">2</ins><del style="background:#fdd">1</del></code> |
+| result | 420s31BfW3AnA8C6 | <code><ins style="background:#dfd">MZWuLSMt</ins>4<del style="background:#fdd">20s31Bf</del>W<del style="background:#fdd">3A</del><ins style="background:#dfd">eo</ins>n<ins style="background:#dfd">lfG</ins><del style="background:#fdd">A8C6</del></code> |
+
+</details>
+
+## Outputs
+
+| Output | Action | Before | After |
+| --- | --- | --- | --- |
+| token_length | ⬜ | <code>16</code> | <code>16</code> |
+
+"
+`;
+
+exports[`applyToMarkdown — state enrichment > state-enriched snapshot: tofu/removed-resource/0 1`] = `
+"## Apply Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Added | null_resource | 2 |
+|  | **Added** | **2** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>➕ <strong>null_resource</strong> ephemeral</summary>
+
+\`\`\`
+null_resource.ephemeral
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id |  | <code><ins style="background:#dfd">7141248472287551342</ins></code> |
+| triggers.version |  | <code><ins style="background:#dfd">1</ins></code> |
+
+</details>
+
+<details>
+<summary>➕ <strong>null_resource</strong> keeper</summary>
+
+\`\`\`
+null_resource.keeper
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id |  | <code><ins style="background:#dfd">1171978598540972065</ins></code> |
+| triggers.version |  | <code><ins style="background:#dfd">1</ins></code> |
+
+</details>
+
+"
+`;
+
+exports[`applyToMarkdown — state enrichment > state-enriched snapshot: tofu/removed-resource/1 1`] = `
+"## Apply Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| 👋 Forgotten | null_resource | 1 |
+|  | **Forgotten** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>👋 <strong>null_resource</strong> ephemeral</summary>
+
+\`\`\`
+null_resource.ephemeral
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | 7141248472287551342 | <code><del style="background:#fdd">7141248472287551342</del></code> |
+| triggers.version | 1 | <code><del style="background:#fdd">1</del></code> |
+
+</details>
+
+"
+`;
+
+exports[`applyToMarkdown — state enrichment > state-enriched snapshot: tofu/sensitive-values/0 1`] = `
+"## Apply Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Added | local_sensitive_file | 1 |
+|  | **Added** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>➕ <strong>local_sensitive_file</strong> secret</summary>
+
+\`\`\`
+local_sensitive_file.secret
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| content | <code></code> | <code>(sensitive)</code> |
+| content_base64 | <code></code> | <code>(sensitive)</code> |
+| content_base64sha256 |  | <code><ins style="background:#dfd">tglbgl+ELKnIfsYFkBXQKZLLTwS6icynJuYOJcOo9bY=</ins></code> |
+| content_base64sha512 |  | <code><ins style="background:#dfd">Eo7RifRBpd27pi/st4ERjtqdT19zPyGc5afG7yxwwtDeKueSo9wvSeZdo2Ami5LjFA92F1wrQqtKWqljFWCLdQ==</ins></code> |
+| content_md5 |  | <code><ins style="background:#dfd">8ed8462ae2d0cac83f45c1288b82946d</ins></code> |
+| content_sha1 |  | <code><ins style="background:#dfd">ffae43b95440019e9bb698e9713dc5ac27be8dd5</ins></code> |
+| content_sha256 |  | <code><ins style="background:#dfd">b6095b825f842ca9c87ec6059015d02992cb4f04ba89cca726e60e25c3a8f5b6</ins></code> |
+| content_sha512 |  | <code><ins style="background:#dfd">128ed189f441a5ddbba62fecb781118eda9d4f5f733f219ce5a7c6ef2c70c2d0de2ae792a3dc2f49e65da360268b92e3140f76175c2b42ab4a5aa96315608b75</ins></code> |
+| directory_permission |  | <code><ins style="background:#dfd">0700</ins></code> |
+| file_permission |  | <code><ins style="background:#dfd">0700</ins></code> |
+| filename |  | <code><ins style="background:#dfd">./output/secret.txt</ins></code> |
+| id |  | <code><ins style="background:#dfd">ffae43b95440019e9bb698e9713dc5ac27be8dd5</ins></code> |
+
+</details>
+
+## Outputs
+
+| Output | Action | Before | After |
+| --- | --- | --- | --- |
+| secret_checksum | ➕ | <code>(sensitive)</code> | <code>(sensitive)</code> |
+| secret_path | ➕ |  | <code>./output/secret.txt</code> |
+
+"
+`;
+
+exports[`applyToMarkdown — state enrichment > state-enriched snapshot: tofu/sensitive-values/1 1`] = `
+"## Apply Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| ± Replaced | local_sensitive_file | 1 |
+|  | **Replaced** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>± <strong>local_sensitive_file</strong> secret</summary>
+
+\`\`\`
+local_sensitive_file.secret
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| content | <code>(sensitive)</code> | <code>(sensitive)</code> |
+| content_base64 | <code>(sensitive)</code> | <code>(sensitive)</code> |
+| content_base64sha256 | tglbgl+ELKnIfsYFkBXQKZLLTwS6icynJuYOJcOo9bY= | <code><del style="background:#fdd">tglbgl+EL</del>K<del style="background:#fdd">nIfsY</del><ins style="background:#dfd">Dv</ins>F<del style="background:#fdd">kB</del><ins style="background:#dfd">/GlyAo</ins>X<del style="background:#fdd">QKZ</del>L<del style="background:#fdd">LTwS6ic</del><ins style="background:#dfd">Jn5</ins>y<del style="background:#fdd">nJ</del><ins style="background:#dfd">f2Aq5R</ins>u<del style="background:#fdd">YO</del><ins style="background:#dfd">mEmxgPyzoHH</ins>J<del style="background:#fdd">cO</del><ins style="background:#dfd">dRFwZBD</ins>o<del style="background:#fdd">9bY</del>=</code> |
+| content_base64sha512 | Eo7RifRBpd27pi/st4ERjtqdT19zPyGc5afG7yxwwtDeKueSo9wvSeZdo2Ami5LjFA92F1wrQqtKWqljFWCLdQ== | <code><del style="background:#fdd">Eo7RifRBpd27pi/</del><ins style="background:#dfd">hO1</ins>s<del style="background:#fdd">t4ER</del><ins style="background:#dfd">1</ins>j<ins style="background:#dfd">yY</ins>t<del style="background:#fdd">qdT1</del>9<del style="background:#fdd">z</del><ins style="background:#dfd">mLxtNLF8In</ins>P<del style="background:#fdd">y</del><ins style="background:#dfd">9Un</ins>G<del style="background:#fdd">c5afG7y</del><ins style="background:#dfd">0MX1H/nz4qdeBUNN</ins>x<del style="background:#fdd">ww</del><ins style="background:#dfd">o2qP</ins>t<del style="background:#fdd">DeK</del>u<del style="background:#fdd">eSo9</del><ins style="background:#dfd">3p4TLVW</ins>w<ins style="background:#dfd">hqCOEkNsL4x</ins>v<del style="background:#fdd">Se</del><ins style="background:#dfd">9P8/</ins>Z<del style="background:#fdd">do2</del><ins style="background:#dfd">k</ins>A<del style="background:#fdd">m</del><ins style="background:#dfd">V7</ins>i5<del style="background:#fdd">LjFA92F</del><ins style="background:#dfd">oZCp</ins>1<ins style="background:#dfd">S</ins>w<del style="background:#fdd">rQqtKWqljFWCLdQ</del>==</code> |
+| content_md5 | 8ed8462ae2d0cac83f45c1288b82946d | <code><del style="background:#fdd">8e</del><ins style="background:#dfd">43fd904</ins>d<del style="background:#fdd">8</del><ins style="background:#dfd">f</ins>4<del style="background:#fdd">62</del><ins style="background:#dfd">7</ins>a<ins style="background:#dfd">b4fc8</ins>e<ins style="background:#dfd">7570</ins>2<del style="background:#fdd">d0cac</del>83<del style="background:#fdd">f45c</del>12<del style="background:#fdd">88b8</del><ins style="background:#dfd">3ea</ins>2<ins style="background:#dfd">f</ins><del style="background:#fdd">946d</del></code> |
+| content_sha1 | ffae43b95440019e9bb698e9713dc5ac27be8dd5 | <code><del style="background:#fdd">ff</del><ins style="background:#dfd">e6bb28ad117</ins>a<del style="background:#fdd">e</del><ins style="background:#dfd">02</ins>4<ins style="background:#dfd">8accba6c</ins>3<del style="background:#fdd">b</del>9<del style="background:#fdd">54</del>40<del style="background:#fdd">019e9bb</del><ins style="background:#dfd">c2d</ins>6<del style="background:#fdd">9</del><ins style="background:#dfd">7</ins>8e<del style="background:#fdd">9713</del>dc<del style="background:#fdd">5</del>a<del style="background:#fdd">c</del><ins style="background:#dfd">3b</ins>2<del style="background:#fdd">7be8dd5</del></code> |
+| content_sha256 | b6095b825f842ca9c87ec6059015d02992cb4f04ba89cca726e60e25c3a8f5b6 | <code><ins style="background:#dfd">283</ins>b<ins style="background:#dfd">c5fc</ins>6<ins style="background:#dfd">972</ins>0<del style="background:#fdd">9</del><ins style="background:#dfd">28</ins>5<ins style="background:#dfd">c</ins>b<del style="background:#fdd">8</del><ins style="background:#dfd">267e7</ins>2<del style="background:#fdd">5</del><ins style="background:#dfd">7</ins>f<del style="background:#fdd">84</del><ins style="background:#dfd">60</ins>2<del style="background:#fdd">c</del>a<del style="background:#fdd">9c87</del>e<del style="background:#fdd">c60</del>5<del style="background:#fdd">90</del>1<del style="background:#fdd">5d02992cb4f04</del>ba<del style="background:#fdd">89cca7</del><ins style="background:#dfd">61</ins>26<del style="background:#fdd">e</del><ins style="background:#dfd">c</ins>60<ins style="background:#dfd">3f2c</ins>e<ins style="background:#dfd">81c7</ins>2<ins style="background:#dfd">5d44</ins>5c<ins style="background:#dfd">1904</ins>3a<del style="background:#fdd">8f5b6</del></code> |
+| content_sha512 | 128ed189f441a5ddbba62fecb781118eda9d4f5f733f219ce5a7c6ef2c70c2d0de2ae792a3dc2f49e65da360268b92e3140f76175c2b42ab4a5aa96315608b75 | <code><del style="background:#fdd">12</del>8<ins style="background:#dfd">4</ins>ed<del style="background:#fdd">189f441a5d</del><ins style="background:#dfd">6c</ins>d<del style="background:#fdd">bba</del>6<del style="background:#fdd">2fe</del><ins style="background:#dfd">3</ins>c<ins style="background:#dfd">98</ins>b7<del style="background:#fdd">81118e</del>d<del style="background:#fdd">a</del>9<ins style="background:#dfd">8bc6</ins>d<ins style="background:#dfd">3</ins>4<del style="background:#fdd">f5f733f2</del><ins style="background:#dfd">b</ins>1<del style="background:#fdd">9ce5a</del>7c<del style="background:#fdd">6ef</del><ins style="background:#dfd">2</ins>2<del style="background:#fdd">c</del>7<del style="background:#fdd">0c2</del><ins style="background:#dfd">3f</ins>d<del style="background:#fdd">0de</del><ins style="background:#dfd">5</ins>2<del style="background:#fdd">ae</del>7<del style="background:#fdd">92a</del><ins style="background:#dfd">1b4</ins>3<ins style="background:#dfd">17</ins>d<ins style="background:#dfd">47fe7</ins>c<del style="background:#fdd">2</del>f<del style="background:#fdd">4</del><ins style="background:#dfd">8a</ins>9<del style="background:#fdd">e6</del><ins style="background:#dfd">d781</ins>5<ins style="background:#dfd">0</ins>d<ins style="background:#dfd">371</ins>a36<del style="background:#fdd">026</del><ins style="background:#dfd">a</ins>8<ins style="background:#dfd">f</ins>b<ins style="background:#dfd">6ede</ins>9<del style="background:#fdd">2</del>e<ins style="background:#dfd">1</ins>3<del style="background:#fdd">14</del><ins style="background:#dfd">2d55b</ins>0<del style="background:#fdd">f7</del><ins style="background:#dfd">8</ins>6<ins style="background:#dfd">a08e</ins>1<del style="background:#fdd">75c</del>2<del style="background:#fdd">b</del>4<ins style="background:#dfd">36c</ins>2<del style="background:#fdd">ab</del><ins style="background:#dfd">f8c6ff</ins>4<del style="background:#fdd">a5aa9</del><ins style="background:#dfd">ff3f6</ins>6<del style="background:#fdd">3</del><ins style="background:#dfd">40</ins>15<ins style="background:#dfd">ee2e</ins>6<del style="background:#fdd">0</del>8<del style="background:#fdd">b</del><ins style="background:#dfd">642a</ins>75<ins style="background:#dfd">4b</ins></code> |
+| id | ffae43b95440019e9bb698e9713dc5ac27be8dd5 | <code><del style="background:#fdd">ff</del><ins style="background:#dfd">e6bb28ad117</ins>a<del style="background:#fdd">e</del><ins style="background:#dfd">02</ins>4<ins style="background:#dfd">8accba6c</ins>3<del style="background:#fdd">b</del>9<del style="background:#fdd">54</del>40<del style="background:#fdd">019e9bb</del><ins style="background:#dfd">c2d</ins>6<del style="background:#fdd">9</del><ins style="background:#dfd">7</ins>8e<del style="background:#fdd">9713</del>dc<del style="background:#fdd">5</del>a<del style="background:#fdd">c</del><ins style="background:#dfd">3b</ins>2<del style="background:#fdd">7be8dd5</del></code> |
+
+</details>
+
+## Outputs
+
+| Output | Action | Before | After |
+| --- | --- | --- | --- |
+| secret_checksum | 🔧 | <code>(sensitive)</code> | <code>(sensitive)</code> |
+| secret_path | ⬜ | <code>./output/secret.txt</code> | <code>./output/secret.txt</code> |
+
+"
+`;
+
+exports[`applyToMarkdown — state enrichment > state-enriched snapshot: tofu/validate-error/0 1`] = `
+"## Apply Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Added | null_resource | 1 |
+|  | **Added** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>➕ <strong>null_resource</strong> baseline</summary>
+
+\`\`\`
+null_resource.baseline
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id |  | <code><ins style="background:#dfd">4241805242669959038</ins></code> |
+| triggers.value |  | <code><ins style="background:#dfd">v1</ins></code> |
+
+</details>
+
+"
+`;
+
+exports[`applyToMarkdown — state enrichment > state-enriched snapshot: tofu/with-modules/0 1`] = `
+"## Apply Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Added | null_resource | 1 |
+|  | random_string | 1 |
+|  | **Added** | **2** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>➕ <strong>null_resource</strong> root</summary>
+
+\`\`\`
+null_resource.root
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id |  | <code><ins style="background:#dfd">4003373015687382808</ins></code> |
+| triggers.stage |  | <code><ins style="background:#dfd">0</ins></code> |
+
+</details>
+
+### 📦 Module: \`module.naming\`
+
+<details>
+<summary>➕ <strong>random_string</strong> suffix</summary>
+
+\`\`\`
+module.naming.random_string.suffix
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id |  | <code><ins style="background:#dfd">4dx07ozc</ins></code> |
+| keepers.prefix |  | <code><ins style="background:#dfd">fixture</ins></code> |
+| length |  | <code><ins style="background:#dfd">8</ins></code> |
+| lower |  | <code><ins style="background:#dfd">true</ins></code> |
+| min_lower |  | <code><ins style="background:#dfd">0</ins></code> |
+| min_numeric |  | <code><ins style="background:#dfd">0</ins></code> |
+| min_special |  | <code><ins style="background:#dfd">0</ins></code> |
+| min_upper |  | <code><ins style="background:#dfd">0</ins></code> |
+| number |  | <code><ins style="background:#dfd">true</ins></code> |
+| numeric |  | <code><ins style="background:#dfd">true</ins></code> |
+| result |  | <code><ins style="background:#dfd">4dx07ozc</ins></code> |
+| special |  | <code><ins style="background:#dfd">false</ins></code> |
+| upper |  | <code><ins style="background:#dfd">false</ins></code> |
+
+</details>
+
+## Outputs
+
+| Output | Action | Before | After |
+| --- | --- | --- | --- |
+| generated_name | ➕ |  | <code>fixture-4dx07ozc</code> |
+| root_id | ➕ |  | <code>4003373015687382808</code> |
+
+"
+`;
+
+exports[`applyToMarkdown — state enrichment > state-enriched snapshot: tofu/with-modules/1 1`] = `
+"## Apply Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| ± Replaced | null_resource | 1 |
+|  | random_string | 1 |
+|  | **Replaced** | **2** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>± <strong>null_resource</strong> root</summary>
+
+\`\`\`
+null_resource.root
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | 4003373015687382808 | <code><del style="background:#fdd">40033730</del>1<ins style="background:#dfd">6</ins>5<del style="background:#fdd">6</del><ins style="background:#dfd">74</ins>8<del style="background:#fdd">7</del>3<del style="background:#fdd">8</del><ins style="background:#dfd">95</ins>2<del style="background:#fdd">8</del><ins style="background:#dfd">4536</ins>0<ins style="background:#dfd">9</ins>8<ins style="background:#dfd">36</ins></code> |
+| triggers.stage | 0 | <code><ins style="background:#dfd">1</ins><del style="background:#fdd">0</del></code> |
+
+</details>
+
+### 📦 Module: \`module.naming\`
+
+<details>
+<summary>± <strong>random_string</strong> suffix</summary>
+
+\`\`\`
+module.naming.random_string.suffix
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | 4dx07ozc | <code><del style="background:#fdd">4</del><ins style="background:#dfd">lqc7r</ins>d<ins style="background:#dfd">mn</ins><del style="background:#fdd">x07ozc</del></code> |
+| keepers.prefix | fixture | <code>fixtur<ins style="background:#dfd">e-updat</ins>e<ins style="background:#dfd">d</ins></code> |
+| result | 4dx07ozc | <code><del style="background:#fdd">4</del><ins style="background:#dfd">lqc7r</ins>d<ins style="background:#dfd">mn</ins><del style="background:#fdd">x07ozc</del></code> |
+
+</details>
+
+## Outputs
+
+| Output | Action | Before | After |
+| --- | --- | --- | --- |
+| generated_name | 🔧 | <code>fixture-4dx07ozc</code> | <code>fixture-updated-lqc7rdmn</code> |
+| root_id | 🔧 | <code>4003373015687382808</code> | <code>1657483952453609836</code> |
+
+"
+`;

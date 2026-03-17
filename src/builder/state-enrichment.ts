@@ -9,20 +9,30 @@
  * attributes that already have real values from the plan. Sensitive values
  * discovered through the state are actively masked as `(sensitive)`.
  *
- * Layer 3 (business logic). May import from tfjson/, flattener/,
- * sensitivity/, model/.
+ * Layer 3 (business logic). May import from parser/, flattener/, model/.
  */
 
-import type { State } from "../tfjson/state.js";
-import type { ValueResource, ValuesModule } from "../tfjson/values.js";
+import type {
+  RawState,
+  RawStateResource,
+  RawStateInstance,
+} from "../parser/state.js";
 import type { JsonValue } from "../tfjson/common.js";
 import type { Report } from "../model/report.js";
 import { SENSITIVE_MASK } from "../model/sentinels.js";
 import { flatten } from "../flattener/index.js";
-import { isSensitive } from "../sensitivity/index.js";
 
 /** Threshold for considering a value "large" — mirrors builder/attributes.ts. */
 const LARGE_LINE_THRESHOLD = 3;
+
+/** View of a single resource instance from state. */
+interface StateInstance {
+  /** Raw attribute values, for direct top-level lookup. */
+  rawValues: Record<string, JsonValue> | undefined;
+  /** Flattened attribute values, for dotted-path lookup. */
+  flatValues: Map<string, string | null>;
+  sensitiveNames: ReadonlySet<string>;
+}
 
 /**
  * Resolves unknown attribute and output placeholders using post-apply state.
@@ -34,15 +44,20 @@ const LARGE_LINE_THRESHOLD = 3;
  * **Invariant:** After this function returns (with a non-empty state), no
  * resource in the report may have `allUnknownAfterApply === true`.
  *
- * When state is empty (no `values`), this is a no-op — all flags are
- * left untouched.
+ * When state has no resources, this is a no-op — all flags are left untouched.
  */
-export function enrichReportFromState(report: Report, state: State): void {
-  const stateValues = state.values;
-  if (stateValues === undefined) return;
+export function enrichReportFromState(report: Report, state: RawState): void {
+  const stateResources = state.resources;
+  const hasResources =
+    stateResources !== undefined && stateResources.length > 0;
+  const hasOutputs =
+    state.outputs !== undefined && Object.keys(state.outputs).length > 0;
+  if (!hasResources && !hasOutputs) return;
 
-  // Build address → ValueResource lookup from the recursive state tree
-  const stateResourceMap = buildResourceMap(stateValues.root_module);
+  // Build address → StateInstance lookup from flat resource list
+  const instanceMap = hasResources
+    ? buildInstanceMap(stateResources)
+    : new Map<string, StateInstance>();
 
   let enrichedAny = false;
 
@@ -50,36 +65,30 @@ export function enrichReportFromState(report: Report, state: State): void {
   for (const resource of report.resources ?? []) {
     if (!resource.hasAttributeDetail) continue;
 
-    const stateResource = stateResourceMap.get(resource.address);
+    const flat = instanceMap.get(resource.address);
 
-    if (stateResource !== undefined) {
-      // Flatten state values and sensitive_values for this resource
-      const stateFlat =
-        stateResource.values !== undefined
-          ? flatten(stateResource.values as JsonValue)
-          : new Map<string, string | null>();
-      const sensFlat =
-        stateResource.sensitive_values !== undefined
-          ? flatten(stateResource.sensitive_values as JsonValue)
-          : new Map<string, string | null>();
-
+    if (flat !== undefined) {
       for (const attr of resource.attributes) {
         if (!attr.isKnownAfterApply) continue;
         if (attr.isSensitive) continue; // already masked from plan
 
-        if (isSensitive(attr.name, sensFlat, sensFlat)) {
+        if (flat.sensitiveNames.has(attr.name)) {
           // Discovered to be sensitive through state — actively mask
           attr.isSensitive = true;
           attr.after = SENSITIVE_MASK;
           attr.isKnownAfterApply = false;
           enrichedAny = true;
-        } else if (stateFlat.has(attr.name)) {
-          // Resolve to actual value from state
-          const resolved = stateFlat.get(attr.name) ?? null;
-          attr.after = resolved;
-          attr.isKnownAfterApply = false;
-          attr.isLarge = isLargeValue(resolved);
-          enrichedAny = true;
+        } else {
+          // Try raw lookup first (handles complex types like objects/arrays
+          // whose top-level key doesn't appear in the flattened map), then
+          // fall back to the flattened map for dotted-path attributes.
+          const resolved = resolveFromInstance(flat, attr.name);
+          if (resolved !== undefined) {
+            attr.after = resolved;
+            attr.isKnownAfterApply = false;
+            attr.isLarge = isLargeValue(resolved);
+            enrichedAny = true;
+          }
         }
       }
     }
@@ -91,7 +100,7 @@ export function enrichReportFromState(report: Report, state: State): void {
   }
 
   // ── Enrich outputs ────────────────────────────────────────────────────
-  const stateOutputs = stateValues.outputs;
+  const stateOutputs = state.outputs;
   if (stateOutputs !== undefined) {
     for (const output of report.outputs ?? []) {
       if (!output.isKnownAfterApply) continue;
@@ -100,7 +109,7 @@ export function enrichReportFromState(report: Report, state: State): void {
       const stateOutput = stateOutputs[output.name];
       if (stateOutput === undefined) continue;
 
-      if (stateOutput.sensitive) {
+      if (stateOutput.sensitive === true) {
         // Discovered to be sensitive through state — actively mask
         output.isSensitive = true;
         output.after = SENSITIVE_MASK;
@@ -122,28 +131,97 @@ export function enrichReportFromState(report: Report, state: State): void {
 // ── Helpers ───────────────────────────────────────────────────────────────
 
 /**
- * Build a map from resource address to ValueResource by walking the
- * recursive ValuesModule tree.
+ * Build a map from resource address to state instance values.
+ *
+ * Raw tfstate resources have a flat list with `module`, `type`, `name`,
+ * and `instances[]`. Each instance has an optional `index_key` for
+ * count/for_each. The address is constructed to match the plan's
+ * fully-qualified resource address format.
  */
-function buildResourceMap(
-  rootModule: ValuesModule | undefined,
-): Map<string, ValueResource> {
-  const map = new Map<string, ValueResource>();
-  if (rootModule === undefined) return map;
+function buildInstanceMap(
+  resources: readonly RawStateResource[],
+): Map<string, StateInstance> {
+  const map = new Map<string, StateInstance>();
 
-  function walk(mod: ValuesModule): void {
-    for (const resource of mod.resources ?? []) {
-      if (resource.address !== undefined) {
-        map.set(resource.address, resource);
-      }
-    }
-    for (const child of mod.child_modules ?? []) {
-      walk(child);
+  for (const res of resources) {
+    for (const inst of res.instances ?? []) {
+      const address = buildAddress(res, inst);
+      const rawValues = inst.attributes;
+      const flatValues =
+        rawValues !== undefined
+          ? flatten(rawValues as JsonValue)
+          : new Map<string, string | null>();
+      const sensitiveNames = extractSensitiveNames(inst);
+      map.set(address, { rawValues, flatValues, sensitiveNames });
     }
   }
 
-  walk(rootModule);
   return map;
+}
+
+/**
+ * Construct a fully-qualified resource address from raw state fields.
+ *
+ * Format: `[module.]type.name[index]`
+ * - `module` is optional, already in `module.xxx` format
+ * - `index_key` is a number for count, string for for_each, absent for single
+ */
+function buildAddress(res: RawStateResource, inst: RawStateInstance): string {
+  let address = "";
+  if (res.module !== undefined && res.module !== "") {
+    address = `${res.module}.`;
+  }
+  address += `${res.type}.${res.name}`;
+  if (inst.index_key !== undefined) {
+    if (typeof inst.index_key === "number") {
+      address += `[${String(inst.index_key)}]`;
+    } else {
+      address += `["${inst.index_key}"]`;
+    }
+  }
+  return address;
+}
+
+/**
+ * Extract top-level sensitive attribute names from the raw state's
+ * `sensitive_attributes` path descriptors.
+ *
+ * Each entry is an array of path segments. We only match single-segment
+ * `get_attr` paths (top-level attributes), which matches the granularity
+ * of the flattened attribute names in the report.
+ */
+function extractSensitiveNames(inst: RawStateInstance): ReadonlySet<string> {
+  const names = new Set<string>();
+  for (const path of inst.sensitive_attributes ?? []) {
+    const first = path[0];
+    if (first?.type === "get_attr") {
+      names.add(first.value);
+    }
+  }
+  return names;
+}
+
+/**
+ * Resolve an attribute value from a state instance.
+ *
+ * Tries a direct lookup in the raw attributes first (handles complex types
+ * like objects whose top-level key doesn't appear in the flattened map),
+ * then falls back to the flattened map for dotted-path attribute names.
+ * Returns `undefined` when the attribute is not found in state.
+ */
+function resolveFromInstance(
+  inst: StateInstance,
+  attrName: string,
+): string | null | undefined {
+  // Direct lookup in raw attributes (handles top-level complex types)
+  if (inst.rawValues !== undefined && attrName in inst.rawValues) {
+    return stringifyValue(inst.rawValues[attrName] as JsonValue);
+  }
+  // Flattened lookup (handles dotted-path attribute names)
+  if (inst.flatValues.has(attrName)) {
+    return inst.flatValues.get(attrName) ?? null;
+  }
+  return undefined;
 }
 
 /**

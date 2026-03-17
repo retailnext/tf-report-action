@@ -37,6 +37,11 @@ export default defineConfig({
         // Integration tests exercise the happy paths through reportFromSteps().
         "src/steps/parse.ts",
         "src/steps/reader.ts",
+        // Step failure predicates (hasAnyFailedStep, hasAnyFailedKnownStep) require
+        // specific failure patterns in the steps context not present in generated fixtures.
+        // Core outcome functions (getStepOutcome, getExitCode, buildStepOutcomes) are
+        // covered by integration tests; edge-case predicates are covered by unit tests.
+        "src/steps/outcomes.ts",
         // Steps barrel re-exports are trivially covered by unit tests.
         "src/steps/index.ts",
         "src/compositor/index.ts",

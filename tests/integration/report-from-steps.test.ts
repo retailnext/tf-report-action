@@ -7,6 +7,7 @@ import {
   discoverNoShowStepsFixtures,
   discoverApplyNoShowStepsFixtures,
   discoverApplyOnlyStepsFixtures,
+  discoverNoStateStepsFixtures,
   discoverManualStepsFixtures,
   resolveStepFilePaths,
 } from "../helpers/fixture-loader.js";
@@ -1014,6 +1015,110 @@ describe("reportFromSteps integration — rendering quality", () => {
     expect(result).not.toContain("❌");
     expect(result).not.toContain("Failed");
   });
+});
+
+// ---------- State enrichment ----------
+
+const noStateFixtures = discoverNoStateStepsFixtures();
+
+describe("reportFromSteps — state enrichment", () => {
+  beforeAll(() => {
+    if (noStateFixtures.length === 0) {
+      throw new Error(
+        "No no-state-steps.json fixtures found. Run: bash scripts/generate-fixtures.sh",
+      );
+    }
+  });
+
+  it("resolves unknown values when state step is present", () => {
+    // null-lifecycle/2 creates a null_resource then replaces it — good test
+    const fixture = generatedFixtures.find(
+      (f) => f.label === "tofu/null-lifecycle/2",
+    );
+    expect(fixture).toBeDefined();
+    const resolved = resolveStepFilePaths(
+      fixture!.stepsJson,
+      fixture!.fixtureDir,
+    );
+    const result = reportFromSteps(resolved, {
+      allowedDirs: [fixture!.fixtureDir],
+      env: NO_GITHUB_ENV,
+    });
+    // With state, unknown values should be resolved — no placeholder text
+    expect(result).not.toContain("(value not in plan)");
+    // Should NOT show the missing-state warning
+    expect(result).not.toContain("could not be resolved");
+  });
+
+  it("shows missing-state warning when state step is absent", () => {
+    // Find an apply fixture that would have unknown values
+    const fixture = noStateFixtures.find(
+      (f) => f.label === "tofu/null-lifecycle/2/no-state",
+    );
+    expect(fixture).toBeDefined();
+    const resolved = resolveStepFilePaths(
+      fixture!.stepsJson,
+      fixture!.fixtureDir,
+    );
+    const result = reportFromSteps(resolved, {
+      allowedDirs: [fixture!.fixtureDir],
+      env: NO_GITHUB_ENV,
+    });
+    // Without state, should show the warning
+    expect(result).toContain("could not be resolved");
+    expect(result).toContain("state pull");
+  });
+
+  it("does not show missing-state warning for plan-only reports", () => {
+    const fixture = planOnlyFixtures.find(
+      (f) => f.label === "tofu/null-lifecycle/2/plan-only",
+    );
+    expect(fixture).toBeDefined();
+    const resolved = resolveStepFilePaths(
+      fixture!.stepsJson,
+      fixture!.fixtureDir,
+    );
+    const result = reportFromSteps(resolved, {
+      allowedDirs: [fixture!.fixtureDir],
+      env: NO_GITHUB_ENV,
+    });
+    // Plan-only reports never show the missing-state warning
+    expect(result).not.toContain("could not be resolved");
+    expect(result).not.toContain("state pull");
+  });
+
+  it("masks sensitive state values as (sensitive)", () => {
+    // sensitive-values/1 has sensitive attributes in state
+    const fixture = generatedFixtures.find(
+      (f) => f.label === "tofu/sensitive-values/1",
+    );
+    expect(fixture).toBeDefined();
+    const resolved = resolveStepFilePaths(
+      fixture!.stepsJson,
+      fixture!.fixtureDir,
+    );
+    const result = reportFromSteps(resolved, {
+      allowedDirs: [fixture!.fixtureDir],
+      env: NO_GITHUB_ENV,
+    });
+    // Sensitive values must be masked, not revealed
+    expect(result).not.toContain("updated-secret-value");
+    // Should not show missing-state warning (state is available)
+    expect(result).not.toContain("could not be resolved");
+  });
+
+  // Snapshot all no-state fixtures to catch regressions
+  for (const { label, stepsJson, fixtureDir } of noStateFixtures) {
+    it(`no-state snapshot: ${label}`, () => {
+      const resolved = resolveStepFilePaths(stepsJson, fixtureDir);
+      const options: ReportOptions = {
+        allowedDirs: [fixtureDir],
+        env: NO_GITHUB_ENV,
+      };
+      const result = reportFromSteps(resolved, options);
+      expect(result).toMatchSnapshot();
+    });
+  }
 });
 
 // ---------- Security: sensitive values must never appear in output ----------
