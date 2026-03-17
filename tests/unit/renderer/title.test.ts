@@ -63,4 +63,11 @@ describe("renderWorkspaceMarker", () => {
     expect(section).toBeDefined();
     expect(section!.full).toContain("ws--\\>end");
   });
+
+  it("escapes --!> in workspace name", () => {
+    const report = makeReport({ title: "Plan", workspace: "ws--!>end" });
+    const section = renderWorkspaceMarker(report);
+    expect(section).toBeDefined();
+    expect(section!.full).toContain("ws--!\\>end");
+  });
 });

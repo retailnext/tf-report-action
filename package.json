@@ -28,7 +28,8 @@
     "test:integration:coverage": "vitest run --config vitest.integration.config.ts --coverage",
     "render": "tsx scripts/render.ts",
     "gallery": "tsx scripts/render.ts --gallery",
-    "ci": "npm run lint && npm run typecheck && npm run test:coverage:ci && npm run test:integration:coverage && npm run bundle"
+    "check:dist": "npm run bundle && git diff --exit-code dist/ || (echo 'dist/ is out of date. Run npm run bundle and commit the result.' && exit 1)",
+    "ci": "npm run lint && npm run typecheck && npm run test:coverage:ci && npm run test:integration:coverage"
   },
   "devDependencies": {
     "@eslint/js": "^9.0.0",

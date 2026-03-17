@@ -1885,7 +1885,7 @@ var MarkdownWriter = class {
   }
   /** Escapes pipe characters in table cells. */
   static escapeCell(value) {
-    return value.replace(/\|/g, "\\|");
+    return value.replace(/\\/g, "\\\\").replace(/\|/g, "\\|");
   }
   /** Wraps value in `<code>` tags. */
   static inlineCode(value) {
@@ -2516,7 +2516,7 @@ function getWorkspace(report) {
   return report.workspace;
 }
 function escapeMarkerWorkspace(workspace) {
-  return workspace.replace(/\\/g, "\\\\").replace(/"/g, '\\"').replace(/-->/g, "--\\>").replace(/--!>/g, "--!\\>");
+  return workspace.replace(/\\/g, "\\\\").replace(/"/g, '\\"').replace(/(--!?)>/g, "$1\\>");
 }
 
 // src/raw-formatter/validate.ts
@@ -3207,7 +3207,7 @@ function formatTimestamp(date) {
   return `${month} ${day}, ${year} at ${hours}:${minutes} UTC`;
 }
 function escapeMarkerWorkspace2(workspace) {
-  return workspace.replace(/\\/g, "\\\\").replace(/"/g, '\\"').replace(/-->/g, "--\\>").replace(/--!>/g, "--!\\>");
+  return workspace.replace(/\\/g, "\\\\").replace(/"/g, '\\"').replace(/(--!?)>/g, "$1\\>");
 }
 function buildMarker(workspace) {
   return `<!-- tf-report-action:"${escapeMarkerWorkspace2(workspace)}" -->`;

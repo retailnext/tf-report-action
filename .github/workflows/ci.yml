@@ -12,7 +12,7 @@ permissions:
 
 jobs:
   ci:
-    name: Lint, typecheck, test, bundle
+    name: CI
     runs-on: ubuntu-latest
 
     steps:
@@ -27,28 +27,11 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Lint
-        run: npm run lint
-
-      - name: Typecheck
-        run: npm run typecheck
-
-      - name: Test with coverage
-        run: npm run test:coverage:ci
-
-      - name: Integration test coverage
-        run: npm run test:integration:coverage
-
-      - name: Bundle
-        run: npm run bundle
+      - name: CI
+        run: npm run ci
 
       - name: Check dist up to date
-        run: |
-          if [ -n "$(git status --porcelain dist/)" ]; then
-            echo "::error::dist/ is out of date. Run 'npm run bundle' and commit the result."
-            git diff dist/
-            exit 1
-          fi
+        run: npm run check:dist
 
       - name: Report CI Status
         if: always()

@@ -107,6 +107,14 @@ describe("MarkdownWriter", () => {
       expect(MarkdownWriter.escapeCell("a|b|c")).toBe("a\\|b\\|c");
     });
 
+    it("escapeCell escapes backslash characters", () => {
+      expect(MarkdownWriter.escapeCell("a\\b")).toBe("a\\\\b");
+    });
+
+    it("escapeCell escapes backslash before pipe", () => {
+      expect(MarkdownWriter.escapeCell("a\\|b")).toBe("a\\\\\\|b");
+    });
+
     it("escapeCell leaves non-pipe text unchanged", () => {
       expect(MarkdownWriter.escapeCell("hello world")).toBe("hello world");
     });

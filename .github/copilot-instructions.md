@@ -146,9 +146,19 @@ expectations from `action.yml` and fails if any file is out of sync. When upgrad
 Node.js, update `action.yml` first, then let the governance test guide remaining
 changes.
 
-**Agent obligation**: Before making any changes, verify your local Node.js major
-version matches the project requirement. Run `node --version` and confirm the major
-matches.
+**Agent obligation**: Before running any `npm` or `node` script, verify the active
+Node.js major version matches the project requirement:
+
+```bash
+node --version   # must match the major in .node-version
+```
+
+If the major does not match, **do not proceed** until the shell environment resolves
+to the correct version. Fix the PATH in your shell session (e.g.
+`export PATH="/opt/homebrew/opt/node@24/bin:$PATH"` on a Homebrew-managed machine,
+checking that the versioned Homebrew prefix matches the required major) and re-run
+`node --version` to confirm before continuing. Never hardcode PATH manipulation
+inside source or test files — always set it in the shell environment.
 
 ---
 

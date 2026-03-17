@@ -98,7 +98,7 @@ export class MarkdownWriter {
 
   /** Escapes pipe characters in table cells. */
   static escapeCell(value: string): string {
-    return value.replace(/\|/g, "\\|");
+    return value.replace(/\\/g, "\\\\").replace(/\|/g, "\\|");
   }
 
   /** Wraps value in `<code>` tags. */

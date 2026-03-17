@@ -7,7 +7,7 @@
  * 2. reportFromSteps gracefully handles missing files, read errors, parse failures
  * 3. Error information is surfaced in the rendered output
  */
-import { execSync } from "node:child_process";
+import { execFileSync } from "node:child_process";
 import { readFileSync, existsSync } from "node:fs";
 import { join, resolve, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -35,10 +35,10 @@ describe("render-plan.ts E2E", () => {
    */
   function runRender(stepsFile: string): string {
     const htmlPath = "/tmp/tf-plan-preview.html";
-    const cmd = `PATH="/opt/homebrew/opt/node@24/bin:$PATH" npm run render -- --steps ${stepsFile} --no-open 2>&1`;
-    execSync(cmd, {
+    execFileSync("npm", ["run", "render", "--", stepsFile, "--no-open"], {
       cwd: PROJECT_ROOT,
       timeout: 30_000,
+      stdio: "pipe",
     });
     expect(existsSync(htmlPath)).toBe(true);
     return readFileSync(htmlPath, "utf-8");
@@ -59,7 +59,10 @@ describe("render-plan.ts E2E", () => {
       GENERATED_DIR,
       "terraform/null-lifecycle/1/steps.json",
     );
-    if (!existsSync(stepsFile)) return;
+    expect(
+      existsSync(stepsFile),
+      `Fixture missing: ${stepsFile}. Run: bash scripts/generate-fixtures.sh`,
+    ).toBe(true);
     const html = runRender(stepsFile);
     const md = extractMarkdown(html);
     // Should have structured content, not empty/stub
@@ -73,7 +76,10 @@ describe("render-plan.ts E2E", () => {
       GENERATED_DIR,
       "terraform/null-lifecycle/2/steps.json",
     );
-    if (!existsSync(stepsFile)) return;
+    expect(
+      existsSync(stepsFile),
+      `Fixture missing: ${stepsFile}. Run: bash scripts/generate-fixtures.sh`,
+    ).toBe(true);
     const html = runRender(stepsFile);
     const md = extractMarkdown(html);
     expect(md).toContain("Apply");
@@ -83,7 +89,10 @@ describe("render-plan.ts E2E", () => {
 
   it("produces meaningful output for a no-op fixture", () => {
     const stepsFile = join(GENERATED_DIR, "terraform/no-op/1/steps.json");
-    if (!existsSync(stepsFile)) return;
+    expect(
+      existsSync(stepsFile),
+      `Fixture missing: ${stepsFile}. Run: bash scripts/generate-fixtures.sh`,
+    ).toBe(true);
     const html = runRender(stepsFile);
     const md = extractMarkdown(html);
     // No-op has an apply step, so it renders as apply complete with no changes
@@ -93,7 +102,10 @@ describe("render-plan.ts E2E", () => {
 
   it("produces meaningful output for an apply-error fixture", () => {
     const stepsFile = join(GENERATED_DIR, "terraform/apply-error/1/steps.json");
-    if (!existsSync(stepsFile)) return;
+    expect(
+      existsSync(stepsFile),
+      `Fixture missing: ${stepsFile}. Run: bash scripts/generate-fixtures.sh`,
+    ).toBe(true);
     const html = runRender(stepsFile);
     const md = extractMarkdown(html);
     expect(md).toContain("Apply");
@@ -108,14 +120,21 @@ describe("render-plan.ts E2E", () => {
 
 const manualFixtures = discoverManualStepsFixtures();
 
+function requireManualFixture(label: string) {
+  const fixture = manualFixtures.find((f) => f.label === label);
+  if (fixture == null) {
+    throw new Error(
+      `Manual fixture "${label}" not found under tests/fixtures/manual/`,
+    );
+  }
+  return fixture;
+}
+
 describe("reportFromSteps — manual error fixtures", () => {
   describe("read-errors (absolute paths to nonexistent files)", () => {
-    const fixture = manualFixtures.find(
-      (f) => f.label === "manual/read-errors",
-    );
+    const fixture = requireManualFixture("manual/read-errors");
 
     it("produces output with error details", () => {
-      if (!fixture) return;
       // Don't resolve paths — they are absolute /nonexistent/... paths intentionally
       const result = reportFromSteps(fixture.stepsJson, {
         allowedDirs: [fixture.fixtureDir],
@@ -129,7 +148,6 @@ describe("reportFromSteps — manual error fixtures", () => {
     });
 
     it("shows step statuses when output is not readable", () => {
-      if (!fixture) return;
       const result = reportFromSteps(fixture.stepsJson, {
         allowedDirs: [fixture.fixtureDir],
         env: NO_GITHUB_ENV,
@@ -141,7 +159,6 @@ describe("reportFromSteps — manual error fixtures", () => {
     });
 
     it("does not say 'Showing raw command output' when there is none", () => {
-      if (!fixture) return;
       const result = reportFromSteps(fixture.stepsJson, {
         allowedDirs: [fixture.fixtureDir],
         env: NO_GITHUB_ENV,
@@ -151,12 +168,9 @@ describe("reportFromSteps — manual error fixtures", () => {
   });
 
   describe("missing-outputs (steps without stdout_file/stderr_file)", () => {
-    const fixture = manualFixtures.find(
-      (f) => f.label === "manual/missing-outputs",
-    );
+    const fixture = requireManualFixture("manual/missing-outputs");
 
     it("produces output without crashing", () => {
-      if (!fixture) return;
       const result = reportFromSteps(fixture.stepsJson, {
         allowedDirs: [fixture.fixtureDir],
         env: NO_GITHUB_ENV,
@@ -165,7 +179,6 @@ describe("reportFromSteps — manual error fixtures", () => {
     });
 
     it("shows step statuses since no file output is available", () => {
-      if (!fixture) return;
       const result = reportFromSteps(fixture.stepsJson, {
         allowedDirs: [fixture.fixtureDir],
         env: NO_GITHUB_ENV,
@@ -175,7 +188,6 @@ describe("reportFromSteps — manual error fixtures", () => {
     });
 
     it("reports that no output was available", () => {
-      if (!fixture) return;
       const result = reportFromSteps(fixture.stepsJson, {
         allowedDirs: [fixture.fixtureDir],
         env: NO_GITHUB_ENV,
@@ -186,12 +198,9 @@ describe("reportFromSteps — manual error fixtures", () => {
   });
 
   describe("parse-failure (show-plan.stdout is not valid JSON)", () => {
-    const fixture = manualFixtures.find(
-      (f) => f.label === "manual/parse-failure",
-    );
+    const fixture = requireManualFixture("manual/parse-failure");
 
     it("produces a meaningful error report", () => {
-      if (!fixture) return;
       const resolved = resolveStepFilePaths(
         fixture.stepsJson,
         fixture.fixtureDir,
@@ -207,12 +216,9 @@ describe("reportFromSteps — manual error fixtures", () => {
   });
 
   describe("unrelated-workflow (no IaC steps at all)", () => {
-    const fixture = manualFixtures.find(
-      (f) => f.label === "manual/unrelated-workflow",
-    );
+    const fixture = requireManualFixture("manual/unrelated-workflow");
 
     it("produces a general workflow report", () => {
-      if (!fixture) return;
       const resolved = resolveStepFilePaths(
         fixture.stepsJson,
         fixture.fixtureDir,

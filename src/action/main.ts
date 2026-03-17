@@ -70,8 +70,7 @@ function escapeMarkerWorkspace(workspace: string): string {
   return workspace
     .replace(/\\/g, "\\\\")
     .replace(/"/g, '\\"')
-    .replace(/-->/g, "--\\>")
-    .replace(/--!>/g, "--!\\>");
+    .replace(/(--!?)>/g, "$1\\>");
 }
 
 /** Build the workspace dedup marker HTML comment. */

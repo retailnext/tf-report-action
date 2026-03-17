@@ -5,7 +5,7 @@ description: >-
 author: "retailnext"
 inputs:
   steps:
-    description: "JSON string of workflow steps (use ${{ toJSON(steps) }})"
+    description: "JSON string of workflow steps (pass toJSON(steps))"
     required: true
   workspace:
     description: >-

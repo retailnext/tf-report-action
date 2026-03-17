@@ -43,6 +43,5 @@ function escapeMarkerWorkspace(workspace: string): string {
   return workspace
     .replace(/\\/g, "\\\\")
     .replace(/"/g, '\\"')
-    .replace(/-->/g, "--\\>")
-    .replace(/--!>/g, "--!\\>");
+    .replace(/(--!?)>/g, "$1\\>");
 }
