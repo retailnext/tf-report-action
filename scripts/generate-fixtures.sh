@@ -31,6 +31,13 @@
 # Workspace options (via a `workspace.conf` file in the workspace root):
 #   no-json=true       — run without -json flag
 #   no-detailed-exitcode=true — run plan without -detailed-exitcode
+#   log-level=<level>  — set TF_LOG for plan and apply (e.g. trace, debug)
+#
+# Stage hooks:
+#   A stage directory may contain a `pre-plan` executable script. It runs
+#   inside the tool working directory ($tool_tmp) immediately before the plan
+#   command. Use this to simulate external changes (e.g. deleting a managed
+#   file to produce resource drift).
 #
 # Expected failures:
 #   A stage directory may contain an `expect-fail` file listing one command
@@ -298,12 +305,14 @@ run_tool_workspace() {
   # Read workspace options
   local use_json=true
   local use_detailed_exitcode=true
+  local log_level=""
   if [[ "$(read_workspace_conf "$workspace_src" "no-json")" == "true" ]]; then
     use_json=false
   fi
   if [[ "$(read_workspace_conf "$workspace_src" "no-detailed-exitcode")" == "true" ]]; then
     use_detailed_exitcode=false
   fi
+  log_level="$(read_workspace_conf "$workspace_src" "log-level")"
 
   # Collect stages in ascending numeric order
   local stages=()
@@ -336,9 +345,10 @@ run_tool_workspace() {
         rsync -a --exclude='.terraform' --exclude='*.tfstate' \
           --exclude='*.tfstate.backup' --exclude='*.tfplan' \
           --exclude='expect-fail' --exclude='workspace.conf' \
+          --exclude='pre-plan' \
           "$stage_src/" "$tool_tmp/"
       else
-        find "$stage_src" -maxdepth 1 -type f ! -name 'expect-fail' ! -name 'workspace.conf' | while read -r f; do
+        find "$stage_src" -maxdepth 1 -type f ! -name 'expect-fail' ! -name 'workspace.conf' ! -name 'pre-plan' | while read -r f; do
           cp "$f" "$tool_tmp/"
         done
         find "$stage_src" -mindepth 1 -maxdepth 1 -type d | while read -r d; do
@@ -406,6 +416,12 @@ run_tool_workspace() {
 
     # -- plan --
     if $init_ok && $validate_ok; then
+      # Run pre-plan hook if present (e.g. to simulate external drift)
+      if [[ -x "$stage_src/pre-plan" ]]; then
+        echo "      (running pre-plan hook)"
+        (cd "$tool_tmp" && "$stage_src/pre-plan")
+      fi
+
       exit_code=0
       local plan_flags="$json_flag -out=tfplan -input=false -no-color"
       local is_detailed="0"
@@ -414,7 +430,7 @@ run_tool_workspace() {
         is_detailed="1"
       fi
       # shellcheck disable=SC2086
-      "$tool" -chdir="$tool_tmp" plan $plan_flags > "$out_dir/plan.stdout" 2> "$out_dir/plan.stderr" || exit_code=$?
+      TF_LOG="${log_level}" "$tool" -chdir="$tool_tmp" plan $plan_flags > "$out_dir/plan.stdout" 2> "$out_dir/plan.stderr" || exit_code=$?
       ef=""
       [[ "$expect_fail_list" == *":plan:"* ]] && ef="1"
       check_exit_code "plan" "$exit_code" "$ef" "$is_detailed" || return 1
@@ -442,7 +458,7 @@ run_tool_workspace() {
     # -- apply --
     if $init_ok && $validate_ok && $plan_ok; then
       exit_code=0
-      "$tool" -chdir="$tool_tmp" apply $json_flag tfplan > "$out_dir/apply.stdout" 2> "$out_dir/apply.stderr" || exit_code=$?
+      TF_LOG="${log_level}" "$tool" -chdir="$tool_tmp" apply $json_flag tfplan > "$out_dir/apply.stdout" 2> "$out_dir/apply.stderr" || exit_code=$?
       ef=""
       [[ "$expect_fail_list" == *":apply:"* ]] && ef="1"
       check_exit_code "apply" "$exit_code" "$ef" || return 1

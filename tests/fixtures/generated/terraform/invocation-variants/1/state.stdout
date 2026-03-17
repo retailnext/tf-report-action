@@ -1,0 +1,30 @@
+{
+  "version": 4,
+  "terraform_version": "1.14.6",
+  "serial": 1,
+  "lineage": "5c8d9354-4161-0b36-6623-581d1f3d47cb",
+  "outputs": {},
+  "resources": [
+    {
+      "mode": "managed",
+      "type": "null_resource",
+      "name": "example",
+      "provider": "provider[\"registry.terraform.io/hashicorp/null\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "id": "1123500059082889439",
+            "triggers": {
+              "value": "hello"
+            }
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0
+        }
+      ]
+    }
+  ],
+  "check_results": null
+}
+

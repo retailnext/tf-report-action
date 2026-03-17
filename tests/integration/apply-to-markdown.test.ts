@@ -79,9 +79,9 @@ describe("applyToMarkdown integration", () => {
     });
   });
 
-  describe("removed-resource/1 forget operation (Terraform)", () => {
+  describe("state-operations/1 forget operation (Terraform)", () => {
     const fixture = fixtures.find(
-      (f) => f.label === "terraform/removed-resource/1",
+      (f) => f.label === "terraform/state-operations/1",
     );
 
     it("includes the forgotten resource in apply output", () => {
@@ -111,8 +111,8 @@ describe("applyToMarkdown integration", () => {
     });
   });
 
-  describe("removed-resource/1 forget operation (OpenTofu)", () => {
-    const fixture = fixtures.find((f) => f.label === "tofu/removed-resource/1");
+  describe("state-operations/1 forget operation (OpenTofu)", () => {
+    const fixture = fixtures.find((f) => f.label === "tofu/state-operations/1");
 
     it("includes the forgotten resource in apply output", () => {
       expect(fixture).toBeDefined();
@@ -142,8 +142,8 @@ describe("applyToMarkdown integration", () => {
   });
 
   for (const toolLabel of [
-    "terraform/moved-resource/1",
-    "tofu/moved-resource/1",
+    "terraform/state-operations/1",
+    "tofu/state-operations/1",
   ]) {
     describe(`${toolLabel} move operation`, () => {
       const fixture = fixtures.find((f) => f.label === toolLabel);
@@ -177,8 +177,8 @@ describe("applyToMarkdown integration", () => {
   }
 
   for (const toolLabel of [
-    "terraform/import-resource/1",
-    "tofu/import-resource/1",
+    "terraform/state-operations/1",
+    "tofu/state-operations/1",
   ]) {
     describe(`${toolLabel} state-only import`, () => {
       const fixture = fixtures.find((f) => f.label === toolLabel);

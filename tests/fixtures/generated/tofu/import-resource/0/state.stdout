@@ -1,2 +1,0 @@
-{"version":4,"terraform_version":"1.11.5","serial":1,"lineage":"d5284a8c-1fd8-d463-6d58-6050a329f863","outputs":{},"resources":[{"mode":"managed","type":"random_string","name":"existing","provider":"provider[\"registry.opentofu.org/hashicorp/random\"]","instances":[{"schema_version":2,"attributes":{"id":"Ni0FnVnZ","keepers":null,"length":8,"lower":true,"min_lower":0,"min_numeric":0,"min_special":0,"min_upper":0,"number":true,"numeric":true,"override_special":null,"result":"Ni0FnVnZ","special":false,"upper":true},"sensitive_attributes":[]}]}],"check_results":null}
-

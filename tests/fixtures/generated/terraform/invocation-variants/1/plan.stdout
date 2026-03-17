@@ -1,0 +1,6 @@
+null_resource.example: Refreshing state... [id=1123500059082889439]
+
+No changes. Your infrastructure matches the configuration.
+
+Terraform has compared your real infrastructure against your configuration
+and found no differences, so no changes are needed.

@@ -220,8 +220,10 @@ describe("reportFromSteps integration — apply-only fixtures", () => {
 // ---------- Targeted assertions for move/import/forget/no-op ----------
 
 describe("reportFromSteps — action classification", () => {
-  it("no-op/1: truly unchanged resource produces 'No Changes' with no resource section", () => {
-    const fixture = planOnlyFixtures.find((f) => f.label.includes("no-op/1"));
+  it("null-lifecycle/3: truly unchanged resource produces 'No Changes' with no resource section", () => {
+    const fixture = planOnlyFixtures.find((f) =>
+      f.label.includes("null-lifecycle/3"),
+    );
     expect(fixture).toBeDefined();
     const resolved = resolveStepFilePaths(
       fixture!.stepsJson,
@@ -236,8 +238,8 @@ describe("reportFromSteps — action classification", () => {
   });
 
   for (const toolLabel of [
-    "terraform/moved-resource/1/plan-only",
-    "tofu/moved-resource/1/plan-only",
+    "terraform/state-operations/1/plan-only",
+    "tofu/state-operations/1/plan-only",
   ]) {
     it(`${toolLabel}: moved resource shows 🚚 Move in summary`, () => {
       const fixture = planOnlyFixtures.find((f) => f.label === toolLabel);
@@ -258,8 +260,8 @@ describe("reportFromSteps — action classification", () => {
   }
 
   for (const toolLabel of [
-    "terraform/import-resource/1/plan-only",
-    "tofu/import-resource/1/plan-only",
+    "terraform/state-operations/1/plan-only",
+    "tofu/state-operations/1/plan-only",
   ]) {
     it(`${toolLabel}: imported resource shows 📥 Import in summary`, () => {
       const fixture = planOnlyFixtures.find((f) => f.label === toolLabel);
@@ -279,9 +281,9 @@ describe("reportFromSteps — action classification", () => {
     });
   }
 
-  it("terraform/removed-resource/1: forgotten resource shows 👋 Forget in summary", () => {
+  it("terraform/state-operations/1: forgotten resource shows 👋 Forget in summary", () => {
     const fixture = planOnlyFixtures.find(
-      (f) => f.label === "terraform/removed-resource/1/plan-only",
+      (f) => f.label === "terraform/state-operations/1/plan-only",
     );
     expect(fixture).toBeDefined();
     const resolved = resolveStepFilePaths(
@@ -298,9 +300,9 @@ describe("reportFromSteps — action classification", () => {
     expect(result).not.toContain("No Changes");
   });
 
-  it("tofu/removed-resource/1: forgotten resource shows 👋 Forget in summary", () => {
+  it("tofu/state-operations/1: forgotten resource shows 👋 Forget in summary", () => {
     const fixture = planOnlyFixtures.find(
-      (f) => f.label === "tofu/removed-resource/1/plan-only",
+      (f) => f.label === "tofu/state-operations/1/plan-only",
     );
     expect(fixture).toBeDefined();
     const resolved = resolveStepFilePaths(
@@ -318,12 +320,12 @@ describe("reportFromSteps — action classification", () => {
   });
 });
 
-// ---------- Targeted assertions for removed-resource/1 apply (forget) ----------
+// ---------- Targeted assertions for state-operations/1 apply (forget) ----------
 
 describe("reportFromSteps — forget in apply output", () => {
   for (const toolLabel of [
-    "terraform/removed-resource/1",
-    "tofu/removed-resource/1",
+    "terraform/state-operations/1",
+    "tofu/state-operations/1",
   ]) {
     describe(toolLabel, () => {
       it("shows forgotten resource (not 'No Changes') in apply report", () => {
@@ -378,8 +380,8 @@ describe("reportFromSteps — forget in apply output", () => {
 
 describe("reportFromSteps — state-only operations in apply output", () => {
   for (const toolLabel of [
-    "terraform/moved-resource/1",
-    "tofu/moved-resource/1",
+    "terraform/state-operations/1",
+    "tofu/state-operations/1",
   ]) {
     describe(`${toolLabel} move operation`, () => {
       it("shows moved resource (not 'No Changes') in apply report", () => {
@@ -430,8 +432,8 @@ describe("reportFromSteps — state-only operations in apply output", () => {
   }
 
   for (const toolLabel of [
-    "terraform/import-resource/1",
-    "tofu/import-resource/1",
+    "terraform/state-operations/1",
+    "tofu/state-operations/1",
   ]) {
     describe(`${toolLabel} state-only import`, () => {
       it("shows imported resource (not 'No Changes') in apply report", () => {
@@ -506,9 +508,9 @@ describe("reportFromSteps integration — manual fixtures", () => {
 // ---------- Targeted assertions — error fixtures ----------
 
 describe("reportFromSteps integration — error fixture scenarios", () => {
-  it("validate-error: renders failed validate with error details", () => {
+  it("error-stages/1: renders failed validate with error details", () => {
     const fixture = generatedFixtures.find((f) =>
-      f.label.includes("validate-error/1"),
+      f.label.includes("error-stages/1"),
     );
     expect(fixture).toBeDefined();
     const resolved = resolveStepFilePaths(
@@ -525,9 +527,9 @@ describe("reportFromSteps integration — error fixture scenarios", () => {
     expect(result).toContain("❌");
   });
 
-  it("validate-error: with workspace shows workspace in title", () => {
+  it("error-stages/1: with workspace shows workspace in title", () => {
     const fixture = generatedFixtures.find((f) =>
-      f.label.includes("validate-error/1"),
+      f.label.includes("error-stages/1"),
     );
     expect(fixture).toBeDefined();
     const resolved = resolveStepFilePaths(
@@ -543,9 +545,9 @@ describe("reportFromSteps integration — error fixture scenarios", () => {
     expect(result).toContain("❌");
   });
 
-  it("plan-error: renders failed plan with step issue details", () => {
+  it("error-stages/2: renders failed plan with step issue details", () => {
     const fixture = generatedFixtures.find((f) =>
-      f.label.includes("plan-error/1"),
+      f.label.includes("error-stages/2"),
     );
     expect(fixture).toBeDefined();
     const resolved = resolveStepFilePaths(
@@ -562,9 +564,9 @@ describe("reportFromSteps integration — error fixture scenarios", () => {
     expect(result).toContain("`plan` failed");
   });
 
-  it("plan-error: plan-only variant shows plan failure without apply", () => {
+  it("error-stages/2: plan-only variant shows plan failure without apply", () => {
     const fixture = planOnlyFixtures.find((f) =>
-      f.label.includes("plan-error/1"),
+      f.label.includes("error-stages/2"),
     );
     expect(fixture).toBeDefined();
     const resolved = resolveStepFilePaths(
@@ -579,9 +581,9 @@ describe("reportFromSteps integration — error fixture scenarios", () => {
     expect(result).not.toContain("Apply");
   });
 
-  it("validate-error: no-show variant exercises Tier 3 no-output path", () => {
+  it("error-stages/1: no-show variant exercises Tier 3 no-output path", () => {
     const fixture = noShowFixtures.find((f) =>
-      f.label.includes("validate-error/1"),
+      f.label.includes("error-stages/1"),
     );
     expect(fixture).toBeDefined();
     const resolved = resolveStepFilePaths(
@@ -658,9 +660,9 @@ describe("reportFromSteps integration — error fixture scenarios", () => {
     );
   });
 
-  it("no-json-flags: shows structured plan from show-plan even though apply was not -json", () => {
+  it("invocation-variants: shows structured plan from show-plan even though apply was not -json", () => {
     const fixture = generatedFixtures.find((f) =>
-      f.label.includes("no-json-flags/0"),
+      f.label.includes("invocation-variants/0"),
     );
     expect(fixture).toBeDefined();
     const resolved = resolveStepFilePaths(
@@ -847,9 +849,9 @@ describe("reportFromSteps integration — targeted scenarios", () => {
 // ---------- Targeted assertions — all called-out rendering cases ----------
 
 describe("reportFromSteps integration — rendering quality", () => {
-  it("plan-error/1: title clearly says Plan Failed", () => {
+  it("error-stages/2: title clearly says Plan Failed", () => {
     const fixture = generatedFixtures.find((f) =>
-      f.label.includes("plan-error/1"),
+      f.label.includes("error-stages/2"),
     );
     expect(fixture).toBeDefined();
     const resolved = resolveStepFilePaths(
@@ -864,9 +866,9 @@ describe("reportFromSteps integration — rendering quality", () => {
     expect(result).toContain("❌");
   });
 
-  it("validate-error/1/no-show: shows graphically formatted diagnostics, not raw JSON", () => {
+  it("error-stages/1/no-show: shows graphically formatted diagnostics, not raw JSON", () => {
     const fixture = noShowFixtures.find((f) =>
-      f.label.includes("validate-error/1"),
+      f.label.includes("error-stages/1"),
     );
     expect(fixture).toBeDefined();
     const resolved = resolveStepFilePaths(
@@ -885,9 +887,9 @@ describe("reportFromSteps integration — rendering quality", () => {
     expect(result).toContain("<details>");
   });
 
-  it("random-replace/1/apply-no-show: JSONL-enriched structured apply report", () => {
+  it("null-lifecycle/2/apply-no-show: JSONL-enriched structured apply report", () => {
     const fixture = applyNoShowFixtures.find((f) =>
-      f.label.includes("random-replace/1"),
+      f.label.includes("null-lifecycle/2"),
     );
     expect(fixture).toBeDefined();
     const resolved = resolveStepFilePaths(

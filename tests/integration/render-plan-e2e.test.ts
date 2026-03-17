@@ -95,7 +95,10 @@ describe("render-plan.ts E2E", () => {
   });
 
   it("produces meaningful output for a no-op fixture", () => {
-    const stepsFile = join(GENERATED_DIR, "terraform/no-op/1/steps.json");
+    const stepsFile = join(
+      GENERATED_DIR,
+      "terraform/null-lifecycle/3/steps.json",
+    );
     expect(
       existsSync(stepsFile),
       `Fixture missing: ${stepsFile}. Run: bash scripts/generate-fixtures.sh`,
