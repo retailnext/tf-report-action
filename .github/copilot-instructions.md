@@ -58,6 +58,24 @@ Follow these boundaries strictly — do not add cross-cutting logic.
 | `src/builder/`    | Build `Report` from parsed input. Plan JSON → Report with flat resource arrays and full attribute detail, JSONL → Report with flat resource arrays but no attribute detail, steps context → progressively enriched Report (tier detection, step issue collection, title generation). |
 | `src/compositor/` | Budget-aware section assembly. Composes Markdown sections within an output size limit, progressively degrading from full → compact → omit. Truncation notice helper.                                                                                                                 |
 
+**Builder internal structure:**
+
+The `report-from-steps.ts` orchestrator delegates per-step processing to
+dedicated files:
+
+| File                   | Responsibility                                                                        |
+| ---------------------- | ------------------------------------------------------------------------------------- |
+| `report-from-steps.ts` | Pipeline orchestrator: phases, sequencing, `ReportOptions`, error/helper functions    |
+| `process-helpers.ts`   | Shared helpers (`addScannerWarnings`, `uiDiagnosticToModel`) used by process-\* files |
+| `process-validate.ts`  | Validate step: diagnostic extraction, StepIssue on failure                            |
+| `process-show-plan.ts` | Show-plan step: parse plan JSON, build structured/apply report, merge fields          |
+| `process-plan.ts`      | Plan step: JSONL scanning for resources/diagnostics/drift, raw text fallback          |
+| `process-apply.ts`     | Apply step: JSONL scanning for apply statuses/diagnostics, raw text fallback          |
+
+**Dependency rule:** `process-*.ts` files are dependency leaves — they may
+import from `process-helpers.ts` and lower-layer modules, but **never from
+each other**.
+
 ### Layer 4 — Rendering (depends on Layers 0–3)
 
 | Module          | Responsibility                                                                                                                                                                                                                                                                                                                              |
