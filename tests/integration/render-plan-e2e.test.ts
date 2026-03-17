@@ -259,10 +259,9 @@ describe("reportFromSteps — manual error fixtures", () => {
       });
       const body = buildFullBody(result, true);
       // Count occurrences of the logs URL — catches any link text variant
-      const urlMatches =
-        body.match(new RegExp(LOGS_URL.replace(/\//g, "\\/"), "g")) ?? [];
+      const urlCount = body.split(LOGS_URL).length - 1;
       expect(
-        urlMatches.length,
+        urlCount,
         "Expected exactly one logs URL in the full PR comment body",
       ).toBe(1);
     });
@@ -278,10 +277,9 @@ describe("reportFromSteps — manual error fixtures", () => {
         allowedDirs: [fixture.fixtureDir],
       });
       const body = buildFullBody(result, false);
-      const urlMatches =
-        body.match(new RegExp(LOGS_URL.replace(/\//g, "\\/"), "g")) ?? [];
+      const urlCount = body.split(LOGS_URL).length - 1;
       expect(
-        urlMatches.length,
+        urlCount,
         "Expected exactly one logs URL in the full issue comment body",
       ).toBe(1);
     });
