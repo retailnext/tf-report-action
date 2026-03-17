@@ -16,21 +16,26 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - id: checkout
+        uses: actions/checkout@v4
 
-      - name: Set up Node.js
+      - id: setup-node
+        name: Set up Node.js
         uses: actions/setup-node@v4
         with:
           node-version-file: .node-version
           cache: npm
 
-      - name: Install dependencies
+      - id: install
+        name: Install dependencies
         run: npm ci
 
-      - name: CI
+      - id: ci
+        name: CI
         run: npm run ci
 
-      - name: Check dist up to date
+      - id: check-dist
+        name: Check dist up to date
         run: npm run check:dist
 
       - name: Report CI Status
