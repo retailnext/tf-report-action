@@ -34,11 +34,13 @@ tests/fixtures/
           plan.stdout
           show-plan.stdout
           apply.stdout
+          state.stdout
           steps.json
           plan-steps.json
           no-show-steps.json
           apply-no-show-steps.json
           apply-only-steps.json
+          no-state-steps.json
         1/
           ...
     tofu/
@@ -159,10 +161,10 @@ apply
 
 **Command dependency chain when a command fails:**
 
-- `init` failure → `validate`, `plan`, `show`, and `apply` are all skipped
-- `plan` failure → `show` and `apply` are skipped
-- `validate` failure → skip `plan`, `show`, `apply`
-- `apply` failure → terminal (no downstream commands)
+- `init` failure → `validate`, `plan`, `show`, `apply`, and `state` are all skipped
+- `plan` failure → `show`, `apply`, and `state` are skipped
+- `validate` failure → skip `plan`, `show`, `apply`, `state`
+- `apply` failure → `state` still runs (partial state may exist)
 
 Skipped commands produce no output files.
 

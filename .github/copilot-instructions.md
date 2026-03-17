@@ -11,7 +11,9 @@ The rendering engine provides three internal entry points:
 - `planToMarkdown(json, options?)` — converts plan JSON (from `show -json <planfile>`)
   into a plan report
 - `applyToMarkdown(planJson, applyJsonl, options?)` — converts plan JSON plus apply
-  JSONL (from `apply -json`) into an apply report showing only actually-changed resources
+  JSONL (from `apply -json`) into an apply report showing only actually-changed
+  resources. When `options.stateJson` is provided, resolves unknown attribute values
+  from post-apply state.
 - `reportFromSteps(stepsJson, options?)` — accepts a GitHub Actions steps context JSON
   and produces a report with tiered degradation (structured plan → raw text → general
   workflow table)
@@ -48,7 +50,7 @@ Follow these boundaries strictly — do not add cross-cutting logic.
 
 | Module        | Responsibility                                                                                                                                                                                       |
 | ------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `src/parser/` | Parse Terraform/OpenTofu formats: plan JSON, apply JSONL, validate output.                                                                                                                           |
+| `src/parser/` | Parse Terraform/OpenTofu formats: plan JSON, state JSON (raw tfstate from `state pull`), apply JSONL, validate output.                                                                               |
 | `src/steps/`  | GitHub Actions steps context: parsing, secure file reading, step-data-aware I/O wrappers, outcome helpers. This is the I/O boundary between the external world and the pure transformation pipeline. |
 
 ### Layer 3 — Business logic (depend on Layers 0–2)
@@ -71,6 +73,7 @@ dedicated files:
 | `process-show-plan.ts` | Show-plan step: parse plan JSON, build structured/apply report, merge fields          |
 | `process-plan.ts`      | Plan step: JSONL scanning for resources/diagnostics/drift, raw text fallback          |
 | `process-apply.ts`     | Apply step: JSONL scanning for apply statuses/diagnostics, raw text fallback          |
+| `state-enrichment.ts`  | State enrichment: resolves unknown attribute values from post-apply state             |
 
 **Dependency rule:** `process-*.ts` files are dependency leaves — they may
 import from `process-helpers.ts` and lower-layer modules, but **never from
@@ -290,6 +293,27 @@ etc. instead.
 - **Action references**: Always use `@main` (e.g. `retailnext/tf-report-action@main`),
   never version tags like `@v1`.
 
+### Workflow Example Style Guide
+
+Every example workflow step in user-facing documentation must demonstrate
+best/recommended practices:
+
+1. **`-json` required** — every `tofu`/`terraform` command that supports a
+   `-json` flag must include it, even if the action does not consume that
+   particular step's JSON output. This establishes a consistent best-practice
+   pattern users can copy. (`state pull` always outputs JSON and has no
+   `-json` flag — it is exempt.)
+2. **No `-no-color`** — never use `-no-color` because `-json` implies
+   `-no-color`. Including both is redundant and misleading.
+3. **No `-auto-approve`** — never use `-auto-approve` in examples. When
+   `apply` is given a saved plan file (e.g., `tofu apply -json tfplan`),
+   no interactive approval is required — the plan file itself is the
+   approval. Using `-auto-approve` is misleading and not necessary.
+4. **`hide_outputs: true` for state** — any step that outputs the full
+   OpenTofu/Terraform state (e.g., `state pull`) must use
+   `hide_outputs: true` on `exec-action` to avoid leaking sensitive state
+   values into GitHub Actions logs.
+
 ---
 
 ## Sensitive Values
@@ -355,7 +379,7 @@ Markdown content. Output is bounded by `maxOutputLength` (default 63 KiB).
 
 **`ReportOptions`** extends `Options` with: `allowedDirs`, `maxOutputLength`, `workspace`,
 `env` (DI for `process.env`), and step ID overrides (`initStepId`, `validateStepId`,
-`planStepId`, `showPlanStepId`, `applyStepId`).
+`planStepId`, `showPlanStepId`, `applyStepId`, `stateStepId`).
 
 **Report variants** (discriminated union on `kind`):
 
@@ -372,6 +396,13 @@ Markdown content. Output is bounded by `maxOutputLength` (default 63 KiB).
 - **Tier 4**: No recognized terraform steps → general workflow table
 
 _(Tier 2 is reserved for future use.)_
+
+**State enrichment** (Tier 1 apply reports only): When a `state` step provides
+post-apply state JSON (via `state pull`), the builder resolves `isKnownAfterApply`
+attribute placeholders to their actual values from the state. Sensitive values
+discovered through the state are masked as `(sensitive)`. This runs after the
+main report is built, as a progressive enrichment phase. When state is not
+available and there are unresolved placeholders, a warning is added to the report.
 
 **Dynamic title generation**: Title includes status icon, optional workspace prefix,
 operation label, and change counts. Determined automatically from report content.
@@ -440,6 +471,8 @@ them, because attribute values may be sensitive. This means:
   `tests/fixtures/generated/<tool>/<workspace>/<N>/show-plan.stdout`.
 - Every apply JSONL loaded in `tests/integration/` must come from
   `tests/fixtures/generated/<tool>/<workspace>/<N>/apply.stdout`.
+- Every state JSON loaded in `tests/integration/` must come from
+  `tests/fixtures/generated/<tool>/<workspace>/<N>/state.stdout`.
 - No inline-constructed plan objects are permitted in `tests/integration/`.
 - No manually-crafted JSON strings are permitted in `tests/integration/`.
 - Error-path tests (invalid JSON, unsupported format version, etc.) belong in

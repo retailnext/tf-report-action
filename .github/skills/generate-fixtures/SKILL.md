@@ -52,9 +52,10 @@ For each workspace × each tool (`terraform` and `tofu`):
    d. Runs `<tool> validate [-json]` → writes to `validate.stdout` / `validate.stderr`
    e. Runs `<tool> plan [-json] [-detailed-exitcode] -out=tfplan` → writes to `plan.stdout` / `plan.stderr`
    f. Runs `<tool> show -json tfplan` → writes to `show-plan.stdout` / `show-plan.stderr`
-   g. Runs `<tool> apply [-json] -auto-approve tfplan` → writes to `apply.stdout` / `apply.stderr`
-   h. Generates `steps.json` with step outcomes and file references
-   i. State carries forward to the next stage
+   g. Runs `<tool> apply [-json] tfplan` → writes to `apply.stdout` / `apply.stderr`
+   h. Runs `<tool> state pull` → writes to `state.stdout` (always JSON, no `-json` flag)
+   i. Generates `steps.json` with step outcomes and file references
+   j. State carries forward to the next stage
 4. Removes the temporary directory
 
 ### `-detailed-exitcode` handling
@@ -78,10 +79,10 @@ A stage directory may contain an `expect-fail` file listing commands expected to
 
 When a prerequisite command fails, dependent commands are skipped:
 
-- `init` failure → skip `validate`, `plan`, `show`, `apply`
-- `plan` failure → skip `show`, `apply`
-- `validate` failure → skip `plan`, `show`, `apply`
-- `apply` failure → terminal
+- `init` failure → skip `validate`, `plan`, `show`, `apply`, `state`
+- `plan` failure → skip `show`, `apply`, `state`
+- `validate` failure → skip `plan`, `show`, `apply`, `state`
+- `apply` failure → `state` still runs (partial state may exist)
 
 Skipped commands produce no output files. The `expect-fail` file itself is NOT copied
 to the generated output directory.
@@ -105,24 +106,27 @@ tests/fixtures/generated/
         show-plan.stderr     ← show -json stderr (omitted if empty)
         apply.stdout         ← apply stdout (JSONL with -json, plain text without)
         apply.stderr         ← apply stderr (omitted if empty)
+        state.stdout         ← state pull stdout (always JSON)
         steps.json           ← step outcomes and file references
-        plan-steps.json      ← plan-only variant (no apply step)
+        plan-steps.json      ← plan-only variant (no apply or state step)
         no-show-steps.json   ← no show-plan variant (forces Tier 3 fallback)
         apply-no-show-steps.json ← apply present but no show-plan
         apply-only-steps.json    ← only init/validate/apply (no plan or show-plan)
+        no-state-steps.json  ← full pipeline without state (tests missing-state warning)
 ```
 
 ### Step variant files
 
-In addition to the canonical `steps.json`, the generation script produces four
+In addition to the canonical `steps.json`, the generation script produces
 variant files that exercise different rendering tiers by omitting specific steps:
 
-| Variant                    | Omitted steps        | Purpose                                 |
-| -------------------------- | -------------------- | --------------------------------------- |
-| `plan-steps.json`          | `apply`              | Plan-only report (Tier 1 without apply) |
-| `no-show-steps.json`       | `show-plan`, `apply` | Forces Tier 3 raw text fallback         |
-| `apply-no-show-steps.json` | `show-plan`          | Apply present but no structured plan    |
-| `apply-only-steps.json`    | `plan`, `show-plan`  | Only init/validate/apply steps          |
+| Variant                    | Omitted steps                 | Purpose                                                   |
+| -------------------------- | ----------------------------- | --------------------------------------------------------- |
+| `plan-steps.json`          | `apply`, `state`              | Plan-only report (Tier 1 without apply)                   |
+| `no-show-steps.json`       | `show-plan`, `apply`, `state` | Forces Tier 3 raw text fallback                           |
+| `apply-no-show-steps.json` | `show-plan`, `state`          | Apply present but no structured plan                      |
+| `apply-only-steps.json`    | `plan`, `show-plan`, `state`  | Only init/validate/apply steps                            |
+| `no-state-steps.json`      | `state`                       | Full pipeline without state (tests missing-state warning) |
 
 ### `steps.json` format
 

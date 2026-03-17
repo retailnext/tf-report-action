@@ -29,13 +29,14 @@ npm -s run render -- <steps.json> --format markdown --no-open --output <output-f
 Steps JSON files live under `tests/fixtures/generated/<tool>/<workspace>/<stage>/`.
 Each stage directory contains several step variants:
 
-| File                       | Description                                           |
-| -------------------------- | ----------------------------------------------------- |
-| `steps.json`               | Full pipeline (init → validate → plan → show → apply) |
-| `plan-steps.json`          | Plan-only (no apply step)                             |
-| `no-show-steps.json`       | No show-plan (forces Tier 3 fallback)                 |
-| `apply-no-show-steps.json` | Apply present but no structured plan                  |
-| `apply-only-steps.json`    | Only init/validate/apply (no plan or show-plan)       |
+| File                       | Description                                                   |
+| -------------------------- | ------------------------------------------------------------- |
+| `steps.json`               | Full pipeline (init → validate → plan → show → apply → state) |
+| `plan-steps.json`          | Plan-only (no apply or state step)                            |
+| `no-show-steps.json`       | No show-plan (forces Tier 3 fallback)                         |
+| `apply-no-show-steps.json` | Apply present but no structured plan                          |
+| `apply-only-steps.json`    | Only init/validate/apply (no plan or show-plan)               |
+| `no-state-steps.json`      | Full pipeline without state (tests missing-state warning)     |
 
 ## Example
 

@@ -7,16 +7,16 @@ rich plan and apply detail.
 
 - **Rich plan diffs** — attribute-level changes with inline character diffs, grouped
   by module
-- **Apply reports** — shows only actually-changed resources with per-resource outcomes
-  and diagnostics
+- **Apply reports** — shows only actually-changed resources with per-resource outcomes,
+  diagnostics, and resolved computed values when post-apply state is available
 - **Progressive enrichment** — structured plan → raw text fallback → general workflow
   table, progressively enriched with whatever data is available
 - **PR comments** — automatically posts and updates comments on pull requests with
   workspace-based deduplication
 - **Status issues** — creates and maintains status issues for non-PR workflows
   (push to main, scheduled runs)
-- **Auto-discovery** — automatically identifies init, validate, plan, show-plan, and
-  apply steps from the workflow context
+- **Auto-discovery** — automatically identifies init, validate, plan, show-plan,
+  apply, and state steps from the workflow context
 - **Limit-aware** — intelligently truncates output to fit within GitHub's 65,536
   character limit while preserving the most important information
 - **Zero runtime dependencies** — uses only Node.js built-in modules
@@ -150,7 +150,18 @@ jobs:
         if: github.event_name == 'push'
         uses: retailnext/exec-action@main
         with:
-          command: tofu apply -auto-approve -json tfplan
+          command: tofu apply -json tfplan
+
+      - name: State
+        id: state
+        if: steps.apply.outcome != 'skipped'
+        uses: retailnext/exec-action@main
+        with:
+          command: tofu state pull
+          # Hide outputs to avoid leaking sensitive state values in the
+          # GitHub Actions log. The state is still available to the report
+          # action via the stdout_file output.
+          hide_outputs: true
 
       - name: Report
         if: always()
@@ -300,6 +311,7 @@ jobs:
 | `plan-step-id`      | No       | `plan`                       | Step ID for the plan step                                                      |
 | `show-plan-step-id` | No       | `show-plan`                  | Step ID for the show-plan step                                                 |
 | `apply-step-id`     | No       | `apply`                      | Step ID for the apply step                                                     |
+| `state-step-id`     | No       | `state`                      | Step ID for the state step (post-apply state for resolving computed values)    |
 
 ## How It Works
 
@@ -307,8 +319,8 @@ jobs:
 
 The action automatically identifies IaC workflow steps by their step IDs. It
 looks for steps matching the configured step IDs (defaulting to `init`,
-`validate`, `plan`, `show-plan`, and `apply`) and determines which operations
-were performed.
+`validate`, `plan`, `show-plan`, `apply`, and `state`) and determines which
+operations were performed.
 
 ### Progressive Enrichment
 
@@ -318,7 +330,11 @@ The action progressively enriches the report with whatever data is available:
    the action renders a full report with attribute-level diffs, module grouping,
    and inline character highlighting. Adding `-json` to plan and apply steps
    further enriches the report with diagnostics, drift detection, and
-   per-resource apply outcomes.
+   per-resource apply outcomes. When a `state` step provides post-apply state
+   JSON (via `state pull`), attribute values that were unknown at plan time
+   (such as provider-generated IDs) are resolved to their actual values in the
+   apply report. Without the `state` step, these values are shown as
+   "(value not in plan)".
 2. **Tier 3 — Raw text fallback**: When no show-plan JSON is available but plan
    or apply steps ran, the action formats their raw output with JSON Lines
    parsing where possible.
