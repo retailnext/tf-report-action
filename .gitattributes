@@ -1,0 +1,5 @@
+# Mark generated fixture outputs so GitHub collapses them in PR diffs
+tests/fixtures/generated/** linguist-generated=true
+
+# Mark bundled dist files as generated
+dist/** linguist-generated=true
