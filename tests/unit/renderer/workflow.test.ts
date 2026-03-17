@@ -28,14 +28,6 @@ describe("renderWorkflowBody", () => {
     expect(table!.full).toContain("| `plan` | success |");
   });
 
-  it("renders 'No steps' message when steps array is empty", () => {
-    const report = makeReport({ steps: [] });
-    const sections = renderWorkflowBody(report);
-    const noSteps = sections.find((s) => s.id === "no-steps");
-    expect(noSteps).toBeDefined();
-    expect(noSteps!.full).toContain("No steps were found");
-  });
-
   it("does not include a logs link (caller is responsible for the footer)", () => {
     const report = makeReport({
       steps: [{ id: "plan", outcome: "success" }],

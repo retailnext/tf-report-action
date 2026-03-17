@@ -1,11 +1,13 @@
 /**
  * End-to-end tests for the render-plan.ts script and reportFromSteps()
- * with manual error fixtures.
+ * with generated and manual fixtures.
  *
  * These tests validate that:
  * 1. The render script produces meaningful HTML output (not empty/stub)
- * 2. reportFromSteps gracefully handles missing files, read errors, parse failures
- * 3. Error information is surfaced in the rendered output
+ * 2. reportFromSteps in-process produces meaningful output for all generated
+ *    fixture variants (raises coverage of the core rendering pipeline)
+ * 3. reportFromSteps gracefully handles missing files, read errors, parse failures
+ * 4. Error information is surfaced in the rendered output
  */
 import { execFileSync } from "node:child_process";
 import { readFileSync, existsSync } from "node:fs";
@@ -15,12 +17,17 @@ import { describe, it, expect } from "vitest";
 import { reportFromSteps } from "../../src/index.js";
 import {
   discoverManualStepsFixtures,
+  discoverStepsFixtures,
+  discoverPlanStepsFixtures,
+  discoverNoShowStepsFixtures,
+  discoverApplyNoShowStepsFixtures,
+  discoverApplyOnlyStepsFixtures,
   resolveStepFilePaths,
+  GENERATED_DIR,
 } from "../helpers/fixture-loader.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const PROJECT_ROOT = resolve(__dirname, "../..");
-const GENERATED_DIR = join(PROJECT_ROOT, "tests/fixtures/generated");
 
 /** Env with no GitHub vars — suppresses logs URL. */
 const NO_GITHUB_ENV = { HOME: "/tmp" };
@@ -112,6 +119,116 @@ describe("render-plan.ts E2E", () => {
     expect(md).toContain("will_fail");
     expect(md.length).toBeGreaterThan(200);
   });
+});
+
+// ---------------------------------------------------------------------------
+// In-process reportFromSteps — generated fixture suites
+//
+// These suites call reportFromSteps directly (not via subprocess) so that
+// the full rendering pipeline is exercised within the coverage-instrumented
+// process. Each suite covers a different steps-context variant.
+// ---------------------------------------------------------------------------
+
+/**
+ * Helper: run reportFromSteps on a generated fixture in-process and return the
+ * Markdown string. Resolves relative file paths within the fixture directory.
+ */
+function renderFixtureInProcess(stepsJson: string, fixtureDir: string): string {
+  const resolved = resolveStepFilePaths(stepsJson, fixtureDir);
+  return reportFromSteps(resolved, {
+    allowedDirs: [fixtureDir],
+    env: NO_GITHUB_ENV,
+  });
+}
+
+describe("reportFromSteps — generated steps fixtures (full plan+apply)", () => {
+  const fixtures = discoverStepsFixtures();
+  if (fixtures.length === 0)
+    throw new Error(
+      "No generated steps fixtures found. Run: bash scripts/generate-fixtures.sh",
+    );
+
+  for (const fixture of fixtures) {
+    it(`${fixture.label}: produces non-empty output`, () => {
+      const result = renderFixtureInProcess(
+        fixture.stepsJson,
+        fixture.fixtureDir,
+      );
+      expect(result.length).toBeGreaterThan(0);
+    });
+  }
+});
+
+describe("reportFromSteps — generated plan-only steps fixtures", () => {
+  const fixtures = discoverPlanStepsFixtures();
+  if (fixtures.length === 0)
+    throw new Error(
+      "No generated plan-steps fixtures found. Run: bash scripts/generate-fixtures.sh",
+    );
+
+  for (const fixture of fixtures) {
+    it(`${fixture.label}: produces non-empty output`, () => {
+      const result = renderFixtureInProcess(
+        fixture.stepsJson,
+        fixture.fixtureDir,
+      );
+      expect(result.length).toBeGreaterThan(0);
+    });
+  }
+});
+
+describe("reportFromSteps — generated no-show fixtures (Tier 3 text fallback)", () => {
+  const fixtures = discoverNoShowStepsFixtures();
+  if (fixtures.length === 0)
+    throw new Error(
+      "No generated no-show-steps fixtures found. Run: bash scripts/generate-fixtures.sh",
+    );
+
+  for (const fixture of fixtures) {
+    it(`${fixture.label}: produces non-empty output`, () => {
+      const result = renderFixtureInProcess(
+        fixture.stepsJson,
+        fixture.fixtureDir,
+      );
+      expect(result.length).toBeGreaterThan(0);
+    });
+  }
+});
+
+describe("reportFromSteps — generated apply-no-show fixtures", () => {
+  const fixtures = discoverApplyNoShowStepsFixtures();
+  if (fixtures.length === 0)
+    throw new Error(
+      "No generated apply-no-show-steps fixtures found. Run: bash scripts/generate-fixtures.sh",
+    );
+
+  for (const fixture of fixtures) {
+    it(`${fixture.label}: produces non-empty output`, () => {
+      const result = renderFixtureInProcess(
+        fixture.stepsJson,
+        fixture.fixtureDir,
+      );
+      expect(result.length).toBeGreaterThan(0);
+    });
+  }
+});
+
+describe("reportFromSteps — generated apply-only fixtures", () => {
+  const fixtures = discoverApplyOnlyStepsFixtures();
+  if (fixtures.length === 0)
+    throw new Error(
+      "No generated apply-only-steps fixtures found. Run: bash scripts/generate-fixtures.sh",
+    );
+
+  for (const fixture of fixtures) {
+    it(`${fixture.label}: produces non-empty output`, () => {
+      const result = renderFixtureInProcess(
+        fixture.stepsJson,
+        fixture.fixtureDir,
+      );
+      expect(result.length).toBeGreaterThan(0);
+    });
+  }
 });
 
 // ---------------------------------------------------------------------------
@@ -295,6 +412,71 @@ describe("reportFromSteps — manual error fixtures", () => {
         allowedDirs: [fixture.fixtureDir],
       });
       expect(result).not.toContain("[View workflow run logs]");
+    });
+  });
+
+  describe("step-with-stderr (unfamiliar step with non-empty stderr)", () => {
+    const fixture = requireManualFixture("manual/step-with-stderr");
+
+    it("surfaces a step issue for successful step with stderr", () => {
+      const resolved = resolveStepFilePaths(
+        fixture.stepsJson,
+        fixture.fixtureDir,
+      );
+      const result = reportFromSteps(resolved, {
+        allowedDirs: [fixture.fixtureDir],
+        env: NO_GITHUB_ENV,
+      });
+      expect(result).toContain("build");
+      expect(result).toContain("warning: deprecated API usage");
+    });
+
+    it("shows the step issue under a warning icon (not failure)", () => {
+      const resolved = resolveStepFilePaths(
+        fixture.stepsJson,
+        fixture.fixtureDir,
+      );
+      const result = reportFromSteps(resolved, {
+        allowedDirs: [fixture.fixtureDir],
+        env: NO_GITHUB_ENV,
+      });
+      // The heading uses the DIAGNOSTIC_WARNING icon and includes outcome
+      expect(result).toContain("`build` success");
+    });
+
+    it("truncates stderr when maxDisplayRead is very small", () => {
+      const resolved = resolveStepFilePaths(
+        fixture.stepsJson,
+        fixture.fixtureDir,
+      );
+      const result = reportFromSteps(resolved, {
+        allowedDirs: [fixture.fixtureDir],
+        env: NO_GITHUB_ENV,
+        maxDisplayRead: 1,
+      });
+      expect(result).toContain("… (truncated)");
+    });
+  });
+
+  describe("failed-plan-unreadable-outputs (absolute paths to nonexistent files)", () => {
+    const fixture = requireManualFixture(
+      "manual/failed-plan-unreadable-outputs",
+    );
+
+    it("produces output explaining why stdout was not available", () => {
+      const result = reportFromSteps(fixture.stepsJson, {
+        allowedDirs: [fixture.fixtureDir],
+        env: NO_GITHUB_ENV,
+      });
+      expect(result).toMatch(/stdout not available/i);
+    });
+
+    it("produces output explaining why stderr was not available", () => {
+      const result = reportFromSteps(fixture.stepsJson, {
+        allowedDirs: [fixture.fixtureDir],
+        env: NO_GITHUB_ENV,
+      });
+      expect(result).toMatch(/stderr not available/i);
     });
   });
 });

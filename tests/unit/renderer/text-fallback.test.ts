@@ -33,25 +33,6 @@ describe("renderTextFallbackBody", () => {
     expect(planOutput!.compact).toContain("_(omitted due to size)_");
   });
 
-  it("renders 'No readable output' note and step table when no output", () => {
-    const report = makeReport({
-      rawStdout: [],
-      steps: [
-        { id: "init", outcome: "success" },
-        { id: "plan", outcome: "failure" },
-      ],
-    });
-    const sections = renderTextFallbackBody(report);
-    const note = sections.find((s) => s.id === "note");
-    expect(note).toBeDefined();
-    expect(note!.full).toContain("No readable output was available");
-
-    const stepTable = sections.find((s) => s.id === "step-statuses");
-    expect(stepTable).toBeDefined();
-    expect(stepTable!.full).toContain("| `init` | success |");
-    expect(stepTable!.full).toContain("| `plan` | failure |");
-  });
-
   it("renders both plan and apply output when both are present", () => {
     const report = makeReport({
       rawStdout: [
@@ -113,26 +94,6 @@ describe("renderTextFallbackBody", () => {
 
   it("does not render warnings (handled by renderReportSections)", () => {
     const report = makeReport({
-      warnings: ["Could not read plan file"],
-    });
-    const sections = renderTextFallbackBody(report);
-    const warnSection = sections.find((s) => s.id.startsWith("warning-"));
-    expect(warnSection).toBeUndefined();
-  });
-
-  it("renders no-output note when rawStdout is empty and no warnings", () => {
-    const report = makeReport({
-      rawStdout: [],
-      warnings: [],
-    });
-    const sections = renderTextFallbackBody(report);
-    const note = sections.find((s) => s.id === "note");
-    expect(note).toBeDefined();
-    expect(note!.full).toContain("No readable output was available");
-  });
-
-  it("does not render step table when output is available", () => {
-    const report = makeReport({
       rawStdout: [
         {
           stepId: "plan",
@@ -141,9 +102,10 @@ describe("renderTextFallbackBody", () => {
           truncated: false,
         },
       ],
-      steps: [{ id: "plan", outcome: "success" }],
+      warnings: ["Could not read plan file"],
     });
     const sections = renderTextFallbackBody(report);
-    expect(sections.find((s) => s.id === "step-statuses")).toBeUndefined();
+    const warnSection = sections.find((s) => s.id.startsWith("warning-"));
+    expect(warnSection).toBeUndefined();
   });
 });

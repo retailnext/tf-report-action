@@ -27,6 +27,8 @@ export default defineConfig({
         "src/diff/types.ts",
         "src/builder/options.ts",
         "src/renderer/options.ts",
+        // Test helper files must not appear in source coverage
+        "tests/**",
         // Error-path branches in the parser are covered by unit tests, not integration tests.
         // Integration tests only supply valid plan JSON from real terraform/tofu runs.
         "src/parser/**",
@@ -39,6 +41,13 @@ export default defineConfig({
         "src/steps/index.ts",
         "src/compositor/index.ts",
         "src/compositor/types.ts",
+        // jsonl-scanner barrel and types — no executable logic
+        "src/jsonl-scanner/index.ts",
+        "src/jsonl-scanner/types.ts",
+        // Error renderer is only reachable when the pipeline itself fails (invalid
+        // steps context, parse error with no fallback). Integration tests always
+        // supply valid fixture data, so these branches are exercised by unit tests.
+        "src/renderer/error.ts",
         // The action module is the GitHub Action entry point — it is exercised
         // by unit tests with mocked clients, not integration tests.
         "src/action/**",

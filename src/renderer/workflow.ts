@@ -12,20 +12,10 @@ import { renderStepStatusTable } from "./step-table.js";
 /**
  * Render the body sections for a workflow-only report.
  *
- * Includes: step status table and logs link.
+ * Renders the step status table. Callers must only invoke this when
+ * `report.steps.length > 0`.
  */
 export function renderWorkflowBody(report: Report): Section[] {
-  const sections: Section[] = [];
-
-  if (report.steps.length > 0) {
-    const stepTable = renderStepStatusTable(report.steps);
-    sections.push({ id: "step-table", full: `### Steps\n\n${stepTable}` });
-  } else {
-    sections.push({
-      id: "no-steps",
-      full: "No steps were found in the workflow context.\n\n",
-    });
-  }
-
-  return sections;
+  const stepTable = renderStepStatusTable(report.steps);
+  return [{ id: "step-table", full: `### Steps\n\n${stepTable}` }];
 }

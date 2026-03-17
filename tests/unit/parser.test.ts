@@ -28,7 +28,7 @@ describe("parsePlan", () => {
   });
 
   it("throws on invalid JSON without exposing the input content", () => {
-    expect(() => parsePlan('{"password": bad_json}')).toThrowError(
+    expect(() => parsePlan('{"password": bad_json}')).toThrow(
       /Failed to parse plan JSON/,
     );
   });
@@ -46,27 +46,27 @@ describe("parsePlan", () => {
   });
 
   it("throws when input is a JSON array (not an object)", () => {
-    expect(() => parsePlan("[]")).toThrowError(/JSON object/);
+    expect(() => parsePlan("[]")).toThrow(/JSON object/);
   });
 
   it("throws when input is a JSON string", () => {
-    expect(() => parsePlan('"hello"')).toThrowError(/JSON object/);
+    expect(() => parsePlan('"hello"')).toThrow(/JSON object/);
   });
 
   it("throws when input is null JSON", () => {
-    expect(() => parsePlan("null")).toThrowError(/JSON object/);
+    expect(() => parsePlan("null")).toThrow(/JSON object/);
   });
 
   it("throws when format_version is missing", () => {
-    expect(() =>
-      parsePlan(JSON.stringify({ resource_changes: [] })),
-    ).toThrowError(/format_version/);
+    expect(() => parsePlan(JSON.stringify({ resource_changes: [] }))).toThrow(
+      /format_version/,
+    );
   });
 
   it("throws when format_version is not a string", () => {
     expect(() =>
       parsePlan(JSON.stringify({ format_version: 1, resource_changes: [] })),
-    ).toThrowError(/format_version/);
+    ).toThrow(/format_version/);
   });
 
   it("throws when format_version major is 2", () => {
@@ -74,7 +74,7 @@ describe("parsePlan", () => {
       parsePlan(
         JSON.stringify({ format_version: "2.0", resource_changes: [] }),
       ),
-    ).toThrowError(/format_version/);
+    ).toThrow(/format_version/);
   });
 
   it("throws when format_version major is NaN", () => {
@@ -82,7 +82,7 @@ describe("parsePlan", () => {
       parsePlan(
         JSON.stringify({ format_version: "invalid", resource_changes: [] }),
       ),
-    ).toThrowError(/format_version/);
+    ).toThrow(/format_version/);
   });
 
   it("succeeds when resource_changes is absent (empty workspace)", () => {

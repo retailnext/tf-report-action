@@ -49,7 +49,7 @@ import { buildSummaryFromScan } from "./summary.js";
 import { buildResourcesFromScan } from "./resources.js";
 import { scanString, scanFile } from "../jsonl-scanner/scan.js";
 import { isJsonLines } from "../jsonl-scanner/detect.js";
-import { buildStepIssue } from "./step-issues.js";
+import { buildStepIssue, shouldCreateStepIssue } from "./step-issues.js";
 import { buildTitle } from "./title.js";
 import { tmpdir } from "node:os";
 
@@ -73,6 +73,11 @@ export interface ReportOptions extends BuildOptions, RenderOptions {
    * to override auto-detection.
    */
   tool?: Tool;
+  /**
+   * Maximum bytes to read from a step's stdout/stderr file for display.
+   * Default: 64 KiB. Set lower in tests to exercise truncation paths.
+   */
+  maxDisplayRead?: number;
   /** Step ID for the init step. Default: "init" */
   initStep?: string;
   /** Step ID for the validate step. Default: "validate" */
@@ -135,7 +140,7 @@ export function buildReportFromSteps(
   const readerOpts: ReaderOptions = {
     allowedDirs: options?.allowedDirs ?? [env["RUNNER_TEMP"] ?? tmpdir()],
     maxFileSize: DEFAULT_MAX_FILE_SIZE,
-    maxDisplayRead: DEFAULT_MAX_DISPLAY_READ,
+    maxDisplayRead: options?.maxDisplayRead ?? DEFAULT_MAX_DISPLAY_READ,
   };
 
   // Parse steps JSON
@@ -215,10 +220,10 @@ export function buildReportFromSteps(
     tool ??= report.tool;
   }
 
-  // ─── Phase 3: Unfamiliar step issues ──────────────────────────────
+  // ─── Phase 3: Unfamiliar step issues ──────────────────────────
   for (const [stepId, step] of Object.entries(steps)) {
     if (knownStepIds.has(stepId)) continue;
-    if (getStepOutcome(step) === "failure") {
+    if (shouldCreateStepIssue(step, readerOpts)) {
       report.issues.push(buildStepIssue(step, stepId, readerOpts));
     }
   }

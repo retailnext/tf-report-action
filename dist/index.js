@@ -1260,6 +1260,13 @@ function buildStepIssue(step, stepId, readerOpts, diagnostic) {
   if (stderrRead.error !== void 0) bag["stderrError"] = stderrRead.error;
   return bag;
 }
+function shouldCreateStepIssue(step, readerOpts, diagnostic) {
+  const outcome = getStepOutcome(step);
+  if (outcome === "failure") return true;
+  if (diagnostic !== void 0) return true;
+  const stderrRead = readStepStderrForDisplay(step, readerOpts);
+  return stderrRead.content !== void 0 && stderrRead.content.trim().length > 0;
+}
 
 // src/model/status-icons.ts
 var STATUS_SUCCESS = "\u2705";
@@ -1450,7 +1457,7 @@ function buildReportFromSteps(stepsJson, options) {
   const readerOpts = {
     allowedDirs: options?.allowedDirs ?? [env["RUNNER_TEMP"] ?? tmpdir()],
     maxFileSize: DEFAULT_MAX_FILE_SIZE,
-    maxDisplayRead: DEFAULT_MAX_DISPLAY_READ
+    maxDisplayRead: options?.maxDisplayRead ?? DEFAULT_MAX_DISPLAY_READ
   };
   const parseResult = parseSteps(stepsJson);
   if (typeof parseResult === "string") {
@@ -1506,7 +1513,7 @@ function buildReportFromSteps(stepsJson, options) {
   }
   for (const [stepId, step] of Object.entries(steps)) {
     if (knownStepIds.has(stepId)) continue;
-    if (getStepOutcome(step) === "failure") {
+    if (shouldCreateStepIssue(step, readerOpts)) {
       report.issues.push(buildStepIssue(step, stepId, readerOpts));
     }
   }
@@ -2786,6 +2793,28 @@ ${formattedStderr}
   };
 }
 
+// src/renderer/text-fallback.ts
+function renderTextFallbackBody(report) {
+  const sections = [];
+  for (const raw of report.rawStdout) {
+    const displayContent = raw.truncated ? raw.content + "\n\u2026 (truncated)" : raw.content;
+    sections.push({
+      id: `raw-${raw.stepId}`,
+      full: `### ${raw.label}
+
+${formatRawOutput(displayContent)}
+
+`,
+      compact: `### ${raw.label}
+
+_(omitted due to size)_
+
+`
+    });
+  }
+  return sections;
+}
+
 // src/renderer/step-table.ts
 function renderStepStatusTable(steps, excludeIds) {
   const filtered = excludeIds ? steps.filter((s) => !excludeIds.has(s.id)) : steps;
@@ -2808,59 +2837,12 @@ function renderStepStatusTable(steps, excludeIds) {
   return table + "\n";
 }
 
-// src/renderer/text-fallback.ts
-function renderTextFallbackBody(report) {
-  const sections = [];
-  if (report.rawStdout.length > 0) {
-    for (const raw of report.rawStdout) {
-      const displayContent = raw.truncated ? raw.content + "\n\u2026 (truncated)" : raw.content;
-      sections.push({
-        id: `raw-${raw.stepId}`,
-        full: `### ${raw.label}
-
-${formatRawOutput(displayContent)}
-
-`,
-        compact: `### ${raw.label}
-
-_(omitted due to size)_
-
-`
-      });
-    }
-  } else {
-    sections.push({
-      id: "note",
-      full: "> **Note:** No readable output was available for this run.\n\n",
-      fixed: true
-    });
-  }
-  if (report.rawStdout.length === 0) {
-    const stepTable = renderStepStatusTable(report.steps);
-    if (stepTable.length > 0) {
-      sections.push({ id: "step-statuses", full: `### Steps
-
-${stepTable}` });
-    }
-  }
-  return sections;
-}
-
 // src/renderer/workflow.ts
 function renderWorkflowBody(report) {
-  const sections = [];
-  if (report.steps.length > 0) {
-    const stepTable = renderStepStatusTable(report.steps);
-    sections.push({ id: "step-table", full: `### Steps
+  const stepTable = renderStepStatusTable(report.steps);
+  return [{ id: "step-table", full: `### Steps
 
-${stepTable}` });
-  } else {
-    sections.push({
-      id: "no-steps",
-      full: "No steps were found in the workflow context.\n\n"
-    });
-  }
-  return sections;
+${stepTable}` }];
 }
 
 // src/renderer/error.ts

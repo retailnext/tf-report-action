@@ -236,7 +236,7 @@ describe("planToMarkdown", () => {
 
   describe("error handling", () => {
     it("throws on invalid JSON without exposing content", () => {
-      expect(() => planToMarkdown("not valid json")).toThrowError(
+      expect(() => planToMarkdown("not valid json")).toThrow(
         /Failed to parse plan JSON/,
       );
     });
@@ -246,7 +246,7 @@ describe("planToMarkdown", () => {
         planToMarkdown(
           JSON.stringify({ format_version: "2.0", resource_changes: [] }),
         ),
-      ).toThrowError(/format_version/);
+      ).toThrow(/format_version/);
     });
   });
 

@@ -1,0 +1,15 @@
+{
+  "checkout": {
+    "outcome": "success",
+    "conclusion": "success",
+    "outputs": {}
+  },
+  "build": {
+    "outcome": "success",
+    "conclusion": "success",
+    "outputs": {
+      "exit_code": "0",
+      "stderr_file": "build.stderr"
+    }
+  }
+}

@@ -50,9 +50,7 @@ describe("parseValidateOutput", () => {
 
   it("throws on invalid JSON without exposing input content", () => {
     const sensitiveInput = '{"password": "s3cr3t"}bad';
-    expect(() => parseValidateOutput(sensitiveInput)).toThrowError(
-      /not valid JSON/,
-    );
+    expect(() => parseValidateOutput(sensitiveInput)).toThrow(/not valid JSON/);
     try {
       parseValidateOutput(sensitiveInput);
       expect.fail("Should have thrown");
@@ -63,15 +61,15 @@ describe("parseValidateOutput", () => {
   });
 
   it("throws when input is a JSON array", () => {
-    expect(() => parseValidateOutput("[]")).toThrowError(/JSON object/);
+    expect(() => parseValidateOutput("[]")).toThrow(/JSON object/);
   });
 
   it("throws when input is a JSON string", () => {
-    expect(() => parseValidateOutput('"hello"')).toThrowError(/JSON object/);
+    expect(() => parseValidateOutput('"hello"')).toThrow(/JSON object/);
   });
 
   it("throws when input is null JSON", () => {
-    expect(() => parseValidateOutput("null")).toThrowError(/JSON object/);
+    expect(() => parseValidateOutput("null")).toThrow(/JSON object/);
   });
 
   it("throws when format_version is missing", () => {
@@ -81,7 +79,7 @@ describe("parseValidateOutput", () => {
       warning_count: 0,
       diagnostics: [],
     });
-    expect(() => parseValidateOutput(input)).toThrowError(/format_version/);
+    expect(() => parseValidateOutput(input)).toThrow(/format_version/);
   });
 
   it("throws when format_version is not a string", () => {
@@ -92,6 +90,6 @@ describe("parseValidateOutput", () => {
       warning_count: 0,
       diagnostics: [],
     });
-    expect(() => parseValidateOutput(input)).toThrowError(/format_version/);
+    expect(() => parseValidateOutput(input)).toThrow(/format_version/);
   });
 });

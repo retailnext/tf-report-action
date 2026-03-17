@@ -17,6 +17,8 @@ export default defineConfig({
         "src/diff/types.ts",
         "src/builder/options.ts",
         "src/renderer/options.ts",
+        // Test helper files must not appear in source coverage
+        "tests/**",
       ],
       thresholds: {
         lines: 90,
