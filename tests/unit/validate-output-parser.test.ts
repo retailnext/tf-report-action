@@ -92,4 +92,39 @@ describe("parseValidateOutput", () => {
     });
     expect(() => parseValidateOutput(input)).toThrow(/format_version/);
   });
+
+  it("throws when format_version major is greater than 1", () => {
+    const input = JSON.stringify({
+      format_version: "2.0",
+      valid: true,
+      error_count: 0,
+      warning_count: 0,
+      diagnostics: [],
+    });
+    expect(() => parseValidateOutput(input)).toThrow(/major version 2/);
+  });
+
+  it("accepts format_version 1.x variants", () => {
+    for (const v of ["1.0", "1.1", "1.99"]) {
+      const input = JSON.stringify({
+        format_version: v,
+        valid: true,
+        error_count: 0,
+        warning_count: 0,
+        diagnostics: [],
+      });
+      expect(parseValidateOutput(input).format_version).toBe(v);
+    }
+  });
+
+  it("accepts format_version 0.x variants", () => {
+    const input = JSON.stringify({
+      format_version: "0.1",
+      valid: true,
+      error_count: 0,
+      warning_count: 0,
+      diagnostics: [],
+    });
+    expect(parseValidateOutput(input).format_version).toBe("0.1");
+  });
 });

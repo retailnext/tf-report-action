@@ -78,7 +78,7 @@ function isLargeValue(value: string | null): boolean {
 export function buildAttributeChanges(
   change: Change,
   address: string,
-  configRefs: ConfigRefIndex,
+  _configRefs: ConfigRefIndex,
   options: BuildOptions,
 ): AttributeChange[] {
   const before = change.before ?? null;

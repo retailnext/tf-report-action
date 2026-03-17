@@ -63,9 +63,17 @@ function parseValidateOutput(json) {
     throw new Error("Validate output must be a JSON object");
   }
   const obj = parsed;
-  if (typeof obj["format_version"] !== "string") {
+  const formatVersion = obj["format_version"];
+  if (typeof formatVersion !== "string") {
     throw new Error(
       "Validate output is missing required field: format_version"
+    );
+  }
+  const majorStr = formatVersion.split(".")[0] ?? "0";
+  const major = parseInt(majorStr, 10);
+  if (isNaN(major) || major > 1) {
+    throw new Error(
+      `Unsupported validate format_version: ${formatVersion} (major version ${String(major)} > 1)`
     );
   }
   return parsed;
@@ -296,7 +304,7 @@ function isLargeValue(value) {
   }
   return false;
 }
-function buildAttributeChanges(change, address, configRefs, options) {
+function buildAttributeChanges(change, address, _configRefs, options) {
   const before = change.before ?? null;
   const after = change.after ?? null;
   const beforeSensitiveMap = shadowToMap(change.before_sensitive);
@@ -2146,9 +2154,11 @@ var MarkdownWriter = class {
     this.lines.push("");
     return this;
   }
-  /** Appends a blockquote line (> prefix). */
+  /** Appends blockquote lines (> prefix on every line). */
   blockquote(text) {
-    this.lines.push(`> ${text}`);
+    for (const line of text.split("\n")) {
+      this.lines.push(`> ${line}`);
+    }
     return this;
   }
   /** Appends a blank line. */
@@ -2558,8 +2568,12 @@ function renderResource(resource, writer, options, diffCache, applyContext) {
       writer.tableHeader(["Attribute", "Before", "After"]);
       for (const attr of smallAttrs) {
         const skipDiff = attr.isSensitive || attr.isKnownAfterApply;
-        const beforeCell = skipDiff ? MarkdownWriter.inlineCode(attr.before ?? "") : MarkdownWriter.escapeCell(attr.before ?? "");
-        const afterCell = skipDiff ? MarkdownWriter.inlineCode(attr.after ?? "") : formatDiff(attr.before, attr.after, diffFormat);
+        const beforeCell = skipDiff ? MarkdownWriter.inlineCode(
+          MarkdownWriter.escapeCell(attr.before ?? "")
+        ) : MarkdownWriter.escapeCell(attr.before ?? "");
+        const afterCell = skipDiff ? MarkdownWriter.inlineCode(
+          MarkdownWriter.escapeCell(attr.after ?? "")
+        ) : formatDiff(attr.before, attr.after, diffFormat);
         writer.tableRow([
           MarkdownWriter.escapeCell(attr.name),
           beforeCell,

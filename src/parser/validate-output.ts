@@ -28,9 +28,18 @@ export function parseValidateOutput(json: string): ValidateOutput {
 
   const obj = parsed as Record<string, unknown>;
 
-  if (typeof obj["format_version"] !== "string") {
+  const formatVersion = obj["format_version"];
+  if (typeof formatVersion !== "string") {
     throw new Error(
       "Validate output is missing required field: format_version",
+    );
+  }
+
+  const majorStr = formatVersion.split(".")[0] ?? "0";
+  const major = parseInt(majorStr, 10);
+  if (isNaN(major) || major > 1) {
+    throw new Error(
+      `Unsupported validate format_version: ${formatVersion} (major version ${String(major)} > 1)`,
     );
   }
 

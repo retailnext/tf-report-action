@@ -26,9 +26,11 @@ export class MarkdownWriter {
     return this;
   }
 
-  /** Appends a blockquote line (> prefix). */
+  /** Appends blockquote lines (> prefix on every line). */
   blockquote(text: string): this {
-    this.lines.push(`> ${text}`);
+    for (const line of text.split("\n")) {
+      this.lines.push(`> ${line}`);
+    }
     return this;
   }
 

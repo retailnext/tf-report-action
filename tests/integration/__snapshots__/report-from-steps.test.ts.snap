@@ -1472,9 +1472,9 @@ exports[`reportFromSteps integration — apply-no-show fixtures > terraform/stat
 ⚠️ **Some objects will no longer be managed by Terraform**
 
 > If you apply this plan, Terraform will discard its tracking information for the following objects, but it will not delete them:
- - null_resource.ephemeral
-
-After applying this plan, Terraform will no longer manage these objects. You will need to import them into Terraform to manage them again.
+>  - null_resource.ephemeral
+> 
+> After applying this plan, Terraform will no longer manage these objects. You will need to import them into Terraform to manage them again.
 
 ## Resource Changes
 
@@ -2982,8 +2982,8 @@ exports[`reportFromSteps integration — apply-no-show fixtures > tofu/state-ope
 ⚠️ **Resource going to be removed from the state**
 
 > After this plan gets applied, the resource null_resource.ephemeral will not be managed anymore by OpenTofu.
-
-In case you want to manage the resource again, you will have to import it.
+> 
+> In case you want to manage the resource again, you will have to import it.
 
 ## Resource Changes
 
@@ -9555,9 +9555,9 @@ exports[`reportFromSteps integration — generated fixtures > terraform/state-op
 ⚠️ **Some objects will no longer be managed by Terraform**
 
 > If you apply this plan, Terraform will discard its tracking information for the following objects, but it will not delete them:
- - null_resource.ephemeral
-
-After applying this plan, Terraform will no longer manage these objects. You will need to import them into Terraform to manage them again.
+>  - null_resource.ephemeral
+> 
+> After applying this plan, Terraform will no longer manage these objects. You will need to import them into Terraform to manage them again.
 
 ## Resource Changes
 
@@ -9625,9 +9625,9 @@ exports[`reportFromSteps integration — generated fixtures > terraform/state-op
 ⚠️ **Some objects will no longer be managed by Terraform**
 
 > If you apply this plan, Terraform will discard its tracking information for the following objects, but it will not delete them:
- - null_resource.ephemeral
-
-After applying this plan, Terraform will no longer manage these objects. You will need to import them into Terraform to manage them again.
+>  - null_resource.ephemeral
+> 
+> After applying this plan, Terraform will no longer manage these objects. You will need to import them into Terraform to manage them again.
 
 ## Resource Changes
 
@@ -13702,8 +13702,8 @@ exports[`reportFromSteps integration — generated fixtures > tofu/state-operati
 ⚠️ **Resource going to be removed from the state**
 
 > After this plan gets applied, the resource null_resource.ephemeral will not be managed anymore by OpenTofu.
-
-In case you want to manage the resource again, you will have to import it.
+> 
+> In case you want to manage the resource again, you will have to import it.
 
 ## Resource Changes
 
@@ -13771,8 +13771,8 @@ exports[`reportFromSteps integration — generated fixtures > tofu/state-operati
 ⚠️ **Resource going to be removed from the state**
 
 > After this plan gets applied, the resource null_resource.ephemeral will not be managed anymore by OpenTofu.
-
-In case you want to manage the resource again, you will have to import it.
+> 
+> In case you want to manage the resource again, you will have to import it.
 
 ## Resource Changes
 
@@ -15168,9 +15168,9 @@ exports[`reportFromSteps integration — no-show fixtures (Tier 3) > terraform/s
 ⚠️ **Some objects will no longer be managed by Terraform**
 
 > If you apply this plan, Terraform will discard its tracking information for the following objects, but it will not delete them:
- - null_resource.ephemeral
-
-After applying this plan, Terraform will no longer manage these objects. You will need to import them into Terraform to manage them again.
+>  - null_resource.ephemeral
+> 
+> After applying this plan, Terraform will no longer manage these objects. You will need to import them into Terraform to manage them again.
 
 ## Resource Changes
 
@@ -16378,8 +16378,8 @@ exports[`reportFromSteps integration — no-show fixtures (Tier 3) > tofu/state-
 ⚠️ **Resource going to be removed from the state**
 
 > After this plan gets applied, the resource null_resource.ephemeral will not be managed anymore by OpenTofu.
-
-In case you want to manage the resource again, you will have to import it.
+> 
+> In case you want to manage the resource again, you will have to import it.
 
 ## Resource Changes
 
@@ -18024,9 +18024,9 @@ exports[`reportFromSteps integration — plan-only fixtures > terraform/state-op
 ⚠️ **Some objects will no longer be managed by Terraform**
 
 > If you apply this plan, Terraform will discard its tracking information for the following objects, but it will not delete them:
- - null_resource.ephemeral
-
-After applying this plan, Terraform will no longer manage these objects. You will need to import them into Terraform to manage them again.
+>  - null_resource.ephemeral
+> 
+> After applying this plan, Terraform will no longer manage these objects. You will need to import them into Terraform to manage them again.
 
 ## Resource Changes
 
@@ -19684,8 +19684,8 @@ exports[`reportFromSteps integration — plan-only fixtures > tofu/state-operati
 ⚠️ **Resource going to be removed from the state**
 
 > After this plan gets applied, the resource null_resource.ephemeral will not be managed anymore by OpenTofu.
-
-In case you want to manage the resource again, you will have to import it.
+> 
+> In case you want to manage the resource again, you will have to import it.
 
 ## Resource Changes
 
@@ -21590,9 +21590,9 @@ exports[`reportFromSteps — state enrichment > no-state snapshot: terraform/sta
 ⚠️ **Some objects will no longer be managed by Terraform**
 
 > If you apply this plan, Terraform will discard its tracking information for the following objects, but it will not delete them:
- - null_resource.ephemeral
-
-After applying this plan, Terraform will no longer manage these objects. You will need to import them into Terraform to manage them again.
+>  - null_resource.ephemeral
+> 
+> After applying this plan, Terraform will no longer manage these objects. You will need to import them into Terraform to manage them again.
 
 ## Resource Changes
 
@@ -23497,8 +23497,8 @@ exports[`reportFromSteps — state enrichment > no-state snapshot: tofu/state-op
 ⚠️ **Resource going to be removed from the state**
 
 > After this plan gets applied, the resource null_resource.ephemeral will not be managed anymore by OpenTofu.
-
-In case you want to manage the resource again, you will have to import it.
+> 
+> In case you want to manage the resource again, you will have to import it.
 
 ## Resource Changes
 

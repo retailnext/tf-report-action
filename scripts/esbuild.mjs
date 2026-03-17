@@ -5,6 +5,7 @@ await esbuild.build({
   bundle: true,
   format: "esm",
   platform: "node",
+  // Must match the Node.js major version from action.yml runs.using
   target: "node24",
   outfile: "dist/index.js",
   sourcemap: true,
