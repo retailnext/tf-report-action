@@ -51,7 +51,7 @@ jobs:
         id: init
         uses: retailnext/exec-action@main
         with:
-          command: tofu init -no-color
+          command: tofu init -json -no-color
 
       - name: Validate
         id: validate
@@ -124,7 +124,7 @@ jobs:
         id: init
         uses: retailnext/exec-action@main
         with:
-          command: tofu init -no-color
+          command: tofu init -json -no-color
 
       - name: Validate
         id: validate
@@ -210,7 +210,7 @@ jobs:
         id: init
         uses: retailnext/exec-action@main
         with:
-          command: tofu init -no-color
+          command: tofu init -json -no-color
           working_directory: ${{ matrix.workspace.directory }}
 
       - name: Plan
