@@ -1,3 +1,4 @@
 paths-ignore:
   - dist
+  - node_modules
   - tests/fixtures/generated
