@@ -50,11 +50,17 @@ jobs:
         with:
           command: tofu init -no-color
 
+      - name: Validate
+        id: validate
+        uses: retailnext/exec-action@main
+        with:
+          command: tofu validate -json -no-color
+
       - name: Plan
         id: plan
         uses: retailnext/exec-action@main
         with:
-          command: tofu plan -no-color -out=tfplan
+          command: tofu plan -no-color -json -detailed-exitcode -out=tfplan
           success_exit_codes: "0,2"
 
       - name: Show Plan
