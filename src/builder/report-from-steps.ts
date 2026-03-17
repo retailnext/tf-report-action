@@ -13,7 +13,7 @@
  */
 
 import type { BuildOptions } from "./options.js";
-import type { RenderOptions } from "../renderer/options.js";
+import type { RenderOptions } from "../model/render-options.js";
 import type { Env } from "../env/index.js";
 import type { StepData, ReaderOptions } from "../steps/types.js";
 import type { Report, Tool } from "../model/report.js";

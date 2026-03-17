@@ -42,6 +42,7 @@ Follow these boundaries strictly — do not add cross-cutting logic.
 | `src/flattener/`     | Flatten nested `JsonValue` → `Map<string, string \| null>` with dotted-path keys.             |
 | `src/sensitivity/`   | Detect whether a flattened attribute path is sensitive. Pure predicate.                       |
 | `src/raw-formatter/` | Format raw command output (JSON Lines, validate results, plain text) into Markdown fragments. |
+| `src/jsonl-scanner/` | Scan and classify JSON Lines output from Terraform/OpenTofu commands into structured results. |
 
 ### Layer 2 — I/O and parsing (depend on Layers 0–1)
 
@@ -78,26 +79,27 @@ Follow these boundaries strictly — do not add cross-cutting logic.
 
 **Dependency rules (layered — import only from same or lower layer):**
 
-| Module           | May import from (beyond `model/`)                                    |
-| ---------------- | -------------------------------------------------------------------- |
-| `diff/`          | _(nothing)_                                                          |
-| `flattener/`     | _(nothing)_                                                          |
-| `sensitivity/`   | _(nothing)_                                                          |
-| `raw-formatter/` | _(nothing)_                                                          |
-| `env/`           | _(nothing)_                                                          |
-| `parser/`        | `tfjson/`                                                            |
-| `steps/`         | `env/`                                                               |
-| `builder/`       | `tfjson/`, `flattener/`, `sensitivity/`, `steps/`, `env/`, `parser/` |
-| `compositor/`    | _(nothing)_                                                          |
-| `renderer/`      | `diff/`, `raw-formatter/`                                            |
-| `index.ts`       | `parser/`, `builder/`, `renderer/`, `compositor/`, `steps/`, `env/`  |
-| `action/`        | `index.ts`, `model/`, `github/`, `env/`                              |
-| `github/`        | `model/` only                                                        |
+| Module           | May import from (beyond `model/`)                                                      |
+| ---------------- | -------------------------------------------------------------------------------------- |
+| `diff/`          | _(nothing)_                                                                            |
+| `flattener/`     | _(nothing)_                                                                            |
+| `sensitivity/`   | _(nothing)_                                                                            |
+| `raw-formatter/` | _(nothing)_                                                                            |
+| `jsonl-scanner/` | `tfjson/`                                                                              |
+| `env/`           | _(nothing)_                                                                            |
+| `parser/`        | `tfjson/`                                                                              |
+| `steps/`         | `env/`                                                                                 |
+| `builder/`       | `tfjson/`, `flattener/`, `sensitivity/`, `steps/`, `env/`, `parser/`, `jsonl-scanner/` |
+| `compositor/`    | _(nothing)_                                                                            |
+| `renderer/`      | `diff/`, `raw-formatter/`                                                              |
+| `index.ts`       | `parser/`, `builder/`, `renderer/`, `compositor/`, `steps/`, `env/`                    |
+| `action/`        | `index.ts`, `model/`, `github/`, `env/`                                                |
+| `github/`        | `model/` only                                                                          |
 
 **Additional constraints:**
 
 - `model/` is universal — every module may import from it.
-- `tfjson/` is restricted — only `parser/` and `builder/` may import.
+- `tfjson/` is restricted — only `model/`, `parser/`, `builder/`, and `jsonl-scanner/` may import.
 - `builder/apply.ts` must NOT be reexported from the builder barrel (circular dep risk).
 - `renderer/` must **not** import sentinel string constants from `model/sentinels.ts` —
   all display logic must use boolean flags (`isSensitive`, `isKnownAfterApply`). This

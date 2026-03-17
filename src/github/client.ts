@@ -147,8 +147,12 @@ function parseJson(body: string): unknown {
 /** Throw if the HTTP status code is outside the 2xx range. */
 function assertOk(res: HttpResponse): void {
   if (res.statusCode < 200 || res.statusCode > 299) {
+    // Truncate body to avoid leaking sensitive data (e.g. issue bodies
+    // containing plan content) in error messages.
+    const preview =
+      res.body.length > 200 ? res.body.slice(0, 200) + "…" : res.body;
     throw new Error(
-      `GitHub API request failed with status ${String(res.statusCode)}: ${res.body}`,
+      `GitHub API request failed with status ${String(res.statusCode)}: ${preview}`,
     );
   }
 }

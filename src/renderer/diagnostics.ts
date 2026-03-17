@@ -1,5 +1,5 @@
 import type { Diagnostic } from "../model/diagnostic.js";
-import type { UIDiagnosticSnippet } from "../tfjson/machine-readable-ui.js";
+import type { UIDiagnosticSnippet } from "../model/index.js";
 import type { MarkdownWriter } from "./writer.js";
 import { DIAGNOSTIC_ERROR, DIAGNOSTIC_WARNING } from "../model/status-icons.js";
 

@@ -17,3 +17,6 @@ export type { StepOutcome } from "./step-outcome.js";
 export type { StepFileRead } from "./step-file-read.js";
 export type { StepRole } from "./step-commands.js";
 export { expectedCommand } from "./step-commands.js";
+export type { JsonValue } from "../tfjson/common.js";
+export type { UIDiagnosticSnippet } from "../tfjson/machine-readable-ui.js";
+export type { RenderOptions, DiffFormat } from "./render-options.js";

@@ -48,24 +48,24 @@ export function buildStepIssue(
   const stdoutRead = readStepStdoutForDisplay(step, readerOpts);
   const stderrRead = readStepStderrForDisplay(step, readerOpts);
 
-  const issue: StepIssue = { id: stepId, heading, isFailed };
-  if (exitCode !== undefined)
-    (issue as { exitCode: string }).exitCode = exitCode;
-  if (diagnostic !== undefined)
-    (issue as { diagnostic: string }).diagnostic = diagnostic;
-  if (stdoutRead.content !== undefined)
-    (issue as { stdout: string }).stdout = stdoutRead.content;
-  if (stdoutRead.truncated === true)
-    (issue as { stdoutTruncated: boolean }).stdoutTruncated = true;
-  if (stdoutRead.error !== undefined)
-    (issue as { stdoutError: string }).stdoutError = stdoutRead.error;
-  if (stderrRead.content !== undefined)
-    (issue as { stderr: string }).stderr = stderrRead.content;
-  if (stderrRead.truncated === true)
-    (issue as { stderrTruncated: boolean }).stderrTruncated = true;
-  if (stderrRead.error !== undefined)
-    (issue as { stderrError: string }).stderrError = stderrRead.error;
-  return issue;
+  // Build a mutable bag then return as the readonly StepIssue interface.
+  // This avoids repeated `as` casts for each optional field while still
+  // satisfying exactOptionalPropertyTypes (fields are only present when
+  // their values are defined).
+  const bag: Record<string, string | boolean> = {
+    id: stepId,
+    heading,
+    isFailed,
+  };
+  if (exitCode !== undefined) bag["exitCode"] = exitCode;
+  if (diagnostic !== undefined) bag["diagnostic"] = diagnostic;
+  if (stdoutRead.content !== undefined) bag["stdout"] = stdoutRead.content;
+  if (stdoutRead.truncated === true) bag["stdoutTruncated"] = true;
+  if (stdoutRead.error !== undefined) bag["stdoutError"] = stdoutRead.error;
+  if (stderrRead.content !== undefined) bag["stderr"] = stderrRead.content;
+  if (stderrRead.truncated === true) bag["stderrTruncated"] = true;
+  if (stderrRead.error !== undefined) bag["stderrError"] = stderrRead.error;
+  return bag as unknown as StepIssue;
 }
 
 /**

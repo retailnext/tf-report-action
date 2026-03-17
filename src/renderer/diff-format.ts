@@ -74,9 +74,8 @@ export function formatDiff(
         }
         delBuf += entry.value;
       } else if (entry.kind === "added") {
-        if (delBuf && !insBuf) {
-          // Keep collecting del first, then ins
-        }
+        // Deletions accumulate in delBuf first; insertions follow in insBuf.
+        // Both are flushed together when an "equal" entry arrives.
         insBuf += entry.value;
       } else {
         flushBuffers();

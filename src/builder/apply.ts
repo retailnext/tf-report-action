@@ -64,13 +64,9 @@ export function buildApplyReport(
   replaceKnownAfterApply(report);
 
   // Detect resources that were planned but never started (interrupted apply)
-  const completedAddresses = new Set(
-    scanResult.applyStatuses.filter((s) => s.success).map((s) => s.address),
-  );
   const notStartedStatuses = buildNotStartedStatuses(
     plannedAddresses,
     appliedAddresses,
-    completedAddresses,
   );
   const allStatuses = [
     ...scanResult.applyStatuses,
@@ -171,11 +167,12 @@ function buildStateOnlyStatuses(
 function buildNotStartedStatuses(
   plannedAddresses: Map<string, PlanAction>,
   appliedAddresses: Set<string>,
-  completedAddresses: Set<string>,
 ): ApplyStatus[] {
   const notStarted: ApplyStatus[] = [];
   for (const [addr, action] of plannedAddresses) {
-    if (!appliedAddresses.has(addr) && !completedAddresses.has(addr)) {
+    // completedAddresses ⊆ appliedAddresses, so checking appliedAddresses
+    // is sufficient — a resource cannot complete without being applied.
+    if (!appliedAddresses.has(addr)) {
       notStarted.push({
         address: addr,
         action,

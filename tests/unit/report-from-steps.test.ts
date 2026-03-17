@@ -866,4 +866,54 @@ describe("edge cases", () => {
     expect(typeof result).toBe("string");
     expect(result.length).toBeGreaterThan(0);
   });
+
+  // ─── Relative path rejection ────────────────────────────────────────────
+
+  it("reports errors for relative stdout_file paths (not silently empty)", () => {
+    const result = reportFromSteps(
+      stepsJson({
+        plan: {
+          outcome: "success",
+          conclusion: "success",
+          outputs: {
+            exit_code: "2",
+            stdout_file: "plan.stdout",
+          },
+        },
+        "show-plan": {
+          outcome: "success",
+          conclusion: "success",
+          outputs: {
+            exit_code: "0",
+            stdout_file: "show-plan.stdout",
+          },
+        },
+      }),
+      baseOpts(),
+    );
+    // Should NOT silently produce empty content — should explain the error
+    expect(result).toMatch(/[Rr]elative file path/);
+    expect(result).not.toContain("Showing raw command output");
+  });
+
+  it("shows step statuses when file reads fail due to relative paths", () => {
+    const result = reportFromSteps(
+      stepsJson({
+        plan: {
+          outcome: "success",
+          conclusion: "success",
+          outputs: { exit_code: "2", stdout_file: "plan.stdout" },
+        },
+        "show-plan": {
+          outcome: "success",
+          conclusion: "success",
+          outputs: { exit_code: "0", stdout_file: "show-plan.stdout" },
+        },
+      }),
+      baseOpts(),
+    );
+    expect(result).toContain("Steps");
+    expect(result).toContain("show-plan");
+    expect(result).toContain("plan");
+  });
 });

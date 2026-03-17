@@ -208,7 +208,10 @@ export async function run(
       ? `\n---\n\n[View logs](${logsUrl})\n`
       : `\n---\n\n[View logs](${logsUrl}) • Last updated: ${formatTimestamp(new Date())}\n`;
 
-    const maxOutputLength = COMMENT_LIMIT - footer.length - OVERHEAD_RESERVE;
+    const maxOutputLength = Math.max(
+      0,
+      COMMENT_LIMIT - footer.length - OVERHEAD_RESERVE,
+    );
 
     // -----------------------------------------------------------------------
     // Generate report

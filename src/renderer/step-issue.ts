@@ -45,7 +45,8 @@ export function renderStepIssue(issue: StepIssue): Section {
       issue.stderrTruncated === true
         ? issue.stderr + "\n… (truncated)"
         : issue.stderr;
-    content += `<details open>\n<summary>stderr</summary>\n\n\`\`\`\n${displayContent}\n\`\`\`\n\n</details>\n\n`;
+    const formattedStderr = formatRawOutput(displayContent);
+    content += `<details open>\n<summary>stderr</summary>\n\n${formattedStderr}\n\n</details>\n\n`;
   } else if (issue.stderrError !== undefined) {
     content += `> ${DIAGNOSTIC_WARNING} stderr not available: ${issue.stderrError}\n\n`;
   }

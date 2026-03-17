@@ -1,5 +1,5 @@
 import type { BuildOptions } from "./builder/options.js";
-import type { RenderOptions } from "./renderer/options.js";
+import type { RenderOptions } from "./model/render-options.js";
 import { parsePlan } from "./parser/index.js";
 import { buildReport } from "./builder/index.js";
 import { buildApplyReport } from "./builder/apply.js";
@@ -118,7 +118,7 @@ function getLogsUrl(
 
 // Re-export types consumers may need
 export type { BuildOptions } from "./builder/options.js";
-export type { RenderOptions, DiffFormat } from "./renderer/options.js";
+export type { RenderOptions, DiffFormat } from "./model/render-options.js";
 export type { Report, RawStepStdout, Tool } from "./model/report.js";
 export type { StepRole } from "./model/step-commands.js";
 export { expectedCommand } from "./model/step-commands.js";

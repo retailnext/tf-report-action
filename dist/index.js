@@ -585,13 +585,9 @@ function buildApplyReport(plan, scanResult, options = {}) {
   }));
   filterPhantomResources(report, appliedAddresses);
   replaceKnownAfterApply(report);
-  const completedAddresses = new Set(
-    scanResult.applyStatuses.filter((s) => s.success).map((s) => s.address)
-  );
   const notStartedStatuses = buildNotStartedStatuses(
     plannedAddresses,
-    appliedAddresses,
-    completedAddresses
+    appliedAddresses
   );
   const allStatuses = [
     ...scanResult.applyStatuses,
@@ -643,10 +639,10 @@ function buildStateOnlyStatuses(stateOnlyAddresses) {
     success: true
   }));
 }
-function buildNotStartedStatuses(plannedAddresses, appliedAddresses, completedAddresses) {
+function buildNotStartedStatuses(plannedAddresses, appliedAddresses) {
   const notStarted = [];
   for (const [addr, action] of plannedAddresses) {
-    if (!appliedAddresses.has(addr) && !completedAddresses.has(addr)) {
+    if (!appliedAddresses.has(addr)) {
       notStarted.push({
         address: addr,
         action,
@@ -1249,24 +1245,20 @@ function buildStepIssue(step, stepId, readerOpts, diagnostic) {
   }
   const stdoutRead = readStepStdoutForDisplay(step, readerOpts);
   const stderrRead = readStepStderrForDisplay(step, readerOpts);
-  const issue = { id: stepId, heading, isFailed };
-  if (exitCode !== void 0)
-    issue.exitCode = exitCode;
-  if (diagnostic !== void 0)
-    issue.diagnostic = diagnostic;
-  if (stdoutRead.content !== void 0)
-    issue.stdout = stdoutRead.content;
-  if (stdoutRead.truncated === true)
-    issue.stdoutTruncated = true;
-  if (stdoutRead.error !== void 0)
-    issue.stdoutError = stdoutRead.error;
-  if (stderrRead.content !== void 0)
-    issue.stderr = stderrRead.content;
-  if (stderrRead.truncated === true)
-    issue.stderrTruncated = true;
-  if (stderrRead.error !== void 0)
-    issue.stderrError = stderrRead.error;
-  return issue;
+  const bag = {
+    id: stepId,
+    heading,
+    isFailed
+  };
+  if (exitCode !== void 0) bag["exitCode"] = exitCode;
+  if (diagnostic !== void 0) bag["diagnostic"] = diagnostic;
+  if (stdoutRead.content !== void 0) bag["stdout"] = stdoutRead.content;
+  if (stdoutRead.truncated === true) bag["stdoutTruncated"] = true;
+  if (stdoutRead.error !== void 0) bag["stdoutError"] = stdoutRead.error;
+  if (stderrRead.content !== void 0) bag["stderr"] = stderrRead.content;
+  if (stderrRead.truncated === true) bag["stderrTruncated"] = true;
+  if (stderrRead.error !== void 0) bag["stderrError"] = stderrRead.error;
+  return bag;
 }
 
 // src/model/status-icons.ts
@@ -2086,8 +2078,6 @@ function formatDiff(before, after, format) {
         }
         delBuf += entry.value;
       } else if (entry.kind === "added") {
-        if (delBuf && !insBuf) {
-        }
         insBuf += entry.value;
       } else {
         flushBuffers2();
@@ -2770,12 +2760,11 @@ ${formatted}
   }
   if (issue.stderr !== void 0) {
     const displayContent = issue.stderrTruncated === true ? issue.stderr + "\n\u2026 (truncated)" : issue.stderr;
+    const formattedStderr = formatRawOutput(displayContent);
     content += `<details open>
 <summary>stderr</summary>
 
-\`\`\`
-${displayContent}
-\`\`\`
+${formattedStderr}
 
 </details>
 
@@ -3086,8 +3075,9 @@ function parseJson(body) {
 }
 function assertOk(res) {
   if (res.statusCode < 200 || res.statusCode > 299) {
+    const preview = res.body.length > 200 ? res.body.slice(0, 200) + "\u2026" : res.body;
     throw new Error(
-      `GitHub API request failed with status ${String(res.statusCode)}: ${res.body}`
+      `GitHub API request failed with status ${String(res.statusCode)}: ${preview}`
     );
   }
 }
@@ -3280,7 +3270,10 @@ async function run(env = process.env, clientFactory = createGitHubClient) {
 
 [View logs](${logsUrl}) \u2022 Last updated: ${formatTimestamp(/* @__PURE__ */ new Date())}
 `;
-    const maxOutputLength = COMMENT_LIMIT - footer.length - OVERHEAD_RESERVE;
+    const maxOutputLength = Math.max(
+      0,
+      COMMENT_LIMIT - footer.length - OVERHEAD_RESERVE
+    );
     const reportOptions = {
       workspace: inputs.workspace,
       env,

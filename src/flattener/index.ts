@@ -3,7 +3,7 @@
  * used under the MIT License.
  */
 
-import type { JsonValue } from "../tfjson/common.js";
+import type { JsonValue } from "../model/index.js";
 
 /**
  * Flattens a nested JSON value into a flat map with dotted-path notation.
