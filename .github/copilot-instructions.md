@@ -168,13 +168,27 @@ inside source or test files — always set it in the shell environment.
 Actions requires the entry point to be checked in — there is no install step at
 action runtime.
 
-**When to bundle**: After any change to source code, configuration, or dependencies,
-run `npm run bundle` to regenerate the dist files. The CI workflow verifies dist is
-up to date.
+**When to bundle**: After any change to source code, configuration, or
+dependencies, dist must be rebuilt. This is handled automatically by the
+pre-commit obligation below.
 
-**Obligation**: You must run `npm run lint` and `npm run bundle` before committing
-or calling `report_progress`. Never call `report_progress` with a stale bundle or
-failing lint.
+**Obligation**: Before every commit, run:
+
+```bash
+npm run ci && npm run check:dist
+```
+
+`npm run check:dist` runs `npm run bundle` then checks `git diff --exit-code dist/`
+(working tree vs index). If it fails because dist changed, stage the updated dist
+and include it in the commit:
+
+```bash
+git add dist/
+git commit  # include dist/ in the commit
+```
+
+Never commit with a stale dist. Never run only `npm run ci` without also running
+`npm run check:dist` before committing — `npm run ci` does not include bundling.
 
 ---
 

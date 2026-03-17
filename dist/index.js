@@ -2860,13 +2860,6 @@ ${stepTable}` });
       full: "No steps were found in the workflow context.\n\n"
     });
   }
-  if (report.logsUrl !== void 0) {
-    sections.push({
-      id: "logs-link",
-      full: `[View workflow run logs](${report.logsUrl})
-`
-    });
-  }
   return sections;
 }
 
