@@ -1,14 +1,18 @@
 name: CodeQL
 
 on:
-  push:
-    branches: [main]
   pull_request:
+    branches:
+      - main
+  push:
+    branches:
+      - main
   schedule:
-    - cron: "37 5 * * 1"
+    - cron: "31 7 * * 3"
 
 permissions:
   actions: read
+  checks: write
   contents: read
   security-events: write
 
@@ -20,21 +24,26 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        language: [javascript-typescript]
+        language:
+          - javascript-typescript
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        id: checkout
+        uses: actions/checkout@v4
 
       - name: Initialize CodeQL
+        id: initialize
         uses: github/codeql-action/init@v3
         with:
+          config-file: .github/codeql/codeql-config.yml
           languages: ${{ matrix.language }}
-          config-file: ./.github/codeql/codeql-config.yml
+          source-root: src
 
       - name: Autobuild
+        id: autobuild
         uses: github/codeql-action/autobuild@v3
 
       - name: Perform CodeQL Analysis
+        id: analyze
         uses: github/codeql-action/analyze@v3
-        with:
-          category: "/language:${{ matrix.language }}"
