@@ -17,11 +17,17 @@ export const DEFAULT_MAX_OUTPUT_LENGTH = 63 * 1024;
  * Compose sections into a single output string within a budget.
  *
  * Sections are processed in the order given. Fixed sections are always
- * included. Non-fixed sections use their full content if budget allows,
- * compact content if under pressure, or are omitted if neither fits.
+ * included in full (they are never degraded or omitted). Non-fixed sections
+ * use their full content if budget allows, compact content if under pressure,
+ * or are omitted if neither fits.
+ *
+ * **Budget is best-effort**: if the total length of fixed sections alone
+ * exceeds the budget, the output will exceed the budget because fixed
+ * sections are unconditionally included. Callers that need a hard limit
+ * should truncate the returned output.
  *
  * @param sections - Ordered list of sections to compose
- * @param budget - Maximum total output length in characters
+ * @param budget - Maximum total output length in characters (best-effort)
  * @returns The composed result with degradation metadata
  */
 export function composeSections(

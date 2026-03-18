@@ -49,6 +49,12 @@ function renderDiagnostic(diag: Diagnostic, writer: MarkdownWriter): void {
   if (diag.snippet !== undefined) {
     renderSnippet(diag.snippet, diag.range?.filename, writer);
   }
+
+  // Blank line after blockquote group prevents CommonMark lazy continuation
+  // from absorbing subsequent content into the blockquote.
+  if (diag.detail || diag.snippet !== undefined) {
+    writer.blankLine();
+  }
 }
 
 /**

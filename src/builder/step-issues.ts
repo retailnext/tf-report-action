@@ -50,31 +50,28 @@ export function buildStepIssue(
 
   // Build with conditional spreads to preserve type safety while
   // respecting exactOptionalPropertyTypes (fields must not be undefined).
-  return {
+  const issue: StepIssue = {
     id: stepId,
     heading,
     isFailed,
-    ...(exitCode !== undefined ? { exitCode } : undefined),
-    ...(diagnostic !== undefined ? { diagnostic } : undefined),
-    ...(stdoutRead.content !== undefined
-      ? { stdout: stdoutRead.content }
-      : undefined),
+    ...(exitCode !== undefined ? { exitCode } : {}),
+    ...(diagnostic !== undefined ? { diagnostic } : {}),
+    ...(stdoutRead.content !== undefined ? { stdout: stdoutRead.content } : {}),
     ...(stdoutRead.truncated === true
       ? { stdoutTruncated: true as const }
-      : undefined),
+      : {}),
     ...(stdoutRead.error !== undefined
       ? { stdoutError: stdoutRead.error }
-      : undefined),
-    ...(stderrRead.content !== undefined
-      ? { stderr: stderrRead.content }
-      : undefined),
+      : {}),
+    ...(stderrRead.content !== undefined ? { stderr: stderrRead.content } : {}),
     ...(stderrRead.truncated === true
       ? { stderrTruncated: true as const }
-      : undefined),
+      : {}),
     ...(stderrRead.error !== undefined
       ? { stderrError: stderrRead.error }
-      : undefined),
-  } as StepIssue;
+      : {}),
+  };
+  return issue;
 }
 
 /**

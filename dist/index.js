@@ -1037,19 +1037,20 @@ function buildStepIssue(step, stepId, readerOpts, diagnostic) {
   }
   const stdoutRead = readStepStdoutForDisplay(step, readerOpts);
   const stderrRead = readStepStderrForDisplay(step, readerOpts);
-  return {
+  const issue = {
     id: stepId,
     heading,
     isFailed,
-    ...exitCode !== void 0 ? { exitCode } : void 0,
-    ...diagnostic !== void 0 ? { diagnostic } : void 0,
-    ...stdoutRead.content !== void 0 ? { stdout: stdoutRead.content } : void 0,
-    ...stdoutRead.truncated === true ? { stdoutTruncated: true } : void 0,
-    ...stdoutRead.error !== void 0 ? { stdoutError: stdoutRead.error } : void 0,
-    ...stderrRead.content !== void 0 ? { stderr: stderrRead.content } : void 0,
-    ...stderrRead.truncated === true ? { stderrTruncated: true } : void 0,
-    ...stderrRead.error !== void 0 ? { stderrError: stderrRead.error } : void 0
+    ...exitCode !== void 0 ? { exitCode } : {},
+    ...diagnostic !== void 0 ? { diagnostic } : {},
+    ...stdoutRead.content !== void 0 ? { stdout: stdoutRead.content } : {},
+    ...stdoutRead.truncated === true ? { stdoutTruncated: true } : {},
+    ...stdoutRead.error !== void 0 ? { stdoutError: stdoutRead.error } : {},
+    ...stderrRead.content !== void 0 ? { stderr: stderrRead.content } : {},
+    ...stderrRead.truncated === true ? { stderrTruncated: true } : {},
+    ...stderrRead.error !== void 0 ? { stderrError: stderrRead.error } : {}
   };
+  return issue;
 }
 function shouldCreateStepIssue(step, readerOpts, diagnostic) {
   const outcome = getStepOutcome(step);
@@ -2603,6 +2604,9 @@ function renderDiagnostic(diag, writer) {
   }
   if (diag.snippet !== void 0) {
     renderSnippet(diag.snippet, diag.range?.filename, writer);
+  }
+  if (diag.detail || diag.snippet !== void 0) {
+    writer.blankLine();
   }
 }
 function renderSnippet(snippet, filename, writer) {
