@@ -112,9 +112,10 @@ function buildActionGroupsFromScan(
   actionOrder: readonly PlanAction[],
 ): SummaryActionGroup[] {
   const buckets = new Map<PlanAction, Map<string, number>>();
+  const actionSet = new Set<PlanAction>(actionOrder);
 
   for (const c of changes) {
-    if (!actionOrder.includes(c.action)) continue;
+    if (!actionSet.has(c.action)) continue;
     let typeCounts = buckets.get(c.action);
     if (!typeCounts) {
       typeCounts = new Map();

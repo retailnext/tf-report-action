@@ -76,6 +76,9 @@ export function tryProcessShowPlan(
         const applyScan = scanString(applyRead.content);
         enrichedReport = buildApplyReport(plan, applyScan, options);
       } catch {
+        report.warnings.push(
+          `Apply output from step \`${applyStepId}\` could not be parsed; using plan data only.`,
+        );
         enrichedReport = buildReport(plan, options);
       }
     } else {

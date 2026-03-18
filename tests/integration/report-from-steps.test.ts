@@ -85,7 +85,138 @@ describe("reportFromSteps integration — generated fixtures", () => {
   }
 });
 
-// ---------- Plan-only fixtures (Tier 1 without apply) ----------
+// ---------- Custom step IDs (verify step ID overrides work end-to-end) ----------
+
+/**
+ * Renames step keys in a steps JSON string, mapping default IDs to custom ones.
+ * This simulates a user configuring custom step IDs in their workflow.
+ */
+function renameStepKeys(
+  stepsJson: string,
+  mapping: Record<string, string>,
+): string {
+  const steps = JSON.parse(stepsJson) as Record<string, unknown>;
+  const renamed: Record<string, unknown> = {};
+  for (const [key, value] of Object.entries(steps)) {
+    renamed[mapping[key] ?? key] = value;
+  }
+  return JSON.stringify(renamed);
+}
+
+const CUSTOM_STEP_IDS = {
+  init: "my-init",
+  validate: "my-validate",
+  plan: "my-plan",
+  "show-plan": "my-show-plan",
+  apply: "my-apply",
+  state: "my-state",
+} as const;
+
+const CUSTOM_STEP_ID_OPTIONS: Partial<ReportOptions> = {
+  initStepId: CUSTOM_STEP_IDS.init,
+  validateStepId: CUSTOM_STEP_IDS.validate,
+  planStepId: CUSTOM_STEP_IDS.plan,
+  showPlanStepId: CUSTOM_STEP_IDS["show-plan"],
+  applyStepId: CUSTOM_STEP_IDS.apply,
+  stateStepId: CUSTOM_STEP_IDS.state,
+};
+
+describe("reportFromSteps integration — custom step IDs", () => {
+  for (const { label, stepsJson, fixtureDir } of generatedFixtures) {
+    describe(label, () => {
+      it("produces structured output with renamed steps and custom IDs", () => {
+        // Render with default step IDs
+        const defaultResolved = resolveStepFilePaths(stepsJson, fixtureDir);
+        const defaultResult = reportFromSteps(defaultResolved, {
+          allowedDirs: [fixtureDir],
+          env: NO_GITHUB_ENV,
+        });
+
+        // Render with custom step IDs
+        const renamedJson = renameStepKeys(stepsJson, CUSTOM_STEP_IDS);
+        const renamedResolved = resolveStepFilePaths(renamedJson, fixtureDir);
+        const customResult = reportFromSteps(renamedResolved, {
+          allowedDirs: [fixtureDir],
+          env: NO_GITHUB_ENV,
+          ...CUSTOM_STEP_ID_OPTIONS,
+        });
+
+        // Both should produce the same report tier (structured, not degraded)
+        // Step IDs appear in step tables and error headings, so exact match
+        // won't work — verify structural equivalence instead.
+        const defaultHasSummary = /Plan Summary|Apply Summary|No Changes/.test(
+          defaultResult,
+        );
+        const customHasSummary = /Plan Summary|Apply Summary|No Changes/.test(
+          customResult,
+        );
+        expect(customHasSummary).toBe(defaultHasSummary);
+
+        // If default has resource detail, custom should too
+        const defaultHasResources = defaultResult.includes("| Attribute");
+        const customHasResources = customResult.includes("| Attribute");
+        expect(customHasResources).toBe(defaultHasResources);
+
+        // Custom output should reference custom step IDs in step table
+        for (const customId of Object.values(CUSTOM_STEP_IDS)) {
+          if (customResult.includes(customId)) {
+            expect(defaultResult).not.toContain(customId);
+          }
+        }
+      });
+    });
+  }
+
+  for (const { label, stepsJson, fixtureDir } of planOnlyFixtures) {
+    describe(label, () => {
+      it("produces structured plan output with renamed steps and custom IDs", () => {
+        const defaultResolved = resolveStepFilePaths(stepsJson, fixtureDir);
+        const defaultResult = reportFromSteps(defaultResolved, {
+          allowedDirs: [fixtureDir],
+          env: NO_GITHUB_ENV,
+        });
+
+        const renamedJson = renameStepKeys(stepsJson, CUSTOM_STEP_IDS);
+        const renamedResolved = resolveStepFilePaths(renamedJson, fixtureDir);
+        const customResult = reportFromSteps(renamedResolved, {
+          allowedDirs: [fixtureDir],
+          env: NO_GITHUB_ENV,
+          ...CUSTOM_STEP_ID_OPTIONS,
+        });
+
+        // Both should produce plan content (not degraded)
+        const defaultHasPlan = /Plan Summary|Plan Output|No Changes/.test(
+          defaultResult,
+        );
+        const customHasPlan = /Plan Summary|Plan Output|No Changes/.test(
+          customResult,
+        );
+        expect(customHasPlan).toBe(defaultHasPlan);
+      });
+    });
+  }
+
+  it("degrades to Tier 4 when step IDs do not match", () => {
+    // Use the first generated fixture with default IDs but custom step ID options
+    // This means the steps won't be found → should degrade to workflow table
+    const fixture = generatedFixtures[0]!;
+    const resolved = resolveStepFilePaths(
+      fixture.stepsJson,
+      fixture.fixtureDir,
+    );
+    const result = reportFromSteps(resolved, {
+      allowedDirs: [fixture.fixtureDir],
+      env: NO_GITHUB_ENV,
+      ...CUSTOM_STEP_ID_OPTIONS,
+    });
+
+    // Should NOT contain structured plan/apply output
+    expect(result).not.toContain("Plan Summary");
+    expect(result).not.toContain("Apply Summary");
+    // Should still render (Tier 4 workflow table)
+    expect(result).toBeTruthy();
+  });
+});
 
 describe("reportFromSteps integration — plan-only fixtures", () => {
   for (const { label, stepsJson, fixtureDir } of planOnlyFixtures) {

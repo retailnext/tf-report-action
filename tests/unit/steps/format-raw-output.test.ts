@@ -104,9 +104,12 @@ describe("formatRawOutput", () => {
     expect(result).toContain("**invalid**");
     expect(result).toContain("🚨");
     expect(result).toContain("**Reference to undeclared variable**");
-    expect(result).toContain('Variable "foo" has not been declared.');
+    expect(result).toContain("Variable &quot;foo&quot; has not been declared.");
     expect(result).toContain("`    value = var.foo`");
     expect(result).toContain("line 10");
+    expect(result).toContain(
+      "resource &quot;null_resource&quot; &quot;test&quot;",
+    );
     // Validate output includes raw JSON in collapsed details
     expect(result).toContain("Show raw JSON");
   });

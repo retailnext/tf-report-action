@@ -2,6 +2,7 @@ import type { Diagnostic } from "../model/diagnostic.js";
 import type { UIDiagnosticSnippet } from "../model/index.js";
 import type { MarkdownWriter } from "./writer.js";
 import { DIAGNOSTIC_ERROR, DIAGNOSTIC_WARNING } from "../model/status-icons.js";
+import { escapeHtml } from "../raw-formatter/jsonl.js";
 
 /**
  * Renders diagnostics (errors and warnings) as a markdown section.
@@ -40,10 +41,10 @@ function renderDiagnostic(diag: Diagnostic, writer: MarkdownWriter): void {
     diag.severity === "error" ? DIAGNOSTIC_ERROR : DIAGNOSTIC_WARNING;
   const addressSuffix =
     diag.address !== undefined ? ` — \`${diag.address}\`` : "";
-  writer.paragraph(`${prefix} **${diag.summary}**${addressSuffix}`);
+  writer.paragraph(`${prefix} **${escapeHtml(diag.summary)}**${addressSuffix}`);
 
   if (diag.detail) {
-    writer.blockquote(diag.detail);
+    writer.blockquote(escapeHtml(diag.detail));
   }
 
   if (diag.snippet !== undefined) {
@@ -71,13 +72,15 @@ function renderSnippet(
 ): void {
   const location =
     filename !== undefined
-      ? `\`${snippet.code}\` in ${snippet.context} (\`${filename}\`:${String(snippet.start_line)})`
-      : `\`${snippet.code}\` in ${snippet.context}`;
+      ? `\`${snippet.code}\` in ${escapeHtml(snippet.context)} (\`${filename}\`:${String(snippet.start_line)})`
+      : `\`${snippet.code}\` in ${escapeHtml(snippet.context)}`;
   writer.blockquote(location);
 
   if (snippet.values.length > 0) {
     for (const val of snippet.values) {
-      writer.blockquote(`${val.traversal} = ${val.statement}`);
+      writer.blockquote(
+        `${escapeHtml(val.traversal)} = ${escapeHtml(val.statement)}`,
+      );
     }
   }
 }

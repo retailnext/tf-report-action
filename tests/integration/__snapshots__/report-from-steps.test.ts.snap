@@ -624,8 +624,8 @@ Exit code: \`1\`
 ❌ Configuration is **invalid**
 
 🚨 **Reference to undeclared input variable**
-> An input variable with the name "nonexistent_variable" has not been declared. This variable can be declared with a variable "nonexistent_variable" {} block.
-> \`    value = var.nonexistent_variable\` in resource "null_resource" "baseline" (line 16)
+> An input variable with the name &quot;nonexistent_variable&quot; has not been declared. This variable can be declared with a variable &quot;nonexistent_variable&quot; {} block.
+> \`    value = var.nonexistent_variable\` in resource &quot;null_resource&quot; &quot;baseline&quot; (line 16)
 
 <details>
 <summary>Show raw JSON</summary>
@@ -1178,7 +1178,7 @@ exports[`reportFromSteps integration — apply-no-show fixtures > terraform/null
 ⚠️ **Check block assertion known after apply**
 
 > The condition could not be evaluated at this time, a result will be known when this plan is applied.
-> \`    condition     = null_resource.alpha.id != ""\` in check "readiness" (\`main.tf\`:50)
+> \`    condition     = null_resource.alpha.id != ""\` in check &quot;readiness&quot; (\`main.tf\`:50)
 > null_resource.alpha.id = is a string
 
 ## Resource Changes
@@ -1245,7 +1245,7 @@ exports[`reportFromSteps integration — apply-no-show fixtures > terraform/null
 ⚠️ **Check block assertion known after apply**
 
 > The condition could not be evaluated at this time, a result will be known when this plan is applied.
-> \`    condition     = null_resource.alpha.id != ""\` in check "readiness" (\`main.tf\`:39)
+> \`    condition     = null_resource.alpha.id != ""\` in check &quot;readiness&quot; (\`main.tf\`:39)
 > null_resource.alpha.id = is a string
 
 ## Resource Changes
@@ -2134,8 +2134,8 @@ Exit code: \`1\`
 ❌ Configuration is **invalid**
 
 🚨 **Reference to undeclared input variable**
-> An input variable with the name "nonexistent_variable" has not been declared. This variable can be declared with a variable "nonexistent_variable" {} block.
-> \`    value = var.nonexistent_variable\` in resource "null_resource" "baseline" (line 16)
+> An input variable with the name &quot;nonexistent_variable&quot; has not been declared. This variable can be declared with a variable &quot;nonexistent_variable&quot; {} block.
+> \`    value = var.nonexistent_variable\` in resource &quot;null_resource&quot; &quot;baseline&quot; (line 16)
 
 <details>
 <summary>Show raw JSON</summary>
@@ -2688,7 +2688,7 @@ exports[`reportFromSteps integration — apply-no-show fixtures > tofu/null-life
 ⚠️ **Check block assertion known after apply**
 
 > The condition could not be evaluated at this time, a result will be known when this plan is applied.
-> \`    condition     = null_resource.alpha.id != ""\` in check "readiness" (\`main.tf\`:50)
+> \`    condition     = null_resource.alpha.id != ""\` in check &quot;readiness&quot; (\`main.tf\`:50)
 > null_resource.alpha.id = is a string
 
 ## Resource Changes
@@ -2755,7 +2755,7 @@ exports[`reportFromSteps integration — apply-no-show fixtures > tofu/null-life
 ⚠️ **Check block assertion known after apply**
 
 > The condition could not be evaluated at this time, a result will be known when this plan is applied.
-> \`    condition     = null_resource.alpha.id != ""\` in check "readiness" (\`main.tf\`:39)
+> \`    condition     = null_resource.alpha.id != ""\` in check &quot;readiness&quot; (\`main.tf\`:39)
 > null_resource.alpha.id = is a string
 
 ## Resource Changes
@@ -3641,8 +3641,8 @@ Exit code: \`1\`
 ❌ Configuration is **invalid**
 
 🚨 **Reference to undeclared input variable**
-> An input variable with the name "nonexistent_variable" has not been declared. This variable can be declared with a variable "nonexistent_variable" {} block.
-> \`    value = var.nonexistent_variable\` in resource "null_resource" "baseline" (line 16)
+> An input variable with the name &quot;nonexistent_variable&quot; has not been declared. This variable can be declared with a variable &quot;nonexistent_variable&quot; {} block.
+> \`    value = var.nonexistent_variable\` in resource &quot;null_resource&quot; &quot;baseline&quot; (line 16)
 
 <details>
 <summary>Show raw JSON</summary>
@@ -4896,8 +4896,8 @@ Exit code: \`1\`
 ❌ Configuration is **invalid**
 
 🚨 **Reference to undeclared input variable**
-> An input variable with the name "nonexistent_variable" has not been declared. This variable can be declared with a variable "nonexistent_variable" {} block.
-> \`    value = var.nonexistent_variable\` in resource "null_resource" "baseline" (line 16)
+> An input variable with the name &quot;nonexistent_variable&quot; has not been declared. This variable can be declared with a variable &quot;nonexistent_variable&quot; {} block.
+> \`    value = var.nonexistent_variable\` in resource &quot;null_resource&quot; &quot;baseline&quot; (line 16)
 
 <details>
 <summary>Show raw JSON</summary>
@@ -7185,8 +7185,8 @@ Exit code: \`1\`
 ❌ Configuration is **invalid**
 
 🚨 **Reference to undeclared input variable**
-> An input variable with the name "nonexistent_variable" has not been declared. This variable can be declared with a variable "nonexistent_variable" {} block.
-> \`    value = var.nonexistent_variable\` in resource "null_resource" "baseline" (line 16)
+> An input variable with the name &quot;nonexistent_variable&quot; has not been declared. This variable can be declared with a variable &quot;nonexistent_variable&quot; {} block.
+> \`    value = var.nonexistent_variable\` in resource &quot;null_resource&quot; &quot;baseline&quot; (line 16)
 
 <details>
 <summary>Show raw JSON</summary>
@@ -7261,8 +7261,8 @@ Exit code: \`1\`
 ❌ Configuration is **invalid**
 
 🚨 **Reference to undeclared input variable**
-> An input variable with the name "nonexistent_variable" has not been declared. This variable can be declared with a variable "nonexistent_variable" {} block.
-> \`    value = var.nonexistent_variable\` in resource "null_resource" "baseline" (line 16)
+> An input variable with the name &quot;nonexistent_variable&quot; has not been declared. This variable can be declared with a variable &quot;nonexistent_variable&quot; {} block.
+> \`    value = var.nonexistent_variable\` in resource &quot;null_resource&quot; &quot;baseline&quot; (line 16)
 
 <details>
 <summary>Show raw JSON</summary>
@@ -8652,7 +8652,7 @@ exports[`reportFromSteps integration — generated fixtures > terraform/null-lif
 ⚠️ **Check block assertion known after apply**
 
 > The condition could not be evaluated at this time, a result will be known when this plan is applied.
-> \`    condition     = null_resource.alpha.id != ""\` in check "readiness" (\`main.tf\`:50)
+> \`    condition     = null_resource.alpha.id != ""\` in check &quot;readiness&quot; (\`main.tf\`:50)
 > null_resource.alpha.id = is a string
 
 ## Resource Changes
@@ -8759,7 +8759,7 @@ exports[`reportFromSteps integration — generated fixtures > terraform/null-lif
 ⚠️ **Check block assertion known after apply**
 
 > The condition could not be evaluated at this time, a result will be known when this plan is applied.
-> \`    condition     = null_resource.alpha.id != ""\` in check "readiness" (\`main.tf\`:50)
+> \`    condition     = null_resource.alpha.id != ""\` in check &quot;readiness&quot; (\`main.tf\`:50)
 > null_resource.alpha.id = is a string
 
 ## Resource Changes
@@ -8869,7 +8869,7 @@ exports[`reportFromSteps integration — generated fixtures > terraform/null-lif
 ⚠️ **Check block assertion known after apply**
 
 > The condition could not be evaluated at this time, a result will be known when this plan is applied.
-> \`    condition     = null_resource.alpha.id != ""\` in check "readiness" (\`main.tf\`:39)
+> \`    condition     = null_resource.alpha.id != ""\` in check &quot;readiness&quot; (\`main.tf\`:39)
 > null_resource.alpha.id = is a string
 
 ## Resource Changes
@@ -8953,7 +8953,7 @@ exports[`reportFromSteps integration — generated fixtures > terraform/null-lif
 ⚠️ **Check block assertion known after apply**
 
 > The condition could not be evaluated at this time, a result will be known when this plan is applied.
-> \`    condition     = null_resource.alpha.id != ""\` in check "readiness" (\`main.tf\`:39)
+> \`    condition     = null_resource.alpha.id != ""\` in check &quot;readiness&quot; (\`main.tf\`:39)
 > null_resource.alpha.id = is a string
 
 ## Resource Changes
@@ -11332,8 +11332,8 @@ Exit code: \`1\`
 ❌ Configuration is **invalid**
 
 🚨 **Reference to undeclared input variable**
-> An input variable with the name "nonexistent_variable" has not been declared. This variable can be declared with a variable "nonexistent_variable" {} block.
-> \`    value = var.nonexistent_variable\` in resource "null_resource" "baseline" (line 16)
+> An input variable with the name &quot;nonexistent_variable&quot; has not been declared. This variable can be declared with a variable &quot;nonexistent_variable&quot; {} block.
+> \`    value = var.nonexistent_variable\` in resource &quot;null_resource&quot; &quot;baseline&quot; (line 16)
 
 <details>
 <summary>Show raw JSON</summary>
@@ -11408,8 +11408,8 @@ Exit code: \`1\`
 ❌ Configuration is **invalid**
 
 🚨 **Reference to undeclared input variable**
-> An input variable with the name "nonexistent_variable" has not been declared. This variable can be declared with a variable "nonexistent_variable" {} block.
-> \`    value = var.nonexistent_variable\` in resource "null_resource" "baseline" (line 16)
+> An input variable with the name &quot;nonexistent_variable&quot; has not been declared. This variable can be declared with a variable &quot;nonexistent_variable&quot; {} block.
+> \`    value = var.nonexistent_variable\` in resource &quot;null_resource&quot; &quot;baseline&quot; (line 16)
 
 <details>
 <summary>Show raw JSON</summary>
@@ -12799,7 +12799,7 @@ exports[`reportFromSteps integration — generated fixtures > tofu/null-lifecycl
 ⚠️ **Check block assertion known after apply**
 
 > The condition could not be evaluated at this time, a result will be known when this plan is applied.
-> \`    condition     = null_resource.alpha.id != ""\` in check "readiness" (\`main.tf\`:50)
+> \`    condition     = null_resource.alpha.id != ""\` in check &quot;readiness&quot; (\`main.tf\`:50)
 > null_resource.alpha.id = is a string
 
 ## Resource Changes
@@ -12906,7 +12906,7 @@ exports[`reportFromSteps integration — generated fixtures > tofu/null-lifecycl
 ⚠️ **Check block assertion known after apply**
 
 > The condition could not be evaluated at this time, a result will be known when this plan is applied.
-> \`    condition     = null_resource.alpha.id != ""\` in check "readiness" (\`main.tf\`:50)
+> \`    condition     = null_resource.alpha.id != ""\` in check &quot;readiness&quot; (\`main.tf\`:50)
 > null_resource.alpha.id = is a string
 
 ## Resource Changes
@@ -13016,7 +13016,7 @@ exports[`reportFromSteps integration — generated fixtures > tofu/null-lifecycl
 ⚠️ **Check block assertion known after apply**
 
 > The condition could not be evaluated at this time, a result will be known when this plan is applied.
-> \`    condition     = null_resource.alpha.id != ""\` in check "readiness" (\`main.tf\`:39)
+> \`    condition     = null_resource.alpha.id != ""\` in check &quot;readiness&quot; (\`main.tf\`:39)
 > null_resource.alpha.id = is a string
 
 ## Resource Changes
@@ -13100,7 +13100,7 @@ exports[`reportFromSteps integration — generated fixtures > tofu/null-lifecycl
 ⚠️ **Check block assertion known after apply**
 
 > The condition could not be evaluated at this time, a result will be known when this plan is applied.
-> \`    condition     = null_resource.alpha.id != ""\` in check "readiness" (\`main.tf\`:39)
+> \`    condition     = null_resource.alpha.id != ""\` in check &quot;readiness&quot; (\`main.tf\`:39)
 > null_resource.alpha.id = is a string
 
 ## Resource Changes
@@ -14346,8 +14346,8 @@ Exit code: \`1\`
 ❌ Configuration is **invalid**
 
 🚨 **Reference to undeclared input variable**
-> An input variable with the name "nonexistent_variable" has not been declared. This variable can be declared with a variable "nonexistent_variable" {} block.
-> \`    value = var.nonexistent_variable\` in resource "null_resource" "baseline" (line 16)
+> An input variable with the name &quot;nonexistent_variable&quot; has not been declared. This variable can be declared with a variable &quot;nonexistent_variable&quot; {} block.
+> \`    value = var.nonexistent_variable\` in resource &quot;null_resource&quot; &quot;baseline&quot; (line 16)
 
 <details>
 <summary>Show raw JSON</summary>
@@ -14876,7 +14876,7 @@ exports[`reportFromSteps integration — no-show fixtures (Tier 3) > terraform/n
 ⚠️ **Check block assertion known after apply**
 
 > The condition could not be evaluated at this time, a result will be known when this plan is applied.
-> \`    condition     = null_resource.alpha.id != ""\` in check "readiness" (\`main.tf\`:50)
+> \`    condition     = null_resource.alpha.id != ""\` in check &quot;readiness&quot; (\`main.tf\`:50)
 > null_resource.alpha.id = is a string
 
 ## Resource Changes
@@ -14943,7 +14943,7 @@ exports[`reportFromSteps integration — no-show fixtures (Tier 3) > terraform/n
 ⚠️ **Check block assertion known after apply**
 
 > The condition could not be evaluated at this time, a result will be known when this plan is applied.
-> \`    condition     = null_resource.alpha.id != ""\` in check "readiness" (\`main.tf\`:39)
+> \`    condition     = null_resource.alpha.id != ""\` in check &quot;readiness&quot; (\`main.tf\`:39)
 > null_resource.alpha.id = is a string
 
 ## Resource Changes
@@ -15556,8 +15556,8 @@ Exit code: \`1\`
 ❌ Configuration is **invalid**
 
 🚨 **Reference to undeclared input variable**
-> An input variable with the name "nonexistent_variable" has not been declared. This variable can be declared with a variable "nonexistent_variable" {} block.
-> \`    value = var.nonexistent_variable\` in resource "null_resource" "baseline" (line 16)
+> An input variable with the name &quot;nonexistent_variable&quot; has not been declared. This variable can be declared with a variable &quot;nonexistent_variable&quot; {} block.
+> \`    value = var.nonexistent_variable\` in resource &quot;null_resource&quot; &quot;baseline&quot; (line 16)
 
 <details>
 <summary>Show raw JSON</summary>
@@ -16086,7 +16086,7 @@ exports[`reportFromSteps integration — no-show fixtures (Tier 3) > tofu/null-l
 ⚠️ **Check block assertion known after apply**
 
 > The condition could not be evaluated at this time, a result will be known when this plan is applied.
-> \`    condition     = null_resource.alpha.id != ""\` in check "readiness" (\`main.tf\`:50)
+> \`    condition     = null_resource.alpha.id != ""\` in check &quot;readiness&quot; (\`main.tf\`:50)
 > null_resource.alpha.id = is a string
 
 ## Resource Changes
@@ -16153,7 +16153,7 @@ exports[`reportFromSteps integration — no-show fixtures (Tier 3) > tofu/null-l
 ⚠️ **Check block assertion known after apply**
 
 > The condition could not be evaluated at this time, a result will be known when this plan is applied.
-> \`    condition     = null_resource.alpha.id != ""\` in check "readiness" (\`main.tf\`:39)
+> \`    condition     = null_resource.alpha.id != ""\` in check &quot;readiness&quot; (\`main.tf\`:39)
 > null_resource.alpha.id = is a string
 
 ## Resource Changes
@@ -16873,8 +16873,8 @@ Exit code: \`1\`
 ❌ Configuration is **invalid**
 
 🚨 **Reference to undeclared input variable**
-> An input variable with the name "nonexistent_variable" has not been declared. This variable can be declared with a variable "nonexistent_variable" {} block.
-> \`    value = var.nonexistent_variable\` in resource "null_resource" "baseline" (line 16)
+> An input variable with the name &quot;nonexistent_variable&quot; has not been declared. This variable can be declared with a variable &quot;nonexistent_variable&quot; {} block.
+> \`    value = var.nonexistent_variable\` in resource &quot;null_resource&quot; &quot;baseline&quot; (line 16)
 
 <details>
 <summary>Show raw JSON</summary>
@@ -17598,7 +17598,7 @@ exports[`reportFromSteps integration — plan-only fixtures > terraform/null-lif
 ⚠️ **Check block assertion known after apply**
 
 > The condition could not be evaluated at this time, a result will be known when this plan is applied.
-> \`    condition     = null_resource.alpha.id != ""\` in check "readiness" (\`main.tf\`:50)
+> \`    condition     = null_resource.alpha.id != ""\` in check &quot;readiness&quot; (\`main.tf\`:50)
 > null_resource.alpha.id = is a string
 
 ## Resource Changes
@@ -17696,7 +17696,7 @@ exports[`reportFromSteps integration — plan-only fixtures > terraform/null-lif
 ⚠️ **Check block assertion known after apply**
 
 > The condition could not be evaluated at this time, a result will be known when this plan is applied.
-> \`    condition     = null_resource.alpha.id != ""\` in check "readiness" (\`main.tf\`:39)
+> \`    condition     = null_resource.alpha.id != ""\` in check &quot;readiness&quot; (\`main.tf\`:39)
 > null_resource.alpha.id = is a string
 
 ## Resource Changes
@@ -18533,8 +18533,8 @@ Exit code: \`1\`
 ❌ Configuration is **invalid**
 
 🚨 **Reference to undeclared input variable**
-> An input variable with the name "nonexistent_variable" has not been declared. This variable can be declared with a variable "nonexistent_variable" {} block.
-> \`    value = var.nonexistent_variable\` in resource "null_resource" "baseline" (line 16)
+> An input variable with the name &quot;nonexistent_variable&quot; has not been declared. This variable can be declared with a variable &quot;nonexistent_variable&quot; {} block.
+> \`    value = var.nonexistent_variable\` in resource &quot;null_resource&quot; &quot;baseline&quot; (line 16)
 
 <details>
 <summary>Show raw JSON</summary>
@@ -19258,7 +19258,7 @@ exports[`reportFromSteps integration — plan-only fixtures > tofu/null-lifecycl
 ⚠️ **Check block assertion known after apply**
 
 > The condition could not be evaluated at this time, a result will be known when this plan is applied.
-> \`    condition     = null_resource.alpha.id != ""\` in check "readiness" (\`main.tf\`:50)
+> \`    condition     = null_resource.alpha.id != ""\` in check &quot;readiness&quot; (\`main.tf\`:50)
 > null_resource.alpha.id = is a string
 
 ## Resource Changes
@@ -19356,7 +19356,7 @@ exports[`reportFromSteps integration — plan-only fixtures > tofu/null-lifecycl
 ⚠️ **Check block assertion known after apply**
 
 > The condition could not be evaluated at this time, a result will be known when this plan is applied.
-> \`    condition     = null_resource.alpha.id != ""\` in check "readiness" (\`main.tf\`:39)
+> \`    condition     = null_resource.alpha.id != ""\` in check &quot;readiness&quot; (\`main.tf\`:39)
 > null_resource.alpha.id = is a string
 
 ## Resource Changes
@@ -20416,8 +20416,8 @@ Exit code: \`1\`
 ❌ Configuration is **invalid**
 
 🚨 **Reference to undeclared input variable**
-> An input variable with the name "nonexistent_variable" has not been declared. This variable can be declared with a variable "nonexistent_variable" {} block.
-> \`    value = var.nonexistent_variable\` in resource "null_resource" "baseline" (line 16)
+> An input variable with the name &quot;nonexistent_variable&quot; has not been declared. This variable can be declared with a variable &quot;nonexistent_variable&quot; {} block.
+> \`    value = var.nonexistent_variable\` in resource &quot;null_resource&quot; &quot;baseline&quot; (line 16)
 
 <details>
 <summary>Show raw JSON</summary>
@@ -21154,7 +21154,7 @@ exports[`reportFromSteps — state enrichment > no-state snapshot: terraform/nul
 ⚠️ **Check block assertion known after apply**
 
 > The condition could not be evaluated at this time, a result will be known when this plan is applied.
-> \`    condition     = null_resource.alpha.id != ""\` in check "readiness" (\`main.tf\`:50)
+> \`    condition     = null_resource.alpha.id != ""\` in check &quot;readiness&quot; (\`main.tf\`:50)
 > null_resource.alpha.id = is a string
 
 ## Resource Changes
@@ -21254,7 +21254,7 @@ exports[`reportFromSteps — state enrichment > no-state snapshot: terraform/nul
 ⚠️ **Check block assertion known after apply**
 
 > The condition could not be evaluated at this time, a result will be known when this plan is applied.
-> \`    condition     = null_resource.alpha.id != ""\` in check "readiness" (\`main.tf\`:39)
+> \`    condition     = null_resource.alpha.id != ""\` in check &quot;readiness&quot; (\`main.tf\`:39)
 > null_resource.alpha.id = is a string
 
 ## Resource Changes
@@ -22323,8 +22323,8 @@ Exit code: \`1\`
 ❌ Configuration is **invalid**
 
 🚨 **Reference to undeclared input variable**
-> An input variable with the name "nonexistent_variable" has not been declared. This variable can be declared with a variable "nonexistent_variable" {} block.
-> \`    value = var.nonexistent_variable\` in resource "null_resource" "baseline" (line 16)
+> An input variable with the name &quot;nonexistent_variable&quot; has not been declared. This variable can be declared with a variable &quot;nonexistent_variable&quot; {} block.
+> \`    value = var.nonexistent_variable\` in resource &quot;null_resource&quot; &quot;baseline&quot; (line 16)
 
 <details>
 <summary>Show raw JSON</summary>
@@ -23061,7 +23061,7 @@ exports[`reportFromSteps — state enrichment > no-state snapshot: tofu/null-lif
 ⚠️ **Check block assertion known after apply**
 
 > The condition could not be evaluated at this time, a result will be known when this plan is applied.
-> \`    condition     = null_resource.alpha.id != ""\` in check "readiness" (\`main.tf\`:50)
+> \`    condition     = null_resource.alpha.id != ""\` in check &quot;readiness&quot; (\`main.tf\`:50)
 > null_resource.alpha.id = is a string
 
 ## Resource Changes
@@ -23161,7 +23161,7 @@ exports[`reportFromSteps — state enrichment > no-state snapshot: tofu/null-lif
 ⚠️ **Check block assertion known after apply**
 
 > The condition could not be evaluated at this time, a result will be known when this plan is applied.
-> \`    condition     = null_resource.alpha.id != ""\` in check "readiness" (\`main.tf\`:39)
+> \`    condition     = null_resource.alpha.id != ""\` in check &quot;readiness&quot; (\`main.tf\`:39)
 > null_resource.alpha.id = is a string
 
 ## Resource Changes

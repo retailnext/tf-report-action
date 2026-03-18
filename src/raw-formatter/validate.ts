@@ -12,6 +12,7 @@ import {
   DIAGNOSTIC_WARNING,
   DIAGNOSTIC_ERROR,
 } from "../model/status-icons.js";
+import { escapeHtml } from "./jsonl.js";
 
 export function tryFormatValidateOutput(content: string): string | undefined {
   let parsed: unknown;
@@ -58,9 +59,9 @@ export function tryFormatValidateOutput(content: string): string | undefined {
         typeof diag["summary"] === "string" ? diag["summary"] : "(unknown)";
       const detail = typeof diag["detail"] === "string" ? diag["detail"] : "";
 
-      output += `${icon} **${summary}**\n`;
+      output += `${icon} **${escapeHtml(summary)}**\n`;
       if (detail) {
-        const detailLines = detail
+        const detailLines = escapeHtml(detail)
           .split("\n")
           .map((l) => `> ${l}`)
           .join("\n");
@@ -75,7 +76,7 @@ export function tryFormatValidateOutput(content: string): string | undefined {
             : "";
         const ctx =
           typeof snippet["context"] === "string"
-            ? ` in ${snippet["context"]}`
+            ? ` in ${escapeHtml(snippet["context"])}`
             : "";
         output += `> \`${snippet["code"]}\`${ctx}${lineInfo}\n`;
       }

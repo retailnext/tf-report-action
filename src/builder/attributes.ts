@@ -5,6 +5,7 @@
 
 import type { Change } from "../tfjson/plan.js";
 import type { AttributeShadow } from "../tfjson/common.js";
+import type { JsonValue } from "../tfjson/common.js";
 import type { AttributeChange } from "../model/attribute.js";
 import type { BuildOptions } from "./options.js";
 import { flatten } from "../flattener/index.js";
@@ -26,13 +27,8 @@ function shadowToMap(
     m.set("", shadow ? "true" : "false");
     return m;
   }
-  // Array or object — cast to JsonValue-compatible type for flatten
-  // AttributeShadow is boolean | AttributeShadowMap | AttributeShadow[]
-  // All of these are valid JSON-like structures; flatten handles them.
-  // We cast carefully: flatten accepts JsonValue which includes null | boolean | number | string | array | object
-  // AttributeShadowMap is { [key: string]: AttributeShadow } which maps to JsonObject pattern
-  // We use unknown→JsonValue cast with a comment since AttributeShadow is structurally compatible
-  return flatten(shadow as unknown as import("../tfjson/common.js").JsonValue);
+  // AttributeShadow is structurally compatible with JsonValue — cast via unknown.
+  return flatten(shadow as unknown as JsonValue);
 }
 
 /**
@@ -90,10 +86,10 @@ export function buildAttributeChanges(
 
   // Flatten the before/after objects to get nested keys
   const beforeFlat = before
-    ? flatten(before as unknown as import("../tfjson/common.js").JsonValue)
+    ? flatten(before as unknown as JsonValue)
     : new Map<string, string | null>();
   const afterFlat = after
-    ? flatten(after as unknown as import("../tfjson/common.js").JsonValue)
+    ? flatten(after as unknown as JsonValue)
     : new Map<string, string | null>();
 
   // Collect all flattened keys

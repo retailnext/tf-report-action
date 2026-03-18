@@ -451,8 +451,9 @@ function buildSummaryFromScan(changes) {
 }
 function buildActionGroupsFromScan(changes, actionOrder) {
   const buckets = /* @__PURE__ */ new Map();
+  const actionSet = new Set(actionOrder);
   for (const c of changes) {
-    if (!actionOrder.includes(c.action)) continue;
+    if (!actionSet.has(c.action)) continue;
     let typeCounts = buckets.get(c.action);
     if (!typeCounts) {
       typeCounts = /* @__PURE__ */ new Map();
@@ -1592,6 +1593,9 @@ function tryProcessShowPlan(showPlanStep, showPlanStepId, applyStep, applyStepId
         const applyScan = scanString(applyRead.content);
         enrichedReport = buildApplyReport(plan, applyScan, options);
       } catch {
+        report.warnings.push(
+          `Apply output from step \`${applyStepId}\` could not be parsed; using plan data only.`
+        );
         enrichedReport = buildReport(plan, options);
       }
     } else {
@@ -2598,9 +2602,9 @@ function renderDiagnostics(diagnostics, writer, headingLevel = 3) {
 function renderDiagnostic(diag, writer) {
   const prefix = diag.severity === "error" ? DIAGNOSTIC_ERROR : DIAGNOSTIC_WARNING;
   const addressSuffix = diag.address !== void 0 ? ` \u2014 \`${diag.address}\`` : "";
-  writer.paragraph(`${prefix} **${diag.summary}**${addressSuffix}`);
+  writer.paragraph(`${prefix} **${escapeHtml(diag.summary)}**${addressSuffix}`);
   if (diag.detail) {
-    writer.blockquote(diag.detail);
+    writer.blockquote(escapeHtml(diag.detail));
   }
   if (diag.snippet !== void 0) {
     renderSnippet(diag.snippet, diag.range?.filename, writer);
@@ -2610,11 +2614,13 @@ function renderDiagnostic(diag, writer) {
   }
 }
 function renderSnippet(snippet, filename, writer) {
-  const location = filename !== void 0 ? `\`${snippet.code}\` in ${snippet.context} (\`${filename}\`:${String(snippet.start_line)})` : `\`${snippet.code}\` in ${snippet.context}`;
+  const location = filename !== void 0 ? `\`${snippet.code}\` in ${escapeHtml(snippet.context)} (\`${filename}\`:${String(snippet.start_line)})` : `\`${snippet.code}\` in ${escapeHtml(snippet.context)}`;
   writer.blockquote(location);
   if (snippet.values.length > 0) {
     for (const val of snippet.values) {
-      writer.blockquote(`${val.traversal} = ${val.statement}`);
+      writer.blockquote(
+        `${escapeHtml(val.traversal)} = ${escapeHtml(val.statement)}`
+      );
     }
   }
 }
@@ -2867,17 +2873,17 @@ function tryFormatValidateOutput(content) {
       const icon = severity === "warning" ? DIAGNOSTIC_WARNING : DIAGNOSTIC_ERROR;
       const summary = typeof diag["summary"] === "string" ? diag["summary"] : "(unknown)";
       const detail = typeof diag["detail"] === "string" ? diag["detail"] : "";
-      output += `${icon} **${summary}**
+      output += `${icon} **${escapeHtml(summary)}**
 `;
       if (detail) {
-        const detailLines = detail.split("\n").map((l) => `> ${l}`).join("\n");
+        const detailLines = escapeHtml(detail).split("\n").map((l) => `> ${l}`).join("\n");
         output += `${detailLines}
 `;
       }
       const snippet = diag["snippet"];
       if (snippet && typeof snippet["code"] === "string") {
         const lineInfo = typeof snippet["start_line"] === "number" ? ` (line ${String(snippet["start_line"])})` : "";
-        const ctx = typeof snippet["context"] === "string" ? ` in ${snippet["context"]}` : "";
+        const ctx = typeof snippet["context"] === "string" ? ` in ${escapeHtml(snippet["context"])}` : "";
         output += `> \`${snippet["code"]}\`${ctx}${lineInfo}
 `;
       }
