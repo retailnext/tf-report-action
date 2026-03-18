@@ -191,7 +191,7 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Set up OpenTofu
-        uses: opentofu/setup-opentofu@v1
+        uses: opentofu/setup-opentofu@v2
         with:
           # The wrapper is disabled because it interferes with signal forwarding
           # (opentofu/setup-opentofu#41), detailed exitcodes (opentofu/setup-opentofu#42),
@@ -264,7 +264,7 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Set up OpenTofu
-        uses: opentofu/setup-opentofu@v1
+        uses: opentofu/setup-opentofu@v2
         with:
           # The wrapper is disabled because it interferes with signal forwarding
           # (opentofu/setup-opentofu#41), detailed exitcodes (opentofu/setup-opentofu#42),
@@ -361,7 +361,7 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Set up OpenTofu
-        uses: opentofu/setup-opentofu@v1
+        uses: opentofu/setup-opentofu@v2
         with:
           # The wrapper is disabled because it interferes with signal forwarding
           # (opentofu/setup-opentofu#41), detailed exitcodes (opentofu/setup-opentofu#42),
