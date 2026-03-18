@@ -10,7 +10,7 @@ import { JsonValue } from "./common";
  * pre-evaluation snapshots: they capture what is written in .tf files, not the
  * resolved runtime values (those appear in planned_values instead).
  *
- * Exactly one of constantValue or references will be set for any given
+ * Exactly one of constant_value or references will be set for any given
  * expression. When neither is set, the expression is absent or the zero value
  * (e.g. an omitted optional argument).
  *
@@ -22,12 +22,12 @@ import { JsonValue } from "./common";
  */
 export interface Expression {
   /**
-   * constantValue is set when the expression contains no references to other
+   * constant_value is set when the expression contains no references to other
    * objects — i.e. it is a pure literal. The value is the JSON-encoded result
    * of evaluating the expression. This will be null (JSON null) if the
    * expression evaluates to null.
    *
-   * constantValue and references are mutually exclusive. If constantValue is
+   * constant_value and references are mutually exclusive. If constant_value is
    * non-undefined, references will be undefined/empty.
    */
   constant_value?: JsonValue;
@@ -52,8 +52,8 @@ export interface Expression {
    * string equality checks here — the syntax of reference strings may be
    * extended in future releases.
    *
-   * constantValue and references are mutually exclusive. If references is
-   * non-empty, constantValue will be undefined.
+   * constant_value and references are mutually exclusive. If references is
+   * non-empty, constant_value will be undefined.
    */
   references?: string[];
 }

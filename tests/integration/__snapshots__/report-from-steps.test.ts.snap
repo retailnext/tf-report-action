@@ -9584,7 +9584,7 @@ null_resource.ephemeral
 null_resource.renamed
 \`\`\`
 
-**Moved from:** \`null_resource.original\`
+**Moved from:** <code>null_resource.original</code>
 
 _No attribute changes._
 
@@ -9597,7 +9597,7 @@ _No attribute changes._
 random_string.imported
 \`\`\`
 
-**Import ID:** \`fixedval\`
+**Import ID:** <code>fixedval</code>
 
 _No attribute changes._
 
@@ -9654,7 +9654,7 @@ null_resource.ephemeral
 null_resource.renamed
 \`\`\`
 
-**Moved from:** \`null_resource.original\`
+**Moved from:** <code>null_resource.original</code>
 
 _No attribute changes._
 
@@ -9667,7 +9667,7 @@ _No attribute changes._
 random_string.imported
 \`\`\`
 
-**Import ID:** \`fixedval\`
+**Import ID:** <code>fixedval</code>
 
 _No attribute changes._
 
@@ -13730,7 +13730,7 @@ null_resource.ephemeral
 null_resource.renamed
 \`\`\`
 
-**Moved from:** \`null_resource.original\`
+**Moved from:** <code>null_resource.original</code>
 
 _No attribute changes._
 
@@ -13743,7 +13743,7 @@ _No attribute changes._
 random_string.imported
 \`\`\`
 
-**Import ID:** \`fixedval\`
+**Import ID:** <code>fixedval</code>
 
 _No attribute changes._
 
@@ -13799,7 +13799,7 @@ null_resource.ephemeral
 null_resource.renamed
 \`\`\`
 
-**Moved from:** \`null_resource.original\`
+**Moved from:** <code>null_resource.original</code>
 
 _No attribute changes._
 
@@ -13812,7 +13812,7 @@ _No attribute changes._
 random_string.imported
 \`\`\`
 
-**Import ID:** \`fixedval\`
+**Import ID:** <code>fixedval</code>
 
 _No attribute changes._
 
@@ -18053,7 +18053,7 @@ null_resource.ephemeral
 null_resource.renamed
 \`\`\`
 
-**Moved from:** \`null_resource.original\`
+**Moved from:** <code>null_resource.original</code>
 
 _No attribute changes._
 
@@ -18066,7 +18066,7 @@ _No attribute changes._
 random_string.imported
 \`\`\`
 
-**Import ID:** \`fixedval\`
+**Import ID:** <code>fixedval</code>
 
 _No attribute changes._
 
@@ -19712,7 +19712,7 @@ null_resource.ephemeral
 null_resource.renamed
 \`\`\`
 
-**Moved from:** \`null_resource.original\`
+**Moved from:** <code>null_resource.original</code>
 
 _No attribute changes._
 
@@ -19725,7 +19725,7 @@ _No attribute changes._
 random_string.imported
 \`\`\`
 
-**Import ID:** \`fixedval\`
+**Import ID:** <code>fixedval</code>
 
 _No attribute changes._
 
@@ -21619,7 +21619,7 @@ null_resource.ephemeral
 null_resource.renamed
 \`\`\`
 
-**Moved from:** \`null_resource.original\`
+**Moved from:** <code>null_resource.original</code>
 
 _No attribute changes._
 
@@ -21632,7 +21632,7 @@ _No attribute changes._
 random_string.imported
 \`\`\`
 
-**Import ID:** \`fixedval\`
+**Import ID:** <code>fixedval</code>
 
 _No attribute changes._
 
@@ -23525,7 +23525,7 @@ null_resource.ephemeral
 null_resource.renamed
 \`\`\`
 
-**Moved from:** \`null_resource.original\`
+**Moved from:** <code>null_resource.original</code>
 
 _No attribute changes._
 
@@ -23538,7 +23538,7 @@ _No attribute changes._
 random_string.imported
 \`\`\`
 
-**Import ID:** \`fixedval\`
+**Import ID:** <code>fixedval</code>
 
 _No attribute changes._
 

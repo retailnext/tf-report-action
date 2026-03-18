@@ -2538,10 +2538,14 @@ function renderResource(resource, writer, options, diffCache, applyContext) {
   writer.detailsOpenHtml(summaryText, shouldOpen);
   writer.codeFence(resource.address);
   if (resource.importId !== null) {
-    writer.paragraph(`**Import ID:** \`${resource.importId}\``);
+    writer.paragraph(
+      `**Import ID:** ${MarkdownWriter.inlineCode(resource.importId)}`
+    );
   }
   if (resource.movedFromAddress !== null) {
-    writer.paragraph(`**Moved from:** \`${resource.movedFromAddress}\``);
+    writer.paragraph(
+      `**Moved from:** ${MarkdownWriter.inlineCode(resource.movedFromAddress)}`
+    );
   }
   const smallAttrs = resource.attributes.filter((a) => !a.isLarge);
   const largeAttrs = resource.attributes.filter((a) => a.isLarge);

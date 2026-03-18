@@ -68,10 +68,14 @@ export function renderResource(
 
   // Show import/moved-from metadata
   if (resource.importId !== null) {
-    writer.paragraph(`**Import ID:** \`${resource.importId}\``);
+    writer.paragraph(
+      `**Import ID:** ${MarkdownWriter.inlineCode(resource.importId)}`,
+    );
   }
   if (resource.movedFromAddress !== null) {
-    writer.paragraph(`**Moved from:** \`${resource.movedFromAddress}\``);
+    writer.paragraph(
+      `**Moved from:** ${MarkdownWriter.inlineCode(resource.movedFromAddress)}`,
+    );
   }
 
   // Separate small and large attributes
