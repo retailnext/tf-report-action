@@ -59,9 +59,10 @@ function buildActionGroups(
 ): SummaryActionGroup[] {
   // Bucket resources by action → resource type
   const buckets = new Map<PlanAction, Map<string, number>>();
+  const actionSet = new Set<PlanAction>(actionOrder);
 
   for (const r of resources) {
-    if (!actionOrder.includes(r.action)) continue;
+    if (!actionSet.has(r.action)) continue;
     let typeCounts = buckets.get(r.action);
     if (!typeCounts) {
       typeCounts = new Map();

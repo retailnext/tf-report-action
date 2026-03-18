@@ -3,7 +3,6 @@ import type { Plan } from "../tfjson/plan.js";
 import type { ResourceChange as ModelResourceChange } from "../model/resource.js";
 import type { PlanAction } from "../model/plan-action.js";
 import type { BuildOptions } from "./options.js";
-import type { ConfigRefIndex } from "./config-refs.js";
 import type { PlannedChange } from "../jsonl-scanner/types.js";
 import { determineAction } from "./action.js";
 import { buildAttributeChanges } from "./attributes.js";
@@ -31,7 +30,6 @@ function refineAction(base: PlanAction, rc: TFResourceChange): PlanAction {
  */
 export function buildResourceChanges(
   plan: Plan,
-  configRefs: ConfigRefIndex,
   options: BuildOptions,
 ): ModelResourceChange[] {
   const resourceChanges = plan.resource_changes ?? [];
@@ -46,12 +44,7 @@ export function buildResourceChanges(
     const address =
       rc.address ?? `${rc.type ?? "unknown"}.${rc.name ?? "unknown"}`;
 
-    const attributes = buildAttributeChanges(
-      rc.change,
-      address,
-      configRefs,
-      options,
-    );
+    const attributes = buildAttributeChanges(rc.change, options);
 
     // Determine if all attributes are known after apply
     const allUnknownAfterApply = isAllUnknownAfterApply(rc, attributes);
@@ -81,7 +74,6 @@ export function buildResourceChanges(
  */
 export function buildDriftChanges(
   plan: Plan,
-  configRefs: ConfigRefIndex,
   options: BuildOptions,
 ): ModelResourceChange[] {
   const driftChanges = plan.resource_drift ?? [];
@@ -94,12 +86,7 @@ export function buildDriftChanges(
     const address =
       rc.address ?? `${rc.type ?? "unknown"}.${rc.name ?? "unknown"}`;
 
-    const attributes = buildAttributeChanges(
-      rc.change,
-      address,
-      configRefs,
-      options,
-    );
+    const attributes = buildAttributeChanges(rc.change, options);
     const allUnknownAfterApply = isAllUnknownAfterApply(rc, attributes);
 
     result.push({

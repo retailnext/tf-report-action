@@ -1,9 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { buildAttributeChanges } from "../../../src/builder/attributes.js";
 import type { Change } from "../../../src/tfjson/plan.js";
-import type { ConfigRefIndex } from "../../../src/builder/config-refs.js";
-
-const emptyConfigRefs: ConfigRefIndex = new Map();
 
 function makeChange(overrides: Partial<Change> = {}): Change {
   return {
@@ -21,8 +18,6 @@ describe("buildAttributeChanges", () => {
   it("returns empty array when both before and after are null", () => {
     const result = buildAttributeChanges(
       makeChange({ actions: ["create"] }),
-      "null_resource.test",
-      emptyConfigRefs,
       {},
     );
     expect(result).toEqual([]);
@@ -31,8 +26,6 @@ describe("buildAttributeChanges", () => {
   it("detects simple string change", () => {
     const result = buildAttributeChanges(
       makeChange({ before: { name: "old" }, after: { name: "new" } }),
-      "null_resource.test",
-      emptyConfigRefs,
       {},
     );
     expect(result).toHaveLength(1);
@@ -45,8 +38,6 @@ describe("buildAttributeChanges", () => {
   it("skips unchanged attributes by default", () => {
     const result = buildAttributeChanges(
       makeChange({ before: { name: "same" }, after: { name: "same" } }),
-      "null_resource.test",
-      emptyConfigRefs,
       {},
     );
     expect(result).toHaveLength(0);
@@ -55,8 +46,6 @@ describe("buildAttributeChanges", () => {
   it("includes unchanged attributes when showUnchangedAttributes=true", () => {
     const result = buildAttributeChanges(
       makeChange({ before: { name: "same" }, after: { name: "same" } }),
-      "null_resource.test",
-      emptyConfigRefs,
       { showUnchangedAttributes: true },
     );
     expect(result.some((a) => a.name === "name")).toBe(true);
@@ -70,8 +59,6 @@ describe("buildAttributeChanges", () => {
         before_sensitive: { password: true },
         after_sensitive: { password: true },
       }),
-      "null_resource.test",
-      emptyConfigRefs,
       {},
     );
     const passwordAttr = result.find((a) => a.name === "password");
@@ -88,8 +75,6 @@ describe("buildAttributeChanges", () => {
         after: { secret: "other" },
         before_sensitive: true,
       }),
-      "null_resource.test",
-      emptyConfigRefs,
       {},
     );
     expect(result.every((a) => a.isSensitive)).toBe(true);
@@ -102,8 +87,6 @@ describe("buildAttributeChanges", () => {
         after: null,
         after_unknown: { id: true },
       }),
-      "null_resource.test",
-      emptyConfigRefs,
       {},
     );
     const idAttr = result.find((a) => a.name === "id");
@@ -119,8 +102,6 @@ describe("buildAttributeChanges", () => {
         before: { data: largeObj },
         after: { data: largeObj + "x" },
       }),
-      "null_resource.test",
-      emptyConfigRefs,
       { showUnchangedAttributes: true },
     );
     const dataAttr = result.find((a) => a.name === "data");
@@ -135,8 +116,6 @@ describe("buildAttributeChanges", () => {
         before: { content: multiline },
         after: { content: multiline + "\nline6" },
       }),
-      "null_resource.test",
-      emptyConfigRefs,
       {},
     );
     const contentAttr = result.find((a) => a.name === "content");
@@ -150,8 +129,6 @@ describe("buildAttributeChanges", () => {
         before: { zebra: "old", apple: "old", mango: "old" },
         after: { zebra: "new", apple: "new", mango: "new" },
       }),
-      "null_resource.test",
-      emptyConfigRefs,
       {},
     );
     const names = result.map((a) => a.name);
@@ -161,8 +138,6 @@ describe("buildAttributeChanges", () => {
   it("handles attribute added (before null, after present)", () => {
     const result = buildAttributeChanges(
       makeChange({ before: {}, after: { new_key: "value" } }),
-      "null_resource.test",
-      emptyConfigRefs,
       {},
     );
     const attr = result.find((a) => a.name === "new_key");
@@ -174,8 +149,6 @@ describe("buildAttributeChanges", () => {
   it("handles attribute removed (before present, after null)", () => {
     const result = buildAttributeChanges(
       makeChange({ before: { old_key: "value" }, after: {} }),
-      "null_resource.test",
-      emptyConfigRefs,
       {},
     );
     const attr = result.find((a) => a.name === "old_key");
@@ -190,8 +163,6 @@ describe("buildAttributeChanges", () => {
         before: { tags: { env: "staging" } },
         after: { tags: { env: "prod" } },
       }),
-      "null_resource.test",
-      emptyConfigRefs,
       {},
     );
     const attr = result.find((a) => a.name === "tags.env");

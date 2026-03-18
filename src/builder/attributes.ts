@@ -7,7 +7,6 @@ import type { Change } from "../tfjson/plan.js";
 import type { AttributeShadow } from "../tfjson/common.js";
 import type { AttributeChange } from "../model/attribute.js";
 import type { BuildOptions } from "./options.js";
-import type { ConfigRefIndex } from "./config-refs.js";
 import { flatten } from "../flattener/index.js";
 import { isSensitive } from "../sensitivity/index.js";
 import { SENSITIVE_MASK, KNOWN_AFTER_APPLY } from "../model/sentinels.js";
@@ -77,8 +76,6 @@ function isLargeValue(value: string | null): boolean {
  */
 export function buildAttributeChanges(
   change: Change,
-  address: string,
-  _configRefs: ConfigRefIndex,
   options: BuildOptions,
 ): AttributeChange[] {
   const before = change.before ?? null;

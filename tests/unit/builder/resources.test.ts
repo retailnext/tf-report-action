@@ -1,9 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { buildResourceChanges } from "../../../src/builder/resources.js";
 import type { Plan } from "../../../src/tfjson/plan.js";
-import type { ConfigRefIndex } from "../../../src/builder/config-refs.js";
-
-const emptyConfigRefs: ConfigRefIndex = new Map();
 
 function basePlan(resourceChanges: Plan["resource_changes"]): Plan {
   return {
@@ -15,7 +12,7 @@ function basePlan(resourceChanges: Plan["resource_changes"]): Plan {
 describe("buildResourceChanges", () => {
   it("returns empty array when resource_changes is undefined", () => {
     const plan = { format_version: "1.2" } as Plan;
-    expect(buildResourceChanges(plan, emptyConfigRefs, {})).toEqual([]);
+    expect(buildResourceChanges(plan, {})).toEqual([]);
   });
 
   it("falls back to constructed address when rc.address is missing", () => {
@@ -35,7 +32,7 @@ describe("buildResourceChanges", () => {
         },
       } as Plan["resource_changes"][0],
     ]);
-    const result = buildResourceChanges(plan, emptyConfigRefs, {});
+    const result = buildResourceChanges(plan, {});
     expect(result[0]!.address).toBe("null_resource.fallback");
   });
 
@@ -53,7 +50,7 @@ describe("buildResourceChanges", () => {
         },
       } as Plan["resource_changes"][0],
     ]);
-    const result = buildResourceChanges(plan, emptyConfigRefs, {});
+    const result = buildResourceChanges(plan, {});
     expect(result[0]!.address).toBe("unknown.unknown");
     expect(result[0]!.type).toBe("unknown");
   });
@@ -76,7 +73,7 @@ describe("buildResourceChanges", () => {
         },
       },
     ]);
-    const result = buildResourceChanges(plan, emptyConfigRefs, {});
+    const result = buildResourceChanges(plan, {});
     expect(result[0]!.importId).toBe("i-abc123");
   });
 
@@ -98,7 +95,7 @@ describe("buildResourceChanges", () => {
         },
       },
     ]);
-    const result = buildResourceChanges(plan, emptyConfigRefs, {});
+    const result = buildResourceChanges(plan, {});
     expect(result[0]!.actionReason).toBe("replace_because_tainted");
   });
 
@@ -120,7 +117,7 @@ describe("buildResourceChanges", () => {
         },
       },
     ]);
-    const result = buildResourceChanges(plan, emptyConfigRefs, {});
+    const result = buildResourceChanges(plan, {});
     expect(result).toHaveLength(1);
     expect(result[0]!.movedFromAddress).toBe("null_resource.old");
     expect(result[0]!.action).toBe("move");
@@ -144,7 +141,7 @@ describe("buildResourceChanges", () => {
         },
       },
     ]);
-    const result = buildResourceChanges(plan, emptyConfigRefs, {});
+    const result = buildResourceChanges(plan, {});
     expect(result).toHaveLength(1);
     expect(result[0]!.action).toBe("import");
     expect(result[0]!.importId).toBe("i-abc123");
@@ -168,7 +165,7 @@ describe("buildResourceChanges", () => {
         },
       },
     ]);
-    const result = buildResourceChanges(plan, emptyConfigRefs, {});
+    const result = buildResourceChanges(plan, {});
     expect(result).toHaveLength(1);
     expect(result[0]!.action).toBe("create");
     expect(result[0]!.importId).toBe("i-abc123");
@@ -191,7 +188,7 @@ describe("buildResourceChanges", () => {
         },
       },
     ]);
-    const result = buildResourceChanges(plan, emptyConfigRefs, {});
+    const result = buildResourceChanges(plan, {});
     expect(result).toHaveLength(0);
   });
 
@@ -212,7 +209,7 @@ describe("buildResourceChanges", () => {
         },
       },
     ]);
-    const result = buildResourceChanges(plan, emptyConfigRefs, {});
+    const result = buildResourceChanges(plan, {});
     expect(result[0]!.allUnknownAfterApply).toBe(true);
   });
 
@@ -233,7 +230,7 @@ describe("buildResourceChanges", () => {
         },
       },
     ]);
-    const result = buildResourceChanges(plan, emptyConfigRefs, {});
+    const result = buildResourceChanges(plan, {});
     expect(result).toHaveLength(0);
   });
 
@@ -254,7 +251,7 @@ describe("buildResourceChanges", () => {
         },
       },
     ]);
-    const result = buildResourceChanges(plan, emptyConfigRefs, {});
+    const result = buildResourceChanges(plan, {});
     expect(result).toHaveLength(0);
   });
 });

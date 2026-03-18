@@ -48,24 +48,33 @@ export function buildStepIssue(
   const stdoutRead = readStepStdoutForDisplay(step, readerOpts);
   const stderrRead = readStepStderrForDisplay(step, readerOpts);
 
-  // Build a mutable bag then return as the readonly StepIssue interface.
-  // This avoids repeated `as` casts for each optional field while still
-  // satisfying exactOptionalPropertyTypes (fields are only present when
-  // their values are defined).
-  const bag: Record<string, string | boolean> = {
+  // Build with conditional spreads to preserve type safety while
+  // respecting exactOptionalPropertyTypes (fields must not be undefined).
+  return {
     id: stepId,
     heading,
     isFailed,
-  };
-  if (exitCode !== undefined) bag["exitCode"] = exitCode;
-  if (diagnostic !== undefined) bag["diagnostic"] = diagnostic;
-  if (stdoutRead.content !== undefined) bag["stdout"] = stdoutRead.content;
-  if (stdoutRead.truncated === true) bag["stdoutTruncated"] = true;
-  if (stdoutRead.error !== undefined) bag["stdoutError"] = stdoutRead.error;
-  if (stderrRead.content !== undefined) bag["stderr"] = stderrRead.content;
-  if (stderrRead.truncated === true) bag["stderrTruncated"] = true;
-  if (stderrRead.error !== undefined) bag["stderrError"] = stderrRead.error;
-  return bag as unknown as StepIssue;
+    ...(exitCode !== undefined ? { exitCode } : undefined),
+    ...(diagnostic !== undefined ? { diagnostic } : undefined),
+    ...(stdoutRead.content !== undefined
+      ? { stdout: stdoutRead.content }
+      : undefined),
+    ...(stdoutRead.truncated === true
+      ? { stdoutTruncated: true as const }
+      : undefined),
+    ...(stdoutRead.error !== undefined
+      ? { stdoutError: stdoutRead.error }
+      : undefined),
+    ...(stderrRead.content !== undefined
+      ? { stderr: stderrRead.content }
+      : undefined),
+    ...(stderrRead.truncated === true
+      ? { stderrTruncated: true as const }
+      : undefined),
+    ...(stderrRead.error !== undefined
+      ? { stderrError: stderrRead.error }
+      : undefined),
+  } as StepIssue;
 }
 
 /**

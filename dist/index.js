@@ -134,59 +134,6 @@ function detectFromRawText(content) {
   return void 0;
 }
 
-// src/builder/config-refs.ts
-function buildConfigRefs(config) {
-  const index = /* @__PURE__ */ new Map();
-  if (!config) return index;
-  walkModule(config.root_module, index);
-  return index;
-}
-function walkModule(module, index) {
-  if (!module) return;
-  for (const resource of module.resources ?? []) {
-    const address = resource.address;
-    if (!address) continue;
-    const expressions = resource.expressions;
-    if (!expressions) continue;
-    const attrRefs = /* @__PURE__ */ new Map();
-    for (const [attrName, expr] of Object.entries(expressions)) {
-      const refs = collectRefs(expr);
-      if (refs.length > 0) {
-        attrRefs.set(attrName, refs);
-      }
-    }
-    if (attrRefs.size > 0) {
-      index.set(address, attrRefs);
-    }
-  }
-  for (const moduleCall of Object.values(module.module_calls ?? {})) {
-    walkModule(moduleCall.module, index);
-  }
-}
-function collectRefs(expr) {
-  if (Array.isArray(expr)) {
-    const refs = [];
-    for (const item of expr) {
-      refs.push(...collectRefs(item));
-    }
-    return refs;
-  }
-  if (typeof expr === "object") {
-    const asExpr = expr;
-    if (asExpr.references !== void 0) {
-      return asExpr.references.filter(
-        (r) => typeof r === "string"
-      );
-    }
-    const refs = [];
-    for (const val of Object.values(expr)) {
-      refs.push(...collectRefs(val));
-    }
-    return refs;
-  }
-  return [];
-}
-
 // src/builder/action.ts
 function determineAction(actions) {
   const [first, second] = actions;
@@ -314,7 +261,7 @@ function isLargeValue(value) {
   }
   return false;
 }
-function buildAttributeChanges(change, address, _configRefs, options) {
+function buildAttributeChanges(change, options) {
   const before = change.before ?? null;
   const after = change.after ?? null;
   const beforeSensitiveMap = shadowToMap(change.before_sensitive);
@@ -371,7 +318,7 @@ function refineAction(base, rc) {
   if (rc.change.importing) return "import";
   return "no-op";
 }
-function buildResourceChanges(plan, configRefs, options) {
+function buildResourceChanges(plan, options) {
   const resourceChanges = plan.resource_changes ?? [];
   const result = [];
   for (const rc of resourceChanges) {
@@ -379,12 +326,7 @@ function buildResourceChanges(plan, configRefs, options) {
     const action = refineAction(determineAction(rc.change.actions), rc);
     if (action === "no-op") continue;
     const address = rc.address ?? `${rc.type ?? "unknown"}.${rc.name ?? "unknown"}`;
-    const attributes = buildAttributeChanges(
-      rc.change,
-      address,
-      configRefs,
-      options
-    );
+    const attributes = buildAttributeChanges(rc.change, options);
     const allUnknownAfterApply = isAllUnknownAfterApply(rc, attributes);
     result.push({
       address,
@@ -400,19 +342,14 @@ function buildResourceChanges(plan, configRefs, options) {
   }
   return result;
 }
-function buildDriftChanges(plan, configRefs, options) {
+function buildDriftChanges(plan, options) {
   const driftChanges = plan.resource_drift ?? [];
   const result = [];
   for (const rc of driftChanges) {
     if (shouldSkip(rc)) continue;
     const action = refineAction(determineAction(rc.change.actions), rc);
     const address = rc.address ?? `${rc.type ?? "unknown"}.${rc.name ?? "unknown"}`;
-    const attributes = buildAttributeChanges(
-      rc.change,
-      address,
-      configRefs,
-      options
-    );
+    const attributes = buildAttributeChanges(rc.change, options);
     const allUnknownAfterApply = isAllUnknownAfterApply(rc, attributes);
     result.push({
       address,
@@ -486,8 +423,9 @@ function buildApplySummary(resources, failedAddresses) {
 }
 function buildActionGroups(resources, actionOrder) {
   const buckets = /* @__PURE__ */ new Map();
+  const actionSet = new Set(actionOrder);
   for (const r of resources) {
-    if (!actionOrder.includes(r.action)) continue;
+    if (!actionSet.has(r.action)) continue;
     let typeCounts = buckets.get(r.action);
     if (!typeCounts) {
       typeCounts = /* @__PURE__ */ new Map();
@@ -572,9 +510,8 @@ function valueToString(val) {
 
 // src/builder/index.ts
 function buildReport(plan, options = {}) {
-  const configRefs = buildConfigRefs(plan.configuration);
-  const resources = buildResourceChanges(plan, configRefs, options);
-  const driftResources = buildDriftChanges(plan, configRefs, options);
+  const resources = buildResourceChanges(plan, options);
+  const driftResources = buildDriftChanges(plan, options);
   const summary = buildSummary(resources);
   const outputs = buildOutputChanges(plan);
   return {
@@ -1100,20 +1037,19 @@ function buildStepIssue(step, stepId, readerOpts, diagnostic) {
   }
   const stdoutRead = readStepStdoutForDisplay(step, readerOpts);
   const stderrRead = readStepStderrForDisplay(step, readerOpts);
-  const bag = {
+  return {
     id: stepId,
     heading,
-    isFailed
+    isFailed,
+    ...exitCode !== void 0 ? { exitCode } : void 0,
+    ...diagnostic !== void 0 ? { diagnostic } : void 0,
+    ...stdoutRead.content !== void 0 ? { stdout: stdoutRead.content } : void 0,
+    ...stdoutRead.truncated === true ? { stdoutTruncated: true } : void 0,
+    ...stdoutRead.error !== void 0 ? { stdoutError: stdoutRead.error } : void 0,
+    ...stderrRead.content !== void 0 ? { stderr: stderrRead.content } : void 0,
+    ...stderrRead.truncated === true ? { stderrTruncated: true } : void 0,
+    ...stderrRead.error !== void 0 ? { stderrError: stderrRead.error } : void 0
   };
-  if (exitCode !== void 0) bag["exitCode"] = exitCode;
-  if (diagnostic !== void 0) bag["diagnostic"] = diagnostic;
-  if (stdoutRead.content !== void 0) bag["stdout"] = stdoutRead.content;
-  if (stdoutRead.truncated === true) bag["stdoutTruncated"] = true;
-  if (stdoutRead.error !== void 0) bag["stdoutError"] = stdoutRead.error;
-  if (stderrRead.content !== void 0) bag["stderr"] = stderrRead.content;
-  if (stderrRead.truncated === true) bag["stderrTruncated"] = true;
-  if (stderrRead.error !== void 0) bag["stderrError"] = stderrRead.error;
-  return bag;
 }
 function shouldCreateStepIssue(step, readerOpts, diagnostic) {
   const outcome = getStepOutcome(step);
@@ -2601,7 +2537,7 @@ function renderResource(resource, writer, options, diffCache, applyContext) {
         const skipDiff = attr.isSensitive || attr.isKnownAfterApply;
         const beforeCell = skipDiff ? MarkdownWriter.inlineCodeCell(attr.before ?? "") : MarkdownWriter.escapeCell(
           MarkdownWriter.escapeHtml(attr.before ?? "")
-        );
+        ).replace(/\n/g, "<br>");
         const afterCell = skipDiff ? MarkdownWriter.inlineCodeCell(attr.after ?? "") : formatDiff(attr.before, attr.after, diffFormat);
         writer.tableRow([
           MarkdownWriter.escapeCell(MarkdownWriter.escapeHtml(attr.name)),

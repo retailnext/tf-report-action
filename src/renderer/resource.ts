@@ -93,7 +93,7 @@ export function renderResource(
           ? MarkdownWriter.inlineCodeCell(attr.before ?? "")
           : MarkdownWriter.escapeCell(
               MarkdownWriter.escapeHtml(attr.before ?? ""),
-            );
+            ).replace(/\n/g, "<br>");
         const afterCell = skipDiff
           ? MarkdownWriter.inlineCodeCell(attr.after ?? "")
           : formatDiff(attr.before, attr.after, diffFormat);

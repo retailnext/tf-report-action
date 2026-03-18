@@ -3,9 +3,6 @@ import { buildDriftChanges } from "../../../src/builder/resources.js";
 import { buildReport } from "../../../src/builder/index.js";
 import type { Plan } from "../../../src/tfjson/plan.js";
 import type { ResourceChange as TFResourceChange } from "../../../src/tfjson/resource.js";
-import type { ConfigRefIndex } from "../../../src/builder/config-refs.js";
-
-const emptyConfigRefs: ConfigRefIndex = new Map();
 
 function basePlan(resourceDrift: Plan["resource_drift"]): Plan {
   return {
@@ -37,12 +34,12 @@ function makeDriftEntry(
 describe("buildDriftChanges", () => {
   it("returns empty array when resource_drift is undefined", () => {
     const plan = { format_version: "1.2" } as Plan;
-    expect(buildDriftChanges(plan, emptyConfigRefs, {})).toEqual([]);
+    expect(buildDriftChanges(plan, {})).toEqual([]);
   });
 
   it("returns empty array when resource_drift is empty", () => {
     const plan = basePlan([]);
-    expect(buildDriftChanges(plan, emptyConfigRefs, {})).toEqual([]);
+    expect(buildDriftChanges(plan, {})).toEqual([]);
   });
 
   it("converts drift entries to model ResourceChange objects", () => {
@@ -62,7 +59,7 @@ describe("buildDriftChanges", () => {
       }),
     ]);
 
-    const result = buildDriftChanges(plan, emptyConfigRefs, {});
+    const result = buildDriftChanges(plan, {});
 
     expect(result).toHaveLength(1);
     expect(result[0]!.address).toBe("aws_instance.web");
@@ -80,7 +77,7 @@ describe("buildDriftChanges", () => {
       }),
     ]);
 
-    const result = buildDriftChanges(plan, emptyConfigRefs, {});
+    const result = buildDriftChanges(plan, {});
     expect(result).toHaveLength(0);
   });
 });
