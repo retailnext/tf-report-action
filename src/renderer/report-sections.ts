@@ -1,0 +1,93 @@
+/**
+ * Top-level report section renderer — checks report field presence to produce
+ * an ordered array of Sections ready for the compositor.
+ *
+ * This is the "render" step for the reportFromSteps pipeline. It converts
+ * any Report into Section[], which the compositor then assembles within a budget.
+ */
+
+import type { Report } from "../model/report.js";
+import type { Section } from "../model/section.js";
+import type { RenderOptions } from "./options.js";
+import { renderStructuredSections } from "./index.js";
+import { renderTitle, renderWorkspaceMarker } from "./title.js";
+import { renderStepIssue } from "./step-issue.js";
+import { renderTextFallbackBody } from "./text-fallback.js";
+import { renderWorkflowBody } from "./workflow.js";
+import { renderErrorBody } from "./error.js";
+import { DIAGNOSTIC_WARNING } from "../model/status-icons.js";
+import { MarkdownWriter } from "./writer.js";
+import { formatRawOutput } from "../raw-formatter/index.js";
+
+/**
+ * Render a Report into an ordered array of Sections.
+ *
+ * Sections include: workspace marker (fixed), title (fixed), warnings (fixed),
+ * step issues, and body sections determined by what report fields are populated.
+ */
+export function renderReportSections(
+  report: Report,
+  options?: RenderOptions,
+): Section[] {
+  const sections: Section[] = [];
+
+  // Workspace dedup marker (always first if present)
+  const marker = renderWorkspaceMarker(report);
+  if (marker !== undefined) {
+    sections.push(marker);
+  }
+
+  // Title
+  sections.push(renderTitle(report));
+
+  // Warnings (always first after title when present)
+  for (const [i, warning] of report.warnings.entries()) {
+    sections.push({
+      id: `warning-${String(i)}`,
+      full: `> ${DIAGNOSTIC_WARNING} **Warning:** ${warning}\n\n`,
+      fixed: true,
+    });
+  }
+
+  // Step issues
+  for (const issue of report.issues) {
+    sections.push(renderStepIssue(issue));
+  }
+
+  // Body sections — determined by which fields are populated
+  if (report.error !== undefined) {
+    // Error report
+    sections.push(...renderErrorBody(report));
+  } else if (report.summary !== undefined || report.resources !== undefined) {
+    // Structured body (from show-plan JSON or JSONL enrichment)
+    // Strip title — already handled by renderTitle() above
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { title: _discardTitle, ...renderOptsNoTitle } = options ?? {};
+    sections.push(...renderStructuredSections(report, renderOptsNoTitle));
+    // Also render any raw stdout blocks (e.g. plaintext plan + JSONL show-plan)
+    sections.push(...renderRawStdoutSections(report));
+  } else if (report.rawStdout.length > 0) {
+    // Text fallback — raw stdout blocks only
+    sections.push(...renderTextFallbackBody(report));
+  } else if (report.steps.length > 0) {
+    // Workflow-only — just step table
+    sections.push(...renderWorkflowBody(report));
+  }
+
+  return sections;
+}
+
+/** Render raw stdout blocks as collapsible sections. */
+function renderRawStdoutSections(report: Report): Section[] {
+  const sections: Section[] = [];
+  for (const raw of report.rawStdout) {
+    const displayContent = raw.truncated
+      ? raw.content + "\n… (truncated)"
+      : raw.content;
+    const formatted = formatRawOutput(displayContent);
+    const escapedLabel = MarkdownWriter.escapeHtml(raw.label);
+    const full = `<details><summary>${escapedLabel}</summary>\n\n${formatted}\n\n</details>\n\n`;
+    sections.push({ id: `raw-${raw.stepId}`, full });
+  }
+  return sections;
+}

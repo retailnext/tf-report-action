@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+# Pre-plan hook: delete the managed file to simulate external drift.
+# When Terraform refreshes, it detects local_file.managed was deleted
+# externally, producing a resource_drift entry in the plan JSON.
+rm -f managed.txt

@@ -1,24 +1,54 @@
-name: 'OpenTofu Report Action'
-description:
-  'Reports OpenTofu workflow execution status with step outputs as PR comments'
-author: 'retailnext'
+name: "TF Report Action"
+description: >-
+  Reports OpenTofu/Terraform workflow status as PR comments or status issues
+  with rich plan/apply detail
+author: "retailnext"
 inputs:
   steps:
-    description: 'JSON string of workflow steps (e.g., toJSON(steps))'
+    description: "JSON string of workflow steps (pass toJSON(steps))"
     required: true
   workspace:
-    description:
-      'Workspace name to disambiguate comments from multiple workspaces. If not
-      provided, uses workflow name and job name.'
+    description: >-
+      Workspace name used in the comment title, status issue title, and
+      deduplication marker. If not provided, defaults to
+      GITHUB_WORKFLOW/GITHUB_JOB.
     required: false
   target-step:
-    description:
-      'Optional step name to focus the comment on. When specified, the comment
-      will highlight this step status and outputs.'
+    description: >-
+      Optional step ID to focus the report on. When specified, the report
+      treats this step being skipped or failing as a serious error that is
+      prominently reported. Most useful for non-IaC use cases.
     required: false
   github-token:
-    description: 'GitHub token for posting comments'
+    description: >-
+      GitHub token for API calls. In PR context, requires pull-requests: write.
+      In non-PR context (status issues), requires issues: write. Both are
+      needed if the workflow triggers on both push and pull_request.
     required: true
+  init-step-id:
+    description: "Step ID for the init step"
+    required: false
+    default: "init"
+  validate-step-id:
+    description: "Step ID for the validate step"
+    required: false
+    default: "validate"
+  plan-step-id:
+    description: "Step ID for the plan step"
+    required: false
+    default: "plan"
+  show-plan-step-id:
+    description: "Step ID for the show-plan step"
+    required: false
+    default: "show-plan"
+  apply-step-id:
+    description: "Step ID for the apply step"
+    required: false
+    default: "apply"
+  state-step-id:
+    description: "Step ID for the state step (post-apply state pull)"
+    required: false
+    default: "state"
 runs:
-  using: 'node24'
-  main: 'dist/index.js'
+  using: "node24"
+  main: "dist/index.js"

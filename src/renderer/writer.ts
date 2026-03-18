@@ -1,0 +1,152 @@
+/**
+ * Portions of this file are derived from tfplan2md by oocx (https://github.com/oocx/tfplan2md),
+ * used under the MIT License.
+ */
+
+import { escapeHtml } from "../raw-formatter/jsonl.js";
+
+/**
+ * A fluent markdown writer with helper methods for common markdown constructs.
+ * All methods return `this` for chaining.
+ */
+export class MarkdownWriter {
+  private lines: string[] = [];
+
+  /** Appends a heading at the given level. */
+  heading(text: string, level: 1 | 2 | 3 | 4 | 5 | 6): this {
+    this.lines.push(`${"#".repeat(level)} ${text}`);
+    this.lines.push("");
+    return this;
+  }
+
+  /** Appends a paragraph (text followed by a blank line). */
+  paragraph(text: string): this {
+    this.lines.push(text);
+    this.lines.push("");
+    return this;
+  }
+
+  /** Appends blockquote lines (> prefix on every line). */
+  blockquote(text: string): this {
+    for (const line of text.split("\n")) {
+      this.lines.push(`> ${line}`);
+    }
+    return this;
+  }
+
+  /** Appends a blank line. */
+  blankLine(): this {
+    this.lines.push("");
+    return this;
+  }
+
+  /** Appends a table header row with separator. */
+  tableHeader(columns: string[]): this {
+    this.lines.push(`| ${columns.join(" | ")} |`);
+    this.lines.push(`| ${columns.map(() => "---").join(" | ")} |`);
+    return this;
+  }
+
+  /** Appends a table data row. */
+  tableRow(cells: string[]): this {
+    this.lines.push(`| ${cells.join(" | ")} |`);
+    return this;
+  }
+
+  /**
+   * Opens a `<details>` block with an HTML-escaped `<summary>` line.
+   * Use `detailsOpenHtml()` when the summary contains intentional HTML markup.
+   */
+  detailsOpen(summary: string, open = false): this {
+    this.lines.push(open ? "<details open>" : "<details>");
+    this.lines.push(`<summary>${escapeHtml(summary)}</summary>`);
+    this.lines.push("");
+    return this;
+  }
+
+  /**
+   * Opens a `<details>` block with a pre-escaped HTML `<summary>` line.
+   * Caller is responsible for ensuring `htmlSummary` is safe (all
+   * user-controlled content must be HTML-escaped before interpolation).
+   */
+  detailsOpenHtml(htmlSummary: string, open = false): this {
+    this.lines.push(open ? "<details open>" : "<details>");
+    this.lines.push(`<summary>${htmlSummary}</summary>`);
+    this.lines.push("");
+    return this;
+  }
+
+  /** Closes a `<details>` block. */
+  detailsClose(): this {
+    this.lines.push("</details>");
+    this.lines.push("");
+    return this;
+  }
+
+  /** Appends a fenced code block. */
+  codeFence(content: string, language = ""): this {
+    this.lines.push(`\`\`\`${language}`);
+    this.lines.push(content);
+    this.lines.push("```");
+    this.lines.push("");
+    return this;
+  }
+
+  /** Appends raw text verbatim (no trailing newline added). */
+  raw(text: string): this {
+    this.lines.push(text);
+    return this;
+  }
+
+  /**
+   * Post-processes and returns the accumulated markdown string.
+   * 1. Collapses runs of 3+ blank lines to 2 blank lines.
+   * 2. Ensures a blank line before each # heading.
+   */
+  build(): string {
+    let text = this.lines.join("\n");
+
+    // Collapse 3+ consecutive blank lines to 2
+    text = text.replace(/\n{3,}/g, "\n\n");
+
+    // Ensure blank line before headings (not at the very start)
+    text = text.replace(/([^\n])\n(#{1,6} )/g, "$1\n\n$2");
+
+    return text;
+  }
+
+  /** Escapes pipe characters in table cells (Markdown context, not HTML). */
+  static escapeCell(value: string): string {
+    return value.replace(/\\/g, "\\\\").replace(/\|/g, "\\|");
+  }
+
+  /**
+   * Escapes a value for use inside HTML tags within a Markdown table cell.
+   * Uses HTML entity encoding for pipe characters instead of Markdown backslash
+   * escaping, since backslash escapes are not interpreted inside HTML tags.
+   */
+  static escapeHtmlCell(value: string): string {
+    return escapeHtml(value).replace(/\|/g, "&#124;");
+  }
+
+  /**
+   * Escape characters that have special meaning in HTML.
+   * Delegates to the shared `escapeHtml` utility from `raw-formatter/jsonl`.
+   */
+  static escapeHtml(text: string): string {
+    return escapeHtml(text);
+  }
+
+  /** Wraps value in `<code>` tags, HTML-escaping the content. */
+  static inlineCode(value: string): string {
+    return `<code>${escapeHtml(value)}</code>`;
+  }
+
+  /**
+   * Wraps value in `<code>` tags with HTML escaping and table-safe pipe encoding.
+   * Use instead of `inlineCode(escapeCell(...))` in table cell contexts.
+   */
+  static inlineCodeCell(value: string): string {
+    return `<code>${escapeHtml(value).replace(/\|/g, "&#124;")}</code>`;
+  }
+}

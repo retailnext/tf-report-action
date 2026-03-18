@@ -1,0 +1,6 @@
+null_resource.example: Refreshing state... [id=7319856636459721639]
+
+No changes. Your infrastructure matches the configuration.
+
+OpenTofu has compared your real infrastructure against your configuration and
+found no differences, so no changes are needed.

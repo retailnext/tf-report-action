@@ -1,197 +1,571 @@
-# Copilot Instructions
+# tf-report-action — Copilot Instructions
 
-This GitHub Action is written in TypeScript and transpiled to JavaScript. Both
-the TypeScript sources and the **generated** JavaScript code are contained in
-this repository. The TypeScript sources are contained in the `src` directory and
-the JavaScript code is contained in the `dist` directory. A GitHub Actions
-workflow checks that the JavaScript code in `dist` is up-to-date. Therefore, you
-should not review any changes to the contents of the `dist` folder and it is
-expected that the JavaScript code in `dist` closely mirrors the TypeScript code
-it is generated from.
+## Project Purpose
 
-## Repository Structure
+`tf-report-action` is a GitHub Action that posts OpenTofu/Terraform workflow reports
+as PR comments or status issues. It converts plan and apply outputs into rich Markdown
+with attribute-level diffs, module grouping, and tiered degradation.
 
-| Path                 | Description                                              |
-| -------------------- | -------------------------------------------------------- |
-| `__fixtures__/`      | Unit Test Fixtures                                       |
-| `__tests__/`         | Unit Tests                                               |
-| `.devcontainer/`     | Development Container Configuration                      |
-| `.github/`           | GitHub Configuration                                     |
-| `.licenses/`         | License Information                                      |
-| `.vscode/`           | Visual Studio Code Configuration                         |
-| `badges/`            | Badges for readme                                        |
-| `dist/`              | Generated JavaScript Code                                |
-| `src/`               | TypeScript Source Code                                   |
-| `.env.example`       | Environment Variables Example for `@github/local-action` |
-| `.licensed.yml`      | Licensed Configuration                                   |
-| `.markdown-lint.yml` | Markdown Linter Configuration                            |
-| `.node-version`      | Node.js Version Configuration                            |
-| `.prettierrc.yml`    | Prettier Formatter Configuration                         |
-| `.yaml-lint.yml`     | YAML Linter Configuration                                |
-| `action.yml`         | GitHub Action Metadata                                   |
-| `CODEOWNERS`         | Code Owners File                                         |
-| `eslint.config.mjs`  | ESLint Configuration                                     |
-| `jest.config.js`     | Jest Configuration                                       |
-| `LICENSE`            | License File                                             |
-| `package.json`       | NPM Package Configuration                                |
-| `README.md`          | Project Documentation                                    |
-| `rollup.config.ts`   | Rollup Bundler Configuration                             |
-| `tsconfig.json`      | TypeScript Configuration                                 |
+The rendering engine provides three internal entry points:
 
-## Environment Setup
+- `planToMarkdown(json, options?)` — converts plan JSON (from `show -json <planfile>`)
+  into a plan report
+- `applyToMarkdown(planJson, applyJsonl, options?)` — converts plan JSON plus apply
+  JSONL (from `apply -json`) into an apply report showing only actually-changed
+  resources. When `options.stateJson` is provided, resolves unknown attribute values
+  from post-apply state.
+- `reportFromSteps(stepsJson, options?)` — accepts a GitHub Actions steps context JSON
+  and produces a report with tiered degradation (structured plan → raw text → general
+  workflow table)
 
-Install dependencies by running:
+The action entry point (`src/action/main.ts`) orchestrates input parsing, calls
+`reportFromSteps()`, and posts the result via the GitHub API.
+
+---
+
+## Module Boundaries
+
+The source is organized into layered modules with narrow, single-responsibility scopes.
+Follow these boundaries strictly — do not add cross-cutting logic.
+
+### Layer 0 — Foundation (zero project dependencies)
+
+| Module        | Responsibility                                                                                                                                                                        |
+| ------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `src/tfjson/` | Type definitions for the plan JSON wire format and machine-readable UI log format. **Never modify** files copied from tfplanjson; new type files may be added.                        |
+| `src/model/`  | Shared TypeScript interfaces and constants: `Report`, `ResourceChange`, `StepIssue`, `StepOutcome`, `Section`, `CompositionResult`, sentinels, status icons. **No executable logic.** |
+| `src/env/`    | `Env` type alias (`Record<string, string \| undefined>`). DI abstraction over `process.env`.                                                                                          |
+
+### Layer 1 — Pure algorithms (depend only on Layer 0)
+
+| Module               | Responsibility                                                                                |
+| -------------------- | --------------------------------------------------------------------------------------------- |
+| `src/diff/`          | Pure LCS, line-diff, and char-diff algorithms. No Markdown, no I/O.                           |
+| `src/flattener/`     | Flatten nested `JsonValue` → `Map<string, string \| null>` with dotted-path keys.             |
+| `src/sensitivity/`   | Detect whether a flattened attribute path is sensitive. Pure predicate.                       |
+| `src/raw-formatter/` | Format raw command output (JSON Lines, validate results, plain text) into Markdown fragments. |
+| `src/jsonl-scanner/` | Scan and classify JSON Lines output from Terraform/OpenTofu commands into structured results. |
+
+### Layer 2 — I/O and parsing (depend on Layers 0–1)
+
+| Module        | Responsibility                                                                                                                                                                                       |
+| ------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `src/parser/` | Parse Terraform/OpenTofu formats: plan JSON, state JSON (raw tfstate from `state pull`), apply JSONL, validate output.                                                                               |
+| `src/steps/`  | GitHub Actions steps context: parsing, secure file reading, step-data-aware I/O wrappers, outcome helpers. This is the I/O boundary between the external world and the pure transformation pipeline. |
+
+### Layer 3 — Business logic (depend on Layers 0–2)
+
+| Module            | Responsibility                                                                                                                                                                                                                                                                       |
+| ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `src/builder/`    | Build `Report` from parsed input. Plan JSON → Report with flat resource arrays and full attribute detail, JSONL → Report with flat resource arrays but no attribute detail, steps context → progressively enriched Report (tier detection, step issue collection, title generation). |
+| `src/compositor/` | Budget-aware section assembly. Composes Markdown sections within an output size limit, progressively degrading from full → compact → omit. Truncation notice helper.                                                                                                                 |
+
+**Builder internal structure:**
+
+The `report-from-steps.ts` orchestrator delegates per-step processing to
+dedicated files:
+
+| File                   | Responsibility                                                                        |
+| ---------------------- | ------------------------------------------------------------------------------------- |
+| `report-from-steps.ts` | Pipeline orchestrator: phases, sequencing, `ReportOptions`, error/helper functions    |
+| `process-helpers.ts`   | Shared helpers (`addScannerWarnings`, `uiDiagnosticToModel`) used by process-\* files |
+| `process-validate.ts`  | Validate step: diagnostic extraction, StepIssue on failure                            |
+| `process-show-plan.ts` | Show-plan step: parse plan JSON, build structured/apply report, merge fields          |
+| `process-plan.ts`      | Plan step: JSONL scanning for resources/diagnostics/drift, raw text fallback          |
+| `process-apply.ts`     | Apply step: JSONL scanning for apply statuses/diagnostics, raw text fallback          |
+| `state-enrichment.ts`  | State enrichment: resolves unknown attribute values from post-apply state             |
+
+**Dependency rule:** `process-*.ts` files are dependency leaves — they may
+import from `process-helpers.ts` and lower-layer modules, but **never from
+each other**.
+
+### Layer 4 — Rendering (depends on Layers 0–3)
+
+| Module          | Responsibility                                                                                                                                                                                                                                                                                                                              |
+| --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `src/renderer/` | Render any `Report` variant to Markdown. Groups resources by module address (derived from address + type) for display — module grouping is a renderer concern. StructuredReport → full Markdown string, TextFallbackReport/WorkflowReport/ErrorReport → Section arrays. Title, step issue, step table, and variant-specific body renderers. |
+
+### Layer 5 — Entry points
+
+| Module         | Responsibility                                                                                                                           |
+| -------------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
+| `src/index.ts` | Rendering API: `planToMarkdown`, `applyToMarkdown`, `reportFromSteps`. Three pipelines all following parse → build → render (→ compose). |
+
+### Layer 6 — Action (depends on Layers 0–5)
+
+| Module        | Responsibility                                                                                                                                                   |
+| ------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `src/action/` | Action entry point. Parses `INPUT_*` env vars, calls `reportFromSteps()`, posts results via GitHub API. Only module allowed to reference `process.env` directly. |
+| `src/github/` | GitHub REST API client with DI HTTP transport. Comment CRUD, issue search/create/update, pagination. No direct model dependency beyond types.                    |
+
+**Dependency rules (layered — import only from same or lower layer):**
+
+| Module           | May import from (beyond `model/`)                                                      |
+| ---------------- | -------------------------------------------------------------------------------------- |
+| `diff/`          | _(nothing)_                                                                            |
+| `flattener/`     | _(nothing)_                                                                            |
+| `sensitivity/`   | _(nothing)_                                                                            |
+| `raw-formatter/` | _(nothing)_                                                                            |
+| `jsonl-scanner/` | `tfjson/`                                                                              |
+| `env/`           | _(nothing)_                                                                            |
+| `parser/`        | `tfjson/`                                                                              |
+| `steps/`         | `env/`                                                                                 |
+| `builder/`       | `tfjson/`, `flattener/`, `sensitivity/`, `steps/`, `env/`, `parser/`, `jsonl-scanner/` |
+| `compositor/`    | _(nothing)_                                                                            |
+| `renderer/`      | `diff/`, `raw-formatter/`                                                              |
+| `index.ts`       | `parser/`, `builder/`, `renderer/`, `compositor/`, `steps/`, `env/`                    |
+| `action/`        | `index.ts`, `model/`, `github/`, `env/`                                                |
+| `github/`        | `model/` only                                                                          |
+
+**Additional constraints:**
+
+- `model/` is universal — every module may import from it.
+- `tfjson/` is restricted — only `model/`, `parser/`, `builder/`, and `jsonl-scanner/` may import.
+- `builder/apply.ts` must NOT be reexported from the builder barrel (circular dep risk).
+- `renderer/` must **not** import sentinel string constants from `model/sentinels.ts` —
+  all display logic must use boolean flags (`isSensitive`, `isKnownAfterApply`). This
+  is enforced by an ESLint `no-restricted-imports` rule.
+
+---
+
+## Coding Conventions
+
+- **ESM throughout**: `"type": "module"` in package.json. All relative imports use
+  explicit `.js` extensions (e.g. `import { foo } from "./foo.js"`). No `require()`,
+  no `__dirname`.
+- **TypeScript strict mode**: `noUncheckedIndexedAccess`, `exactOptionalPropertyTypes`,
+  `noImplicitOverride` are all enabled. Do not use `any` or type assertions unless
+  absolutely necessary and documented with a comment.
+- **Pure functions**: prefer pure, side-effect-free functions. Every module in `diff/`,
+  `sensitivity/`, and `flattener/` must be fully side-effect-free.
+- **JSDoc on exported symbols**: every exported function, class, and interface must
+  have a JSDoc comment explaining _why_ it exists, not just what it does.
+- **No unnecessary comments**: do not write comments that simply restate the code.
+- **Error handling**: use descriptive `Error` messages with enough context to diagnose
+  the problem (e.g. include the invalid value and what was expected).
+
+---
+
+## Node.js Version Management
+
+The **source of truth** for the project's Node.js major version is the `runs.using`
+field in `action.yml` (e.g. `node24`). No exact minor/patch version is pinned because
+GitHub-hosted runners ship whichever 24.x release they choose.
+
+The following files must all stay in sync with the major version derived from
+`action.yml`:
+
+| File                   | Must contain                                                                 |
+| ---------------------- | ---------------------------------------------------------------------------- |
+| `.node-version`        | `24\n` (major only, no minor/patch)                                          |
+| `package.json` engines | `">=24.0.0"`                                                                 |
+| `@types/node`          | `"^24.x.x"` (major must match)                                               |
+| CI workflow steps      | `node-version-file: .node-version` (never a hardcoded `node-version:` input) |
+
+A governance test (`tests/unit/governance/node-version.test.ts`) derives all
+expectations from `action.yml` and fails if any file is out of sync. When upgrading
+Node.js, update `action.yml` first, then let the governance test guide remaining
+changes.
+
+**Agent obligation**: Before running any `npm` or `node` script, verify the active
+Node.js major version matches the project requirement:
 
 ```bash
-npm install
+node --version   # must match the major in .node-version
 ```
+
+If the major does not match, **do not proceed** until the shell environment resolves
+to the correct version. Fix the PATH in your shell session (e.g.
+`export PATH="/opt/homebrew/opt/node@24/bin:$PATH"` on a Homebrew-managed machine,
+checking that the versioned Homebrew prefix matches the required major) and re-run
+`node --version` to confirm before continuing. Never hardcode PATH manipulation
+inside source or test files — always set it in the shell environment.
+
+---
+
+## Bundling and Distribution
+
+`dist/index.js` and `dist/index.js.map` are **committed to the repository**. GitHub
+Actions requires the entry point to be checked in — there is no install step at
+action runtime.
+
+**When to bundle**: After any change to source code, configuration, or
+dependencies, dist must be rebuilt. This is handled automatically by the
+pre-commit obligation below.
+
+**Obligation**: Before every commit, run:
+
+```bash
+npm run ci && npm run check:dist
+```
+
+`npm run check:dist` runs `npm run bundle` then checks `git diff --exit-code dist/`
+(working tree vs index). If it fails because dist changed, stage the updated dist
+and include it in the commit:
+
+```bash
+git add dist/
+git commit  # include dist/ in the commit
+```
+
+Never commit with a stale dist. Never run only `npm run ci` without also running
+`npm run check:dist` before committing — `npm run ci` does not include bundling.
+
+---
+
+## Linting Obligation
+
+`npm run lint` is the single unified linting command. It runs:
+
+1. `npm run lint:es` — ESLint (source + tests)
+2. `npm run lint:markdown` — markdownlint-cli2 (all Markdown files)
+3. `npm run lint:text` — textlint (terminology checking)
+4. `npm run format:check` — Prettier (formatting verification)
+
+All four must pass before any commit or `report_progress` call. When only one
+specific linter needs debugging, run its sub-script directly.
+
+---
+
+## Coverage Obligation
+
+Both of these coverage checks must pass before any work is considered complete:
+
+- `npm run test:coverage:ci` — overall coverage thresholds:
+  90% lines/functions/statements, 85% branches
+- `npm run test:integration:coverage` — integration-only thresholds:
+  90% lines, 80% branches
+
+If coverage drops below these thresholds after a change, add tests until thresholds
+are satisfied. **Never reduce thresholds.**
+
+### Integration Test Coverage Exclusions
+
+The integration-only coverage config (`vitest.integration.config.ts`) may exclude
+modules that **cannot** be meaningfully exercised by fixture-driven integration tests.
+Allowed exclusion categories:
+
+- **Type-only / no-logic modules** — `tfjson/`, `model/`, `env/`, `*.d.ts`,
+  interface-only files (`builder/options.ts`, `renderer/options.ts`, `diff/types.ts`,
+  `compositor/types.ts`)
+- **Error-path-only modules** — `parser/`, `steps/parse.ts`, `steps/reader.ts` —
+  integration tests supply valid plan JSON from real tool runs; error paths are
+  exercised by unit tests
+- **Barrel reexports** — `steps/index.ts`, `compositor/index.ts`
+- **Requires live API** — `action/`, `github/` — require GitHub API interaction that
+  cannot be exercised with fixture data
+
+Every exclusion must include a comment in `vitest.integration.config.ts` explaining
+**why** the module cannot be covered by integration tests. Do not exclude modules
+that have logic exercisable through `planToMarkdown`, `applyToMarkdown`, or
+`reportFromSteps` with fixture data.
+
+---
+
+## Zero Runtime Dependencies
+
+The action must have **no runtime dependencies** — only Node.js built-in modules.
+All code is bundled into a single `dist/index.js` file. The `dependencies` field in
+`package.json` must be absent or empty `{}`. This is enforced by a governance test
+(`tests/unit/governance/no-runtime-deps.test.ts`).
+
+Do NOT use external runtime dependencies like `@actions/core`, `@actions/github`,
+`@octokit/rest`, or any other npm package at runtime. Use `node:https`, `node:fs`,
+etc. instead.
+
+---
+
+## Style Guide
+
+- **OpenTofu preference**: Use OpenTofu (`tofu`) in all examples and documentation
+  unless specifically demonstrating Terraform compatibility.
+- **`tofu_wrapper: false`**: Every `opentofu/setup-opentofu` step in examples must
+  include `tofu_wrapper: false` with this explanation comment:
+
+  ```yaml
+  # The wrapper is disabled because it fails to forward signals properly
+  # (opentofu/setup-opentofu#41), interferes with detailed exitcodes
+  # (opentofu/setup-opentofu#42), and is generally discouraged when using
+  # retailnext/exec-action to run OpenTofu.
+  tofu_wrapper: false
+  ```
+
+- **Action references**: Always use `@main` (e.g. `retailnext/tf-report-action@main`),
+  never version tags like `@v1`.
+
+### Workflow Example Style Guide
+
+Every example workflow step in user-facing documentation must demonstrate
+best/recommended practices:
+
+1. **`-json` required** — every `tofu`/`terraform` command that supports a
+   `-json` flag must include it, even if the action does not consume that
+   particular step's JSON output. This establishes a consistent best-practice
+   pattern users can copy. (`state pull` always outputs JSON and has no
+   `-json` flag — it is exempt.)
+2. **No `-no-color`** — never use `-no-color` because `-json` implies
+   `-no-color`. Including both is redundant and misleading.
+3. **No `-auto-approve`** — never use `-auto-approve` in examples. When
+   `apply` is given a saved plan file (e.g., `tofu apply -json tfplan`),
+   no interactive approval is required — the plan file itself is the
+   approval. Using `-auto-approve` is misleading and not necessary.
+4. **`hide_outputs: true` for state** — any step that outputs the full
+   OpenTofu/Terraform state (e.g., `state pull`) must use
+   `hide_outputs: true` on `exec-action` to avoid leaking sensitive state
+   values into GitHub Actions logs.
+
+---
+
+## Sensitive Values
+
+Sensitive attribute values are **always masked** as `(sensitive)`. There is no option
+to reveal them. This is a security invariant — do not add any bypass.
+
+## Sentinel Value Architecture
+
+Sentinel string constants (`SENSITIVE_MASK`, `KNOWN_AFTER_APPLY`, `VALUE_NOT_IN_PLAN`)
+are defined in `src/model/sentinels.ts`. They serve as display text assigned in the
+builder layer. **All logic must use boolean flags** (`isSensitive`, `isKnownAfterApply`)
+on the model interfaces — never compare rendered strings against sentinel values.
+
+- The renderer must **not** import from `model/sentinels.ts` (enforced by ESLint).
+- `isKnownAfterApply` stays `true` even after replacement with `VALUE_NOT_IN_PLAN`
+  in the apply builder, because the value is still a placeholder that should not be
+  character-diffed.
+- Values with `isSensitive` or `isKnownAfterApply` are rendered as-is without
+  character-level diffing against previous values.
+
+## Action Classification
+
+The `PlanAction` type includes derived actions beyond the raw Terraform/OpenTofu
+action strings:
+
+- `"replace"` — derived from two-element action pairs (`create+delete` or `delete+create`)
+- `"move"` — derived from `no-op` with `previous_address` set (moved block)
+- `"import"` — derived from `no-op` with `importing` set (import block, no other changes)
+
+Import combined with `create`/`update` retains the original action — `importId` is
+metadata. True no-op resources (unchanged, not moved or imported) are filtered out
+of the report entirely and never shown.
+
+## Data Source Exclusion
+
+Data sources are **never** shown in plan or apply output. They are excluded by
+`shouldSkip()` in `src/builder/resources.ts` which filters out all resources with
+`mode === "data"`. Errors and warnings relating to data sources surface through the
+diagnostics section of apply reports only.
+
+## File Reading Safety
+
+The `src/steps/reader.ts` module enforces security constraints when reading files
+referenced by exec-action step outputs:
+
+- **Allowed directories** — files must reside directly within an allowed directory
+  (no subdirectory traversal). Default: `RUNNER_TEMP` or the OS temp directory.
+- **Regular files only** — rejects symlinks-to-non-regular-files, devices, FIFOs,
+  sockets, and directories.
+- **Two read strategies**: parse reads (full file, bounded by `maxFileSize` = 256 MiB)
+  and display reads (first `maxDisplayRead` = 64 KiB bytes only).
+- **Error messages** must never contain file paths (may reveal runner directory structure).
+
+## Steps Context
+
+The `reportFromSteps(stepsJson, options?)` entry point accepts a JSON-encoded GitHub
+Actions steps context and produces a report. It **never throws** — all errors become
+Markdown content. Output is bounded by `maxOutputLength` (default 63 KiB).
+
+**Pipeline**: `parse steps → build Report → render Section[] → compose within budget`
+— the same parse → build → render → compose pattern as the other two entry points.
+
+**`ReportOptions`** extends `Options` with: `allowedDirs`, `maxOutputLength`, `workspace`,
+`env` (DI for `process.env`), and step ID overrides (`initStepId`, `validateStepId`,
+`planStepId`, `showPlanStepId`, `applyStepId`, `stateStepId`).
+
+**Report variants** (discriminated union on `kind`):
+
+- `StructuredReport` — Tier 1: full plan/apply detail from JSON
+- `TextFallbackReport` — Tier 3: raw command output, no structured plan data
+- `WorkflowReport` — Tier 4: just step statuses, no plan data
+- `ErrorReport` — pipeline/parse errors
+
+**Tiered degradation**:
+
+- **Tier 1**: show-plan JSON available → full structured report (plan or apply)
+- **Tier 3**: No show-plan, but plan/apply step present → raw text fallback with
+  JSON Lines formatting where possible
+- **Tier 4**: No recognized terraform steps → general workflow table
+
+_(Tier 2 is reserved for future use.)_
+
+**State enrichment** (Tier 1 apply reports only): When a `state` step provides
+post-apply state JSON (via `state pull`), the builder resolves `isKnownAfterApply`
+attribute placeholders to their actual values from the state. Sensitive values
+discovered through the state are masked as `(sensitive)`. This runs after the
+main report is built, as a progressive enrichment phase. When state is not
+available and there are unresolved placeholders, a warning is added to the report.
+
+**Dynamic title generation**: Title includes status icon, optional workspace prefix,
+operation label, and change counts. Determined automatically from report content.
+
+**Workspace marker**: When `workspace` is set, the first line of output is
+`<!-- tf-report-action:"WORKSPACE" -->` for comment deduplication.
+
+**Logs URL**: Auto-derived from `GITHUB_REPOSITORY`, `GITHUB_RUN_ID`, and
+`GITHUB_RUN_ATTEMPT` environment variables via the `env` DI option.
+
+## Emoji / Symbol Uniqueness
+
+**No emoji or symbol may be used to mean two different things.** Every visual indicator
+in the rendered output must be unambiguous. This is enforced by the tests in
+`tests/unit/model/emoji-uniqueness.test.ts`.
+
+All emojis and symbols used in the output **must** be defined in one of two constant
+sources so the governance tests can check them:
+
+- **Action symbols**: `ACTION_SYMBOLS` in `src/model/plan-action.ts`
+- **All other icons**: named exports in `src/model/status-icons.ts`
+
+A **source lint test** scans every `.ts` file under `src/` (excluding the two table
+files above) for hardcoded emoji (`\p{Extended_Pictographic}`) and non-ASCII math
+symbols (`\p{Sm}`). Comments are stripped before scanning, so documentation may use
+arrows (`→`) or similar, but code and string literals must import from the constants.
+
+When adding a new emoji or changing an existing one, update the appropriate constant
+source. Do not hardcode emoji or math-symbol literals in renderer code — always import
+from the constant sources above.
+
+## Error Messages
+
+Error messages must **never** contain plan attribute values or any data derived from
+them, because attribute values may be sensitive. This means:
+
+- When catching a `JSON.parse` error, **discard** the underlying `SyntaxError` and
+  throw a new generic message. Node.js 20+ embeds a snippet of the raw input in
+  `SyntaxError` messages, which would expose plan contents.
+- Do not interpolate `before`, `after`, or any flattened attribute map entries into
+  error strings.
+- Structural metadata (format version, field names) is safe to include in errors.
+
+Error and warning messages must **never** hardcode tool names (`"tofu"`,
+`"terraform"`). Always use `expectedCommand(tool, role)` from
+`src/model/step-commands.ts` or pass the detected `tool` value. This ensures
+messages automatically reflect the tool that produced the input. Integration
+tests enforce this: every fixture's rendered output is checked for mentions of
+the wrong tool via `assertCorrectToolName()` in `tests/helpers/fixture-loader.ts`.
+
+---
 
 ## Testing
 
-Ensure all unit tests pass by running:
+- Every module with executable code must have a corresponding test file under `tests/unit/`.
+- Integration tests live under `tests/integration/` and are driven by real plan JSON
+  and apply JSONL files generated from fixture Terraform workspaces.
+- Coverage thresholds: 90% lines/functions/statements, 85% branches.
+- **After adding or modifying any source code, run `npm run ci` and verify all checks
+  pass.** `npm run ci` runs lint, typecheck, full coverage (unit + integration combined),
+  and integration-only coverage in sequence. If coverage drops below thresholds, add
+  tests until thresholds are satisfied before committing. If snapshots need updating,
+  run `npx vitest run -u` first, then re-run `npm run ci`.
+- Use the `/add-fixture-workspace` skill to add fixture workspaces.
+- Use the `/generate-fixtures` skill to regenerate fixture JSON files.
+
+### Integration Test Rule (non-negotiable)
+
+**`tests/integration/` may only use inputs that were generated by actually running
+`terraform` or `tofu` against a fixture workspace under `tests/fixtures/`.**
+
+- Every plan JSON loaded in `tests/integration/` must come from
+  `tests/fixtures/generated/<tool>/<workspace>/<N>/show-plan.stdout`.
+- Every apply JSONL loaded in `tests/integration/` must come from
+  `tests/fixtures/generated/<tool>/<workspace>/<N>/apply.stdout`.
+- Every state JSON loaded in `tests/integration/` must come from
+  `tests/fixtures/generated/<tool>/<workspace>/<N>/state.stdout`.
+- No inline-constructed plan objects are permitted in `tests/integration/`.
+- No manually-crafted JSON strings are permitted in `tests/integration/`.
+- Error-path tests (invalid JSON, unsupported format version, etc.) belong in
+  `tests/unit/`, not `tests/integration/`.
+- The integration-only coverage report (`npm run test:integration:coverage`) must
+  independently meet the same thresholds as the full suite.
+
+**Code review instructions:** When reviewing any change to files under
+`tests/integration/`, flag as a blocking issue if:
+
+- Any test constructs a plan JSON object or string inline (e.g. `{ format_version: "1.0", ... }`,
+  `JSON.stringify({...})`, template literals containing plan-like JSON).
+- Any test imports or uses a helper that returns a hardcoded plan object.
+- Any `show-plan.stdout` file under `tests/integration/` is not a symlink or copy of a file
+  from `tests/fixtures/generated/`.
+- Any plan JSON is loaded from a path outside `tests/fixtures/generated/`.
+
+The only permitted pattern for obtaining plan input in `tests/integration/` is
+reading a file from `tests/fixtures/generated/<tool>/<workspace>/<N>/show-plan.stdout`.
+
+---
+
+## Development Tools
+
+### `scripts/render.ts` — local render tool
+
+`scripts/render.ts` renders a steps.json file to Markdown or a browser-viewable HTML
+page. It uses `reportFromSteps()` as its sole rendering API. Output format is
+controlled by `--format` (default: `html`).
 
 ```bash
-npm run test
+# Render a fixture to HTML and open in browser
+npm run render -- tests/fixtures/generated/terraform/null-lifecycle/2/steps.json
+
+# Render to Markdown on stdout
+npm run render -- steps.json --format markdown --output -
+
+# Render to a Markdown file
+npm run render -- steps.json --format markdown --output report.md
+
+# With options
+npm run render -- steps.json --title "PR #42" --no-open
+
+# Open the fixture gallery (all fixtures rendered in a navigable HTML page)
+npm run gallery -- --no-open
+
+# From stdin
+cat steps.json | npm run render -- -
 ```
 
-Unit tests should exist in the `__tests__` directory. They are powered by
-`jest`. Fixtures should be placed in the `__fixtures__` directory.
+**Supported flags** (each maps 1:1 to an `Options` field or a render-script behaviour):
 
-## Bundling
+| Flag                             | `Options` field / behaviour                                                   | Default                             |
+| -------------------------------- | ----------------------------------------------------------------------------- | ----------------------------------- |
+| `--format <html\|markdown>`      | Output format; `markdown` implies `--no-open`                                 | `"html"`                            |
+| `--output <path>` / `-o`         | Output file; `"-"` for stdout                                                 | temp file (HTML), stdout (Markdown) |
+| `--title <text>`                 | `title`                                                                       | _(none)_                            |
+| `--show-unchanged`               | `showUnchangedAttributes`                                                     | `false`                             |
+| `--diff-format <inline\|simple>` | `diffFormat`                                                                  | `"inline"`                          |
+| `--workspace <name>`             | `workspace` (for title and dedup marker)                                      | _(none)_                            |
+| `--logs-url <url>`               | Parses a GitHub Actions run URL into `env` vars                               | _(none)_                            |
+| `--allowed-dirs <dirs>`          | Comma-separated allowed directories for file reading                          | _(directory of input file)_         |
+| `--max-output-length <n>`        | Maximum output length in characters                                           | `64512` (63 KiB)                    |
+| `--gallery`                      | Render all fixture steps JSONs into a navigable gallery HTML page (HTML only) | _(off)_                             |
+| `--no-open`                      | Suppress browser opening (write HTML only)                                    | _(browser opens by default)_        |
 
-Any time files in the `src` directory are changed, you should run the following
-command to bundle the TypeScript code into JavaScript:
+The **gallery** (`npm run gallery`) renders all fixture steps JSON files into a single
+HTML page with keyboard navigation (←/→ arrows), text filtering, and a "Copy Markdown"
+button for each fixture. It uses marked.js and DOMPurify loaded from CDN — no npm UI
+dependencies are added to the project. Gallery mode only supports HTML output.
+
+**Maintenance rule:** When `Options` (defined across `src/renderer/options.ts` and
+`src/builder/options.ts`) gains, loses, or renames a field, update `parseArgs()` in
+`scripts/render.ts` to keep the CLI flags in sync. The flag table above must
+also be kept current.
+
+**Agent constraint — browser opening is forbidden:** Agents must **never** run any
+command that causes the user's browser to open. This includes:
+
+- `npm run render` (without `--no-open`) — always pass `--no-open` when running this script
+- Any shell command invoking `open`, `xdg-open`, or `start` with a file or URL
+- Any other script or tool that has a side effect of opening a browser window
+
+When running `npm run render` as part of any task, always append `--no-open` and use
+`--format markdown` to get raw Markdown output:
 
 ```bash
-npm run bundle
+npm -s run render -- steps.json --format markdown --no-open --output -
 ```
-
-## Linting
-
-**Any time TypeScript (`.ts`) or JavaScript (`.js`) files are modified, you must
-run the linter to check for errors:**
-
-```bash
-npm run lint
-```
-
-Fix all linting errors before committing changes. The linter enforces code style
-and catches common errors.
-
-## General Coding Guidelines
-
-- Follow standard TypeScript and JavaScript coding conventions and best
-  practices
-- Changes should maintain consistency with existing patterns and style
-- Document changes clearly and thoroughly, including updates to existing
-  comments when appropriate
-- Do not include basic, unnecessary comments that simply restate what the code
-  is doing (focus on explaining _why_, not _what_)
-- Use consistent error handling patterns throughout the codebase
-- Use TypeScript's type system to ensure type safety and clarity
-- Keep functions focused and manageable
-- Use descriptive variable and function names that clearly convey their purpose
-- Use JSDoc comments to document functions, classes, and complex logic
-- **Prefer TypeScript over JavaScript when writing scripts.** Use the `.ts`
-  extension and run scripts with `npx tsx` for TypeScript execution.
-- After doing any refactoring, ensure to run `npm run test` to ensure that all
-  tests still pass and coverage requirements are met
-- When suggesting code changes, always opt for the most maintainable approach.
-  Try your best to keep the code clean and follow "Don't Repeat Yourself" (DRY)
-  principles
-- Avoid unnecessary complexity and always consider the long-term maintainability
-  of the code
-- When writing unit tests, try to consider edge cases as well as the main path
-  of success. This will help ensure that the code is robust and can handle
-  unexpected inputs or situations
-- Do NOT use external runtime dependencies like `@actions/core` to keep the
-  action lightweight. Implement needed functions within the project instead.
-  Only use Node.js built-in modules (https, fs, etc.)
-- Example outputs in documentation must always be produced by executing the
-  action code with real OpenTofu outputs. The inputs to those executions must
-  always be produced by actually executing `tofu`. Use the script
-  `scripts/generate-examples.sh` to generate real OpenTofu JSON outputs, and
-  `scripts/demonstrate-formatting.ts` (run with `npx tsx`) to demonstrate how
-  the action formats those outputs.
-- After updating any Markdown files, always run the following checks:
-  1. Format with Prettier: `npm run format:write`
-  1. Lint Markdown: `npx markdownlint-cli2 "**/*.md" "#node_modules" "#dist"`
-  1. Check natural language: `npx textlint <file>.md` or check all Markdown
-     files with:
-     <!-- markdownlint-disable-next-line MD013 -->
-     `find . -name "*.md" -not -path "./node_modules/*" -not -path "./dist/*" | xargs npx textlint`
-  1. The super-linter workflow includes Markdown (markdownlint),
-     NATURAL_LANGUAGE (textlint using textlint-rule-terminology) and
-     MARKDOWN_PRETTIER check. Configuration files: `.markdownlint.yml`,
-     `.textlintrc` to ensure consistency.
-- After updating any shell scripts, run the shell formatter:
-  `docker run --rm -v "$(pwd)":/mnt mvdan/shfmt:v3.12.0 -w /mnt/scripts/*.sh`
-- **Before updating any pull request**, if there are changes to Markdown or
-  shell files between the base branch and current state, run the super-linter
-  Docker image exactly as the CI workflow does:
-
-  ```bash
-  docker run --rm \
-    -e RUN_LOCAL=true \
-    -e USE_FIND_ALGORITHM=true \
-    -e CHECKOV_FILE_NAME=.checkov.yml \
-    -e FILTER_REGEX_EXCLUDE="dist/**/*" \
-    -e LINTER_RULES_PATH=. \
-    -e VALIDATE_ALL_CODEBASE=true \
-    -e VALIDATE_BIOME_FORMAT=false \
-    -e VALIDATE_BIOME_LINT=false \
-    -e VALIDATE_GITHUB_ACTIONS_ZIZMOR=false \
-    -e VALIDATE_JAVASCRIPT_ES=false \
-    -e VALIDATE_JSCPD=false \
-    -e VALIDATE_TYPESCRIPT_ES=false \
-    -e VALIDATE_JSON=false \
-    -v "$(pwd)":/tmp/lint:ro \
-    --workdir=/tmp/lint \
-    ghcr.io/super-linter/super-linter:slim-v8
-  ```
-
-  This command uses all environment variables from the linter workflow
-  (`.github/workflows/linter.yml`) except `GITHUB_TOKEN` (not needed for local
-  runs) and `DEFAULT_BRANCH` (not compatible with `USE_FIND_ALGORITHM=true`).
-  The `RUN_LOCAL=true` flag enables local execution mode. This ensures linting
-  is performed using the same versions and configurations as CI.
-
-  **Important:** Always check this command against
-  `.github/workflows/linter.yml` and update it whenever there are changes to the
-  linter workflow to ensure it stays synchronized with the CI configuration.
-
-### Versioning
-
-GitHub Actions are versioned using branch and tag names. Please ensure the
-version in the project's `package.json` is updated to reflect the changes made
-in the codebase. The version should follow
-[Semantic Versioning](https://semver.org/) principles.
-
-## Pull Request Guidelines
-
-When creating a pull request (PR), please ensure that:
-
-- Keep changes focused and minimal (avoid large changes, or consider breaking
-  them into separate, smaller PRs)
-- Formatting checks pass
-- Linting checks pass
-- Unit tests pass and coverage requirements are met
-- The action has been transpiled to JavaScript and the `dist` directory is
-  up-to-date with the latest changes in the `src` directory
-- If necessary, the `README.md` file is updated to reflect any changes in
-  functionality or usage
-
-The body of the PR should include:
-
-- A summary of the changes
-- A special note of any changes to dependencies
-- A link to any relevant issues or discussions
-- Any additional context that may be helpful for reviewers
-
-## Code Review Guidelines
-
-When performing a code review, please follow these guidelines:
-
-- If there are changes that modify the functionality/usage of the action,
-  validate that there are changes in the `README.md` file that document the new
-  or modified functionality

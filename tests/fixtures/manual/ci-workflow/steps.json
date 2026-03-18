@@ -1,0 +1,27 @@
+{
+  "checkout": {
+    "outcome": "success",
+    "conclusion": "success",
+    "outputs": {}
+  },
+  "setup-node": {
+    "outcome": "success",
+    "conclusion": "success",
+    "outputs": {}
+  },
+  "install": {
+    "outcome": "success",
+    "conclusion": "success",
+    "outputs": {}
+  },
+  "ci": {
+    "outcome": "success",
+    "conclusion": "success",
+    "outputs": {}
+  },
+  "check-dist": {
+    "outcome": "success",
+    "conclusion": "success",
+    "outputs": {}
+  }
+}
