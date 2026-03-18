@@ -30,6 +30,6 @@ export function formatRawOutput(content: string): string {
   const jsonlResult = tryFormatJsonLines(trimmed);
   if (jsonlResult !== undefined) return jsonlResult;
 
-  // Fallback: raw code block
-  return `\`\`\`\n${content}\n\`\`\``;
+  // Fallback: raw code block (4-backtick fence to avoid conflicts with content)
+  return `\`\`\`\`\n${content}\n\`\`\`\``;
 }

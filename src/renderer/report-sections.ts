@@ -16,6 +16,8 @@ import { renderTextFallbackBody } from "./text-fallback.js";
 import { renderWorkflowBody } from "./workflow.js";
 import { renderErrorBody } from "./error.js";
 import { DIAGNOSTIC_WARNING } from "../model/status-icons.js";
+import { MarkdownWriter } from "./writer.js";
+import { formatRawOutput } from "../raw-formatter/index.js";
 
 /**
  * Render a Report into an ordered array of Sections.
@@ -79,10 +81,12 @@ export function renderReportSections(
 function renderRawStdoutSections(report: Report): Section[] {
   const sections: Section[] = [];
   for (const raw of report.rawStdout) {
-    const truncNote = raw.truncated
-      ? "\n\n> **Note:** Output was truncated."
-      : "";
-    const full = `<details><summary>${raw.label}</summary>\n\n\`\`\`\n${raw.content}\n\`\`\`${truncNote}\n\n</details>\n\n`;
+    const displayContent = raw.truncated
+      ? raw.content + "\n… (truncated)"
+      : raw.content;
+    const formatted = formatRawOutput(displayContent);
+    const escapedLabel = MarkdownWriter.escapeHtml(raw.label);
+    const full = `<details><summary>${escapedLabel}</summary>\n\n${formatted}\n\n</details>\n\n`;
     sections.push({ id: `raw-${raw.stepId}`, full });
   }
   return sections;

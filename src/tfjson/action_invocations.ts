@@ -5,7 +5,7 @@
  * All types in this file will be unpopulated when parsing OpenTofu plan output.
  */
 
-import { AttributeValues, AttributeShadow } from "./common";
+import type { AttributeValues, AttributeShadow } from "./common.js";
 
 /**
  * ActionInvocation describes a single invocation of a provider-defined action

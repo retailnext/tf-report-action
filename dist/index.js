@@ -2403,8 +2403,14 @@ function formatDiff(before, after, format) {
   }
   if (format === "simple") {
     const parts = [];
-    if (b !== "") parts.push(`- ${MarkdownWriter.escapeCell(b)}`);
-    if (a !== "") parts.push(`+ ${MarkdownWriter.escapeCell(a)}`);
+    if (b !== "")
+      parts.push(
+        `- ${MarkdownWriter.escapeCell(MarkdownWriter.escapeHtml(b))}`
+      );
+    if (a !== "")
+      parts.push(
+        `+ ${MarkdownWriter.escapeCell(MarkdownWriter.escapeHtml(a))}`
+      );
     return parts.join("<br>");
   }
   const beforeLines = b.split("\n");
@@ -2518,7 +2524,8 @@ ${codeContent}
   return buildDetailsBlock(name, fenced, totalLines, changedLines);
 }
 function buildDetailsBlock(name, content, totalLines, changedLines) {
-  const summary = totalLines > 0 ? `Large value: ${name} (${String(totalLines)} lines, ${String(changedLines)} changes)` : `Large value: ${name}`;
+  const escapedName = escapeHtml(name);
+  const summary = totalLines > 0 ? `Large value: ${escapedName} (${String(totalLines)} lines, ${String(changedLines)} changes)` : `Large value: ${escapedName}`;
   return `<details>
 <summary>${summary}</summary>
 
@@ -2564,10 +2571,10 @@ function renderResource(resource, writer, options, diffCache, applyContext) {
   const changedAttrs = resource.attributes.filter(
     (a) => !a.isSensitive && !a.isKnownAfterApply && a.before !== a.after
   ).map((a) => a.name);
-  let summaryText = `${symbol} <strong>${MarkdownWriter.escapeCell(resource.type)}</strong> ${MarkdownWriter.escapeCell(deriveInstanceName(resource.address, resource.type))}`;
+  let summaryText = `${symbol} <strong>${MarkdownWriter.escapeHtml(resource.type)}</strong> ${MarkdownWriter.escapeHtml(deriveInstanceName(resource.address, resource.type))}`;
   if (resource.action === "update" && changedAttrs.length > 0) {
     const hint = changedAttrs.slice(0, 5).join(", ");
-    summaryText += ` \u2014 changed: ${MarkdownWriter.escapeCell(hint)}`;
+    summaryText += ` \u2014 changed: ${MarkdownWriter.escapeHtml(hint)}`;
   }
   if (applyContext?.failed) {
     summaryText += ` ${STATUS_FAILURE}`;
@@ -2592,10 +2599,12 @@ function renderResource(resource, writer, options, diffCache, applyContext) {
       writer.tableHeader(["Attribute", "Before", "After"]);
       for (const attr of smallAttrs) {
         const skipDiff = attr.isSensitive || attr.isKnownAfterApply;
-        const beforeCell = skipDiff ? MarkdownWriter.inlineCodeCell(attr.before ?? "") : MarkdownWriter.escapeCell(attr.before ?? "");
+        const beforeCell = skipDiff ? MarkdownWriter.inlineCodeCell(attr.before ?? "") : MarkdownWriter.escapeCell(
+          MarkdownWriter.escapeHtml(attr.before ?? "")
+        );
         const afterCell = skipDiff ? MarkdownWriter.inlineCodeCell(attr.after ?? "") : formatDiff(attr.before, attr.after, diffFormat);
         writer.tableRow([
-          MarkdownWriter.escapeCell(attr.name),
+          MarkdownWriter.escapeCell(MarkdownWriter.escapeHtml(attr.name)),
           beforeCell,
           afterCell
         ]);
@@ -2661,7 +2670,7 @@ function renderDiagnostic(diag, writer) {
   }
 }
 function renderSnippet(snippet, filename, writer) {
-  const location = filename !== void 0 ? `\`${snippet.code}\` in ${snippet.context} (line ${String(snippet.start_line)})` : `\`${snippet.code}\` in ${snippet.context}`;
+  const location = filename !== void 0 ? `\`${snippet.code}\` in ${snippet.context} (\`${filename}\`:${String(snippet.start_line)})` : `\`${snippet.code}\` in ${snippet.context}`;
   writer.blockquote(location);
   if (snippet.values.length > 0) {
     for (const val of snippet.values) {
@@ -2954,9 +2963,9 @@ function formatRawOutput(content) {
   if (validateResult !== void 0) return validateResult;
   const jsonlResult = tryFormatJsonLines(trimmed);
   if (jsonlResult !== void 0) return jsonlResult;
-  return `\`\`\`
+  return `\`\`\`\`
 ${content}
-\`\`\``;
+\`\`\`\``;
 }
 
 // src/renderer/step-issue.ts
@@ -3126,12 +3135,12 @@ function renderReportSections(report, options) {
 function renderRawStdoutSections(report) {
   const sections = [];
   for (const raw of report.rawStdout) {
-    const truncNote = raw.truncated ? "\n\n> **Note:** Output was truncated." : "";
-    const full = `<details><summary>${raw.label}</summary>
+    const displayContent = raw.truncated ? raw.content + "\n\u2026 (truncated)" : raw.content;
+    const formatted = formatRawOutput(displayContent);
+    const escapedLabel = MarkdownWriter.escapeHtml(raw.label);
+    const full = `<details><summary>${escapedLabel}</summary>
 
-\`\`\`
-${raw.content}
-\`\`\`${truncNote}
+${formatted}
 
 </details>
 

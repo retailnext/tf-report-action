@@ -49,11 +49,11 @@ export function renderResource(
     )
     .map((a) => a.name);
 
-  let summaryText = `${symbol} <strong>${MarkdownWriter.escapeCell(resource.type)}</strong> ${MarkdownWriter.escapeCell(deriveInstanceName(resource.address, resource.type))}`;
+  let summaryText = `${symbol} <strong>${MarkdownWriter.escapeHtml(resource.type)}</strong> ${MarkdownWriter.escapeHtml(deriveInstanceName(resource.address, resource.type))}`;
 
   if (resource.action === "update" && changedAttrs.length > 0) {
     const hint = changedAttrs.slice(0, 5).join(", ");
-    summaryText += ` — changed: ${MarkdownWriter.escapeCell(hint)}`;
+    summaryText += ` — changed: ${MarkdownWriter.escapeHtml(hint)}`;
   }
 
   if (applyContext?.failed) {
@@ -91,12 +91,14 @@ export function renderResource(
         const skipDiff = attr.isSensitive || attr.isKnownAfterApply;
         const beforeCell = skipDiff
           ? MarkdownWriter.inlineCodeCell(attr.before ?? "")
-          : MarkdownWriter.escapeCell(attr.before ?? "");
+          : MarkdownWriter.escapeCell(
+              MarkdownWriter.escapeHtml(attr.before ?? ""),
+            );
         const afterCell = skipDiff
           ? MarkdownWriter.inlineCodeCell(attr.after ?? "")
           : formatDiff(attr.before, attr.after, diffFormat);
         writer.tableRow([
-          MarkdownWriter.escapeCell(attr.name),
+          MarkdownWriter.escapeCell(MarkdownWriter.escapeHtml(attr.name)),
           beforeCell,
           afterCell,
         ]);

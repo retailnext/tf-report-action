@@ -2,7 +2,7 @@
  * Resource change types for Terraform/OpenTofu JSON plans.
  */
 
-import { Change } from "./plan";
+import type { Change } from "./plan.js";
 
 /**
  * ResourceChange describes a single planned change action for one resource

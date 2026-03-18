@@ -5,6 +5,7 @@
 
 import type { DiffEntry } from "../diff/types.js";
 import { buildLineDiff } from "../diff/line-diff.js";
+import { escapeHtml } from "../raw-formatter/jsonl.js";
 
 /**
  * Formats a large attribute value as a collapsible markdown block.
@@ -60,10 +61,11 @@ function buildDetailsBlock(
   totalLines: number,
   changedLines: number,
 ): string {
+  const escapedName = escapeHtml(name);
   const summary =
     totalLines > 0
-      ? `Large value: ${name} (${String(totalLines)} lines, ${String(changedLines)} changes)`
-      : `Large value: ${name}`;
+      ? `Large value: ${escapedName} (${String(totalLines)} lines, ${String(changedLines)} changes)`
+      : `Large value: ${escapedName}`;
 
   return `<details>\n<summary>${summary}</summary>\n\n${content}\n\n</details>\n`;
 }

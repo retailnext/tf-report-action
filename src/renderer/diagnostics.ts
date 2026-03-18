@@ -65,7 +65,7 @@ function renderSnippet(
 ): void {
   const location =
     filename !== undefined
-      ? `\`${snippet.code}\` in ${snippet.context} (line ${String(snippet.start_line)})`
+      ? `\`${snippet.code}\` in ${snippet.context} (\`${filename}\`:${String(snippet.start_line)})`
       : `\`${snippet.code}\` in ${snippet.context}`;
   writer.blockquote(location);
 

@@ -31,8 +31,14 @@ export function formatDiff(
 
   if (format === "simple") {
     const parts: string[] = [];
-    if (b !== "") parts.push(`- ${MarkdownWriter.escapeCell(b)}`);
-    if (a !== "") parts.push(`+ ${MarkdownWriter.escapeCell(a)}`);
+    if (b !== "")
+      parts.push(
+        `- ${MarkdownWriter.escapeCell(MarkdownWriter.escapeHtml(b))}`,
+      );
+    if (a !== "")
+      parts.push(
+        `+ ${MarkdownWriter.escapeCell(MarkdownWriter.escapeHtml(a))}`,
+      );
     return parts.join("<br>");
   }
 

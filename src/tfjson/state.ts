@@ -2,8 +2,8 @@
  * State types for Terraform/OpenTofu JSON state output.
  */
 
-import { StateValues } from "./values";
-import { CheckResult } from "./checks";
+import type { StateValues } from "./values.js";
+import type { CheckResult } from "./checks.js";
 
 /**
  * State represents the JSON state output, as embedded in Plan.prior_state and
