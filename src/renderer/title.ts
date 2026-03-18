@@ -38,10 +38,17 @@ function getWorkspace(report: Report): string | undefined {
   return report.workspace;
 }
 
-/** Escape special characters in workspace name for safe HTML comment embedding. */
+/**
+ * Escape workspace name for safe HTML comment embedding.
+ *
+ * HTML comments are terminated by `-->` (or `--!>`). Backslash escaping
+ * has no special meaning inside HTML comments, so we insert a zero-width
+ * space between consecutive dashes to break `--` sequences and prevent
+ * premature comment termination.
+ */
 function escapeMarkerWorkspace(workspace: string): string {
   return workspace
     .replace(/\\/g, "\\\\")
     .replace(/"/g, '\\"')
-    .replace(/(--!?)>/g, "$1\\>");
+    .replace(/--/g, "-\u200B-");
 }

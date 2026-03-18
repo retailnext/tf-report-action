@@ -63,7 +63,7 @@ export function renderResource(
   const shouldOpen =
     applyContext !== undefined &&
     (applyContext.failed || applyContext.diagnostics.length > 0);
-  writer.detailsOpen(summaryText, shouldOpen);
+  writer.detailsOpenHtml(summaryText, shouldOpen);
   writer.codeFence(resource.address);
 
   // Show import/moved-from metadata
@@ -91,9 +91,7 @@ export function renderResource(
         const skipDiff = attr.isSensitive || attr.isKnownAfterApply;
         const beforeCell = skipDiff
           ? MarkdownWriter.inlineCodeCell(attr.before ?? "")
-          : MarkdownWriter.escapeCell(
-              MarkdownWriter.escapeHtml(attr.before ?? ""),
-            ).replace(/\n/g, "<br>");
+          : `<code>${MarkdownWriter.escapeHtmlCell(attr.before ?? "").replace(/\n/g, "<br>")}</code>`;
         const afterCell = skipDiff
           ? MarkdownWriter.inlineCodeCell(attr.after ?? "")
           : formatDiff(attr.before, attr.after, diffFormat);

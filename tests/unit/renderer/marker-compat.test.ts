@@ -47,18 +47,17 @@ describe("workspace marker compatibility", () => {
   });
 
   it("escapes --> to prevent premature comment closure", () => {
+    // Zero-width space breaks the -- sequence
     expect(marker("foo-->bar")).toBe(
-      '<!-- tf-report-action:"foo--\\>bar" -->\n',
+      '<!-- tf-report-action:"foo-\u200B->bar" -->\n',
     );
   });
 
   it("escapes --!> to prevent premature comment closure", () => {
-    // The old tf-report-action escaped --!> as --\!> (backslash before !).
-    // This implementation escapes it as --!\> (backslash before >), which
-    // equally prevents the browser from treating it as a comment close
-    // sequence. Both are safe; the difference is cosmetic.
+    // Zero-width space breaks the -- sequence, preventing both --> and --!>
+    // from terminating the HTML comment.
     expect(marker("foo--!>bar")).toBe(
-      '<!-- tf-report-action:"foo--!\\>bar" -->\n',
+      '<!-- tf-report-action:"foo-\u200B-!>bar" -->\n',
     );
   });
 });

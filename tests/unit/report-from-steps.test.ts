@@ -456,11 +456,12 @@ describe("workspace marker", () => {
       stepsJson({}),
       baseOpts({ workspace: "a-->b" }),
     );
-    expect(result).toContain("a--\\>b");
-    // Must not contain unescaped --> inside the comment
-    expect(result).not.toMatch(
-      /<!-- tf-report-action:"[^"]*(?<!\\)-->"[^>]*-->/,
-    );
+    // Zero-width space breaks the -- sequence to prevent comment termination
+    expect(result).toContain("a-\u200B->b");
+    // The workspace value inside the comment must not contain unbroken --
+    const match = /tf-report-action:"([^"]+)"/.exec(result);
+    expect(match).not.toBeNull();
+    expect(match![1]).not.toContain("--");
   });
 
   it("escapes --!> in workspace name", () => {
@@ -468,7 +469,7 @@ describe("workspace marker", () => {
       stepsJson({}),
       baseOpts({ workspace: "a--!>b" }),
     );
-    expect(result).toContain("a--!\\>b");
+    expect(result).toContain("a-\u200B-!>b");
   });
 });
 

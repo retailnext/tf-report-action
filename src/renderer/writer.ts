@@ -53,10 +53,25 @@ export class MarkdownWriter {
     return this;
   }
 
-  /** Opens a `<details>` block with a `<summary>` line. */
+  /**
+   * Opens a `<details>` block with an HTML-escaped `<summary>` line.
+   * Use `detailsOpenHtml()` when the summary contains intentional HTML markup.
+   */
   detailsOpen(summary: string, open = false): this {
     this.lines.push(open ? "<details open>" : "<details>");
-    this.lines.push(`<summary>${summary}</summary>`);
+    this.lines.push(`<summary>${escapeHtml(summary)}</summary>`);
+    this.lines.push("");
+    return this;
+  }
+
+  /**
+   * Opens a `<details>` block with a pre-escaped HTML `<summary>` line.
+   * Caller is responsible for ensuring `htmlSummary` is safe (all
+   * user-controlled content must be HTML-escaped before interpolation).
+   */
+  detailsOpenHtml(htmlSummary: string, open = false): this {
+    this.lines.push(open ? "<details open>" : "<details>");
+    this.lines.push(`<summary>${htmlSummary}</summary>`);
     this.lines.push("");
     return this;
   }

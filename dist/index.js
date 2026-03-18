@@ -2127,10 +2127,24 @@ var MarkdownWriter = class {
     this.lines.push(`| ${cells.join(" | ")} |`);
     return this;
   }
-  /** Opens a `<details>` block with a `<summary>` line. */
+  /**
+   * Opens a `<details>` block with an HTML-escaped `<summary>` line.
+   * Use `detailsOpenHtml()` when the summary contains intentional HTML markup.
+   */
   detailsOpen(summary, open = false) {
     this.lines.push(open ? "<details open>" : "<details>");
-    this.lines.push(`<summary>${summary}</summary>`);
+    this.lines.push(`<summary>${escapeHtml(summary)}</summary>`);
+    this.lines.push("");
+    return this;
+  }
+  /**
+   * Opens a `<details>` block with a pre-escaped HTML `<summary>` line.
+   * Caller is responsible for ensuring `htmlSummary` is safe (all
+   * user-controlled content must be HTML-escaped before interpolation).
+   */
+  detailsOpenHtml(htmlSummary, open = false) {
+    this.lines.push(open ? "<details open>" : "<details>");
+    this.lines.push(`<summary>${htmlSummary}</summary>`);
     this.lines.push("");
     return this;
   }
@@ -2521,7 +2535,7 @@ function renderResource(resource, writer, options, diffCache, applyContext) {
     summaryText += ` ${STATUS_FAILURE}`;
   }
   const shouldOpen = applyContext !== void 0 && (applyContext.failed || applyContext.diagnostics.length > 0);
-  writer.detailsOpen(summaryText, shouldOpen);
+  writer.detailsOpenHtml(summaryText, shouldOpen);
   writer.codeFence(resource.address);
   if (resource.importId !== null) {
     writer.paragraph(`**Import ID:** \`${resource.importId}\``);
@@ -2540,9 +2554,7 @@ function renderResource(resource, writer, options, diffCache, applyContext) {
       writer.tableHeader(["Attribute", "Before", "After"]);
       for (const attr of smallAttrs) {
         const skipDiff = attr.isSensitive || attr.isKnownAfterApply;
-        const beforeCell = skipDiff ? MarkdownWriter.inlineCodeCell(attr.before ?? "") : MarkdownWriter.escapeCell(
-          MarkdownWriter.escapeHtml(attr.before ?? "")
-        ).replace(/\n/g, "<br>");
+        const beforeCell = skipDiff ? MarkdownWriter.inlineCodeCell(attr.before ?? "") : `<code>${MarkdownWriter.escapeHtmlCell(attr.before ?? "").replace(/\n/g, "<br>")}</code>`;
         const afterCell = skipDiff ? MarkdownWriter.inlineCodeCell(attr.after ?? "") : formatDiff(attr.before, attr.after, diffFormat);
         writer.tableRow([
           MarkdownWriter.escapeCell(MarkdownWriter.escapeHtml(attr.name)),
@@ -2835,7 +2847,7 @@ function getWorkspace(report) {
   return report.workspace;
 }
 function escapeMarkerWorkspace(workspace) {
-  return workspace.replace(/\\/g, "\\\\").replace(/"/g, '\\"').replace(/(--!?)>/g, "$1\\>");
+  return workspace.replace(/\\/g, "\\\\").replace(/"/g, '\\"').replace(/--/g, "-\u200B-");
 }
 
 // src/raw-formatter/validate.ts

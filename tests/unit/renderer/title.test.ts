@@ -61,13 +61,20 @@ describe("renderWorkspaceMarker", () => {
     const report = makeReport({ title: "Plan", workspace: "ws-->end" });
     const section = renderWorkspaceMarker(report);
     expect(section).toBeDefined();
-    expect(section!.full).toContain("ws--\\>end");
+    // Zero-width space breaks the -- sequence to prevent comment termination
+    expect(section!.full).toContain("ws-\u200B->end");
+    // The workspace value must not contain an unbroken -- sequence
+    const match = /"([^"]+)"/.exec(section!.full);
+    expect(match).not.toBeNull();
+    expect(match![1]).not.toContain("--");
   });
 
   it("escapes --!> in workspace name", () => {
     const report = makeReport({ title: "Plan", workspace: "ws--!>end" });
     const section = renderWorkspaceMarker(report);
     expect(section).toBeDefined();
-    expect(section!.full).toContain("ws--!\\>end");
+    // Zero-width space breaks the -- sequence
+    expect(section!.full).toContain("ws-\u200B-!>end");
+    expect(section!.full).not.toContain("--!");
   });
 });
