@@ -10,6 +10,8 @@ import { renderSummary } from "./summary.js";
 import { renderResource } from "./resource.js";
 import type { ApplyContext } from "./resource.js";
 import { renderDiagnostics } from "./diagnostics.js";
+import { formatDiff } from "./diff-format.js";
+import { renderLargeValue } from "./large-value.js";
 import { ACTION_SYMBOLS } from "../model/plan-action.js";
 import { MODULE_ICON, DRIFT_ICON } from "../model/status-icons.js";
 import { deriveModuleAddress } from "./address.js";
@@ -183,8 +185,8 @@ export function renderStructuredSections(
   // Top-level outputs
   if (outputs.length > 0) {
     const writer = new MarkdownWriter();
-    writer.heading("Outputs", 2);
-    renderOutputTable(outputs, writer);
+    writer.heading("Output Changes", 2);
+    renderOutputs(outputs, writer, options, diffCache);
     sections.push({
       id: "outputs",
       full: ensureTrailingBlankLine(writer.build()),
@@ -274,31 +276,73 @@ function buildApplyContext(
   };
 }
 
-function renderOutputTable(
+/**
+ * Renders output changes using the same split strategy as resource attributes:
+ * small values go into an inline table with character-level diffs, large values
+ * (JSON objects, XML, multi-line strings) go into collapsible `<details>` blocks
+ * with line-level diffs.
+ *
+ * Outputs with placeholder values (sensitive or known-after-apply) are always
+ * rendered in the table regardless of `isLarge`, because diffing a real value
+ * against a sentinel string produces meaningless output.
+ */
+function renderOutputs(
   outputs: readonly OutputChange[],
   writer: MarkdownWriter,
+  options: RenderOptions,
+  diffCache: Map<string, DiffEntry[]>,
 ): void {
-  writer.tableHeader(["Output", "Action", "Before", "After"]);
-  for (const output of outputs) {
-    const symbol = ACTION_SYMBOLS[output.action];
-    const before = output.isSensitive
-      ? MarkdownWriter.inlineCode("(sensitive)")
-      : output.before !== null
-        ? MarkdownWriter.inlineCodeCell(output.before)
-        : "";
-    const after = output.isSensitive
-      ? MarkdownWriter.inlineCode("(sensitive)")
-      : output.after !== null
-        ? MarkdownWriter.inlineCodeCell(output.after)
-        : "";
-    writer.tableRow([
-      MarkdownWriter.escapeCell(output.name),
-      symbol,
-      before,
-      after,
-    ]);
+  const diffFormat = options.diffFormat ?? "inline";
+
+  // Placeholder outputs always go in the table — diffing against a sentinel is meaningless
+  const smallOutputs = outputs.filter(
+    (o) => !o.isLarge || o.isSensitive || o.isKnownAfterApply,
+  );
+  const largeOutputs = outputs.filter(
+    (o) => o.isLarge && !o.isSensitive && !o.isKnownAfterApply,
+  );
+
+  // Render small outputs in an attribute-style table
+  if (smallOutputs.length > 0) {
+    writer.tableHeader(["Output", "Action", "Before", "After"]);
+    for (const output of smallOutputs) {
+      const symbol = ACTION_SYMBOLS[output.action];
+      const skipDiff = output.isSensitive || output.isKnownAfterApply;
+      const before = output.isSensitive
+        ? MarkdownWriter.inlineCode("(sensitive)")
+        : output.before !== null
+          ? skipDiff
+            ? MarkdownWriter.inlineCodeCell(output.before)
+            : `<code>${MarkdownWriter.escapeHtmlCell(output.before).replace(/\n/g, "<br>")}</code>`
+          : "";
+      const after = output.isSensitive
+        ? MarkdownWriter.inlineCode("(sensitive)")
+        : skipDiff
+          ? MarkdownWriter.inlineCodeCell(output.after ?? "")
+          : formatDiff(output.before, output.after, diffFormat);
+      writer.tableRow([
+        MarkdownWriter.escapeCell(output.name),
+        symbol,
+        before,
+        after,
+      ]);
+    }
+    writer.blankLine();
   }
-  writer.blankLine();
+
+  // Render large outputs as collapsible details blocks with line-level diffs
+  for (const output of largeOutputs) {
+    const symbol = ACTION_SYMBOLS[output.action];
+    const block = renderLargeValue(
+      `${symbol} ${output.name}`,
+      output.before,
+      output.after,
+      diffCache,
+    );
+    if (block) {
+      writer.raw(block);
+    }
+  }
 }
 
 /**

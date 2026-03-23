@@ -118,6 +118,7 @@ export function enrichReportFromState(report: Report, state: RawState): void {
       } else if (stateOutput.value !== undefined) {
         output.after = stringifyValue(stateOutput.value);
         output.isKnownAfterApply = false;
+        output.isLarge = isLargeValue(output.after);
         enrichedAny = true;
       }
     }

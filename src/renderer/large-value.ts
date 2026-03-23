@@ -40,8 +40,8 @@ export function renderLargeValue(
     return "";
   }
   const diff = buildLineDiff(bVal, aVal, cache);
-  const totalLines = diff.length;
-  const changedLines = diff.filter((e) => e.kind !== "unchanged").length;
+  const addedLines = diff.filter((e) => e.kind === "added").length;
+  const removedLines = diff.filter((e) => e.kind === "removed").length;
 
   const codeContent = diff
     .map((e) => {
@@ -52,22 +52,22 @@ export function renderLargeValue(
     .join("\n");
 
   const fenced = `\`\`\`diff\n${codeContent}\n\`\`\``;
-  return buildDetailsBlock(name, fenced, totalLines, changedLines);
+  return buildDetailsBlock(name, fenced, addedLines, removedLines);
 }
 
 function buildDetailsBlock(
   name: string,
   content: string,
-  totalLines: number,
-  changedLines: number,
+  addedLines: number,
+  removedLines: number,
 ): string {
   const escapedName = escapeHtml(name);
-  const summary =
-    totalLines > 0
-      ? `Large value: ${escapedName} (${String(totalLines)} lines, ${String(changedLines)} changes)`
-      : `Large value: ${escapedName}`;
+  const hasDiff = addedLines > 0 || removedLines > 0;
+  const suffix = hasDiff
+    ? ` (large value; +${String(addedLines)}, -${String(removedLines)})`
+    : " (large value)";
 
-  return `<details>\n<summary>${summary}</summary>\n\n${content}\n\n</details>\n`;
+  return `<details>\n<summary>${escapedName}${suffix}</summary>\n\n${content}\n\n</details>\n`;
 }
 
 function prettyPrint(value: string): string {

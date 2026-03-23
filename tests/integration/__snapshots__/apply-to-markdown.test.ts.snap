@@ -53,7 +53,7 @@ terraform_data.success
 
 </details>
 
-## Outputs
+## Output Changes
 
 | Output | Action | Before | After |
 | --- | --- | --- | --- |
@@ -95,12 +95,11 @@ Error running command 'exit 1': exit status 1. Output:
 
 </details>
 
-## Outputs
+## Output Changes
 
 | Output | Action | Before | After |
 | --- | --- | --- | --- |
 | depends_on_fail_output | 🔧 | <code>18876309414156996</code> | <code>(value not in plan)</code> |
-| success_output | ⬜ | <code>stable</code> | <code>stable</code> |
 
 "
 `;
@@ -140,7 +139,7 @@ local_file.config
 | sensitive_content | <code></code> | <code>(sensitive)</code> |
 
 <details>
-<summary>Large value: content</summary>
+<summary>content (large value)</summary>
 
 \`\`\`
 {
@@ -202,7 +201,7 @@ _(all values known after apply)_
 
 </details>
 
-## Outputs
+## Output Changes
 
 | Output | Action | Before | After |
 | --- | --- | --- | --- |
@@ -263,7 +262,7 @@ terraform_data.independent
 
 </details>
 
-## Outputs
+## Output Changes
 
 | Output | Action | Before | After |
 | --- | --- | --- | --- |
@@ -305,7 +304,7 @@ local_file.config
 | sensitive_content | <code>(sensitive)</code> | <code>(sensitive)</code> |
 
 <details>
-<summary>Large value: content (6 lines, 2 changes)</summary>
+<summary>content (large value; +1, -1)</summary>
 
 \`\`\`diff
   {
@@ -331,7 +330,7 @@ _(all values known after apply)_
 
 </details>
 
-## Outputs
+## Output Changes
 
 | Output | Action | Before | After |
 | --- | --- | --- | --- |
@@ -403,7 +402,7 @@ local_file.readme
 | sensitive_content | <code></code> | <code>(sensitive)</code> |
 
 <details>
-<summary>Large value: content</summary>
+<summary>content (large value)</summary>
 
 \`\`\`
 Project: tf-plan-md fixture
@@ -425,11 +424,11 @@ Line 12: end of file
 
 </details>
 
-## Outputs
+## Output Changes
 
 | Output | Action | Before | After |
 | --- | --- | --- | --- |
-| readme_path | ➕ |  | <code>./output/readme.txt</code> |
+| readme_path | ➕ |  | <code><ins style="background:#dfd">./output/readme.txt</ins></code> |
 
 "
 `;
@@ -465,7 +464,7 @@ local_file.readme
 | sensitive_content | <code>(sensitive)</code> | <code>(sensitive)</code> |
 
 <details>
-<summary>Large value: content (18 lines, 9 changes)</summary>
+<summary>content (large value; +5, -4)</summary>
 
 \`\`\`diff
   Project: tf-plan-md fixture
@@ -491,12 +490,6 @@ local_file.readme
 </details>
 
 </details>
-
-## Outputs
-
-| Output | Action | Before | After |
-| --- | --- | --- | --- |
-| readme_path | ⬜ | <code>./output/readme.txt</code> | <code>./output/readme.txt</code> |
 
 "
 `;
@@ -604,7 +597,7 @@ module.parent["2"].module.child.null_resource.item[1]
 
 </details>
 
-## Outputs
+## Output Changes
 
 | Output | Action | Before | After |
 | --- | --- | --- | --- |
@@ -741,7 +734,7 @@ module.parent["3"].module.child.null_resource.item[2]
 
 </details>
 
-## Outputs
+## Output Changes
 
 | Output | Action | Before | After |
 | --- | --- | --- | --- |
@@ -1018,12 +1011,12 @@ local_sensitive_file.secret
 
 </details>
 
-## Outputs
+## Output Changes
 
 | Output | Action | Before | After |
 | --- | --- | --- | --- |
 | secret_checksum | ➕ | <code>(sensitive)</code> | <code>(sensitive)</code> |
-| secret_path | ➕ |  | <code>./output/secret.txt</code> |
+| secret_path | ➕ |  | <code><ins style="background:#dfd">./output/secret.txt</ins></code> |
 
 "
 `;
@@ -1061,12 +1054,11 @@ local_sensitive_file.secret
 
 </details>
 
-## Outputs
+## Output Changes
 
 | Output | Action | Before | After |
 | --- | --- | --- | --- |
 | secret_checksum | 🔧 | <code>(sensitive)</code> | <code>(sensitive)</code> |
-| secret_path | ⬜ | <code>./output/secret.txt</code> | <code>./output/secret.txt</code> |
 
 "
 `;
@@ -1265,7 +1257,7 @@ terraform_data.success
 
 </details>
 
-## Outputs
+## Output Changes
 
 | Output | Action | Before | After |
 | --- | --- | --- | --- |
@@ -1307,12 +1299,11 @@ Error running command 'exit 1': exit status 1. Output:
 
 </details>
 
-## Outputs
+## Output Changes
 
 | Output | Action | Before | After |
 | --- | --- | --- | --- |
 | depends_on_fail_output | 🔧 | <code>5805321220910071849</code> | <code>(value not in plan)</code> |
-| success_output | ⬜ | <code>stable</code> | <code>stable</code> |
 
 "
 `;
@@ -1352,7 +1343,7 @@ local_file.config
 | sensitive_content | <code></code> | <code>(sensitive)</code> |
 
 <details>
-<summary>Large value: content</summary>
+<summary>content (large value)</summary>
 
 \`\`\`
 {
@@ -1414,7 +1405,7 @@ _(all values known after apply)_
 
 </details>
 
-## Outputs
+## Output Changes
 
 | Output | Action | Before | After |
 | --- | --- | --- | --- |
@@ -1475,7 +1466,7 @@ terraform_data.independent
 
 </details>
 
-## Outputs
+## Output Changes
 
 | Output | Action | Before | After |
 | --- | --- | --- | --- |
@@ -1517,7 +1508,7 @@ local_file.config
 | sensitive_content | <code>(sensitive)</code> | <code>(sensitive)</code> |
 
 <details>
-<summary>Large value: content (6 lines, 2 changes)</summary>
+<summary>content (large value; +1, -1)</summary>
 
 \`\`\`diff
   {
@@ -1543,7 +1534,7 @@ _(all values known after apply)_
 
 </details>
 
-## Outputs
+## Output Changes
 
 | Output | Action | Before | After |
 | --- | --- | --- | --- |
@@ -1615,7 +1606,7 @@ local_file.readme
 | sensitive_content | <code></code> | <code>(sensitive)</code> |
 
 <details>
-<summary>Large value: content</summary>
+<summary>content (large value)</summary>
 
 \`\`\`
 Project: tf-plan-md fixture
@@ -1637,11 +1628,11 @@ Line 12: end of file
 
 </details>
 
-## Outputs
+## Output Changes
 
 | Output | Action | Before | After |
 | --- | --- | --- | --- |
-| readme_path | ➕ |  | <code>./output/readme.txt</code> |
+| readme_path | ➕ |  | <code><ins style="background:#dfd">./output/readme.txt</ins></code> |
 
 "
 `;
@@ -1677,7 +1668,7 @@ local_file.readme
 | sensitive_content | <code>(sensitive)</code> | <code>(sensitive)</code> |
 
 <details>
-<summary>Large value: content (18 lines, 9 changes)</summary>
+<summary>content (large value; +5, -4)</summary>
 
 \`\`\`diff
   Project: tf-plan-md fixture
@@ -1703,12 +1694,6 @@ local_file.readme
 </details>
 
 </details>
-
-## Outputs
-
-| Output | Action | Before | After |
-| --- | --- | --- | --- |
-| readme_path | ⬜ | <code>./output/readme.txt</code> | <code>./output/readme.txt</code> |
 
 "
 `;
@@ -1816,7 +1801,7 @@ module.parent["2"].module.child.null_resource.item[1]
 
 </details>
 
-## Outputs
+## Output Changes
 
 | Output | Action | Before | After |
 | --- | --- | --- | --- |
@@ -1953,7 +1938,7 @@ module.parent["3"].module.child.null_resource.item[2]
 
 </details>
 
-## Outputs
+## Output Changes
 
 | Output | Action | Before | After |
 | --- | --- | --- | --- |
@@ -2230,12 +2215,12 @@ local_sensitive_file.secret
 
 </details>
 
-## Outputs
+## Output Changes
 
 | Output | Action | Before | After |
 | --- | --- | --- | --- |
 | secret_checksum | ➕ | <code>(sensitive)</code> | <code>(sensitive)</code> |
-| secret_path | ➕ |  | <code>./output/secret.txt</code> |
+| secret_path | ➕ |  | <code><ins style="background:#dfd">./output/secret.txt</ins></code> |
 
 "
 `;
@@ -2273,12 +2258,11 @@ local_sensitive_file.secret
 
 </details>
 
-## Outputs
+## Output Changes
 
 | Output | Action | Before | After |
 | --- | --- | --- | --- |
 | secret_checksum | 🔧 | <code>(sensitive)</code> | <code>(sensitive)</code> |
-| secret_path | ⬜ | <code>./output/secret.txt</code> | <code>./output/secret.txt</code> |
 
 "
 `;
@@ -2463,7 +2447,7 @@ terraform_data.depends_on_fail
 | id | <code></code> | <code><ins style="background:#dfd">0e26e812-d7e5-9051-5db2-910e6210a2f6</ins></code> |
 
 <details>
-<summary>Large value: input</summary>
+<summary>input (large value)</summary>
 
 \`\`\`
 {
@@ -2475,7 +2459,7 @@ terraform_data.depends_on_fail
 </details>
 
 <details>
-<summary>Large value: output</summary>
+<summary>output (large value)</summary>
 
 \`\`\`
 {
@@ -2501,7 +2485,7 @@ terraform_data.success
 | input | <code></code> | <code><ins style="background:#dfd">stable</ins></code> |
 
 <details>
-<summary>Large value: output</summary>
+<summary>output (large value)</summary>
 
 \`\`\`
 {
@@ -2514,12 +2498,12 @@ terraform_data.success
 
 </details>
 
-## Outputs
+## Output Changes
 
 | Output | Action | Before | After |
 | --- | --- | --- | --- |
-| depends_on_fail_output | ➕ |  | <code>18876309414156996</code> |
-| success_output | ➕ |  | <code>stable</code> |
+| depends_on_fail_output | ➕ |  | <code><ins style="background:#dfd">18876309414156996</ins></code> |
+| success_output | ➕ |  | <code><ins style="background:#dfd">stable</ins></code> |
 
 "
 `;
@@ -2556,12 +2540,11 @@ Error running command 'exit 1': exit status 1. Output:
 
 </details>
 
-## Outputs
+## Output Changes
 
 | Output | Action | Before | After |
 | --- | --- | --- | --- |
 | depends_on_fail_output | 🔧 | <code>18876309414156996</code> | <code>18876309414156996</code> |
-| success_output | ⬜ | <code>stable</code> | <code>stable</code> |
 
 "
 `;
@@ -2601,7 +2584,7 @@ local_file.config
 | sensitive_content | <code></code> | <code>(sensitive)</code> |
 
 <details>
-<summary>Large value: content</summary>
+<summary>content (large value)</summary>
 
 \`\`\`
 {
@@ -2628,7 +2611,7 @@ terraform_data.independent
 | input | <code></code> | <code><ins style="background:#dfd">v1</ins></code> |
 
 <details>
-<summary>Large value: output</summary>
+<summary>output (large value)</summary>
 
 \`\`\`
 {
@@ -2653,7 +2636,7 @@ terraform_data.worker_a
 | id | <code></code> | <code><ins style="background:#dfd">3068beb4-da22-038a-3f8e-01e6423a93a9</ins></code> |
 
 <details>
-<summary>Large value: input</summary>
+<summary>input (large value)</summary>
 
 \`\`\`
 {
@@ -2665,7 +2648,7 @@ terraform_data.worker_a
 </details>
 
 <details>
-<summary>Large value: output</summary>
+<summary>output (large value)</summary>
 
 \`\`\`
 {
@@ -2690,7 +2673,7 @@ terraform_data.worker_b
 | id | <code></code> | <code><ins style="background:#dfd">09504b51-fcb3-1ae7-31b0-ba22cfa1aa63</ins></code> |
 
 <details>
-<summary>Large value: input</summary>
+<summary>input (large value)</summary>
 
 \`\`\`
 {
@@ -2702,7 +2685,7 @@ terraform_data.worker_b
 </details>
 
 <details>
-<summary>Large value: output</summary>
+<summary>output (large value)</summary>
 
 \`\`\`
 {
@@ -2727,7 +2710,7 @@ terraform_data.worker_c
 | id | <code></code> | <code><ins style="background:#dfd">f925fa17-aa75-41c4-9fe4-44866db3b6dc</ins></code> |
 
 <details>
-<summary>Large value: input</summary>
+<summary>input (large value)</summary>
 
 \`\`\`
 {
@@ -2739,7 +2722,7 @@ terraform_data.worker_c
 </details>
 
 <details>
-<summary>Large value: output</summary>
+<summary>output (large value)</summary>
 
 \`\`\`
 {
@@ -2752,11 +2735,20 @@ terraform_data.worker_c
 
 </details>
 
-## Outputs
+## Output Changes
 
-| Output | Action | Before | After |
-| --- | --- | --- | --- |
-| config_value | ➕ |  | <code>{&quot;worker_a&quot;:&quot;alpha&quot;,&quot;worker_b&quot;:&quot;bravo&quot;,&quot;worker_c&quot;:&quot;charlie&quot;}</code> |
+<details>
+<summary>➕ config_value (large value)</summary>
+
+\`\`\`
+{
+  "worker_a": "alpha",
+  "worker_b": "bravo",
+  "worker_c": "charlie"
+}
+\`\`\`
+
+</details>
 
 "
 `;
@@ -2811,7 +2803,7 @@ terraform_data.independent
 | input | <code>v1</code> | <code>v<ins style="background:#dfd">2</ins><del style="background:#fdd">1</del></code> |
 
 <details>
-<summary>Large value: output (5 lines, 5 changes)</summary>
+<summary>output (large value; +4, -1)</summary>
 
 \`\`\`diff
 + {
@@ -2825,11 +2817,20 @@ terraform_data.independent
 
 </details>
 
-## Outputs
+## Output Changes
 
-| Output | Action | Before | After |
-| --- | --- | --- | --- |
-| config_value | 🔧 | <code>{&quot;worker_a&quot;:&quot;alpha&quot;,&quot;worker_b&quot;:&quot;bravo&quot;,&quot;worker_c&quot;:&quot;charlie&quot;}</code> | <code>{&quot;worker_a&quot;:&quot;alpha&quot;,&quot;worker_b&quot;:&quot;bravo&quot;,&quot;worker_c&quot;:&quot;charlie&quot;}</code> |
+<details>
+<summary>🔧 config_value (large value)</summary>
+
+\`\`\`diff
+  {
+    "worker_a": "alpha",
+    "worker_b": "bravo",
+    "worker_c": "charlie"
+  }
+\`\`\`
+
+</details>
 
 "
 `;
@@ -2867,7 +2868,7 @@ local_file.config
 | sensitive_content | <code>(sensitive)</code> | <code>(sensitive)</code> |
 
 <details>
-<summary>Large value: content (6 lines, 2 changes)</summary>
+<summary>content (large value; +1, -1)</summary>
 
 \`\`\`diff
   {
@@ -2890,7 +2891,7 @@ terraform_data.worker_a
 \`\`\`
 
 <details>
-<summary>Large value: input (5 lines, 5 changes)</summary>
+<summary>input (large value; +4, -1)</summary>
 
 \`\`\`diff
 + {
@@ -2903,7 +2904,7 @@ terraform_data.worker_a
 </details>
 
 <details>
-<summary>Large value: output (5 lines, 5 changes)</summary>
+<summary>output (large value; +4, -1)</summary>
 
 \`\`\`diff
 + {
@@ -2917,11 +2918,21 @@ terraform_data.worker_a
 
 </details>
 
-## Outputs
+## Output Changes
 
-| Output | Action | Before | After |
-| --- | --- | --- | --- |
-| config_value | 🔧 | <code>{&quot;worker_a&quot;:&quot;alpha&quot;,&quot;worker_b&quot;:&quot;bravo&quot;,&quot;worker_c&quot;:&quot;charlie&quot;}</code> | <code>{&quot;worker_a&quot;:&quot;ALPHA&quot;,&quot;worker_b&quot;:&quot;bravo&quot;,&quot;worker_c&quot;:&quot;charlie&quot;}</code> |
+<details>
+<summary>🔧 config_value (large value; +1, -1)</summary>
+
+\`\`\`diff
+  {
+-   "worker_a": "alpha",
++   "worker_a": "ALPHA",
+    "worker_b": "bravo",
+    "worker_c": "charlie"
+  }
+\`\`\`
+
+</details>
 
 "
 `;
@@ -2989,7 +3000,7 @@ local_file.readme
 | sensitive_content | <code></code> | <code>(sensitive)</code> |
 
 <details>
-<summary>Large value: content</summary>
+<summary>content (large value)</summary>
 
 \`\`\`
 Project: tf-plan-md fixture
@@ -3011,11 +3022,11 @@ Line 12: end of file
 
 </details>
 
-## Outputs
+## Output Changes
 
 | Output | Action | Before | After |
 | --- | --- | --- | --- |
-| readme_path | ➕ |  | <code>./output/readme.txt</code> |
+| readme_path | ➕ |  | <code><ins style="background:#dfd">./output/readme.txt</ins></code> |
 
 "
 `;
@@ -3051,7 +3062,7 @@ local_file.readme
 | sensitive_content | <code>(sensitive)</code> | <code>(sensitive)</code> |
 
 <details>
-<summary>Large value: content (18 lines, 9 changes)</summary>
+<summary>content (large value; +5, -4)</summary>
 
 \`\`\`diff
   Project: tf-plan-md fixture
@@ -3077,12 +3088,6 @@ local_file.readme
 </details>
 
 </details>
-
-## Outputs
-
-| Output | Action | Before | After |
-| --- | --- | --- | --- |
-| readme_path | ⬜ | <code>./output/readme.txt</code> | <code>./output/readme.txt</code> |
 
 "
 `;
@@ -3190,12 +3195,12 @@ module.parent["2"].module.child.null_resource.item[1]
 
 </details>
 
-## Outputs
+## Output Changes
 
 | Output | Action | Before | After |
 | --- | --- | --- | --- |
-| generated_name | ➕ |  | <code>fixture-0aura6xr</code> |
-| root_id | ➕ |  | <code>4740972482117666024</code> |
+| generated_name | ➕ |  | <code><ins style="background:#dfd">fixture-0aura6xr</ins></code> |
+| root_id | ➕ |  | <code><ins style="background:#dfd">4740972482117666024</ins></code> |
 
 "
 `;
@@ -3327,12 +3332,12 @@ module.parent["3"].module.child.null_resource.item[2]
 
 </details>
 
-## Outputs
+## Output Changes
 
 | Output | Action | Before | After |
 | --- | --- | --- | --- |
-| generated_name | 🔧 | <code>fixture-0aura6xr</code> | <code>fixture-updated-lg0wtfhp</code> |
-| root_id | 🔧 | <code>4740972482117666024</code> | <code>6289329542247481419</code> |
+| generated_name | 🔧 | <code>fixture-0aura6xr</code> | <code>fixture-<del style="background:#fdd">0a</del>u<del style="background:#fdd">r</del><ins style="background:#dfd">pd</ins>a<ins style="background:#dfd">ted-lg0wtfhp</ins><del style="background:#fdd">6xr</del></code> |
+| root_id | 🔧 | <code>4740972482117666024</code> | <code><ins style="background:#dfd">62893295</ins>4<del style="background:#fdd">7</del><ins style="background:#dfd">22</ins>4<del style="background:#fdd">09</del>7<del style="background:#fdd">2</del>48<del style="background:#fdd">2</del>1<ins style="background:#dfd">4</ins>1<ins style="background:#dfd">9</ins><del style="background:#fdd">7666024</del></code> |
 
 "
 `;
@@ -3426,7 +3431,7 @@ terraform_data.meta
 | input | <code></code> | <code><ins style="background:#dfd">v1</ins></code> |
 
 <details>
-<summary>Large value: output</summary>
+<summary>output (large value)</summary>
 
 \`\`\`
 {
@@ -3499,7 +3504,7 @@ terraform_data.meta
 | input | <code>v1</code> | <code>v<ins style="background:#dfd">2</ins><del style="background:#fdd">1</del></code> |
 
 <details>
-<summary>Large value: output (5 lines, 5 changes)</summary>
+<summary>output (large value; +4, -1)</summary>
 
 \`\`\`diff
 + {
@@ -3627,12 +3632,12 @@ local_sensitive_file.secret
 
 </details>
 
-## Outputs
+## Output Changes
 
 | Output | Action | Before | After |
 | --- | --- | --- | --- |
 | secret_checksum | ➕ | <code>(sensitive)</code> | <code>(sensitive)</code> |
-| secret_path | ➕ |  | <code>./output/secret.txt</code> |
+| secret_path | ➕ |  | <code><ins style="background:#dfd">./output/secret.txt</ins></code> |
 
 "
 `;
@@ -3670,12 +3675,11 @@ local_sensitive_file.secret
 
 </details>
 
-## Outputs
+## Output Changes
 
 | Output | Action | Before | After |
 | --- | --- | --- | --- |
 | secret_checksum | 🔧 | <code>(sensitive)</code> | <code>(sensitive)</code> |
-| secret_path | ⬜ | <code>./output/secret.txt</code> | <code>./output/secret.txt</code> |
 
 "
 `;
@@ -3860,7 +3864,7 @@ terraform_data.depends_on_fail
 | id | <code></code> | <code><ins style="background:#dfd">187022b4-6440-9fcf-3593-4b6f27d3a442</ins></code> |
 
 <details>
-<summary>Large value: input</summary>
+<summary>input (large value)</summary>
 
 \`\`\`
 {
@@ -3872,7 +3876,7 @@ terraform_data.depends_on_fail
 </details>
 
 <details>
-<summary>Large value: output</summary>
+<summary>output (large value)</summary>
 
 \`\`\`
 {
@@ -3898,7 +3902,7 @@ terraform_data.success
 | input | <code></code> | <code><ins style="background:#dfd">stable</ins></code> |
 
 <details>
-<summary>Large value: output</summary>
+<summary>output (large value)</summary>
 
 \`\`\`
 {
@@ -3911,12 +3915,12 @@ terraform_data.success
 
 </details>
 
-## Outputs
+## Output Changes
 
 | Output | Action | Before | After |
 | --- | --- | --- | --- |
-| depends_on_fail_output | ➕ |  | <code>5805321220910071849</code> |
-| success_output | ➕ |  | <code>stable</code> |
+| depends_on_fail_output | ➕ |  | <code><ins style="background:#dfd">5805321220910071849</ins></code> |
+| success_output | ➕ |  | <code><ins style="background:#dfd">stable</ins></code> |
 
 "
 `;
@@ -3953,12 +3957,11 @@ Error running command 'exit 1': exit status 1. Output:
 
 </details>
 
-## Outputs
+## Output Changes
 
 | Output | Action | Before | After |
 | --- | --- | --- | --- |
 | depends_on_fail_output | 🔧 | <code>5805321220910071849</code> | <code>5805321220910071849</code> |
-| success_output | ⬜ | <code>stable</code> | <code>stable</code> |
 
 "
 `;
@@ -3998,7 +4001,7 @@ local_file.config
 | sensitive_content | <code></code> | <code>(sensitive)</code> |
 
 <details>
-<summary>Large value: content</summary>
+<summary>content (large value)</summary>
 
 \`\`\`
 {
@@ -4025,7 +4028,7 @@ terraform_data.independent
 | input | <code></code> | <code><ins style="background:#dfd">v1</ins></code> |
 
 <details>
-<summary>Large value: output</summary>
+<summary>output (large value)</summary>
 
 \`\`\`
 {
@@ -4050,7 +4053,7 @@ terraform_data.worker_a
 | id | <code></code> | <code><ins style="background:#dfd">0d9f36ea-9187-50de-26ad-3679b9fac8c9</ins></code> |
 
 <details>
-<summary>Large value: input</summary>
+<summary>input (large value)</summary>
 
 \`\`\`
 {
@@ -4062,7 +4065,7 @@ terraform_data.worker_a
 </details>
 
 <details>
-<summary>Large value: output</summary>
+<summary>output (large value)</summary>
 
 \`\`\`
 {
@@ -4087,7 +4090,7 @@ terraform_data.worker_b
 | id | <code></code> | <code><ins style="background:#dfd">3112a96b-8d7e-1ab5-e88d-671b3f3b41b4</ins></code> |
 
 <details>
-<summary>Large value: input</summary>
+<summary>input (large value)</summary>
 
 \`\`\`
 {
@@ -4099,7 +4102,7 @@ terraform_data.worker_b
 </details>
 
 <details>
-<summary>Large value: output</summary>
+<summary>output (large value)</summary>
 
 \`\`\`
 {
@@ -4124,7 +4127,7 @@ terraform_data.worker_c
 | id | <code></code> | <code><ins style="background:#dfd">8031ba13-c0a5-1c61-f45b-981dee5e2587</ins></code> |
 
 <details>
-<summary>Large value: input</summary>
+<summary>input (large value)</summary>
 
 \`\`\`
 {
@@ -4136,7 +4139,7 @@ terraform_data.worker_c
 </details>
 
 <details>
-<summary>Large value: output</summary>
+<summary>output (large value)</summary>
 
 \`\`\`
 {
@@ -4149,11 +4152,20 @@ terraform_data.worker_c
 
 </details>
 
-## Outputs
+## Output Changes
 
-| Output | Action | Before | After |
-| --- | --- | --- | --- |
-| config_value | ➕ |  | <code>{&quot;worker_a&quot;:&quot;alpha&quot;,&quot;worker_b&quot;:&quot;bravo&quot;,&quot;worker_c&quot;:&quot;charlie&quot;}</code> |
+<details>
+<summary>➕ config_value (large value)</summary>
+
+\`\`\`
+{
+  "worker_a": "alpha",
+  "worker_b": "bravo",
+  "worker_c": "charlie"
+}
+\`\`\`
+
+</details>
 
 "
 `;
@@ -4208,7 +4220,7 @@ terraform_data.independent
 | input | <code>v1</code> | <code>v<ins style="background:#dfd">2</ins><del style="background:#fdd">1</del></code> |
 
 <details>
-<summary>Large value: output (5 lines, 5 changes)</summary>
+<summary>output (large value; +4, -1)</summary>
 
 \`\`\`diff
 + {
@@ -4222,11 +4234,20 @@ terraform_data.independent
 
 </details>
 
-## Outputs
+## Output Changes
 
-| Output | Action | Before | After |
-| --- | --- | --- | --- |
-| config_value | 🔧 | <code>{&quot;worker_a&quot;:&quot;alpha&quot;,&quot;worker_b&quot;:&quot;bravo&quot;,&quot;worker_c&quot;:&quot;charlie&quot;}</code> | <code>{&quot;worker_a&quot;:&quot;alpha&quot;,&quot;worker_b&quot;:&quot;bravo&quot;,&quot;worker_c&quot;:&quot;charlie&quot;}</code> |
+<details>
+<summary>🔧 config_value (large value)</summary>
+
+\`\`\`diff
+  {
+    "worker_a": "alpha",
+    "worker_b": "bravo",
+    "worker_c": "charlie"
+  }
+\`\`\`
+
+</details>
 
 "
 `;
@@ -4264,7 +4285,7 @@ local_file.config
 | sensitive_content | <code>(sensitive)</code> | <code>(sensitive)</code> |
 
 <details>
-<summary>Large value: content (6 lines, 2 changes)</summary>
+<summary>content (large value; +1, -1)</summary>
 
 \`\`\`diff
   {
@@ -4287,7 +4308,7 @@ terraform_data.worker_a
 \`\`\`
 
 <details>
-<summary>Large value: input (5 lines, 5 changes)</summary>
+<summary>input (large value; +4, -1)</summary>
 
 \`\`\`diff
 + {
@@ -4300,7 +4321,7 @@ terraform_data.worker_a
 </details>
 
 <details>
-<summary>Large value: output (5 lines, 5 changes)</summary>
+<summary>output (large value; +4, -1)</summary>
 
 \`\`\`diff
 + {
@@ -4314,11 +4335,21 @@ terraform_data.worker_a
 
 </details>
 
-## Outputs
+## Output Changes
 
-| Output | Action | Before | After |
-| --- | --- | --- | --- |
-| config_value | 🔧 | <code>{&quot;worker_a&quot;:&quot;alpha&quot;,&quot;worker_b&quot;:&quot;bravo&quot;,&quot;worker_c&quot;:&quot;charlie&quot;}</code> | <code>{&quot;worker_a&quot;:&quot;ALPHA&quot;,&quot;worker_b&quot;:&quot;bravo&quot;,&quot;worker_c&quot;:&quot;charlie&quot;}</code> |
+<details>
+<summary>🔧 config_value (large value; +1, -1)</summary>
+
+\`\`\`diff
+  {
+-   "worker_a": "alpha",
++   "worker_a": "ALPHA",
+    "worker_b": "bravo",
+    "worker_c": "charlie"
+  }
+\`\`\`
+
+</details>
 
 "
 `;
@@ -4386,7 +4417,7 @@ local_file.readme
 | sensitive_content | <code></code> | <code>(sensitive)</code> |
 
 <details>
-<summary>Large value: content</summary>
+<summary>content (large value)</summary>
 
 \`\`\`
 Project: tf-plan-md fixture
@@ -4408,11 +4439,11 @@ Line 12: end of file
 
 </details>
 
-## Outputs
+## Output Changes
 
 | Output | Action | Before | After |
 | --- | --- | --- | --- |
-| readme_path | ➕ |  | <code>./output/readme.txt</code> |
+| readme_path | ➕ |  | <code><ins style="background:#dfd">./output/readme.txt</ins></code> |
 
 "
 `;
@@ -4448,7 +4479,7 @@ local_file.readme
 | sensitive_content | <code>(sensitive)</code> | <code>(sensitive)</code> |
 
 <details>
-<summary>Large value: content (18 lines, 9 changes)</summary>
+<summary>content (large value; +5, -4)</summary>
 
 \`\`\`diff
   Project: tf-plan-md fixture
@@ -4474,12 +4505,6 @@ local_file.readme
 </details>
 
 </details>
-
-## Outputs
-
-| Output | Action | Before | After |
-| --- | --- | --- | --- |
-| readme_path | ⬜ | <code>./output/readme.txt</code> | <code>./output/readme.txt</code> |
 
 "
 `;
@@ -4587,12 +4612,12 @@ module.parent["2"].module.child.null_resource.item[1]
 
 </details>
 
-## Outputs
+## Output Changes
 
 | Output | Action | Before | After |
 | --- | --- | --- | --- |
-| generated_name | ➕ |  | <code>fixture-840awmb7</code> |
-| root_id | ➕ |  | <code>2125317276110653885</code> |
+| generated_name | ➕ |  | <code><ins style="background:#dfd">fixture-840awmb7</ins></code> |
+| root_id | ➕ |  | <code><ins style="background:#dfd">2125317276110653885</ins></code> |
 
 "
 `;
@@ -4724,12 +4749,12 @@ module.parent["3"].module.child.null_resource.item[2]
 
 </details>
 
-## Outputs
+## Output Changes
 
 | Output | Action | Before | After |
 | --- | --- | --- | --- |
-| generated_name | 🔧 | <code>fixture-840awmb7</code> | <code>fixture-updated-hd0gtlde</code> |
-| root_id | 🔧 | <code>2125317276110653885</code> | <code>7563404096097142219</code> |
+| generated_name | 🔧 | <code>fixture-840awmb7</code> | <code>fixtur<ins style="background:#dfd">e-updat</ins>e<ins style="background:#dfd">d</ins>-<del style="background:#fdd">84</del><ins style="background:#dfd">hd</ins>0<ins style="background:#dfd">gtlde</ins><del style="background:#fdd">awmb7</del></code> |
+| root_id | 🔧 | <code>2125317276110653885</code> | <code><del style="background:#fdd">212</del><ins style="background:#dfd">7</ins>5<ins style="background:#dfd">6</ins>3<ins style="background:#dfd">404096097</ins>1<del style="background:#fdd">7</del><ins style="background:#dfd">42</ins>2<del style="background:#fdd">76</del>1<ins style="background:#dfd">9</ins><del style="background:#fdd">10653885</del></code> |
 
 "
 `;
@@ -4823,7 +4848,7 @@ terraform_data.meta
 | input | <code></code> | <code><ins style="background:#dfd">v1</ins></code> |
 
 <details>
-<summary>Large value: output</summary>
+<summary>output (large value)</summary>
 
 \`\`\`
 {
@@ -4896,7 +4921,7 @@ terraform_data.meta
 | input | <code>v1</code> | <code>v<ins style="background:#dfd">2</ins><del style="background:#fdd">1</del></code> |
 
 <details>
-<summary>Large value: output (5 lines, 5 changes)</summary>
+<summary>output (large value; +4, -1)</summary>
 
 \`\`\`diff
 + {
@@ -5024,12 +5049,12 @@ local_sensitive_file.secret
 
 </details>
 
-## Outputs
+## Output Changes
 
 | Output | Action | Before | After |
 | --- | --- | --- | --- |
 | secret_checksum | ➕ | <code>(sensitive)</code> | <code>(sensitive)</code> |
-| secret_path | ➕ |  | <code>./output/secret.txt</code> |
+| secret_path | ➕ |  | <code><ins style="background:#dfd">./output/secret.txt</ins></code> |
 
 "
 `;
@@ -5067,12 +5092,11 @@ local_sensitive_file.secret
 
 </details>
 
-## Outputs
+## Output Changes
 
 | Output | Action | Before | After |
 | --- | --- | --- | --- |
 | secret_checksum | 🔧 | <code>(sensitive)</code> | <code>(sensitive)</code> |
-| secret_path | ⬜ | <code>./output/secret.txt</code> | <code>./output/secret.txt</code> |
 
 "
 `;

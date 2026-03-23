@@ -21,6 +21,41 @@ describe("buildOutputChanges", () => {
     expect(buildOutputChanges(plan)).toEqual([]);
   });
 
+  it("filters out no-op (unchanged) outputs", () => {
+    const plan = makePlan({
+      unchanged: {
+        actions: ["no-op"],
+        before: "same",
+        after: "same",
+        before_sensitive: false,
+        after_sensitive: false,
+      },
+    });
+    expect(buildOutputChanges(plan)).toEqual([]);
+  });
+
+  it("filters no-op outputs while keeping changed outputs", () => {
+    const plan = makePlan({
+      unchanged: {
+        actions: ["no-op"],
+        before: "same",
+        after: "same",
+        before_sensitive: false,
+        after_sensitive: false,
+      },
+      changed: {
+        actions: ["update"],
+        before: "old",
+        after: "new",
+        before_sensitive: false,
+        after_sensitive: false,
+      },
+    });
+    const result = buildOutputChanges(plan);
+    expect(result).toHaveLength(1);
+    expect(result[0]!.name).toBe("changed");
+  });
+
   it("maps a create output change", () => {
     const plan = makePlan({
       greeting: {
@@ -38,6 +73,7 @@ describe("buildOutputChanges", () => {
     expect(result[0]!.before).toBe(null);
     expect(result[0]!.after).toBe("hello world");
     expect(result[0]!.isSensitive).toBe(false);
+    expect(result[0]!.isLarge).toBe(false);
   });
 
   it("maps a delete output change", () => {
@@ -99,6 +135,7 @@ describe("buildOutputChanges", () => {
     });
     const result = buildOutputChanges(plan);
     expect(result[0]!.after).toBe("true");
+    expect(result[0]!.isLarge).toBe(false);
   });
 
   it("converts numeric output values to strings", () => {
@@ -113,6 +150,7 @@ describe("buildOutputChanges", () => {
     });
     const result = buildOutputChanges(plan);
     expect(result[0]!.after).toBe("42");
+    expect(result[0]!.isLarge).toBe(false);
   });
 
   it("pretty-prints object output values", () => {
@@ -127,5 +165,75 @@ describe("buildOutputChanges", () => {
     });
     const result = buildOutputChanges(plan);
     expect(result[0]!.after).toContain("key");
+  });
+
+  it("marks JSON object outputs as large", () => {
+    const plan = makePlan({
+      config: {
+        actions: ["create"],
+        before: null,
+        after: { key: "value" },
+        before_sensitive: false,
+        after_sensitive: false,
+      },
+    });
+    const result = buildOutputChanges(plan);
+    expect(result[0]!.isLarge).toBe(true);
+  });
+
+  it("marks JSON array outputs as large", () => {
+    const plan = makePlan({
+      items: {
+        actions: ["create"],
+        before: null,
+        after: ["a", "b", "c"],
+        before_sensitive: false,
+        after_sensitive: false,
+      },
+    });
+    const result = buildOutputChanges(plan);
+    expect(result[0]!.isLarge).toBe(true);
+  });
+
+  it("marks multi-line string outputs as large when exceeding threshold", () => {
+    const plan = makePlan({
+      script: {
+        actions: ["create"],
+        before: null,
+        after: "line1\nline2\nline3\nline4\nline5",
+        before_sensitive: false,
+        after_sensitive: false,
+      },
+    });
+    const result = buildOutputChanges(plan);
+    expect(result[0]!.isLarge).toBe(true);
+  });
+
+  it("marks short string outputs as not large", () => {
+    const plan = makePlan({
+      greeting: {
+        actions: ["create"],
+        before: null,
+        after: "hello",
+        before_sensitive: false,
+        after_sensitive: false,
+      },
+    });
+    const result = buildOutputChanges(plan);
+    expect(result[0]!.isLarge).toBe(false);
+  });
+
+  it("marks as large when before value is large", () => {
+    const plan = makePlan({
+      config: {
+        actions: ["delete"],
+        before: { key: "value" },
+        after: null,
+        before_sensitive: false,
+        after_sensitive: false,
+      },
+    });
+    const result = buildOutputChanges(plan);
+    expect(result[0]!.isLarge).toBe(true);
   });
 });

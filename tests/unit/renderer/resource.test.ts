@@ -167,7 +167,7 @@ describe("renderResource", () => {
         ],
       }),
     );
-    expect(output).toContain("Large value");
+    expect(output).toContain("(large value;");
     expect(output).toContain("policy");
   });
 
