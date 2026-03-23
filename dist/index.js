@@ -2487,8 +2487,8 @@ ${aVal}
     return "";
   }
   const diff = buildLineDiff(bVal, aVal, cache);
-  const totalLines = diff.length;
-  const changedLines = diff.filter((e) => e.kind !== "unchanged").length;
+  const addedLines = diff.filter((e) => e.kind === "added").length;
+  const removedLines = diff.filter((e) => e.kind === "removed").length;
   const codeContent = diff.map((e) => {
     const prefix = e.kind === "removed" ? "-" : e.kind === "added" ? "+" : " ";
     return `${prefix} ${e.value}`;
@@ -2496,11 +2496,12 @@ ${aVal}
   const fenced = `\`\`\`diff
 ${codeContent}
 \`\`\``;
-  return buildDetailsBlock(name, fenced, totalLines, changedLines);
+  return buildDetailsBlock(name, fenced, addedLines, removedLines);
 }
-function buildDetailsBlock(name, content, totalLines, changedLines) {
+function buildDetailsBlock(name, content, addedLines, removedLines) {
   const escapedName = escapeHtml(name);
-  const summary = totalLines > 0 ? `Large value: ${escapedName} (${String(totalLines)} lines, ${String(changedLines)} changes)` : `Large value: ${escapedName}`;
+  const hasDiff = addedLines > 0 || removedLines > 0;
+  const summary = hasDiff ? `Large value: ${escapedName} (+${String(addedLines)}, -${String(removedLines)})` : `Large value: ${escapedName}`;
   return `<details>
 <summary>${summary}</summary>
 
