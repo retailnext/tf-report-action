@@ -473,12 +473,14 @@ function buildActionGroupsFromScan(changes, actionOrder) {
 }
 
 // src/builder/outputs.ts
+var LARGE_LINE_THRESHOLD2 = 3;
 function buildOutputChanges(plan) {
   const outputChanges = plan.output_changes;
   if (!outputChanges) return [];
   const result = [];
   for (const [name, change] of Object.entries(outputChanges)) {
     const action = determineAction(change.actions);
+    if (action === "no-op") continue;
     const isSensitive2 = change.before_sensitive === true || change.after_sensitive === true;
     const before = isSensitive2 ? null : valueToString(change.before ?? null);
     let after;
@@ -491,12 +493,14 @@ function buildOutputChanges(plan) {
     } else {
       after = valueToString(change.after ?? null);
     }
+    const isLarge = isLargeValue2(isSensitive2 ? null : before) || isLargeValue2(isSensitive2 || isKnownAfterApply ? null : after);
     result.push({
       name,
       action,
       before,
       after,
       isSensitive: isSensitive2,
+      isLarge,
       isKnownAfterApply
     });
   }
@@ -507,6 +511,21 @@ function valueToString(val) {
   if (typeof val === "string") return val;
   if (typeof val === "number" || typeof val === "boolean") return String(val);
   return JSON.stringify(val, null, 2);
+}
+function isLargeValue2(value) {
+  if (value === null) return false;
+  const trimmed = value.trim();
+  if (trimmed.startsWith("{") || trimmed.startsWith("[") || trimmed.startsWith("<")) {
+    return true;
+  }
+  let count = 0;
+  for (const ch of value) {
+    if (ch === "\n") {
+      count++;
+      if (count > LARGE_LINE_THRESHOLD2) return true;
+    }
+  }
+  return false;
 }
 
 // src/builder/index.ts
@@ -653,7 +672,7 @@ function resolveOutputValues(report, outputsMessage) {
 }
 
 // src/builder/state-enrichment.ts
-var LARGE_LINE_THRESHOLD2 = 3;
+var LARGE_LINE_THRESHOLD3 = 3;
 function enrichReportFromState(report, state) {
   const stateResources = state.resources;
   const hasResources = stateResources !== void 0 && stateResources.length > 0;
@@ -678,7 +697,7 @@ function enrichReportFromState(report, state) {
           if (resolved !== void 0) {
             attr.after = resolved;
             attr.isKnownAfterApply = false;
-            attr.isLarge = isLargeValue2(resolved);
+            attr.isLarge = isLargeValue3(resolved);
             enrichedAny = true;
           }
         }
@@ -701,6 +720,7 @@ function enrichReportFromState(report, state) {
       } else if (stateOutput.value !== void 0) {
         output.after = stringifyValue(stateOutput.value);
         output.isKnownAfterApply = false;
+        output.isLarge = isLargeValue3(output.after);
         enrichedAny = true;
       }
     }
@@ -764,7 +784,7 @@ function stringifyValue(value) {
   }
   return JSON.stringify(value);
 }
-function isLargeValue2(value) {
+function isLargeValue3(value) {
   if (value === null) return false;
   const trimmed = value.trim();
   if (trimmed.startsWith("{") || trimmed.startsWith("[") || trimmed.startsWith("<")) {
@@ -774,7 +794,7 @@ function isLargeValue2(value) {
   for (const ch of value) {
     if (ch === "\n") {
       count++;
-      if (count > LARGE_LINE_THRESHOLD2) return true;
+      if (count > LARGE_LINE_THRESHOLD3) return true;
     }
   }
   return false;
@@ -2744,7 +2764,7 @@ _(details omitted)_
   if (outputs.length > 0) {
     const writer = new MarkdownWriter();
     writer.heading("Outputs", 2);
-    renderOutputTable(outputs, writer);
+    renderOutputs(outputs, writer, options, diffCache);
     sections.push({
       id: "outputs",
       full: ensureTrailingBlankLine(writer.build())
@@ -2797,20 +2817,38 @@ function buildApplyContext(address, failedAddresses, diagByAddress) {
     diagnostics: diagByAddress.get(address) ?? []
   };
 }
-function renderOutputTable(outputs, writer) {
-  writer.tableHeader(["Output", "Action", "Before", "After"]);
-  for (const output of outputs) {
-    const symbol = ACTION_SYMBOLS[output.action];
-    const before = output.isSensitive ? MarkdownWriter.inlineCode("(sensitive)") : output.before !== null ? MarkdownWriter.inlineCodeCell(output.before) : "";
-    const after = output.isSensitive ? MarkdownWriter.inlineCode("(sensitive)") : output.after !== null ? MarkdownWriter.inlineCodeCell(output.after) : "";
-    writer.tableRow([
-      MarkdownWriter.escapeCell(output.name),
-      symbol,
-      before,
-      after
-    ]);
+function renderOutputs(outputs, writer, options, diffCache) {
+  const diffFormat = options.diffFormat ?? "inline";
+  const smallOutputs = outputs.filter((o) => !o.isLarge);
+  const largeOutputs = outputs.filter((o) => o.isLarge);
+  if (smallOutputs.length > 0) {
+    writer.tableHeader(["Output", "Action", "Before", "After"]);
+    for (const output of smallOutputs) {
+      const symbol = ACTION_SYMBOLS[output.action];
+      const skipDiff = output.isSensitive || output.isKnownAfterApply;
+      const before = output.isSensitive ? MarkdownWriter.inlineCode("(sensitive)") : output.before !== null ? skipDiff ? MarkdownWriter.inlineCodeCell(output.before) : `<code>${MarkdownWriter.escapeHtmlCell(output.before).replace(/\n/g, "<br>")}</code>` : "";
+      const after = output.isSensitive ? MarkdownWriter.inlineCode("(sensitive)") : skipDiff ? MarkdownWriter.inlineCodeCell(output.after ?? "") : formatDiff(output.before, output.after, diffFormat);
+      writer.tableRow([
+        MarkdownWriter.escapeCell(output.name),
+        symbol,
+        before,
+        after
+      ]);
+    }
+    writer.blankLine();
   }
-  writer.blankLine();
+  for (const output of largeOutputs) {
+    const symbol = ACTION_SYMBOLS[output.action];
+    const block = renderLargeValue(
+      `${symbol} ${output.name}`,
+      output.before,
+      output.after,
+      diffCache
+    );
+    if (block) {
+      writer.raw(block);
+    }
+  }
 }
 function renderDriftSection(driftResources, writer, options, diffCache) {
   writer.heading(

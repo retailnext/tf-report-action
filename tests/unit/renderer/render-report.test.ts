@@ -150,6 +150,7 @@ describe("renderReport — apply-specific rendering", () => {
           before: null,
           after: "(value not in plan)",
           isSensitive: false,
+          isLarge: false,
           isKnownAfterApply: true,
         },
       ],

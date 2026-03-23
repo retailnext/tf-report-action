@@ -6,6 +6,8 @@ export interface OutputChange {
   before: string | null;
   after: string | null;
   isSensitive: boolean;
+  /** True when the value is multi-line or structured JSON/XML, rendered collapsibly. */
+  isLarge: boolean;
   /** True when the after value is a placeholder (known after apply / value not in plan). */
   isKnownAfterApply: boolean;
 }

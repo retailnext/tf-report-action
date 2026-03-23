@@ -100,7 +100,6 @@ Error running command 'exit 1': exit status 1. Output:
 | Output | Action | Before | After |
 | --- | --- | --- | --- |
 | depends_on_fail_output | 🔧 | <code>18876309414156996</code> | <code>(value not in plan)</code> |
-| success_output | ⬜ | <code>stable</code> | <code>stable</code> |
 
 "
 `;
@@ -265,9 +264,18 @@ terraform_data.independent
 
 ## Outputs
 
-| Output | Action | Before | After |
-| --- | --- | --- | --- |
-| config_value | 🔧 | <code>{&quot;worker_a&quot;:&quot;alpha&quot;,&quot;worker_b&quot;:&quot;bravo&quot;,&quot;worker_c&quot;:&quot;charlie&quot;}</code> | <code>{&quot;worker_a&quot;:&quot;alpha&quot;,&quot;worker_b&quot;:&quot;bravo&quot;,&quot;worker_c&quot;:&quot;charlie&quot;}</code> |
+<details>
+<summary>Large value: 🔧 config_value (5 lines, 0 changes)</summary>
+
+\`\`\`diff
+  {
+    "worker_a": "alpha",
+    "worker_b": "bravo",
+    "worker_c": "charlie"
+  }
+\`\`\`
+
+</details>
 
 "
 `;
@@ -333,9 +341,19 @@ _(all values known after apply)_
 
 ## Outputs
 
-| Output | Action | Before | After |
-| --- | --- | --- | --- |
-| config_value | 🔧 | <code>{&quot;worker_a&quot;:&quot;alpha&quot;,&quot;worker_b&quot;:&quot;bravo&quot;,&quot;worker_c&quot;:&quot;charlie&quot;}</code> | <code>{&quot;worker_a&quot;:&quot;ALPHA&quot;,&quot;worker_b&quot;:&quot;bravo&quot;,&quot;worker_c&quot;:&quot;charlie&quot;}</code> |
+<details>
+<summary>Large value: 🔧 config_value (6 lines, 2 changes)</summary>
+
+\`\`\`diff
+  {
+-   "worker_a": "alpha",
++   "worker_a": "ALPHA",
+    "worker_b": "bravo",
+    "worker_c": "charlie"
+  }
+\`\`\`
+
+</details>
 
 "
 `;
@@ -429,7 +447,7 @@ Line 12: end of file
 
 | Output | Action | Before | After |
 | --- | --- | --- | --- |
-| readme_path | ➕ |  | <code>./output/readme.txt</code> |
+| readme_path | ➕ |  | <code><ins style="background:#dfd">./output/readme.txt</ins></code> |
 
 "
 `;
@@ -491,12 +509,6 @@ local_file.readme
 </details>
 
 </details>
-
-## Outputs
-
-| Output | Action | Before | After |
-| --- | --- | --- | --- |
-| readme_path | ⬜ | <code>./output/readme.txt</code> | <code>./output/readme.txt</code> |
 
 "
 `;
@@ -1023,7 +1035,7 @@ local_sensitive_file.secret
 | Output | Action | Before | After |
 | --- | --- | --- | --- |
 | secret_checksum | ➕ | <code>(sensitive)</code> | <code>(sensitive)</code> |
-| secret_path | ➕ |  | <code>./output/secret.txt</code> |
+| secret_path | ➕ |  | <code><ins style="background:#dfd">./output/secret.txt</ins></code> |
 
 "
 `;
@@ -1066,7 +1078,6 @@ local_sensitive_file.secret
 | Output | Action | Before | After |
 | --- | --- | --- | --- |
 | secret_checksum | 🔧 | <code>(sensitive)</code> | <code>(sensitive)</code> |
-| secret_path | ⬜ | <code>./output/secret.txt</code> | <code>./output/secret.txt</code> |
 
 "
 `;
@@ -1312,7 +1323,6 @@ Error running command 'exit 1': exit status 1. Output:
 | Output | Action | Before | After |
 | --- | --- | --- | --- |
 | depends_on_fail_output | 🔧 | <code>5805321220910071849</code> | <code>(value not in plan)</code> |
-| success_output | ⬜ | <code>stable</code> | <code>stable</code> |
 
 "
 `;
@@ -1477,9 +1487,18 @@ terraform_data.independent
 
 ## Outputs
 
-| Output | Action | Before | After |
-| --- | --- | --- | --- |
-| config_value | 🔧 | <code>{&quot;worker_a&quot;:&quot;alpha&quot;,&quot;worker_b&quot;:&quot;bravo&quot;,&quot;worker_c&quot;:&quot;charlie&quot;}</code> | <code>{&quot;worker_a&quot;:&quot;alpha&quot;,&quot;worker_b&quot;:&quot;bravo&quot;,&quot;worker_c&quot;:&quot;charlie&quot;}</code> |
+<details>
+<summary>Large value: 🔧 config_value (5 lines, 0 changes)</summary>
+
+\`\`\`diff
+  {
+    "worker_a": "alpha",
+    "worker_b": "bravo",
+    "worker_c": "charlie"
+  }
+\`\`\`
+
+</details>
 
 "
 `;
@@ -1545,9 +1564,19 @@ _(all values known after apply)_
 
 ## Outputs
 
-| Output | Action | Before | After |
-| --- | --- | --- | --- |
-| config_value | 🔧 | <code>{&quot;worker_a&quot;:&quot;alpha&quot;,&quot;worker_b&quot;:&quot;bravo&quot;,&quot;worker_c&quot;:&quot;charlie&quot;}</code> | <code>{&quot;worker_a&quot;:&quot;ALPHA&quot;,&quot;worker_b&quot;:&quot;bravo&quot;,&quot;worker_c&quot;:&quot;charlie&quot;}</code> |
+<details>
+<summary>Large value: 🔧 config_value (6 lines, 2 changes)</summary>
+
+\`\`\`diff
+  {
+-   "worker_a": "alpha",
++   "worker_a": "ALPHA",
+    "worker_b": "bravo",
+    "worker_c": "charlie"
+  }
+\`\`\`
+
+</details>
 
 "
 `;
@@ -1641,7 +1670,7 @@ Line 12: end of file
 
 | Output | Action | Before | After |
 | --- | --- | --- | --- |
-| readme_path | ➕ |  | <code>./output/readme.txt</code> |
+| readme_path | ➕ |  | <code><ins style="background:#dfd">./output/readme.txt</ins></code> |
 
 "
 `;
@@ -1703,12 +1732,6 @@ local_file.readme
 </details>
 
 </details>
-
-## Outputs
-
-| Output | Action | Before | After |
-| --- | --- | --- | --- |
-| readme_path | ⬜ | <code>./output/readme.txt</code> | <code>./output/readme.txt</code> |
 
 "
 `;
@@ -2235,7 +2258,7 @@ local_sensitive_file.secret
 | Output | Action | Before | After |
 | --- | --- | --- | --- |
 | secret_checksum | ➕ | <code>(sensitive)</code> | <code>(sensitive)</code> |
-| secret_path | ➕ |  | <code>./output/secret.txt</code> |
+| secret_path | ➕ |  | <code><ins style="background:#dfd">./output/secret.txt</ins></code> |
 
 "
 `;
@@ -2278,7 +2301,6 @@ local_sensitive_file.secret
 | Output | Action | Before | After |
 | --- | --- | --- | --- |
 | secret_checksum | 🔧 | <code>(sensitive)</code> | <code>(sensitive)</code> |
-| secret_path | ⬜ | <code>./output/secret.txt</code> | <code>./output/secret.txt</code> |
 
 "
 `;
@@ -2518,8 +2540,8 @@ terraform_data.success
 
 | Output | Action | Before | After |
 | --- | --- | --- | --- |
-| depends_on_fail_output | ➕ |  | <code>18876309414156996</code> |
-| success_output | ➕ |  | <code>stable</code> |
+| depends_on_fail_output | ➕ |  | <code><ins style="background:#dfd">18876309414156996</ins></code> |
+| success_output | ➕ |  | <code><ins style="background:#dfd">stable</ins></code> |
 
 "
 `;
@@ -2561,7 +2583,6 @@ Error running command 'exit 1': exit status 1. Output:
 | Output | Action | Before | After |
 | --- | --- | --- | --- |
 | depends_on_fail_output | 🔧 | <code>18876309414156996</code> | <code>18876309414156996</code> |
-| success_output | ⬜ | <code>stable</code> | <code>stable</code> |
 
 "
 `;
@@ -2754,9 +2775,18 @@ terraform_data.worker_c
 
 ## Outputs
 
-| Output | Action | Before | After |
-| --- | --- | --- | --- |
-| config_value | ➕ |  | <code>{&quot;worker_a&quot;:&quot;alpha&quot;,&quot;worker_b&quot;:&quot;bravo&quot;,&quot;worker_c&quot;:&quot;charlie&quot;}</code> |
+<details>
+<summary>Large value: ➕ config_value</summary>
+
+\`\`\`
+{
+  "worker_a": "alpha",
+  "worker_b": "bravo",
+  "worker_c": "charlie"
+}
+\`\`\`
+
+</details>
 
 "
 `;
@@ -2827,9 +2857,18 @@ terraform_data.independent
 
 ## Outputs
 
-| Output | Action | Before | After |
-| --- | --- | --- | --- |
-| config_value | 🔧 | <code>{&quot;worker_a&quot;:&quot;alpha&quot;,&quot;worker_b&quot;:&quot;bravo&quot;,&quot;worker_c&quot;:&quot;charlie&quot;}</code> | <code>{&quot;worker_a&quot;:&quot;alpha&quot;,&quot;worker_b&quot;:&quot;bravo&quot;,&quot;worker_c&quot;:&quot;charlie&quot;}</code> |
+<details>
+<summary>Large value: 🔧 config_value (5 lines, 0 changes)</summary>
+
+\`\`\`diff
+  {
+    "worker_a": "alpha",
+    "worker_b": "bravo",
+    "worker_c": "charlie"
+  }
+\`\`\`
+
+</details>
 
 "
 `;
@@ -2919,9 +2958,19 @@ terraform_data.worker_a
 
 ## Outputs
 
-| Output | Action | Before | After |
-| --- | --- | --- | --- |
-| config_value | 🔧 | <code>{&quot;worker_a&quot;:&quot;alpha&quot;,&quot;worker_b&quot;:&quot;bravo&quot;,&quot;worker_c&quot;:&quot;charlie&quot;}</code> | <code>{&quot;worker_a&quot;:&quot;ALPHA&quot;,&quot;worker_b&quot;:&quot;bravo&quot;,&quot;worker_c&quot;:&quot;charlie&quot;}</code> |
+<details>
+<summary>Large value: 🔧 config_value (6 lines, 2 changes)</summary>
+
+\`\`\`diff
+  {
+-   "worker_a": "alpha",
++   "worker_a": "ALPHA",
+    "worker_b": "bravo",
+    "worker_c": "charlie"
+  }
+\`\`\`
+
+</details>
 
 "
 `;
@@ -3015,7 +3064,7 @@ Line 12: end of file
 
 | Output | Action | Before | After |
 | --- | --- | --- | --- |
-| readme_path | ➕ |  | <code>./output/readme.txt</code> |
+| readme_path | ➕ |  | <code><ins style="background:#dfd">./output/readme.txt</ins></code> |
 
 "
 `;
@@ -3077,12 +3126,6 @@ local_file.readme
 </details>
 
 </details>
-
-## Outputs
-
-| Output | Action | Before | After |
-| --- | --- | --- | --- |
-| readme_path | ⬜ | <code>./output/readme.txt</code> | <code>./output/readme.txt</code> |
 
 "
 `;
@@ -3194,8 +3237,8 @@ module.parent["2"].module.child.null_resource.item[1]
 
 | Output | Action | Before | After |
 | --- | --- | --- | --- |
-| generated_name | ➕ |  | <code>fixture-0aura6xr</code> |
-| root_id | ➕ |  | <code>4740972482117666024</code> |
+| generated_name | ➕ |  | <code><ins style="background:#dfd">fixture-0aura6xr</ins></code> |
+| root_id | ➕ |  | <code><ins style="background:#dfd">4740972482117666024</ins></code> |
 
 "
 `;
@@ -3331,8 +3374,8 @@ module.parent["3"].module.child.null_resource.item[2]
 
 | Output | Action | Before | After |
 | --- | --- | --- | --- |
-| generated_name | 🔧 | <code>fixture-0aura6xr</code> | <code>fixture-updated-lg0wtfhp</code> |
-| root_id | 🔧 | <code>4740972482117666024</code> | <code>6289329542247481419</code> |
+| generated_name | 🔧 | <code>fixture-0aura6xr</code> | <code>fixture-<del style="background:#fdd">0a</del>u<del style="background:#fdd">r</del><ins style="background:#dfd">pd</ins>a<ins style="background:#dfd">ted-lg0wtfhp</ins><del style="background:#fdd">6xr</del></code> |
+| root_id | 🔧 | <code>4740972482117666024</code> | <code><ins style="background:#dfd">62893295</ins>4<del style="background:#fdd">7</del><ins style="background:#dfd">22</ins>4<del style="background:#fdd">09</del>7<del style="background:#fdd">2</del>48<del style="background:#fdd">2</del>1<ins style="background:#dfd">4</ins>1<ins style="background:#dfd">9</ins><del style="background:#fdd">7666024</del></code> |
 
 "
 `;
@@ -3632,7 +3675,7 @@ local_sensitive_file.secret
 | Output | Action | Before | After |
 | --- | --- | --- | --- |
 | secret_checksum | ➕ | <code>(sensitive)</code> | <code>(sensitive)</code> |
-| secret_path | ➕ |  | <code>./output/secret.txt</code> |
+| secret_path | ➕ |  | <code><ins style="background:#dfd">./output/secret.txt</ins></code> |
 
 "
 `;
@@ -3675,7 +3718,6 @@ local_sensitive_file.secret
 | Output | Action | Before | After |
 | --- | --- | --- | --- |
 | secret_checksum | 🔧 | <code>(sensitive)</code> | <code>(sensitive)</code> |
-| secret_path | ⬜ | <code>./output/secret.txt</code> | <code>./output/secret.txt</code> |
 
 "
 `;
@@ -3915,8 +3957,8 @@ terraform_data.success
 
 | Output | Action | Before | After |
 | --- | --- | --- | --- |
-| depends_on_fail_output | ➕ |  | <code>5805321220910071849</code> |
-| success_output | ➕ |  | <code>stable</code> |
+| depends_on_fail_output | ➕ |  | <code><ins style="background:#dfd">5805321220910071849</ins></code> |
+| success_output | ➕ |  | <code><ins style="background:#dfd">stable</ins></code> |
 
 "
 `;
@@ -3958,7 +4000,6 @@ Error running command 'exit 1': exit status 1. Output:
 | Output | Action | Before | After |
 | --- | --- | --- | --- |
 | depends_on_fail_output | 🔧 | <code>5805321220910071849</code> | <code>5805321220910071849</code> |
-| success_output | ⬜ | <code>stable</code> | <code>stable</code> |
 
 "
 `;
@@ -4151,9 +4192,18 @@ terraform_data.worker_c
 
 ## Outputs
 
-| Output | Action | Before | After |
-| --- | --- | --- | --- |
-| config_value | ➕ |  | <code>{&quot;worker_a&quot;:&quot;alpha&quot;,&quot;worker_b&quot;:&quot;bravo&quot;,&quot;worker_c&quot;:&quot;charlie&quot;}</code> |
+<details>
+<summary>Large value: ➕ config_value</summary>
+
+\`\`\`
+{
+  "worker_a": "alpha",
+  "worker_b": "bravo",
+  "worker_c": "charlie"
+}
+\`\`\`
+
+</details>
 
 "
 `;
@@ -4224,9 +4274,18 @@ terraform_data.independent
 
 ## Outputs
 
-| Output | Action | Before | After |
-| --- | --- | --- | --- |
-| config_value | 🔧 | <code>{&quot;worker_a&quot;:&quot;alpha&quot;,&quot;worker_b&quot;:&quot;bravo&quot;,&quot;worker_c&quot;:&quot;charlie&quot;}</code> | <code>{&quot;worker_a&quot;:&quot;alpha&quot;,&quot;worker_b&quot;:&quot;bravo&quot;,&quot;worker_c&quot;:&quot;charlie&quot;}</code> |
+<details>
+<summary>Large value: 🔧 config_value (5 lines, 0 changes)</summary>
+
+\`\`\`diff
+  {
+    "worker_a": "alpha",
+    "worker_b": "bravo",
+    "worker_c": "charlie"
+  }
+\`\`\`
+
+</details>
 
 "
 `;
@@ -4316,9 +4375,19 @@ terraform_data.worker_a
 
 ## Outputs
 
-| Output | Action | Before | After |
-| --- | --- | --- | --- |
-| config_value | 🔧 | <code>{&quot;worker_a&quot;:&quot;alpha&quot;,&quot;worker_b&quot;:&quot;bravo&quot;,&quot;worker_c&quot;:&quot;charlie&quot;}</code> | <code>{&quot;worker_a&quot;:&quot;ALPHA&quot;,&quot;worker_b&quot;:&quot;bravo&quot;,&quot;worker_c&quot;:&quot;charlie&quot;}</code> |
+<details>
+<summary>Large value: 🔧 config_value (6 lines, 2 changes)</summary>
+
+\`\`\`diff
+  {
+-   "worker_a": "alpha",
++   "worker_a": "ALPHA",
+    "worker_b": "bravo",
+    "worker_c": "charlie"
+  }
+\`\`\`
+
+</details>
 
 "
 `;
@@ -4412,7 +4481,7 @@ Line 12: end of file
 
 | Output | Action | Before | After |
 | --- | --- | --- | --- |
-| readme_path | ➕ |  | <code>./output/readme.txt</code> |
+| readme_path | ➕ |  | <code><ins style="background:#dfd">./output/readme.txt</ins></code> |
 
 "
 `;
@@ -4474,12 +4543,6 @@ local_file.readme
 </details>
 
 </details>
-
-## Outputs
-
-| Output | Action | Before | After |
-| --- | --- | --- | --- |
-| readme_path | ⬜ | <code>./output/readme.txt</code> | <code>./output/readme.txt</code> |
 
 "
 `;
@@ -4591,8 +4654,8 @@ module.parent["2"].module.child.null_resource.item[1]
 
 | Output | Action | Before | After |
 | --- | --- | --- | --- |
-| generated_name | ➕ |  | <code>fixture-840awmb7</code> |
-| root_id | ➕ |  | <code>2125317276110653885</code> |
+| generated_name | ➕ |  | <code><ins style="background:#dfd">fixture-840awmb7</ins></code> |
+| root_id | ➕ |  | <code><ins style="background:#dfd">2125317276110653885</ins></code> |
 
 "
 `;
@@ -4728,8 +4791,8 @@ module.parent["3"].module.child.null_resource.item[2]
 
 | Output | Action | Before | After |
 | --- | --- | --- | --- |
-| generated_name | 🔧 | <code>fixture-840awmb7</code> | <code>fixture-updated-hd0gtlde</code> |
-| root_id | 🔧 | <code>2125317276110653885</code> | <code>7563404096097142219</code> |
+| generated_name | 🔧 | <code>fixture-840awmb7</code> | <code>fixtur<ins style="background:#dfd">e-updat</ins>e<ins style="background:#dfd">d</ins>-<del style="background:#fdd">84</del><ins style="background:#dfd">hd</ins>0<ins style="background:#dfd">gtlde</ins><del style="background:#fdd">awmb7</del></code> |
+| root_id | 🔧 | <code>2125317276110653885</code> | <code><del style="background:#fdd">212</del><ins style="background:#dfd">7</ins>5<ins style="background:#dfd">6</ins>3<ins style="background:#dfd">404096097</ins>1<del style="background:#fdd">7</del><ins style="background:#dfd">42</ins>2<del style="background:#fdd">76</del>1<ins style="background:#dfd">9</ins><del style="background:#fdd">10653885</del></code> |
 
 "
 `;
@@ -5029,7 +5092,7 @@ local_sensitive_file.secret
 | Output | Action | Before | After |
 | --- | --- | --- | --- |
 | secret_checksum | ➕ | <code>(sensitive)</code> | <code>(sensitive)</code> |
-| secret_path | ➕ |  | <code>./output/secret.txt</code> |
+| secret_path | ➕ |  | <code><ins style="background:#dfd">./output/secret.txt</ins></code> |
 
 "
 `;
@@ -5072,7 +5135,6 @@ local_sensitive_file.secret
 | Output | Action | Before | After |
 | --- | --- | --- | --- |
 | secret_checksum | 🔧 | <code>(sensitive)</code> | <code>(sensitive)</code> |
-| secret_path | ⬜ | <code>./output/secret.txt</code> | <code>./output/secret.txt</code> |
 
 "
 `;

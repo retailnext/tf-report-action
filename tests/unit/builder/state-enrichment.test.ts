@@ -304,6 +304,7 @@ describe("enrichReportFromState", () => {
       before: null,
       after: VALUE_NOT_IN_PLAN,
       isSensitive: false,
+      isLarge: false,
       isKnownAfterApply: true,
     };
     const report = makeReport([], [output]);
@@ -325,6 +326,7 @@ describe("enrichReportFromState", () => {
       before: null,
       after: VALUE_NOT_IN_PLAN,
       isSensitive: false,
+      isLarge: false,
       isKnownAfterApply: true,
     };
     const report = makeReport([], [output]);
