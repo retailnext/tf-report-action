@@ -64,10 +64,9 @@ describe("renderLargeValue", () => {
     expect(result).toMatch(/\+\d+, -\d+/);
   });
 
-  it("shows 'Large value: name' without line counts for single side", () => {
+  it("shows name with large value suffix for single side", () => {
     const result = renderLargeValue("blob", null, "some content", makeCache());
-    expect(result).toContain("Large value: blob");
-    // Single-side entries don't have totalLines > 0
+    expect(result).toContain("blob (large value)");
   });
 
   it("uses the diff cache", () => {

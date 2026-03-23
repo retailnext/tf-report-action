@@ -63,11 +63,11 @@ function buildDetailsBlock(
 ): string {
   const escapedName = escapeHtml(name);
   const hasDiff = addedLines > 0 || removedLines > 0;
-  const summary = hasDiff
-    ? `Large value: ${escapedName} (+${String(addedLines)}, -${String(removedLines)})`
-    : `Large value: ${escapedName}`;
+  const suffix = hasDiff
+    ? ` (large value; +${String(addedLines)}, -${String(removedLines)})`
+    : " (large value)";
 
-  return `<details>\n<summary>${summary}</summary>\n\n${content}\n\n</details>\n`;
+  return `<details>\n<summary>${escapedName}${suffix}</summary>\n\n${content}\n\n</details>\n`;
 }
 
 function prettyPrint(value: string): string {

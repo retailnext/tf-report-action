@@ -2501,9 +2501,9 @@ ${codeContent}
 function buildDetailsBlock(name, content, addedLines, removedLines) {
   const escapedName = escapeHtml(name);
   const hasDiff = addedLines > 0 || removedLines > 0;
-  const summary = hasDiff ? `Large value: ${escapedName} (+${String(addedLines)}, -${String(removedLines)})` : `Large value: ${escapedName}`;
+  const suffix = hasDiff ? ` (large value; +${String(addedLines)}, -${String(removedLines)})` : " (large value)";
   return `<details>
-<summary>${summary}</summary>
+<summary>${escapedName}${suffix}</summary>
 
 ${content}
 

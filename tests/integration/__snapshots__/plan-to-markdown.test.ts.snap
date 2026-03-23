@@ -379,7 +379,7 @@ local_file.config
 | sensitive_content | <code></code> | <code>(sensitive)</code> |
 
 <details>
-<summary>Large value: content</summary>
+<summary>content (large value)</summary>
 
 \`\`\`
 {
@@ -485,7 +485,7 @@ local_file.config
 | sensitive_content | <code></code> | <code>(sensitive)</code> |
 
 <details>
-<summary>Large value: content</summary>
+<summary>content (large value)</summary>
 
 \`\`\`
 {
@@ -593,7 +593,7 @@ local_file.config
 | source | <code></code> |  |
 
 <details>
-<summary>Large value: content</summary>
+<summary>content (large value)</summary>
 
 \`\`\`
 {
@@ -1014,7 +1014,7 @@ local_file.config
 | sensitive_content | <code>(sensitive)</code> | <code>(sensitive)</code> |
 
 <details>
-<summary>Large value: content (+1, -1)</summary>
+<summary>content (large value; +1, -1)</summary>
 
 \`\`\`diff
   {
@@ -1104,7 +1104,7 @@ local_file.config
 | sensitive_content | <code>(sensitive)</code> | <code>(sensitive)</code> |
 
 <details>
-<summary>Large value: content (+1, -1)</summary>
+<summary>content (large value; +1, -1)</summary>
 
 \`\`\`diff
   {
@@ -1199,7 +1199,7 @@ local_file.config
 | source | <code></code> |  |
 
 <details>
-<summary>Large value: content (+1, -1)</summary>
+<summary>content (large value; +1, -1)</summary>
 
 \`\`\`diff
   {
@@ -1503,7 +1503,7 @@ local_file.readme
 | sensitive_content | <code></code> | <code>(sensitive)</code> |
 
 <details>
-<summary>Large value: content</summary>
+<summary>content (large value)</summary>
 
 \`\`\`
 Project: tf-plan-md fixture
@@ -1568,7 +1568,7 @@ local_file.readme
 | sensitive_content | <code></code> | <code>(sensitive)</code> |
 
 <details>
-<summary>Large value: content</summary>
+<summary>content (large value)</summary>
 
 \`\`\`
 Project: tf-plan-md fixture
@@ -1635,7 +1635,7 @@ local_file.readme
 | source | <code></code> |  |
 
 <details>
-<summary>Large value: content</summary>
+<summary>content (large value)</summary>
 
 \`\`\`
 Project: tf-plan-md fixture
@@ -1697,7 +1697,7 @@ local_file.readme
 | sensitive_content | <code>(sensitive)</code> | <code>(sensitive)</code> |
 
 <details>
-<summary>Large value: content (+5, -4)</summary>
+<summary>content (large value; +5, -4)</summary>
 
 \`\`\`diff
   Project: tf-plan-md fixture
@@ -1758,7 +1758,7 @@ local_file.readme
 | sensitive_content | <code>(sensitive)</code> | <code>(sensitive)</code> |
 
 <details>
-<summary>Large value: content (+5, -4)</summary>
+<summary>content (large value; +5, -4)</summary>
 
 \`\`\`diff
   Project: tf-plan-md fixture
@@ -1824,7 +1824,7 @@ local_file.readme
 | source | <code></code> |  |
 
 <details>
-<summary>Large value: content (+5, -4)</summary>
+<summary>content (large value; +5, -4)</summary>
 
 \`\`\`diff
   Project: tf-plan-md fixture
@@ -4410,7 +4410,7 @@ local_file.config
 | sensitive_content | <code></code> | <code>(sensitive)</code> |
 
 <details>
-<summary>Large value: content</summary>
+<summary>content (large value)</summary>
 
 \`\`\`
 {
@@ -4516,7 +4516,7 @@ local_file.config
 | sensitive_content | <code></code> | <code>(sensitive)</code> |
 
 <details>
-<summary>Large value: content</summary>
+<summary>content (large value)</summary>
 
 \`\`\`
 {
@@ -4624,7 +4624,7 @@ local_file.config
 | source | <code></code> |  |
 
 <details>
-<summary>Large value: content</summary>
+<summary>content (large value)</summary>
 
 \`\`\`
 {
@@ -5045,7 +5045,7 @@ local_file.config
 | sensitive_content | <code>(sensitive)</code> | <code>(sensitive)</code> |
 
 <details>
-<summary>Large value: content (+1, -1)</summary>
+<summary>content (large value; +1, -1)</summary>
 
 \`\`\`diff
   {
@@ -5135,7 +5135,7 @@ local_file.config
 | sensitive_content | <code>(sensitive)</code> | <code>(sensitive)</code> |
 
 <details>
-<summary>Large value: content (+1, -1)</summary>
+<summary>content (large value; +1, -1)</summary>
 
 \`\`\`diff
   {
@@ -5230,7 +5230,7 @@ local_file.config
 | source | <code></code> |  |
 
 <details>
-<summary>Large value: content (+1, -1)</summary>
+<summary>content (large value; +1, -1)</summary>
 
 \`\`\`diff
   {
@@ -5534,7 +5534,7 @@ local_file.readme
 | sensitive_content | <code></code> | <code>(sensitive)</code> |
 
 <details>
-<summary>Large value: content</summary>
+<summary>content (large value)</summary>
 
 \`\`\`
 Project: tf-plan-md fixture
@@ -5599,7 +5599,7 @@ local_file.readme
 | sensitive_content | <code></code> | <code>(sensitive)</code> |
 
 <details>
-<summary>Large value: content</summary>
+<summary>content (large value)</summary>
 
 \`\`\`
 Project: tf-plan-md fixture
@@ -5666,7 +5666,7 @@ local_file.readme
 | source | <code></code> |  |
 
 <details>
-<summary>Large value: content</summary>
+<summary>content (large value)</summary>
 
 \`\`\`
 Project: tf-plan-md fixture
@@ -5728,7 +5728,7 @@ local_file.readme
 | sensitive_content | <code>(sensitive)</code> | <code>(sensitive)</code> |
 
 <details>
-<summary>Large value: content (+5, -4)</summary>
+<summary>content (large value; +5, -4)</summary>
 
 \`\`\`diff
   Project: tf-plan-md fixture
@@ -5789,7 +5789,7 @@ local_file.readme
 | sensitive_content | <code>(sensitive)</code> | <code>(sensitive)</code> |
 
 <details>
-<summary>Large value: content (+5, -4)</summary>
+<summary>content (large value; +5, -4)</summary>
 
 \`\`\`diff
   Project: tf-plan-md fixture
@@ -5855,7 +5855,7 @@ local_file.readme
 | source | <code></code> |  |
 
 <details>
-<summary>Large value: content (+5, -4)</summary>
+<summary>content (large value; +5, -4)</summary>
 
 \`\`\`diff
   Project: tf-plan-md fixture

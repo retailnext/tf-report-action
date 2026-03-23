@@ -5571,7 +5571,7 @@ terraform_data.depends_on_fail
 | id | <code></code> | <code><ins style="background:#dfd">0e26e812-d7e5-9051-5db2-910e6210a2f6</ins></code> |
 
 <details>
-<summary>Large value: input</summary>
+<summary>input (large value)</summary>
 
 \`\`\`
 {
@@ -5583,7 +5583,7 @@ terraform_data.depends_on_fail
 </details>
 
 <details>
-<summary>Large value: output</summary>
+<summary>output (large value)</summary>
 
 \`\`\`
 {
@@ -5609,7 +5609,7 @@ terraform_data.success
 | input | <code></code> | <code><ins style="background:#dfd">stable</ins></code> |
 
 <details>
-<summary>Large value: output</summary>
+<summary>output (large value)</summary>
 
 \`\`\`
 {
@@ -5673,7 +5673,7 @@ terraform_data.depends_on_fail
 | id | <code></code> | <code><ins style="background:#dfd">0e26e812-d7e5-9051-5db2-910e6210a2f6</ins></code> |
 
 <details>
-<summary>Large value: input</summary>
+<summary>input (large value)</summary>
 
 \`\`\`
 {
@@ -5685,7 +5685,7 @@ terraform_data.depends_on_fail
 </details>
 
 <details>
-<summary>Large value: output</summary>
+<summary>output (large value)</summary>
 
 \`\`\`
 {
@@ -5711,7 +5711,7 @@ terraform_data.success
 | input | <code></code> | <code><ins style="background:#dfd">stable</ins></code> |
 
 <details>
-<summary>Large value: output</summary>
+<summary>output (large value)</summary>
 
 \`\`\`
 {
@@ -6407,7 +6407,7 @@ local_file.config
 | sensitive_content | <code></code> | <code>(sensitive)</code> |
 
 <details>
-<summary>Large value: content</summary>
+<summary>content (large value)</summary>
 
 \`\`\`
 {
@@ -6434,7 +6434,7 @@ terraform_data.independent
 | input | <code></code> | <code><ins style="background:#dfd">v1</ins></code> |
 
 <details>
-<summary>Large value: output</summary>
+<summary>output (large value)</summary>
 
 \`\`\`
 {
@@ -6459,7 +6459,7 @@ terraform_data.worker_a
 | id | <code></code> | <code><ins style="background:#dfd">3068beb4-da22-038a-3f8e-01e6423a93a9</ins></code> |
 
 <details>
-<summary>Large value: input</summary>
+<summary>input (large value)</summary>
 
 \`\`\`
 {
@@ -6471,7 +6471,7 @@ terraform_data.worker_a
 </details>
 
 <details>
-<summary>Large value: output</summary>
+<summary>output (large value)</summary>
 
 \`\`\`
 {
@@ -6496,7 +6496,7 @@ terraform_data.worker_b
 | id | <code></code> | <code><ins style="background:#dfd">09504b51-fcb3-1ae7-31b0-ba22cfa1aa63</ins></code> |
 
 <details>
-<summary>Large value: input</summary>
+<summary>input (large value)</summary>
 
 \`\`\`
 {
@@ -6508,7 +6508,7 @@ terraform_data.worker_b
 </details>
 
 <details>
-<summary>Large value: output</summary>
+<summary>output (large value)</summary>
 
 \`\`\`
 {
@@ -6533,7 +6533,7 @@ terraform_data.worker_c
 | id | <code></code> | <code><ins style="background:#dfd">f925fa17-aa75-41c4-9fe4-44866db3b6dc</ins></code> |
 
 <details>
-<summary>Large value: input</summary>
+<summary>input (large value)</summary>
 
 \`\`\`
 {
@@ -6545,7 +6545,7 @@ terraform_data.worker_c
 </details>
 
 <details>
-<summary>Large value: output</summary>
+<summary>output (large value)</summary>
 
 \`\`\`
 {
@@ -6561,7 +6561,7 @@ terraform_data.worker_c
 ## Output Changes
 
 <details>
-<summary>Large value: ➕ config_value</summary>
+<summary>➕ config_value (large value)</summary>
 
 \`\`\`
 {
@@ -6613,7 +6613,7 @@ local_file.config
 | sensitive_content | <code></code> | <code>(sensitive)</code> |
 
 <details>
-<summary>Large value: content</summary>
+<summary>content (large value)</summary>
 
 \`\`\`
 {
@@ -6640,7 +6640,7 @@ terraform_data.independent
 | input | <code></code> | <code><ins style="background:#dfd">v1</ins></code> |
 
 <details>
-<summary>Large value: output</summary>
+<summary>output (large value)</summary>
 
 \`\`\`
 {
@@ -6665,7 +6665,7 @@ terraform_data.worker_a
 | id | <code></code> | <code><ins style="background:#dfd">3068beb4-da22-038a-3f8e-01e6423a93a9</ins></code> |
 
 <details>
-<summary>Large value: input</summary>
+<summary>input (large value)</summary>
 
 \`\`\`
 {
@@ -6677,7 +6677,7 @@ terraform_data.worker_a
 </details>
 
 <details>
-<summary>Large value: output</summary>
+<summary>output (large value)</summary>
 
 \`\`\`
 {
@@ -6702,7 +6702,7 @@ terraform_data.worker_b
 | id | <code></code> | <code><ins style="background:#dfd">09504b51-fcb3-1ae7-31b0-ba22cfa1aa63</ins></code> |
 
 <details>
-<summary>Large value: input</summary>
+<summary>input (large value)</summary>
 
 \`\`\`
 {
@@ -6714,7 +6714,7 @@ terraform_data.worker_b
 </details>
 
 <details>
-<summary>Large value: output</summary>
+<summary>output (large value)</summary>
 
 \`\`\`
 {
@@ -6739,7 +6739,7 @@ terraform_data.worker_c
 | id | <code></code> | <code><ins style="background:#dfd">f925fa17-aa75-41c4-9fe4-44866db3b6dc</ins></code> |
 
 <details>
-<summary>Large value: input</summary>
+<summary>input (large value)</summary>
 
 \`\`\`
 {
@@ -6751,7 +6751,7 @@ terraform_data.worker_c
 </details>
 
 <details>
-<summary>Large value: output</summary>
+<summary>output (large value)</summary>
 
 \`\`\`
 {
@@ -6767,7 +6767,7 @@ terraform_data.worker_c
 ## Output Changes
 
 <details>
-<summary>Large value: ➕ config_value</summary>
+<summary>➕ config_value (large value)</summary>
 
 \`\`\`
 {
@@ -6835,7 +6835,7 @@ terraform_data.independent
 | input | <code>v1</code> | <code>v<ins style="background:#dfd">2</ins><del style="background:#fdd">1</del></code> |
 
 <details>
-<summary>Large value: output (+4, -1)</summary>
+<summary>output (large value; +4, -1)</summary>
 
 \`\`\`diff
 + {
@@ -6852,7 +6852,7 @@ terraform_data.independent
 ## Output Changes
 
 <details>
-<summary>Large value: 🔧 config_value</summary>
+<summary>🔧 config_value (large value)</summary>
 
 \`\`\`diff
   {
@@ -6919,7 +6919,7 @@ terraform_data.independent
 | input | <code>v1</code> | <code>v<ins style="background:#dfd">2</ins><del style="background:#fdd">1</del></code> |
 
 <details>
-<summary>Large value: output (+4, -1)</summary>
+<summary>output (large value; +4, -1)</summary>
 
 \`\`\`diff
 + {
@@ -6936,7 +6936,7 @@ terraform_data.independent
 ## Output Changes
 
 <details>
-<summary>Large value: 🔧 config_value</summary>
+<summary>🔧 config_value (large value)</summary>
 
 \`\`\`diff
   {
@@ -6987,7 +6987,7 @@ local_file.config
 | sensitive_content | <code>(sensitive)</code> | <code>(sensitive)</code> |
 
 <details>
-<summary>Large value: content (+1, -1)</summary>
+<summary>content (large value; +1, -1)</summary>
 
 \`\`\`diff
   {
@@ -7010,7 +7010,7 @@ terraform_data.worker_a
 \`\`\`
 
 <details>
-<summary>Large value: input (+4, -1)</summary>
+<summary>input (large value; +4, -1)</summary>
 
 \`\`\`diff
 + {
@@ -7023,7 +7023,7 @@ terraform_data.worker_a
 </details>
 
 <details>
-<summary>Large value: output (+4, -1)</summary>
+<summary>output (large value; +4, -1)</summary>
 
 \`\`\`diff
 + {
@@ -7040,7 +7040,7 @@ terraform_data.worker_a
 ## Output Changes
 
 <details>
-<summary>Large value: 🔧 config_value (+1, -1)</summary>
+<summary>🔧 config_value (large value; +1, -1)</summary>
 
 \`\`\`diff
   {
@@ -7091,7 +7091,7 @@ local_file.config
 | sensitive_content | <code>(sensitive)</code> | <code>(sensitive)</code> |
 
 <details>
-<summary>Large value: content (+1, -1)</summary>
+<summary>content (large value; +1, -1)</summary>
 
 \`\`\`diff
   {
@@ -7114,7 +7114,7 @@ terraform_data.worker_a
 \`\`\`
 
 <details>
-<summary>Large value: input (+4, -1)</summary>
+<summary>input (large value; +4, -1)</summary>
 
 \`\`\`diff
 + {
@@ -7127,7 +7127,7 @@ terraform_data.worker_a
 </details>
 
 <details>
-<summary>Large value: output (+4, -1)</summary>
+<summary>output (large value; +4, -1)</summary>
 
 \`\`\`diff
 + {
@@ -7144,7 +7144,7 @@ terraform_data.worker_a
 ## Output Changes
 
 <details>
-<summary>Large value: 🔧 config_value (+1, -1)</summary>
+<summary>🔧 config_value (large value; +1, -1)</summary>
 
 \`\`\`diff
   {
@@ -7920,7 +7920,7 @@ local_file.readme
 | sensitive_content | <code></code> | <code>(sensitive)</code> |
 
 <details>
-<summary>Large value: content</summary>
+<summary>content (large value)</summary>
 
 \`\`\`
 Project: tf-plan-md fixture
@@ -7987,7 +7987,7 @@ local_file.readme
 | sensitive_content | <code></code> | <code>(sensitive)</code> |
 
 <details>
-<summary>Large value: content</summary>
+<summary>content (large value)</summary>
 
 \`\`\`
 Project: tf-plan-md fixture
@@ -8052,7 +8052,7 @@ local_file.readme
 | sensitive_content | <code>(sensitive)</code> | <code>(sensitive)</code> |
 
 <details>
-<summary>Large value: content (+5, -4)</summary>
+<summary>content (large value; +5, -4)</summary>
 
 \`\`\`diff
   Project: tf-plan-md fixture
@@ -8115,7 +8115,7 @@ local_file.readme
 | sensitive_content | <code>(sensitive)</code> | <code>(sensitive)</code> |
 
 <details>
-<summary>Large value: content (+5, -4)</summary>
+<summary>content (large value; +5, -4)</summary>
 
 \`\`\`diff
   Project: tf-plan-md fixture
@@ -8768,7 +8768,7 @@ terraform_data.meta
 | input | <code></code> | <code><ins style="background:#dfd">v1</ins></code> |
 
 <details>
-<summary>Large value: output</summary>
+<summary>output (large value)</summary>
 
 \`\`\`
 {
@@ -8875,7 +8875,7 @@ terraform_data.meta
 | input | <code></code> | <code><ins style="background:#dfd">v1</ins></code> |
 
 <details>
-<summary>Large value: output</summary>
+<summary>output (large value)</summary>
 
 \`\`\`
 {
@@ -8959,7 +8959,7 @@ terraform_data.meta
 | input | <code>v1</code> | <code>v<ins style="background:#dfd">2</ins><del style="background:#fdd">1</del></code> |
 
 <details>
-<summary>Large value: output (+4, -1)</summary>
+<summary>output (large value; +4, -1)</summary>
 
 \`\`\`diff
 + {
@@ -9043,7 +9043,7 @@ terraform_data.meta
 | input | <code>v1</code> | <code>v<ins style="background:#dfd">2</ins><del style="background:#fdd">1</del></code> |
 
 <details>
-<summary>Large value: output (+4, -1)</summary>
+<summary>output (large value; +4, -1)</summary>
 
 \`\`\`diff
 + {
@@ -9758,7 +9758,7 @@ terraform_data.depends_on_fail
 | id | <code></code> | <code><ins style="background:#dfd">187022b4-6440-9fcf-3593-4b6f27d3a442</ins></code> |
 
 <details>
-<summary>Large value: input</summary>
+<summary>input (large value)</summary>
 
 \`\`\`
 {
@@ -9770,7 +9770,7 @@ terraform_data.depends_on_fail
 </details>
 
 <details>
-<summary>Large value: output</summary>
+<summary>output (large value)</summary>
 
 \`\`\`
 {
@@ -9796,7 +9796,7 @@ terraform_data.success
 | input | <code></code> | <code><ins style="background:#dfd">stable</ins></code> |
 
 <details>
-<summary>Large value: output</summary>
+<summary>output (large value)</summary>
 
 \`\`\`
 {
@@ -9860,7 +9860,7 @@ terraform_data.depends_on_fail
 | id | <code></code> | <code><ins style="background:#dfd">187022b4-6440-9fcf-3593-4b6f27d3a442</ins></code> |
 
 <details>
-<summary>Large value: input</summary>
+<summary>input (large value)</summary>
 
 \`\`\`
 {
@@ -9872,7 +9872,7 @@ terraform_data.depends_on_fail
 </details>
 
 <details>
-<summary>Large value: output</summary>
+<summary>output (large value)</summary>
 
 \`\`\`
 {
@@ -9898,7 +9898,7 @@ terraform_data.success
 | input | <code></code> | <code><ins style="background:#dfd">stable</ins></code> |
 
 <details>
-<summary>Large value: output</summary>
+<summary>output (large value)</summary>
 
 \`\`\`
 {
@@ -10594,7 +10594,7 @@ local_file.config
 | sensitive_content | <code></code> | <code>(sensitive)</code> |
 
 <details>
-<summary>Large value: content</summary>
+<summary>content (large value)</summary>
 
 \`\`\`
 {
@@ -10621,7 +10621,7 @@ terraform_data.independent
 | input | <code></code> | <code><ins style="background:#dfd">v1</ins></code> |
 
 <details>
-<summary>Large value: output</summary>
+<summary>output (large value)</summary>
 
 \`\`\`
 {
@@ -10646,7 +10646,7 @@ terraform_data.worker_a
 | id | <code></code> | <code><ins style="background:#dfd">0d9f36ea-9187-50de-26ad-3679b9fac8c9</ins></code> |
 
 <details>
-<summary>Large value: input</summary>
+<summary>input (large value)</summary>
 
 \`\`\`
 {
@@ -10658,7 +10658,7 @@ terraform_data.worker_a
 </details>
 
 <details>
-<summary>Large value: output</summary>
+<summary>output (large value)</summary>
 
 \`\`\`
 {
@@ -10683,7 +10683,7 @@ terraform_data.worker_b
 | id | <code></code> | <code><ins style="background:#dfd">3112a96b-8d7e-1ab5-e88d-671b3f3b41b4</ins></code> |
 
 <details>
-<summary>Large value: input</summary>
+<summary>input (large value)</summary>
 
 \`\`\`
 {
@@ -10695,7 +10695,7 @@ terraform_data.worker_b
 </details>
 
 <details>
-<summary>Large value: output</summary>
+<summary>output (large value)</summary>
 
 \`\`\`
 {
@@ -10720,7 +10720,7 @@ terraform_data.worker_c
 | id | <code></code> | <code><ins style="background:#dfd">8031ba13-c0a5-1c61-f45b-981dee5e2587</ins></code> |
 
 <details>
-<summary>Large value: input</summary>
+<summary>input (large value)</summary>
 
 \`\`\`
 {
@@ -10732,7 +10732,7 @@ terraform_data.worker_c
 </details>
 
 <details>
-<summary>Large value: output</summary>
+<summary>output (large value)</summary>
 
 \`\`\`
 {
@@ -10748,7 +10748,7 @@ terraform_data.worker_c
 ## Output Changes
 
 <details>
-<summary>Large value: ➕ config_value</summary>
+<summary>➕ config_value (large value)</summary>
 
 \`\`\`
 {
@@ -10800,7 +10800,7 @@ local_file.config
 | sensitive_content | <code></code> | <code>(sensitive)</code> |
 
 <details>
-<summary>Large value: content</summary>
+<summary>content (large value)</summary>
 
 \`\`\`
 {
@@ -10827,7 +10827,7 @@ terraform_data.independent
 | input | <code></code> | <code><ins style="background:#dfd">v1</ins></code> |
 
 <details>
-<summary>Large value: output</summary>
+<summary>output (large value)</summary>
 
 \`\`\`
 {
@@ -10852,7 +10852,7 @@ terraform_data.worker_a
 | id | <code></code> | <code><ins style="background:#dfd">0d9f36ea-9187-50de-26ad-3679b9fac8c9</ins></code> |
 
 <details>
-<summary>Large value: input</summary>
+<summary>input (large value)</summary>
 
 \`\`\`
 {
@@ -10864,7 +10864,7 @@ terraform_data.worker_a
 </details>
 
 <details>
-<summary>Large value: output</summary>
+<summary>output (large value)</summary>
 
 \`\`\`
 {
@@ -10889,7 +10889,7 @@ terraform_data.worker_b
 | id | <code></code> | <code><ins style="background:#dfd">3112a96b-8d7e-1ab5-e88d-671b3f3b41b4</ins></code> |
 
 <details>
-<summary>Large value: input</summary>
+<summary>input (large value)</summary>
 
 \`\`\`
 {
@@ -10901,7 +10901,7 @@ terraform_data.worker_b
 </details>
 
 <details>
-<summary>Large value: output</summary>
+<summary>output (large value)</summary>
 
 \`\`\`
 {
@@ -10926,7 +10926,7 @@ terraform_data.worker_c
 | id | <code></code> | <code><ins style="background:#dfd">8031ba13-c0a5-1c61-f45b-981dee5e2587</ins></code> |
 
 <details>
-<summary>Large value: input</summary>
+<summary>input (large value)</summary>
 
 \`\`\`
 {
@@ -10938,7 +10938,7 @@ terraform_data.worker_c
 </details>
 
 <details>
-<summary>Large value: output</summary>
+<summary>output (large value)</summary>
 
 \`\`\`
 {
@@ -10954,7 +10954,7 @@ terraform_data.worker_c
 ## Output Changes
 
 <details>
-<summary>Large value: ➕ config_value</summary>
+<summary>➕ config_value (large value)</summary>
 
 \`\`\`
 {
@@ -11022,7 +11022,7 @@ terraform_data.independent
 | input | <code>v1</code> | <code>v<ins style="background:#dfd">2</ins><del style="background:#fdd">1</del></code> |
 
 <details>
-<summary>Large value: output (+4, -1)</summary>
+<summary>output (large value; +4, -1)</summary>
 
 \`\`\`diff
 + {
@@ -11039,7 +11039,7 @@ terraform_data.independent
 ## Output Changes
 
 <details>
-<summary>Large value: 🔧 config_value</summary>
+<summary>🔧 config_value (large value)</summary>
 
 \`\`\`diff
   {
@@ -11106,7 +11106,7 @@ terraform_data.independent
 | input | <code>v1</code> | <code>v<ins style="background:#dfd">2</ins><del style="background:#fdd">1</del></code> |
 
 <details>
-<summary>Large value: output (+4, -1)</summary>
+<summary>output (large value; +4, -1)</summary>
 
 \`\`\`diff
 + {
@@ -11123,7 +11123,7 @@ terraform_data.independent
 ## Output Changes
 
 <details>
-<summary>Large value: 🔧 config_value</summary>
+<summary>🔧 config_value (large value)</summary>
 
 \`\`\`diff
   {
@@ -11174,7 +11174,7 @@ local_file.config
 | sensitive_content | <code>(sensitive)</code> | <code>(sensitive)</code> |
 
 <details>
-<summary>Large value: content (+1, -1)</summary>
+<summary>content (large value; +1, -1)</summary>
 
 \`\`\`diff
   {
@@ -11197,7 +11197,7 @@ terraform_data.worker_a
 \`\`\`
 
 <details>
-<summary>Large value: input (+4, -1)</summary>
+<summary>input (large value; +4, -1)</summary>
 
 \`\`\`diff
 + {
@@ -11210,7 +11210,7 @@ terraform_data.worker_a
 </details>
 
 <details>
-<summary>Large value: output (+4, -1)</summary>
+<summary>output (large value; +4, -1)</summary>
 
 \`\`\`diff
 + {
@@ -11227,7 +11227,7 @@ terraform_data.worker_a
 ## Output Changes
 
 <details>
-<summary>Large value: 🔧 config_value (+1, -1)</summary>
+<summary>🔧 config_value (large value; +1, -1)</summary>
 
 \`\`\`diff
   {
@@ -11278,7 +11278,7 @@ local_file.config
 | sensitive_content | <code>(sensitive)</code> | <code>(sensitive)</code> |
 
 <details>
-<summary>Large value: content (+1, -1)</summary>
+<summary>content (large value; +1, -1)</summary>
 
 \`\`\`diff
   {
@@ -11301,7 +11301,7 @@ terraform_data.worker_a
 \`\`\`
 
 <details>
-<summary>Large value: input (+4, -1)</summary>
+<summary>input (large value; +4, -1)</summary>
 
 \`\`\`diff
 + {
@@ -11314,7 +11314,7 @@ terraform_data.worker_a
 </details>
 
 <details>
-<summary>Large value: output (+4, -1)</summary>
+<summary>output (large value; +4, -1)</summary>
 
 \`\`\`diff
 + {
@@ -11331,7 +11331,7 @@ terraform_data.worker_a
 ## Output Changes
 
 <details>
-<summary>Large value: 🔧 config_value (+1, -1)</summary>
+<summary>🔧 config_value (large value; +1, -1)</summary>
 
 \`\`\`diff
   {
@@ -12107,7 +12107,7 @@ local_file.readme
 | sensitive_content | <code></code> | <code>(sensitive)</code> |
 
 <details>
-<summary>Large value: content</summary>
+<summary>content (large value)</summary>
 
 \`\`\`
 Project: tf-plan-md fixture
@@ -12174,7 +12174,7 @@ local_file.readme
 | sensitive_content | <code></code> | <code>(sensitive)</code> |
 
 <details>
-<summary>Large value: content</summary>
+<summary>content (large value)</summary>
 
 \`\`\`
 Project: tf-plan-md fixture
@@ -12239,7 +12239,7 @@ local_file.readme
 | sensitive_content | <code>(sensitive)</code> | <code>(sensitive)</code> |
 
 <details>
-<summary>Large value: content (+5, -4)</summary>
+<summary>content (large value; +5, -4)</summary>
 
 \`\`\`diff
   Project: tf-plan-md fixture
@@ -12302,7 +12302,7 @@ local_file.readme
 | sensitive_content | <code>(sensitive)</code> | <code>(sensitive)</code> |
 
 <details>
-<summary>Large value: content (+5, -4)</summary>
+<summary>content (large value; +5, -4)</summary>
 
 \`\`\`diff
   Project: tf-plan-md fixture
@@ -12955,7 +12955,7 @@ terraform_data.meta
 | input | <code></code> | <code><ins style="background:#dfd">v1</ins></code> |
 
 <details>
-<summary>Large value: output</summary>
+<summary>output (large value)</summary>
 
 \`\`\`
 {
@@ -13062,7 +13062,7 @@ terraform_data.meta
 | input | <code></code> | <code><ins style="background:#dfd">v1</ins></code> |
 
 <details>
-<summary>Large value: output</summary>
+<summary>output (large value)</summary>
 
 \`\`\`
 {
@@ -13146,7 +13146,7 @@ terraform_data.meta
 | input | <code>v1</code> | <code>v<ins style="background:#dfd">2</ins><del style="background:#fdd">1</del></code> |
 
 <details>
-<summary>Large value: output (+4, -1)</summary>
+<summary>output (large value; +4, -1)</summary>
 
 \`\`\`diff
 + {
@@ -13230,7 +13230,7 @@ terraform_data.meta
 | input | <code>v1</code> | <code>v<ins style="background:#dfd">2</ins><del style="background:#fdd">1</del></code> |
 
 <details>
-<summary>Large value: output (+4, -1)</summary>
+<summary>output (large value; +4, -1)</summary>
 
 \`\`\`diff
 + {
@@ -16647,7 +16647,7 @@ local_file.config
 | sensitive_content | <code></code> | <code>(sensitive)</code> |
 
 <details>
-<summary>Large value: content</summary>
+<summary>content (large value)</summary>
 
 \`\`\`
 {
@@ -16849,7 +16849,7 @@ local_file.config
 | sensitive_content | <code>(sensitive)</code> | <code>(sensitive)</code> |
 
 <details>
-<summary>Large value: content (+1, -1)</summary>
+<summary>content (large value; +1, -1)</summary>
 
 \`\`\`diff
   {
@@ -17296,7 +17296,7 @@ local_file.readme
 | sensitive_content | <code></code> | <code>(sensitive)</code> |
 
 <details>
-<summary>Large value: content</summary>
+<summary>content (large value)</summary>
 
 \`\`\`
 Project: tf-plan-md fixture
@@ -17360,7 +17360,7 @@ local_file.readme
 | sensitive_content | <code>(sensitive)</code> | <code>(sensitive)</code> |
 
 <details>
-<summary>Large value: content (+5, -4)</summary>
+<summary>content (large value; +5, -4)</summary>
 
 \`\`\`diff
   Project: tf-plan-md fixture
@@ -18299,7 +18299,7 @@ local_file.config
 | sensitive_content | <code></code> | <code>(sensitive)</code> |
 
 <details>
-<summary>Large value: content</summary>
+<summary>content (large value)</summary>
 
 \`\`\`
 {
@@ -18501,7 +18501,7 @@ local_file.config
 | sensitive_content | <code>(sensitive)</code> | <code>(sensitive)</code> |
 
 <details>
-<summary>Large value: content (+1, -1)</summary>
+<summary>content (large value; +1, -1)</summary>
 
 \`\`\`diff
   {
@@ -18948,7 +18948,7 @@ local_file.readme
 | sensitive_content | <code></code> | <code>(sensitive)</code> |
 
 <details>
-<summary>Large value: content</summary>
+<summary>content (large value)</summary>
 
 \`\`\`
 Project: tf-plan-md fixture
@@ -19012,7 +19012,7 @@ local_file.readme
 | sensitive_content | <code>(sensitive)</code> | <code>(sensitive)</code> |
 
 <details>
-<summary>Large value: content (+5, -4)</summary>
+<summary>content (large value; +5, -4)</summary>
 
 \`\`\`diff
   Project: tf-plan-md fixture
@@ -20223,7 +20223,7 @@ local_file.config
 | sensitive_content | <code></code> | <code>(sensitive)</code> |
 
 <details>
-<summary>Large value: content</summary>
+<summary>content (large value)</summary>
 
 \`\`\`
 {
@@ -20396,7 +20396,7 @@ local_file.config
 | sensitive_content | <code>(sensitive)</code> | <code>(sensitive)</code> |
 
 <details>
-<summary>Large value: content (+1, -1)</summary>
+<summary>content (large value; +1, -1)</summary>
 
 \`\`\`diff
   {
@@ -20828,7 +20828,7 @@ local_file.readme
 | sensitive_content | <code></code> | <code>(sensitive)</code> |
 
 <details>
-<summary>Large value: content</summary>
+<summary>content (large value)</summary>
 
 \`\`\`
 Project: tf-plan-md fixture
@@ -20894,7 +20894,7 @@ local_file.readme
 | sensitive_content | <code>(sensitive)</code> | <code>(sensitive)</code> |
 
 <details>
-<summary>Large value: content (+5, -4)</summary>
+<summary>content (large value; +5, -4)</summary>
 
 \`\`\`diff
   Project: tf-plan-md fixture
@@ -22122,7 +22122,7 @@ local_file.config
 | sensitive_content | <code></code> | <code>(sensitive)</code> |
 
 <details>
-<summary>Large value: content</summary>
+<summary>content (large value)</summary>
 
 \`\`\`
 {
@@ -22295,7 +22295,7 @@ local_file.config
 | sensitive_content | <code>(sensitive)</code> | <code>(sensitive)</code> |
 
 <details>
-<summary>Large value: content (+1, -1)</summary>
+<summary>content (large value; +1, -1)</summary>
 
 \`\`\`diff
   {
@@ -22727,7 +22727,7 @@ local_file.readme
 | sensitive_content | <code></code> | <code>(sensitive)</code> |
 
 <details>
-<summary>Large value: content</summary>
+<summary>content (large value)</summary>
 
 \`\`\`
 Project: tf-plan-md fixture
@@ -22793,7 +22793,7 @@ local_file.readme
 | sensitive_content | <code>(sensitive)</code> | <code>(sensitive)</code> |
 
 <details>
-<summary>Large value: content (+5, -4)</summary>
+<summary>content (large value; +5, -4)</summary>
 
 \`\`\`diff
   Project: tf-plan-md fixture
