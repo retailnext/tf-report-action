@@ -2764,7 +2764,7 @@ _(details omitted)_
   }
   if (outputs.length > 0) {
     const writer = new MarkdownWriter();
-    writer.heading("Outputs", 2);
+    writer.heading("Output Changes", 2);
     renderOutputs(outputs, writer, options, diffCache);
     sections.push({
       id: "outputs",
@@ -2820,8 +2820,12 @@ function buildApplyContext(address, failedAddresses, diagByAddress) {
 }
 function renderOutputs(outputs, writer, options, diffCache) {
   const diffFormat = options.diffFormat ?? "inline";
-  const smallOutputs = outputs.filter((o) => !o.isLarge);
-  const largeOutputs = outputs.filter((o) => o.isLarge);
+  const smallOutputs = outputs.filter(
+    (o) => !o.isLarge || o.isSensitive || o.isKnownAfterApply
+  );
+  const largeOutputs = outputs.filter(
+    (o) => o.isLarge && !o.isSensitive && !o.isKnownAfterApply
+  );
   if (smallOutputs.length > 0) {
     writer.tableHeader(["Output", "Action", "Before", "After"]);
     for (const output of smallOutputs) {

@@ -267,7 +267,7 @@ describe("planToMarkdown", () => {
       });
       const result = planToMarkdown(plan);
       expect(result).toContain("result");
-      expect(result).toContain("Outputs");
+      expect(result).toContain("Output Changes");
     });
 
     it("masks sensitive output values", () => {

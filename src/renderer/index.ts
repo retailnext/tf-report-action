@@ -185,7 +185,7 @@ export function renderStructuredSections(
   // Top-level outputs
   if (outputs.length > 0) {
     const writer = new MarkdownWriter();
-    writer.heading("Outputs", 2);
+    writer.heading("Output Changes", 2);
     renderOutputs(outputs, writer, options, diffCache);
     sections.push({
       id: "outputs",
@@ -281,6 +281,10 @@ function buildApplyContext(
  * small values go into an inline table with character-level diffs, large values
  * (JSON objects, XML, multi-line strings) go into collapsible `<details>` blocks
  * with line-level diffs.
+ *
+ * Outputs with placeholder values (sensitive or known-after-apply) are always
+ * rendered in the table regardless of `isLarge`, because diffing a real value
+ * against a sentinel string produces meaningless output.
  */
 function renderOutputs(
   outputs: readonly OutputChange[],
@@ -290,8 +294,13 @@ function renderOutputs(
 ): void {
   const diffFormat = options.diffFormat ?? "inline";
 
-  const smallOutputs = outputs.filter((o) => !o.isLarge);
-  const largeOutputs = outputs.filter((o) => o.isLarge);
+  // Placeholder outputs always go in the table — diffing against a sentinel is meaningless
+  const smallOutputs = outputs.filter(
+    (o) => !o.isLarge || o.isSensitive || o.isKnownAfterApply,
+  );
+  const largeOutputs = outputs.filter(
+    (o) => o.isLarge && !o.isSensitive && !o.isKnownAfterApply,
+  );
 
   // Render small outputs in an attribute-style table
   if (smallOutputs.length > 0) {
