@@ -21,7 +21,10 @@ import { isJsonLines } from "../jsonl-scanner/detect.js";
 import { buildStepIssue } from "./step-issues.js";
 import { buildSummaryFromScan } from "./summary.js";
 import { buildResourcesFromScan } from "./resources.js";
-import { addScannerWarnings } from "./process-helpers.js";
+import {
+  addScannerWarnings,
+  filterStepIssueStdout,
+} from "./process-helpers.js";
 
 /**
  * Process the plan step: scan JSONL for structured data, or fall back
@@ -52,7 +55,12 @@ export function processPlanStep(
     if (peek.content !== undefined) {
       const firstLines = peek.content.split("\n", 10);
       if (isJsonLines(firstLines)) {
+        const diagsBefore = report.diagnostics?.length ?? 0;
         enrichFromPlanJsonl(path, report, readerOpts, showPlanParsed);
+        if (outcome === "failure") {
+          const newDiags = (report.diagnostics ?? []).slice(diagsBefore);
+          filterStepIssueStdout(report, stepId, newDiags);
+        }
         return;
       }
     }

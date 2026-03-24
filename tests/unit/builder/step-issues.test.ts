@@ -145,4 +145,30 @@ describe("buildStepIssue", () => {
     expect("stdoutTruncated" in issue).toBe(false);
     expect("stderrTruncated" in issue).toBe(false);
   });
+
+  it("omits stderr when the file contains only whitespace", () => {
+    const stdoutPath = writeFixture("ws-stdout.txt", "output");
+    const stderrPath = writeFixture("ws-stderr.txt", "   \n\t\n  ");
+    const step: StepData = {
+      outcome: "failure",
+      outputs: { stdout_file: stdoutPath, stderr_file: stderrPath },
+    };
+
+    const issue = buildStepIssue(step, "apply", opts);
+    expect(issue.stdout).toBe("output");
+    expect("stderr" in issue).toBe(false);
+    expect("stderrTruncated" in issue).toBe(false);
+  });
+
+  it("omits stderr when the file is empty", () => {
+    const stdoutPath = writeFixture("empty-out-stdout.txt", "output");
+    const stderrPath = writeFixture("empty-out-stderr.txt", "");
+    const step: StepData = {
+      outcome: "failure",
+      outputs: { stdout_file: stdoutPath, stderr_file: stderrPath },
+    };
+
+    const issue = buildStepIssue(step, "apply", opts);
+    expect("stderr" in issue).toBe(false);
+  });
 });
