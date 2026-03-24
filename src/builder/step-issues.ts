@@ -50,6 +50,14 @@ export function buildStepIssue(
 
   // Build with conditional spreads to preserve type safety while
   // respecting exactOptionalPropertyTypes (fields must not be undefined).
+  // Only include stderr when it has non-whitespace content. An empty or
+  // whitespace-only stderr is uninformative and produces a misleading
+  // "(empty)" block in the rendered output.
+  const stderrContent =
+    stderrRead.content !== undefined && stderrRead.content.trim().length > 0
+      ? stderrRead.content
+      : undefined;
+
   const issue: StepIssue = {
     id: stepId,
     heading,
@@ -63,8 +71,8 @@ export function buildStepIssue(
     ...(stdoutRead.error !== undefined
       ? { stdoutError: stdoutRead.error }
       : {}),
-    ...(stderrRead.content !== undefined ? { stderr: stderrRead.content } : {}),
-    ...(stderrRead.truncated === true
+    ...(stderrContent !== undefined ? { stderr: stderrContent } : {}),
+    ...(stderrContent !== undefined && stderrRead.truncated === true
       ? { stderrTruncated: true as const }
       : {}),
     ...(stderrRead.error !== undefined

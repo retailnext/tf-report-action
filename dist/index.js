@@ -1058,6 +1058,7 @@ function buildStepIssue(step, stepId, readerOpts, diagnostic) {
   }
   const stdoutRead = readStepStdoutForDisplay(step, readerOpts);
   const stderrRead = readStepStderrForDisplay(step, readerOpts);
+  const stderrContent = stderrRead.content !== void 0 && stderrRead.content.trim().length > 0 ? stderrRead.content : void 0;
   const issue = {
     id: stepId,
     heading,
@@ -1067,8 +1068,8 @@ function buildStepIssue(step, stepId, readerOpts, diagnostic) {
     ...stdoutRead.content !== void 0 ? { stdout: stdoutRead.content } : {},
     ...stdoutRead.truncated === true ? { stdoutTruncated: true } : {},
     ...stdoutRead.error !== void 0 ? { stdoutError: stdoutRead.error } : {},
-    ...stderrRead.content !== void 0 ? { stderr: stderrRead.content } : {},
-    ...stderrRead.truncated === true ? { stderrTruncated: true } : {},
+    ...stderrContent !== void 0 ? { stderr: stderrContent } : {},
+    ...stderrContent !== void 0 && stderrRead.truncated === true ? { stderrTruncated: true } : {},
     ...stderrRead.error !== void 0 ? { stderrError: stderrRead.error } : {}
   };
   return issue;
@@ -1252,6 +1253,74 @@ function uiDiagnosticToModel(d, source) {
   if (d.range !== void 0) base["range"] = d.range;
   if (d.snippet !== void 0) base["snippet"] = d.snippet;
   return base;
+}
+function extractJsonlResourceAddress(obj) {
+  const type = obj["type"];
+  if (typeof type !== "string") return void 0;
+  if (type === "apply_start" || type === "apply_progress" || type === "apply_complete" || type === "apply_errored" || type === "refresh_start" || type === "refresh_complete" || type === "provision_start" || type === "provision_progress" || type === "provision_complete" || type === "provision_errored") {
+    const hook = obj["hook"];
+    if (typeof hook !== "object" || hook === null) return void 0;
+    const resource = hook["resource"];
+    if (typeof resource !== "object" || resource === null) return void 0;
+    const addr = resource["addr"];
+    return typeof addr === "string" ? addr : void 0;
+  }
+  if (type === "planned_change" || type === "resource_drift") {
+    const change = obj["change"];
+    if (typeof change !== "object" || change === null) return void 0;
+    const resource = change["resource"];
+    if (typeof resource !== "object" || resource === null) return void 0;
+    const addr = resource["addr"];
+    return typeof addr === "string" ? addr : void 0;
+  }
+  if (type === "diagnostic") {
+    const diagnostic = obj["diagnostic"];
+    if (typeof diagnostic !== "object" || diagnostic === null) return void 0;
+    const addr = diagnostic["address"];
+    return typeof addr === "string" ? addr : void 0;
+  }
+  return void 0;
+}
+function filterJsonlByAddresses(content, addresses) {
+  const lines = content.split("\n");
+  const filtered = [];
+  for (const line of lines) {
+    if (line.trim() === "") {
+      filtered.push(line);
+      continue;
+    }
+    let parsed;
+    try {
+      parsed = JSON.parse(line);
+    } catch {
+      filtered.push(line);
+      continue;
+    }
+    if (typeof parsed !== "object" || parsed === null || Array.isArray(parsed)) {
+      filtered.push(line);
+      continue;
+    }
+    const addr = extractJsonlResourceAddress(parsed);
+    if (addr === void 0 || addresses.has(addr)) {
+      filtered.push(line);
+    }
+  }
+  return filtered.join("\n");
+}
+function filterStepIssueStdout(report, stepId, diagnostics) {
+  const addresses = /* @__PURE__ */ new Set();
+  for (const d of diagnostics) {
+    if (d.address === void 0) return;
+    addresses.add(d.address);
+  }
+  if (addresses.size === 0) return;
+  const idx = report.issues.findIndex((i) => i.id === stepId);
+  if (idx < 0) return;
+  const issue = report.issues[idx];
+  if (issue === void 0) return;
+  if (issue.stdout === void 0) return;
+  const filtered = filterJsonlByAddresses(issue.stdout, addresses);
+  report.issues[idx] = { ...issue, stdout: filtered };
 }
 function addScannerWarnings(report, scan, stepLabel) {
   if (scan.unparseableLines > 0) {
@@ -1678,7 +1747,12 @@ function processPlanStep(step, stepId, report, readerOpts, showPlanParsed) {
     if (peek.content !== void 0) {
       const firstLines = peek.content.split("\n", 10);
       if (isJsonLines(firstLines)) {
+        const diagsBefore = report.diagnostics?.length ?? 0;
         enrichFromPlanJsonl(path, report, readerOpts, showPlanParsed);
+        if (outcome === "failure") {
+          const newDiags = (report.diagnostics ?? []).slice(diagsBefore);
+          filterStepIssueStdout(report, stepId, newDiags);
+        }
         return;
       }
     }
@@ -1748,7 +1822,12 @@ function processApplyStep(step, stepId, report, readerOpts, showPlanParsed) {
     if (peek.content !== void 0) {
       const firstLines = peek.content.split("\n", 10);
       if (isJsonLines(firstLines)) {
+        const diagsBefore = report.diagnostics?.length ?? 0;
         enrichFromApplyJsonl(path, report, readerOpts, showPlanParsed);
+        if (outcome === "failure") {
+          const newDiags = (report.diagnostics ?? []).slice(diagsBefore);
+          filterStepIssueStdout(report, stepId, newDiags);
+        }
         return;
       }
     }
