@@ -1308,9 +1308,12 @@ function filterJsonlByAddresses(content, addresses) {
   return filtered.join("\n");
 }
 function filterStepIssueStdout(report, stepId, diagnostics) {
-  if (diagnostics.length === 0) return;
-  if (!diagnostics.every((d) => d.address !== void 0)) return;
-  const addresses = new Set(diagnostics.map((d) => d.address));
+  const addresses = /* @__PURE__ */ new Set();
+  for (const d of diagnostics) {
+    if (d.address === void 0) return;
+    addresses.add(d.address);
+  }
+  if (addresses.size === 0) return;
   const idx = report.issues.findIndex((i) => i.id === stepId);
   if (idx < 0) return;
   const issue = report.issues[idx];

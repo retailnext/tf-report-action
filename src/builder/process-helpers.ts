@@ -163,10 +163,12 @@ export function filterStepIssueStdout(
   stepId: string,
   diagnostics: readonly Diagnostic[],
 ): void {
-  if (diagnostics.length === 0) return;
-  if (!diagnostics.every((d) => d.address !== undefined)) return;
-
-  const addresses = new Set(diagnostics.map((d) => d.address as string));
+  const addresses = new Set<string>();
+  for (const d of diagnostics) {
+    if (d.address === undefined) return;
+    addresses.add(d.address);
+  }
+  if (addresses.size === 0) return;
   const idx = report.issues.findIndex((i) => i.id === stepId);
   if (idx < 0) return;
 
