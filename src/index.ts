@@ -107,7 +107,10 @@ function reportFromStepsInner(
 
   // Extract logsUrl for truncation notice
   const logsUrl = getLogsUrl(report);
-  const truncationNotice = buildTruncationNotice(logsUrl);
+  const truncationLink = logsUrl !== undefined
+    ? { url: logsUrl, label: "View full workflow run logs" }
+    : undefined;
+  const truncationNotice = buildTruncationNotice(truncationLink);
 
   // Compose: Section[] → bounded output string
   const composeBudget = maxOutputLength - truncationNotice.length;
