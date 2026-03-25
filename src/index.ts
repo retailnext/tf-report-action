@@ -12,7 +12,6 @@ import {
   composeSections,
   DEFAULT_MAX_OUTPUT_LENGTH,
 } from "./compositor/index.js";
-import { buildTruncationNotice } from "./compositor/truncation.js";
 import { STATUS_FAILURE } from "./model/status-icons.js";
 import { scanString } from "./jsonl-scanner/scan.js";
 
@@ -68,73 +67,83 @@ export function applyToMarkdown(
 }
 
 /**
- * Generates a GitHub-comment-ready markdown string from a GitHub Actions
- * steps context JSON string.
+ * Result of generating a report from a GitHub Actions steps context.
  *
- * **Never throws.** All errors are rendered as markdown content. Output
- * length is bounded by `maxOutputLength`.
+ * Separates the budget-constrained markdown (for the comment body)
+ * from the un-truncated full markdown (for artifact upload) so that
+ * callers can handle truncation notices and artifact upload independently.
+ */
+export interface ReportFromStepsResult {
+  /** Budget-constrained markdown (without truncation notice). */
+  readonly markdown: string;
+  /** Un-truncated markdown (all sections at full size, for artifact upload). */
+  readonly fullMarkdown: string;
+  /** Whether any section was degraded or omitted. */
+  readonly wasTruncated: boolean;
+}
+
+/**
+ * Generates a report from a GitHub Actions steps context JSON string.
+ *
+ * **Never throws.** All errors are rendered as markdown content. The
+ * budget-constrained output is in `markdown`; the un-truncated version
+ * is in `fullMarkdown`.
+ *
+ * The `markdown` field does **not** include a truncation notice — the
+ * caller is responsible for building and appending one (e.g. with a
+ * link to an uploaded artifact or to workflow logs).
  *
  * This is the third pipeline, following the same parse → build → render → compose
  * pattern as planToMarkdown and applyToMarkdown.
  *
  * @param stepsJson - JSON-encoded GitHub Actions steps context
  * @param options - Report generation options
- * @returns Markdown string suitable for a GitHub issue or PR comment body
+ * @returns Structured result with budget-constrained and full markdown
  */
 export function reportFromSteps(
   stepsJson: string,
   options?: import("./builder/report-from-steps.js").ReportOptions,
-): string {
+): ReportFromStepsResult {
   try {
-    return reportFromStepsInner(stepsJson, options);
+    const maxOutputLength =
+      options?.maxOutputLength ?? DEFAULT_MAX_OUTPUT_LENGTH;
+
+    // Build: parse steps → detect tier → build appropriate Report variant
+    const report = buildReportFromSteps(stepsJson, options);
+
+    // Render: Report → Section[]
+    const sections = renderReportSections(report, options);
+
+    // Full markdown: all sections at full size (for artifact upload)
+    const fullMarkdown = sections.map((s) => s.full).join("");
+
+    // Compose: Section[] → bounded output string
+    const result = composeSections(sections, maxOutputLength);
+
+    return {
+      markdown: result.output,
+      fullMarkdown,
+      wasTruncated: result.wasTruncated,
+    };
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : "Unknown error";
-    return `## ${STATUS_FAILURE} Report Generation Failed\n\nAn unexpected error occurred while generating the report:\n\n\`\`\`\n${message}\n\`\`\`\n`;
+    const errorMarkdown = `## ${STATUS_FAILURE} Report Generation Failed\n\nAn unexpected error occurred while generating the report:\n\n\`\`\`\n${message}\n\`\`\`\n`;
+    return {
+      markdown: errorMarkdown,
+      fullMarkdown: errorMarkdown,
+      wasTruncated: false,
+    };
   }
 }
 
-function reportFromStepsInner(
-  stepsJson: string,
-  options?: import("./builder/report-from-steps.js").ReportOptions,
-): string {
-  const maxOutputLength = options?.maxOutputLength ?? DEFAULT_MAX_OUTPUT_LENGTH;
-
-  // Build: parse steps → detect tier → build appropriate Report variant
-  const report = buildReportFromSteps(stepsJson, options);
-
-  // Render: Report → Section[]
-  const sections = renderReportSections(report, options);
-
-  // Extract logsUrl for truncation notice
-  const logsUrl = getLogsUrl(report);
-  const truncationLink = logsUrl !== undefined
-    ? { url: logsUrl, label: "View full workflow run logs" }
-    : undefined;
-  const truncationNotice = buildTruncationNotice(truncationLink);
-
-  // Compose: Section[] → bounded output string
-  const composeBudget = maxOutputLength - truncationNotice.length;
-  const result = composeSections(sections, composeBudget);
-
-  if (result.wasTruncated) {
-    return result.output + truncationNotice;
-  }
-  return result.output;
-}
-
-/** Extract logsUrl from the report. */
-function getLogsUrl(
-  report: import("./model/report.js").Report,
-): string | undefined {
-  return report.logsUrl;
-}
-
-// Re-export types consumers may need
+// Re-export types and utilities consumers may need
 export type { BuildOptions } from "./builder/options.js";
 export type { RenderOptions, DiffFormat } from "./model/render-options.js";
 export type { Report, RawStepStdout, Tool } from "./model/report.js";
 export type { StepRole } from "./model/step-commands.js";
 export { expectedCommand } from "./model/step-commands.js";
+export { buildTruncationNotice } from "./compositor/truncation.js";
+export type { TruncationLink } from "./compositor/truncation.js";
 export type { Summary } from "./model/summary.js";
 export type { ResourceChange } from "./model/resource.js";
 export type { AttributeChange } from "./model/attribute.js";

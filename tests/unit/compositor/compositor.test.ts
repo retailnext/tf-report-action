@@ -104,7 +104,9 @@ describe("composeSections", () => {
       // Budget: 1 (title) + 3 + 3 + 3 = 10 exactly for all compact
       // No room for any upgrade
       const result = composeSections(sections, 10);
-      expect(result.output).toBe("T" + "x".repeat(3) + "y".repeat(3) + "z".repeat(3));
+      expect(result.output).toBe(
+        "T" + "x".repeat(3) + "y".repeat(3) + "z".repeat(3),
+      );
       expect(result.degradedIds).toEqual(["a", "b", "c"]);
       expect(result.omittedIds).toEqual([]);
     });
@@ -120,7 +122,9 @@ describe("composeSections", () => {
       // Upgrade a: delta = 7, fits exactly (remaining = 0)
       // b and c stay compact
       const result = composeSections(sections, 17);
-      expect(result.output).toBe("T" + "x".repeat(10) + "y".repeat(3) + "z".repeat(3));
+      expect(result.output).toBe(
+        "T" + "x".repeat(10) + "y".repeat(3) + "z".repeat(3),
+      );
       expect(result.degradedIds).toEqual(["b", "c"]);
       expect(result.omittedIds).toEqual([]);
     });
@@ -137,7 +141,9 @@ describe("composeSections", () => {
       // Upgrade b: delta 7, remaining = 0
       // c stays compact
       const result = composeSections(sections, 24);
-      expect(result.output).toBe("T" + "x".repeat(10) + "y".repeat(10) + "z".repeat(3));
+      expect(result.output).toBe(
+        "T" + "x".repeat(10) + "y".repeat(10) + "z".repeat(3),
+      );
       expect(result.degradedIds).toEqual(["c"]);
       expect(result.omittedIds).toEqual([]);
     });
@@ -260,9 +266,7 @@ describe("composeSections", () => {
     });
 
     it("is true when any section is omitted", () => {
-      const sections: Section[] = [
-        { id: "body", full: "x".repeat(20) },
-      ];
+      const sections: Section[] = [{ id: "body", full: "x".repeat(20) }];
       const result = composeSections(sections, 5);
       expect(result.wasTruncated).toBe(true);
       expect(result.omittedIds).toEqual(["body"]);

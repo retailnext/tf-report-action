@@ -86,8 +86,10 @@ export function composeSections(
 
   // Pass 2: upgrade compact → full where the delta fits
   for (let i = 0; i < sections.length; i++) {
-    if (allocations[i] !== "compact") continue;
-    const section = sections[i]!;
+    const alloc = allocations[i];
+    if (alloc !== "compact") continue;
+    const section = sections[i];
+    if (section === undefined) continue;
     const delta = section.full.length - (section.compact?.length ?? 0);
     if (delta <= remaining) {
       allocations[i] = "full";
@@ -101,13 +103,14 @@ export function composeSections(
   const parts: string[] = [];
 
   for (let i = 0; i < sections.length; i++) {
-    const section = sections[i]!;
-    const alloc = allocations[i]!;
+    const section = sections[i];
+    const alloc = allocations[i];
+    if (section === undefined || alloc === undefined) continue;
 
     if (alloc === "full") {
       parts.push(section.full);
-    } else if (alloc === "compact") {
-      parts.push(section.compact!);
+    } else if (alloc === "compact" && section.compact !== undefined) {
+      parts.push(section.compact);
       degradedIds.push(section.id);
     } else {
       omittedIds.push(section.id);
