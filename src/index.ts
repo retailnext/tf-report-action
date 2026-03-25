@@ -113,7 +113,7 @@ function reportFromStepsInner(
   const composeBudget = maxOutputLength - truncationNotice.length;
   const result = composeSections(sections, composeBudget);
 
-  if (result.degradedCount > 0 || result.omittedCount > 0) {
+  if (result.wasTruncated) {
     return result.output + truncationNotice;
   }
   return result.output;

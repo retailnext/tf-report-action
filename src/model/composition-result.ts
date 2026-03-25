@@ -19,4 +19,7 @@ export interface CompositionResult {
 
   /** IDs of sections that were omitted. */
   readonly omittedIds: readonly string[];
+
+  /** Whether any section was degraded or omitted. */
+  readonly wasTruncated: boolean;
 }
