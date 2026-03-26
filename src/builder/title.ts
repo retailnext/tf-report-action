@@ -26,7 +26,7 @@ import {
  * Evaluation order (first match wins):
  * 1. Error → "❌ Report Generation Failed"
  * 2. IaC step failures + operation → "❌ Plan/Apply Failed"
- * 3. Summary + apply + apply errors → "⚠️ Apply: N failed, ..."
+ * 3. Summary + apply + apply errors → "❌ Apply Failed: N failed, ..."
  * 4. Summary + apply + no changes → "✅ Apply Complete"
  * 5. Summary + apply + changes → "✅ Apply: N added, ..."
  * 6. Summary + plan + no changes → "✅ No Changes"

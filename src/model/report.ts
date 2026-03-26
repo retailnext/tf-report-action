@@ -105,11 +105,11 @@ export interface Report {
   operation?: "plan" | "apply" | "destroy";
 
   /**
-   * The outcome of the primary operation step (plan or apply) as recorded
-   * in the GitHub Actions steps context (e.g. "success", "skipped",
-   * "failure"). Only set when the operation was auto-detected from step
-   * presence in `buildReportFromSteps`. Used to distinguish "plan ran and
-   * succeeded" from "plan step was skipped entirely".
+   * The outcome of the primary IaC operation step (plan, apply, or destroy)
+   * as recorded in the GitHub Actions steps context (e.g. "success",
+   * "skipped", "failure"). Only set when the operation was auto-detected
+   * from step presence in `buildReportFromSteps`. Used to distinguish
+   * "operation ran and succeeded" from "operation step was skipped entirely".
    */
   operationOutcome?: string;
 
