@@ -194,6 +194,14 @@ each other**.
   Internal implementation details (refactors, new abstractions, test changes)
   belong in a secondary section. If there are no user-facing changes, state
   that explicitly up front.
+- **Never replace an existing PR description**: When adding commits to a
+  branch that already has an open PR, **read the current PR description
+  first** (`gh pr view <number>`). Do not replace it. If your commits add
+  scope not yet covered, append a new section. If the cumulative changes
+  warrant a unified description, rewrite it so that **all** commits on the
+  branch are represented — nothing from the original may be silently
+  dropped. Only update the PR title if the original is now actively
+  misleading; otherwise leave it unchanged.
 
 ---
 
