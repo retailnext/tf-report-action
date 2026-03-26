@@ -13,8 +13,9 @@ import { readFileSync } from "node:fs";
 import type { Env } from "../env/index.js";
 import type { ReportOptions } from "../index.js";
 import { reportFromSteps, buildTruncationNotice } from "../index.js";
-import type { GitHubClient } from "../github/index.js";
+import type { GitHubClient, GitHubClientDeps } from "../github/index.js";
 import { createGitHubClient } from "../github/index.js";
+import { httpRequest } from "../http/index.js";
 import { parseInputs } from "./inputs.js";
 
 // ---------------------------------------------------------------------------
@@ -187,7 +188,7 @@ async function handleIssue(
  */
 export async function run(
   env: Env = process.env as Env,
-  clientFactory: (token: string) => GitHubClient = createGitHubClient,
+  clientFactory: (deps: GitHubClientDeps) => GitHubClient = createGitHubClient,
 ): Promise<void> {
   try {
     const inputs = parseInputs(env);
@@ -272,7 +273,17 @@ export async function run(
     const { owner, repo } = repoInfo;
 
     const marker = buildMarker(inputs.workspace);
-    const client = clientFactory(inputs.githubToken);
+    const transport = (
+      method: string,
+      url: string,
+      headers: Record<string, string>,
+      body?: string,
+    ) => httpRequest(method, url, headers, body, { env });
+    const client = clientFactory({
+      token: inputs.githubToken,
+      baseUrl: env["GITHUB_API_URL"],
+      transport,
+    });
 
     if (isPr) {
       const eventPath = env["GITHUB_EVENT_PATH"] ?? "";

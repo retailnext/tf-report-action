@@ -3,6 +3,7 @@ import { run, formatTimestamp } from "../../../src/action/main.js";
 import type { Env } from "../../../src/env/index.js";
 import type {
   GitHubClient,
+  GitHubClientDeps,
   Comment,
   SearchIssue,
 } from "../../../src/github/index.js";
@@ -23,6 +24,7 @@ interface TrackedClient {
     searchIssues: unknown[][];
     createIssue: unknown[][];
     updateIssue: unknown[][];
+    renderMarkdown: unknown[][];
   };
 }
 
@@ -34,6 +36,7 @@ function mockClient(overrides: Partial<GitHubClient> = {}): TrackedClient {
     searchIssues: [] as unknown[][],
     createIssue: [] as unknown[][],
     updateIssue: [] as unknown[][],
+    renderMarkdown: [] as unknown[][],
   };
 
   const client: GitHubClient = {
@@ -72,6 +75,12 @@ function mockClient(overrides: Partial<GitHubClient> = {}): TrackedClient {
       ((...args) => {
         calls.updateIssue.push(args);
         return Promise.resolve();
+      }),
+    renderMarkdown:
+      overrides.renderMarkdown ??
+      ((...args) => {
+        calls.renderMarkdown.push(args);
+        return Promise.resolve("<p>rendered</p>");
       }),
   };
 
@@ -115,7 +124,7 @@ describe("formatTimestamp", () => {
 describe("run — non-PR flow", () => {
   it("creates a new status issue when none exists", async () => {
     const { client, calls } = mockClient();
-    const factory = () => client;
+    const factory = (_deps: GitHubClientDeps) => client;
 
     await run(baseEnv(), factory);
 
@@ -140,7 +149,7 @@ describe("run — non-PR flow", () => {
     const { client, calls } = mockClient({
       searchIssues: () => Promise.resolve(existing),
     });
-    const factory = () => client;
+    const factory = (_deps: GitHubClientDeps) => client;
 
     await run(baseEnv(), factory);
 
@@ -158,7 +167,7 @@ describe("run — non-PR flow", () => {
 
   it("skips API calls when GITHUB_REPOSITORY is not set", async () => {
     const { client, calls } = mockClient();
-    const factory = () => client;
+    const factory = (_deps: GitHubClientDeps) => client;
     const env = baseEnv();
     delete env["GITHUB_REPOSITORY"];
 
@@ -168,7 +177,7 @@ describe("run — non-PR flow", () => {
 
   it("skips API calls when GITHUB_REPOSITORY is malformed", async () => {
     const { client, calls } = mockClient();
-    const factory = () => client;
+    const factory = (_deps: GitHubClientDeps) => client;
 
     await run(baseEnv({ GITHUB_REPOSITORY: "noslash" }), factory);
     expect(calls.searchIssues).toHaveLength(0);
@@ -203,7 +212,7 @@ describe("run — PR flow", () => {
 
   it("posts a PR comment", async () => {
     const { client, calls } = mockClient();
-    const factory = () => client;
+    const factory = (_deps: GitHubClientDeps) => client;
 
     await run(prEnv(), factory);
 
@@ -232,7 +241,7 @@ describe("run — PR flow", () => {
     const { client, calls } = mockClient({
       getComments: () => Promise.resolve(staleComments),
     });
-    const factory = () => client;
+    const factory = (_deps: GitHubClientDeps) => client;
 
     await run(prEnv(), factory);
 
@@ -245,7 +254,7 @@ describe("run — PR flow", () => {
 
   it("also triggers on pull_request_target", async () => {
     const { client, calls } = mockClient();
-    const factory = () => client;
+    const factory = (_deps: GitHubClientDeps) => client;
 
     await run(prEnv({ GITHUB_EVENT_NAME: "pull_request_target" }), factory);
 
@@ -255,7 +264,7 @@ describe("run — PR flow", () => {
 
   it("reports error when event payload is unreadable", async () => {
     const { client } = mockClient();
-    const factory = () => client;
+    const factory = (_deps: GitHubClientDeps) => client;
     const exitSpy = vi.spyOn(process, "exit").mockImplementation((() => {
       throw new Error("EXIT");
     }) as never);
@@ -293,7 +302,7 @@ describe("run — error handling", () => {
     const env: Env = { "INPUT_GITHUB-TOKEN": "tok" };
 
     try {
-      await run(env, () => mockClient().client);
+      await run(env, (_deps: GitHubClientDeps) => mockClient().client);
     } catch {
       // Expected
     }
@@ -318,7 +327,7 @@ describe("body budget", () => {
         return Promise.resolve(1);
       },
     });
-    const factory = () => client;
+    const factory = (_deps: GitHubClientDeps) => client;
 
     await run(baseEnv(), factory);
 
