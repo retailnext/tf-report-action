@@ -66,9 +66,10 @@ export function checkBypass(reqUrl: URL, env: Env): boolean {
   }
 
   // Build the set of host representations to match against.
-  const upperHosts = [reqUrl.hostname.toUpperCase()];
+  const upperHost = reqUrl.hostname.toUpperCase();
+  const upperHosts = [upperHost];
   if (reqPort !== undefined) {
-    upperHosts.push(`${upperHosts[0]!}:${String(reqPort)}`);
+    upperHosts.push(`${upperHost}:${String(reqPort)}`);
   }
 
   for (const entry of noProxy

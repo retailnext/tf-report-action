@@ -3351,34 +3351,16 @@ ${message}
 }
 
 // src/github/client.ts
-import * as https from "node:https";
-function defaultTransport(method, url, headers, body) {
-  return new Promise((resolve2, reject) => {
-    const req = https.request(url, { method, headers }, (res) => {
-      const chunks = [];
-      res.on("data", (chunk) => chunks.push(chunk));
-      res.on("end", () => {
-        resolve2({
-          statusCode: res.statusCode ?? 0,
-          headers: res.headers,
-          body: Buffer.concat(chunks).toString("utf-8")
-        });
-      });
-      res.on("error", reject);
-    });
-    req.on("error", reject);
-    if (body !== void 0) {
-      req.write(body);
-    }
-    req.end();
-  });
+var DEFAULT_BASE_URL = "https://api.github.com";
+function authScheme(token) {
+  return token.split(".").length === 3 ? "bearer" : "token";
 }
-var API_BASE = "https://api.github.com";
 function baseHeaders(token) {
   return {
-    Authorization: `Bearer ${token}`,
+    Authorization: `${authScheme(token)} ${token}`,
     "User-Agent": "tf-report-action",
-    Accept: "application/vnd.github+json"
+    Accept: "application/vnd.github+json",
+    "X-GitHub-Api-Version": "2022-11-28"
   };
 }
 function withJsonBody(token) {
@@ -3395,19 +3377,21 @@ function parseJson(body) {
   }
 }
 function assertOk(res) {
-  if (res.statusCode < 200 || res.statusCode > 299) {
+  if (res.status < 200 || res.status > 299) {
     const preview = res.body.length > 200 ? res.body.slice(0, 200) + "\u2026" : res.body;
     throw new Error(
-      `GitHub API request failed with status ${String(res.statusCode)}: ${preview}`
+      `GitHub API request failed with status ${String(res.status)}: ${preview}`
     );
   }
 }
-function createGitHubClient(token, transport = defaultTransport) {
+function createGitHubClient(deps) {
+  const { token, transport } = deps;
+  const apiBase = deps.baseUrl ?? DEFAULT_BASE_URL;
   async function getComments(owner, repo, issueNumber) {
     const all = [];
     let page = 1;
     for (; ; ) {
-      const url = `${API_BASE}/repos/${owner}/${repo}/issues/${String(issueNumber)}/comments?per_page=100&page=${String(page)}`;
+      const url = `${apiBase}/repos/${owner}/${repo}/issues/${String(issueNumber)}/comments?per_page=100&page=${String(page)}`;
       const res = await transport("GET", url, baseHeaders(token));
       assertOk(res);
       const batch = parseJson(res.body);
@@ -3418,12 +3402,12 @@ function createGitHubClient(token, transport = defaultTransport) {
     return all;
   }
   async function deleteComment(owner, repo, commentId) {
-    const url = `${API_BASE}/repos/${owner}/${repo}/issues/comments/${String(commentId)}`;
+    const url = `${apiBase}/repos/${owner}/${repo}/issues/comments/${String(commentId)}`;
     const res = await transport("DELETE", url, baseHeaders(token));
     assertOk(res);
   }
   async function postComment(owner, repo, issueNumber, body) {
-    const url = `${API_BASE}/repos/${owner}/${repo}/issues/${String(issueNumber)}/comments`;
+    const url = `${apiBase}/repos/${owner}/${repo}/issues/${String(issueNumber)}/comments`;
     const res = await transport(
       "POST",
       url,
@@ -3433,14 +3417,14 @@ function createGitHubClient(token, transport = defaultTransport) {
     assertOk(res);
   }
   async function searchIssues(query) {
-    const url = `${API_BASE}/search/issues?q=${encodeURIComponent(query)}`;
+    const url = `${apiBase}/search/issues?q=${encodeURIComponent(query)}`;
     const res = await transport("GET", url, baseHeaders(token));
     assertOk(res);
     const data = parseJson(res.body);
     return data.items;
   }
   async function createIssue(owner, repo, title, body) {
-    const url = `${API_BASE}/repos/${owner}/${repo}/issues`;
+    const url = `${apiBase}/repos/${owner}/${repo}/issues`;
     const res = await transport(
       "POST",
       url,
@@ -3452,7 +3436,7 @@ function createGitHubClient(token, transport = defaultTransport) {
     return data.number;
   }
   async function updateIssue(owner, repo, issueNumber, title, body) {
-    const url = `${API_BASE}/repos/${owner}/${repo}/issues/${String(issueNumber)}`;
+    const url = `${apiBase}/repos/${owner}/${repo}/issues/${String(issueNumber)}`;
     const res = await transport(
       "PATCH",
       url,
@@ -3461,14 +3445,194 @@ function createGitHubClient(token, transport = defaultTransport) {
     );
     assertOk(res);
   }
+  async function renderMarkdown(params) {
+    const url = `${apiBase}/markdown`;
+    const res = await transport(
+      "POST",
+      url,
+      withJsonBody(token),
+      JSON.stringify(params)
+    );
+    assertOk(res);
+    return res.body;
+  }
   return {
     getComments,
     deleteComment,
     postComment,
     searchIssues,
     createIssue,
-    updateIssue
+    updateIssue,
+    renderMarkdown
   };
+}
+
+// src/http/proxy.ts
+function isLoopbackAddress(host) {
+  const lower = host.toLowerCase();
+  return lower === "localhost" || lower.startsWith("127.") || lower.startsWith("[::1]") || lower.startsWith("[0:0:0:0:0:0:0:1]");
+}
+function checkBypass(reqUrl, env) {
+  if (!reqUrl.hostname) {
+    return false;
+  }
+  if (isLoopbackAddress(reqUrl.hostname)) {
+    return true;
+  }
+  const noProxy = env["no_proxy"] ?? env["NO_PROXY"] ?? "";
+  if (!noProxy) {
+    return false;
+  }
+  let reqPort;
+  if (reqUrl.port) {
+    reqPort = Number(reqUrl.port);
+  } else if (reqUrl.protocol === "http:") {
+    reqPort = 80;
+  } else if (reqUrl.protocol === "https:") {
+    reqPort = 443;
+  }
+  const upperHost = reqUrl.hostname.toUpperCase();
+  const upperHosts = [upperHost];
+  if (reqPort !== void 0) {
+    upperHosts.push(`${upperHost}:${String(reqPort)}`);
+  }
+  for (const entry of noProxy.split(",").map((s) => s.trim().toUpperCase()).filter((s) => s !== "")) {
+    if (entry === "*" || upperHosts.some(
+      (h) => h === entry || h.endsWith(`.${entry}`) || entry.startsWith(".") && h.endsWith(entry)
+    )) {
+      return true;
+    }
+  }
+  return false;
+}
+function getProxyUrl(reqUrl, env) {
+  if (checkBypass(reqUrl, env)) {
+    return void 0;
+  }
+  const proxyVar = reqUrl.protocol === "https:" ? env["https_proxy"] ?? env["HTTPS_PROXY"] : env["http_proxy"] ?? env["HTTP_PROXY"];
+  if (!proxyVar) {
+    return void 0;
+  }
+  try {
+    const url = new URL(proxyVar);
+    if (url.protocol === "http:" || url.protocol === "https:") {
+      return url;
+    }
+  } catch {
+  }
+  try {
+    return new URL(`http://${proxyVar}`);
+  } catch {
+    return void 0;
+  }
+}
+
+// src/http/transport.ts
+import * as http from "node:http";
+import * as https from "node:https";
+import * as tls from "node:tls";
+async function httpRequest(method, url, headers, body, options) {
+  const target = new URL(url);
+  const env = options?.env ?? process.env;
+  const proxyUrl = getProxyUrl(target, env);
+  if (!proxyUrl) {
+    return directRequest(method, target, headers, body);
+  }
+  if (target.protocol === "https:") {
+    return tunnelRequest(method, target, proxyUrl, headers, body);
+  }
+  return proxyPlainRequest(method, target, proxyUrl, headers, body);
+}
+function directRequest(method, target, headers, body) {
+  const transport = target.protocol === "https:" ? https : http;
+  return new Promise((resolve2, reject) => {
+    const req = transport.request(target, { method, headers }, (res) => {
+      collectResponse(res, resolve2, reject);
+    });
+    req.on("error", reject);
+    if (body !== void 0) {
+      req.write(body);
+    }
+    req.end();
+  });
+}
+function proxyPlainRequest(method, target, proxyUrl, headers, body) {
+  return new Promise((resolve2, reject) => {
+    const req = http.request(
+      {
+        hostname: proxyUrl.hostname,
+        port: proxyUrl.port || 80,
+        method,
+        path: target.href,
+        headers
+      },
+      (res) => {
+        collectResponse(res, resolve2, reject);
+      }
+    );
+    req.on("error", reject);
+    if (body !== void 0) {
+      req.write(body);
+    }
+    req.end();
+  });
+}
+function tunnelRequest(method, target, proxyUrl, headers, body) {
+  const targetHost = target.hostname;
+  const targetPort = target.port || "443";
+  return new Promise((resolve2, reject) => {
+    const connectReq = http.request({
+      hostname: proxyUrl.hostname,
+      port: proxyUrl.port || 80,
+      method: "CONNECT",
+      path: `${targetHost}:${targetPort}`
+    });
+    connectReq.on("connect", (_res, socket) => {
+      const tlsSocket = tls.connect(
+        {
+          socket,
+          servername: targetHost
+        },
+        () => {
+          const req = https.request(
+            {
+              hostname: targetHost,
+              port: Number(targetPort),
+              method,
+              path: target.pathname + target.search,
+              headers,
+              createConnection: () => tlsSocket
+            },
+            (res) => {
+              collectResponse(res, resolve2, reject);
+            }
+          );
+          req.on("error", reject);
+          if (body !== void 0) {
+            req.write(body);
+          }
+          req.end();
+        }
+      );
+      tlsSocket.on("error", reject);
+    });
+    connectReq.on("error", reject);
+    connectReq.end();
+  });
+}
+function collectResponse(res, resolve2, reject) {
+  const chunks = [];
+  res.on("data", (chunk) => {
+    chunks.push(chunk);
+  });
+  res.on("end", () => {
+    resolve2({
+      status: res.statusCode ?? 0,
+      headers: res.headers,
+      body: Buffer.concat(chunks).toString("utf-8")
+    });
+  });
+  res.on("error", reject);
 }
 
 // src/action/inputs.ts
@@ -3631,7 +3795,12 @@ async function run(env = process.env, clientFactory = createGitHubClient) {
     }
     const { owner, repo } = repoInfo;
     const marker = buildMarker(inputs.workspace);
-    const client = clientFactory(inputs.githubToken);
+    const transport = (method, url, headers, body2) => httpRequest(method, url, headers, body2, { env });
+    const client = clientFactory({
+      token: inputs.githubToken,
+      ...env["GITHUB_API_URL"] !== void 0 && env["GITHUB_API_URL"] !== "" && { baseUrl: env["GITHUB_API_URL"] },
+      transport
+    });
     if (isPr) {
       const eventPath = env["GITHUB_EVENT_PATH"] ?? "";
       const prNumber = readPrNumber(eventPath);

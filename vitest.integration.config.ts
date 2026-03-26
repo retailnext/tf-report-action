@@ -59,6 +59,10 @@ export default defineConfig({
         // The GitHub API client requires real HTTP calls and cannot be exercised
         // by integration tests that use fixture data.
         "src/github/**",
+        // The HTTP transport, proxy detection, and retry modules require real HTTP
+        // calls or network configuration and cannot be exercised by fixture-driven
+        // integration tests.
+        "src/http/**",
       ],
       thresholds: {
         lines: 90,

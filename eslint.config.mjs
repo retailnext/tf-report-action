@@ -137,8 +137,7 @@ export default tseslint.config(
                 "../model/*",
                 "../index.js",
               ],
-              message:
-                "The GitHub client may only import from src/http/.",
+              message: "The GitHub client may only import from src/http/.",
             },
           ],
         },

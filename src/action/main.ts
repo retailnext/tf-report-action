@@ -281,7 +281,8 @@ export async function run(
     ) => httpRequest(method, url, headers, body, { env });
     const client = clientFactory({
       token: inputs.githubToken,
-      baseUrl: env["GITHUB_API_URL"],
+      ...(env["GITHUB_API_URL"] !== undefined &&
+        env["GITHUB_API_URL"] !== "" && { baseUrl: env["GITHUB_API_URL"] }),
       transport,
     });
 

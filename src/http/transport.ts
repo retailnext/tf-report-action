@@ -77,16 +77,11 @@ export async function httpRequest(
  * body is truncated to 200 characters in the error message to avoid leaking
  * sensitive data.
  */
-export function assertOk(
-  status: number,
-  body: string,
-  context?: string,
-): void {
+export function assertOk(status: number, body: string, context?: string): void {
   if (status >= 200 && status < 300) {
     return;
   }
-  const truncated =
-    body.length > 200 ? body.slice(0, 200) + "\u2026" : body;
+  const truncated = body.length > 200 ? body.slice(0, 200) + "\u2026" : body;
   const prefix = context ? `${context}: ` : "";
   throw new ActionsError(
     `${prefix}HTTP ${String(status)}: ${truncated}`,
@@ -188,7 +183,6 @@ function tunnelRequest(
               method,
               path: target.pathname + target.search,
               headers,
-              socket: tlsSocket,
               createConnection: () => tlsSocket,
             },
             (res) => {

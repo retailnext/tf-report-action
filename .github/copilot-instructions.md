@@ -37,6 +37,7 @@ delegating to sub-agents — you must verify the Node.js version:
    - Other: `which -a node`, `ls /usr/local/bin/node*`
 
    Once found, fix PATH in your shell session and re-verify with `node --version`.
+
 4. **Do not** run any `npm`, `node`, or `npx` command until verification succeeds.
 5. **Do not** delegate to any sub-agent (explore, task, general-purpose) that might
    run `node`/`npm`/`npx` until verification succeeds. When delegating after
@@ -78,7 +79,7 @@ Follow these boundaries strictly — do not add cross-cutting logic.
 | ------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `src/parser/` | Parse Terraform/OpenTofu formats: plan JSON, state JSON (raw tfstate from `state pull`), apply JSONL, validate output.                                                                               |
 | `src/steps/`  | GitHub Actions steps context: parsing, secure file reading, step-data-aware I/O wrappers, outcome helpers. This is the I/O boundary between the external world and the pure transformation pipeline. |
-| `src/github/` | GitHub REST API client with DI HTTP transport. Comment CRUD, issue search/create/update, pagination, markdown rendering. No domain model dependency.                                                 |
+| `src/github/` | GitHub REST API client with DI HTTP transport. Comment CRUD, issue search/create/update, pagination, Markdown rendering. No domain model dependency.                                                 |
 
 ### Layer 3 — Business logic (depend on Layers 0–2)
 
@@ -120,8 +121,8 @@ each other**.
 
 ### Layer 6 — Action (depends on Layers 0–5)
 
-| Module        | Responsibility                                                                                                                                                                                         |
-| ------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Module        | Responsibility                                                                                                                                                                                                       |
+| ------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `src/action/` | Action entry point and composition root. Parses `INPUT_*` env vars, wires HTTP transport into GitHub client, calls `reportFromSteps()`, posts results via GitHub API. Only module that reads `process.env` directly. |
 
 **Dependency rules (layered — import only from same or lower layer):**

@@ -3,12 +3,16 @@ import { withRetry } from "../../../src/http/retry.js";
 import { ActionsError } from "../../../src/http/errors.js";
 
 /** A no-op sleep that records the requested delays. */
-function fakeSleep(): { sleep: (ms: number) => Promise<void>; delays: number[] } {
+function fakeSleep(): {
+  sleep: (ms: number) => Promise<void>;
+  delays: number[];
+} {
   const delays: number[] = [];
   return {
     delays,
-    sleep: async (ms: number) => {
+    sleep: (ms: number): Promise<void> => {
       delays.push(ms);
+      return Promise.resolve();
     },
   };
 }

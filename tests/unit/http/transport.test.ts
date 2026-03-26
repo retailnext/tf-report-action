@@ -5,10 +5,7 @@ import { ActionsError } from "../../../src/http/errors.js";
 
 /** Start a local HTTP server, return its URL and a close function. */
 function startServer(
-  handler: (
-    req: http.IncomingMessage,
-    res: http.ServerResponse,
-  ) => void,
+  handler: (req: http.IncomingMessage, res: http.ServerResponse) => void,
 ): Promise<{ url: string; close: () => Promise<void> }> {
   return new Promise((resolve) => {
     const server = http.createServer(handler);
@@ -87,13 +84,9 @@ describe("httpRequest", () => {
 
     try {
       const targetUrl = "http://example.test:9999/path";
-      const response = await httpRequest(
-        "GET",
-        targetUrl,
-        {},
-        undefined,
-        { env: { http_proxy: proxyUrl } },
-      );
+      const response = await httpRequest("GET", targetUrl, {}, undefined, {
+        env: { http_proxy: proxyUrl },
+      });
       expect(proxyHit).toBe(true);
       expect(requestedUrl).toBe(targetUrl);
       expect(response.status).toBe(200);

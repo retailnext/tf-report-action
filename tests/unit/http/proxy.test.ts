@@ -83,7 +83,10 @@ describe("checkBypass", () => {
     it("handles comma-separated entries with whitespace", () => {
       const url = new URL("https://second.com");
       expect(
-        checkBypass(url, env({ NO_PROXY: "first.com , second.com , third.com" })),
+        checkBypass(
+          url,
+          env({ NO_PROXY: "first.com , second.com , third.com" }),
+        ),
       ).toBe(true);
     });
 

@@ -66,7 +66,9 @@ export async function withRetry<T>(
 
       const minDelay = baseIntervalMs * multiplier ** attempt;
       const maxDelay = minDelay * multiplier;
-      const delay = Math.floor(minDelay + Math.random() * (maxDelay - minDelay));
+      const delay = Math.floor(
+        minDelay + Math.random() * (maxDelay - minDelay),
+      );
       await sleep(delay);
     }
   }

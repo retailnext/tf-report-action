@@ -115,9 +115,7 @@ describe("getComments", () => {
     });
     await client.getComments("o", "r", 1);
 
-    expect(calls[0]!.url).toMatch(
-      /^https:\/\/ghes\.example\.com\/api\/v3\//,
-    );
+    expect(calls[0]!.url).toMatch(/^https:\/\/ghes\.example\.com\/api\/v3\//);
   });
 
   it("throws on non-2xx response", async () => {
@@ -303,9 +301,7 @@ describe("renderMarkdown", () => {
       context: "o/r",
     });
 
-    expect(calls[0]!.url).toBe(
-      "https://ghes.example.com/api/v3/markdown",
-    );
+    expect(calls[0]!.url).toBe("https://ghes.example.com/api/v3/markdown");
   });
 
   it("throws on non-2xx response", async () => {
