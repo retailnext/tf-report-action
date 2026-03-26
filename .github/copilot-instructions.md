@@ -146,6 +146,22 @@ each other**.
 
 ---
 
+## Commit and Pull Request Conventions
+
+- **Conventional Commits**: All commit messages must follow the
+  [Conventional Commits](https://www.conventionalcommits.org/) specification.
+  Use a type prefix, optional scope, and imperative subject:
+  `<type>(<scope>): <description>`. Common types: `feat`, `fix`, `refactor`,
+  `test`, `docs`, `chore`, `ci`, `perf`. Breaking changes use `!` after the
+  type/scope (e.g. `refactor(compositor)!: change return type`).
+- **Pull request descriptions**: Lead with user-facing impact — what changes
+  for someone using the action, and what is the scope of those changes.
+  Internal implementation details (refactors, new abstractions, test changes)
+  belong in a secondary section. If there are no user-facing changes, state
+  that explicitly up front.
+
+---
+
 ## Node.js Version Management
 
 The **source of truth** for the project's Node.js major version is the `runs.using`
