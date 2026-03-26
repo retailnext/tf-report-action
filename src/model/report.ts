@@ -104,6 +104,15 @@ export interface Report {
    */
   operation?: "plan" | "apply" | "destroy";
 
+  /**
+   * The outcome of the primary operation step (plan or apply) as recorded
+   * in the GitHub Actions steps context (e.g. "success", "skipped",
+   * "failure"). Only set when the operation was auto-detected from step
+   * presence in `buildReportFromSteps`. Used to distinguish "plan ran and
+   * succeeded" from "plan step was skipped entirely".
+   */
+  operationOutcome?: string;
+
   /** Tool version string from plan JSON (`terraform_version` field). */
   toolVersion?: string;
 

@@ -3467,7 +3467,7 @@ null_resource.baseline
 `;
 
 exports[`reportFromSteps integration — apply-only fixtures > terraform/error-stages/1/apply-only > renders without error and matches snapshot 1`] = `
-"## ❌ Failed
+"## ❌ Apply Failed
 
 ### ❌ \`validate\` failed
 
@@ -3539,7 +3539,7 @@ Exit code: \`1\`
 `;
 
 exports[`reportFromSteps integration — apply-only fixtures > terraform/error-stages/2/apply-only > renders without error and matches snapshot 1`] = `
-"## ✅ Succeeded
+"## ⚠️ Apply Skipped
 
 ### Steps
 
@@ -4700,7 +4700,7 @@ null_resource.baseline
 `;
 
 exports[`reportFromSteps integration — apply-only fixtures > tofu/error-stages/1/apply-only > renders without error and matches snapshot 1`] = `
-"## ❌ Failed
+"## ❌ Apply Failed
 
 ### ❌ \`validate\` failed
 
@@ -4772,7 +4772,7 @@ Exit code: \`1\`
 `;
 
 exports[`reportFromSteps integration — apply-only fixtures > tofu/error-stages/2/apply-only > renders without error and matches snapshot 1`] = `
-"## ✅ Succeeded
+"## ⚠️ Apply Skipped
 
 ### Steps
 
