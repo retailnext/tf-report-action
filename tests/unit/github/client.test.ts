@@ -264,13 +264,59 @@ describe("updateIssue", () => {
 });
 
 // ---------------------------------------------------------------------------
-// Error handling edge cases
+// renderMarkdown
 // ---------------------------------------------------------------------------
 
-describe("error handling", () => {
-  it("throws on invalid JSON in response body", async () => {
-    const { transport } = mockTransport([ok("not json")]);
+describe("renderMarkdown", () => {
+  it("posts to /markdown and returns raw HTML body", async () => {
+    const html = "<p>Hello <strong>world</strong></p>";
+    const { transport, calls } = mockTransport([ok(html)]);
     const client = createGitHubClient({ token: PAT_TOKEN, transport });
-    await expect(client.searchIssues("q")).rejects.toThrow(/invalid JSON/i);
+    const result = await client.renderMarkdown({
+      text: "Hello **world**",
+      mode: "gfm",
+      context: "owner/repo",
+    });
+
+    expect(result).toBe(html);
+    expect(calls).toHaveLength(1);
+    expect(calls[0]!.method).toBe("POST");
+    expect(calls[0]!.url).toBe("https://api.github.com/markdown");
+    expect(calls[0]!.headers["Content-Type"]).toBe("application/json");
+    expect(JSON.parse(calls[0]!.body!)).toEqual({
+      text: "Hello **world**",
+      mode: "gfm",
+      context: "owner/repo",
+    });
+  });
+
+  it("uses configurable baseUrl for markdown endpoint", async () => {
+    const { transport, calls } = mockTransport([ok("<p>ok</p>")]);
+    const client = createGitHubClient({
+      token: PAT_TOKEN,
+      baseUrl: "https://ghes.example.com/api/v3",
+      transport,
+    });
+    await client.renderMarkdown({
+      text: "test",
+      mode: "gfm",
+      context: "o/r",
+    });
+
+    expect(calls[0]!.url).toBe(
+      "https://ghes.example.com/api/v3/markdown",
+    );
+  });
+
+  it("throws on non-2xx response", async () => {
+    const { transport } = mockTransport([err(500, "Internal Server Error")]);
+    const client = createGitHubClient({ token: PAT_TOKEN, transport });
+    await expect(
+      client.renderMarkdown({
+        text: "test",
+        mode: "gfm",
+        context: "o/r",
+      }),
+    ).rejects.toThrow(/500/);
   });
 });

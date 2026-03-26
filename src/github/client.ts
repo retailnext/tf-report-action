@@ -81,6 +81,16 @@ export interface GitHubClient {
     title: string,
     body: string,
   ): Promise<void>;
+  /**
+   * Render Markdown to HTML using GitHub's rendering API.
+   *
+   * Returns raw HTML — the response is `text/html`, not JSON.
+   */
+  renderMarkdown(params: {
+    text: string;
+    mode: "gfm";
+    context: string;
+  }): Promise<string>;
 }
 
 // ---------------------------------------------------------------------------
@@ -241,6 +251,23 @@ export function createGitHubClient(deps: GitHubClientDeps): GitHubClient {
     assertOk(res);
   }
 
+  async function renderMarkdown(params: {
+    text: string;
+    mode: "gfm";
+    context: string;
+  }): Promise<string> {
+    const url = `${apiBase}/markdown`;
+    const res = await transport(
+      "POST",
+      url,
+      withJsonBody(token),
+      JSON.stringify(params),
+    );
+    assertOk(res);
+    // The /markdown endpoint returns raw HTML (text/html), not JSON.
+    return res.body;
+  }
+
   return {
     getComments,
     deleteComment,
@@ -248,5 +275,6 @@ export function createGitHubClient(deps: GitHubClientDeps): GitHubClient {
     searchIssues,
     createIssue,
     updateIssue,
+    renderMarkdown,
   };
 }
