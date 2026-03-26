@@ -1,8 +1,8 @@
 export { createGitHubClient } from "./client.js";
 export type {
   GitHubClient,
+  GitHubClientDeps,
   Comment,
   SearchIssue,
   HttpTransport,
-  HttpResponse,
 } from "./client.js";

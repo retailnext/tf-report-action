@@ -80,7 +80,7 @@ export default tseslint.config(
     },
   },
   {
-    // The action layer may only import from entry points, model, github, and env.
+    // The action layer may only import from entry points, model, github, env, and http.
     // It must not reach into internal library modules.
     files: ["src/action/**/*.ts"],
     rules: {
@@ -103,7 +103,7 @@ export default tseslint.config(
                 "../tfjson/*",
               ],
               message:
-                "The action layer may only import from src/index.js, src/model/, src/github/, and src/env/.",
+                "The action layer may only import from src/index.js, src/model/, src/github/, src/env/, and src/http/.",
             },
           ],
         },
@@ -111,7 +111,7 @@ export default tseslint.config(
     },
   },
   {
-    // The GitHub API client may only import from model (if needed).
+    // The GitHub API client may only import from http/ (for the HttpResponse type).
     // It must not reach into any library internals.
     files: ["src/github/**/*.ts"],
     rules: {
@@ -134,10 +134,43 @@ export default tseslint.config(
                 "../tfjson/*",
                 "../action/*",
                 "../env/*",
+                "../model/*",
                 "../index.js",
               ],
-              message:
-                "The GitHub client may only import from src/model/ (if needed).",
+              message: "The GitHub client may only import from src/http/.",
+            },
+          ],
+        },
+      ],
+    },
+  },
+  {
+    // The HTTP module may only import from env/ (DI abstraction).
+    files: ["src/http/**/*.ts"],
+    rules: {
+      "no-restricted-imports": [
+        "error",
+        {
+          patterns: [
+            {
+              group: [
+                "../builder/*",
+                "../renderer/*",
+                "../compositor/*",
+                "../diff/*",
+                "../flattener/*",
+                "../sensitivity/*",
+                "../raw-formatter/*",
+                "../parser/*",
+                "../steps/*",
+                "../jsonl-scanner/*",
+                "../tfjson/*",
+                "../action/*",
+                "../model/*",
+                "../github/*",
+                "../index.js",
+              ],
+              message: "The HTTP module may only import from src/env/.",
             },
           ],
         },

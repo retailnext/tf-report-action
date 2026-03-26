@@ -23,6 +23,7 @@ interface TrackedClient {
     searchIssues: unknown[][];
     createIssue: unknown[][];
     updateIssue: unknown[][];
+    renderMarkdown: unknown[][];
   };
 }
 
@@ -34,6 +35,7 @@ function mockClient(overrides: Partial<GitHubClient> = {}): TrackedClient {
     searchIssues: [] as unknown[][],
     createIssue: [] as unknown[][],
     updateIssue: [] as unknown[][],
+    renderMarkdown: [] as unknown[][],
   };
 
   const client: GitHubClient = {
@@ -72,6 +74,12 @@ function mockClient(overrides: Partial<GitHubClient> = {}): TrackedClient {
       ((...args) => {
         calls.updateIssue.push(args);
         return Promise.resolve();
+      }),
+    renderMarkdown:
+      overrides.renderMarkdown ??
+      ((...args) => {
+        calls.renderMarkdown.push(args);
+        return Promise.resolve("<p>rendered</p>");
       }),
   };
 

@@ -1,21 +1,15 @@
-import * as https from "node:https";
+import type { HttpResponse } from "../http/index.js";
 
 // ---------------------------------------------------------------------------
 // Types
 // ---------------------------------------------------------------------------
 
-/** Raw HTTP response from the transport layer. */
-export interface HttpResponse {
-  statusCode: number;
-  headers: Record<string, string | string[] | undefined>;
-  body: string;
-}
-
 /**
  * HTTP transport function — injectable for testing.
  *
  * Accepts a method, fully-qualified URL, headers, and optional body string.
- * Returns the raw HTTP response.
+ * Returns the raw HTTP response. The concrete implementation (backed by
+ * `src/http/transport.ts`) is wired in the composition root (`action/main.ts`).
  */
 export type HttpTransport = (
   method: string,
@@ -35,6 +29,22 @@ export interface Comment {
 export interface SearchIssue {
   number: number;
   body: string;
+}
+
+/** Dependencies for creating a GitHub client. */
+export interface GitHubClientDeps {
+  /** GitHub personal access token, `GITHUB_TOKEN`, or GitHub App JWT. */
+  readonly token: string;
+  /**
+   * Base URL for the GitHub REST API.
+   * Defaults to `https://api.github.com`. Set for GHES instances.
+   */
+  readonly baseUrl?: string;
+  /**
+   * HTTP transport function. Inject a mock for unit testing.
+   * The real transport is wired in the composition root.
+   */
+  readonly transport: HttpTransport;
 }
 
 /** GitHub API client interface for DI. */
@@ -71,56 +81,40 @@ export interface GitHubClient {
     title: string,
     body: string,
   ): Promise<void>;
-}
-
-// ---------------------------------------------------------------------------
-// Default HTTPS transport
-// ---------------------------------------------------------------------------
-
-/**
- * Default HTTP transport backed by Node.js `https.request`.
- *
- * Sends the request to the given URL and collects the full response body as a
- * string. Network-level errors are propagated as-is.
- */
-function defaultTransport(
-  method: string,
-  url: string,
-  headers: Record<string, string>,
-  body?: string,
-): Promise<HttpResponse> {
-  return new Promise<HttpResponse>((resolve, reject) => {
-    const req = https.request(url, { method, headers }, (res) => {
-      const chunks: Buffer[] = [];
-      res.on("data", (chunk: Buffer) => chunks.push(chunk));
-      res.on("end", () => {
-        resolve({
-          statusCode: res.statusCode ?? 0,
-          headers: res.headers as Record<string, string | string[] | undefined>,
-          body: Buffer.concat(chunks).toString("utf-8"),
-        });
-      });
-      res.on("error", reject);
-    });
-    req.on("error", reject);
-    if (body !== undefined) {
-      req.write(body);
-    }
-    req.end();
-  });
+  /**
+   * Render Markdown to HTML using GitHub's rendering API.
+   *
+   * Returns raw HTML — the response is `text/html`, not JSON.
+   */
+  renderMarkdown(params: {
+    text: string;
+    mode: "gfm";
+    context: string;
+  }): Promise<string>;
 }
 
 // ---------------------------------------------------------------------------
 // Internal helpers
 // ---------------------------------------------------------------------------
 
-const API_BASE = "https://api.github.com";
+const DEFAULT_BASE_URL = "https://api.github.com";
+
+/**
+ * Determine the auth scheme from the token format.
+ *
+ * GitHub App JWTs have exactly two dots (three base64 segments).
+ * PATs and GITHUB_TOKEN use the `token` scheme.
+ */
+function authScheme(token: string): "bearer" | "token" {
+  return token.split(".").length === 3 ? "bearer" : "token";
+}
 
 function baseHeaders(token: string): Record<string, string> {
   return {
-    Authorization: `Bearer ${token}`,
+    Authorization: `${authScheme(token)} ${token}`,
     "User-Agent": "tf-report-action",
     Accept: "application/vnd.github+json",
+    "X-GitHub-Api-Version": "2022-11-28",
   };
 }
 
@@ -146,13 +140,11 @@ function parseJson(body: string): unknown {
 
 /** Throw if the HTTP status code is outside the 2xx range. */
 function assertOk(res: HttpResponse): void {
-  if (res.statusCode < 200 || res.statusCode > 299) {
-    // Truncate body to avoid leaking sensitive data (e.g. issue bodies
-    // containing plan content) in error messages.
+  if (res.status < 200 || res.status > 299) {
     const preview =
-      res.body.length > 200 ? res.body.slice(0, 200) + "…" : res.body;
+      res.body.length > 200 ? res.body.slice(0, 200) + "\u2026" : res.body;
     throw new Error(
-      `GitHub API request failed with status ${String(res.statusCode)}: ${preview}`,
+      `GitHub API request failed with status ${String(res.status)}: ${preview}`,
     );
   }
 }
@@ -164,14 +156,13 @@ function assertOk(res: HttpResponse): void {
 /**
  * Create a {@link GitHubClient} backed by the GitHub REST API.
  *
- * @param token - GitHub personal access token or `GITHUB_TOKEN`.
- * @param transport - Optional HTTP transport override (defaults to Node.js
- *   `https.request`). Inject a mock here for unit testing.
+ * The `transport` function is the HTTP layer — inject a mock for unit testing,
+ * or wire the real `httpRequest` from `src/http/` in the composition root.
  */
-export function createGitHubClient(
-  token: string,
-  transport: HttpTransport = defaultTransport,
-): GitHubClient {
+export function createGitHubClient(deps: GitHubClientDeps): GitHubClient {
+  const { token, transport } = deps;
+  const apiBase = deps.baseUrl ?? DEFAULT_BASE_URL;
+
   async function getComments(
     owner: string,
     repo: string,
@@ -180,7 +171,7 @@ export function createGitHubClient(
     const all: Comment[] = [];
     let page = 1;
     for (;;) {
-      const url = `${API_BASE}/repos/${owner}/${repo}/issues/${String(issueNumber)}/comments?per_page=100&page=${String(page)}`;
+      const url = `${apiBase}/repos/${owner}/${repo}/issues/${String(issueNumber)}/comments?per_page=100&page=${String(page)}`;
       const res = await transport("GET", url, baseHeaders(token));
       assertOk(res);
       const batch = parseJson(res.body) as Comment[];
@@ -196,7 +187,7 @@ export function createGitHubClient(
     repo: string,
     commentId: number,
   ): Promise<void> {
-    const url = `${API_BASE}/repos/${owner}/${repo}/issues/comments/${String(commentId)}`;
+    const url = `${apiBase}/repos/${owner}/${repo}/issues/comments/${String(commentId)}`;
     const res = await transport("DELETE", url, baseHeaders(token));
     assertOk(res);
   }
@@ -207,7 +198,7 @@ export function createGitHubClient(
     issueNumber: number,
     body: string,
   ): Promise<void> {
-    const url = `${API_BASE}/repos/${owner}/${repo}/issues/${String(issueNumber)}/comments`;
+    const url = `${apiBase}/repos/${owner}/${repo}/issues/${String(issueNumber)}/comments`;
     const res = await transport(
       "POST",
       url,
@@ -218,7 +209,7 @@ export function createGitHubClient(
   }
 
   async function searchIssues(query: string): Promise<SearchIssue[]> {
-    const url = `${API_BASE}/search/issues?q=${encodeURIComponent(query)}`;
+    const url = `${apiBase}/search/issues?q=${encodeURIComponent(query)}`;
     const res = await transport("GET", url, baseHeaders(token));
     assertOk(res);
     const data = parseJson(res.body) as { items: SearchIssue[] };
@@ -231,7 +222,7 @@ export function createGitHubClient(
     title: string,
     body: string,
   ): Promise<number> {
-    const url = `${API_BASE}/repos/${owner}/${repo}/issues`;
+    const url = `${apiBase}/repos/${owner}/${repo}/issues`;
     const res = await transport(
       "POST",
       url,
@@ -250,7 +241,7 @@ export function createGitHubClient(
     title: string,
     body: string,
   ): Promise<void> {
-    const url = `${API_BASE}/repos/${owner}/${repo}/issues/${String(issueNumber)}`;
+    const url = `${apiBase}/repos/${owner}/${repo}/issues/${String(issueNumber)}`;
     const res = await transport(
       "PATCH",
       url,
@@ -260,6 +251,23 @@ export function createGitHubClient(
     assertOk(res);
   }
 
+  async function renderMarkdown(params: {
+    text: string;
+    mode: "gfm";
+    context: string;
+  }): Promise<string> {
+    const url = `${apiBase}/markdown`;
+    const res = await transport(
+      "POST",
+      url,
+      withJsonBody(token),
+      JSON.stringify(params),
+    );
+    assertOk(res);
+    // The /markdown endpoint returns raw HTML (text/html), not JSON.
+    return res.body;
+  }
+
   return {
     getComments,
     deleteComment,
@@ -267,5 +275,6 @@ export function createGitHubClient(
     searchIssues,
     createIssue,
     updateIssue,
+    renderMarkdown,
   };
 }

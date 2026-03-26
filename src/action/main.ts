@@ -13,8 +13,9 @@ import { readFileSync } from "node:fs";
 import type { Env } from "../env/index.js";
 import type { ReportOptions } from "../index.js";
 import { reportFromSteps, buildTruncationNotice } from "../index.js";
-import type { GitHubClient } from "../github/index.js";
+import type { GitHubClient, GitHubClientDeps } from "../github/index.js";
 import { createGitHubClient } from "../github/index.js";
+import { httpRequest } from "../http/index.js";
 import { parseInputs } from "./inputs.js";
 
 // ---------------------------------------------------------------------------
@@ -187,7 +188,7 @@ async function handleIssue(
  */
 export async function run(
   env: Env = process.env as Env,
-  clientFactory: (token: string) => GitHubClient = createGitHubClient,
+  clientFactory: (deps: GitHubClientDeps) => GitHubClient = createGitHubClient,
 ): Promise<void> {
   try {
     const inputs = parseInputs(env);
@@ -207,29 +208,10 @@ export async function run(
       ? `\n---\n\n[View logs](${logsUrl})\n`
       : `\n---\n\n[View logs](${logsUrl}) • Last updated: ${formatTimestamp(new Date())}\n`;
 
-    // Pre-compute the truncation notice to reserve its length in the budget.
-    // The action always uses the logs URL link when truncation occurs.
-    const truncationLink = {
-      url: logsUrl,
-      label: "View full workflow run logs",
-    };
-    const truncationNotice = buildTruncationNotice(truncationLink);
-
-    const maxOutputLength = Math.max(
-      0,
-      COMMENT_LIMIT -
-        footer.length -
-        truncationNotice.length -
-        OVERHEAD_RESERVE,
-    );
-
-    // -----------------------------------------------------------------------
-    // Generate report
-    // -----------------------------------------------------------------------
     const reportOptions: ReportOptions = {
       workspace: inputs.workspace,
       env,
-      maxOutputLength,
+      maxOutputLength: 0, // overridden below
       initStepId: inputs.initStepId,
       validateStepId: inputs.validateStepId,
       planStepId: inputs.planStepId,
@@ -242,10 +224,36 @@ export async function run(
       reportOptions.allowedDirs = [env["RUNNER_TEMP"]];
     }
 
-    const { markdown, wasTruncated } = reportFromSteps(
-      inputs.steps,
-      reportOptions,
+    // Pre-compute the truncation notice so we know its length if needed.
+    // The action always uses the logs URL link when truncation occurs.
+    const truncationLink = {
+      url: logsUrl,
+      label: "View full workflow run logs",
+    };
+    const truncationNotice = buildTruncationNotice(truncationLink);
+
+    // First pass: give the report the full available budget (no truncation
+    // notice reservation). If the report is not truncated, we avoid
+    // needlessly shrinking the budget.
+    const fullBudget = Math.max(
+      0,
+      COMMENT_LIMIT - footer.length - OVERHEAD_RESERVE,
     );
+
+    let { markdown, wasTruncated } = reportFromSteps(inputs.steps, {
+      ...reportOptions,
+      maxOutputLength: fullBudget,
+    });
+
+    // Second pass: if truncated, re-generate with the truncation notice
+    // length reserved so the final output (report + notice + footer) fits.
+    if (wasTruncated) {
+      const reducedBudget = Math.max(0, fullBudget - truncationNotice.length);
+      ({ markdown, wasTruncated } = reportFromSteps(inputs.steps, {
+        ...reportOptions,
+        maxOutputLength: reducedBudget,
+      }));
+    }
 
     // -----------------------------------------------------------------------
     // Build truncation notice if needed
@@ -272,7 +280,18 @@ export async function run(
     const { owner, repo } = repoInfo;
 
     const marker = buildMarker(inputs.workspace);
-    const client = clientFactory(inputs.githubToken);
+    const transport = (
+      method: string,
+      url: string,
+      headers: Record<string, string>,
+      body?: string,
+    ) => httpRequest(method, url, headers, body, { env });
+    const client = clientFactory({
+      token: inputs.githubToken,
+      ...(env["GITHUB_API_URL"] !== undefined &&
+        env["GITHUB_API_URL"] !== "" && { baseUrl: env["GITHUB_API_URL"] }),
+      transport,
+    });
 
     if (isPr) {
       const eventPath = env["GITHUB_EVENT_PATH"] ?? "";

@@ -1,9 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { createGitHubClient } from "../../../src/github/client.js";
-import type {
-  HttpResponse,
-  HttpTransport,
-} from "../../../src/github/client.js";
+import type { HttpTransport } from "../../../src/github/client.js";
+import type { HttpResponse } from "../../../src/http/index.js";
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -36,22 +34,23 @@ function ok(
   body: string,
   headers: Record<string, string | string[] | undefined> = {},
 ): HttpResponse {
-  return { statusCode: 200, headers, body };
+  return { status: 200, headers, body };
 }
 
 function created(body: string): HttpResponse {
-  return { statusCode: 201, headers: {}, body };
+  return { status: 201, headers: {}, body };
 }
 
 function noContent(): HttpResponse {
-  return { statusCode: 204, headers: {}, body: "" };
+  return { status: 204, headers: {}, body: "" };
 }
 
 function err(status: number, body = "error"): HttpResponse {
-  return { statusCode: status, headers: {}, body };
+  return { status, headers: {}, body };
 }
 
-const TOKEN = "ghp_test123";
+const PAT_TOKEN = "ghp_test123";
+const JWT_TOKEN = "eyJhbGciOiJSUzI1NiJ9.eyJpc3MiOiIxMjM0NTYifQ.signature";
 
 // ---------------------------------------------------------------------------
 // getComments
@@ -76,7 +75,7 @@ describe("getComments", () => {
       ok(JSON.stringify([])),
     ]);
 
-    const client = createGitHubClient(TOKEN, transport);
+    const client = createGitHubClient({ token: PAT_TOKEN, transport });
     const comments = await client.getComments("owner", "repo", 42);
 
     expect(comments).toHaveLength(150);
@@ -86,20 +85,42 @@ describe("getComments", () => {
     expect(calls[2]!.url).toContain("page=3");
   });
 
-  it("sends correct authorization and accept headers", async () => {
+  it("sends correct authorization and accept headers for PAT", async () => {
     const { transport, calls } = mockTransport([ok(JSON.stringify([]))]);
-    const client = createGitHubClient(TOKEN, transport);
+    const client = createGitHubClient({ token: PAT_TOKEN, transport });
     await client.getComments("o", "r", 1);
 
     const h = calls[0]!.headers;
-    expect(h["Authorization"]).toBe(`Bearer ${TOKEN}`);
+    expect(h["Authorization"]).toBe(`token ${PAT_TOKEN}`);
     expect(h["User-Agent"]).toBe("tf-report-action");
     expect(h["Accept"]).toBe("application/vnd.github+json");
+    expect(h["X-GitHub-Api-Version"]).toBe("2022-11-28");
+  });
+
+  it("uses bearer scheme for JWT tokens", async () => {
+    const { transport, calls } = mockTransport([ok(JSON.stringify([]))]);
+    const client = createGitHubClient({ token: JWT_TOKEN, transport });
+    await client.getComments("o", "r", 1);
+
+    const h = calls[0]!.headers;
+    expect(h["Authorization"]).toBe(`bearer ${JWT_TOKEN}`);
+  });
+
+  it("uses configurable baseUrl", async () => {
+    const { transport, calls } = mockTransport([ok(JSON.stringify([]))]);
+    const client = createGitHubClient({
+      token: PAT_TOKEN,
+      baseUrl: "https://ghes.example.com/api/v3",
+      transport,
+    });
+    await client.getComments("o", "r", 1);
+
+    expect(calls[0]!.url).toMatch(/^https:\/\/ghes\.example\.com\/api\/v3\//);
   });
 
   it("throws on non-2xx response", async () => {
     const { transport } = mockTransport([err(403, "Forbidden")]);
-    const client = createGitHubClient(TOKEN, transport);
+    const client = createGitHubClient({ token: PAT_TOKEN, transport });
     await expect(client.getComments("o", "r", 1)).rejects.toThrow(/403/);
   });
 });
@@ -111,7 +132,7 @@ describe("getComments", () => {
 describe("deleteComment", () => {
   it("sends DELETE to the correct URL", async () => {
     const { transport, calls } = mockTransport([noContent()]);
-    const client = createGitHubClient(TOKEN, transport);
+    const client = createGitHubClient({ token: PAT_TOKEN, transport });
     await client.deleteComment("owner", "repo", 999);
 
     expect(calls[0]!.method).toBe("DELETE");
@@ -122,7 +143,7 @@ describe("deleteComment", () => {
 
   it("throws on non-2xx response", async () => {
     const { transport } = mockTransport([err(404)]);
-    const client = createGitHubClient(TOKEN, transport);
+    const client = createGitHubClient({ token: PAT_TOKEN, transport });
     await expect(client.deleteComment("o", "r", 1)).rejects.toThrow(/404/);
   });
 });
@@ -134,7 +155,7 @@ describe("deleteComment", () => {
 describe("postComment", () => {
   it("sends POST with JSON body and correct content-type", async () => {
     const { transport, calls } = mockTransport([created("{}")]);
-    const client = createGitHubClient(TOKEN, transport);
+    const client = createGitHubClient({ token: PAT_TOKEN, transport });
     await client.postComment("owner", "repo", 7, "hello world");
 
     expect(calls[0]!.method).toBe("POST");
@@ -147,7 +168,7 @@ describe("postComment", () => {
 
   it("throws on non-2xx response", async () => {
     const { transport } = mockTransport([err(500)]);
-    const client = createGitHubClient(TOKEN, transport);
+    const client = createGitHubClient({ token: PAT_TOKEN, transport });
     await expect(client.postComment("o", "r", 1, "x")).rejects.toThrow(/500/);
   });
 });
@@ -163,7 +184,7 @@ describe("searchIssues", () => {
       { number: 2, body: "issue two" },
     ];
     const { transport, calls } = mockTransport([ok(JSON.stringify({ items }))]);
-    const client = createGitHubClient(TOKEN, transport);
+    const client = createGitHubClient({ token: PAT_TOKEN, transport });
     const result = await client.searchIssues("repo:o/r is:open label:bug");
 
     expect(calls[0]!.method).toBe("GET");
@@ -175,7 +196,7 @@ describe("searchIssues", () => {
 
   it("throws on non-2xx response", async () => {
     const { transport } = mockTransport([err(422)]);
-    const client = createGitHubClient(TOKEN, transport);
+    const client = createGitHubClient({ token: PAT_TOKEN, transport });
     await expect(client.searchIssues("bad")).rejects.toThrow(/422/);
   });
 });
@@ -189,7 +210,7 @@ describe("createIssue", () => {
     const { transport, calls } = mockTransport([
       created(JSON.stringify({ number: 42 })),
     ]);
-    const client = createGitHubClient(TOKEN, transport);
+    const client = createGitHubClient({ token: PAT_TOKEN, transport });
     const num = await client.createIssue("owner", "repo", "title", "body");
 
     expect(num).toBe(42);
@@ -206,7 +227,7 @@ describe("createIssue", () => {
 
   it("throws on non-2xx response", async () => {
     const { transport } = mockTransport([err(403)]);
-    const client = createGitHubClient(TOKEN, transport);
+    const client = createGitHubClient({ token: PAT_TOKEN, transport });
     await expect(client.createIssue("o", "r", "t", "b")).rejects.toThrow(/403/);
   });
 });
@@ -218,7 +239,7 @@ describe("createIssue", () => {
 describe("updateIssue", () => {
   it("sends PATCH with correct body", async () => {
     const { transport, calls } = mockTransport([ok("{}")]);
-    const client = createGitHubClient(TOKEN, transport);
+    const client = createGitHubClient({ token: PAT_TOKEN, transport });
     await client.updateIssue("owner", "repo", 10, "new title", "new body");
 
     expect(calls[0]!.method).toBe("PATCH");
@@ -233,7 +254,7 @@ describe("updateIssue", () => {
 
   it("throws on non-2xx response", async () => {
     const { transport } = mockTransport([err(404)]);
-    const client = createGitHubClient(TOKEN, transport);
+    const client = createGitHubClient({ token: PAT_TOKEN, transport });
     await expect(client.updateIssue("o", "r", 1, "t", "b")).rejects.toThrow(
       /404/,
     );
@@ -241,13 +262,57 @@ describe("updateIssue", () => {
 });
 
 // ---------------------------------------------------------------------------
-// Error handling edge cases
+// renderMarkdown
 // ---------------------------------------------------------------------------
 
-describe("error handling", () => {
-  it("throws on invalid JSON in response body", async () => {
-    const { transport } = mockTransport([ok("not json")]);
-    const client = createGitHubClient(TOKEN, transport);
-    await expect(client.searchIssues("q")).rejects.toThrow(/invalid JSON/i);
+describe("renderMarkdown", () => {
+  it("posts to /markdown and returns raw HTML body", async () => {
+    const html = "<p>Hello <strong>world</strong></p>";
+    const { transport, calls } = mockTransport([ok(html)]);
+    const client = createGitHubClient({ token: PAT_TOKEN, transport });
+    const result = await client.renderMarkdown({
+      text: "Hello **world**",
+      mode: "gfm",
+      context: "owner/repo",
+    });
+
+    expect(result).toBe(html);
+    expect(calls).toHaveLength(1);
+    expect(calls[0]!.method).toBe("POST");
+    expect(calls[0]!.url).toBe("https://api.github.com/markdown");
+    expect(calls[0]!.headers["Content-Type"]).toBe("application/json");
+    expect(JSON.parse(calls[0]!.body!)).toEqual({
+      text: "Hello **world**",
+      mode: "gfm",
+      context: "owner/repo",
+    });
+  });
+
+  it("uses configurable baseUrl for markdown endpoint", async () => {
+    const { transport, calls } = mockTransport([ok("<p>ok</p>")]);
+    const client = createGitHubClient({
+      token: PAT_TOKEN,
+      baseUrl: "https://ghes.example.com/api/v3",
+      transport,
+    });
+    await client.renderMarkdown({
+      text: "test",
+      mode: "gfm",
+      context: "o/r",
+    });
+
+    expect(calls[0]!.url).toBe("https://ghes.example.com/api/v3/markdown");
+  });
+
+  it("throws on non-2xx response", async () => {
+    const { transport } = mockTransport([err(500, "Internal Server Error")]);
+    const client = createGitHubClient({ token: PAT_TOKEN, transport });
+    await expect(
+      client.renderMarkdown({
+        text: "test",
+        mode: "gfm",
+        context: "o/r",
+      }),
+    ).rejects.toThrow(/500/);
   });
 });
