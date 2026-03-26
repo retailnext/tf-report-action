@@ -12,7 +12,7 @@
 import { readFileSync } from "node:fs";
 import type { Env } from "../env/index.js";
 import type { ReportOptions } from "../index.js";
-import { reportFromSteps } from "../index.js";
+import { reportFromSteps, buildTruncationNotice } from "../index.js";
 import type { GitHubClient } from "../github/index.js";
 import { createGitHubClient } from "../github/index.js";
 import { parseInputs } from "./inputs.js";
@@ -207,9 +207,20 @@ export async function run(
       ? `\n---\n\n[View logs](${logsUrl})\n`
       : `\n---\n\n[View logs](${logsUrl}) • Last updated: ${formatTimestamp(new Date())}\n`;
 
+    // Pre-compute the truncation notice to reserve its length in the budget.
+    // The action always uses the logs URL link when truncation occurs.
+    const truncationLink = {
+      url: logsUrl,
+      label: "View full workflow run logs",
+    };
+    const truncationNotice = buildTruncationNotice(truncationLink);
+
     const maxOutputLength = Math.max(
       0,
-      COMMENT_LIMIT - footer.length - OVERHEAD_RESERVE,
+      COMMENT_LIMIT -
+        footer.length -
+        truncationNotice.length -
+        OVERHEAD_RESERVE,
     );
 
     // -----------------------------------------------------------------------
@@ -231,12 +242,24 @@ export async function run(
       reportOptions.allowedDirs = [env["RUNNER_TEMP"]];
     }
 
-    const report = reportFromSteps(inputs.steps, reportOptions);
+    const { markdown, wasTruncated } = reportFromSteps(
+      inputs.steps,
+      reportOptions,
+    );
+
+    // -----------------------------------------------------------------------
+    // Build truncation notice if needed
+    // -----------------------------------------------------------------------
+    let reportBody = markdown;
+
+    if (wasTruncated) {
+      reportBody += truncationNotice;
+    }
 
     // -----------------------------------------------------------------------
     // Construct full comment body
     // -----------------------------------------------------------------------
-    const body = report + footer;
+    const body = reportBody + footer;
 
     // -----------------------------------------------------------------------
     // Post via GitHub API

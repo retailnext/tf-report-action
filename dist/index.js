@@ -3243,44 +3243,73 @@ function composeSections(sections, budget) {
       remaining -= section.full.length;
     }
   }
+  const allocations = [];
+  for (const section of sections) {
+    if (section.fixed === true) {
+      allocations.push("full");
+      continue;
+    }
+    if (section.compact !== void 0) {
+      if (section.compact.length <= remaining) {
+        allocations.push("compact");
+        remaining -= section.compact.length;
+      } else {
+        allocations.push("omitted");
+      }
+    } else {
+      if (section.full.length <= remaining) {
+        allocations.push("full");
+        remaining -= section.full.length;
+      } else {
+        allocations.push("omitted");
+      }
+    }
+  }
+  for (let i = 0; i < sections.length; i++) {
+    const alloc = allocations[i];
+    if (alloc !== "compact") continue;
+    const section = sections[i];
+    if (section === void 0) continue;
+    const delta = section.full.length - (section.compact?.length ?? 0);
+    if (delta <= remaining) {
+      allocations[i] = "full";
+      remaining -= delta;
+    }
+  }
   const degradedIds = [];
   const omittedIds = [];
   const parts = [];
-  for (const section of sections) {
-    if (section.fixed === true) {
+  for (let i = 0; i < sections.length; i++) {
+    const section = sections[i];
+    const alloc = allocations[i];
+    if (section === void 0 || alloc === void 0) continue;
+    if (alloc === "full") {
       parts.push(section.full);
-      continue;
-    }
-    if (section.full.length <= remaining) {
-      parts.push(section.full);
-      remaining -= section.full.length;
-      continue;
-    }
-    if (section.compact !== void 0 && section.compact.length <= remaining) {
+    } else if (alloc === "compact" && section.compact !== void 0) {
       parts.push(section.compact);
-      remaining -= section.compact.length;
       degradedIds.push(section.id);
-      continue;
+    } else {
+      omittedIds.push(section.id);
     }
-    omittedIds.push(section.id);
   }
   return {
     output: parts.join(""),
     degradedCount: degradedIds.length,
     omittedCount: omittedIds.length,
     degradedIds,
-    omittedIds
+    omittedIds,
+    wasTruncated: degradedIds.length > 0 || omittedIds.length > 0
   };
 }
 
 // src/compositor/truncation.ts
-function buildTruncationNotice(logsUrl) {
-  if (logsUrl !== void 0) {
+function buildTruncationNotice(link) {
+  if (link !== void 0) {
     return `
 ---
 
 > ${DIAGNOSTIC_WARNING} **Output truncated** \u2014 some details were shortened or omitted to fit within the comment size limit.
-> [View full workflow run logs](${logsUrl})
+> [${link.label}](${link.url})
 `;
   }
   return `
@@ -3293,10 +3322,19 @@ function buildTruncationNotice(logsUrl) {
 // src/index.ts
 function reportFromSteps(stepsJson, options) {
   try {
-    return reportFromStepsInner(stepsJson, options);
+    const maxOutputLength = options?.maxOutputLength ?? DEFAULT_MAX_OUTPUT_LENGTH;
+    const report = buildReportFromSteps(stepsJson, options);
+    const sections = renderReportSections(report, options);
+    const fullMarkdown = sections.map((s) => s.full).join("");
+    const result = composeSections(sections, maxOutputLength);
+    return {
+      markdown: result.output,
+      fullMarkdown,
+      wasTruncated: result.wasTruncated
+    };
   } catch (err) {
     const message = err instanceof Error ? err.message : "Unknown error";
-    return `## ${STATUS_FAILURE} Report Generation Failed
+    const errorMarkdown = `## ${STATUS_FAILURE} Report Generation Failed
 
 An unexpected error occurred while generating the report:
 
@@ -3304,23 +3342,12 @@ An unexpected error occurred while generating the report:
 ${message}
 \`\`\`
 `;
+    return {
+      markdown: errorMarkdown,
+      fullMarkdown: errorMarkdown,
+      wasTruncated: false
+    };
   }
-}
-function reportFromStepsInner(stepsJson, options) {
-  const maxOutputLength = options?.maxOutputLength ?? DEFAULT_MAX_OUTPUT_LENGTH;
-  const report = buildReportFromSteps(stepsJson, options);
-  const sections = renderReportSections(report, options);
-  const logsUrl = getLogsUrl(report);
-  const truncationNotice = buildTruncationNotice(logsUrl);
-  const composeBudget = maxOutputLength - truncationNotice.length;
-  const result = composeSections(sections, composeBudget);
-  if (result.degradedCount > 0 || result.omittedCount > 0) {
-    return result.output + truncationNotice;
-  }
-  return result.output;
-}
-function getLogsUrl(report) {
-  return report.logsUrl;
 }
 
 // src/github/client.ts
@@ -3565,9 +3592,14 @@ async function run(env = process.env, clientFactory = createGitHubClient) {
 
 [View logs](${logsUrl}) \u2022 Last updated: ${formatTimestamp(/* @__PURE__ */ new Date())}
 `;
+    const truncationLink = {
+      url: logsUrl,
+      label: "View full workflow run logs"
+    };
+    const truncationNotice = buildTruncationNotice(truncationLink);
     const maxOutputLength = Math.max(
       0,
-      COMMENT_LIMIT - footer.length - OVERHEAD_RESERVE
+      COMMENT_LIMIT - footer.length - truncationNotice.length - OVERHEAD_RESERVE
     );
     const reportOptions = {
       workspace: inputs.workspace,
@@ -3583,8 +3615,15 @@ async function run(env = process.env, clientFactory = createGitHubClient) {
     if (env["RUNNER_TEMP"] !== void 0 && env["RUNNER_TEMP"] !== "") {
       reportOptions.allowedDirs = [env["RUNNER_TEMP"]];
     }
-    const report = reportFromSteps(inputs.steps, reportOptions);
-    const body = report + footer;
+    const { markdown, wasTruncated } = reportFromSteps(
+      inputs.steps,
+      reportOptions
+    );
+    let reportBody = markdown;
+    if (wasTruncated) {
+      reportBody += truncationNotice;
+    }
+    const body = reportBody + footer;
     const repoInfo = parseRepo(env);
     if (repoInfo === void 0) {
       console.log("GITHUB_REPOSITORY not set, skipping API calls");

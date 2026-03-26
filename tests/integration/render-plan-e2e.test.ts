@@ -141,7 +141,7 @@ function renderFixtureInProcess(stepsJson: string, fixtureDir: string): string {
   return reportFromSteps(resolved, {
     allowedDirs: [fixtureDir],
     env: NO_GITHUB_ENV,
-  });
+  }).markdown;
 }
 
 describe("reportFromSteps — generated steps fixtures (full plan+apply)", () => {
@@ -259,7 +259,7 @@ describe("reportFromSteps — manual error fixtures", () => {
       const result = reportFromSteps(fixture.stepsJson, {
         allowedDirs: [fixture.fixtureDir],
         env: NO_GITHUB_ENV,
-      });
+      }).markdown;
       expect(result.length).toBeGreaterThan(50);
       // Should explain why output wasn't available
       expect(result).toMatch(
@@ -271,7 +271,7 @@ describe("reportFromSteps — manual error fixtures", () => {
       const result = reportFromSteps(fixture.stepsJson, {
         allowedDirs: [fixture.fixtureDir],
         env: NO_GITHUB_ENV,
-      });
+      }).markdown;
       // Should show step outcomes
       expect(result).toContain("Steps");
       expect(result).toContain("show-plan");
@@ -282,7 +282,7 @@ describe("reportFromSteps — manual error fixtures", () => {
       const result = reportFromSteps(fixture.stepsJson, {
         allowedDirs: [fixture.fixtureDir],
         env: NO_GITHUB_ENV,
-      });
+      }).markdown;
       expect(result).not.toContain("Showing raw command output");
     });
   });
@@ -294,7 +294,7 @@ describe("reportFromSteps — manual error fixtures", () => {
       const result = reportFromSteps(fixture.stepsJson, {
         allowedDirs: [fixture.fixtureDir],
         env: NO_GITHUB_ENV,
-      });
+      }).markdown;
       expect(result.length).toBeGreaterThan(50);
     });
 
@@ -302,7 +302,7 @@ describe("reportFromSteps — manual error fixtures", () => {
       const result = reportFromSteps(fixture.stepsJson, {
         allowedDirs: [fixture.fixtureDir],
         env: NO_GITHUB_ENV,
-      });
+      }).markdown;
       expect(result).toContain("Steps");
       expect(result).toContain("show-plan");
     });
@@ -311,7 +311,7 @@ describe("reportFromSteps — manual error fixtures", () => {
       const result = reportFromSteps(fixture.stepsJson, {
         allowedDirs: [fixture.fixtureDir],
         env: NO_GITHUB_ENV,
-      });
+      }).markdown;
       // Read errors are shown as standalone warning sections
       expect(result).toContain("stdout_file output missing in steps");
     });
@@ -328,7 +328,7 @@ describe("reportFromSteps — manual error fixtures", () => {
       const result = reportFromSteps(resolved, {
         allowedDirs: [fixture.fixtureDir],
         env: NO_GITHUB_ENV,
-      });
+      }).markdown;
       expect(result.length).toBeGreaterThan(50);
       // Should indicate a processing error
       expect(result).toMatch(/error|fail/i);
@@ -346,7 +346,7 @@ describe("reportFromSteps — manual error fixtures", () => {
       const result = reportFromSteps(resolved, {
         allowedDirs: [fixture.fixtureDir],
         env: NO_GITHUB_ENV,
-      });
+      }).markdown;
       expect(result.length).toBeGreaterThan(20);
       // Should list the steps it found
       expect(result).toContain("Step");
@@ -376,7 +376,7 @@ describe("reportFromSteps — manual error fixtures", () => {
           GITHUB_RUN_ATTEMPT: "1",
         },
         allowedDirs: [fixture.fixtureDir],
-      });
+      }).markdown;
       const body = buildFullBody(result, true);
       // Count occurrences of the logs URL — catches any link text variant
       const urlCount = body.split(LOGS_URL).length - 1;
@@ -395,7 +395,7 @@ describe("reportFromSteps — manual error fixtures", () => {
           GITHUB_RUN_ATTEMPT: "1",
         },
         allowedDirs: [fixture.fixtureDir],
-      });
+      }).markdown;
       const body = buildFullBody(result, false);
       const urlCount = body.split(LOGS_URL).length - 1;
       expect(
@@ -413,7 +413,7 @@ describe("reportFromSteps — manual error fixtures", () => {
           GITHUB_RUN_ATTEMPT: "1",
         },
         allowedDirs: [fixture.fixtureDir],
-      });
+      }).markdown;
       expect(result).not.toContain("[View workflow run logs]");
     });
   });
@@ -429,7 +429,7 @@ describe("reportFromSteps — manual error fixtures", () => {
       const result = reportFromSteps(resolved, {
         allowedDirs: [fixture.fixtureDir],
         env: NO_GITHUB_ENV,
-      });
+      }).markdown;
       expect(result).toContain("build");
       expect(result).toContain("warning: deprecated API usage");
     });
@@ -442,7 +442,7 @@ describe("reportFromSteps — manual error fixtures", () => {
       const result = reportFromSteps(resolved, {
         allowedDirs: [fixture.fixtureDir],
         env: NO_GITHUB_ENV,
-      });
+      }).markdown;
       // The heading uses the DIAGNOSTIC_WARNING icon and includes outcome
       expect(result).toContain("`build` success");
     });
@@ -456,7 +456,7 @@ describe("reportFromSteps — manual error fixtures", () => {
         allowedDirs: [fixture.fixtureDir],
         env: NO_GITHUB_ENV,
         maxDisplayRead: 1,
-      });
+      }).markdown;
       expect(result).toContain("… (truncated)");
     });
   });
@@ -470,7 +470,7 @@ describe("reportFromSteps — manual error fixtures", () => {
       const result = reportFromSteps(fixture.stepsJson, {
         allowedDirs: [fixture.fixtureDir],
         env: NO_GITHUB_ENV,
-      });
+      }).markdown;
       expect(result).toMatch(/stdout not available/i);
     });
 
@@ -478,7 +478,7 @@ describe("reportFromSteps — manual error fixtures", () => {
       const result = reportFromSteps(fixture.stepsJson, {
         allowedDirs: [fixture.fixtureDir],
         env: NO_GITHUB_ENV,
-      });
+      }).markdown;
       expect(result).toMatch(/stderr not available/i);
     });
   });

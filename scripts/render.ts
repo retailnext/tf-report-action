@@ -364,7 +364,7 @@ if (gallery) {
     };
 
     try {
-      const md = reportFromSteps(json, opts);
+      const md = reportFromSteps(json, opts).markdown;
       entries.push({ path: relPath, markdown: md });
     } catch {
       entries.push({
@@ -799,6 +799,6 @@ if (!gallery) {
     stepsJson = resolveRelativeFilePaths(stepsJson, stepsDir, join, isAbsolute);
   }
 
-  const markdown = reportFromSteps(stepsJson, stepsOpts);
+  const markdown = reportFromSteps(stepsJson, stepsOpts).markdown;
   await writeOutput(markdown, options.title, format, output, effectiveNoOpen);
 }
