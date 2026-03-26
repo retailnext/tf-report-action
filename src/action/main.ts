@@ -208,29 +208,10 @@ export async function run(
       ? `\n---\n\n[View logs](${logsUrl})\n`
       : `\n---\n\n[View logs](${logsUrl}) • Last updated: ${formatTimestamp(new Date())}\n`;
 
-    // Pre-compute the truncation notice to reserve its length in the budget.
-    // The action always uses the logs URL link when truncation occurs.
-    const truncationLink = {
-      url: logsUrl,
-      label: "View full workflow run logs",
-    };
-    const truncationNotice = buildTruncationNotice(truncationLink);
-
-    const maxOutputLength = Math.max(
-      0,
-      COMMENT_LIMIT -
-        footer.length -
-        truncationNotice.length -
-        OVERHEAD_RESERVE,
-    );
-
-    // -----------------------------------------------------------------------
-    // Generate report
-    // -----------------------------------------------------------------------
     const reportOptions: ReportOptions = {
       workspace: inputs.workspace,
       env,
-      maxOutputLength,
+      maxOutputLength: 0, // overridden below
       initStepId: inputs.initStepId,
       validateStepId: inputs.validateStepId,
       planStepId: inputs.planStepId,
@@ -243,10 +224,36 @@ export async function run(
       reportOptions.allowedDirs = [env["RUNNER_TEMP"]];
     }
 
-    const { markdown, wasTruncated } = reportFromSteps(
-      inputs.steps,
-      reportOptions,
+    // Pre-compute the truncation notice so we know its length if needed.
+    // The action always uses the logs URL link when truncation occurs.
+    const truncationLink = {
+      url: logsUrl,
+      label: "View full workflow run logs",
+    };
+    const truncationNotice = buildTruncationNotice(truncationLink);
+
+    // First pass: give the report the full available budget (no truncation
+    // notice reservation). If the report is not truncated, we avoid
+    // needlessly shrinking the budget.
+    const fullBudget = Math.max(
+      0,
+      COMMENT_LIMIT - footer.length - OVERHEAD_RESERVE,
     );
+
+    let { markdown, wasTruncated } = reportFromSteps(inputs.steps, {
+      ...reportOptions,
+      maxOutputLength: fullBudget,
+    });
+
+    // Second pass: if truncated, re-generate with the truncation notice
+    // length reserved so the final output (report + notice + footer) fits.
+    if (wasTruncated) {
+      const reducedBudget = Math.max(0, fullBudget - truncationNotice.length);
+      ({ markdown, wasTruncated } = reportFromSteps(inputs.steps, {
+        ...reportOptions,
+        maxOutputLength: reducedBudget,
+      }));
+    }
 
     // -----------------------------------------------------------------------
     // Build truncation notice if needed

@@ -123,11 +123,13 @@ function proxyPlainRequest(
   headers: Record<string, string>,
   body?: string,
 ): Promise<HttpResponse> {
+  const proxyTransport = proxyUrl.protocol === "https:" ? https : http;
+  const defaultPort = proxyUrl.protocol === "https:" ? 443 : 80;
   return new Promise<HttpResponse>((resolve, reject) => {
-    const req = http.request(
+    const req = proxyTransport.request(
       {
         hostname: proxyUrl.hostname,
-        port: proxyUrl.port || 80,
+        port: proxyUrl.port || defaultPort,
         method,
         path: target.href,
         headers,
@@ -157,17 +159,32 @@ function tunnelRequest(
 ): Promise<HttpResponse> {
   const targetHost = target.hostname;
   const targetPort = target.port || "443";
+  const proxyTransport = proxyUrl.protocol === "https:" ? https : http;
+  const defaultProxyPort = proxyUrl.protocol === "https:" ? 443 : 80;
 
   return new Promise<HttpResponse>((resolve, reject) => {
     // Step 1: Open a CONNECT tunnel through the proxy.
-    const connectReq = http.request({
+    const connectReq = proxyTransport.request({
       hostname: proxyUrl.hostname,
-      port: proxyUrl.port || 80,
+      port: proxyUrl.port || defaultProxyPort,
       method: "CONNECT",
       path: `${targetHost}:${targetPort}`,
     });
 
-    connectReq.on("connect", (_res, socket) => {
+    connectReq.on("connect", (connectRes, socket) => {
+      // Validate the CONNECT response before proceeding.
+      const connectStatus = connectRes.statusCode ?? 0;
+      if (connectStatus !== 200) {
+        socket.destroy();
+        reject(
+          new ActionsError(
+            `Proxy CONNECT failed with status ${String(connectStatus)}`,
+            connectStatus,
+          ),
+        );
+        return;
+      }
+
       // Step 2: Establish TLS over the tunnel socket.
       const tlsSocket = tls.connect(
         {

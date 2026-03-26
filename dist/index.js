@@ -3467,6 +3467,15 @@ function createGitHubClient(deps) {
   };
 }
 
+// src/http/errors.ts
+var ActionsError = class extends Error {
+  constructor(message, statusCode) {
+    super(message);
+    this.statusCode = statusCode;
+    this.name = "ActionsError";
+  }
+};
+
 // src/http/proxy.ts
 function isLoopbackAddress(host) {
   const lower = host.toLowerCase();
@@ -3557,11 +3566,13 @@ function directRequest(method, target, headers, body) {
   });
 }
 function proxyPlainRequest(method, target, proxyUrl, headers, body) {
+  const proxyTransport = proxyUrl.protocol === "https:" ? https : http;
+  const defaultPort = proxyUrl.protocol === "https:" ? 443 : 80;
   return new Promise((resolve2, reject) => {
-    const req = http.request(
+    const req = proxyTransport.request(
       {
         hostname: proxyUrl.hostname,
-        port: proxyUrl.port || 80,
+        port: proxyUrl.port || defaultPort,
         method,
         path: target.href,
         headers
@@ -3580,14 +3591,27 @@ function proxyPlainRequest(method, target, proxyUrl, headers, body) {
 function tunnelRequest(method, target, proxyUrl, headers, body) {
   const targetHost = target.hostname;
   const targetPort = target.port || "443";
+  const proxyTransport = proxyUrl.protocol === "https:" ? https : http;
+  const defaultProxyPort = proxyUrl.protocol === "https:" ? 443 : 80;
   return new Promise((resolve2, reject) => {
-    const connectReq = http.request({
+    const connectReq = proxyTransport.request({
       hostname: proxyUrl.hostname,
-      port: proxyUrl.port || 80,
+      port: proxyUrl.port || defaultProxyPort,
       method: "CONNECT",
       path: `${targetHost}:${targetPort}`
     });
-    connectReq.on("connect", (_res, socket) => {
+    connectReq.on("connect", (connectRes, socket) => {
+      const connectStatus = connectRes.statusCode ?? 0;
+      if (connectStatus !== 200) {
+        socket.destroy();
+        reject(
+          new ActionsError(
+            `Proxy CONNECT failed with status ${String(connectStatus)}`,
+            connectStatus
+          )
+        );
+        return;
+      }
       const tlsSocket = tls.connect(
         {
           socket,
@@ -3756,19 +3780,11 @@ async function run(env = process.env, clientFactory = createGitHubClient) {
 
 [View logs](${logsUrl}) \u2022 Last updated: ${formatTimestamp(/* @__PURE__ */ new Date())}
 `;
-    const truncationLink = {
-      url: logsUrl,
-      label: "View full workflow run logs"
-    };
-    const truncationNotice = buildTruncationNotice(truncationLink);
-    const maxOutputLength = Math.max(
-      0,
-      COMMENT_LIMIT - footer.length - truncationNotice.length - OVERHEAD_RESERVE
-    );
     const reportOptions = {
       workspace: inputs.workspace,
       env,
-      maxOutputLength,
+      maxOutputLength: 0,
+      // overridden below
       initStepId: inputs.initStepId,
       validateStepId: inputs.validateStepId,
       planStepId: inputs.planStepId,
@@ -3779,10 +3795,26 @@ async function run(env = process.env, clientFactory = createGitHubClient) {
     if (env["RUNNER_TEMP"] !== void 0 && env["RUNNER_TEMP"] !== "") {
       reportOptions.allowedDirs = [env["RUNNER_TEMP"]];
     }
-    const { markdown, wasTruncated } = reportFromSteps(
-      inputs.steps,
-      reportOptions
+    const truncationLink = {
+      url: logsUrl,
+      label: "View full workflow run logs"
+    };
+    const truncationNotice = buildTruncationNotice(truncationLink);
+    const fullBudget = Math.max(
+      0,
+      COMMENT_LIMIT - footer.length - OVERHEAD_RESERVE
     );
+    let { markdown, wasTruncated } = reportFromSteps(inputs.steps, {
+      ...reportOptions,
+      maxOutputLength: fullBudget
+    });
+    if (wasTruncated) {
+      const reducedBudget = Math.max(0, fullBudget - truncationNotice.length);
+      ({ markdown, wasTruncated } = reportFromSteps(inputs.steps, {
+        ...reportOptions,
+        maxOutputLength: reducedBudget
+      }));
+    }
     let reportBody = markdown;
     if (wasTruncated) {
       reportBody += truncationNotice;

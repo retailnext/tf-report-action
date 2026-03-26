@@ -121,9 +121,9 @@ each other**.
 
 ### Layer 6 — Action (depends on Layers 0–5)
 
-| Module        | Responsibility                                                                                                                                                                                                       |
-| ------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `src/action/` | Action entry point and composition root. Parses `INPUT_*` env vars, wires HTTP transport into GitHub client, calls `reportFromSteps()`, posts results via GitHub API. Only module that reads `process.env` directly. |
+| Module        | Responsibility                                                                                                                                                                                                                                                                            |
+| ------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `src/action/` | Action entry point and composition root. Parses `INPUT_*` env vars, wires HTTP transport into GitHub client, calls `reportFromSteps()`, posts results via GitHub API. Entry-point layer is allowed to read `process.env` directly; lower layers should consume an injected `Env` instead. |
 
 **Dependency rules (layered — import only from same or lower layer):**
 
