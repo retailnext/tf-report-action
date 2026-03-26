@@ -23,6 +23,31 @@ The action entry point (`src/action/main.ts`) orchestrates input parsing, calls
 
 ---
 
+## Session Bootstrap (mandatory first action)
+
+Before **any** other work — including planning, investigation, reading files, or
+delegating to sub-agents — you must verify the Node.js version:
+
+1. Read `.node-version` to determine the required major version.
+2. Run `node --version` and compare.
+3. If the major version does not match, **find and activate the correct version**
+   before doing anything else. Search common locations and version managers:
+   - Homebrew: `/opt/homebrew/opt/node@<major>/bin/` or `/usr/local/opt/node@<major>/bin/`
+   - Version managers: `nvm`, `fnm`, `volta`, `mise`, `asdf`
+   - Other: `which -a node`, `ls /usr/local/bin/node*`
+
+   Once found, fix PATH in your shell session and re-verify with `node --version`.
+4. **Do not** run any `npm`, `node`, or `npx` command until verification succeeds.
+5. **Do not** delegate to any sub-agent (explore, task, general-purpose) that might
+   run `node`/`npm`/`npx` until verification succeeds. When delegating after
+   verification, include the PATH export command in the sub-agent prompt so it
+   uses the same version.
+
+This is a **blocking prerequisite**. No exceptions. If Node.js at the required major
+version cannot be found, stop and tell the user.
+
+---
+
 ## Module Boundaries
 
 The source is organized into layered modules with narrow, single-responsibility scopes.
@@ -35,6 +60,7 @@ Follow these boundaries strictly — do not add cross-cutting logic.
 | `src/tfjson/` | Type definitions for the plan JSON wire format and machine-readable UI log format. **Never modify** files copied from tfplanjson; new type files may be added.                        |
 | `src/model/`  | Shared TypeScript interfaces and constants: `Report`, `ResourceChange`, `StepIssue`, `StepOutcome`, `Section`, `CompositionResult`, sentinels, status icons. **No executable logic.** |
 | `src/env/`    | `Env` type alias (`Record<string, string \| undefined>`). DI abstraction over `process.env`.                                                                                          |
+| `src/http/`   | HTTP primitives: `ActionsError`, exponential-backoff retry, proxy detection (matching `@actions/http-client`), `node:http`/`node:https` transport with CONNECT tunneling.             |
 
 ### Layer 1 — Pure algorithms (depend only on Layer 0)
 
@@ -52,6 +78,7 @@ Follow these boundaries strictly — do not add cross-cutting logic.
 | ------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `src/parser/` | Parse Terraform/OpenTofu formats: plan JSON, state JSON (raw tfstate from `state pull`), apply JSONL, validate output.                                                                               |
 | `src/steps/`  | GitHub Actions steps context: parsing, secure file reading, step-data-aware I/O wrappers, outcome helpers. This is the I/O boundary between the external world and the pure transformation pipeline. |
+| `src/github/` | GitHub REST API client with DI HTTP transport. Comment CRUD, issue search/create/update, pagination, markdown rendering. No domain model dependency.                                                 |
 
 ### Layer 3 — Business logic (depend on Layers 0–2)
 
@@ -93,10 +120,9 @@ each other**.
 
 ### Layer 6 — Action (depends on Layers 0–5)
 
-| Module        | Responsibility                                                                                                                                                   |
-| ------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `src/action/` | Action entry point. Parses `INPUT_*` env vars, calls `reportFromSteps()`, posts results via GitHub API. Only module allowed to reference `process.env` directly. |
-| `src/github/` | GitHub REST API client with DI HTTP transport. Comment CRUD, issue search/create/update, pagination. No direct model dependency beyond types.                    |
+| Module        | Responsibility                                                                                                                                                                                         |
+| ------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `src/action/` | Action entry point and composition root. Parses `INPUT_*` env vars, wires HTTP transport into GitHub client, calls `reportFromSteps()`, posts results via GitHub API. Only module that reads `process.env` directly. |
 
 **Dependency rules (layered — import only from same or lower layer):**
 
@@ -108,14 +134,15 @@ each other**.
 | `raw-formatter/` | _(nothing)_                                                                            |
 | `jsonl-scanner/` | `tfjson/`                                                                              |
 | `env/`           | _(nothing)_                                                                            |
+| `http/`          | `env/`                                                                                 |
 | `parser/`        | `tfjson/`                                                                              |
 | `steps/`         | `env/`                                                                                 |
+| `github/`        | `http/` (types only — transport function is injected)                                  |
 | `builder/`       | `tfjson/`, `flattener/`, `sensitivity/`, `steps/`, `env/`, `parser/`, `jsonl-scanner/` |
 | `compositor/`    | _(nothing)_                                                                            |
 | `renderer/`      | `diff/`, `raw-formatter/`                                                              |
 | `index.ts`       | `parser/`, `builder/`, `renderer/`, `compositor/`, `steps/`, `env/`                    |
-| `action/`        | `index.ts`, `model/`, `github/`, `env/`                                                |
-| `github/`        | `model/` only                                                                          |
+| `action/`        | `index.ts`, `model/`, `github/`, `env/`, `http/`                                       |
 
 **Additional constraints:**
 
@@ -143,6 +170,13 @@ each other**.
 - **No unnecessary comments**: do not write comments that simply restate the code.
 - **Error handling**: use descriptive `Error` messages with enough context to diagnose
   the problem (e.g. include the invalid value and what was expected).
+- **Dependency injection over mocking**: modules that perform I/O (HTTP requests,
+  file reads, environment access) must accept their dependencies as parameters
+  (functions, objects, or `Env`) rather than importing and calling concrete
+  implementations directly. This keeps modules unit-testable by injecting fakes —
+  prefer constructor/factory injection over `vi.mock()` or module-level monkey
+  patching. Composition roots (`src/action/main.ts`) wire the concrete
+  implementations.
 
 ---
 
@@ -183,19 +217,21 @@ expectations from `action.yml` and fails if any file is out of sync. When upgrad
 Node.js, update `action.yml` first, then let the governance test guide remaining
 changes.
 
-**Agent obligation**: Before running any `npm` or `node` script, verify the active
-Node.js major version matches the project requirement:
+**Agent obligation** (see also **Session Bootstrap** above): Before running any
+`npm` or `node` script, verify the active Node.js major version matches the project
+requirement:
 
 ```bash
 node --version   # must match the major in .node-version
 ```
 
 If the major does not match, **do not proceed** until the shell environment resolves
-to the correct version. Fix the PATH in your shell session (e.g.
-`export PATH="/opt/homebrew/opt/node@24/bin:$PATH"` on a Homebrew-managed machine,
-checking that the versioned Homebrew prefix matches the required major) and re-run
-`node --version` to confirm before continuing. Never hardcode PATH manipulation
-inside source or test files — always set it in the shell environment.
+to the correct version. Search for the required Node.js major version on the system
+(e.g. check `/opt/homebrew/opt/node@<major>/bin/`, `/usr/local/opt/node@<major>/bin/`,
+or the output of version managers like `nvm`, `fnm`, `volta`, `mise`, `asdf`). Fix
+the PATH in your shell session and re-run `node --version` to confirm before
+continuing. Never hardcode PATH manipulation inside source or test files — always
+set it in the shell environment.
 
 ---
 
