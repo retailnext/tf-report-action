@@ -1111,6 +1111,11 @@ function buildTitle(report) {
       hasAnyStepFailure
     );
   }
+  if (report.operationOutcome === "skipped") {
+    const op = operationLabel(report.operation);
+    const label = op ? `${op} Skipped` : "Skipped";
+    return `${DIAGNOSTIC_WARNING} ${wsPrefix}${label}`;
+  }
   if (report.steps.length > 0 && report.steps.every((s) => s.outcome === "skipped")) {
     return `${DIAGNOSTIC_WARNING} ${wsPrefix}All Steps Skipped`;
   }
@@ -2013,11 +2018,18 @@ function buildReportFromSteps(stepsJson, options) {
   if (report.operation === void 0) {
     if (applyStep && getStepOutcome(applyStep) !== "skipped") {
       report.operation = "apply";
+      report.operationOutcome = getStepOutcome(applyStep);
+    } else if (applyStep && getStepOutcome(applyStep) === "skipped" && !planStep && !showPlanStep) {
+      report.operation = "apply";
+      report.operationOutcome = "skipped";
     } else if (planStep || showPlanStep) {
       report.operation = "plan";
+      const primaryStep = planStep ?? showPlanStep;
+      if (primaryStep !== void 0) {
+        report.operationOutcome = getStepOutcome(primaryStep);
+      }
     }
   }
-  report.title = buildTitle(report);
   if (hasAnyIaCStep) {
     const failedUnfamiliar = new Set(
       report.issues.filter((i) => !knownStepIds.has(i.id) && i.isFailed).map((i) => i.id)
@@ -2026,6 +2038,7 @@ function buildReportFromSteps(stepsJson, options) {
       (s) => knownStepIds.has(s.id) || failedUnfamiliar.has(s.id)
     );
   }
+  report.title = buildTitle(report);
   return report;
 }
 function buildErrorReport(message, workspace, steps) {

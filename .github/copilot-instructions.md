@@ -194,6 +194,14 @@ each other**.
   Internal implementation details (refactors, new abstractions, test changes)
   belong in a secondary section. If there are no user-facing changes, state
   that explicitly up front.
+- **Never replace an existing PR description**: When adding commits to a
+  branch that already has an open PR, **read the current PR description
+  first** (`gh pr view <number>`). Do not replace it. If your commits add
+  scope not yet covered, append a new section. If the cumulative changes
+  warrant a unified description, rewrite it so that **all** commits on the
+  branch are represented — nothing from the original may be silently
+  dropped. Only update the PR title if the original is now actively
+  misleading; otherwise leave it unchanged.
 
 ---
 
@@ -242,9 +250,17 @@ set it in the shell environment.
 Actions requires the entry point to be checked in — there is no install step at
 action runtime.
 
-**When to bundle**: After any change to source code, configuration, or
-dependencies, dist must be rebuilt. This is handled automatically by the
-pre-commit obligation below.
+**When to bundle**: After **any** change to a file under `src/`, including
+comment-only or JSDoc-only edits. Configuration or dependency changes also require
+a rebuild. Dist must be rebuilt whenever any tracked source file changes.
+
+**No exceptions for "documentation-only" source edits**: Comments and JSDoc within
+`.ts` source files are still source-code changes. The general rule that
+"documentation changes do not need to be built" applies only to standalone
+documentation files (e.g. `.md` files). It does **not** apply to comments or JSDoc
+inside TypeScript files — those files are compiled into `dist/`, so even a
+whitespace-only or comment-only edit to a `.ts` file under `src/` requires running
+`npm run check:dist` before committing.
 
 **Obligation**: Before every commit, run:
 
@@ -264,6 +280,12 @@ git commit  # include dist/ in the commit
 Never commit with a stale dist. Never run only `npm run ci` without also running
 `npm run check:dist` before committing — `npm run ci` does not include bundling.
 
+**Do not substitute ad-hoc checks**: Running `tsc --noEmit`, `eslint`, or any
+individual tool directly is **not** a substitute for `npm run ci && npm run
+check:dist`. These partial checks do not rebuild `dist/` and will allow a stale
+bundle to be committed. The full two-command sequence is the only accepted
+pre-commit verification.
+
 ---
 
 ## Linting Obligation
@@ -277,6 +299,13 @@ Never commit with a stale dist. Never run only `npm run ci` without also running
 
 All four must pass before any commit or `report_progress` call. When only one
 specific linter needs debugging, run its sub-script directly.
+
+**No documentation exemption in this repository**: The general agent rule that
+"documentation changes do not need to be linted, built or tested" does **not**
+apply here. This repository enforces markdownlint and textlint rules on every `.md`
+file, and Prettier on all files including Markdown. Any change to any file —
+source, test, or documentation — requires `npm run ci && npm run check:dist`
+to pass before committing.
 
 ---
 

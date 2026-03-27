@@ -26,14 +26,15 @@ import {
  * Evaluation order (first match wins):
  * 1. Error → "❌ Report Generation Failed"
  * 2. IaC step failures + operation → "❌ Plan/Apply Failed"
- * 3. Summary + apply + apply errors → "⚠️ Apply: N failed, ..."
+ * 3. Summary + apply + apply errors → "❌ Apply Failed: N failed, ..."
  * 4. Summary + apply + no changes → "✅ Apply Complete"
  * 5. Summary + apply + changes → "✅ Apply: N added, ..."
  * 6. Summary + plan + no changes → "✅ No Changes"
  * 7. Summary + plan + changes → "✅ Plan: N to add, ..."
- * 8. All steps skipped → "⚠️ All Steps Skipped"
- * 9. No summary + failures → "❌ Failed"
- * 10. No summary + all OK → "✅ Succeeded"
+ * 8. operationOutcome === "skipped" → "⚠️ Plan/Apply/Destroy Skipped"
+ * 9. All steps skipped → "⚠️ All Steps Skipped"
+ * 10. No summary + failures → "❌ Failed"
+ * 11. No summary + all OK → "✅ Succeeded"
  */
 export function buildTitle(report: Report): string {
   const wsPrefix = report.workspace ? `\`${report.workspace}\` ` : "";
@@ -63,7 +64,14 @@ export function buildTitle(report: Report): string {
     );
   }
 
-  // 8. All steps skipped
+  // 8. Primary operation step was skipped
+  if (report.operationOutcome === "skipped") {
+    const op = operationLabel(report.operation);
+    const label = op ? `${op} Skipped` : "Skipped";
+    return `${DIAGNOSTIC_WARNING} ${wsPrefix}${label}`;
+  }
+
+  // 9. All steps skipped (defense-in-depth: catches cases where operationOutcome is not set)
   if (
     report.steps.length > 0 &&
     report.steps.every((s) => s.outcome === "skipped")
@@ -71,7 +79,7 @@ export function buildTitle(report: Report): string {
     return `${DIAGNOSTIC_WARNING} ${wsPrefix}All Steps Skipped`;
   }
 
-  // 9–10. No summary — generic title based on failure state
+  // 10–11. No summary — generic title based on failure state
   if (hasAnyStepFailure || report.issues.some((i) => i.isFailed)) {
     const failLabel = singleFailedStepLabel(report);
     return `${STATUS_FAILURE} ${wsPrefix}${failLabel}`;

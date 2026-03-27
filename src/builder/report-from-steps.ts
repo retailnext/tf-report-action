@@ -281,16 +281,29 @@ export function buildReportFromSteps(
   if (report.operation === undefined) {
     if (applyStep && getStepOutcome(applyStep) !== "skipped") {
       report.operation = "apply";
+      report.operationOutcome = getStepOutcome(applyStep);
+    } else if (
+      applyStep &&
+      getStepOutcome(applyStep) === "skipped" &&
+      !planStep &&
+      !showPlanStep
+    ) {
+      // Apply is the only operation step and it was skipped
+      report.operation = "apply";
+      report.operationOutcome = "skipped";
     } else if (planStep || showPlanStep) {
       report.operation = "plan";
+      // Use the plan step outcome when present, otherwise show-plan outcome
+      const primaryStep = planStep ?? showPlanStep;
+      if (primaryStep !== undefined) {
+        report.operationOutcome = getStepOutcome(primaryStep);
+      }
     }
   }
 
-  // ─── Phase 6: Generate title ───────────────────────────────────────
-  report.title = buildTitle(report);
-
-  // ─── Phase 7: Filter step table for IaC reports ────────────────────
-  // When IaC content is present, show only IaC steps + failed unfamiliar
+  // ─── Phase 6: Filter step table for IaC reports ────────────────────
+  // When IaC content is present, show only IaC steps + failed unfamiliar.
+  // This must run BEFORE title generation so buildTitle sees the filtered list.
   if (hasAnyIaCStep) {
     const failedUnfamiliar = new Set(
       report.issues
@@ -301,6 +314,9 @@ export function buildReportFromSteps(
       (s) => knownStepIds.has(s.id) || failedUnfamiliar.has(s.id),
     );
   }
+
+  // ─── Phase 7: Generate title ───────────────────────────────────────
+  report.title = buildTitle(report);
 
   return report;
 }

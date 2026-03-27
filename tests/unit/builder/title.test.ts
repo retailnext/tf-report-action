@@ -162,6 +162,47 @@ describe("buildTitle", () => {
     expect(buildTitle(report)).toBe("⚠️ All Steps Skipped");
   });
 
+  it("returns 'Plan Skipped' when operationOutcome is skipped and operation is plan", () => {
+    const report = makeReport({
+      operation: "plan",
+      operationOutcome: "skipped",
+    });
+    expect(buildTitle(report)).toBe("⚠️ Plan Skipped");
+  });
+
+  it("returns 'Apply Skipped' when operationOutcome is skipped and operation is apply", () => {
+    const report = makeReport({
+      operation: "apply",
+      operationOutcome: "skipped",
+    });
+    expect(buildTitle(report)).toBe("⚠️ Apply Skipped");
+  });
+
+  it("returns 'Destroy Skipped' when operationOutcome is skipped and operation is destroy", () => {
+    const report = makeReport({
+      operation: "destroy",
+      operationOutcome: "skipped",
+    });
+    expect(buildTitle(report)).toBe("⚠️ Destroy Skipped");
+  });
+
+  it("includes workspace prefix in 'Plan Skipped' title", () => {
+    const report = makeReport({
+      operation: "plan",
+      operationOutcome: "skipped",
+      workspace: "tf",
+    });
+    expect(buildTitle(report)).toBe("⚠️ `tf` Plan Skipped");
+  });
+
+  it("does not skip title when operationOutcome is success", () => {
+    const report = makeReport({
+      operation: "plan",
+      operationOutcome: "success",
+    });
+    expect(buildTitle(report)).toBe("✅ Plan Succeeded");
+  });
+
   it("returns 'Succeeded' when no data is available", () => {
     const report = makeReport();
     expect(buildTitle(report)).toBe("✅ Succeeded");
