@@ -341,7 +341,7 @@ export async function run(
       // Not truncated but always-upload-report is enabled — add a subtle link
       markdown += buildArtifactNotice({
         url: artifactUrl,
-        label: "Full report artifact",
+        label: "View/Download Report",
       });
     }
 

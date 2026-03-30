@@ -468,7 +468,7 @@ describe("run — always-upload-report", () => {
     );
 
     expect(postedBody).toContain("📎");
-    expect(postedBody).toContain("Full report artifact");
+    expect(postedBody).toContain("View/Download Report");
     expect(postedBody).toContain(
       "https://github.com/owner/repo/actions/runs/123/artifacts/42",
     );
@@ -496,7 +496,7 @@ describe("run — always-upload-report", () => {
     );
 
     expect(postedBody).not.toContain("📎");
-    expect(postedBody).not.toContain("Full report artifact");
+    expect(postedBody).not.toContain("View/Download Report");
   });
 });
 

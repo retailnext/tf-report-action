@@ -20,11 +20,20 @@ describe("buildHtmlPage", () => {
     expect(html).toContain(`<div class="markdown-body">${fragment}</div>`);
   });
 
-  it("includes Primer CSS link", () => {
+  it("embeds CSS inline (no external CDN links)", () => {
     const html = buildHtmlPage(fragment);
-    expect(html).toContain(
-      'href="https://unpkg.com/@primer/css/dist/primer.css"',
-    );
+    expect(html).toContain("<style>");
+    expect(html).toContain(".markdown-body");
+    expect(html).not.toContain("unpkg.com");
+    expect(html).not.toContain("cdn.jsdelivr.net");
+    expect(html).not.toContain('<link rel="stylesheet"');
+  });
+
+  it("includes copy-button JavaScript", () => {
+    const html = buildHtmlPage(fragment);
+    expect(html).toContain("<script>");
+    expect(html).toContain("copy-btn");
+    expect(html).toContain("navigator.clipboard");
   });
 
   it("uses default title when omitted", () => {
@@ -42,7 +51,7 @@ describe("buildHtmlPage", () => {
     expect(html).toContain(
       "<title>Test &lt;script&gt;&quot;alert&quot;&lt;/script&gt;</title>",
     );
-    expect(html).not.toContain("<script>");
+    expect(html).not.toContain("<script>alert");
   });
 
   it("inserts fragment verbatim", () => {
@@ -57,5 +66,23 @@ describe("buildHtmlPage", () => {
     expect(html).toContain(
       '<meta name="viewport" content="width=device-width, initial-scale=1.0">',
     );
+  });
+
+  it("styles tables with borders", () => {
+    const html = buildHtmlPage(fragment);
+    expect(html).toContain("border-collapse: collapse");
+    expect(html).toContain("border: 1px solid");
+  });
+
+  it("styles details/summary elements", () => {
+    const html = buildHtmlPage(fragment);
+    expect(html).toContain(".markdown-body details");
+    expect(html).toContain(".markdown-body summary");
+  });
+
+  it("handles markdown-accessiblity-table custom element", () => {
+    const html = buildHtmlPage(fragment);
+    expect(html).toContain("markdown-accessiblity-table");
+    expect(html).toContain("display: block");
   });
 });

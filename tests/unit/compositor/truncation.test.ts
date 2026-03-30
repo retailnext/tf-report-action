@@ -94,13 +94,13 @@ describe("buildLogsNotice", () => {
 describe("buildArtifactNotice", () => {
   const link = {
     url: "https://github.com/owner/repo/actions/runs/123/artifacts/42",
-    label: "Full report artifact",
+    label: "View/Download Report",
   };
 
   it("renders a compact link with paperclip emoji", () => {
     const result = buildArtifactNotice(link);
     expect(result).toContain("📎");
-    expect(result).toContain(`[Full report artifact](${link.url})`);
+    expect(result).toContain(`[View/Download Report](${link.url})`);
   });
 
   it("does not render as a blockquote", () => {

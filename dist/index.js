@@ -3999,6 +3999,94 @@ function missingTransport() {
 }
 
 // src/html/page.ts
+var MARKDOWN_CSS = `
+  .markdown-body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    font-size: 16px; line-height: 1.6; color: #1f2328;
+  }
+  .markdown-body a { color: #0969da; text-decoration: none; }
+  .markdown-body a:hover { text-decoration: underline; }
+  .markdown-body h1, .markdown-body h2, .markdown-body h3,
+  .markdown-body h4, .markdown-body h5, .markdown-body h6 {
+    margin-top: 24px; margin-bottom: 16px; font-weight: 600; line-height: 1.25;
+  }
+  .markdown-body h1 { font-size: 2em; border-bottom: 1px solid #d0d7de; padding-bottom: 0.3em; }
+  .markdown-body h2 { font-size: 1.5em; border-bottom: 1px solid #d0d7de; padding-bottom: 0.3em; }
+  .markdown-body h3 { font-size: 1.25em; }
+  .markdown-body h4 { font-size: 1em; }
+  .markdown-body p { margin-top: 0; margin-bottom: 16px; }
+  .markdown-body ul, .markdown-body ol { margin-top: 0; margin-bottom: 16px; padding-left: 2em; }
+  .markdown-body li + li { margin-top: 0.25em; }
+  .markdown-body hr {
+    height: 0.25em; padding: 0; margin: 24px 0;
+    background: #d0d7de; border: 0; border-radius: 6px;
+  }
+  .markdown-body blockquote {
+    margin: 0 0 16px; padding: 0 1em;
+    color: #57606a; border-left: 4px solid #d0d7de;
+  }
+  .markdown-body code {
+    font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, monospace;
+    font-size: 0.85em; background: #afb8c133; padding: 0.2em 0.4em; border-radius: 6px;
+  }
+  .markdown-body pre {
+    position: relative;
+    background: #f6f8fa; border: 1px solid #d0d7de; border-radius: 6px;
+    padding: 16px; overflow: auto; margin-bottom: 16px;
+  }
+  .markdown-body pre code { background: none; padding: 0; font-size: 0.875em; }
+  .markdown-body table { border-collapse: collapse; width: 100%; margin-bottom: 16px; }
+  .markdown-body th, .markdown-body td { border: 1px solid #d0d7de; padding: 6px 13px; }
+  .markdown-body th { background: #f6f8fa; font-weight: 600; }
+  .markdown-body tr:nth-child(even) { background: #f6f8fa; }
+  .markdown-body details {
+    margin-bottom: 8px; border: 1px solid #d0d7de; border-radius: 6px;
+    padding: 8px 12px;
+  }
+  .markdown-body summary { cursor: pointer; font-weight: 500; }
+  .markdown-body del {
+    color: #cf222e; text-decoration: none; background: #ffebe9;
+    padding: 0 2px; border-radius: 2px;
+  }
+  .markdown-body ins {
+    color: #116329; text-decoration: none; background: #dafbe1;
+    padding: 0 2px; border-radius: 2px;
+  }
+  .markdown-body img { max-width: 100%; }
+  markdown-accessiblity-table { display: block; }
+  .copy-btn {
+    position: absolute; top: 8px; right: 8px;
+    padding: 4px 8px; font-size: 12px;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    border: 1px solid #d0d7de; border-radius: 6px;
+    background: #f6f8fa; color: #57606a; cursor: pointer;
+    opacity: 0; transition: opacity 0.15s;
+  }
+  pre:hover .copy-btn { opacity: 1; }
+  .copy-btn:hover { background: #eaeef2; }
+  .copy-btn.copied { background: #dafbe1; border-color: #116329; color: #116329; opacity: 1; }
+`;
+var COPY_BUTTON_JS = `
+  document.addEventListener("DOMContentLoaded", function() {
+    document.querySelectorAll("pre").forEach(function(pre) {
+      var btn = document.createElement("button");
+      btn.className = "copy-btn";
+      btn.textContent = "Copy";
+      btn.addEventListener("click", function() {
+        var text = pre.textContent || "";
+        navigator.clipboard.writeText(text).then(function() {
+          btn.textContent = "Copied!";
+          btn.classList.add("copied");
+          setTimeout(function() {
+            btn.textContent = "Copy";
+            btn.classList.remove("copied");
+          }, 2000);
+        });
+      });
+      pre.appendChild(btn);
+    });
+  });
+`;
 function buildHtmlPage(htmlFragment, title) {
   const pageTitle = title ?? "TF Report";
   return `<!DOCTYPE html>
@@ -4007,14 +4095,14 @@ function buildHtmlPage(htmlFragment, title) {
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>${escapeHtml2(pageTitle)}</title>
-  <link rel="stylesheet" href="https://unpkg.com/@primer/css/dist/primer.css">
   <style>
-    body { max-width: 1012px; margin: 0 auto; padding: 32px; }
-    .markdown-body { font-size: 16px; }
+    body { max-width: 1012px; margin: 0 auto; padding: 32px; background: #fff; }
+    ${MARKDOWN_CSS}
   </style>
 </head>
 <body>
   <div class="markdown-body">${htmlFragment}</div>
+  <script>${COPY_BUTTON_JS}</script>
 </body>
 </html>
 `;
@@ -4253,7 +4341,7 @@ async function run(env = process.env, deps) {
     } else if (artifactUrl !== void 0) {
       markdown += buildArtifactNotice({
         url: artifactUrl,
-        label: "Full report artifact"
+        label: "View/Download Report"
       });
     }
     if (hasUnresolvedFailures) {

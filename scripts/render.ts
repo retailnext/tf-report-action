@@ -32,6 +32,7 @@ import { writeFile } from "node:fs/promises";
 import { execSync } from "node:child_process";
 import { reportFromSteps } from "../src/index.js";
 import type { Options, ReportOptions } from "../src/index.js";
+import { MARKDOWN_CSS, COPY_BUTTON_JS } from "../src/html/index.js";
 
 // ---------------------------------------------------------------------------
 // Argument parsing
@@ -203,37 +204,12 @@ function buildSingleHtml(markdown: string, title: string | undefined): string {
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>${title ? title + " — " : ""}Plan Preview</title>
   <style>
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
-      font-size: 16px;
-      line-height: 1.6;
-      color: #1f2328;
-      background: #ffffff;
-      max-width: 1012px;
-      margin: 0 auto;
-      padding: 32px;
-    }
-    h1, h2, h3, h4 { margin-top: 24px; margin-bottom: 16px; font-weight: 600; line-height: 1.25; }
-    h2 { font-size: 1.5em; border-bottom: 1px solid #d0d7de; padding-bottom: 0.3em; }
-    h3 { font-size: 1.25em; }
-    h4 { font-size: 1em; }
-    code { font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, monospace; font-size: 0.85em; background: #afb8c133; padding: 0.2em 0.4em; border-radius: 6px; }
-    pre { background: #f6f8fa; border: 1px solid #d0d7de; border-radius: 6px; padding: 16px; overflow: auto; }
-    pre code { background: none; padding: 0; font-size: 0.875em; }
-    table { border-collapse: collapse; width: 100%; margin-bottom: 16px; }
-    th, td { border: 1px solid #d0d7de; padding: 6px 13px; }
-    th { background: #f6f8fa; font-weight: 600; }
-    tr:nth-child(even) { background: #f6f8fa; }
-    details { margin-bottom: 8px; border: 1px solid #d0d7de; border-radius: 6px; padding: 8px 12px; }
-    summary { cursor: pointer; font-weight: 500; }
-    del { color: #cf222e; text-decoration: none; background: #ffebe9; padding: 0 2px; border-radius: 2px; }
-    ins { color: #116329; text-decoration: none; background: #dafbe1; padding: 0 2px; border-radius: 2px; }
-    p { margin-top: 0; margin-bottom: 16px; }
-    blockquote { margin: 0; padding: 0 1em; color: #57606a; border-left: 4px solid #d0d7de; }
+    body { max-width: 1012px; margin: 0 auto; padding: 32px; background: #fff; }
+    ${MARKDOWN_CSS}
   </style>
 </head>
 <body>
-  <div id="content"></div>
+  <div id="content" class="markdown-body"></div>
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/dompurify/dist/purify.min.js"></script>
   <script>
@@ -241,6 +217,7 @@ function buildSingleHtml(markdown: string, title: string | undefined): string {
     const html = DOMPurify.sanitize(marked.parse(markdown));
     document.getElementById('content').innerHTML = html;
   </script>
+  <script>${COPY_BUTTON_JS}</script>
 </body>
 </html>`;
 }
@@ -507,43 +484,8 @@ function buildGalleryHtml(entriesJson: string): string {
       max-width: 1012px;
     }
 
-    /* GitHub-flavored markdown styles */
-    #content-area h1, #content-area h2, #content-area h3, #content-area h4 {
-      margin-top: 24px; margin-bottom: 16px; font-weight: 600; line-height: 1.25;
-    }
-    #content-area h2 { font-size: 1.5em; border-bottom: 1px solid #d0d7de; padding-bottom: 0.3em; }
-    #content-area h3 { font-size: 1.25em; }
-    #content-area h4 { font-size: 1em; }
-    #content-area code {
-      font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, monospace;
-      font-size: 0.85em; background: #afb8c133; padding: 0.2em 0.4em; border-radius: 6px;
-    }
-    #content-area pre {
-      background: #f6f8fa; border: 1px solid #d0d7de; border-radius: 6px;
-      padding: 16px; overflow: auto;
-    }
-    #content-area pre code { background: none; padding: 0; font-size: 0.875em; }
-    #content-area table { border-collapse: collapse; width: 100%; margin-bottom: 16px; }
-    #content-area th, #content-area td { border: 1px solid #d0d7de; padding: 6px 13px; }
-    #content-area th { background: #f6f8fa; font-weight: 600; }
-    #content-area tr:nth-child(even) { background: #f6f8fa; }
-    #content-area details {
-      margin-bottom: 8px; border: 1px solid #d0d7de; border-radius: 6px; padding: 8px 12px;
-    }
-    #content-area summary { cursor: pointer; font-weight: 500; }
-    #content-area del {
-      color: #cf222e; text-decoration: none; background: #ffebe9;
-      padding: 0 2px; border-radius: 2px;
-    }
-    #content-area ins {
-      color: #116329; text-decoration: none; background: #dafbe1;
-      padding: 0 2px; border-radius: 2px;
-    }
-    #content-area p { margin-top: 0; margin-bottom: 16px; }
-    #content-area blockquote {
-      margin: 0; padding: 0 1em; color: #57606a;
-      border-left: 4px solid #d0d7de;
-    }
+    /* GitHub-flavored markdown styles (shared with artifact page) */
+    ${MARKDOWN_CSS}
   </style>
 </head>
 <body>
@@ -563,7 +505,7 @@ function buildGalleryHtml(entriesJson: string): string {
       <span id="fixture-path"></span>
       <span id="position-label"></span>
     </div>
-    <div id="content-area"></div>
+    <div id="content-area" class="markdown-body"></div>
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
@@ -573,6 +515,23 @@ function buildGalleryHtml(entriesJson: string): string {
     'use strict';
 
     var entries = JSON.parse('${escapedJson}');
+
+    function addCopyButtons(container) {
+      container.querySelectorAll("pre").forEach(function(pre) {
+        var btn = document.createElement("button");
+        btn.className = "copy-btn";
+        btn.textContent = "Copy";
+        btn.addEventListener("click", function() {
+          var text = pre.textContent || "";
+          navigator.clipboard.writeText(text).then(function() {
+            btn.textContent = "Copied!";
+            btn.classList.add("copied");
+            setTimeout(function() { btn.textContent = "Copy"; btn.classList.remove("copied"); }, 2000);
+          });
+        });
+        pre.appendChild(btn);
+      });
+    }
 
     var filterInput = document.getElementById('filter-input');
     var countLabel = document.getElementById('count-label');
@@ -645,6 +604,7 @@ function buildGalleryHtml(entriesJson: string): string {
 
       var html = DOMPurify.sanitize(marked.parse(entry.markdown));
       contentArea.innerHTML = html;
+      addCopyButtons(contentArea);
       contentArea.scrollTop = 0;
 
       btnPrev.disabled = currentVisiblePos === 0;
