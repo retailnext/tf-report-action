@@ -59,11 +59,14 @@ export async function tryUploadFullReport(
   try {
     const runtimeToken = params.env["ACTIONS_RUNTIME_TOKEN"];
     const resultsUrl = params.env["ACTIONS_RESULTS_URL"];
+    const runId = params.env["GITHUB_RUN_ID"];
     if (
       runtimeToken === undefined ||
       runtimeToken === "" ||
       resultsUrl === undefined ||
-      resultsUrl === ""
+      resultsUrl === "" ||
+      runId === undefined ||
+      runId === ""
     ) {
       return undefined;
     }
@@ -99,7 +102,6 @@ export async function tryUploadFullReport(
 
     const artifactServerUrl =
       params.env["GITHUB_SERVER_URL"] ?? "https://github.com";
-    const runId = params.env["GITHUB_RUN_ID"] ?? "";
     return `${artifactServerUrl}/${params.repoContext}/actions/runs/${runId}/artifacts/${String(result.id)}`;
   } catch (error: unknown) {
     const msg = error instanceof Error ? error.message : String(error);

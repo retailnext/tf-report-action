@@ -132,6 +132,15 @@ describe("tryUploadFullReport", () => {
     expect(url).toBeUndefined();
   });
 
+  it("returns undefined when GITHUB_RUN_ID is missing", async () => {
+    const url = await tryUploadFullReport(
+      baseParams({
+        env: baseEnv({ GITHUB_RUN_ID: undefined }),
+      }),
+    );
+    expect(url).toBeUndefined();
+  });
+
   it("returns undefined when renderMarkdown throws", async () => {
     const url = await tryUploadFullReport(
       baseParams({

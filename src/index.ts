@@ -80,6 +80,10 @@ export interface ReportFromStepsResult {
   readonly fullMarkdown: string;
   /** Whether any section was degraded or omitted. */
   readonly wasTruncated: boolean;
+  /** The detected operation type, if determinable from step context. */
+  readonly operation?: "plan" | "apply" | "destroy";
+  /** Whether any step failed without captured stdout/stderr output. */
+  readonly hasUnresolvedFailures: boolean;
 }
 
 /**
@@ -124,6 +128,8 @@ export function reportFromSteps(
       markdown: result.output,
       fullMarkdown,
       wasTruncated: result.wasTruncated,
+      ...(report.operation !== undefined && { operation: report.operation }),
+      hasUnresolvedFailures: report.hasUnresolvedFailures ?? false,
     };
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : "Unknown error";
@@ -132,6 +138,7 @@ export function reportFromSteps(
       markdown: errorMarkdown,
       fullMarkdown: errorMarkdown,
       wasTruncated: false,
+      hasUnresolvedFailures: false,
     };
   }
 }
@@ -142,7 +149,10 @@ export type { RenderOptions, DiffFormat } from "./model/render-options.js";
 export type { Report, RawStepStdout, Tool } from "./model/report.js";
 export type { StepRole } from "./model/step-commands.js";
 export { expectedCommand } from "./model/step-commands.js";
-export { buildTruncationNotice } from "./compositor/truncation.js";
+export {
+  buildTruncationNotice,
+  buildLogsNotice,
+} from "./compositor/truncation.js";
 export type { TruncationLink } from "./compositor/truncation.js";
 export type { Summary } from "./model/summary.js";
 export type { ResourceChange } from "./model/resource.js";

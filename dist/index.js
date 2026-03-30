@@ -1089,6 +1089,7 @@ var DIAGNOSTIC_ERROR = "\u{1F6A8}";
 var DIAGNOSTIC_WARNING = "\u26A0\uFE0F";
 var MODULE_ICON = "\u{1F4E6}";
 var DRIFT_ICON = "\u{1F500}";
+var INFO_ICON = "\u2139\uFE0F";
 
 // src/builder/title.ts
 function buildTitle(report) {
@@ -2039,6 +2040,9 @@ function buildReportFromSteps(stepsJson, options) {
     );
   }
   report.title = buildTitle(report);
+  report.hasUnresolvedFailures = report.issues.some(
+    (i) => i.isFailed && i.stdout === void 0 && i.stderr === void 0
+  );
   return report;
 }
 function buildErrorReport(message, workspace, steps) {
@@ -3331,6 +3335,13 @@ function buildTruncationNotice(link) {
 > ${DIAGNOSTIC_WARNING} **Output truncated** \u2014 some details were shortened or omitted to fit within the comment size limit. Check the workflow run logs for complete output.
 `;
 }
+function buildLogsNotice(link) {
+  return `
+---
+
+> ${INFO_ICON} Some step errors are not shown \u2014 see the [${link.label}](${link.url}) for details.
+`;
+}
 
 // src/index.ts
 function reportFromSteps(stepsJson, options) {
@@ -3343,7 +3354,9 @@ function reportFromSteps(stepsJson, options) {
     return {
       markdown: result.output,
       fullMarkdown,
-      wasTruncated: result.wasTruncated
+      wasTruncated: result.wasTruncated,
+      ...report.operation !== void 0 && { operation: report.operation },
+      hasUnresolvedFailures: report.hasUnresolvedFailures ?? false
     };
   } catch (err) {
     const message = err instanceof Error ? err.message : "Unknown error";
@@ -3358,7 +3371,8 @@ ${message}
     return {
       markdown: errorMarkdown,
       fullMarkdown: errorMarkdown,
-      wasTruncated: false
+      wasTruncated: false,
+      hasUnresolvedFailures: false
     };
   }
 }
@@ -3489,6 +3503,41 @@ var ActionsError = class extends Error {
   }
 };
 
+// src/http/retry.ts
+var DEFAULT_MAX_ATTEMPTS = 5;
+var DEFAULT_BASE_INTERVAL_MS = 3e3;
+var DEFAULT_MULTIPLIER = 1.5;
+async function withRetry(fn, isRetryable3, options) {
+  const maxAttempts = options?.maxAttempts ?? DEFAULT_MAX_ATTEMPTS;
+  const baseIntervalMs = options?.baseIntervalMs ?? DEFAULT_BASE_INTERVAL_MS;
+  const multiplier = options?.multiplier ?? DEFAULT_MULTIPLIER;
+  const sleep = options?.sleep ?? realSleep;
+  let lastError;
+  for (let attempt = 0; attempt < maxAttempts; attempt++) {
+    try {
+      return await fn();
+    } catch (error) {
+      lastError = error;
+      const isLastAttempt = attempt === maxAttempts - 1;
+      if (isLastAttempt || !isRetryable3(error)) {
+        throw error;
+      }
+      const minDelay = baseIntervalMs * multiplier ** attempt;
+      const maxDelay = minDelay * multiplier;
+      const delay = Math.floor(
+        minDelay + Math.random() * (maxDelay - minDelay)
+      );
+      await sleep(delay);
+    }
+  }
+  throw lastError;
+}
+function realSleep(ms) {
+  return new Promise((resolve2) => {
+    setTimeout(resolve2, ms);
+  });
+}
+
 // src/http/proxy.ts
 function isLoopbackAddress(host) {
   const lower = host.toLowerCase();
@@ -3564,6 +3613,17 @@ async function httpRequest(method, url, headers, body, options) {
     return tunnelRequest(method, target, proxyUrl, headers, body);
   }
   return proxyPlainRequest(method, target, proxyUrl, headers, body);
+}
+function assertOk2(status, body, context) {
+  if (status >= 200 && status < 300) {
+    return;
+  }
+  const truncated = body.length > 200 ? body.slice(0, 200) + "\u2026" : body;
+  const prefix = context ? `${context}: ` : "";
+  throw new ActionsError(
+    `${prefix}HTTP ${String(status)}: ${truncated}`,
+    status
+  );
 }
 function directRequest(method, target, headers, body) {
   const transport = target.protocol === "https:" ? https : http;
@@ -3704,6 +3764,301 @@ function parseInputs(env) {
   };
 }
 
+// src/artifact/upload.ts
+import { createHash as nodeCreateHash } from "node:crypto";
+
+// src/artifact/jwt.ts
+function extractBackendIds(runtimeToken) {
+  const segments = runtimeToken.split(".");
+  if (segments.length < 3) {
+    throw new Error(
+      `Expected a JWT with 3 segments, got ${String(segments.length)}`
+    );
+  }
+  const payloadSegment = segments[1];
+  if (payloadSegment === void 0) {
+    throw new Error("JWT payload segment is missing");
+  }
+  let payloadJson;
+  try {
+    payloadJson = Buffer.from(payloadSegment, "base64url").toString("utf-8");
+  } catch {
+    throw new Error("Failed to base64url-decode the JWT payload segment");
+  }
+  let payload;
+  try {
+    payload = JSON.parse(payloadJson);
+  } catch {
+    throw new Error("JWT payload is not valid JSON");
+  }
+  if (typeof payload !== "object" || payload === null) {
+    throw new Error("JWT payload is not an object");
+  }
+  const scp = payload["scp"];
+  if (typeof scp !== "string") {
+    throw new Error(`Expected "scp" claim to be a string, got ${typeof scp}`);
+  }
+  const scopes = scp.split(" ");
+  const resultsScope = scopes.find((s) => s.startsWith("Actions.Results:"));
+  if (resultsScope === void 0) {
+    throw new Error('No "Actions.Results:" scope found in the "scp" claim');
+  }
+  const parts = resultsScope.split(":");
+  if (parts.length !== 3) {
+    throw new Error(
+      `Expected "Actions.Results:<runId>:<jobId>", got ${String(parts.length)} parts`
+    );
+  }
+  const workflowRunBackendId = parts[1];
+  const workflowJobRunBackendId = parts[2];
+  if (workflowRunBackendId === void 0 || workflowJobRunBackendId === void 0 || workflowRunBackendId === "" || workflowJobRunBackendId === "") {
+    throw new Error("Backend IDs in Actions.Results scope must not be empty");
+  }
+  return { workflowRunBackendId, workflowJobRunBackendId };
+}
+
+// src/artifact/twirp.ts
+var SERVICE = "github.actions.results.api.v1.ArtifactService";
+var RETRYABLE_STATUS_CODES = /* @__PURE__ */ new Set([
+  429,
+  500,
+  502,
+  503,
+  504
+]);
+async function createArtifact(deps, params) {
+  const body = {
+    workflowRunBackendId: params.backendIds.workflowRunBackendId,
+    workflowJobRunBackendId: params.backendIds.workflowJobRunBackendId,
+    name: params.name,
+    version: 7
+  };
+  const parsed = await twirpCall(deps, "CreateArtifact", body);
+  const url = parsed["signedUploadUrl"];
+  if (typeof url !== "string" || url === "") {
+    throw new ActionsError("CreateArtifact response missing signedUploadUrl");
+  }
+  return { signedUploadUrl: url };
+}
+async function finalizeArtifact(deps, params) {
+  const body = {
+    workflowRunBackendId: params.backendIds.workflowRunBackendId,
+    workflowJobRunBackendId: params.backendIds.workflowJobRunBackendId,
+    name: params.name,
+    size: String(params.size),
+    hash: { value: `sha256:${params.sha256Hex}` }
+  };
+  const parsed = await twirpCall(deps, "FinalizeArtifact", body);
+  const rawId = parsed["artifactId"];
+  const id = typeof rawId === "string" ? Number(rawId) : typeof rawId === "number" ? rawId : NaN;
+  if (!Number.isFinite(id)) {
+    throw new ActionsError(
+      "FinalizeArtifact response missing or invalid artifactId"
+    );
+  }
+  return { artifactId: id };
+}
+function isRetryable(error) {
+  return error instanceof ActionsError && error.statusCode !== void 0 && RETRYABLE_STATUS_CODES.has(error.statusCode);
+}
+async function twirpCall(deps, method, body) {
+  const origin = new URL(deps.resultsUrl).origin;
+  const url = `${origin}/twirp/${SERVICE}/${method}`;
+  const headers = {
+    "Content-Type": "application/json",
+    Authorization: `Bearer ${deps.runtimeToken}`,
+    "User-Agent": "tf-report-action"
+  };
+  const jsonBody = JSON.stringify(body);
+  const response = await withRetry(
+    async () => {
+      const res = await deps.transport("POST", url, headers, jsonBody);
+      assertOk2(res.status, res.body, method);
+      return res;
+    },
+    isRetryable,
+    deps.sleep !== void 0 ? { sleep: deps.sleep } : void 0
+  );
+  try {
+    return JSON.parse(response.body);
+  } catch {
+    throw new ActionsError(`${method}: response body is not valid JSON`);
+  }
+}
+
+// src/artifact/blob-upload.ts
+var RETRYABLE_STATUS_CODES2 = /* @__PURE__ */ new Set([
+  429,
+  500,
+  502,
+  503,
+  504
+]);
+async function uploadBlob(deps) {
+  const byteLength = Buffer.byteLength(deps.content, "utf-8");
+  const headers = {
+    "x-ms-blob-type": "BlockBlob",
+    "Content-Type": deps.contentType,
+    "Content-Length": String(byteLength)
+  };
+  await withRetry(
+    async () => {
+      const res = await deps.transport(
+        "PUT",
+        deps.signedUrl,
+        headers,
+        deps.content
+      );
+      assertOk2(res.status, res.body, "BlobUpload");
+    },
+    isRetryable2,
+    deps.sleep !== void 0 ? { sleep: deps.sleep } : void 0
+  );
+}
+function isRetryable2(error) {
+  return error instanceof ActionsError && error.statusCode !== void 0 && RETRYABLE_STATUS_CODES2.has(error.statusCode);
+}
+
+// src/artifact/upload.ts
+var ALLOWED_HOSTNAME = "github.com";
+var ALLOWED_SUFFIX = ".ghe.com";
+var MIME_TYPES = {
+  ".html": "text/html",
+  ".md": "text/markdown"
+};
+var DEFAULT_MIME = "application/octet-stream";
+function createArtifactUploader(deps) {
+  return {
+    async upload(params) {
+      guardGhes(deps.serverUrl);
+      const backendIds = extractBackendIds(deps.runtimeToken);
+      const hashFn = deps.createHash ?? nodeCreateHash;
+      const sha256Hex = hashFn("sha256").update(params.content, "utf-8").digest("hex");
+      const byteLength = Buffer.byteLength(params.content, "utf-8");
+      const contentType = detectMimeType(params.filename);
+      const transport = deps.transport ?? missingTransport;
+      const { signedUploadUrl } = await createArtifact(
+        {
+          resultsUrl: deps.resultsUrl,
+          runtimeToken: deps.runtimeToken,
+          transport,
+          ...deps.sleep !== void 0 && { sleep: deps.sleep }
+        },
+        { name: params.name, backendIds }
+      );
+      await uploadBlob({
+        signedUrl: signedUploadUrl,
+        content: params.content,
+        contentType,
+        transport,
+        ...deps.sleep !== void 0 && { sleep: deps.sleep }
+      });
+      const { artifactId } = await finalizeArtifact(
+        {
+          resultsUrl: deps.resultsUrl,
+          runtimeToken: deps.runtimeToken,
+          transport,
+          ...deps.sleep !== void 0 && { sleep: deps.sleep }
+        },
+        {
+          name: params.name,
+          backendIds,
+          size: byteLength,
+          sha256Hex
+        }
+      );
+      return { id: artifactId, size: byteLength, sha256: sha256Hex };
+    }
+  };
+}
+function guardGhes(serverUrl) {
+  const hostname = new URL(serverUrl ?? "https://github.com").hostname;
+  if (hostname === ALLOWED_HOSTNAME || hostname.endsWith(ALLOWED_SUFFIX)) {
+    return;
+  }
+  throw new ActionsError(
+    `Artifact upload is not supported on ${hostname} \u2014 only ${ALLOWED_HOSTNAME} and *${ALLOWED_SUFFIX} are supported`
+  );
+}
+function detectMimeType(filename) {
+  const dot = filename.lastIndexOf(".");
+  if (dot === -1) return DEFAULT_MIME;
+  const ext = filename.slice(dot).toLowerCase();
+  return MIME_TYPES[ext] ?? DEFAULT_MIME;
+}
+function missingTransport() {
+  throw new ActionsError("ArtifactUploader: no HTTP transport was provided");
+}
+
+// src/html/page.ts
+function buildHtmlPage(htmlFragment, title) {
+  const pageTitle = title ?? "TF Report";
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>${escapeHtml2(pageTitle)}</title>
+  <link rel="stylesheet" href="https://unpkg.com/@primer/css/dist/primer.css">
+  <style>
+    body { max-width: 1012px; margin: 0 auto; padding: 32px; }
+    .markdown-body { font-size: 16px; }
+  </style>
+</head>
+<body>
+  <div class="markdown-body">${htmlFragment}</div>
+</body>
+</html>
+`;
+}
+function escapeHtml2(s) {
+  return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+}
+
+// src/action/artifact-upload.ts
+async function tryUploadFullReport(params) {
+  try {
+    const runtimeToken = params.env["ACTIONS_RUNTIME_TOKEN"];
+    const resultsUrl = params.env["ACTIONS_RESULTS_URL"];
+    const runId = params.env["GITHUB_RUN_ID"];
+    if (runtimeToken === void 0 || runtimeToken === "" || resultsUrl === void 0 || resultsUrl === "" || runId === void 0 || runId === "") {
+      return void 0;
+    }
+    const htmlFragment = await params.renderMarkdown({
+      text: params.fullMarkdown,
+      mode: "gfm",
+      context: params.repoContext
+    });
+    const htmlPage = buildHtmlPage(htmlFragment, params.artifactName);
+    const filename = `${params.artifactName}.html`;
+    const serverUrl = params.env["GITHUB_SERVER_URL"];
+    const uploader = createArtifactUploader({
+      runtimeToken,
+      resultsUrl,
+      ...serverUrl !== void 0 && { serverUrl },
+      ...params.deps?.transport !== void 0 && {
+        transport: params.deps.transport
+      },
+      ...params.deps?.createHash !== void 0 && {
+        createHash: params.deps.createHash
+      },
+      ...params.deps?.sleep !== void 0 && { sleep: params.deps.sleep }
+    });
+    const result = await uploader.upload({
+      name: params.artifactName,
+      filename,
+      content: htmlPage
+    });
+    const artifactServerUrl = params.env["GITHUB_SERVER_URL"] ?? "https://github.com";
+    return `${artifactServerUrl}/${params.repoContext}/actions/runs/${runId}/artifacts/${String(result.id)}`;
+  } catch (error) {
+    const msg = error instanceof Error ? error.message : String(error);
+    process.stderr.write(`::warning::Artifact upload failed: ${msg}
+`);
+    return void 0;
+  }
+}
+
 // src/action/main.ts
 var COMMENT_LIMIT = 65536;
 var OVERHEAD_RESERVE = 512;
@@ -3778,8 +4133,10 @@ async function handleIssue(client, owner, repo, workspace, marker, body) {
     await client.createIssue(owner, repo, title, body);
   }
 }
-async function run(env = process.env, clientFactory = createGitHubClient) {
+async function run(env = process.env, deps) {
   try {
+    const clientFactory = deps?.clientFactory ?? createGitHubClient;
+    const tryUpload = deps?.tryUploadFullReport ?? tryUploadFullReport;
     const inputs = parseInputs(env);
     const eventName = env["GITHUB_EVENT_NAME"] ?? "";
     const isPr = eventName === "pull_request" || eventName === "pull_request_target";
@@ -3808,31 +4165,6 @@ async function run(env = process.env, clientFactory = createGitHubClient) {
     if (env["RUNNER_TEMP"] !== void 0 && env["RUNNER_TEMP"] !== "") {
       reportOptions.allowedDirs = [env["RUNNER_TEMP"]];
     }
-    const truncationLink = {
-      url: logsUrl,
-      label: "View full workflow run logs"
-    };
-    const truncationNotice = buildTruncationNotice(truncationLink);
-    const fullBudget = Math.max(
-      0,
-      COMMENT_LIMIT - footer.length - OVERHEAD_RESERVE
-    );
-    let { markdown, wasTruncated } = reportFromSteps(inputs.steps, {
-      ...reportOptions,
-      maxOutputLength: fullBudget
-    });
-    if (wasTruncated) {
-      const reducedBudget = Math.max(0, fullBudget - truncationNotice.length);
-      ({ markdown, wasTruncated } = reportFromSteps(inputs.steps, {
-        ...reportOptions,
-        maxOutputLength: reducedBudget
-      }));
-    }
-    let reportBody = markdown;
-    if (wasTruncated) {
-      reportBody += truncationNotice;
-    }
-    const body = reportBody + footer;
     const repoInfo = parseRepo(env);
     if (repoInfo === void 0) {
       console.log("GITHUB_REPOSITORY not set, skipping API calls");
@@ -3840,12 +4172,46 @@ async function run(env = process.env, clientFactory = createGitHubClient) {
     }
     const { owner, repo } = repoInfo;
     const marker = buildMarker(inputs.workspace);
-    const transport = (method, url, headers, body2) => httpRequest(method, url, headers, body2, { env });
+    const transport = (method, url, headers, reqBody) => httpRequest(method, url, headers, reqBody, { env });
     const client = clientFactory({
       token: inputs.githubToken,
       ...env["GITHUB_API_URL"] !== void 0 && env["GITHUB_API_URL"] !== "" && { baseUrl: env["GITHUB_API_URL"] },
       transport
     });
+    const fullBudget = Math.max(
+      0,
+      COMMENT_LIMIT - footer.length - OVERHEAD_RESERVE
+    );
+    const result = reportFromSteps(inputs.steps, {
+      ...reportOptions,
+      maxOutputLength: fullBudget
+    });
+    let { markdown } = result;
+    const { fullMarkdown, wasTruncated, operation, hasUnresolvedFailures } = result;
+    if (wasTruncated) {
+      const opLabel = operation ?? "report";
+      const artifactName = inputs.workspace ? `${inputs.workspace}-${opLabel}` : opLabel;
+      const artifactUrl = await tryUpload({
+        fullMarkdown,
+        renderMarkdown: client.renderMarkdown.bind(client),
+        env,
+        repoContext: `${owner}/${repo}`,
+        artifactName,
+        deps: { transport }
+      });
+      const link = artifactUrl ? { url: artifactUrl, label: "View full report" } : { url: logsUrl, label: "View full workflow run logs" };
+      const truncationNotice = buildTruncationNotice(link);
+      const reducedBudget = Math.max(0, fullBudget - truncationNotice.length);
+      ({ markdown } = reportFromSteps(inputs.steps, {
+        ...reportOptions,
+        maxOutputLength: reducedBudget
+      }));
+      markdown += truncationNotice;
+    }
+    if (hasUnresolvedFailures) {
+      markdown += buildLogsNotice({ url: logsUrl, label: "workflow run logs" });
+    }
+    const body = markdown + footer;
     if (isPr) {
       const eventPath = env["GITHUB_EVENT_PATH"] ?? "";
       const prNumber = readPrNumber(eventPath);
