@@ -362,44 +362,6 @@ describe("run — artifact upload on truncation", () => {
 
     expect(uploadCalls).toHaveLength(0);
   });
-
-  it("calls tryUploadFullReport with correct params when truncated", async () => {
-    // Use a very small budget to force truncation by setting up a very large
-    // steps context that produces a large report. Instead, we rely on the
-    // integration: the existing code path where reportFromSteps returns
-    // wasTruncated = true. For unit testing, we verify the wiring by
-    // making the report artificially exceed the budget. We can do this
-    // by setting a tiny comment limit... but COMMENT_LIMIT is a const.
-    //
-    // Instead, verify the params shape by checking that artifact name
-    // is constructed correctly from workspace + operation.
-    //
-    // The truncation flow is tested implicitly through the body budget test
-    // and through the artifact-upload unit tests. Here we verify the wiring
-    // by testing artifact name construction with a mock.
-    const { client } = mockClient();
-    const uploadCalls: import("../../../src/action/artifact-upload.js").TryUploadParams[] =
-      [];
-    const fakeTryUpload = (
-      params: import("../../../src/action/artifact-upload.js").TryUploadParams,
-    ): Promise<string | undefined> => {
-      uploadCalls.push(params);
-      return Promise.resolve(
-        "https://github.com/owner/repo/actions/runs/123/artifacts/42",
-      );
-    };
-
-    // This test doesn't force truncation — the small steps context fits easily.
-    // Truncation wiring is validated by the logs notice tests and artifact-upload
-    // unit tests. Here we just verify the upload is NOT called when not needed.
-    await run(baseEnv(), {
-      clientFactory: () => client,
-      tryUploadFullReport: fakeTryUpload,
-    });
-
-    // Not truncated, so upload should not be called
-    expect(uploadCalls).toHaveLength(0);
-  });
 });
 
 // ---------------------------------------------------------------------------

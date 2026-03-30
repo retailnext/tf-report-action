@@ -1,16 +1,19 @@
 /**
- * Wrap a GitHub-rendered HTML fragment in a self-contained page.
+ * Wrap a GitHub-rendered HTML fragment in a complete HTML page.
  *
  * The page loads GitHub's Primer CSS from the unpkg CDN for accurate
- * rendering of the `markdown-body` class. The fragment is inserted as-is
- * because it has already been sanitized by GitHub's `/markdown` API.
+ * rendering of the `markdown-body` class. An internet connection is
+ * required when viewing the artifact — the CSS is not embedded.
+ *
+ * The fragment is inserted as-is because it has already been sanitized
+ * by GitHub's `/markdown` API.
  */
 
 /**
  * Build a complete HTML page from a pre-rendered HTML fragment.
  *
- * The result is a self-contained page suitable for uploading as a
- * single-file artifact. Users can open it directly in a browser and
+ * The result is a single-file artifact that loads Primer CSS from CDN.
+ * Users can open it directly in a browser (with internet access) and
  * see the report with GitHub-like styling.
  */
 export function buildHtmlPage(htmlFragment: string, title?: string): string {
