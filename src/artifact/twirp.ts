@@ -56,8 +56,8 @@ export async function createArtifact(
   },
 ): Promise<CreateArtifactResponse> {
   const body: Record<string, unknown> = {
-    workflowRunBackendId: params.backendIds.workflowRunBackendId,
-    workflowJobRunBackendId: params.backendIds.workflowJobRunBackendId,
+    workflow_run_backend_id: params.backendIds.workflowRunBackendId,
+    workflow_job_run_backend_id: params.backendIds.workflowJobRunBackendId,
     name: params.name,
     version: 7,
     ...(params.mimeType !== undefined && { mime_type: params.mimeType }),
@@ -75,8 +75,9 @@ export async function createArtifact(
 /**
  * Finalize an artifact after blob upload, confirming size and hash.
  *
- * The `size` is sent as a string (int64 JSON encoding) and the hash value
- * uses the `sha256:` prefix format.
+ * The `size` is sent as a string (int64 JSON encoding) and the hash is a
+ * plain string with the `sha256:` prefix (protobuf `StringValue` serializes
+ * as a raw string in JSON).
  */
 export async function finalizeArtifact(
   deps: TwirpDeps,
@@ -88,11 +89,11 @@ export async function finalizeArtifact(
   },
 ): Promise<FinalizeArtifactResponse> {
   const body = {
-    workflowRunBackendId: params.backendIds.workflowRunBackendId,
-    workflowJobRunBackendId: params.backendIds.workflowJobRunBackendId,
+    workflow_run_backend_id: params.backendIds.workflowRunBackendId,
+    workflow_job_run_backend_id: params.backendIds.workflowJobRunBackendId,
     name: params.name,
     size: String(params.size),
-    hash: { value: `sha256:${params.sha256Hex}` },
+    hash: `sha256:${params.sha256Hex}`,
   };
 
   const parsed = await twirpCall(deps, "FinalizeArtifact", body);

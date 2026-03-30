@@ -3835,8 +3835,8 @@ var RETRYABLE_STATUS_CODES = /* @__PURE__ */ new Set([
 ]);
 async function createArtifact(deps, params) {
   const body = {
-    workflowRunBackendId: params.backendIds.workflowRunBackendId,
-    workflowJobRunBackendId: params.backendIds.workflowJobRunBackendId,
+    workflow_run_backend_id: params.backendIds.workflowRunBackendId,
+    workflow_job_run_backend_id: params.backendIds.workflowJobRunBackendId,
     name: params.name,
     version: 7,
     ...params.mimeType !== void 0 && { mime_type: params.mimeType }
@@ -3850,11 +3850,11 @@ async function createArtifact(deps, params) {
 }
 async function finalizeArtifact(deps, params) {
   const body = {
-    workflowRunBackendId: params.backendIds.workflowRunBackendId,
-    workflowJobRunBackendId: params.backendIds.workflowJobRunBackendId,
+    workflow_run_backend_id: params.backendIds.workflowRunBackendId,
+    workflow_job_run_backend_id: params.backendIds.workflowJobRunBackendId,
     name: params.name,
     size: String(params.size),
-    hash: { value: `sha256:${params.sha256Hex}` }
+    hash: `sha256:${params.sha256Hex}`
   };
   const parsed = await twirpCall(deps, "FinalizeArtifact", body);
   const rawId = parsed["artifact_id"];

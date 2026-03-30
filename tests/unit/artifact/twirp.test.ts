@@ -89,8 +89,10 @@ describe("createArtifact", () => {
     const body = JSON.parse(requests[0]!.body!) as Record<string, unknown>;
     expect(body["version"]).toBe(7);
     expect(body["name"]).toBe("my-artifact");
-    expect(body["workflowRunBackendId"]).toBe(BACKEND_IDS.workflowRunBackendId);
-    expect(body["workflowJobRunBackendId"]).toBe(
+    expect(body["workflow_run_backend_id"]).toBe(
+      BACKEND_IDS.workflowRunBackendId,
+    );
+    expect(body["workflow_job_run_backend_id"]).toBe(
       BACKEND_IDS.workflowJobRunBackendId,
     );
   });
@@ -175,8 +177,8 @@ describe("finalizeArtifact", () => {
     const body = JSON.parse(requests[0]!.body!) as Record<string, unknown>;
     // A-12: size as string
     expect(body["size"]).toBe("1234");
-    // A-13: hash with sha256: prefix
-    expect(body["hash"]).toEqual({ value: "sha256:abc123def456" });
+    // A-13: hash as plain string (protobuf StringValue → raw string in JSON)
+    expect(body["hash"]).toBe("sha256:abc123def456");
     expect(body["name"]).toBe("test-artifact");
   });
 

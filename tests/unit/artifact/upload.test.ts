@@ -119,14 +119,12 @@ describe("createArtifactUploader", () => {
 
     expect(result.sha256).toBe(expectedHash);
 
-    // Verify FinalizeArtifact request has the hash with prefix
+    // Verify FinalizeArtifact request has the hash as plain string
     const finalizeBody = JSON.parse(requests[2]!.body!) as Record<
       string,
       unknown
     >;
-    expect(finalizeBody["hash"]).toEqual({
-      value: `sha256:${expectedHash}`,
-    });
+    expect(finalizeBody["hash"]).toBe(`sha256:${expectedHash}`);
   });
 
   // A-21: injected createHash is used
