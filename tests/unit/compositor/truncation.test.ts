@@ -1,5 +1,8 @@
 import { describe, it, expect } from "vitest";
-import { buildTruncationNotice } from "../../../src/compositor/truncation.js";
+import {
+  buildTruncationNotice,
+  buildLogsNotice,
+} from "../../../src/compositor/truncation.js";
 
 describe("buildTruncationNotice", () => {
   it("includes a clickable link when link is provided", () => {
@@ -53,5 +56,36 @@ describe("buildTruncationNotice", () => {
       label: "Logs",
     });
     expect(result).toContain("> ⚠️");
+  });
+});
+
+describe("buildLogsNotice", () => {
+  const link = {
+    url: "https://github.com/owner/repo/actions/runs/12345/attempts/1",
+    label: "workflow run logs",
+  };
+
+  it("renders a blockquote with info icon and link", () => {
+    const result = buildLogsNotice(link);
+    expect(result).toContain("> ℹ️");
+    expect(result).toContain(`[workflow run logs](${link.url})`);
+  });
+
+  it("mentions step errors not shown", () => {
+    const result = buildLogsNotice(link);
+    expect(result).toContain("step errors are not shown");
+  });
+
+  it("starts with a horizontal rule separator", () => {
+    const result = buildLogsNotice(link);
+    expect(result).toMatch(/^\n---\n/);
+  });
+
+  it("includes the custom label in the link", () => {
+    const result = buildLogsNotice({
+      url: "https://example.com/logs",
+      label: "View logs",
+    });
+    expect(result).toContain("[View logs](https://example.com/logs)");
   });
 });
