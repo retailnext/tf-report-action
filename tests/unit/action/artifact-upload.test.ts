@@ -44,7 +44,7 @@ function sequenceTransport(artifactId = 42): ArtifactTransport {
         headers: {},
         body: JSON.stringify({
           ok: true,
-          signedUploadUrl: "https://blob.example.com/upload?sig=test",
+          signed_upload_url: "https://blob.example.com/upload?sig=test",
         }),
       });
     }
@@ -54,7 +54,7 @@ function sequenceTransport(artifactId = 42): ArtifactTransport {
     return Promise.resolve({
       status: 200,
       headers: {},
-      body: JSON.stringify({ ok: true, artifactId: String(artifactId) }),
+      body: JSON.stringify({ ok: true, artifact_id: String(artifactId) }),
     });
   };
 }
@@ -223,7 +223,7 @@ describe("tryUploadFullReport", () => {
           headers: {},
           body: JSON.stringify({
             ok: true,
-            signedUploadUrl: "https://blob.example.com/upload",
+            signed_upload_url: "https://blob.example.com/upload",
           }),
         });
       }
@@ -233,7 +233,7 @@ describe("tryUploadFullReport", () => {
       return Promise.resolve({
         status: 200,
         headers: {},
-        body: JSON.stringify({ ok: true, artifactId: "1" }),
+        body: JSON.stringify({ ok: true, artifact_id: "1" }),
       });
     };
 

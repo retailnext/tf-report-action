@@ -45,9 +45,10 @@ function baseDeps(transport: ArtifactTransport): TwirpDeps {
 }
 
 describe("createArtifact", () => {
+  // The real API returns snake_case field names
   const successBody = JSON.stringify({
     ok: true,
-    signedUploadUrl: "https://storage.blob.core.windows.net/artifact?sig=abc",
+    signed_upload_url: "https://storage.blob.core.windows.net/artifact?sig=abc",
   });
 
   // A-4: POST to correct Twirp URL with JSON body
@@ -151,14 +152,15 @@ describe("createArtifact", () => {
         name: "test",
         backendIds: BACKEND_IDS,
       }),
-    ).rejects.toThrow("missing signedUploadUrl");
+    ).rejects.toThrow("missing signed_upload_url");
   });
 });
 
 describe("finalizeArtifact", () => {
+  // The real API returns snake_case field names
   const successBody = JSON.stringify({
     ok: true,
-    artifactId: "987654321",
+    artifact_id: "987654321",
   });
 
   it("sends correct request body with size as string and hash prefix", async () => {
@@ -192,8 +194,8 @@ describe("finalizeArtifact", () => {
     expect(typeof result.artifactId).toBe("number");
   });
 
-  it("handles numeric artifactId in response", async () => {
-    const body = JSON.stringify({ ok: true, artifactId: 42 });
+  it("handles numeric artifact_id in response", async () => {
+    const body = JSON.stringify({ ok: true, artifact_id: 42 });
     const { transport } = mockTransport(200, body);
     const result = await finalizeArtifact(baseDeps(transport), {
       name: "test",
@@ -239,7 +241,7 @@ describe("retry behavior", () => {
         headers: {},
         body: JSON.stringify({
           ok: true,
-          signedUploadUrl: "https://blob.example.com/upload",
+          signed_upload_url: "https://blob.example.com/upload",
         }),
       });
     };
@@ -288,7 +290,7 @@ describe("retry behavior", () => {
         headers: {},
         body: JSON.stringify({
           ok: true,
-          signedUploadUrl: "https://blob.example.com/upload",
+          signed_upload_url: "https://blob.example.com/upload",
         }),
       });
     };
@@ -316,7 +318,7 @@ describe("retry behavior", () => {
         headers: {},
         body: JSON.stringify({
           ok: true,
-          signedUploadUrl: "https://blob.example.com/upload",
+          signed_upload_url: "https://blob.example.com/upload",
         }),
       });
     };

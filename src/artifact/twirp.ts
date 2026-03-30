@@ -64,9 +64,9 @@ export async function createArtifact(
   };
 
   const parsed = await twirpCall(deps, "CreateArtifact", body);
-  const url = (parsed as Record<string, unknown>)["signedUploadUrl"];
+  const url = (parsed as Record<string, unknown>)["signed_upload_url"];
   if (typeof url !== "string" || url === "") {
-    throw new ActionsError("CreateArtifact response missing signedUploadUrl");
+    throw new ActionsError("CreateArtifact response missing signed_upload_url");
   }
 
   return { signedUploadUrl: url };
@@ -96,7 +96,7 @@ export async function finalizeArtifact(
   };
 
   const parsed = await twirpCall(deps, "FinalizeArtifact", body);
-  const rawId = (parsed as Record<string, unknown>)["artifactId"];
+  const rawId = (parsed as Record<string, unknown>)["artifact_id"];
 
   // artifactId comes as a string (int64 encoding) or number
   const id =

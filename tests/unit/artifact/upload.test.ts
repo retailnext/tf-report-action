@@ -28,9 +28,9 @@ interface CapturedRequest {
 
 /**
  * Build a mock transport that responds to the 3-step upload sequence:
- * 1. POST CreateArtifact → signedUploadUrl
+ * 1. POST CreateArtifact → signed_upload_url
  * 2. PUT blob → 201
- * 3. POST FinalizeArtifact → artifactId
+ * 3. POST FinalizeArtifact → artifact_id
  */
 function sequenceTransport(artifactId = 42): {
   transport: ArtifactTransport;
@@ -50,7 +50,7 @@ function sequenceTransport(artifactId = 42): {
         headers: {},
         body: JSON.stringify({
           ok: true,
-          signedUploadUrl: "https://blob.example.com/upload?sig=test",
+          signed_upload_url: "https://blob.example.com/upload?sig=test",
         }),
       });
     }
@@ -62,7 +62,7 @@ function sequenceTransport(artifactId = 42): {
     return Promise.resolve({
       status: 200,
       headers: {},
-      body: JSON.stringify({ ok: true, artifactId: String(artifactId) }),
+      body: JSON.stringify({ ok: true, artifact_id: String(artifactId) }),
     });
   };
 

@@ -3842,9 +3842,9 @@ async function createArtifact(deps, params) {
     ...params.mimeType !== void 0 && { mime_type: params.mimeType }
   };
   const parsed = await twirpCall(deps, "CreateArtifact", body);
-  const url = parsed["signedUploadUrl"];
+  const url = parsed["signed_upload_url"];
   if (typeof url !== "string" || url === "") {
-    throw new ActionsError("CreateArtifact response missing signedUploadUrl");
+    throw new ActionsError("CreateArtifact response missing signed_upload_url");
   }
   return { signedUploadUrl: url };
 }
@@ -3857,7 +3857,7 @@ async function finalizeArtifact(deps, params) {
     hash: { value: `sha256:${params.sha256Hex}` }
   };
   const parsed = await twirpCall(deps, "FinalizeArtifact", body);
-  const rawId = parsed["artifactId"];
+  const rawId = parsed["artifact_id"];
   const id = typeof rawId === "string" ? Number(rawId) : typeof rawId === "number" ? rawId : NaN;
   if (!Number.isFinite(id)) {
     throw new ActionsError(
