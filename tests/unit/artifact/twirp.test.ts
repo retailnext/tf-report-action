@@ -94,6 +94,29 @@ describe("createArtifact", () => {
     );
   });
 
+  it("includes mime_type in the request body when provided", async () => {
+    const { transport, requests } = mockTransport(200, successBody);
+    await createArtifact(baseDeps(transport), {
+      name: "test-artifact",
+      backendIds: BACKEND_IDS,
+      mimeType: "text/html",
+    });
+
+    const body = JSON.parse(requests[0]!.body!) as Record<string, unknown>;
+    expect(body["mime_type"]).toBe("text/html");
+  });
+
+  it("omits mime_type from the request body when not provided", async () => {
+    const { transport, requests } = mockTransport(200, successBody);
+    await createArtifact(baseDeps(transport), {
+      name: "test-artifact",
+      backendIds: BACKEND_IDS,
+    });
+
+    const body = JSON.parse(requests[0]!.body!) as Record<string, unknown>;
+    expect(body).not.toHaveProperty("mime_type");
+  });
+
   it("returns the signed upload URL", async () => {
     const { transport } = mockTransport(200, successBody);
     const result = await createArtifact(baseDeps(transport), {

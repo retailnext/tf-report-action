@@ -49,13 +49,18 @@ export interface FinalizeArtifactResponse {
  */
 export async function createArtifact(
   deps: TwirpDeps,
-  params: { readonly name: string; readonly backendIds: BackendIds },
+  params: {
+    readonly name: string;
+    readonly backendIds: BackendIds;
+    readonly mimeType?: string;
+  },
 ): Promise<CreateArtifactResponse> {
-  const body = {
+  const body: Record<string, unknown> = {
     workflowRunBackendId: params.backendIds.workflowRunBackendId,
     workflowJobRunBackendId: params.backendIds.workflowJobRunBackendId,
     name: params.name,
     version: 7,
+    ...(params.mimeType !== undefined && { mime_type: params.mimeType }),
   };
 
   const parsed = await twirpCall(deps, "CreateArtifact", body);

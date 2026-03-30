@@ -61,7 +61,7 @@ export function createArtifactUploader(deps: ArtifactUploaderDeps): {
           transport,
           ...(deps.sleep !== undefined && { sleep: deps.sleep }),
         },
-        { name: params.name, backendIds },
+        { name: params.name, backendIds, mimeType: contentType },
       );
 
       await uploadBlob({

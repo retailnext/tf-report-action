@@ -3,6 +3,8 @@ import type { Env } from "../../../src/env/index.js";
 import type { TryUploadParams } from "../../../src/action/artifact-upload.js";
 import { tryUploadFullReport } from "../../../src/action/artifact-upload.js";
 import type { ArtifactTransport } from "../../../src/artifact/types.js";
+import { nullLogger } from "../../../src/action/logger.js";
+import type { Logger } from "../../../src/action/logger.js";
 
 /** Build a JWT with a valid Actions.Results scope. */
 function buildJwt(runId: string, jobId: string): string {
@@ -66,6 +68,24 @@ function fakeRenderMarkdown(): (params: {
     Promise.resolve(`<p>Rendered: ${params.text.slice(0, 20)}</p>`);
 }
 
+/** Logger that captures all messages for assertions. */
+function capturingLogger(): {
+  logger: Logger;
+  messages: { warnings: string[]; errors: string[]; infos: string[] };
+} {
+  const messages = {
+    warnings: [] as string[],
+    errors: [] as string[],
+    infos: [] as string[],
+  };
+  const logger: Logger = {
+    warning: (m) => messages.warnings.push(m),
+    error: (m) => messages.errors.push(m),
+    info: (m) => messages.infos.push(m),
+  };
+  return { logger, messages };
+}
+
 function baseParams(overrides: Partial<TryUploadParams> = {}): TryUploadParams {
   return {
     fullMarkdown: "# Plan\n\n3 to add",
@@ -73,6 +93,7 @@ function baseParams(overrides: Partial<TryUploadParams> = {}): TryUploadParams {
     env: baseEnv(),
     repoContext: "owner/repo",
     artifactName: "cluster-plan",
+    logger: nullLogger(),
     deps: {
       transport: sequenceTransport(),
       sleep: async () => {
@@ -142,12 +163,16 @@ describe("tryUploadFullReport", () => {
   });
 
   it("returns undefined when renderMarkdown throws", async () => {
+    const { logger, messages } = capturingLogger();
     const url = await tryUploadFullReport(
       baseParams({
         renderMarkdown: () => Promise.reject(new Error("API error")),
+        logger,
       }),
     );
     expect(url).toBeUndefined();
+    expect(messages.warnings).toHaveLength(1);
+    expect(messages.warnings[0]).toContain("API error");
   });
 
   it("returns undefined when upload fails", async () => {
@@ -158,6 +183,7 @@ describe("tryUploadFullReport", () => {
         body: "Internal Server Error",
       });
 
+    const { logger, messages } = capturingLogger();
     const url = await tryUploadFullReport(
       baseParams({
         deps: {
@@ -166,18 +192,25 @@ describe("tryUploadFullReport", () => {
             /* no-op */
           },
         },
+        logger,
       }),
     );
     expect(url).toBeUndefined();
+    expect(messages.warnings).toHaveLength(1);
+    expect(messages.warnings[0]).toContain("Artifact upload failed");
   });
 
   it("returns undefined when GHES guard rejects", async () => {
+    const { logger, messages } = capturingLogger();
     const url = await tryUploadFullReport(
       baseParams({
         env: baseEnv({ GITHUB_SERVER_URL: "https://github.mycompany.com" }),
+        logger,
       }),
     );
     expect(url).toBeUndefined();
+    expect(messages.warnings).toHaveLength(1);
+    expect(messages.warnings[0]).toContain("github.mycompany.com");
   });
 
   it("passes injected transport through to uploader", async () => {

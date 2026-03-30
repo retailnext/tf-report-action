@@ -4,7 +4,7 @@
  * Attempts to upload the full un-truncated report as an HTML artifact.
  * Returns the artifact view URL on success, or `undefined` when upload
  * is not possible (GHES, missing env vars) or fails. This function never
- * throws — all errors are caught and logged as `::warning::` annotations.
+ * throws — all errors are caught and logged via the injected `Logger`.
  *
  * All I/O dependencies are injected via parameters for testability.
  */
@@ -13,6 +13,8 @@ import type { Env } from "../env/index.js";
 import type { ArtifactTransport } from "../artifact/types.js";
 import { createArtifactUploader } from "../artifact/index.js";
 import { buildHtmlPage } from "../html/index.js";
+import type { Logger } from "./logger.js";
+import { nullLogger } from "./logger.js";
 
 /** Injectable dependencies for the upload process. */
 export interface TryUploadDeps {
@@ -43,6 +45,8 @@ export interface TryUploadParams {
   readonly repoContext: string;
   /** Artifact display name and filename stem, e.g. "cluster-plan". */
   readonly artifactName: string;
+  /** Logger for warnings on failure — defaults to `nullLogger()`. */
+  readonly logger?: Logger;
   /** Optional transport/crypto/sleep overrides. */
   readonly deps?: TryUploadDeps;
 }
@@ -105,7 +109,8 @@ export async function tryUploadFullReport(
     return `${artifactServerUrl}/${params.repoContext}/actions/runs/${runId}/artifacts/${String(result.id)}`;
   } catch (error: unknown) {
     const msg = error instanceof Error ? error.message : String(error);
-    process.stderr.write(`::warning::Artifact upload failed: ${msg}\n`);
+    const log = params.logger ?? nullLogger();
+    log.warning(`Artifact upload failed: ${msg}`);
     return undefined;
   }
 }

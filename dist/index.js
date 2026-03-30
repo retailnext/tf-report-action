@@ -3838,7 +3838,8 @@ async function createArtifact(deps, params) {
     workflowRunBackendId: params.backendIds.workflowRunBackendId,
     workflowJobRunBackendId: params.backendIds.workflowJobRunBackendId,
     name: params.name,
-    version: 7
+    version: 7,
+    ...params.mimeType !== void 0 && { mime_type: params.mimeType }
   };
   const parsed = await twirpCall(deps, "CreateArtifact", body);
   const url = parsed["signedUploadUrl"];
@@ -3951,7 +3952,7 @@ function createArtifactUploader(deps) {
           transport,
           ...deps.sleep !== void 0 && { sleep: deps.sleep }
         },
-        { name: params.name, backendIds }
+        { name: params.name, backendIds, mimeType: contentType }
       );
       await uploadBlob({
         signedUrl: signedUploadUrl,
@@ -4022,6 +4023,34 @@ function escapeHtml2(s) {
   return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 }
 
+// src/action/logger.ts
+function actionsLogger() {
+  return {
+    warning(message) {
+      process.stderr.write(`::warning::${message}
+`);
+    },
+    error(message) {
+      process.stderr.write(`::error::${message}
+`);
+    },
+    info(message) {
+      process.stdout.write(`${message}
+`);
+    }
+  };
+}
+function nullLogger() {
+  return {
+    warning() {
+    },
+    error() {
+    },
+    info() {
+    }
+  };
+}
+
 // src/action/artifact-upload.ts
 async function tryUploadFullReport(params) {
   try {
@@ -4060,8 +4089,8 @@ async function tryUploadFullReport(params) {
     return `${artifactServerUrl}/${params.repoContext}/actions/runs/${runId}/artifacts/${String(result.id)}`;
   } catch (error) {
     const msg = error instanceof Error ? error.message : String(error);
-    process.stderr.write(`::warning::Artifact upload failed: ${msg}
-`);
+    const log = params.logger ?? nullLogger();
+    log.warning(`Artifact upload failed: ${msg}`);
     return void 0;
   }
 }
@@ -4141,6 +4170,8 @@ async function handleIssue(client, owner, repo, workspace, marker, body) {
   }
 }
 async function run(env = process.env, deps) {
+  const logger = deps?.logger ?? actionsLogger();
+  const exit = deps?.exit ?? ((code) => process.exit(code));
   try {
     const clientFactory = deps?.clientFactory ?? createGitHubClient;
     const tryUpload = deps?.tryUploadFullReport ?? tryUploadFullReport;
@@ -4174,7 +4205,7 @@ async function run(env = process.env, deps) {
     }
     const repoInfo = parseRepo(env);
     if (repoInfo === void 0) {
-      console.log("GITHUB_REPOSITORY not set, skipping API calls");
+      logger.info("GITHUB_REPOSITORY not set, skipping API calls");
       return;
     }
     const { owner, repo } = repoInfo;
@@ -4206,6 +4237,7 @@ async function run(env = process.env, deps) {
         env,
         repoContext: `${owner}/${repo}`,
         artifactName,
+        logger,
         deps: { transport }
       });
     }
@@ -4242,8 +4274,8 @@ async function run(env = process.env, deps) {
     }
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);
-    console.error(`::error::${message}`);
-    process.exit(1);
+    logger.error(message);
+    exit(1);
   }
 }
 if (import.meta.url === `file://${process.argv[1] ?? ""}` || import.meta.url.endsWith(process.argv[1] ?? "")) {

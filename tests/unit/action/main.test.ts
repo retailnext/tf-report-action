@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+import { describe, it, expect, beforeEach, afterEach } from "vitest";
 import { run, formatTimestamp } from "../../../src/action/main.js";
 import type { Env } from "../../../src/env/index.js";
 import type {
@@ -9,6 +9,54 @@ import type {
 import { writeFileSync, mkdtempSync, rmSync } from "node:fs";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
+import { nullLogger } from "../../../src/action/logger.js";
+import type { Logger } from "../../../src/action/logger.js";
+import type { RunDeps } from "../../../src/action/main.js";
+
+// ---------------------------------------------------------------------------
+// Helpers
+// ---------------------------------------------------------------------------
+
+/** Sentinel error thrown by the fake exit function. */
+class ExitError extends Error {
+  readonly code: number;
+  constructor(code: number) {
+    super(`process.exit(${String(code)})`);
+    this.code = code;
+  }
+}
+
+/** Fake exit function that throws instead of terminating the process. */
+function throwingExit(code: number): never {
+  throw new ExitError(code);
+}
+
+/** Logger that captures all messages for assertions. */
+function capturingLogger(): {
+  logger: Logger;
+  messages: { warnings: string[]; errors: string[]; infos: string[] };
+} {
+  const messages = {
+    warnings: [] as string[],
+    errors: [] as string[],
+    infos: [] as string[],
+  };
+  const logger: Logger = {
+    warning: (m) => messages.warnings.push(m),
+    error: (m) => messages.errors.push(m),
+    info: (m) => messages.infos.push(m),
+  };
+  return { logger, messages };
+}
+
+/** Default deps that suppress all output and throw on exit. */
+function quietDeps(overrides: Partial<RunDeps> = {}): RunDeps {
+  return {
+    logger: nullLogger(),
+    exit: throwingExit,
+    ...overrides,
+  };
+}
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -125,7 +173,7 @@ describe("run — non-PR flow", () => {
     const { client, calls } = mockClient();
     const factory = () => client;
 
-    await run(baseEnv(), { clientFactory: factory });
+    await run(baseEnv(), quietDeps({ clientFactory: factory }));
 
     expect(calls.searchIssues).toHaveLength(1);
     expect(calls.createIssue).toHaveLength(1);
@@ -150,7 +198,7 @@ describe("run — non-PR flow", () => {
     });
     const factory = () => client;
 
-    await run(baseEnv(), { clientFactory: factory });
+    await run(baseEnv(), quietDeps({ clientFactory: factory }));
 
     expect(calls.updateIssue).toHaveLength(1);
     expect(calls.createIssue).toHaveLength(0);
@@ -170,7 +218,7 @@ describe("run — non-PR flow", () => {
     const env = baseEnv();
     delete env["GITHUB_REPOSITORY"];
 
-    await run(env, { clientFactory: factory });
+    await run(env, quietDeps({ clientFactory: factory }));
     expect(calls.searchIssues).toHaveLength(0);
   });
 
@@ -178,9 +226,12 @@ describe("run — non-PR flow", () => {
     const { client, calls } = mockClient();
     const factory = () => client;
 
-    await run(baseEnv({ GITHUB_REPOSITORY: "noslash" }), {
-      clientFactory: factory,
-    });
+    await run(
+      baseEnv({ GITHUB_REPOSITORY: "noslash" }),
+      quietDeps({
+        clientFactory: factory,
+      }),
+    );
     expect(calls.searchIssues).toHaveLength(0);
   });
 });
@@ -215,7 +266,7 @@ describe("run — PR flow", () => {
     const { client, calls } = mockClient();
     const factory = () => client;
 
-    await run(prEnv(), { clientFactory: factory });
+    await run(prEnv(), quietDeps({ clientFactory: factory }));
 
     expect(calls.postComment).toHaveLength(1);
     const [owner, repo, num, body] = calls.postComment[0] as [
@@ -244,7 +295,7 @@ describe("run — PR flow", () => {
     });
     const factory = () => client;
 
-    await run(prEnv(), { clientFactory: factory });
+    await run(prEnv(), quietDeps({ clientFactory: factory }));
 
     expect(calls.deleteComment).toHaveLength(2);
     const deletedIds = calls.deleteComment.map((c) => c[2]);
@@ -257,9 +308,12 @@ describe("run — PR flow", () => {
     const { client, calls } = mockClient();
     const factory = () => client;
 
-    await run(prEnv({ GITHUB_EVENT_NAME: "pull_request_target" }), {
-      clientFactory: factory,
-    });
+    await run(
+      prEnv({ GITHUB_EVENT_NAME: "pull_request_target" }),
+      quietDeps({
+        clientFactory: factory,
+      }),
+    );
 
     expect(calls.postComment).toHaveLength(1);
     expect(calls.createIssue).toHaveLength(0);
@@ -268,26 +322,20 @@ describe("run — PR flow", () => {
   it("reports error when event payload is unreadable", async () => {
     const { client } = mockClient();
     const factory = () => client;
-    const exitSpy = vi.spyOn(process, "exit").mockImplementation((() => {
-      throw new Error("EXIT");
-    }) as never);
-    const errorSpy = vi.spyOn(console, "error").mockImplementation((() => {
-      return undefined; // suppress test output
-    }) as never);
+    const { logger, messages } = capturingLogger();
 
     try {
       await run(prEnv({ GITHUB_EVENT_PATH: "/nonexistent" }), {
         clientFactory: factory,
+        logger,
+        exit: throwingExit,
       });
     } catch {
-      // Expected — exit mock throws
+      // Expected — throwingExit throws
     }
 
-    expect(errorSpy).toHaveBeenCalledWith(
-      expect.stringContaining("::error::Could not read pull request number"),
-    );
-    exitSpy.mockRestore();
-    errorSpy.mockRestore();
+    expect(messages.errors).toHaveLength(1);
+    expect(messages.errors[0]).toContain("Could not read pull request number");
   });
 });
 
@@ -296,26 +344,28 @@ describe("run — PR flow", () => {
 // ---------------------------------------------------------------------------
 
 describe("run — error handling", () => {
-  it("reports missing steps as ::error:: and exits", async () => {
-    const exitSpy = vi.spyOn(process, "exit").mockImplementation((() => {
-      throw new Error("EXIT");
-    }) as never);
-    const errorSpy = vi.spyOn(console, "error").mockImplementation((() => {
-      return undefined; // suppress test output
-    }) as never);
+  it("reports missing steps as error and exits", async () => {
+    const { logger, messages } = capturingLogger();
+    let exitCode: number | undefined;
 
     const env: Env = { "INPUT_GITHUB-TOKEN": "tok" };
 
     try {
-      await run(env, { clientFactory: () => mockClient().client });
+      await run(env, {
+        clientFactory: () => mockClient().client,
+        logger,
+        exit: ((code: number) => {
+          exitCode = code;
+          throw new ExitError(code);
+        }) as (code: number) => never,
+      });
     } catch {
       // Expected
     }
 
-    expect(errorSpy).toHaveBeenCalledWith(expect.stringContaining("::error::"));
-    expect(exitSpy).toHaveBeenCalledWith(1);
-    exitSpy.mockRestore();
-    errorSpy.mockRestore();
+    expect(messages.errors).toHaveLength(1);
+    expect(messages.errors[0]).toBeTruthy();
+    expect(exitCode).toBe(1);
   });
 });
 
@@ -334,7 +384,7 @@ describe("body budget", () => {
     });
     const factory = () => client;
 
-    await run(baseEnv(), { clientFactory: factory });
+    await run(baseEnv(), quietDeps({ clientFactory: factory }));
 
     expect(postedBody.length).toBeLessThanOrEqual(65_536);
   });
@@ -355,10 +405,13 @@ describe("run — artifact upload on truncation", () => {
       return Promise.resolve(undefined);
     };
 
-    await run(baseEnv(), {
-      clientFactory: () => client,
-      tryUploadFullReport: fakeTryUpload,
-    });
+    await run(
+      baseEnv(),
+      quietDeps({
+        clientFactory: () => client,
+        tryUploadFullReport: fakeTryUpload,
+      }),
+    );
 
     expect(uploadCalls).toHaveLength(0);
   });
@@ -382,10 +435,13 @@ describe("run — always-upload-report", () => {
       );
     };
 
-    await run(baseEnv({ "INPUT_ALWAYS-UPLOAD-REPORT": "true" }), {
-      clientFactory: () => client,
-      tryUploadFullReport: fakeTryUpload,
-    });
+    await run(
+      baseEnv({ "INPUT_ALWAYS-UPLOAD-REPORT": "true" }),
+      quietDeps({
+        clientFactory: () => client,
+        tryUploadFullReport: fakeTryUpload,
+      }),
+    );
 
     expect(uploadCalls).toHaveLength(1);
   });
@@ -403,10 +459,13 @@ describe("run — always-upload-report", () => {
         "https://github.com/owner/repo/actions/runs/123/artifacts/42",
       );
 
-    await run(baseEnv({ "INPUT_ALWAYS-UPLOAD-REPORT": "true" }), {
-      clientFactory: () => client,
-      tryUploadFullReport: fakeTryUpload,
-    });
+    await run(
+      baseEnv({ "INPUT_ALWAYS-UPLOAD-REPORT": "true" }),
+      quietDeps({
+        clientFactory: () => client,
+        tryUploadFullReport: fakeTryUpload,
+      }),
+    );
 
     expect(postedBody).toContain("📎");
     expect(postedBody).toContain("Full report artifact");
@@ -428,10 +487,13 @@ describe("run — always-upload-report", () => {
     const fakeTryUpload = (): Promise<string | undefined> =>
       Promise.resolve(undefined);
 
-    await run(baseEnv({ "INPUT_ALWAYS-UPLOAD-REPORT": "true" }), {
-      clientFactory: () => client,
-      tryUploadFullReport: fakeTryUpload,
-    });
+    await run(
+      baseEnv({ "INPUT_ALWAYS-UPLOAD-REPORT": "true" }),
+      quietDeps({
+        clientFactory: () => client,
+        tryUploadFullReport: fakeTryUpload,
+      }),
+    );
 
     expect(postedBody).not.toContain("📎");
     expect(postedBody).not.toContain("Full report artifact");
@@ -462,9 +524,12 @@ describe("run — artifact naming", () => {
       },
     });
 
-    await run(baseEnv({ INPUT_WORKSPACE: "staging" }), {
-      clientFactory: () => client,
-    });
+    await run(
+      baseEnv({ INPUT_WORKSPACE: "staging" }),
+      quietDeps({
+        clientFactory: () => client,
+      }),
+    );
 
     expect(postedBody).toContain('<!-- tf-report-action:"staging" -->');
   });
@@ -485,7 +550,7 @@ describe("run — logs notice", () => {
     });
 
     // Simple steps context with a successful step — no unresolved failures
-    await run(baseEnv(), { clientFactory: () => client });
+    await run(baseEnv(), quietDeps({ clientFactory: () => client }));
 
     // The info icon from buildLogsNotice should NOT be present
     expect(postedBody).not.toContain("ℹ️");
@@ -512,9 +577,12 @@ describe("run — logs notice", () => {
       },
     });
 
-    await run(baseEnv({ INPUT_STEPS: stepsWithFailure }), {
-      clientFactory: () => client,
-    });
+    await run(
+      baseEnv({ INPUT_STEPS: stepsWithFailure }),
+      quietDeps({
+        clientFactory: () => client,
+      }),
+    );
 
     // The logs notice should be present with the info icon
     expect(postedBody).toContain("ℹ️");

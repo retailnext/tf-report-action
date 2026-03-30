@@ -24,6 +24,8 @@ import { httpRequest } from "../http/index.js";
 import { parseInputs } from "./inputs.js";
 import { tryUploadFullReport } from "./artifact-upload.js";
 import type { TryUploadParams } from "./artifact-upload.js";
+import type { Logger } from "./logger.js";
+import { actionsLogger } from "./logger.js";
 
 // ---------------------------------------------------------------------------
 // Constants
@@ -187,7 +189,7 @@ async function handleIssue(
  * Injectable dependencies for the `run` function.
  *
  * All fields are optional and default to their real implementations.
- * Tests inject fakes for the GitHub client and artifact upload.
+ * Tests inject fakes for the GitHub client, artifact upload, and logger.
  */
 export interface RunDeps {
   /** Factory for creating a GitHub API client. */
@@ -196,6 +198,10 @@ export interface RunDeps {
   readonly tryUploadFullReport?: (
     params: TryUploadParams,
   ) => Promise<string | undefined>;
+  /** Logger for workflow annotations — defaults to `actionsLogger()`. */
+  readonly logger?: Logger;
+  /** Process exit function — defaults to `process.exit`. */
+  readonly exit?: (code: number) => never;
 }
 
 /**
@@ -203,7 +209,7 @@ export interface RunDeps {
  *
  * Generates a report from the steps context and posts it as a PR
  * comment or status issue.  **Never throws** — all errors are reported
- * via `::error::` and `process.exit(1)`.
+ * via `logger.error()` and `exit(1)`.
  *
  * @param env - Environment variables (defaults to `process.env`)
  * @param deps - Injectable dependencies (defaults to real implementations)
@@ -212,6 +218,8 @@ export async function run(
   env: Env = process.env as Env,
   deps?: RunDeps,
 ): Promise<void> {
+  const logger = deps?.logger ?? actionsLogger();
+  const exit = deps?.exit ?? ((code: number): never => process.exit(code));
   try {
     const clientFactory = deps?.clientFactory ?? createGitHubClient;
     const tryUpload = deps?.tryUploadFullReport ?? tryUploadFullReport;
@@ -253,7 +261,7 @@ export async function run(
     // -----------------------------------------------------------------------
     const repoInfo = parseRepo(env);
     if (repoInfo === undefined) {
-      console.log("GITHUB_REPOSITORY not set, skipping API calls");
+      logger.info("GITHUB_REPOSITORY not set, skipping API calls");
       return;
     }
     const { owner, repo } = repoInfo;
@@ -309,6 +317,7 @@ export async function run(
         env,
         repoContext: `${owner}/${repo}`,
         artifactName,
+        logger,
         deps: { transport },
       });
     }
@@ -364,8 +373,8 @@ export async function run(
     }
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : String(err);
-    console.error(`::error::${message}`);
-    process.exit(1);
+    logger.error(message);
+    exit(1);
   }
 }
 
