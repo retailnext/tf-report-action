@@ -14,6 +14,7 @@ export interface ActionInputs {
   workspace: string;
   targetStep: string | undefined;
   githubToken: string;
+  alwaysUploadReport: boolean;
   initStepId: string;
   validateStepId: string;
   planStepId: string;
@@ -65,6 +66,7 @@ export function parseInputs(env: Env): ActionInputs {
     workspace,
     targetStep,
     githubToken,
+    alwaysUploadReport: readInput(env, "always-upload-report") === "true",
     initStepId: readInput(env, "init-step-id") || "init",
     validateStepId: readInput(env, "validate-step-id") || "validate",
     planStepId: readInput(env, "plan-step-id") || "plan",

@@ -96,6 +96,29 @@ describe("parseInputs", () => {
     expect(result.targetStep).toBe("plan");
   });
 
+  it("defaults alwaysUploadReport to false", () => {
+    const result = parseInputs(baseEnv());
+    expect(result.alwaysUploadReport).toBe(false);
+  });
+
+  it("parses alwaysUploadReport as true", () => {
+    const env: Env = {
+      ...baseEnv(),
+      "INPUT_ALWAYS-UPLOAD-REPORT": "true",
+    };
+    const result = parseInputs(env);
+    expect(result.alwaysUploadReport).toBe(true);
+  });
+
+  it("treats non-'true' values as false for alwaysUploadReport", () => {
+    const env: Env = {
+      ...baseEnv(),
+      "INPUT_ALWAYS-UPLOAD-REPORT": "yes",
+    };
+    const result = parseInputs(env);
+    expect(result.alwaysUploadReport).toBe(false);
+  });
+
   it("trims input values", () => {
     const env: Env = {
       ...baseEnv(),

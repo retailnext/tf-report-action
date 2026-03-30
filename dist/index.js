@@ -1090,6 +1090,7 @@ var DIAGNOSTIC_WARNING = "\u26A0\uFE0F";
 var MODULE_ICON = "\u{1F4E6}";
 var DRIFT_ICON = "\u{1F500}";
 var INFO_ICON = "\u2139\uFE0F";
+var ARTIFACT_ICON = "\u{1F4CE}";
 
 // src/builder/title.ts
 function buildTitle(report) {
@@ -3342,6 +3343,11 @@ function buildLogsNotice(link) {
 > ${INFO_ICON} Some step errors are not shown \u2014 see the [${link.label}](${link.url}) for details.
 `;
 }
+function buildArtifactNotice(link) {
+  return `
+${ARTIFACT_ICON} [${link.label}](${link.url})
+`;
+}
 
 // src/index.ts
 function reportFromSteps(stepsJson, options) {
@@ -3755,6 +3761,7 @@ function parseInputs(env) {
     workspace,
     targetStep,
     githubToken,
+    alwaysUploadReport: readInput(env, "always-upload-report") === "true",
     initStepId: readInput(env, "init-step-id") || "init",
     validateStepId: readInput(env, "validate-step-id") || "validate",
     planStepId: readInput(env, "plan-step-id") || "plan",
@@ -4188,10 +4195,12 @@ async function run(env = process.env, deps) {
     });
     let { markdown } = result;
     const { fullMarkdown, wasTruncated, operation, hasUnresolvedFailures } = result;
-    if (wasTruncated) {
+    const shouldUpload = wasTruncated || inputs.alwaysUploadReport;
+    let artifactUrl;
+    if (shouldUpload) {
       const opLabel = operation ?? "report";
       const artifactName = inputs.workspace ? `${inputs.workspace}-${opLabel}` : opLabel;
-      const artifactUrl = await tryUpload({
+      artifactUrl = await tryUpload({
         fullMarkdown,
         renderMarkdown: client.renderMarkdown.bind(client),
         env,
@@ -4199,6 +4208,8 @@ async function run(env = process.env, deps) {
         artifactName,
         deps: { transport }
       });
+    }
+    if (wasTruncated) {
       const link = artifactUrl ? { url: artifactUrl, label: "View full report" } : { url: logsUrl, label: "View full workflow run logs" };
       const truncationNotice = buildTruncationNotice(link);
       const reducedBudget = Math.max(0, fullBudget - truncationNotice.length);
@@ -4207,6 +4218,11 @@ async function run(env = process.env, deps) {
         maxOutputLength: reducedBudget
       }));
       markdown += truncationNotice;
+    } else if (artifactUrl !== void 0) {
+      markdown += buildArtifactNotice({
+        url: artifactUrl,
+        label: "Full report artifact"
+      });
     }
     if (hasUnresolvedFailures) {
       markdown += buildLogsNotice({ url: logsUrl, label: "workflow run logs" });

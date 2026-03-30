@@ -16,6 +16,7 @@ import {
   reportFromSteps,
   buildTruncationNotice,
   buildLogsNotice,
+  buildArtifactNotice,
 } from "../index.js";
 import type { GitHubClient, GitHubClientDeps } from "../github/index.js";
 import { createGitHubClient } from "../github/index.js";
@@ -292,14 +293,17 @@ export async function run(
     const { fullMarkdown, wasTruncated, operation, hasUnresolvedFailures } =
       result;
 
-    if (wasTruncated) {
-      // Construct context-aware artifact name: "cluster-plan", "apply", etc.
+    // Upload artifact when truncated OR when always-upload-report is enabled.
+    const shouldUpload = wasTruncated || inputs.alwaysUploadReport;
+    let artifactUrl: string | undefined;
+
+    if (shouldUpload) {
       const opLabel = operation ?? "report";
       const artifactName = inputs.workspace
         ? `${inputs.workspace}-${opLabel}`
         : opLabel;
 
-      const artifactUrl = await tryUpload({
+      artifactUrl = await tryUpload({
         fullMarkdown,
         renderMarkdown: client.renderMarkdown.bind(client),
         env,
@@ -307,7 +311,9 @@ export async function run(
         artifactName,
         deps: { transport },
       });
+    }
 
+    if (wasTruncated) {
       const link = artifactUrl
         ? { url: artifactUrl, label: "View full report" }
         : { url: logsUrl, label: "View full workflow run logs" };
@@ -322,6 +328,12 @@ export async function run(
       }));
 
       markdown += truncationNotice;
+    } else if (artifactUrl !== undefined) {
+      // Not truncated but always-upload-report is enabled — add a subtle link
+      markdown += buildArtifactNotice({
+        url: artifactUrl,
+        label: "Full report artifact",
+      });
     }
 
     // When step failures lack captured output, always link to logs

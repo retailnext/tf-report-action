@@ -152,6 +152,7 @@ export { expectedCommand } from "./model/step-commands.js";
 export {
   buildTruncationNotice,
   buildLogsNotice,
+  buildArtifactNotice,
 } from "./compositor/truncation.js";
 export type { TruncationLink } from "./compositor/truncation.js";
 export type { Summary } from "./model/summary.js";

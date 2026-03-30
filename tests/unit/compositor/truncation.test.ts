@@ -2,6 +2,7 @@ import { describe, it, expect } from "vitest";
 import {
   buildTruncationNotice,
   buildLogsNotice,
+  buildArtifactNotice,
 } from "../../../src/compositor/truncation.js";
 
 describe("buildTruncationNotice", () => {
@@ -87,5 +88,28 @@ describe("buildLogsNotice", () => {
       label: "View logs",
     });
     expect(result).toContain("[View logs](https://example.com/logs)");
+  });
+});
+
+describe("buildArtifactNotice", () => {
+  const link = {
+    url: "https://github.com/owner/repo/actions/runs/123/artifacts/42",
+    label: "Full report artifact",
+  };
+
+  it("renders a compact link with paperclip emoji", () => {
+    const result = buildArtifactNotice(link);
+    expect(result).toContain("📎");
+    expect(result).toContain(`[Full report artifact](${link.url})`);
+  });
+
+  it("does not render as a blockquote", () => {
+    const result = buildArtifactNotice(link);
+    expect(result).not.toContain("> ");
+  });
+
+  it("does not include a horizontal rule", () => {
+    const result = buildArtifactNotice(link);
+    expect(result).not.toContain("---");
   });
 });

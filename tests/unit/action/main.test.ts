@@ -345,7 +345,7 @@ describe("body budget", () => {
 // ---------------------------------------------------------------------------
 
 describe("run — artifact upload on truncation", () => {
-  it("does not call tryUploadFullReport when report is not truncated", async () => {
+  it("does not call tryUploadFullReport when report is not truncated and flag is off", async () => {
     const { client } = mockClient();
     const uploadCalls: unknown[] = [];
     const fakeTryUpload = (
@@ -361,6 +361,80 @@ describe("run — artifact upload on truncation", () => {
     });
 
     expect(uploadCalls).toHaveLength(0);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// run — always-upload-report
+// ---------------------------------------------------------------------------
+
+describe("run — always-upload-report", () => {
+  it("calls tryUploadFullReport when always-upload-report is true", async () => {
+    const uploadCalls: import("../../../src/action/artifact-upload.js").TryUploadParams[] =
+      [];
+    const { client } = mockClient();
+    const fakeTryUpload = (
+      params: import("../../../src/action/artifact-upload.js").TryUploadParams,
+    ): Promise<string | undefined> => {
+      uploadCalls.push(params);
+      return Promise.resolve(
+        "https://github.com/owner/repo/actions/runs/123/artifacts/42",
+      );
+    };
+
+    await run(baseEnv({ "INPUT_ALWAYS-UPLOAD-REPORT": "true" }), {
+      clientFactory: () => client,
+      tryUploadFullReport: fakeTryUpload,
+    });
+
+    expect(uploadCalls).toHaveLength(1);
+  });
+
+  it("appends artifact notice when upload succeeds and not truncated", async () => {
+    let postedBody = "";
+    const { client } = mockClient({
+      createIssue: (_o, _r, _t, body) => {
+        postedBody = body;
+        return Promise.resolve(1);
+      },
+    });
+    const fakeTryUpload = (): Promise<string | undefined> =>
+      Promise.resolve(
+        "https://github.com/owner/repo/actions/runs/123/artifacts/42",
+      );
+
+    await run(baseEnv({ "INPUT_ALWAYS-UPLOAD-REPORT": "true" }), {
+      clientFactory: () => client,
+      tryUploadFullReport: fakeTryUpload,
+    });
+
+    expect(postedBody).toContain("📎");
+    expect(postedBody).toContain("Full report artifact");
+    expect(postedBody).toContain(
+      "https://github.com/owner/repo/actions/runs/123/artifacts/42",
+    );
+    // Should NOT contain truncation warning since report fits
+    expect(postedBody).not.toContain("Output truncated");
+  });
+
+  it("does not append artifact notice when upload fails", async () => {
+    let postedBody = "";
+    const { client } = mockClient({
+      createIssue: (_o, _r, _t, body) => {
+        postedBody = body;
+        return Promise.resolve(1);
+      },
+    });
+    const fakeTryUpload = (): Promise<string | undefined> =>
+      Promise.resolve(undefined);
+
+    await run(baseEnv({ "INPUT_ALWAYS-UPLOAD-REPORT": "true" }), {
+      clientFactory: () => client,
+      tryUploadFullReport: fakeTryUpload,
+    });
+
+    expect(postedBody).not.toContain("📎");
+    expect(postedBody).not.toContain("Full report artifact");
   });
 });
 

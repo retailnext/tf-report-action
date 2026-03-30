@@ -3,7 +3,11 @@
  * when the compositor had to degrade or omit sections.
  */
 
-import { DIAGNOSTIC_WARNING, INFO_ICON } from "../model/status-icons.js";
+import {
+  DIAGNOSTIC_WARNING,
+  INFO_ICON,
+  ARTIFACT_ICON,
+} from "../model/status-icons.js";
 
 /** Link target for the truncation notice. */
 export interface TruncationLink {
@@ -39,4 +43,18 @@ export function buildTruncationNotice(link?: TruncationLink): string {
  */
 export function buildLogsNotice(link: TruncationLink): string {
   return `\n---\n\n> ${INFO_ICON} Some step errors are not shown — see the [${link.label}](${link.url}) for details.\n`;
+}
+
+/**
+ * Build a subtle artifact link for non-truncated reports.
+ *
+ * Used when `always-upload-report` is enabled and the report was not
+ * truncated. The link is a compact line (not a warning blockquote)
+ * directing readers to the full HTML artifact.
+ *
+ * @param link - Link to the uploaded artifact
+ * @returns A markdown string to append after the report body
+ */
+export function buildArtifactNotice(link: TruncationLink): string {
+  return `\n${ARTIFACT_ICON} [${link.label}](${link.url})\n`;
 }

@@ -49,6 +49,13 @@ inputs:
     description: "Step ID for the state step (post-apply state pull)"
     required: false
     default: "state"
+  always-upload-report:
+    description: >-
+      When "true", always uploads the full report as an HTML artifact
+      and links to it from the comment — even when the report is not
+      truncated. Useful for archival or sharing outside of GitHub.
+    required: false
+    default: "false"
 runs:
   using: "node24"
   main: "dist/index.js"
