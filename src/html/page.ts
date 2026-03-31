@@ -70,7 +70,7 @@ export const MARKDOWN_CSS = `
     padding: 0 2px; border-radius: 2px;
   }
   .markdown-body img { max-width: 100%; }
-  markdown-accessiblity-table { display: block; }
+  markdown-accessiblity-table, markdown-accessibility-table { display: block; }
   .copy-btn {
     position: absolute; top: 8px; right: 8px;
     padding: 4px 8px; font-size: 12px;
@@ -97,7 +97,8 @@ export const COPY_BUTTON_JS = `
       btn.className = "copy-btn";
       btn.textContent = "Copy";
       btn.addEventListener("click", function() {
-        var text = pre.textContent || "";
+        var code = pre.querySelector("code");
+        var text = code ? code.textContent || "" : pre.firstChild.textContent || "";
         navigator.clipboard.writeText(text).then(function() {
           btn.textContent = "Copied!";
           btn.classList.add("copied");

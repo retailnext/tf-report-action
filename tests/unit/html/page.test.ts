@@ -82,7 +82,9 @@ describe("buildHtmlPage", () => {
 
   it("handles markdown-accessiblity-table custom element", () => {
     const html = buildHtmlPage(fragment);
+    // GitHub renders misspelled "accessiblity"; support both spellings
     expect(html).toContain("markdown-accessiblity-table");
+    expect(html).toContain("markdown-accessibility-table");
     expect(html).toContain("display: block");
   });
 });

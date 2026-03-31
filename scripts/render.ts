@@ -522,7 +522,8 @@ function buildGalleryHtml(entriesJson: string): string {
         btn.className = "copy-btn";
         btn.textContent = "Copy";
         btn.addEventListener("click", function() {
-          var text = pre.textContent || "";
+          var code = pre.querySelector("code");
+          var text = code ? code.textContent || "" : pre.firstChild.textContent || "";
           navigator.clipboard.writeText(text).then(function() {
             btn.textContent = "Copied!";
             btn.classList.add("copied");
