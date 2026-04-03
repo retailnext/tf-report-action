@@ -19,6 +19,9 @@ rich plan and apply detail.
   apply, and state steps from the workflow context
 - **Limit-aware** — intelligently truncates output to fit within GitHub's 65,536
   character limit while preserving the most important information
+- **HTML artifact upload** — optionally uploads the full report as an HTML
+  artifact for archival or sharing; automatic on truncation, opt-in via
+  `always-upload-report` for non-truncated reports
 - **Zero runtime dependencies** — uses only Node.js built-in modules
 
 ## Example Output
@@ -451,18 +454,19 @@ jobs:
 
 ## Inputs
 
-| Input               | Required | Default                      | Description                                                                    |
-| ------------------- | -------- | ---------------------------- | ------------------------------------------------------------------------------ |
-| `steps`             | Yes      | —                            | JSON string of workflow steps (use `${{ toJSON(steps) }}`)                     |
-| `workspace`         | No       | `GITHUB_WORKFLOW/GITHUB_JOB` | Workspace name for comment title, status issue title, and deduplication marker |
-| `target-step`       | No       | —                            | Step ID to focus the report on; skipped/failed status is prominently reported  |
-| `github-token`      | Yes      | —                            | GitHub token for API calls                                                     |
-| `init-step-id`      | No       | `init`                       | Step ID for the init step (override when your workflow uses non-default IDs)   |
-| `validate-step-id`  | No       | `validate`                   | Step ID for the validate step                                                  |
-| `plan-step-id`      | No       | `plan`                       | Step ID for the plan step                                                      |
-| `show-plan-step-id` | No       | `show-plan`                  | Step ID for the show-plan step                                                 |
-| `apply-step-id`     | No       | `apply`                      | Step ID for the apply step                                                     |
-| `state-step-id`     | No       | `state`                      | Step ID for the state step (post-apply state for resolving computed values)    |
+| Input                  | Required | Default                      | Description                                                                    |
+| ---------------------- | -------- | ---------------------------- | ------------------------------------------------------------------------------ |
+| `steps`                | Yes      | —                            | JSON string of workflow steps (use `${{ toJSON(steps) }}`)                     |
+| `workspace`            | No       | `GITHUB_WORKFLOW/GITHUB_JOB` | Workspace name for comment title, status issue title, and deduplication marker |
+| `target-step`          | No       | —                            | Step ID to focus the report on; skipped/failed status is prominently reported  |
+| `github-token`         | Yes      | —                            | GitHub token for API calls                                                     |
+| `init-step-id`         | No       | `init`                       | Step ID for the init step (override when your workflow uses non-default IDs)   |
+| `validate-step-id`     | No       | `validate`                   | Step ID for the validate step                                                  |
+| `plan-step-id`         | No       | `plan`                       | Step ID for the plan step                                                      |
+| `show-plan-step-id`    | No       | `show-plan`                  | Step ID for the show-plan step                                                 |
+| `apply-step-id`        | No       | `apply`                      | Step ID for the apply step                                                     |
+| `state-step-id`        | No       | `state`                      | Step ID for the state step (post-apply state for resolving computed values)    |
+| `always-upload-report` | No       | `"false"`                    | Upload the full report as an HTML artifact and link to it from the comment     |
 
 ## How It Works
 
@@ -529,6 +533,9 @@ automatically manages output within this limit:
   (full → compact → omit) to fit within the limit
 - The footer (logs link, timestamp) is reserved from the budget before rendering
 - A 512-character safety margin prevents edge cases from exceeding the limit
+- When output is truncated, the full report is uploaded as an HTML artifact and
+  linked from the comment. Set `always-upload-report: "true"` to upload the
+  artifact even when the report fits in the comment.
 
 ## Development
 

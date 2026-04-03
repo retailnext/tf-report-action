@@ -12,11 +12,20 @@
 import { readFileSync } from "node:fs";
 import type { Env } from "../env/index.js";
 import type { ReportOptions } from "../index.js";
-import { reportFromSteps, buildTruncationNotice } from "../index.js";
+import {
+  reportFromSteps,
+  buildTruncationNotice,
+  buildLogsNotice,
+  buildArtifactNotice,
+} from "../index.js";
 import type { GitHubClient, GitHubClientDeps } from "../github/index.js";
 import { createGitHubClient } from "../github/index.js";
 import { httpRequest } from "../http/index.js";
 import { parseInputs } from "./inputs.js";
+import { tryUploadFullReport } from "./artifact-upload.js";
+import type { TryUploadParams } from "./artifact-upload.js";
+import type { Logger } from "./logger.js";
+import { actionsLogger } from "./logger.js";
 
 // ---------------------------------------------------------------------------
 // Constants
@@ -177,20 +186,43 @@ async function handleIssue(
 // ---------------------------------------------------------------------------
 
 /**
+ * Injectable dependencies for the `run` function.
+ *
+ * All fields are optional and default to their real implementations.
+ * Tests inject fakes for the GitHub client, artifact upload, and logger.
+ */
+export interface RunDeps {
+  /** Factory for creating a GitHub API client. */
+  readonly clientFactory?: (deps: GitHubClientDeps) => GitHubClient;
+  /** Artifact upload function — injected for testability. */
+  readonly tryUploadFullReport?: (
+    params: TryUploadParams,
+  ) => Promise<string | undefined>;
+  /** Logger for workflow annotations — defaults to `actionsLogger()`. */
+  readonly logger?: Logger;
+  /** Process exit function — defaults to `process.exit`. */
+  readonly exit?: (code: number) => never;
+}
+
+/**
  * Run the GitHub Action.
  *
  * Generates a report from the steps context and posts it as a PR
  * comment or status issue.  **Never throws** — all errors are reported
- * via `::error::` and `process.exit(1)`.
+ * via `logger.error()` and `exit(1)`.
  *
  * @param env - Environment variables (defaults to `process.env`)
- * @param clientFactory - Factory for creating a GitHub API client (DI)
+ * @param deps - Injectable dependencies (defaults to real implementations)
  */
 export async function run(
   env: Env = process.env as Env,
-  clientFactory: (deps: GitHubClientDeps) => GitHubClient = createGitHubClient,
+  deps?: RunDeps,
 ): Promise<void> {
+  const logger = deps?.logger ?? actionsLogger();
+  const exit = deps?.exit ?? ((code: number): never => process.exit(code));
   try {
+    const clientFactory = deps?.clientFactory ?? createGitHubClient;
+    const tryUpload = deps?.tryUploadFullReport ?? tryUploadFullReport;
     const inputs = parseInputs(env);
 
     // -----------------------------------------------------------------------
@@ -224,57 +256,12 @@ export async function run(
       reportOptions.allowedDirs = [env["RUNNER_TEMP"]];
     }
 
-    // Pre-compute the truncation notice so we know its length if needed.
-    // The action always uses the logs URL link when truncation occurs.
-    const truncationLink = {
-      url: logsUrl,
-      label: "View full workflow run logs",
-    };
-    const truncationNotice = buildTruncationNotice(truncationLink);
-
-    // First pass: give the report the full available budget (no truncation
-    // notice reservation). If the report is not truncated, we avoid
-    // needlessly shrinking the budget.
-    const fullBudget = Math.max(
-      0,
-      COMMENT_LIMIT - footer.length - OVERHEAD_RESERVE,
-    );
-
-    let { markdown, wasTruncated } = reportFromSteps(inputs.steps, {
-      ...reportOptions,
-      maxOutputLength: fullBudget,
-    });
-
-    // Second pass: if truncated, re-generate with the truncation notice
-    // length reserved so the final output (report + notice + footer) fits.
-    if (wasTruncated) {
-      const reducedBudget = Math.max(0, fullBudget - truncationNotice.length);
-      ({ markdown, wasTruncated } = reportFromSteps(inputs.steps, {
-        ...reportOptions,
-        maxOutputLength: reducedBudget,
-      }));
-    }
-
     // -----------------------------------------------------------------------
-    // Build truncation notice if needed
-    // -----------------------------------------------------------------------
-    let reportBody = markdown;
-
-    if (wasTruncated) {
-      reportBody += truncationNotice;
-    }
-
-    // -----------------------------------------------------------------------
-    // Construct full comment body
-    // -----------------------------------------------------------------------
-    const body = reportBody + footer;
-
-    // -----------------------------------------------------------------------
-    // Post via GitHub API
+    // GitHub API setup (needed for both artifact upload and comment posting)
     // -----------------------------------------------------------------------
     const repoInfo = parseRepo(env);
     if (repoInfo === undefined) {
-      console.log("GITHUB_REPOSITORY not set, skipping API calls");
+      logger.info("GITHUB_REPOSITORY not set, skipping API calls");
       return;
     }
     const { owner, repo } = repoInfo;
@@ -284,8 +271,8 @@ export async function run(
       method: string,
       url: string,
       headers: Record<string, string>,
-      body?: string,
-    ) => httpRequest(method, url, headers, body, { env });
+      reqBody?: string,
+    ) => httpRequest(method, url, headers, reqBody, { env });
     const client = clientFactory({
       token: inputs.githubToken,
       ...(env["GITHUB_API_URL"] !== undefined &&
@@ -293,6 +280,85 @@ export async function run(
       transport,
     });
 
+    // -----------------------------------------------------------------------
+    // Generate report and handle truncation / artifact upload
+    // -----------------------------------------------------------------------
+
+    // First pass: give the report the full available budget (no truncation
+    // notice reservation). If the report is not truncated, we avoid
+    // needlessly shrinking the budget.
+    const fullBudget = Math.max(
+      0,
+      COMMENT_LIMIT - footer.length - OVERHEAD_RESERVE,
+    );
+
+    const result = reportFromSteps(inputs.steps, {
+      ...reportOptions,
+      maxOutputLength: fullBudget,
+    });
+
+    let { markdown } = result;
+    const { fullMarkdown, wasTruncated, operation, hasUnresolvedFailures } =
+      result;
+
+    // Upload artifact when truncated OR when always-upload-report is enabled.
+    const shouldUpload = wasTruncated || inputs.alwaysUploadReport;
+    let artifactUrl: string | undefined;
+
+    if (shouldUpload) {
+      const opLabel = operation ?? "report";
+      const artifactName = inputs.workspace
+        ? `${inputs.workspace}-${opLabel}`
+        : opLabel;
+
+      artifactUrl = await tryUpload({
+        fullMarkdown,
+        renderMarkdown: client.renderMarkdown.bind(client),
+        env,
+        repoContext: `${owner}/${repo}`,
+        artifactName,
+        logger,
+        deps: { transport },
+      });
+    }
+
+    if (wasTruncated) {
+      const link = artifactUrl
+        ? { url: artifactUrl, label: "View full report" }
+        : { url: logsUrl, label: "View full workflow run logs" };
+      const truncationNotice = buildTruncationNotice(link);
+
+      // Second pass: re-generate with truncation notice length reserved so
+      // the final output (report + notice + footer) fits.
+      const reducedBudget = Math.max(0, fullBudget - truncationNotice.length);
+      ({ markdown } = reportFromSteps(inputs.steps, {
+        ...reportOptions,
+        maxOutputLength: reducedBudget,
+      }));
+
+      markdown += truncationNotice;
+    } else if (artifactUrl !== undefined) {
+      // Not truncated but always-upload-report is enabled — add a subtle link
+      markdown += buildArtifactNotice({
+        url: artifactUrl,
+        label: "View/Download Report",
+      });
+    }
+
+    // When step failures lack captured output, always link to logs
+    // (even if not truncated — the error details are only in the logs).
+    if (hasUnresolvedFailures) {
+      markdown += buildLogsNotice({ url: logsUrl, label: "workflow run logs" });
+    }
+
+    // -----------------------------------------------------------------------
+    // Construct full comment body
+    // -----------------------------------------------------------------------
+    const body = markdown + footer;
+
+    // -----------------------------------------------------------------------
+    // Post via GitHub API
+    // -----------------------------------------------------------------------
     if (isPr) {
       const eventPath = env["GITHUB_EVENT_PATH"] ?? "";
       const prNumber = readPrNumber(eventPath);
@@ -307,8 +373,8 @@ export async function run(
     }
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : String(err);
-    console.error(`::error::${message}`);
-    process.exit(1);
+    logger.error(message);
+    exit(1);
   }
 }
 

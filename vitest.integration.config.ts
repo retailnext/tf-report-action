@@ -56,6 +56,12 @@ export default defineConfig({
         // The action module is the GitHub Action entry point — it is exercised
         // by unit tests with mocked clients, not integration tests.
         "src/action/**",
+        // The artifact module requires a live Actions runtime (JWT token, Twirp
+        // service, Azure Blob Storage) and cannot be exercised with fixture data.
+        "src/artifact/**",
+        // The HTML page builder is a pure wrapper exercised only from the action
+        // layer, not reachable through reportFromSteps/planToMarkdown/applyToMarkdown.
+        "src/html/**",
         // The GitHub API client requires real HTTP calls and cannot be exercised
         // by integration tests that use fixture data.
         "src/github/**",

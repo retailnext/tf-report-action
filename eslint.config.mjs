@@ -178,6 +178,48 @@ export default tseslint.config(
     },
   },
   {
+    // Forbid direct process/console access in source files — all I/O must go
+    // through the injected Logger interface. The only exception is
+    // src/action/logger.ts which provides the production implementations.
+    files: ["src/**/*.ts"],
+    ignores: ["src/action/logger.ts"],
+    rules: {
+      "no-restricted-syntax": [
+        "error",
+        {
+          selector:
+            "MemberExpression[object.name='process'][property.name='stderr']",
+          message:
+            "Use the injected Logger interface instead of process.stderr. See src/action/logger.ts.",
+        },
+        {
+          selector:
+            "MemberExpression[object.name='process'][property.name='stdout']",
+          message:
+            "Use the injected Logger interface instead of process.stdout. See src/action/logger.ts.",
+        },
+        {
+          selector:
+            "MemberExpression[object.name='console'][property.name='log']",
+          message:
+            "Use the injected Logger interface instead of console.log. See src/action/logger.ts.",
+        },
+        {
+          selector:
+            "MemberExpression[object.name='console'][property.name='error']",
+          message:
+            "Use the injected Logger interface instead of console.error. See src/action/logger.ts.",
+        },
+        {
+          selector:
+            "MemberExpression[object.name='console'][property.name='warn']",
+          message:
+            "Use the injected Logger interface instead of console.warn. See src/action/logger.ts.",
+        },
+      ],
+    },
+  },
+  {
     ignores: ["dist/**", "coverage/**", "node_modules/**"],
   },
 );

@@ -169,4 +169,13 @@ export interface Report {
 
   /** Pipeline error message. When set, the report is an error report. */
   error?: string;
+
+  /**
+   * Whether any step failed without captured stdout/stderr output.
+   *
+   * When true, the actual error messages are only available in the workflow
+   * run logs — the report cannot show them. The action layer uses this to
+   * include a logs link in the posted comment.
+   */
+  hasUnresolvedFailures?: boolean;
 }

@@ -318,6 +318,11 @@ export function buildReportFromSteps(
   // ─── Phase 7: Generate title ───────────────────────────────────────
   report.title = buildTitle(report);
 
+  // ─── Phase 8: Detect unresolved failures ────────────────────────────
+  report.hasUnresolvedFailures = report.issues.some(
+    (i) => i.isFailed && i.stdout === undefined && i.stderr === undefined,
+  );
+
   return report;
 }
 

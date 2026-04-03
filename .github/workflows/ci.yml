@@ -45,3 +45,4 @@ jobs:
           steps: ${{ toJSON(steps) }}
           workspace: ci
           github-token: ${{ github.token }}
+          always-upload-report: "true"

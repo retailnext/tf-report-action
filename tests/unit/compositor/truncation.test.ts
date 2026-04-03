@@ -1,5 +1,9 @@
 import { describe, it, expect } from "vitest";
-import { buildTruncationNotice } from "../../../src/compositor/truncation.js";
+import {
+  buildTruncationNotice,
+  buildLogsNotice,
+  buildArtifactNotice,
+} from "../../../src/compositor/truncation.js";
 
 describe("buildTruncationNotice", () => {
   it("includes a clickable link when link is provided", () => {
@@ -53,5 +57,59 @@ describe("buildTruncationNotice", () => {
       label: "Logs",
     });
     expect(result).toContain("> ⚠️");
+  });
+});
+
+describe("buildLogsNotice", () => {
+  const link = {
+    url: "https://github.com/owner/repo/actions/runs/12345/attempts/1",
+    label: "workflow run logs",
+  };
+
+  it("renders a blockquote with info icon and link", () => {
+    const result = buildLogsNotice(link);
+    expect(result).toContain("> ℹ️");
+    expect(result).toContain(`[workflow run logs](${link.url})`);
+  });
+
+  it("mentions step errors not shown", () => {
+    const result = buildLogsNotice(link);
+    expect(result).toContain("step errors are not shown");
+  });
+
+  it("starts with a horizontal rule separator", () => {
+    const result = buildLogsNotice(link);
+    expect(result).toMatch(/^\n---\n/);
+  });
+
+  it("includes the custom label in the link", () => {
+    const result = buildLogsNotice({
+      url: "https://example.com/logs",
+      label: "View logs",
+    });
+    expect(result).toContain("[View logs](https://example.com/logs)");
+  });
+});
+
+describe("buildArtifactNotice", () => {
+  const link = {
+    url: "https://github.com/owner/repo/actions/runs/123/artifacts/42",
+    label: "View/Download Report",
+  };
+
+  it("renders a compact link with paperclip emoji", () => {
+    const result = buildArtifactNotice(link);
+    expect(result).toContain("📎");
+    expect(result).toContain(`[View/Download Report](${link.url})`);
+  });
+
+  it("does not render as a blockquote", () => {
+    const result = buildArtifactNotice(link);
+    expect(result).not.toContain("> ");
+  });
+
+  it("does not include a horizontal rule", () => {
+    const result = buildArtifactNotice(link);
+    expect(result).not.toContain("---");
   });
 });

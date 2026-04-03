@@ -23,3 +23,9 @@ export const MODULE_ICON = "📦";
 
 /** Prefix for the resource drift section heading. */
 export const DRIFT_ICON = "🔀";
+
+/** Prefix for informational notices (e.g. "check the logs"). */
+export const INFO_ICON = "ℹ️";
+
+/** Prefix for artifact download links. */
+export const ARTIFACT_ICON = "📎";
