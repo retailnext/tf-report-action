@@ -73,3 +73,19 @@ export function buildApplyContext(
     diagnostics: diagByAddress.get(address) ?? [],
   };
 }
+
+/**
+ * Builds an apply context lookup function for a report.
+ *
+ * Returns `undefined` for non-apply reports. For apply reports, returns
+ * a function that provides the ApplyContext for any resource address.
+ */
+export function buildApplyContextFn(
+  report: Report,
+): ((address: string) => ApplyContext) | undefined {
+  if (!isApplyReport(report)) return undefined;
+  const failedAddresses = buildFailedSet(report);
+  const diagByAddress = buildDiagnosticMap(report);
+  return (addr: string) =>
+    buildApplyContext(addr, failedAddresses, diagByAddress);
+}

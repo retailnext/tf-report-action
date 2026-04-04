@@ -56,18 +56,13 @@ export default defineConfig({
         "src/steps/reader.ts",
         // Steps barrel re-exports are trivially covered by unit tests.
         "src/steps/index.ts",
-        "src/compositor/index.ts",
-        "src/compositor/types.ts",
-        // compositor/truncation.ts is superseded by compose/notices.ts and no
-        // longer called from the integration-testable pipeline.
-        "src/compositor/truncation.ts",
         // compose/notices.ts builds truncation/logs/artifact notice strings.
         // These depend on action-layer inputs (artifact URL, logs URL) not
         // available through reportFromSteps(). Covered by unit tests.
         "src/compose/notices.ts",
         // context-diff.ts implements context-only large-value diffs for
         // progressive tiers 3-4. Not yet wired into production rendering.
-        "src/renderer/context-diff.ts",
+        "src/diff/context-diff.ts",
         // jsonl-scanner barrel and types — no executable logic
         "src/jsonl-scanner/index.ts",
         "src/jsonl-scanner/types.ts",
@@ -87,6 +82,15 @@ export default defineConfig({
         // calls or network configuration and cannot be exercised by fixture-driven
         // integration tests.
         "src/http/**",
+        // The logger module writes to process.stdout/stderr — requires
+        // action runtime. Covered by unit tests.
+        "src/logger/**",
+        // The inputs module parses INPUT_* env vars and event payload —
+        // action-specific context not reachable via reportFromSteps.
+        "src/inputs/**",
+        // The comment module assembles comment bodies/footers/markers —
+        // action-specific output not reachable via reportFromSteps.
+        "src/comment/**",
       ],
       thresholds: {
         lines: 90,

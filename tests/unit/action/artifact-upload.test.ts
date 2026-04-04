@@ -3,8 +3,7 @@ import type { Env } from "../../../src/env/index.js";
 import type { TryUploadParams } from "../../../src/action/artifact-upload.js";
 import { tryUploadFullReport } from "../../../src/action/artifact-upload.js";
 import type { ArtifactTransport } from "../../../src/artifact/types.js";
-import { nullLogger } from "../../../src/action/logger.js";
-import type { Logger } from "../../../src/action/logger.js";
+import { nullLogger, capturingLogger } from "../../helpers/logger.js";
 
 /** Build a JWT with a valid Actions.Results scope. */
 function buildJwt(runId: string, jobId: string): string {
@@ -66,24 +65,6 @@ function fakeRenderMarkdown(): (params: {
 }) => Promise<string> {
   return (params) =>
     Promise.resolve(`<p>Rendered: ${params.text.slice(0, 20)}</p>`);
-}
-
-/** Logger that captures all messages for assertions. */
-function capturingLogger(): {
-  logger: Logger;
-  messages: { warnings: string[]; errors: string[]; infos: string[] };
-} {
-  const messages = {
-    warnings: [] as string[],
-    errors: [] as string[],
-    infos: [] as string[],
-  };
-  const logger: Logger = {
-    warning: (m) => messages.warnings.push(m),
-    error: (m) => messages.errors.push(m),
-    info: (m) => messages.infos.push(m),
-  };
-  return { logger, messages };
 }
 
 function baseParams(overrides: Partial<TryUploadParams> = {}): TryUploadParams {

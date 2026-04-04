@@ -1,6 +1,9 @@
-import { describe, it, expect } from "vitest";
-import { parseInputs } from "../../../src/action/inputs.js";
+import { describe, it, expect, beforeEach, afterEach } from "vitest";
+import { parseInputs, readPrNumber } from "../../../src/inputs/index.js";
 import type { Env } from "../../../src/env/index.js";
+import { writeFileSync, mkdtempSync, rmSync } from "node:fs";
+import { join } from "node:path";
+import { tmpdir } from "node:os";
 
 /** Build a minimal env with all required inputs set. */
 function baseEnv(): Env {
@@ -128,5 +131,39 @@ describe("parseInputs", () => {
     const result = parseInputs(env);
     expect(result.steps).toBe('{"init":{}}');
     expect(result.githubToken).toBe("token");
+  });
+});
+
+describe("readPrNumber", () => {
+  let dir: string;
+
+  beforeEach(() => {
+    dir = mkdtempSync(join(tmpdir(), "inputs-test-"));
+  });
+
+  afterEach(() => {
+    rmSync(dir, { recursive: true });
+  });
+
+  it("reads pull_request.number from event payload", () => {
+    const path = join(dir, "event.json");
+    writeFileSync(path, JSON.stringify({ pull_request: { number: 42 } }));
+    expect(readPrNumber(path)).toBe(42);
+  });
+
+  it("returns undefined for non-PR event", () => {
+    const path = join(dir, "event.json");
+    writeFileSync(path, JSON.stringify({ action: "push" }));
+    expect(readPrNumber(path)).toBeUndefined();
+  });
+
+  it("returns undefined for missing file", () => {
+    expect(readPrNumber(join(dir, "nonexistent.json"))).toBeUndefined();
+  });
+
+  it("returns undefined for invalid JSON", () => {
+    const path = join(dir, "event.json");
+    writeFileSync(path, "not json");
+    expect(readPrNumber(path)).toBeUndefined();
   });
 });

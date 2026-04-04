@@ -160,8 +160,6 @@ export {
   buildArtifactNotice,
 } from "./compose/notices.js";
 export type { NoticeLink } from "./compose/notices.js";
-/** @deprecated Use NoticeLink instead. */
-export type { NoticeLink as TruncationLink } from "./compose/notices.js";
 export type { Summary } from "./model/summary.js";
 export type { ResourceChange } from "./model/resource.js";
 export type { AttributeChange } from "./model/attribute.js";

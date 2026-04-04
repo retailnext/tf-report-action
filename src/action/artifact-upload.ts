@@ -13,8 +13,7 @@ import type { Env } from "../env/index.js";
 import type { ArtifactTransport } from "../artifact/types.js";
 import { createArtifactUploader } from "../artifact/index.js";
 import { buildHtmlPage } from "../html/index.js";
-import type { Logger } from "./logger.js";
-import { nullLogger } from "./logger.js";
+import type { Logger } from "../logger/index.js";
 
 /** Injectable dependencies for the upload process. */
 export interface TryUploadDeps {
@@ -45,8 +44,8 @@ export interface TryUploadParams {
   readonly repoContext: string;
   /** Artifact display name and filename stem, e.g. "cluster-plan". */
   readonly artifactName: string;
-  /** Logger for warnings on failure — defaults to `nullLogger()`. */
-  readonly logger?: Logger;
+  /** Logger for warnings on failure. */
+  readonly logger: Logger;
   /** Optional transport/crypto/sleep overrides. */
   readonly deps?: TryUploadDeps;
 }
@@ -109,7 +108,7 @@ export async function tryUploadFullReport(
     return `${artifactServerUrl}/${params.repoContext}/actions/runs/${runId}/artifacts/${String(result.id)}`;
   } catch (error: unknown) {
     const msg = error instanceof Error ? error.message : String(error);
-    const log = params.logger ?? nullLogger();
+    const log = params.logger;
     log.warning(`Artifact upload failed: ${msg}`);
     return undefined;
   }

@@ -1,6 +1,3 @@
-// src/action/main.ts
-import { readFileSync as readFileSync2 } from "node:fs";
-
 // src/parser/plan.ts
 function parsePlan(json) {
   let parsed;
@@ -2486,6 +2483,12 @@ function buildApplyContext(address, failedAddresses, diagByAddress) {
     diagnostics: diagByAddress.get(address) ?? []
   };
 }
+function buildApplyContextFn(report) {
+  if (!isApplyReport(report)) return void 0;
+  const failedAddresses = buildFailedSet(report);
+  const diagByAddress = buildDiagnosticMap(report);
+  return (addr) => buildApplyContext(addr, failedAddresses, diagByAddress);
+}
 
 // src/diff/lcs.ts
 var MAX_LCS_CELLS = 1e7;
@@ -3412,12 +3415,6 @@ function renderDriftAtTier(tier, report, options, diffCache) {
   }
   return ensureTrailingBlankLine(writer.build());
 }
-function buildApplyContextFn(report) {
-  if (!isApplyReport(report)) return void 0;
-  const failedAddresses = buildFailedSet(report);
-  const diagByAddress = buildDiagnosticMap(report);
-  return (addr) => buildApplyContext(addr, failedAddresses, diagByAddress);
-}
 
 // src/compose/progressive.ts
 var UPGRADE_PRIORITY = ["resources", "outputs", "drift"];
@@ -3949,7 +3946,26 @@ function collectResponse(res, resolve2, reject) {
   res.on("error", reject);
 }
 
-// src/action/inputs.ts
+// src/logger/index.ts
+function actionsLogger() {
+  return {
+    warning(message) {
+      process.stderr.write(`::warning::${message}
+`);
+    },
+    error(message) {
+      process.stderr.write(`::error::${message}
+`);
+    },
+    info(message) {
+      process.stdout.write(`${message}
+`);
+    }
+  };
+}
+
+// src/inputs/index.ts
+import { readFileSync as readFileSync2 } from "node:fs";
 function readInput(env, name) {
   const key = `INPUT_${name.replace(/ /g, "_").toUpperCase()}`;
   return env[key]?.trim() ?? "";
@@ -3980,6 +3996,105 @@ function parseInputs(env) {
     applyStepId: readInput(env, "apply-step-id") || "apply",
     stateStepId: readInput(env, "state-step-id") || "state"
   };
+}
+function readPrNumber(eventPath) {
+  try {
+    const raw = readFileSync2(eventPath, "utf-8");
+    const event = JSON.parse(raw);
+    const num = event.pull_request?.number;
+    return typeof num === "number" ? num : void 0;
+  } catch {
+    return void 0;
+  }
+}
+
+// src/comment/marker.ts
+function escapeMarkerWorkspace2(workspace) {
+  return workspace.replace(/\\/g, "\\\\").replace(/"/g, '\\"').replace(/(--!?)>/g, "$1\\>");
+}
+function buildMarker(workspace) {
+  return `<!-- tf-report-action:"${escapeMarkerWorkspace2(workspace)}" -->`;
+}
+
+// src/comment/footer.ts
+var COMMENT_LIMIT = 65536;
+var OVERHEAD_RESERVE = 512;
+var MONTHS = [
+  "January",
+  "February",
+  "March",
+  "April",
+  "May",
+  "June",
+  "July",
+  "August",
+  "September",
+  "October",
+  "November",
+  "December"
+];
+function formatTimestamp(date) {
+  const month = MONTHS[date.getUTCMonth()] ?? "January";
+  const day = String(date.getUTCDate());
+  const year = String(date.getUTCFullYear());
+  const hours = String(date.getUTCHours()).padStart(2, "0");
+  const minutes = String(date.getUTCMinutes()).padStart(2, "0");
+  return `${month} ${day}, ${year} at ${hours}:${minutes} UTC`;
+}
+function buildLogsUrl2(env) {
+  const repo = env["GITHUB_REPOSITORY"] ?? "";
+  const runId = env["GITHUB_RUN_ID"] ?? "";
+  const attempt = env["GITHUB_RUN_ATTEMPT"] ?? "1";
+  return `https://github.com/${repo}/actions/runs/${runId}/attempts/${attempt}`;
+}
+function parseRepo(env) {
+  const full = env["GITHUB_REPOSITORY"];
+  if (full === void 0 || full === "") return void 0;
+  const slash = full.indexOf("/");
+  if (slash <= 0 || slash === full.length - 1) return void 0;
+  return { owner: full.slice(0, slash), repo: full.slice(slash + 1) };
+}
+function buildFooter(logsUrl, isPr, now = /* @__PURE__ */ new Date()) {
+  if (isPr) {
+    return `
+---
+
+[View logs](${logsUrl})
+`;
+  }
+  return `
+---
+
+[View logs](${logsUrl}) \u2022 Last updated: ${formatTimestamp(now)}
+`;
+}
+function calculateBudget(footerLength) {
+  return Math.max(0, COMMENT_LIMIT - footerLength - OVERHEAD_RESERVE);
+}
+
+// src/comment/body.ts
+function buildTruncation(artifactUrl, logsUrl) {
+  const link = artifactUrl ? { url: artifactUrl, label: "View full report" } : { url: logsUrl, label: "View full workflow run logs" };
+  return buildTruncationNotice(link);
+}
+function assembleCommentBody(markdown, footer, options) {
+  let body = markdown;
+  if (options?.truncationNotice !== void 0) {
+    body += options.truncationNotice;
+  } else if (options?.artifactUrl !== void 0) {
+    body += buildArtifactNotice({
+      url: options.artifactUrl,
+      label: "View/Download Report"
+    });
+  }
+  if (options?.hasUnresolvedFailures === true && options.logsUrl !== void 0) {
+    body += buildLogsNotice({
+      url: options.logsUrl,
+      label: "workflow run logs"
+    });
+  }
+  body += footer;
+  return body;
 }
 
 // src/artifact/upload.ts
@@ -4323,34 +4438,6 @@ function escapeHtml2(s) {
   return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 }
 
-// src/action/logger.ts
-function actionsLogger() {
-  return {
-    warning(message) {
-      process.stderr.write(`::warning::${message}
-`);
-    },
-    error(message) {
-      process.stderr.write(`::error::${message}
-`);
-    },
-    info(message) {
-      process.stdout.write(`${message}
-`);
-    }
-  };
-}
-function nullLogger() {
-  return {
-    warning() {
-    },
-    error() {
-    },
-    info() {
-    }
-  };
-}
-
 // src/action/artifact-upload.ts
 async function tryUploadFullReport(params) {
   try {
@@ -4389,66 +4476,13 @@ async function tryUploadFullReport(params) {
     return `${artifactServerUrl}/${params.repoContext}/actions/runs/${runId}/artifacts/${String(result.id)}`;
   } catch (error) {
     const msg = error instanceof Error ? error.message : String(error);
-    const log = params.logger ?? nullLogger();
+    const log = params.logger;
     log.warning(`Artifact upload failed: ${msg}`);
     return void 0;
   }
 }
 
 // src/action/main.ts
-var COMMENT_LIMIT = 65536;
-var OVERHEAD_RESERVE = 512;
-var MONTHS = [
-  "January",
-  "February",
-  "March",
-  "April",
-  "May",
-  "June",
-  "July",
-  "August",
-  "September",
-  "October",
-  "November",
-  "December"
-];
-function formatTimestamp(date) {
-  const month = MONTHS[date.getUTCMonth()] ?? "January";
-  const day = String(date.getUTCDate());
-  const year = String(date.getUTCFullYear());
-  const hours = String(date.getUTCHours()).padStart(2, "0");
-  const minutes = String(date.getUTCMinutes()).padStart(2, "0");
-  return `${month} ${day}, ${year} at ${hours}:${minutes} UTC`;
-}
-function escapeMarkerWorkspace2(workspace) {
-  return workspace.replace(/\\/g, "\\\\").replace(/"/g, '\\"').replace(/(--!?)>/g, "$1\\>");
-}
-function buildMarker(workspace) {
-  return `<!-- tf-report-action:"${escapeMarkerWorkspace2(workspace)}" -->`;
-}
-function buildLogsUrl2(env) {
-  const repo = env["GITHUB_REPOSITORY"] ?? "";
-  const runId = env["GITHUB_RUN_ID"] ?? "";
-  const attempt = env["GITHUB_RUN_ATTEMPT"] ?? "1";
-  return `https://github.com/${repo}/actions/runs/${runId}/attempts/${attempt}`;
-}
-function parseRepo(env) {
-  const full = env["GITHUB_REPOSITORY"];
-  if (full === void 0 || full === "") return void 0;
-  const slash = full.indexOf("/");
-  if (slash <= 0 || slash === full.length - 1) return void 0;
-  return { owner: full.slice(0, slash), repo: full.slice(slash + 1) };
-}
-function readPrNumber(eventPath) {
-  try {
-    const raw = readFileSync2(eventPath, "utf-8");
-    const event = JSON.parse(raw);
-    const num = event.pull_request?.number;
-    return typeof num === "number" ? num : void 0;
-  } catch {
-    return void 0;
-  }
-}
 async function handlePr(client, owner, repo, prNumber, marker, body) {
   const comments = await client.getComments(owner, repo, prNumber);
   const stale = comments.filter(
@@ -4479,20 +4513,11 @@ async function run(env = process.env, deps) {
     const eventName = env["GITHUB_EVENT_NAME"] ?? "";
     const isPr = eventName === "pull_request" || eventName === "pull_request_target";
     const logsUrl = buildLogsUrl2(env);
-    const footer = isPr ? `
----
-
-[View logs](${logsUrl})
-` : `
----
-
-[View logs](${logsUrl}) \u2022 Last updated: ${formatTimestamp(/* @__PURE__ */ new Date())}
-`;
+    const footer = buildFooter(logsUrl, isPr);
     const reportOptions = {
       workspace: inputs.workspace,
       env,
       maxOutputLength: 0,
-      // overridden below
       initStepId: inputs.initStepId,
       validateStepId: inputs.validateStepId,
       planStepId: inputs.planStepId,
@@ -4516,10 +4541,7 @@ async function run(env = process.env, deps) {
       ...env["GITHUB_API_URL"] !== void 0 && env["GITHUB_API_URL"] !== "" && { baseUrl: env["GITHUB_API_URL"] },
       transport
     });
-    const fullBudget = Math.max(
-      0,
-      COMMENT_LIMIT - footer.length - OVERHEAD_RESERVE
-    );
+    const fullBudget = calculateBudget(footer.length);
     const result = reportFromSteps(inputs.steps, {
       ...reportOptions,
       maxOutputLength: fullBudget
@@ -4542,24 +4564,19 @@ async function run(env = process.env, deps) {
       });
     }
     if (wasTruncated) {
-      const link = artifactUrl ? { url: artifactUrl, label: "View full report" } : { url: logsUrl, label: "View full workflow run logs" };
-      const truncationNotice = buildTruncationNotice(link);
+      const truncationNotice = buildTruncation(artifactUrl, logsUrl);
       const reducedBudget = Math.max(0, fullBudget - truncationNotice.length);
       ({ markdown } = reportFromSteps(inputs.steps, {
         ...reportOptions,
         maxOutputLength: reducedBudget
       }));
       markdown += truncationNotice;
-    } else if (artifactUrl !== void 0) {
-      markdown += buildArtifactNotice({
-        url: artifactUrl,
-        label: "View/Download Report"
-      });
     }
-    if (hasUnresolvedFailures) {
-      markdown += buildLogsNotice({ url: logsUrl, label: "workflow run logs" });
-    }
-    const body = markdown + footer;
+    const body = assembleCommentBody(markdown, footer, {
+      artifactUrl: wasTruncated ? void 0 : artifactUrl,
+      logsUrl,
+      hasUnresolvedFailures
+    });
     if (isPr) {
       const eventPath = env["GITHUB_EVENT_PATH"] ?? "";
       const prNumber = readPrNumber(eventPath);
@@ -4582,7 +4599,6 @@ if (import.meta.url === `file://${process.argv[1] ?? ""}` || import.meta.url.end
   void run();
 }
 export {
-  formatTimestamp,
   run
 };
 //# sourceMappingURL=index.js.map

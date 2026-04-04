@@ -15,12 +15,7 @@ import {
   groupByModule,
   renderModuleSection,
 } from "../renderer/module-section.js";
-import {
-  isApplyReport,
-  buildFailedSet,
-  buildDiagnosticMap,
-  buildApplyContext,
-} from "../renderer/apply-context.js";
+import { buildApplyContextFn } from "../renderer/apply-context.js";
 import { renderOutputs } from "../renderer/outputs.js";
 import { ensureTrailingBlankLine } from "../renderer/index.js";
 import { DRIFT_ICON } from "../model/status-icons.js";
@@ -157,17 +152,4 @@ function renderDriftAtTier(
     renderModuleSection(moduleGroup, writer, options, diffCache, mode);
   }
   return ensureTrailingBlankLine(writer.build());
-}
-
-/** Builds an apply context lookup function if this is an apply report. */
-function buildApplyContextFn(
-  report: Report,
-):
-  | ((address: string) => import("../renderer/apply-context.js").ApplyContext)
-  | undefined {
-  if (!isApplyReport(report)) return undefined;
-  const failedAddresses = buildFailedSet(report);
-  const diagByAddress = buildDiagnosticMap(report);
-  return (addr: string) =>
-    buildApplyContext(addr, failedAddresses, diagByAddress);
 }
