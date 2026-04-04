@@ -8,12 +8,12 @@ import { enrichReportFromState } from "./builder/state-enrichment.js";
 import { buildReportFromSteps } from "./builder/report-from-steps.js";
 import { renderReport } from "./renderer/index.js";
 import { renderReportSections } from "./renderer/report-sections.js";
-import {
-  composeSections,
-  DEFAULT_MAX_OUTPUT_LENGTH,
-} from "./compositor/index.js";
+import { composeWithBudget } from "./compose/index.js";
 import { STATUS_FAILURE } from "./model/status-icons.js";
 import { scanString } from "./jsonl-scanner/scan.js";
+
+/** Default maximum output length (63 KiB). */
+const DEFAULT_MAX_OUTPUT_LENGTH = 64512;
 
 export type Options = BuildOptions & RenderOptions;
 
@@ -115,17 +115,22 @@ export function reportFromSteps(
     // Build: parse steps → detect tier → build appropriate Report variant
     const report = buildReportFromSteps(stepsJson, options);
 
-    // Render: Report → Section[]
+    // Render: Report → Section[] (used for fullMarkdown and fixed content)
     const sections = renderReportSections(report, options);
 
     // Full markdown: all sections at full size (for artifact upload)
     const fullMarkdown = sections.map((s) => s.full).join("");
 
-    // Compose: Section[] → bounded output string
-    const result = composeSections(sections, maxOutputLength);
+    // Compose progressively: fixed content + flex categories within budget
+    const result = composeWithBudget(
+      sections,
+      report,
+      options ?? {},
+      maxOutputLength,
+    );
 
     return {
-      markdown: result.output,
+      markdown: result.markdown,
       fullMarkdown,
       wasTruncated: result.wasTruncated,
       ...(report.operation !== undefined && { operation: report.operation }),
@@ -153,8 +158,10 @@ export {
   buildTruncationNotice,
   buildLogsNotice,
   buildArtifactNotice,
-} from "./compositor/truncation.js";
-export type { TruncationLink } from "./compositor/truncation.js";
+} from "./compose/notices.js";
+export type { NoticeLink } from "./compose/notices.js";
+/** @deprecated Use NoticeLink instead. */
+export type { NoticeLink as TruncationLink } from "./compose/notices.js";
 export type { Summary } from "./model/summary.js";
 export type { ResourceChange } from "./model/resource.js";
 export type { AttributeChange } from "./model/attribute.js";

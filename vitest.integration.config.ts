@@ -61,6 +61,16 @@ export default defineConfig({
         "src/steps/index.ts",
         "src/compositor/index.ts",
         "src/compositor/types.ts",
+        // compositor/truncation.ts is superseded by compose/notices.ts and no
+        // longer called from the integration-testable pipeline.
+        "src/compositor/truncation.ts",
+        // compose/notices.ts builds truncation/logs/artifact notice strings.
+        // These depend on action-layer inputs (artifact URL, logs URL) not
+        // available through reportFromSteps(). Covered by unit tests.
+        "src/compose/notices.ts",
+        // context-diff.ts implements context-only large-value diffs for
+        // progressive tiers 3-4. Not yet wired into production rendering.
+        "src/renderer/context-diff.ts",
         // jsonl-scanner barrel and types — no executable logic
         "src/jsonl-scanner/index.ts",
         "src/jsonl-scanner/types.ts",

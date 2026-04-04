@@ -3304,75 +3304,196 @@ ${formatted}
   return sections;
 }
 
-// src/compositor/index.ts
-var DEFAULT_MAX_OUTPUT_LENGTH = 63 * 1024;
-function composeSections(sections, budget) {
-  let remaining = budget;
-  for (const section of sections) {
-    if (section.fixed === true) {
-      remaining -= section.full.length;
-    }
-  }
-  const allocations = [];
-  for (const section of sections) {
-    if (section.fixed === true) {
-      allocations.push("full");
-      continue;
-    }
-    if (section.compact !== void 0) {
-      if (section.compact.length <= remaining) {
-        allocations.push("compact");
-        remaining -= section.compact.length;
-      } else {
-        allocations.push("omitted");
-      }
-    } else {
-      if (section.full.length <= remaining) {
-        allocations.push("full");
-        remaining -= section.full.length;
-      } else {
-        allocations.push("omitted");
-      }
-    }
-  }
-  for (let i = 0; i < sections.length; i++) {
-    const alloc = allocations[i];
-    if (alloc !== "compact") continue;
-    const section = sections[i];
-    if (section === void 0) continue;
-    const delta = section.full.length - (section.compact?.length ?? 0);
-    if (delta <= remaining) {
-      allocations[i] = "full";
-      remaining -= delta;
-    }
-  }
-  const degradedIds = [];
-  const omittedIds = [];
+// src/compose/listing.ts
+function renderResourceListing(heading, resources, maxItems) {
+  const lines = resources.map(
+    (r) => `${ACTION_SYMBOLS[r.action]} ${r.address}`
+  );
+  return buildListing(heading, lines, maxItems);
+}
+function renderOutputListing(heading, outputs, maxItems) {
+  const lines = outputs.map((o) => `${ACTION_SYMBOLS[o.action]} ${o.name}`);
+  return buildListing(heading, lines, maxItems);
+}
+function buildListing(heading, lines, maxItems) {
   const parts = [];
-  for (let i = 0; i < sections.length; i++) {
-    const section = sections[i];
-    const alloc = allocations[i];
-    if (section === void 0 || alloc === void 0) continue;
-    if (alloc === "full") {
-      parts.push(section.full);
-    } else if (alloc === "compact" && section.compact !== void 0) {
-      parts.push(section.compact);
-      degradedIds.push(section.id);
-    } else {
-      omittedIds.push(section.id);
-    }
+  parts.push(`## ${heading}
+`);
+  const limit = maxItems ?? lines.length;
+  const shown = lines.slice(0, limit);
+  const omitted = lines.length - shown.length;
+  parts.push("```");
+  parts.push(shown.join("\n"));
+  if (omitted > 0) {
+    parts.push(`... and ${String(omitted)} more`);
   }
-  return {
-    output: parts.join(""),
-    degradedCount: degradedIds.length,
-    omittedCount: omittedIds.length,
-    degradedIds,
-    omittedIds,
-    wasTruncated: degradedIds.length > 0 || omittedIds.length > 0
-  };
+  parts.push("```\n");
+  return parts.join("\n");
 }
 
-// src/compositor/truncation.ts
+// src/compose/category-renderer.ts
+function tierToMode(tier) {
+  switch (tier) {
+    case 1:
+      return "compact";
+    case 2:
+      return "compact";
+    case 3:
+      return "attrs-no-diff";
+    case 4:
+      return "attrs-char-diff";
+    case 5:
+      return "full";
+  }
+}
+function renderCategoryAtTier(category, tier, report, options, diffCache) {
+  switch (category) {
+    case "resources":
+      return renderResourcesAtTier(tier, report, options, diffCache);
+    case "outputs":
+      return renderOutputsAtTier(tier, report, options, diffCache);
+    case "drift":
+      return renderDriftAtTier(tier, report, options, diffCache);
+  }
+}
+function renderResourcesAtTier(tier, report, options, diffCache) {
+  const resources = report.resources ?? [];
+  if (resources.length === 0) return "";
+  if (tier === 1) {
+    return renderResourceListing("Resource Changes", resources);
+  }
+  const mode = tierToMode(tier);
+  const moduleGroups = groupByModule(resources);
+  const applyContextFn = buildApplyContextFn(report);
+  const writer = new MarkdownWriter();
+  writer.heading("Resource Changes", 2);
+  for (const moduleGroup of moduleGroups) {
+    renderModuleSection(
+      moduleGroup,
+      writer,
+      options,
+      diffCache,
+      mode,
+      applyContextFn
+    );
+  }
+  return ensureTrailingBlankLine(writer.build());
+}
+function renderOutputsAtTier(tier, report, options, diffCache) {
+  const outputs = report.outputs ?? [];
+  if (outputs.length === 0) return "";
+  if (tier === 1) {
+    return renderOutputListing("Output Changes", outputs);
+  }
+  const mode = tierToMode(tier);
+  const writer = new MarkdownWriter();
+  writer.heading("Output Changes", 2);
+  renderOutputs(outputs, writer, options, diffCache, mode);
+  return ensureTrailingBlankLine(writer.build());
+}
+function renderDriftAtTier(tier, report, options, diffCache) {
+  const driftResources = report.driftResources ?? [];
+  if (driftResources.length === 0) return "";
+  if (tier === 1) {
+    return renderResourceListing(
+      `${DRIFT_ICON} Resource Drift (${String(driftResources.length)} detected)`,
+      driftResources
+    );
+  }
+  const mode = tierToMode(tier);
+  const moduleGroups = groupByModule(driftResources);
+  const writer = new MarkdownWriter();
+  writer.heading(
+    `${DRIFT_ICON} Resource Drift (${String(driftResources.length)} detected)`,
+    2
+  );
+  for (const moduleGroup of moduleGroups) {
+    renderModuleSection(moduleGroup, writer, options, diffCache, mode);
+  }
+  return ensureTrailingBlankLine(writer.build());
+}
+function buildApplyContextFn(report) {
+  if (!isApplyReport(report)) return void 0;
+  const failedAddresses = buildFailedSet(report);
+  const diagByAddress = buildDiagnosticMap(report);
+  return (addr) => buildApplyContext(addr, failedAddresses, diagByAddress);
+}
+
+// src/compose/progressive.ts
+var UPGRADE_PRIORITY = ["resources", "outputs", "drift"];
+var DISPLAY_ORDER = ["drift", "resources", "outputs"];
+var TIERS = [1, 2, 3, 4, 5];
+function composeProgressively(prefix, suffix, report, options, budget) {
+  const diffCache = /* @__PURE__ */ new Map();
+  const fixedLen = prefix.length + suffix.length;
+  const activeCategories = UPGRADE_PRIORITY.filter(
+    (c) => categoryHasContent(c, report)
+  );
+  if (activeCategories.length === 0) {
+    return { markdown: prefix + suffix, wasTruncated: false };
+  }
+  const tierMap = /* @__PURE__ */ new Map();
+  const contentMap = /* @__PURE__ */ new Map();
+  for (const cat of activeCategories) {
+    tierMap.set(cat, 1);
+    contentMap.set(cat, "");
+  }
+  for (const cat of activeCategories) {
+    contentMap.set(
+      cat,
+      renderCategoryAtTier(cat, 1, report, options, diffCache)
+    );
+  }
+  for (const targetTier of TIERS.slice(1)) {
+    for (const cat of activeCategories) {
+      const currentTier = tierMap.get(cat) ?? 1;
+      if (currentTier >= targetTier) continue;
+      const candidateContent = renderCategoryAtTier(
+        cat,
+        targetTier,
+        report,
+        options,
+        diffCache
+      );
+      const otherContent = totalContentExcluding(contentMap, cat);
+      const totalSize = fixedLen + otherContent + candidateContent.length;
+      if (totalSize <= budget) {
+        tierMap.set(cat, targetTier);
+        contentMap.set(cat, candidateContent);
+      }
+    }
+  }
+  const parts = [prefix];
+  for (const cat of DISPLAY_ORDER) {
+    const content = contentMap.get(cat);
+    if (content) parts.push(content);
+  }
+  parts.push(suffix);
+  const markdown = parts.join("");
+  const wasTruncated = activeCategories.some(
+    (cat) => (tierMap.get(cat) ?? 1) < 5
+  );
+  return { markdown, wasTruncated };
+}
+function categoryHasContent(category, report) {
+  switch (category) {
+    case "resources":
+      return (report.resources ?? []).length > 0;
+    case "outputs":
+      return (report.outputs ?? []).length > 0;
+    case "drift":
+      return (report.driftResources ?? []).length > 0;
+  }
+}
+function totalContentExcluding(contentMap, exclude) {
+  let total = 0;
+  for (const [cat, content] of contentMap) {
+    if (cat !== exclude) total += content.length;
+  }
+  return total;
+}
+
+// src/compose/notices.ts
 function buildTruncationNotice(link) {
   if (link !== void 0) {
     return `
@@ -3401,16 +3522,54 @@ ${ARTIFACT_ICON} [${link.label}](${link.url})
 `;
 }
 
+// src/compose/index.ts
+function composeWithBudget(sections, report, options, budget) {
+  const hasCategories = (report.resources?.length ?? 0) > 0 || (report.outputs?.length ?? 0) > 0 || (report.driftResources?.length ?? 0) > 0;
+  if (hasCategories) {
+    const { prefix, suffix } = splitAroundCategories(sections);
+    return composeProgressively(prefix, suffix, report, options, budget);
+  }
+  const full = sections.map((s) => s.full).join("");
+  if (full.length <= budget) {
+    return { markdown: full, wasTruncated: false };
+  }
+  return { markdown: full.slice(0, budget), wasTruncated: true };
+}
+function isCategorySection(section) {
+  const { id } = section;
+  return id === "resource-changes-heading" || id === "drift-heading" || id === "outputs" || id.startsWith("module-") || id.startsWith("drift-module-");
+}
+function splitAroundCategories(sections) {
+  let firstCat = -1;
+  let lastCat = -1;
+  for (let i = 0; i < sections.length; i++) {
+    const s = sections[i];
+    if (s !== void 0 && isCategorySection(s)) {
+      if (firstCat === -1) firstCat = i;
+      lastCat = i;
+    }
+  }
+  const prefix = sections.slice(0, firstCat === -1 ? sections.length : firstCat).map((s) => s.full).join("");
+  const suffix = lastCat === -1 ? "" : sections.slice(lastCat + 1).map((s) => s.full).join("");
+  return { prefix, suffix };
+}
+
 // src/index.ts
+var DEFAULT_MAX_OUTPUT_LENGTH = 64512;
 function reportFromSteps(stepsJson, options) {
   try {
     const maxOutputLength = options?.maxOutputLength ?? DEFAULT_MAX_OUTPUT_LENGTH;
     const report = buildReportFromSteps(stepsJson, options);
     const sections = renderReportSections(report, options);
     const fullMarkdown = sections.map((s) => s.full).join("");
-    const result = composeSections(sections, maxOutputLength);
+    const result = composeWithBudget(
+      sections,
+      report,
+      options ?? {},
+      maxOutputLength
+    );
     return {
-      markdown: result.output,
+      markdown: result.markdown,
       fullMarkdown,
       wasTruncated: result.wasTruncated,
       ...report.operation !== void 0 && { operation: report.operation },
