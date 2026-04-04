@@ -2397,6 +2397,96 @@ function renderActionGroup(group, labels, symbol, writer) {
   writer.tableRow(["", `**${label}**`, `**${String(group.total)}**`]);
 }
 
+// src/renderer/diagnostics.ts
+function renderDiagnostics(diagnostics, writer, headingLevel = 3) {
+  const errors = diagnostics.filter((d) => d.severity === "error");
+  const warnings = diagnostics.filter((d) => d.severity === "warning");
+  if (errors.length > 0) {
+    writer.heading("Errors", headingLevel);
+    for (const diag of errors) {
+      renderDiagnostic(diag, writer);
+    }
+  }
+  if (warnings.length > 0) {
+    writer.heading("Warnings", headingLevel);
+    for (const diag of warnings) {
+      renderDiagnostic(diag, writer);
+    }
+  }
+}
+function renderDiagnostic(diag, writer) {
+  const prefix = diag.severity === "error" ? DIAGNOSTIC_ERROR : DIAGNOSTIC_WARNING;
+  const addressSuffix = diag.address !== void 0 ? ` \u2014 \`${diag.address}\`` : "";
+  writer.paragraph(`${prefix} **${escapeHtml(diag.summary)}**${addressSuffix}`);
+  if (diag.detail) {
+    writer.blockquote(escapeHtml(diag.detail));
+  }
+  if (diag.snippet !== void 0) {
+    renderSnippet(diag.snippet, diag.range?.filename, writer);
+  }
+  if (diag.detail || diag.snippet !== void 0) {
+    writer.blankLine();
+  }
+}
+function renderSnippet(snippet, filename, writer) {
+  const location = filename !== void 0 ? `\`${snippet.code}\` in ${escapeHtml(snippet.context)} (\`${filename}\`:${String(snippet.start_line)})` : `\`${snippet.code}\` in ${escapeHtml(snippet.context)}`;
+  writer.blockquote(location);
+  if (snippet.values.length > 0) {
+    for (const val of snippet.values) {
+      writer.blockquote(
+        `${escapeHtml(val.traversal)} = ${escapeHtml(val.statement)}`
+      );
+    }
+  }
+}
+
+// src/renderer/apply-context.ts
+function isApplyReport(report) {
+  return report.operation === "apply" || report.operation === "destroy";
+}
+function buildFailedSet(report) {
+  const failed = /* @__PURE__ */ new Set();
+  if (report.applyStatuses) {
+    for (const s of report.applyStatuses) {
+      if (!s.success) {
+        failed.add(s.address);
+      }
+    }
+  }
+  return failed;
+}
+function buildDiagnosticMap(report) {
+  const map = /* @__PURE__ */ new Map();
+  if (report.diagnostics) {
+    for (const diag of report.diagnostics) {
+      if (diag.address !== void 0) {
+        let list = map.get(diag.address);
+        if (!list) {
+          list = [];
+          map.set(diag.address, list);
+        }
+        list.push(diag);
+      }
+    }
+  }
+  return map;
+}
+function extractNonResourceDiagnostics(report) {
+  if (!report.diagnostics) return [];
+  const resourceAddresses = new Set(
+    (report.resources ?? []).map((r) => r.address)
+  );
+  return report.diagnostics.filter(
+    (d) => d.address === void 0 || !resourceAddresses.has(d.address)
+  );
+}
+function buildApplyContext(address, failedAddresses, diagByAddress) {
+  return {
+    failed: failedAddresses.has(address),
+    diagnostics: diagByAddress.get(address) ?? []
+  };
+}
+
 // src/diff/lcs.ts
 var MAX_LCS_CELLS = 1e7;
 function computeLcsPairs(before, after) {
@@ -2638,9 +2728,8 @@ function deriveInstanceName(address, type) {
 }
 
 // src/renderer/resource.ts
-function renderResource(resource, writer, options, diffCache, applyContext) {
+function renderResource(resource, writer, options, diffCache, mode = "full", applyContext) {
   const symbol = ACTION_SYMBOLS[resource.action];
-  const diffFormat = options.diffFormat ?? "inline";
   const changedAttrs = resource.attributes.filter(
     (a) => !a.isSensitive && !a.isKnownAfterApply && a.before !== a.after
   ).map((a) => a.name);
@@ -2665,8 +2754,19 @@ function renderResource(resource, writer, options, diffCache, applyContext) {
       `**Moved from:** ${MarkdownWriter.inlineCode(resource.movedFromAddress)}`
     );
   }
+  if (mode !== "compact") {
+    renderAttributes(resource, writer, options, diffCache, mode);
+  }
+  if (applyContext && applyContext.diagnostics.length > 0) {
+    renderInlineDiagnostics(applyContext.diagnostics, writer);
+  }
+  writer.detailsClose();
+}
+function renderAttributes(resource, writer, options, diffCache, mode) {
   const smallAttrs = resource.attributes.filter((a) => !a.isLarge);
   const largeAttrs = resource.attributes.filter((a) => a.isLarge);
+  const useCharDiff = mode === "attrs-char-diff" || mode === "full";
+  const diffFormat = options.diffFormat ?? "inline";
   if (resource.allUnknownAfterApply) {
     writer.paragraph("_(all values known after apply)_");
   } else if (resource.attributes.length === 0 && resource.hasAttributeDetail) {
@@ -2677,7 +2777,7 @@ function renderResource(resource, writer, options, diffCache, applyContext) {
       for (const attr of smallAttrs) {
         const skipDiff = attr.isSensitive || attr.isKnownAfterApply;
         const beforeCell = skipDiff ? MarkdownWriter.inlineCodeCell(attr.before ?? "") : `<code>${MarkdownWriter.escapeHtmlCell(attr.before ?? "").replace(/\n/g, "<br>")}</code>`;
-        const afterCell = skipDiff ? MarkdownWriter.inlineCodeCell(attr.after ?? "") : formatDiff(attr.before, attr.after, diffFormat);
+        const afterCell = skipDiff || !useCharDiff ? MarkdownWriter.inlineCodeCell(attr.after ?? "") : formatDiff(attr.before, attr.after, diffFormat);
         writer.tableRow([
           MarkdownWriter.escapeCell(MarkdownWriter.escapeHtml(attr.name)),
           beforeCell,
@@ -2698,68 +2798,20 @@ function renderResource(resource, writer, options, diffCache, applyContext) {
       }
     }
   }
-  if (applyContext && applyContext.diagnostics.length > 0) {
-    const errors = applyContext.diagnostics.filter(
-      (d) => d.severity === "error"
-    );
-    const warnings = applyContext.diagnostics.filter(
-      (d) => d.severity === "warning"
-    );
-    for (const diag of [...errors, ...warnings]) {
-      const prefix = diag.severity === "error" ? DIAGNOSTIC_ERROR : DIAGNOSTIC_WARNING;
-      writer.paragraph(`${prefix} **${diag.summary}**`);
-      if (diag.detail) {
-        writer.codeFence(diag.detail);
-      }
-    }
-  }
-  writer.detailsClose();
 }
-
-// src/renderer/diagnostics.ts
-function renderDiagnostics(diagnostics, writer, headingLevel = 3) {
+function renderInlineDiagnostics(diagnostics, writer) {
   const errors = diagnostics.filter((d) => d.severity === "error");
   const warnings = diagnostics.filter((d) => d.severity === "warning");
-  if (errors.length > 0) {
-    writer.heading("Errors", headingLevel);
-    for (const diag of errors) {
-      renderDiagnostic(diag, writer);
-    }
-  }
-  if (warnings.length > 0) {
-    writer.heading("Warnings", headingLevel);
-    for (const diag of warnings) {
-      renderDiagnostic(diag, writer);
-    }
-  }
-}
-function renderDiagnostic(diag, writer) {
-  const prefix = diag.severity === "error" ? DIAGNOSTIC_ERROR : DIAGNOSTIC_WARNING;
-  const addressSuffix = diag.address !== void 0 ? ` \u2014 \`${diag.address}\`` : "";
-  writer.paragraph(`${prefix} **${escapeHtml(diag.summary)}**${addressSuffix}`);
-  if (diag.detail) {
-    writer.blockquote(escapeHtml(diag.detail));
-  }
-  if (diag.snippet !== void 0) {
-    renderSnippet(diag.snippet, diag.range?.filename, writer);
-  }
-  if (diag.detail || diag.snippet !== void 0) {
-    writer.blankLine();
-  }
-}
-function renderSnippet(snippet, filename, writer) {
-  const location = filename !== void 0 ? `\`${snippet.code}\` in ${escapeHtml(snippet.context)} (\`${filename}\`:${String(snippet.start_line)})` : `\`${snippet.code}\` in ${escapeHtml(snippet.context)}`;
-  writer.blockquote(location);
-  if (snippet.values.length > 0) {
-    for (const val of snippet.values) {
-      writer.blockquote(
-        `${escapeHtml(val.traversal)} = ${escapeHtml(val.statement)}`
-      );
+  for (const diag of [...errors, ...warnings]) {
+    const prefix = diag.severity === "error" ? DIAGNOSTIC_ERROR : DIAGNOSTIC_WARNING;
+    writer.paragraph(`${prefix} **${diag.summary}**`);
+    if (diag.detail) {
+      writer.codeFence(diag.detail);
     }
   }
 }
 
-// src/renderer/index.ts
+// src/renderer/module-section.ts
 function groupByModule(resources) {
   const map = /* @__PURE__ */ new Map();
   for (const resource of resources) {
@@ -2777,6 +2829,62 @@ function groupByModule(resources) {
     return a.localeCompare(b);
   }).map(([moduleAddress, grouped]) => ({ moduleAddress, resources: grouped }));
 }
+function moduleLabel(moduleAddress) {
+  return moduleAddress === "" ? "root" : `\`${moduleAddress}\``;
+}
+function renderModuleSection(moduleGroup, writer, options, diffCache, mode, applyContextFn) {
+  const label = moduleLabel(moduleGroup.moduleAddress);
+  writer.heading(`${MODULE_ICON} Module: ${label}`, 3);
+  for (const resource of moduleGroup.resources) {
+    const applyContext = applyContextFn?.(resource.address);
+    renderResource(resource, writer, options, diffCache, mode, applyContext);
+  }
+}
+
+// src/renderer/outputs.ts
+function renderOutputs(outputs, writer, options, diffCache, mode = "full") {
+  if (mode === "compact") return;
+  const useDiff = mode === "attrs-char-diff" || mode === "full";
+  const diffFormat = options.diffFormat ?? "inline";
+  const smallOutputs = outputs.filter(
+    (o) => !o.isLarge || o.isSensitive || o.isKnownAfterApply
+  );
+  const largeOutputs = outputs.filter(
+    (o) => o.isLarge && !o.isSensitive && !o.isKnownAfterApply
+  );
+  if (smallOutputs.length > 0) {
+    writer.tableHeader(["Output", "Action", "Before", "After"]);
+    for (const output of smallOutputs) {
+      const symbol = ACTION_SYMBOLS[output.action];
+      const skipDiff = output.isSensitive || output.isKnownAfterApply || !useDiff;
+      const before = output.isSensitive ? MarkdownWriter.inlineCode("(sensitive)") : output.before !== null ? skipDiff ? MarkdownWriter.inlineCodeCell(output.before) : `<code>${MarkdownWriter.escapeHtmlCell(output.before).replace(/\n/g, "<br>")}</code>` : "";
+      const after = output.isSensitive ? MarkdownWriter.inlineCode("(sensitive)") : skipDiff ? MarkdownWriter.inlineCodeCell(output.after ?? "") : formatDiff(output.before, output.after, diffFormat);
+      writer.tableRow([
+        MarkdownWriter.escapeCell(output.name),
+        symbol,
+        before,
+        after
+      ]);
+    }
+    writer.blankLine();
+  }
+  if (mode === "full") {
+    for (const output of largeOutputs) {
+      const symbol = ACTION_SYMBOLS[output.action];
+      const block = renderLargeValue(
+        `${symbol} ${output.name}`,
+        output.before,
+        output.after,
+        diffCache
+      );
+      if (block) {
+        writer.raw(block);
+      }
+    }
+  }
+}
+
+// src/renderer/index.ts
 function ensureTrailingBlankLine(content) {
   const trimmed = content.replace(/\n+$/, "");
   return trimmed + "\n\n";
@@ -2793,6 +2901,7 @@ function renderStructuredSections(report, options = {}) {
   const failedAddresses = buildFailedSet(report);
   const diagByAddress = buildDiagnosticMap(report);
   const nonResourceDiags = extractNonResourceDiagnostics(report);
+  const applyContextFn = isApply ? (addr) => buildApplyContext(addr, failedAddresses, diagByAddress) : void 0;
   if (options.title) {
     sections.push({
       id: "user-title",
@@ -2824,40 +2933,18 @@ function renderStructuredSections(report, options = {}) {
     });
   }
   if (driftResources.length > 0) {
-    const writer = new MarkdownWriter();
-    renderDriftSection(driftResources, writer, options, diffCache);
-    sections.push({
-      id: "drift",
-      full: ensureTrailingBlankLine(writer.build())
-    });
+    sections.push(...renderDriftSections(driftResources, options, diffCache));
   }
   const moduleGroups = groupByModule(resources);
   if (moduleGroups.length > 0) {
-    const writer = new MarkdownWriter();
-    writer.heading("Resource Changes", 2);
-    sections.push({
-      id: "resource-changes-heading",
-      full: ensureTrailingBlankLine(writer.build()),
-      fixed: true
-    });
-    for (const moduleGroup of moduleGroups) {
-      const moduleLabel = moduleGroup.moduleAddress === "" ? "root" : `\`${moduleGroup.moduleAddress}\``;
-      const mw = new MarkdownWriter();
-      mw.heading(`${MODULE_ICON} Module: ${moduleLabel}`, 3);
-      for (const resource of moduleGroup.resources) {
-        const applyContext = isApply ? buildApplyContext(resource.address, failedAddresses, diagByAddress) : void 0;
-        renderResource(resource, mw, options, diffCache, applyContext);
-      }
-      sections.push({
-        id: `module-${moduleGroup.moduleAddress || "root"}`,
-        full: ensureTrailingBlankLine(mw.build()),
-        compact: `### ${MODULE_ICON} Module: ${moduleLabel}
-
-_(details omitted)_
-
-`
-      });
-    }
+    sections.push(
+      ...renderResourceSections(
+        moduleGroups,
+        options,
+        diffCache,
+        applyContextFn
+      )
+    );
   }
   if (outputs.length > 0) {
     const writer = new MarkdownWriter();
@@ -2870,101 +2957,66 @@ _(details omitted)_
   }
   return sections;
 }
-function isApplyReport(report) {
-  return report.operation === "apply" || report.operation === "destroy";
-}
-function buildFailedSet(report) {
-  const failed = /* @__PURE__ */ new Set();
-  if (report.applyStatuses) {
-    for (const s of report.applyStatuses) {
-      if (!s.success) {
-        failed.add(s.address);
-      }
-    }
-  }
-  return failed;
-}
-function buildDiagnosticMap(report) {
-  const map = /* @__PURE__ */ new Map();
-  if (report.diagnostics) {
-    for (const diag of report.diagnostics) {
-      if (diag.address !== void 0) {
-        let list = map.get(diag.address);
-        if (!list) {
-          list = [];
-          map.set(diag.address, list);
-        }
-        list.push(diag);
-      }
-    }
-  }
-  return map;
-}
-function extractNonResourceDiagnostics(report) {
-  if (!report.diagnostics) return [];
-  const resourceAddresses = new Set(
-    (report.resources ?? []).map((r) => r.address)
-  );
-  return report.diagnostics.filter(
-    (d) => d.address === void 0 || !resourceAddresses.has(d.address)
-  );
-}
-function buildApplyContext(address, failedAddresses, diagByAddress) {
-  return {
-    failed: failedAddresses.has(address),
-    diagnostics: diagByAddress.get(address) ?? []
-  };
-}
-function renderOutputs(outputs, writer, options, diffCache) {
-  const diffFormat = options.diffFormat ?? "inline";
-  const smallOutputs = outputs.filter(
-    (o) => !o.isLarge || o.isSensitive || o.isKnownAfterApply
-  );
-  const largeOutputs = outputs.filter(
-    (o) => o.isLarge && !o.isSensitive && !o.isKnownAfterApply
-  );
-  if (smallOutputs.length > 0) {
-    writer.tableHeader(["Output", "Action", "Before", "After"]);
-    for (const output of smallOutputs) {
-      const symbol = ACTION_SYMBOLS[output.action];
-      const skipDiff = output.isSensitive || output.isKnownAfterApply;
-      const before = output.isSensitive ? MarkdownWriter.inlineCode("(sensitive)") : output.before !== null ? skipDiff ? MarkdownWriter.inlineCodeCell(output.before) : `<code>${MarkdownWriter.escapeHtmlCell(output.before).replace(/\n/g, "<br>")}</code>` : "";
-      const after = output.isSensitive ? MarkdownWriter.inlineCode("(sensitive)") : skipDiff ? MarkdownWriter.inlineCodeCell(output.after ?? "") : formatDiff(output.before, output.after, diffFormat);
-      writer.tableRow([
-        MarkdownWriter.escapeCell(output.name),
-        symbol,
-        before,
-        after
-      ]);
-    }
-    writer.blankLine();
-  }
-  for (const output of largeOutputs) {
-    const symbol = ACTION_SYMBOLS[output.action];
-    const block = renderLargeValue(
-      `${symbol} ${output.name}`,
-      output.before,
-      output.after,
-      diffCache
+function renderResourceSections(moduleGroups, options, diffCache, applyContextFn) {
+  const sections = [];
+  const hw = new MarkdownWriter();
+  hw.heading("Resource Changes", 2);
+  sections.push({
+    id: "resource-changes-heading",
+    full: ensureTrailingBlankLine(hw.build()),
+    fixed: true
+  });
+  for (const moduleGroup of moduleGroups) {
+    const label = moduleLabel(moduleGroup.moduleAddress);
+    const mw = new MarkdownWriter();
+    renderModuleSection(
+      moduleGroup,
+      mw,
+      options,
+      diffCache,
+      "full",
+      applyContextFn
     );
-    if (block) {
-      writer.raw(block);
-    }
+    sections.push({
+      id: `module-${moduleGroup.moduleAddress || "root"}`,
+      full: ensureTrailingBlankLine(mw.build()),
+      compact: `### ${label}
+
+_(details omitted)_
+
+`
+    });
   }
+  return sections;
 }
-function renderDriftSection(driftResources, writer, options, diffCache) {
-  writer.heading(
+function renderDriftSections(driftResources, options, diffCache) {
+  const sections = [];
+  const hw = new MarkdownWriter();
+  hw.heading(
     `${DRIFT_ICON} Resource Drift (${String(driftResources.length)} detected)`,
     2
   );
+  sections.push({
+    id: "drift-heading",
+    full: ensureTrailingBlankLine(hw.build()),
+    fixed: true
+  });
   const driftModules = groupByModule(driftResources);
   for (const moduleGroup of driftModules) {
-    const moduleLabel = moduleGroup.moduleAddress === "" ? "root" : `\`${moduleGroup.moduleAddress}\``;
-    writer.heading(`${MODULE_ICON} Module: ${moduleLabel}`, 3);
-    for (const resource of moduleGroup.resources) {
-      renderResource(resource, writer, options, diffCache);
-    }
+    const label = moduleLabel(moduleGroup.moduleAddress);
+    const mw = new MarkdownWriter();
+    renderModuleSection(moduleGroup, mw, options, diffCache, "full");
+    sections.push({
+      id: `drift-module-${moduleGroup.moduleAddress || "root"}`,
+      full: ensureTrailingBlankLine(mw.build()),
+      compact: `### ${label}
+
+_(details omitted)_
+
+`
+    });
   }
+  return sections;
 }
 
 // src/renderer/title.ts

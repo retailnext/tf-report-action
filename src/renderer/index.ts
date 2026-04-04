@@ -2,61 +2,27 @@ import type { Report } from "../model/report.js";
 import type { ResourceChange } from "../model/resource.js";
 import type { RenderOptions } from "./options.js";
 import type { Section } from "../model/section.js";
-import type { Diagnostic } from "../model/diagnostic.js";
 import type { DiffEntry } from "../diff/types.js";
-import type { OutputChange } from "../model/output.js";
 import { MarkdownWriter } from "./writer.js";
 import { renderSummary } from "./summary.js";
-import { renderResource } from "./resource.js";
-import type { ApplyContext } from "./resource.js";
 import { renderDiagnostics } from "./diagnostics.js";
-import { formatDiff } from "./diff-format.js";
-import { renderLargeValue } from "./large-value.js";
-import { ACTION_SYMBOLS } from "../model/plan-action.js";
-import { MODULE_ICON, DRIFT_ICON } from "../model/status-icons.js";
-import { deriveModuleAddress } from "./address.js";
+import { DRIFT_ICON } from "../model/status-icons.js";
+import {
+  isApplyReport,
+  buildFailedSet,
+  buildDiagnosticMap,
+  extractNonResourceDiagnostics,
+  buildApplyContext,
+} from "./apply-context.js";
+import {
+  groupByModule,
+  moduleLabel,
+  renderModuleSection,
+} from "./module-section.js";
+import { renderOutputs } from "./outputs.js";
 
 // Re-export address helpers for use by other renderer files and tests
 export { deriveModuleAddress, deriveInstanceName } from "./address.js";
-
-// ─── Markdown helpers ──────────────────────────────────────────────────────
-
-/**
- * Lightweight grouping structure used only within the renderer.
- * Not part of the public model — module grouping is a display concern.
- */
-interface RendererModuleGroup {
-  readonly moduleAddress: string;
-  readonly resources: ResourceChange[];
-}
-
-/**
- * Groups a flat resource array by derived module address for display.
- * Sorted: root module first, then alphabetical by module address.
- */
-function groupByModule(
-  resources: readonly ResourceChange[],
-): RendererModuleGroup[] {
-  const map = new Map<string, ResourceChange[]>();
-
-  for (const resource of resources) {
-    const moduleAddr = deriveModuleAddress(resource.address, resource.type);
-    let group = map.get(moduleAddr);
-    if (!group) {
-      group = [];
-      map.set(moduleAddr, group);
-    }
-    group.push(resource);
-  }
-
-  return [...map.entries()]
-    .sort(([a], [b]) => {
-      if (a === "") return -1;
-      if (b === "") return 1;
-      return a.localeCompare(b);
-    })
-    .map(([moduleAddress, grouped]) => ({ moduleAddress, resources: grouped }));
-}
 
 /**
  * Ensure content ends with exactly two newlines (a trailing blank line).
@@ -65,12 +31,10 @@ function groupByModule(
  * `\n\n` to provide the required blank line before the next markdown
  * heading or block element.
  */
-function ensureTrailingBlankLine(content: string): string {
+export function ensureTrailingBlankLine(content: string): string {
   const trimmed = content.replace(/\n+$/, "");
   return trimmed + "\n\n";
 }
-
-// ─── Structured rendering ──────────────────────────────────────────────────
 
 /**
  * Renders a Report's structured body as an array of compositable Sections.
@@ -81,9 +45,6 @@ function ensureTrailingBlankLine(content: string): string {
  *
  * Resources are grouped by module address (derived from each resource's
  * `address` and `type`) for display — this is purely a rendering concern.
- *
- * Requires that the report has `summary` or `resources` populated (i.e.,
- * from show-plan JSON or JSONL enrichment).
  */
 export function renderStructuredSections(
   report: Report,
@@ -98,10 +59,13 @@ export function renderStructuredSections(
   const driftResources = report.driftResources ?? [];
   const sections: Section[] = [];
 
-  // Build apply context maps
+  // Build apply context lookup
   const failedAddresses = buildFailedSet(report);
   const diagByAddress = buildDiagnosticMap(report);
   const nonResourceDiags = extractNonResourceDiagnostics(report);
+  const applyContextFn = isApply
+    ? (addr: string) => buildApplyContext(addr, failedAddresses, diagByAddress)
+    : undefined;
 
   // Optional user-provided title (used by library API, not reportFromSteps)
   if (options.title) {
@@ -137,49 +101,22 @@ export function renderStructuredSections(
     });
   }
 
-  // Drift section
+  // Drift — heading + per-module flex sections
   if (driftResources.length > 0) {
-    const writer = new MarkdownWriter();
-    renderDriftSection(driftResources, writer, options, diffCache);
-    sections.push({
-      id: "drift",
-      full: ensureTrailingBlankLine(writer.build()),
-    });
+    sections.push(...renderDriftSections(driftResources, options, diffCache));
   }
 
-  // Resource changes — one section per module group for granular budget control
+  // Resource changes — heading + one flex section per module group
   const moduleGroups = groupByModule(resources);
   if (moduleGroups.length > 0) {
-    const writer = new MarkdownWriter();
-    writer.heading("Resource Changes", 2);
-    sections.push({
-      id: "resource-changes-heading",
-      full: ensureTrailingBlankLine(writer.build()),
-      fixed: true,
-    });
-
-    for (const moduleGroup of moduleGroups) {
-      const moduleLabel =
-        moduleGroup.moduleAddress === ""
-          ? "root"
-          : `\`${moduleGroup.moduleAddress}\``;
-
-      const mw = new MarkdownWriter();
-      mw.heading(`${MODULE_ICON} Module: ${moduleLabel}`, 3);
-
-      for (const resource of moduleGroup.resources) {
-        const applyContext = isApply
-          ? buildApplyContext(resource.address, failedAddresses, diagByAddress)
-          : undefined;
-        renderResource(resource, mw, options, diffCache, applyContext);
-      }
-
-      sections.push({
-        id: `module-${moduleGroup.moduleAddress || "root"}`,
-        full: ensureTrailingBlankLine(mw.build()),
-        compact: `### ${MODULE_ICON} Module: ${moduleLabel}\n\n_(details omitted)_\n\n`,
-      });
-    }
+    sections.push(
+      ...renderResourceSections(
+        moduleGroups,
+        options,
+        diffCache,
+        applyContextFn,
+      ),
+    );
   }
 
   // Top-level outputs
@@ -212,166 +149,78 @@ export function renderReport(
     .join("");
 }
 
-/** Returns true when the report was produced from an apply run. */
-function isApplyReport(report: Report): boolean {
-  return report.operation === "apply" || report.operation === "destroy";
-}
-
-/** Builds a Set of resource addresses that failed during apply. */
-function buildFailedSet(report: Report): Set<string> {
-  const failed = new Set<string>();
-  if (report.applyStatuses) {
-    for (const s of report.applyStatuses) {
-      if (!s.success) {
-        failed.add(s.address);
-      }
-    }
-  }
-  return failed;
-}
-
-/** Builds a Map of resource address → diagnostics for that resource. */
-function buildDiagnosticMap(report: Report): Map<string, Diagnostic[]> {
-  const map = new Map<string, Diagnostic[]>();
-  if (report.diagnostics) {
-    for (const diag of report.diagnostics) {
-      if (diag.address !== undefined) {
-        let list = map.get(diag.address);
-        if (!list) {
-          list = [];
-          map.set(diag.address, list);
-        }
-        list.push(diag);
-      }
-    }
-  }
-  return map;
-}
-
-/**
- * Extracts diagnostics that are not resource-specific: those without
- * an address, or whose address doesn't match any resource in the report.
- */
-function extractNonResourceDiagnostics(report: Report): Diagnostic[] {
-  if (!report.diagnostics) return [];
-
-  const resourceAddresses = new Set(
-    (report.resources ?? []).map((r) => r.address),
-  );
-
-  return report.diagnostics.filter(
-    (d) => d.address === undefined || !resourceAddresses.has(d.address),
-  );
-}
-
-/** Builds an ApplyContext for a given resource address. */
-function buildApplyContext(
-  address: string,
-  failedAddresses: Set<string>,
-  diagByAddress: Map<string, Diagnostic[]>,
-): ApplyContext {
-  return {
-    failed: failedAddresses.has(address),
-    diagnostics: diagByAddress.get(address) ?? [],
-  };
-}
-
-/**
- * Renders output changes using the same split strategy as resource attributes:
- * small values go into an inline table with character-level diffs, large values
- * (JSON objects, XML, multi-line strings) go into collapsible `<details>` blocks
- * with line-level diffs.
- *
- * Outputs with placeholder values (sensitive or known-after-apply) are always
- * rendered in the table regardless of `isLarge`, because diffing a real value
- * against a sentinel string produces meaningless output.
- */
-function renderOutputs(
-  outputs: readonly OutputChange[],
-  writer: MarkdownWriter,
+/** Renders the "Resource Changes" heading + per-module flex sections. */
+function renderResourceSections(
+  moduleGroups: import("./module-section.js").RendererModuleGroup[],
   options: RenderOptions,
   diffCache: Map<string, DiffEntry[]>,
-): void {
-  const diffFormat = options.diffFormat ?? "inline";
+  applyContextFn?: (
+    address: string,
+  ) => import("./apply-context.js").ApplyContext,
+): Section[] {
+  const sections: Section[] = [];
 
-  // Placeholder outputs always go in the table — diffing against a sentinel is meaningless
-  const smallOutputs = outputs.filter(
-    (o) => !o.isLarge || o.isSensitive || o.isKnownAfterApply,
-  );
-  const largeOutputs = outputs.filter(
-    (o) => o.isLarge && !o.isSensitive && !o.isKnownAfterApply,
-  );
+  const hw = new MarkdownWriter();
+  hw.heading("Resource Changes", 2);
+  sections.push({
+    id: "resource-changes-heading",
+    full: ensureTrailingBlankLine(hw.build()),
+    fixed: true,
+  });
 
-  // Render small outputs in an attribute-style table
-  if (smallOutputs.length > 0) {
-    writer.tableHeader(["Output", "Action", "Before", "After"]);
-    for (const output of smallOutputs) {
-      const symbol = ACTION_SYMBOLS[output.action];
-      const skipDiff = output.isSensitive || output.isKnownAfterApply;
-      const before = output.isSensitive
-        ? MarkdownWriter.inlineCode("(sensitive)")
-        : output.before !== null
-          ? skipDiff
-            ? MarkdownWriter.inlineCodeCell(output.before)
-            : `<code>${MarkdownWriter.escapeHtmlCell(output.before).replace(/\n/g, "<br>")}</code>`
-          : "";
-      const after = output.isSensitive
-        ? MarkdownWriter.inlineCode("(sensitive)")
-        : skipDiff
-          ? MarkdownWriter.inlineCodeCell(output.after ?? "")
-          : formatDiff(output.before, output.after, diffFormat);
-      writer.tableRow([
-        MarkdownWriter.escapeCell(output.name),
-        symbol,
-        before,
-        after,
-      ]);
-    }
-    writer.blankLine();
-  }
-
-  // Render large outputs as collapsible details blocks with line-level diffs
-  for (const output of largeOutputs) {
-    const symbol = ACTION_SYMBOLS[output.action];
-    const block = renderLargeValue(
-      `${symbol} ${output.name}`,
-      output.before,
-      output.after,
+  for (const moduleGroup of moduleGroups) {
+    const label = moduleLabel(moduleGroup.moduleAddress);
+    const mw = new MarkdownWriter();
+    renderModuleSection(
+      moduleGroup,
+      mw,
+      options,
       diffCache,
+      "full",
+      applyContextFn,
     );
-    if (block) {
-      writer.raw(block);
-    }
+
+    sections.push({
+      id: `module-${moduleGroup.moduleAddress || "root"}`,
+      full: ensureTrailingBlankLine(mw.build()),
+      compact: `### ${label}\n\n_(details omitted)_\n\n`,
+    });
   }
+
+  return sections;
 }
 
-/**
- * Renders a drift section showing resources whose real-world state has
- * drifted from the prior state file. Uses the same resource rendering
- * as the changes section but under a distinct heading.
- */
-function renderDriftSection(
+/** Renders drift heading + per-module flex sections. */
+function renderDriftSections(
   driftResources: readonly ResourceChange[],
-  writer: MarkdownWriter,
   options: RenderOptions,
   diffCache: Map<string, DiffEntry[]>,
-): void {
-  writer.heading(
+): Section[] {
+  const sections: Section[] = [];
+
+  const hw = new MarkdownWriter();
+  hw.heading(
     `${DRIFT_ICON} Resource Drift (${String(driftResources.length)} detected)`,
     2,
   );
+  sections.push({
+    id: "drift-heading",
+    full: ensureTrailingBlankLine(hw.build()),
+    fixed: true,
+  });
 
   const driftModules = groupByModule(driftResources);
   for (const moduleGroup of driftModules) {
-    const moduleLabel =
-      moduleGroup.moduleAddress === ""
-        ? "root"
-        : `\`${moduleGroup.moduleAddress}\``;
+    const label = moduleLabel(moduleGroup.moduleAddress);
+    const mw = new MarkdownWriter();
+    renderModuleSection(moduleGroup, mw, options, diffCache, "full");
 
-    writer.heading(`${MODULE_ICON} Module: ${moduleLabel}`, 3);
-
-    for (const resource of moduleGroup.resources) {
-      renderResource(resource, writer, options, diffCache);
-    }
+    sections.push({
+      id: `drift-module-${moduleGroup.moduleAddress || "root"}`,
+      full: ensureTrailingBlankLine(mw.build()),
+      compact: `### ${label}\n\n_(details omitted)_\n\n`,
+    });
   }
+
+  return sections;
 }

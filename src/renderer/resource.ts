@@ -5,6 +5,8 @@
 
 import type { ResourceChange } from "../model/resource.js";
 import type { Diagnostic } from "../model/diagnostic.js";
+import type { ResourceRenderMode } from "./render-mode.js";
+import type { ApplyContext } from "./apply-context.js";
 import { MarkdownWriter } from "./writer.js";
 import type { RenderOptions } from "./options.js";
 import type { DiffEntry } from "../diff/types.js";
@@ -18,17 +20,18 @@ import { formatDiff } from "./diff-format.js";
 import { renderLargeValue } from "./large-value.js";
 import { deriveInstanceName } from "./address.js";
 
-/**
- * Per-resource apply context passed when rendering apply reports.
- * Provides the failure status and any resource-specific diagnostics.
- */
-export interface ApplyContext {
-  readonly failed: boolean;
-  readonly diagnostics: readonly Diagnostic[];
-}
+// Re-export for consumers that imported ApplyContext from resource.ts
+export type { ApplyContext } from "./apply-context.js";
 
 /**
  * Renders a single resource change as a collapsible details block.
+ *
+ * The `mode` parameter controls how much detail is shown:
+ * - `"compact"` — summary line, address, import/moved metadata, diagnostics only
+ * - `"attrs-no-diff"` — adds attribute table with plain `<code>` cells
+ * - `"attrs-char-diff"` — attribute table with character-level diffs
+ * - `"full"` — character-level diffs plus full large-value blocks
+ *
  * When `applyContext` is provided, failed resources get `<details open>`
  * and a ❌ indicator; diagnostics are rendered inline after attributes.
  */
@@ -37,10 +40,10 @@ export function renderResource(
   writer: MarkdownWriter,
   options: RenderOptions,
   diffCache: Map<string, DiffEntry[]>,
+  mode: ResourceRenderMode = "full",
   applyContext?: ApplyContext,
 ): void {
   const symbol = ACTION_SYMBOLS[resource.action];
-  const diffFormat = options.diffFormat ?? "inline";
 
   // Build summary text
   const changedAttrs = resource.attributes
@@ -78,9 +81,31 @@ export function renderResource(
     );
   }
 
-  // Separate small and large attributes
+  // In compact mode, skip all attribute rendering
+  if (mode !== "compact") {
+    renderAttributes(resource, writer, options, diffCache, mode);
+  }
+
+  // Render inline diagnostics (errors then warnings)
+  if (applyContext && applyContext.diagnostics.length > 0) {
+    renderInlineDiagnostics(applyContext.diagnostics, writer);
+  }
+
+  writer.detailsClose();
+}
+
+/** Renders resource attributes at the specified detail level. */
+function renderAttributes(
+  resource: ResourceChange,
+  writer: MarkdownWriter,
+  options: RenderOptions,
+  diffCache: Map<string, DiffEntry[]>,
+  mode: ResourceRenderMode,
+): void {
   const smallAttrs = resource.attributes.filter((a) => !a.isLarge);
   const largeAttrs = resource.attributes.filter((a) => a.isLarge);
+  const useCharDiff = mode === "attrs-char-diff" || mode === "full";
+  const diffFormat = options.diffFormat ?? "inline";
 
   if (resource.allUnknownAfterApply) {
     writer.paragraph("_(all values known after apply)_");
@@ -96,9 +121,10 @@ export function renderResource(
         const beforeCell = skipDiff
           ? MarkdownWriter.inlineCodeCell(attr.before ?? "")
           : `<code>${MarkdownWriter.escapeHtmlCell(attr.before ?? "").replace(/\n/g, "<br>")}</code>`;
-        const afterCell = skipDiff
-          ? MarkdownWriter.inlineCodeCell(attr.after ?? "")
-          : formatDiff(attr.before, attr.after, diffFormat);
+        const afterCell =
+          skipDiff || !useCharDiff
+            ? MarkdownWriter.inlineCodeCell(attr.after ?? "")
+            : formatDiff(attr.before, attr.after, diffFormat);
         writer.tableRow([
           MarkdownWriter.escapeCell(MarkdownWriter.escapeHtml(attr.name)),
           beforeCell,
@@ -121,24 +147,21 @@ export function renderResource(
       }
     }
   }
+}
 
-  // Render inline diagnostics (errors then warnings)
-  if (applyContext && applyContext.diagnostics.length > 0) {
-    const errors = applyContext.diagnostics.filter(
-      (d) => d.severity === "error",
-    );
-    const warnings = applyContext.diagnostics.filter(
-      (d) => d.severity === "warning",
-    );
-    for (const diag of [...errors, ...warnings]) {
-      const prefix =
-        diag.severity === "error" ? DIAGNOSTIC_ERROR : DIAGNOSTIC_WARNING;
-      writer.paragraph(`${prefix} **${diag.summary}**`);
-      if (diag.detail) {
-        writer.codeFence(diag.detail);
-      }
+/** Renders inline diagnostics (errors then warnings) for a resource. */
+function renderInlineDiagnostics(
+  diagnostics: readonly Diagnostic[],
+  writer: MarkdownWriter,
+): void {
+  const errors = diagnostics.filter((d) => d.severity === "error");
+  const warnings = diagnostics.filter((d) => d.severity === "warning");
+  for (const diag of [...errors, ...warnings]) {
+    const prefix =
+      diag.severity === "error" ? DIAGNOSTIC_ERROR : DIAGNOSTIC_WARNING;
+    writer.paragraph(`${prefix} **${diag.summary}**`);
+    if (diag.detail) {
+      writer.codeFence(diag.detail);
     }
   }
-
-  writer.detailsClose();
 }

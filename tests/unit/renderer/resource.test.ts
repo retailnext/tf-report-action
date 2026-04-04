@@ -27,7 +27,7 @@ function render(
 ): string {
   const writer = new MarkdownWriter();
   const cache = new Map<string, DiffEntry[]>();
-  renderResource(resource, writer, options, cache, applyContext);
+  renderResource(resource, writer, options, cache, "full", applyContext);
   return writer.build();
 }
 
