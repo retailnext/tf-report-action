@@ -9,125 +9,26 @@
  * `::error::` annotations and a non-zero exit code.
  */
 
-import { readFileSync } from "node:fs";
 import type { Env } from "../env/index.js";
 import type { ReportOptions } from "../index.js";
-import {
-  reportFromSteps,
-  buildTruncationNotice,
-  buildLogsNotice,
-  buildArtifactNotice,
-} from "../index.js";
+import { reportFromSteps } from "../index.js";
 import type { GitHubClient, GitHubClientDeps } from "../github/index.js";
 import { createGitHubClient } from "../github/index.js";
 import { httpRequest } from "../http/index.js";
-import { parseInputs } from "./inputs.js";
+import type { Logger } from "../logger/index.js";
+import { actionsLogger } from "../logger/index.js";
+import { parseInputs, readPrNumber } from "../inputs/index.js";
+import {
+  buildLogsUrl,
+  parseRepo,
+  buildFooter,
+  calculateBudget,
+  buildMarker,
+  assembleCommentBody,
+  buildTruncation,
+} from "../comment/index.js";
 import { tryUploadFullReport } from "./artifact-upload.js";
 import type { TryUploadParams } from "./artifact-upload.js";
-import type { Logger } from "./logger.js";
-import { actionsLogger } from "./logger.js";
-
-// ---------------------------------------------------------------------------
-// Constants
-// ---------------------------------------------------------------------------
-
-/** GitHub comment body hard limit (characters). */
-const COMMENT_LIMIT = 65_536;
-
-/** Reserved bytes for internal overhead (metadata, fencing, etc.). */
-const OVERHEAD_RESERVE = 512;
-
-/** Month names for UTC timestamp formatting. */
-const MONTHS = [
-  "January",
-  "February",
-  "March",
-  "April",
-  "May",
-  "June",
-  "July",
-  "August",
-  "September",
-  "October",
-  "November",
-  "December",
-] as const;
-
-// ---------------------------------------------------------------------------
-// Helpers
-// ---------------------------------------------------------------------------
-
-/**
- * Format a Date as `MONTH DAY, YEAR at HH:MM UTC`.
- *
- * Always uses UTC components so output is deterministic regardless of
- * the runner's local timezone.
- */
-export function formatTimestamp(date: Date): string {
-  const month = MONTHS[date.getUTCMonth()] ?? "January";
-  const day = String(date.getUTCDate());
-  const year = String(date.getUTCFullYear());
-  const hours = String(date.getUTCHours()).padStart(2, "0");
-  const minutes = String(date.getUTCMinutes()).padStart(2, "0");
-  return `${month} ${day}, ${year} at ${hours}:${minutes} UTC`;
-}
-
-/**
- * Escape special characters in a workspace name for safe HTML comment
- * embedding.  Must match the logic in `src/renderer/title.ts`.
- */
-function escapeMarkerWorkspace(workspace: string): string {
-  return workspace
-    .replace(/\\/g, "\\\\")
-    .replace(/"/g, '\\"')
-    .replace(/(--!?)>/g, "$1\\>");
-}
-
-/** Build the workspace dedup marker HTML comment. */
-function buildMarker(workspace: string): string {
-  return `<!-- tf-report-action:"${escapeMarkerWorkspace(workspace)}" -->`;
-}
-
-/** Build the logs URL from environment variables. */
-function buildLogsUrl(env: Env): string {
-  const repo = env["GITHUB_REPOSITORY"] ?? "";
-  const runId = env["GITHUB_RUN_ID"] ?? "";
-  const attempt = env["GITHUB_RUN_ATTEMPT"] ?? "1";
-  return `https://github.com/${repo}/actions/runs/${runId}/attempts/${attempt}`;
-}
-
-/**
- * Parse `owner/repo` from `GITHUB_REPOSITORY`.
- *
- * Returns `undefined` if the variable is missing or not in `owner/repo`
- * format.
- */
-function parseRepo(env: Env): { owner: string; repo: string } | undefined {
-  const full = env["GITHUB_REPOSITORY"];
-  if (full === undefined || full === "") return undefined;
-  const slash = full.indexOf("/");
-  if (slash <= 0 || slash === full.length - 1) return undefined;
-  return { owner: full.slice(0, slash), repo: full.slice(slash + 1) };
-}
-
-/**
- * Read the pull request number from the event payload file.
- *
- * Returns `undefined` if the file cannot be read or the payload does
- * not contain a `pull_request.number` field.
- */
-function readPrNumber(eventPath: string): number | undefined {
-  try {
-    const raw = readFileSync(eventPath, "utf-8");
-    const event = JSON.parse(raw) as {
-      pull_request?: { number?: number };
-    };
-    const num = event.pull_request?.number;
-    return typeof num === "number" ? num : undefined;
-  } catch {
-    return undefined;
-  }
-}
 
 // ---------------------------------------------------------------------------
 // PR flow
@@ -173,7 +74,6 @@ async function handleIssue(
   const title = `:bar_chart: \`${workspace}\` Status`;
 
   if (issues.length > 0) {
-    // Update the first matching issue (should only be one)
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     await client.updateIssue(owner, repo, issues[0]!.number, title, body);
   } else {
@@ -210,9 +110,6 @@ export interface RunDeps {
  * Generates a report from the steps context and posts it as a PR
  * comment or status issue.  **Never throws** — all errors are reported
  * via `logger.error()` and `exit(1)`.
- *
- * @param env - Environment variables (defaults to `process.env`)
- * @param deps - Injectable dependencies (defaults to real implementations)
  */
 export async function run(
   env: Env = process.env as Env,
@@ -225,25 +122,17 @@ export async function run(
     const tryUpload = deps?.tryUploadFullReport ?? tryUploadFullReport;
     const inputs = parseInputs(env);
 
-    // -----------------------------------------------------------------------
-    // Detect PR context
-    // -----------------------------------------------------------------------
     const eventName = env["GITHUB_EVENT_NAME"] ?? "";
     const isPr =
       eventName === "pull_request" || eventName === "pull_request_target";
 
-    // -----------------------------------------------------------------------
-    // Build footer and compute output budget
-    // -----------------------------------------------------------------------
     const logsUrl = buildLogsUrl(env);
-    const footer = isPr
-      ? `\n---\n\n[View logs](${logsUrl})\n`
-      : `\n---\n\n[View logs](${logsUrl}) • Last updated: ${formatTimestamp(new Date())}\n`;
+    const footer = buildFooter(logsUrl, isPr);
 
     const reportOptions: ReportOptions = {
       workspace: inputs.workspace,
       env,
-      maxOutputLength: 0, // overridden below
+      maxOutputLength: 0,
       initStepId: inputs.initStepId,
       validateStepId: inputs.validateStepId,
       planStepId: inputs.planStepId,
@@ -256,9 +145,6 @@ export async function run(
       reportOptions.allowedDirs = [env["RUNNER_TEMP"]];
     }
 
-    // -----------------------------------------------------------------------
-    // GitHub API setup (needed for both artifact upload and comment posting)
-    // -----------------------------------------------------------------------
     const repoInfo = parseRepo(env);
     if (repoInfo === undefined) {
       logger.info("GITHUB_REPOSITORY not set, skipping API calls");
@@ -280,18 +166,8 @@ export async function run(
       transport,
     });
 
-    // -----------------------------------------------------------------------
-    // Generate report and handle truncation / artifact upload
-    // -----------------------------------------------------------------------
-
-    // First pass: give the report the full available budget (no truncation
-    // notice reservation). If the report is not truncated, we avoid
-    // needlessly shrinking the budget.
-    const fullBudget = Math.max(
-      0,
-      COMMENT_LIMIT - footer.length - OVERHEAD_RESERVE,
-    );
-
+    // First pass: full budget (no truncation notice reservation)
+    const fullBudget = calculateBudget(footer.length);
     const result = reportFromSteps(inputs.steps, {
       ...reportOptions,
       maxOutputLength: fullBudget,
@@ -301,7 +177,7 @@ export async function run(
     const { fullMarkdown, wasTruncated, operation, hasUnresolvedFailures } =
       result;
 
-    // Upload artifact when truncated OR when always-upload-report is enabled.
+    // Upload artifact when truncated or always-upload-report enabled
     const shouldUpload = wasTruncated || inputs.alwaysUploadReport;
     let artifactUrl: string | undefined;
 
@@ -323,13 +199,9 @@ export async function run(
     }
 
     if (wasTruncated) {
-      const link = artifactUrl
-        ? { url: artifactUrl, label: "View full report" }
-        : { url: logsUrl, label: "View full workflow run logs" };
-      const truncationNotice = buildTruncationNotice(link);
+      const truncationNotice = buildTruncation(artifactUrl, logsUrl);
 
-      // Second pass: re-generate with truncation notice length reserved so
-      // the final output (report + notice + footer) fits.
+      // Second pass: reserve space for truncation notice
       const reducedBudget = Math.max(0, fullBudget - truncationNotice.length);
       ({ markdown } = reportFromSteps(inputs.steps, {
         ...reportOptions,
@@ -337,28 +209,14 @@ export async function run(
       }));
 
       markdown += truncationNotice;
-    } else if (artifactUrl !== undefined) {
-      // Not truncated but always-upload-report is enabled — add a subtle link
-      markdown += buildArtifactNotice({
-        url: artifactUrl,
-        label: "View/Download Report",
-      });
     }
 
-    // When step failures lack captured output, always link to logs
-    // (even if not truncated — the error details are only in the logs).
-    if (hasUnresolvedFailures) {
-      markdown += buildLogsNotice({ url: logsUrl, label: "workflow run logs" });
-    }
+    const body = assembleCommentBody(markdown, footer, {
+      artifactUrl: wasTruncated ? undefined : artifactUrl,
+      logsUrl,
+      hasUnresolvedFailures,
+    });
 
-    // -----------------------------------------------------------------------
-    // Construct full comment body
-    // -----------------------------------------------------------------------
-    const body = markdown + footer;
-
-    // -----------------------------------------------------------------------
-    // Post via GitHub API
-    // -----------------------------------------------------------------------
     if (isPr) {
       const eventPath = env["GITHUB_EVENT_PATH"] ?? "";
       const prNumber = readPrNumber(eventPath);

@@ -1,5 +1,6 @@
 import { describe, it, expect, beforeEach, afterEach } from "vitest";
-import { run, formatTimestamp } from "../../../src/action/main.js";
+import { run } from "../../../src/action/main.js";
+import { formatTimestamp } from "../../../src/comment/footer.js";
 import type { Env } from "../../../src/env/index.js";
 import type {
   GitHubClient,
@@ -9,8 +10,7 @@ import type {
 import { writeFileSync, mkdtempSync, rmSync } from "node:fs";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
-import { nullLogger } from "../../../src/action/logger.js";
-import type { Logger } from "../../../src/action/logger.js";
+import { nullLogger, capturingLogger } from "../../helpers/logger.js";
 import type { RunDeps } from "../../../src/action/main.js";
 
 // ---------------------------------------------------------------------------
@@ -29,24 +29,6 @@ class ExitError extends Error {
 /** Fake exit function that throws instead of terminating the process. */
 function throwingExit(code: number): never {
   throw new ExitError(code);
-}
-
-/** Logger that captures all messages for assertions. */
-function capturingLogger(): {
-  logger: Logger;
-  messages: { warnings: string[]; errors: string[]; infos: string[] };
-} {
-  const messages = {
-    warnings: [] as string[],
-    errors: [] as string[],
-    infos: [] as string[],
-  };
-  const logger: Logger = {
-    warning: (m) => messages.warnings.push(m),
-    error: (m) => messages.errors.push(m),
-    info: (m) => messages.infos.push(m),
-  };
-  return { logger, messages };
 }
 
 /** Default deps that suppress all output and throw on exit. */

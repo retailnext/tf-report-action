@@ -80,9 +80,41 @@ export default tseslint.config(
     },
   },
   {
-    // The action layer may only import from entry points, model, github, env, and http.
-    // It must not reach into internal library modules.
+    // The action layer may only import from entry points, model, github, env,
+    // http, logger, inputs, and comment. It must not reach into internal
+    // library modules.
     files: ["src/action/**/*.ts"],
+    rules: {
+      "no-restricted-imports": [
+        "error",
+        {
+          patterns: [
+            {
+              group: [
+                "../builder/*",
+                "../renderer/*",
+                "../compositor/*",
+                "../compose/*",
+                "../diff/*",
+                "../flattener/*",
+                "../sensitivity/*",
+                "../raw-formatter/*",
+                "../parser/*",
+                "../steps/*",
+                "../jsonl-scanner/*",
+                "../tfjson/*",
+              ],
+              message:
+                "The action layer may only import from src/index.js, src/model/, src/github/, src/env/, src/http/, src/logger/, src/inputs/, and src/comment/.",
+            },
+          ],
+        },
+      ],
+    },
+  },
+  {
+    // The comment module may only import from env/ and compose/notices.
+    files: ["src/comment/**/*.ts"],
     rules: {
       "no-restricted-imports": [
         "error",
@@ -101,9 +133,17 @@ export default tseslint.config(
                 "../steps/*",
                 "../jsonl-scanner/*",
                 "../tfjson/*",
+                "../action/*",
+                "../github/*",
+                "../http/*",
+                "../logger/*",
+                "../inputs/*",
+                "../html/*",
+                "../artifact/*",
+                "../index.js",
               ],
               message:
-                "The action layer may only import from src/index.js, src/model/, src/github/, src/env/, and src/http/.",
+                "The comment module may only import from src/env/ and src/compose/.",
             },
           ],
         },
@@ -124,6 +164,7 @@ export default tseslint.config(
                 "../builder/*",
                 "../renderer/*",
                 "../compositor/*",
+                "../compose/*",
                 "../diff/*",
                 "../flattener/*",
                 "../sensitivity/*",
@@ -133,6 +174,9 @@ export default tseslint.config(
                 "../jsonl-scanner/*",
                 "../tfjson/*",
                 "../action/*",
+                "../comment/*",
+                "../logger/*",
+                "../inputs/*",
                 "../env/*",
                 "../model/*",
                 "../index.js",
@@ -157,6 +201,7 @@ export default tseslint.config(
                 "../builder/*",
                 "../renderer/*",
                 "../compositor/*",
+                "../compose/*",
                 "../diff/*",
                 "../flattener/*",
                 "../sensitivity/*",
@@ -166,6 +211,9 @@ export default tseslint.config(
                 "../jsonl-scanner/*",
                 "../tfjson/*",
                 "../action/*",
+                "../comment/*",
+                "../logger/*",
+                "../inputs/*",
                 "../model/*",
                 "../github/*",
                 "../index.js",
@@ -180,9 +228,9 @@ export default tseslint.config(
   {
     // Forbid direct process/console access in source files — all I/O must go
     // through the injected Logger interface. The only exception is
-    // src/action/logger.ts which provides the production implementations.
+    // src/logger/index.ts which provides the production implementation.
     files: ["src/**/*.ts"],
-    ignores: ["src/action/logger.ts"],
+    ignores: ["src/logger/index.ts"],
     rules: {
       "no-restricted-syntax": [
         "error",
@@ -190,31 +238,31 @@ export default tseslint.config(
           selector:
             "MemberExpression[object.name='process'][property.name='stderr']",
           message:
-            "Use the injected Logger interface instead of process.stderr. See src/action/logger.ts.",
+            "Use the injected Logger interface instead of process.stderr. See src/logger/index.ts.",
         },
         {
           selector:
             "MemberExpression[object.name='process'][property.name='stdout']",
           message:
-            "Use the injected Logger interface instead of process.stdout. See src/action/logger.ts.",
+            "Use the injected Logger interface instead of process.stdout. See src/logger/index.ts.",
         },
         {
           selector:
             "MemberExpression[object.name='console'][property.name='log']",
           message:
-            "Use the injected Logger interface instead of console.log. See src/action/logger.ts.",
+            "Use the injected Logger interface instead of console.log. See src/logger/index.ts.",
         },
         {
           selector:
             "MemberExpression[object.name='console'][property.name='error']",
           message:
-            "Use the injected Logger interface instead of console.error. See src/action/logger.ts.",
+            "Use the injected Logger interface instead of console.error. See src/logger/index.ts.",
         },
         {
           selector:
             "MemberExpression[object.name='console'][property.name='warn']",
           message:
-            "Use the injected Logger interface instead of console.warn. See src/action/logger.ts.",
+            "Use the injected Logger interface instead of console.warn. See src/logger/index.ts.",
         },
       ],
     },

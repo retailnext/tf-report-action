@@ -20,39 +20,49 @@ export default defineConfig({
       reportsDirectory: "coverage-integration",
       include: ["src/**/*.ts"],
       exclude: [
-        "src/tfjson/**",
-        "src/model/**",
+        "src/tfjson/**", // type-only: all imports are `import type`, consts exist for type derivation
+        // model type-only files (no executable code)
+        "src/model/apply-status.ts",
+        "src/model/attribute.ts",
+        "src/model/composition-result.ts",
+        "src/model/diagnostic.ts",
+        "src/model/index.ts", // barrel re-exports; tests import from specific files
+        "src/model/output.ts",
+        "src/model/render-options.ts",
+        "src/model/report.ts",
+        "src/model/resource.ts",
+        "src/model/section.ts",
+        "src/model/step-file-read.ts",
+        "src/model/step-issue.ts",
+        "src/model/step-outcome.ts",
+        "src/model/summary.ts",
         "src/env/**",
         "src/**/*.d.ts",
         "src/diff/types.ts",
         "src/builder/options.ts",
         "src/renderer/options.ts",
+        "src/renderer/render-mode.ts",
         // Test helper files must not appear in source coverage
         "tests/**",
-        // Error-path branches in the parser are covered by unit tests, not integration tests.
-        // Integration tests only supply valid plan JSON from real terraform/tofu runs.
+        // Parser error-path branches (invalid JSON, unsupported format versions,
+        // malformed state) are covered by unit tests. Integration tests supply
+        // valid plan/state JSON from real tool runs. The parser barrel re-export
+        // (index.ts) and detect-tool error paths significantly reduce coverage
+        // when included.
         "src/parser/**",
-        // Steps context parsing, file reading, and composition have extensive
-        // error-path and edge-case branches that are exercised by unit tests.
-        // Integration tests exercise the happy paths through reportFromSteps().
-        "src/steps/parse.ts",
+        // Steps reader has extensive security/error-path branches (symlink
+        // rejection, size limits, permission errors) not reachable through
+        // fixture-driven integration tests. Happy paths are covered.
         "src/steps/reader.ts",
-        // Step failure predicates (hasAnyFailedStep, hasAnyFailedKnownStep) require
-        // specific failure patterns in the steps context not present in generated fixtures.
-        // Core outcome functions (getStepOutcome, getExitCode, buildStepOutcomes) are
-        // covered by integration tests; edge-case predicates are covered by unit tests.
-        "src/steps/outcomes.ts",
         // Steps barrel re-exports are trivially covered by unit tests.
         "src/steps/index.ts",
-        "src/compositor/index.ts",
-        "src/compositor/types.ts",
+        // compose/notices.ts builds truncation/logs/artifact notice strings.
+        // These depend on action-layer inputs (artifact URL, logs URL) not
+        // available through reportFromSteps(). Covered by unit tests.
+        "src/compose/notices.ts",
         // jsonl-scanner barrel and types — no executable logic
         "src/jsonl-scanner/index.ts",
         "src/jsonl-scanner/types.ts",
-        // Error renderer is only reachable when the pipeline itself fails (invalid
-        // steps context, parse error with no fallback). Integration tests always
-        // supply valid fixture data, so these branches are exercised by unit tests.
-        "src/renderer/error.ts",
         // The action module is the GitHub Action entry point — it is exercised
         // by unit tests with mocked clients, not integration tests.
         "src/action/**",
@@ -69,6 +79,15 @@ export default defineConfig({
         // calls or network configuration and cannot be exercised by fixture-driven
         // integration tests.
         "src/http/**",
+        // The logger module writes to process.stdout/stderr — requires
+        // action runtime. Covered by unit tests.
+        "src/logger/**",
+        // The inputs module parses INPUT_* env vars and event payload —
+        // action-specific context not reachable via reportFromSteps.
+        "src/inputs/**",
+        // The comment module assembles comment bodies/footers/markers —
+        // action-specific output not reachable via reportFromSteps.
+        "src/comment/**",
       ],
       thresholds: {
         lines: 90,

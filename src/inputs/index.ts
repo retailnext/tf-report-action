@@ -1,11 +1,13 @@
 /**
- * Parse GitHub Action inputs from `INPUT_*` environment variables.
+ * Parse GitHub Actions runtime context into typed data.
  *
- * Follows the same convention as `@actions/core`: input names are
- * uppercased with spaces replaced by underscores, then looked up as
- * `INPUT_<NAME>` in the environment.
+ * This module handles two forms of action context: `INPUT_*` environment
+ * variables (the action's declared inputs) and the event payload file
+ * (which provides context like the pull request number). Both are pure
+ * parsing — no live infrastructure required.
  */
 
+import { readFileSync } from "node:fs";
 import type { Env } from "../env/index.js";
 
 /** Parsed action inputs with defaults applied. */
@@ -74,4 +76,23 @@ export function parseInputs(env: Env): ActionInputs {
     applyStepId: readInput(env, "apply-step-id") || "apply",
     stateStepId: readInput(env, "state-step-id") || "state",
   };
+}
+
+/**
+ * Read the pull request number from the event payload file.
+ *
+ * Returns `undefined` if the file cannot be read or the payload does
+ * not contain a `pull_request.number` field.
+ */
+export function readPrNumber(eventPath: string): number | undefined {
+  try {
+    const raw = readFileSync(eventPath, "utf-8");
+    const event = JSON.parse(raw) as {
+      pull_request?: { number?: number };
+    };
+    const num = event.pull_request?.number;
+    return typeof num === "number" ? num : undefined;
+  } catch {
+    return undefined;
+  }
 }

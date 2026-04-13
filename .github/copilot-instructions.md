@@ -62,12 +62,13 @@ Follow these boundaries strictly — do not add cross-cutting logic.
 | `src/model/`  | Shared TypeScript interfaces and constants: `Report`, `ResourceChange`, `StepIssue`, `StepOutcome`, `Section`, `CompositionResult`, sentinels, status icons. **No executable logic.** |
 | `src/env/`    | `Env` type alias (`Record<string, string \| undefined>`). DI abstraction over `process.env`.                                                                                          |
 | `src/http/`   | HTTP primitives: `ActionsError`, exponential-backoff retry, proxy detection (matching `@actions/http-client`), `node:http`/`node:https` transport with CONNECT tunneling.             |
+| `src/logger/` | `Logger` interface and `actionsLogger()` production implementation. The **only** module permitted to write to `process.stdout`/`process.stderr`.                                      |
 
 ### Layer 1 — Pure algorithms (depend only on Layer 0)
 
 | Module               | Responsibility                                                                                |
 | -------------------- | --------------------------------------------------------------------------------------------- |
-| `src/diff/`          | Pure LCS, line-diff, and char-diff algorithms. No Markdown, no I/O.                           |
+| `src/diff/`          | Pure LCS, line-diff, char-diff, and context-diff algorithms with diff formatting. No I/O.     |
 | `src/flattener/`     | Flatten nested `JsonValue` → `Map<string, string \| null>` with dotted-path keys.             |
 | `src/sensitivity/`   | Detect whether a flattened attribute path is sensitive. Pure predicate.                       |
 | `src/raw-formatter/` | Format raw command output (JSON Lines, validate results, plain text) into Markdown fragments. |
@@ -80,13 +81,13 @@ Follow these boundaries strictly — do not add cross-cutting logic.
 | `src/parser/` | Parse Terraform/OpenTofu formats: plan JSON, state JSON (raw tfstate from `state pull`), apply JSONL, validate output.                                                                               |
 | `src/steps/`  | GitHub Actions steps context: parsing, secure file reading, step-data-aware I/O wrappers, outcome helpers. This is the I/O boundary between the external world and the pure transformation pipeline. |
 | `src/github/` | GitHub REST API client with DI HTTP transport. Comment CRUD, issue search/create/update, pagination, Markdown rendering. No domain model dependency.                                                 |
+| `src/inputs/` | Parse GitHub Actions runtime context into typed data: `INPUT_*` env var parsing and event payload reading. Pure functions taking `Env` or file paths.                                                |
 
 ### Layer 3 — Business logic (depend on Layers 0–2)
 
-| Module            | Responsibility                                                                                                                                                                                                                                                                       |
-| ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `src/builder/`    | Build `Report` from parsed input. Plan JSON → Report with flat resource arrays and full attribute detail, JSONL → Report with flat resource arrays but no attribute detail, steps context → progressively enriched Report (tier detection, step issue collection, title generation). |
-| `src/compositor/` | Budget-aware section assembly. Composes Markdown sections within an output size limit, progressively degrading from full → compact → omit. Truncation notice helper.                                                                                                                 |
+| Module         | Responsibility                                                                                                                                                                                                                                                                       |
+| -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `src/builder/` | Build `Report` from parsed input. Plan JSON → Report with flat resource arrays and full attribute detail, JSONL → Report with flat resource arrays but no attribute detail, steps context → progressively enriched Report (tier detection, step issue collection, title generation). |
 
 **Builder internal structure:**
 
@@ -107,43 +108,53 @@ dedicated files:
 import from `process-helpers.ts` and lower-layer modules, but **never from
 each other**.
 
-### Layer 4 — Rendering (depends on Layers 0–3)
+### Layer 4a — Rendering (depends on Layers 0–3)
 
 | Module          | Responsibility                                                                                                                                                                                                                                                                                                                              |
 | --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `src/renderer/` | Render any `Report` variant to Markdown. Groups resources by module address (derived from address + type) for display — module grouping is a renderer concern. StructuredReport → full Markdown string, TextFallbackReport/WorkflowReport/ErrorReport → Section arrays. Title, step issue, step table, and variant-specific body renderers. |
 
-### Layer 5 — Entry points
+### Layer 4b — Composition (depends on Layers 0–4a)
 
-| Module         | Responsibility                                                                                                                           |
-| -------------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
-| `src/index.ts` | Rendering API: `planToMarkdown`, `applyToMarkdown`, `reportFromSteps`. Three pipelines all following parse → build → render (→ compose). |
+| Module         | Responsibility                                                                                                                                                                                                  |
+| -------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `src/compose/` | Budget-aware progressive enhancement assembly. Renders categories at progressive tiers (flat listing → compact → attrs → full diffs) within an output size limit. Notice builders for truncation/logs/artifact. |
+
+### Layer 5 — Entry points and comment construction
+
+| Module         | Responsibility                                                                                                                                                                                           |
+| -------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `src/index.ts` | Rendering API: `planToMarkdown`, `applyToMarkdown`, `reportFromSteps`. Three pipelines all following parse → build → render (→ compose).                                                                 |
+| `src/comment/` | Comment structure: footer, marker, body assembly. Everything about how the final GitHub comment is constructed that does NOT require GitHub API calls. Pure functions operating on strings and env vars. |
 
 ### Layer 6 — Action (depends on Layers 0–5)
 
-| Module        | Responsibility                                                                                                                                                                                                                                                                            |
-| ------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `src/action/` | Action entry point and composition root. Parses `INPUT_*` env vars, wires HTTP transport into GitHub client, calls `reportFromSteps()`, posts results via GitHub API. Entry-point layer is allowed to read `process.env` directly; lower layers should consume an injected `Env` instead. |
+| Module        | Responsibility                                                                                                                                                                                                                                                                                       |
+| ------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `src/action/` | Action entry point. **Strictly limited to**: (1) guarded `main()` invocation, (2) `handlePr()`/`handleIssue()` GitHub API orchestration, (3) `run()` top-level wiring of DI dependencies, (4) artifact upload orchestration. All pure logic lives in `src/comment/`, `src/inputs/`, or lower layers. |
 
 **Dependency rules (layered — import only from same or lower layer):**
 
 | Module           | May import from (beyond `model/`)                                                      |
 | ---------------- | -------------------------------------------------------------------------------------- |
-| `diff/`          | _(nothing)_                                                                            |
+| `diff/`          | `raw-formatter/` (HTML escaping for diff formatting)                                   |
 | `flattener/`     | _(nothing)_                                                                            |
 | `sensitivity/`   | _(nothing)_                                                                            |
 | `raw-formatter/` | _(nothing)_                                                                            |
 | `jsonl-scanner/` | `tfjson/`                                                                              |
 | `env/`           | _(nothing)_                                                                            |
 | `http/`          | `env/`                                                                                 |
+| `logger/`        | _(nothing — only module allowed to use process.stdout/stderr)_                         |
 | `parser/`        | `tfjson/`                                                                              |
 | `steps/`         | `env/`                                                                                 |
 | `github/`        | `http/` (types only — transport function is injected)                                  |
+| `inputs/`        | `env/`                                                                                 |
 | `builder/`       | `tfjson/`, `flattener/`, `sensitivity/`, `steps/`, `env/`, `parser/`, `jsonl-scanner/` |
-| `compositor/`    | _(nothing)_                                                                            |
 | `renderer/`      | `diff/`, `raw-formatter/`                                                              |
-| `index.ts`       | `parser/`, `builder/`, `renderer/`, `compositor/`, `steps/`, `env/`                    |
-| `action/`        | `index.ts`, `model/`, `github/`, `env/`, `http/`                                       |
+| `compose/`       | `renderer/`, `diff/`                                                                   |
+| `comment/`       | `env/`, `compose/`                                                                     |
+| `index.ts`       | `parser/`, `builder/`, `renderer/`, `compose/`, `steps/`, `env/`                       |
+| `action/`        | `index.ts`, `model/`, `github/`, `env/`, `http/`, `logger/`, `inputs/`, `comment/`     |
 
 **Additional constraints:**
 
@@ -153,6 +164,75 @@ each other**.
 - `renderer/` must **not** import sentinel string constants from `model/sentinels.ts` —
   all display logic must use boolean flags (`isSensitive`, `isKnownAfterApply`). This
   is enforced by an ESLint `no-restricted-imports` rule.
+- `logger/` is the **only** module permitted to write to `process.stdout`/`process.stderr`.
+  This is enforced by both ESLint `no-restricted-syntax` rules and a governance test.
+
+---
+
+## Separation of Concerns
+
+### Colocation Principle
+
+"X is only used by Y" is **INVALID** as a reason for two concerns to be
+colocated. Shared consumers and shared pipeline flow are not justifications
+for colocation. The **only** valid reason for code to be in the same file or
+directory is that it addresses the **same conceptual responsibility**.
+
+### Integration-Excluded Code Rule
+
+Directories and files excluded from integration test coverage may **only**
+contain code that is **intrinsically impractical** to integration-test:
+
+- Code that requires a live GitHub API connection
+- Code that requires an Actions runtime environment (JWT tokens, Twirp
+  services, Azure Blob Storage)
+- Code that performs direct process I/O (`process.exit`, `process.stderr`)
+- The guarded `main()` invocation
+
+**Pure functions, interfaces, business logic, string formatting, and budget
+management do NOT belong in integration-excluded files**, even if they are
+only called from excluded code today. Extract them to a non-excluded module
+so they are exercised by integration tests.
+
+### Single Responsibility Per Module
+
+Each directory under `src/` must have a **single, clearly stated
+responsibility** documented in its barrel file (`index.ts`) JSDoc.
+
+Symptoms of mixed concerns (any of these is a blocking code review issue):
+
+- A file imports from 5+ different modules across multiple layers
+- A directory contains both pure algorithms AND I/O code
+- A "helpers" file accumulates unrelated utility functions
+- A module at layer N imports from layer N+1 or higher
+
+When a file grows past 150 lines, ask: does it have multiple concerns that
+should be separate files? Growth alone is not a problem (security-critical
+code like `steps/reader.ts` is correctly large), but growth from accumulating
+unrelated responsibilities is.
+
+### Dead Code and Internal Stability
+
+- **Dead code removal**: All plans must include removal of dead code.
+  Superseded modules, deprecated aliases, and unused functions must be
+  deleted, not left behind. This is non-negotiable.
+- **No internal API stability**: This is **NOT** a library. The stability
+  of internal interfaces (types, function signatures, module boundaries)
+  is **NEVER** important. Only the action's inputs/behavior and the CLI
+  scripts (`scripts/render.ts`) are stable surfaces.
+  It is **ALWAYS WRONG** to treat any internal interface as important or to
+  use backwards compatibility as a reason to preserve dead code, deprecated
+  aliases, or suboptimal designs.
+
+### New Module Checklist
+
+Before creating a new module directory, verify:
+
+1. It has exactly one sentence describing its responsibility
+2. It does not duplicate an existing module's responsibility
+3. Its import dependencies only go downward (same layer or lower)
+4. It is not excluded from integration coverage unless it meets the
+   integration-excluded code rule above
 
 ---
 
@@ -329,13 +409,16 @@ Allowed exclusion categories:
 
 - **Type-only / no-logic modules** — `tfjson/`, `model/`, `env/`, `*.d.ts`,
   interface-only files (`builder/options.ts`, `renderer/options.ts`, `diff/types.ts`,
-  `compositor/types.ts`)
+  `compose/types.ts`)
 - **Error-path-only modules** — `parser/`, `steps/parse.ts`, `steps/reader.ts` —
   integration tests supply valid plan JSON from real tool runs; error paths are
   exercised by unit tests
-- **Barrel reexports** — `steps/index.ts`, `compositor/index.ts`
-- **Requires live API** — `action/`, `github/` — require GitHub API interaction that
-  cannot be exercised with fixture data
+- **Barrel reexports** — `steps/index.ts`, `compose/index.ts`
+- **Requires live API / runtime** — `action/`, `github/`, `logger/`, `inputs/` —
+  require GitHub API interaction, Actions runtime environment, or process I/O
+  that cannot be exercised with fixture data
+- **Comment construction** — `comment/` — assembles final GitHub comment bodies
+  from rendered output; not reachable through `reportFromSteps()` fixture pipeline
 
 Every exclusion must include a comment in `vitest.integration.config.ts` explaining
 **why** the module cannot be covered by integration tests. Do not exclude modules

@@ -1,6 +1,12 @@
 /**
- * Truncation notice builder — produces the truncation warning appended
- * when the compositor had to degrade or omit sections.
+ * Post-composition notice builders.
+ *
+ * Produces the truncation warning, logs link, and artifact link appended
+ * after a composed report. These are composition concerns — they depend
+ * on whether the output was truncated and whether an artifact was uploaded.
+ *
+ * Moved from compositor/truncation.ts to compose/ because the composition
+ * pipeline (not the action entry point) should own notice lifecycle.
  */
 
 import {
@@ -9,8 +15,8 @@ import {
   ARTIFACT_ICON,
 } from "../model/status-icons.js";
 
-/** Link target for the truncation notice. */
-export interface TruncationLink {
+/** Link target for notices (truncation, logs, artifact). */
+export interface NoticeLink {
   readonly url: string;
   readonly label: string;
 }
@@ -21,11 +27,8 @@ export interface TruncationLink {
  * When `link` is provided, the notice includes a clickable link with the
  * given label and URL. When absent, a generic message directs the reader
  * to the workflow run logs.
- *
- * @param link - Optional link to include in the notice
- * @returns A markdown string to append after truncated output
  */
-export function buildTruncationNotice(link?: TruncationLink): string {
+export function buildTruncationNotice(link?: NoticeLink): string {
   if (link !== undefined) {
     return `\n---\n\n> ${DIAGNOSTIC_WARNING} **Output truncated** — some details were shortened or omitted to fit within the comment size limit.\n> [${link.label}](${link.url})\n`;
   }
@@ -37,11 +40,8 @@ export function buildTruncationNotice(link?: TruncationLink): string {
  *
  * Used when a step failed but its stdout/stderr output was not captured
  * in the report. The logs are the only place to find the actual error.
- *
- * @param link - Link to the workflow run logs
- * @returns A markdown string to append after the report body
  */
-export function buildLogsNotice(link: TruncationLink): string {
+export function buildLogsNotice(link: NoticeLink): string {
   return `\n---\n\n> ${INFO_ICON} Some step errors are not shown — see the [${link.label}](${link.url}) for details.\n`;
 }
 
@@ -51,10 +51,7 @@ export function buildLogsNotice(link: TruncationLink): string {
  * Used when `always-upload-report` is enabled and the report was not
  * truncated. The link is a compact line (not a warning blockquote)
  * directing readers to the full HTML artifact.
- *
- * @param link - Link to the uploaded artifact
- * @returns A markdown string to append after the report body
  */
-export function buildArtifactNotice(link: TruncationLink): string {
+export function buildArtifactNotice(link: NoticeLink): string {
   return `\n${ARTIFACT_ICON} [${link.label}](${link.url})\n`;
 }

@@ -9,11 +9,11 @@ const SRC = resolve(ROOT, "src");
 /**
  * Allowed files that may reference process.stderr, process.stdout, or
  * console.* directly. Every other source file must use the injected
- * Logger interface from src/action/logger.ts.
+ * Logger interface from src/logger/index.ts.
  */
 const ALLOWED_FILES = new Set([
   // Production logger — the sole provider of annotation output
-  "src/action/logger.ts",
+  "src/logger/index.ts",
 ]);
 
 /**
