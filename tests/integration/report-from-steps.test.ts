@@ -904,6 +904,25 @@ describe("reportFromSteps integration — targeted scenarios", () => {
     expect(result.length).toBeLessThanOrEqual(700);
   });
 
+  it("respects budget even when tier-1 listing alone would overflow", () => {
+    const fixture = generatedFixtures[0];
+    expect(fixture).toBeDefined();
+    const resolved = resolveStepFilePaths(
+      fixture!.stepsJson,
+      fixture!.fixtureDir,
+    );
+    // Budget tight enough to force tier-1 listing truncation
+    // but large enough to accommodate the fixed prefix (title, summary)
+    const options: ReportOptions = {
+      allowedDirs: [fixture!.fixtureDir],
+      maxOutputLength: 350,
+      env: NO_GITHUB_ENV,
+    };
+    const result = reportFromSteps(resolved, options);
+    expect(result.markdown.length).toBeLessThanOrEqual(350);
+    expect(result.wasTruncated).toBe(true);
+  });
+
   it("produces Tier 1 report for fixtures with show-plan.stdout", () => {
     const fixture = generatedFixtures.find((f) =>
       f.label.includes("null-lifecycle"),

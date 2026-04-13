@@ -4,9 +4,13 @@
  * Assembles report output by starting at the most compact tier and
  * progressively upgrading categories until the budget is exhausted.
  *
- * Upgrade rules:
- * 1. ALL categories must reach tier N before ANY upgrades to N+1.
- * 2. Within a tier, priority order: resources → outputs → drift.
+ * Two-phase upgrade:
+ * 1. **Uniform phase** — advance ALL categories together, tier by tier.
+ *    Stop when any category cannot advance. The resulting tier is the
+ *    "floor" (highest tier all categories share).
+ * 2. **Individual phase** — with remaining budget, upgrade individual
+ *    categories beyond the floor in priority order (resources → outputs
+ *    → drift) to maximize useful information.
  * 3. Fixed content (title, summary, diagnostics) is always included.
  */
 
@@ -73,7 +77,7 @@ export function composeProgressively(
     contentMap.set(cat, "");
   }
 
-  // Render all categories at tier 1
+  // Render all categories at tier 1 (unconstrained first pass)
   for (const cat of activeCategories) {
     contentMap.set(
       cat,
@@ -81,7 +85,65 @@ export function composeProgressively(
     );
   }
 
-  // Try upgrading through tiers 2-5 (in upgrade priority order)
+  // If tier-1 total exceeds budget, re-render with per-category budgets
+  const tier1Total =
+    fixedLen + [...contentMap.values()].reduce((s, c) => s + c.length, 0);
+  if (tier1Total > budget) {
+    const categoryBudget = budget - fixedLen;
+    let spent = 0;
+    for (const cat of activeCategories) {
+      const available = Math.max(0, categoryBudget - spent);
+      const content = renderCategoryAtTier(
+        cat,
+        1,
+        report,
+        options,
+        diffCache,
+        available,
+      );
+      contentMap.set(cat, content);
+      spent += content.length;
+    }
+  }
+
+  // Phase 1 (uniform): advance ALL categories together
+  for (const targetTier of TIERS.slice(1)) {
+    const candidates = new Map<Category, string>();
+    let allFit = true;
+
+    for (const cat of activeCategories) {
+      const currentTier = tierMap.get(cat) ?? 1;
+      if (currentTier >= targetTier) continue;
+
+      const candidateContent = renderCategoryAtTier(
+        cat,
+        targetTier,
+        report,
+        options,
+        diffCache,
+      );
+
+      const otherContent = totalContentExcluding(contentMap, cat);
+      const totalSize = fixedLen + otherContent + candidateContent.length;
+
+      if (totalSize <= budget) {
+        candidates.set(cat, candidateContent);
+      } else {
+        allFit = false;
+        break;
+      }
+    }
+
+    if (!allFit) break;
+
+    // All categories fit at targetTier — commit the upgrades
+    for (const [cat, content] of candidates) {
+      tierMap.set(cat, targetTier);
+      contentMap.set(cat, content);
+    }
+  }
+
+  // Phase 2 (individual): upgrade categories beyond the floor
   for (const targetTier of TIERS.slice(1)) {
     for (const cat of activeCategories) {
       const currentTier = tierMap.get(cat) ?? 1;
@@ -95,7 +157,6 @@ export function composeProgressively(
         diffCache,
       );
 
-      // Check if upgrading this category still fits the budget
       const otherContent = totalContentExcluding(contentMap, cat);
       const totalSize = fixedLen + otherContent + candidateContent.length;
 

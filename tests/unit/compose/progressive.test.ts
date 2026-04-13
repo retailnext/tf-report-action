@@ -154,4 +154,27 @@ describe("composeProgressively", () => {
     );
     expect(result.markdown.length).toBeLessThanOrEqual(budget);
   });
+
+  it("never exceeds budget even when tier-1 alone would overflow", () => {
+    // Many resources with long addresses — tier 1 unconstrained would be huge
+    const resources = makeResources(200, "module.very_long_module_name.");
+    const report = makeReport({ resources });
+    const budget = 1500;
+    const result = composeProgressively("## Title\n\n", "", report, {}, budget);
+    expect(result.markdown.length).toBeLessThanOrEqual(budget);
+    expect(result.wasTruncated).toBe(true);
+  });
+
+  it("uniform phase advances all categories together before individual upgrades", () => {
+    // With a generous budget, all categories should reach tier 5 together
+    const report = makeReport({
+      resources: makeResources(2),
+      outputs: makeOutputs(2),
+    });
+    const result = composeProgressively("", "", report, {}, 100_000);
+    expect(result.wasTruncated).toBe(false);
+    // Both categories fully rendered
+    expect(result.markdown).toContain("Resource Changes");
+    expect(result.markdown).toContain("Output Changes");
+  });
 });

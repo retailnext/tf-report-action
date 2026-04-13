@@ -68,7 +68,7 @@ Follow these boundaries strictly — do not add cross-cutting logic.
 
 | Module               | Responsibility                                                                                |
 | -------------------- | --------------------------------------------------------------------------------------------- |
-| `src/diff/`          | Pure LCS, line-diff, char-diff, and context-diff algorithms. No Markdown, no I/O.             |
+| `src/diff/`          | Pure LCS, line-diff, char-diff, and context-diff algorithms with diff formatting. No I/O.     |
 | `src/flattener/`     | Flatten nested `JsonValue` → `Map<string, string \| null>` with dotted-path keys.             |
 | `src/sensitivity/`   | Detect whether a flattened attribute path is sensitive. Pure predicate.                       |
 | `src/raw-formatter/` | Format raw command output (JSON Lines, validate results, plain text) into Markdown fragments. |
@@ -137,7 +137,7 @@ each other**.
 
 | Module           | May import from (beyond `model/`)                                                      |
 | ---------------- | -------------------------------------------------------------------------------------- |
-| `diff/`          | _(nothing)_                                                                            |
+| `diff/`          | `raw-formatter/` (HTML escaping for diff formatting)                                   |
 | `flattener/`     | _(nothing)_                                                                            |
 | `sensitivity/`   | _(nothing)_                                                                            |
 | `raw-formatter/` | _(nothing)_                                                                            |

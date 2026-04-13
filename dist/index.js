@@ -2712,6 +2712,87 @@ function prettyPrint(value) {
   return value;
 }
 
+// src/diff/context-diff.ts
+var CONTEXT_LINES = 3;
+function renderLargeValueContextDiff(name, before, after, cache) {
+  const bVal = before ? prettyPrint2(before) : null;
+  const aVal = after ? prettyPrint2(after) : null;
+  if (bVal === null && aVal === null) return "";
+  if (bVal === null && aVal !== null) {
+    return buildBlock(name, `\`\`\`
+${aVal}
+\`\`\``, 0, 0);
+  }
+  if (bVal !== null && aVal === null) {
+    return buildBlock(name, `\`\`\`
+${bVal}
+\`\`\``, 0, 0);
+  }
+  if (bVal === null || aVal === null) return "";
+  const diff = buildLineDiff(bVal, aVal, cache);
+  return renderContextHunks(name, diff);
+}
+function renderContextHunks(name, diff) {
+  const visible = new Array(diff.length).fill(false);
+  let addedLines = 0;
+  let removedLines = 0;
+  for (let i = 0; i < diff.length; i++) {
+    const entry = diff[i];
+    if (entry === void 0) continue;
+    if (entry.kind !== "unchanged") {
+      if (entry.kind === "added") addedLines++;
+      if (entry.kind === "removed") removedLines++;
+      for (let j = Math.max(0, i - CONTEXT_LINES); j <= Math.min(diff.length - 1, i + CONTEXT_LINES); j++) {
+        visible[j] = true;
+      }
+    }
+  }
+  if (addedLines === 0 && removedLines === 0) return "";
+  const lines = [];
+  let inGap = false;
+  for (let i = 0; i < diff.length; i++) {
+    if (!visible[i]) {
+      if (!inGap) {
+        lines.push("  ...");
+        inGap = true;
+      }
+      continue;
+    }
+    inGap = false;
+    const entry = diff[i];
+    if (entry === void 0) continue;
+    const prefix = entry.kind === "removed" ? "-" : entry.kind === "added" ? "+" : " ";
+    lines.push(`${prefix} ${entry.value}`);
+  }
+  const fenced = `\`\`\`diff
+${lines.join("\n")}
+\`\`\``;
+  return buildBlock(name, fenced, addedLines, removedLines);
+}
+function buildBlock(name, content, addedLines, removedLines) {
+  const escapedName = escapeHtml(name);
+  const hasDiff = addedLines > 0 || removedLines > 0;
+  const suffix = hasDiff ? ` (large value; +${String(addedLines)}, -${String(removedLines)})` : " (large value)";
+  return `<details>
+<summary>${escapedName}${suffix}</summary>
+
+${content}
+
+</details>
+`;
+}
+function prettyPrint2(value) {
+  const trimmed = value.trim();
+  if (trimmed.startsWith("{") || trimmed.startsWith("[")) {
+    try {
+      const parsed = JSON.parse(trimmed);
+      return JSON.stringify(parsed, null, 2);
+    } catch {
+    }
+  }
+  return value;
+}
+
 // src/renderer/address.ts
 function deriveModuleAddress(address, type) {
   const typePrefix = `${type}.`;
@@ -2790,7 +2871,7 @@ function renderAttributes(resource, writer, options, diffCache, mode) {
       writer.blankLine();
     }
     for (const attr of largeAttrs) {
-      const block = renderLargeValue(
+      const block = mode === "full" ? renderLargeValue(attr.name, attr.before, attr.after, diffCache) : renderLargeValueContextDiff(
         attr.name,
         attr.before,
         attr.after,
@@ -2807,7 +2888,9 @@ function renderInlineDiagnostics(diagnostics, writer) {
   const warnings = diagnostics.filter((d) => d.severity === "warning");
   for (const diag of [...errors, ...warnings]) {
     const prefix = diag.severity === "error" ? DIAGNOSTIC_ERROR : DIAGNOSTIC_WARNING;
-    writer.paragraph(`${prefix} **${diag.summary}**`);
+    writer.paragraph(
+      `${prefix} **${MarkdownWriter.escapeHtml(diag.summary)}**`
+    );
     if (diag.detail) {
       writer.codeFence(diag.detail);
     }
@@ -2871,18 +2954,17 @@ function renderOutputs(outputs, writer, options, diffCache, mode = "full") {
     }
     writer.blankLine();
   }
-  if (mode === "full") {
-    for (const output of largeOutputs) {
-      const symbol = ACTION_SYMBOLS[output.action];
-      const block = renderLargeValue(
-        `${symbol} ${output.name}`,
-        output.before,
-        output.after,
-        diffCache
-      );
-      if (block) {
-        writer.raw(block);
-      }
+  for (const output of largeOutputs) {
+    const symbol = ACTION_SYMBOLS[output.action];
+    const label = `${symbol} ${output.name}`;
+    const block = mode === "full" ? renderLargeValue(label, output.before, output.after, diffCache) : renderLargeValueContextDiff(
+      label,
+      output.before,
+      output.after,
+      diffCache
+    );
+    if (block) {
+      writer.raw(block);
     }
   }
 }
@@ -3308,30 +3390,50 @@ ${formatted}
 }
 
 // src/compose/listing.ts
-function renderResourceListing(heading, resources, maxItems) {
+function renderResourceListing(heading, resources, maxLength) {
   const lines = resources.map(
     (r) => `${ACTION_SYMBOLS[r.action]} ${r.address}`
   );
-  return buildListing(heading, lines, maxItems);
+  return buildListing(heading, lines, maxLength);
 }
-function renderOutputListing(heading, outputs, maxItems) {
-  const lines = outputs.map((o) => `${ACTION_SYMBOLS[o.action]} ${o.name}`);
-  return buildListing(heading, lines, maxItems);
+function renderOutputListing(heading, outputs, maxLength) {
+  const lines = outputs.map((o) => {
+    const suffix = o.isSensitive ? " (sensitive)" : "";
+    return `${ACTION_SYMBOLS[o.action]} ${o.name}${suffix}`;
+  });
+  return buildListing(heading, lines, maxLength);
 }
-function buildListing(heading, lines, maxItems) {
-  const parts = [];
-  parts.push(`## ${heading}
-`);
-  const limit = maxItems ?? lines.length;
-  const shown = lines.slice(0, limit);
-  const omitted = lines.length - shown.length;
-  parts.push("```");
-  parts.push(shown.join("\n"));
-  if (omitted > 0) {
-    parts.push(`... and ${String(omitted)} more`);
+function buildListing(heading, lines, maxLength) {
+  const headerLine = `## ${heading}
+`;
+  const fenceOpen = "```\n";
+  const fenceClose = "\n```\n";
+  if (maxLength === void 0) {
+    return headerLine + fenceOpen + lines.join("\n") + fenceClose;
   }
-  parts.push("```\n");
-  return parts.join("\n");
+  const overhead = headerLine.length + fenceOpen.length + fenceClose.length;
+  let remaining = maxLength - overhead;
+  const shown = [];
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+    if (line === void 0) continue;
+    const lineLen = shown.length > 0 ? line.length + 1 : line.length;
+    const moreItems = lines.length - (i + 1);
+    const omittedSuffix = moreItems > 0 ? `
+... and ${String(moreItems)} more` : "";
+    const neededForRest = omittedSuffix.length;
+    if (lineLen + neededForRest <= remaining) {
+      shown.push(line);
+      remaining -= lineLen;
+    } else {
+      const totalOmitted = lines.length - shown.length;
+      if (totalOmitted > 0) {
+        shown.push(`... and ${String(totalOmitted)} more`);
+      }
+      break;
+    }
+  }
+  return headerLine + fenceOpen + shown.join("\n") + fenceClose;
 }
 
 // src/compose/category-renderer.ts
@@ -3349,21 +3451,21 @@ function tierToMode(tier) {
       return "full";
   }
 }
-function renderCategoryAtTier(category, tier, report, options, diffCache) {
+function renderCategoryAtTier(category, tier, report, options, diffCache, maxLength) {
   switch (category) {
     case "resources":
-      return renderResourcesAtTier(tier, report, options, diffCache);
+      return renderResourcesAtTier(tier, report, options, diffCache, maxLength);
     case "outputs":
-      return renderOutputsAtTier(tier, report, options, diffCache);
+      return renderOutputsAtTier(tier, report, options, diffCache, maxLength);
     case "drift":
-      return renderDriftAtTier(tier, report, options, diffCache);
+      return renderDriftAtTier(tier, report, options, diffCache, maxLength);
   }
 }
-function renderResourcesAtTier(tier, report, options, diffCache) {
+function renderResourcesAtTier(tier, report, options, diffCache, maxLength) {
   const resources = report.resources ?? [];
   if (resources.length === 0) return "";
   if (tier === 1) {
-    return renderResourceListing("Resource Changes", resources);
+    return renderResourceListing("Resource Changes", resources, maxLength);
   }
   const mode = tierToMode(tier);
   const moduleGroups = groupByModule(resources);
@@ -3382,11 +3484,11 @@ function renderResourcesAtTier(tier, report, options, diffCache) {
   }
   return ensureTrailingBlankLine(writer.build());
 }
-function renderOutputsAtTier(tier, report, options, diffCache) {
+function renderOutputsAtTier(tier, report, options, diffCache, maxLength) {
   const outputs = report.outputs ?? [];
   if (outputs.length === 0) return "";
   if (tier === 1) {
-    return renderOutputListing("Output Changes", outputs);
+    return renderOutputListing("Output Changes", outputs, maxLength);
   }
   const mode = tierToMode(tier);
   const writer = new MarkdownWriter();
@@ -3394,13 +3496,14 @@ function renderOutputsAtTier(tier, report, options, diffCache) {
   renderOutputs(outputs, writer, options, diffCache, mode);
   return ensureTrailingBlankLine(writer.build());
 }
-function renderDriftAtTier(tier, report, options, diffCache) {
+function renderDriftAtTier(tier, report, options, diffCache, maxLength) {
   const driftResources = report.driftResources ?? [];
   if (driftResources.length === 0) return "";
   if (tier === 1) {
     return renderResourceListing(
       `${DRIFT_ICON} Resource Drift (${String(driftResources.length)} detected)`,
-      driftResources
+      driftResources,
+      maxLength
     );
   }
   const mode = tierToMode(tier);
@@ -3440,6 +3543,52 @@ function composeProgressively(prefix, suffix, report, options, budget) {
       cat,
       renderCategoryAtTier(cat, 1, report, options, diffCache)
     );
+  }
+  const tier1Total = fixedLen + [...contentMap.values()].reduce((s, c) => s + c.length, 0);
+  if (tier1Total > budget) {
+    const categoryBudget = budget - fixedLen;
+    let spent = 0;
+    for (const cat of activeCategories) {
+      const available = Math.max(0, categoryBudget - spent);
+      const content = renderCategoryAtTier(
+        cat,
+        1,
+        report,
+        options,
+        diffCache,
+        available
+      );
+      contentMap.set(cat, content);
+      spent += content.length;
+    }
+  }
+  for (const targetTier of TIERS.slice(1)) {
+    const candidates = /* @__PURE__ */ new Map();
+    let allFit = true;
+    for (const cat of activeCategories) {
+      const currentTier = tierMap.get(cat) ?? 1;
+      if (currentTier >= targetTier) continue;
+      const candidateContent = renderCategoryAtTier(
+        cat,
+        targetTier,
+        report,
+        options,
+        diffCache
+      );
+      const otherContent = totalContentExcluding(contentMap, cat);
+      const totalSize = fixedLen + otherContent + candidateContent.length;
+      if (totalSize <= budget) {
+        candidates.set(cat, candidateContent);
+      } else {
+        allFit = false;
+        break;
+      }
+    }
+    if (!allFit) break;
+    for (const [cat, content] of candidates) {
+      tierMap.set(cat, targetTier);
+      contentMap.set(cat, content);
+    }
   }
   for (const targetTier of TIERS.slice(1)) {
     for (const cat of activeCategories) {

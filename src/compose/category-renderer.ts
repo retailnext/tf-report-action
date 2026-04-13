@@ -50,6 +50,7 @@ export type Category = "resources" | "outputs" | "drift";
  * - Tier 2: module-grouped compact (no attributes)
  * - Tier 3-5: module-grouped with progressively richer attribute detail
  *
+ * @param maxLength - Character budget for tier-1 listings (ignored at tiers 2+)
  * @returns Markdown string for the category, or empty string if no data
  */
 export function renderCategoryAtTier(
@@ -58,14 +59,15 @@ export function renderCategoryAtTier(
   report: Report,
   options: RenderOptions,
   diffCache: Map<string, DiffEntry[]>,
+  maxLength?: number,
 ): string {
   switch (category) {
     case "resources":
-      return renderResourcesAtTier(tier, report, options, diffCache);
+      return renderResourcesAtTier(tier, report, options, diffCache, maxLength);
     case "outputs":
-      return renderOutputsAtTier(tier, report, options, diffCache);
+      return renderOutputsAtTier(tier, report, options, diffCache, maxLength);
     case "drift":
-      return renderDriftAtTier(tier, report, options, diffCache);
+      return renderDriftAtTier(tier, report, options, diffCache, maxLength);
   }
 }
 
@@ -75,12 +77,13 @@ function renderResourcesAtTier(
   report: Report,
   options: RenderOptions,
   diffCache: Map<string, DiffEntry[]>,
+  maxLength?: number,
 ): string {
   const resources = report.resources ?? [];
   if (resources.length === 0) return "";
 
   if (tier === 1) {
-    return renderResourceListing("Resource Changes", resources);
+    return renderResourceListing("Resource Changes", resources, maxLength);
   }
 
   const mode = tierToMode(tier);
@@ -108,12 +111,13 @@ function renderOutputsAtTier(
   report: Report,
   options: RenderOptions,
   diffCache: Map<string, DiffEntry[]>,
+  maxLength?: number,
 ): string {
   const outputs = report.outputs ?? [];
   if (outputs.length === 0) return "";
 
   if (tier === 1) {
-    return renderOutputListing("Output Changes", outputs);
+    return renderOutputListing("Output Changes", outputs, maxLength);
   }
 
   const mode = tierToMode(tier);
@@ -129,6 +133,7 @@ function renderDriftAtTier(
   report: Report,
   options: RenderOptions,
   diffCache: Map<string, DiffEntry[]>,
+  maxLength?: number,
 ): string {
   const driftResources = report.driftResources ?? [];
   if (driftResources.length === 0) return "";
@@ -137,6 +142,7 @@ function renderDriftAtTier(
     return renderResourceListing(
       `${DRIFT_ICON} Resource Drift (${String(driftResources.length)} detected)`,
       driftResources,
+      maxLength,
     );
   }
 

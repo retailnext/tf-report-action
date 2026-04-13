@@ -5,6 +5,7 @@ import type { DiffEntry } from "../diff/types.js";
 import { MarkdownWriter } from "./writer.js";
 import { formatDiff } from "./diff-format.js";
 import { renderLargeValue } from "./large-value.js";
+import { renderLargeValueContextDiff } from "../diff/context-diff.js";
 import { ACTION_SYMBOLS } from "../model/plan-action.js";
 
 /**
@@ -73,18 +74,20 @@ export function renderOutputs(
   }
 
   // Render large outputs as collapsible details blocks with line-level diffs
-  if (mode === "full") {
-    for (const output of largeOutputs) {
-      const symbol = ACTION_SYMBOLS[output.action];
-      const block = renderLargeValue(
-        `${symbol} ${output.name}`,
-        output.before,
-        output.after,
-        diffCache,
-      );
-      if (block) {
-        writer.raw(block);
-      }
+  for (const output of largeOutputs) {
+    const symbol = ACTION_SYMBOLS[output.action];
+    const label = `${symbol} ${output.name}`;
+    const block =
+      mode === "full"
+        ? renderLargeValue(label, output.before, output.after, diffCache)
+        : renderLargeValueContextDiff(
+            label,
+            output.before,
+            output.after,
+            diffCache,
+          );
+    if (block) {
+      writer.raw(block);
     }
   }
 }

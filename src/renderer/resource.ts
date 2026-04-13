@@ -18,6 +18,7 @@ import {
 } from "../model/status-icons.js";
 import { formatDiff } from "./diff-format.js";
 import { renderLargeValue } from "./large-value.js";
+import { renderLargeValueContextDiff } from "../diff/context-diff.js";
 import { deriveInstanceName } from "./address.js";
 
 // Re-export for consumers that imported ApplyContext from resource.ts
@@ -136,12 +137,15 @@ function renderAttributes(
 
     // Render large attributes as collapsibles
     for (const attr of largeAttrs) {
-      const block = renderLargeValue(
-        attr.name,
-        attr.before,
-        attr.after,
-        diffCache,
-      );
+      const block =
+        mode === "full"
+          ? renderLargeValue(attr.name, attr.before, attr.after, diffCache)
+          : renderLargeValueContextDiff(
+              attr.name,
+              attr.before,
+              attr.after,
+              diffCache,
+            );
       if (block) {
         writer.raw(block);
       }
@@ -159,7 +163,9 @@ function renderInlineDiagnostics(
   for (const diag of [...errors, ...warnings]) {
     const prefix =
       diag.severity === "error" ? DIAGNOSTIC_ERROR : DIAGNOSTIC_WARNING;
-    writer.paragraph(`${prefix} **${diag.summary}**`);
+    writer.paragraph(
+      `${prefix} **${MarkdownWriter.escapeHtml(diag.summary)}**`,
+    );
     if (diag.detail) {
       writer.codeFence(diag.detail);
     }

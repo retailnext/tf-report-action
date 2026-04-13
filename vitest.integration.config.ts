@@ -60,9 +60,6 @@ export default defineConfig({
         // These depend on action-layer inputs (artifact URL, logs URL) not
         // available through reportFromSteps(). Covered by unit tests.
         "src/compose/notices.ts",
-        // context-diff.ts implements context-only large-value diffs for
-        // progressive tiers 3-4. Not yet wired into production rendering.
-        "src/diff/context-diff.ts",
         // jsonl-scanner barrel and types — no executable logic
         "src/jsonl-scanner/index.ts",
         "src/jsonl-scanner/types.ts",

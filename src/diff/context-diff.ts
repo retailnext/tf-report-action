@@ -1,5 +1,5 @@
-import type { DiffEntry } from "../diff/types.js";
-import { buildLineDiff } from "../diff/line-diff.js";
+import type { DiffEntry } from "./types.js";
+import { buildLineDiff } from "./line-diff.js";
 import { escapeHtml } from "../raw-formatter/jsonl.js";
 
 /** Number of unchanged lines to show around each changed hunk. */

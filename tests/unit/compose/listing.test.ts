@@ -20,13 +20,17 @@ function makeResource(address: string, action: string): ResourceChange {
   };
 }
 
-function makeOutput(name: string, action: string): OutputChange {
+function makeOutput(
+  name: string,
+  action: string,
+  sensitive = false,
+): OutputChange {
   return {
     name,
     action: action as OutputChange["action"],
     before: null,
     after: "value",
-    isSensitive: false,
+    isSensitive: sensitive,
     isLarge: false,
     isKnownAfterApply: false,
   };
@@ -58,6 +62,31 @@ describe("renderResourceListing", () => {
     expect(result).toContain("## Changes");
     expect(result).toContain("```");
   });
+
+  it("truncates listing when maxLength is exceeded", () => {
+    const resources = Array.from({ length: 50 }, (_, i) =>
+      makeResource(
+        `module.very_long_name.null_resource.item_${String(i)}`,
+        "create",
+      ),
+    );
+    // Use a tight budget that can only fit a few items
+    const result = renderResourceListing("Resource Changes", resources, 300);
+    expect(result.length).toBeLessThanOrEqual(300);
+    expect(result).toContain("... and ");
+    expect(result).toContain(" more");
+  });
+
+  it("shows all items when maxLength is generous", () => {
+    const resources = [
+      makeResource("null_resource.a", "create"),
+      makeResource("null_resource.b", "delete"),
+    ];
+    const result = renderResourceListing("Resource Changes", resources, 10000);
+    expect(result).toContain("null_resource.a");
+    expect(result).toContain("null_resource.b");
+    expect(result).not.toContain("more");
+  });
 });
 
 describe("renderOutputListing", () => {
@@ -76,5 +105,24 @@ describe("renderOutputListing", () => {
   it("produces heading with empty code block for empty outputs", () => {
     const result = renderOutputListing("Outputs", []);
     expect(result).toContain("## Outputs");
+  });
+
+  it("marks sensitive outputs with (sensitive)", () => {
+    const outputs = [
+      makeOutput("public_key", "create", false),
+      makeOutput("secret_key", "create", true),
+    ];
+    const result = renderOutputListing("Output Changes", outputs);
+    expect(result).toContain("secret_key (sensitive)");
+    expect(result).not.toContain("public_key (sensitive)");
+  });
+
+  it("truncates listing when maxLength is exceeded", () => {
+    const outputs = Array.from({ length: 30 }, (_, i) =>
+      makeOutput(`very_long_output_name_${String(i)}`, "create"),
+    );
+    const result = renderOutputListing("Output Changes", outputs, 250);
+    expect(result.length).toBeLessThanOrEqual(250);
+    expect(result).toContain("... and ");
   });
 });
