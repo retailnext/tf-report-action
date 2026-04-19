@@ -63,6 +63,12 @@ export default defineConfig({
         // jsonl-scanner barrel and types — no executable logic
         "src/jsonl-scanner/index.ts",
         "src/jsonl-scanner/types.ts",
+        // Drift filter rule implementations — pure predicates with no side
+        // effects. The registry (registry.ts) and barrel (index.ts) are NOT
+        // excluded and are exercised by tests/integration/drift-filter.test.ts:
+        // null-lifecycle/4 covers both the suppressed path (custom registry)
+        // and the unsuppressed path (default registry, no rule matches).
+        "src/drift-filter/rules/**",
         // The action module is the GitHub Action entry point — it is exercised
         // by unit tests with mocked clients, not integration tests.
         "src/action/**",

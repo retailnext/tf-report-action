@@ -308,6 +308,38 @@ function buildAttributeChanges(change, options) {
   return result;
 }
 
+// src/drift-filter/rules/data-source.ts
+var suppressDataSourceDrift = (_type, mode) => mode === "data";
+
+// src/drift-filter/rules/etag-only.ts
+var suppressEtagOnlyDrift = (_type, _mode, attributes) => attributes.length > 0 && attributes.every((a) => a.name === "etag");
+
+// src/drift-filter/rules/google-storage-managed-folder.ts
+var BORING_ATTRIBUTES = /* @__PURE__ */ new Set(["metageneration", "update_time"]);
+var suppressGoogleStorageManagedFolderMetaBoring = (type, _mode, attributes) => type === "google_storage_managed_folder" && attributes.length > 0 && attributes.every((a) => BORING_ATTRIBUTES.has(a.name));
+
+// src/drift-filter/registry.ts
+var DriftRuleRegistry = class {
+  rules = [];
+  /**
+   * Registers a drift suppression rule. Returns `this` for chaining.
+   */
+  register(rule) {
+    this.rules.push(rule);
+    return this;
+  }
+  /**
+   * Returns `true` if any registered rule indicates this drift entry should be
+   * suppressed from the report.
+   */
+  shouldSuppressDrift(type, mode, attributes) {
+    return this.rules.some((rule) => rule(type, mode, attributes));
+  }
+};
+function createDefaultDriftRuleRegistry() {
+  return new DriftRuleRegistry().register(suppressDataSourceDrift).register(suppressEtagOnlyDrift).register(suppressGoogleStorageManagedFolderMetaBoring);
+}
+
 // src/builder/resources.ts
 function refineAction(base, rc) {
   if (base !== "no-op") return base;
@@ -342,12 +374,18 @@ function buildResourceChanges(plan, options) {
 function buildDriftChanges(plan, options) {
   const driftChanges = plan.resource_drift ?? [];
   const result = [];
+  const registry = options.driftRuleRegistry ?? createDefaultDriftRuleRegistry();
   for (const rc of driftChanges) {
-    if (shouldSkip(rc)) continue;
     const action = refineAction(determineAction(rc.change.actions), rc);
     const address = rc.address ?? `${rc.type ?? "unknown"}.${rc.name ?? "unknown"}`;
     const attributes = buildAttributeChanges(rc.change, options);
     const allUnknownAfterApply = isAllUnknownAfterApply(rc, attributes);
+    if (registry.shouldSuppressDrift(
+      rc.type ?? "unknown",
+      rc.mode ?? "managed",
+      attributes
+    ))
+      continue;
     result.push({
       address,
       type: rc.type ?? "unknown",

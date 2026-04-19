@@ -168,3 +168,8 @@ export type { PlanAction } from "./model/plan-action.js";
 export type { Diagnostic } from "./model/diagnostic.js";
 export type { ApplyStatus } from "./model/apply-status.js";
 export type { Env } from "./steps/types.js";
+export {
+  DriftRuleRegistry,
+  createDefaultDriftRuleRegistry,
+  type DriftRule,
+} from "./drift-filter/index.js";
