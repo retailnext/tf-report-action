@@ -14,7 +14,7 @@ import { readFileSync, existsSync } from "node:fs";
 import { join, resolve, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import { describe, it, expect } from "vitest";
-import { reportFromSteps } from "../../src/index.js";
+import { reportFromSteps } from "../../src/pipelines/steps.js";
 import {
   discoverManualStepsFixtures,
   discoverStepsFixtures,

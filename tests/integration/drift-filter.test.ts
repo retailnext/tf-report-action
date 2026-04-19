@@ -14,8 +14,11 @@
  * its integration with `planToMarkdown`.
  */
 import { beforeAll, describe, it, expect } from "vitest";
-import { planToMarkdown, DriftRuleRegistry } from "../../src/index.js";
-import type { DriftRule } from "../../src/index.js";
+import { planToMarkdown } from "../../src/pipelines/plan.js";
+import {
+  DriftRuleRegistry,
+  type DriftRule,
+} from "../../src/drift-filter/registry.js";
 import { readFileSync, existsSync } from "node:fs";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";

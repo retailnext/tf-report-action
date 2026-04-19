@@ -30,8 +30,10 @@
 import { readFileSync } from "node:fs";
 import { writeFile } from "node:fs/promises";
 import { execSync } from "node:child_process";
-import { reportFromSteps } from "../src/index.js";
-import type { Options, ReportOptions } from "../src/index.js";
+import { reportFromSteps } from "../src/pipelines/steps.js";
+import type { ReportOptions } from "../src/pipelines/steps.js";
+import type { BuildOptions } from "../src/builder/options.js";
+import type { RenderOptions } from "../src/model/render-options.js";
 import { MARKDOWN_CSS, COPY_BUTTON_JS } from "../src/html/index.js";
 
 // ---------------------------------------------------------------------------
@@ -80,12 +82,12 @@ interface ParsedArgs {
   output: string | null;
   gallery: boolean;
   noOpen: boolean;
-  options: Options;
+  options: BuildOptions & RenderOptions;
   reportOptions: Partial<ReportOptions>;
 }
 
 function parseArgs(argv: string[]): ParsedArgs {
-  const options: Options = {};
+  const options: BuildOptions & RenderOptions = {};
   const reportOptions: Partial<ReportOptions> = {};
   let file: string | null = null;
   let format: "html" | "markdown" = "html";

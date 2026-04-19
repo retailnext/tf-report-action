@@ -1,3 +1,451 @@
+// src/model/step-commands.ts
+function expectedCommand(tool, role) {
+  const prefix = tool !== void 0 ? `${tool} ` : "";
+  switch (role) {
+    case "show-plan":
+      return `${prefix}show -json <tfplan>`;
+    case "plan":
+      return `${prefix}plan -json -out=<tfplan>`;
+    case "apply":
+      return `${prefix}apply -json <tfplan>`;
+    case "validate":
+      return `${prefix}validate -json`;
+    case "init":
+      return `${prefix}init -json`;
+    case "state":
+      return `${prefix}state pull`;
+  }
+}
+
+// src/steps/parse.ts
+function parseSteps(json) {
+  let parsed;
+  try {
+    parsed = JSON.parse(json);
+  } catch {
+    throw new Error("Steps context is not valid JSON");
+  }
+  if (typeof parsed !== "object" || parsed === null || Array.isArray(parsed)) {
+    throw new Error("Steps context must be a JSON object");
+  }
+  const raw = parsed;
+  const result = {};
+  for (const [stepId, value] of Object.entries(raw)) {
+    result[stepId] = validateStepData(stepId, value);
+  }
+  return result;
+}
+function validateStepData(stepId, raw) {
+  if (typeof raw !== "object" || raw === null || Array.isArray(raw)) {
+    throw new Error(`Steps context: step "${stepId}" must be an object`);
+  }
+  const obj = raw;
+  const outcome = validateOptionalString(obj["outcome"], stepId, "outcome");
+  const conclusion = validateOptionalString(
+    obj["conclusion"],
+    stepId,
+    "conclusion"
+  );
+  const outputs = validateOutputs(obj["outputs"], stepId);
+  return {
+    ...outcome !== void 0 ? { outcome } : {},
+    ...conclusion !== void 0 ? { conclusion } : {},
+    ...outputs !== void 0 ? { outputs } : {}
+  };
+}
+function validateOptionalString(value, stepId, field) {
+  if (value === void 0 || value === null) {
+    return void 0;
+  }
+  if (typeof value !== "string") {
+    throw new Error(
+      `Steps context: step "${stepId}" field "${field}" must be a string`
+    );
+  }
+  return value;
+}
+function validateOutputs(value, stepId) {
+  if (value === void 0 || value === null) {
+    return void 0;
+  }
+  if (typeof value !== "object" || Array.isArray(value)) {
+    throw new Error(
+      `Steps context: step "${stepId}" field "outputs" must be an object`
+    );
+  }
+  const raw = value;
+  const result = {};
+  for (const [key, val] of Object.entries(raw)) {
+    if (typeof val === "string") {
+      result[key] = val;
+    }
+  }
+  return result;
+}
+
+// src/steps/types.ts
+var DEFAULT_MAX_FILE_SIZE = 256 * 1024 * 1024;
+var DEFAULT_MAX_DISPLAY_READ = 64 * 1024;
+var DEFAULT_INIT_STEP = "init";
+var DEFAULT_VALIDATE_STEP = "validate";
+var DEFAULT_PLAN_STEP = "plan";
+var DEFAULT_SHOW_PLAN_STEP = "show-plan";
+var DEFAULT_APPLY_STEP = "apply";
+var DEFAULT_STATE_STEP = "state";
+var OUTPUT_STDOUT_FILE = "stdout_file";
+var OUTPUT_STDERR_FILE = "stderr_file";
+var OUTPUT_EXIT_CODE = "exit_code";
+
+// src/steps/outcomes.ts
+function getStepOutcome(step) {
+  return step.outcome ?? step.conclusion ?? "unknown";
+}
+function getExitCode(step) {
+  return step.outputs?.[OUTPUT_EXIT_CODE] ?? void 0;
+}
+function buildStepOutcomes(steps, excludeIds) {
+  return Object.entries(steps).filter(([id]) => !excludeIds?.has(id)).map(([id, step]) => {
+    const outcome = getStepOutcome(step);
+    const exitCode = getExitCode(step);
+    return exitCode !== void 0 ? { id, outcome, exitCode } : { id, outcome };
+  });
+}
+
+// src/steps/reader.ts
+import {
+  realpathSync,
+  statSync,
+  readFileSync,
+  openSync,
+  readSync,
+  closeSync
+} from "node:fs";
+import { dirname, isAbsolute, resolve } from "node:path";
+function isReadError(result) {
+  return "error" in result;
+}
+function readForParse(filePath, options) {
+  const validated = validateFile(filePath, options);
+  if (isReadError(validated)) {
+    return validated;
+  }
+  const { realPath, size } = validated;
+  if (size > options.maxFileSize) {
+    return {
+      error: `File exceeds maximum size for parsing (${formatSize(size)} > ${formatSize(options.maxFileSize)})`
+    };
+  }
+  try {
+    const content = readFileSync(realPath, "utf-8");
+    return { content, truncated: false };
+  } catch {
+    return { error: "Failed to read file" };
+  }
+}
+function readForDisplay(filePath, options) {
+  const validated = validateFile(filePath, options);
+  if (isReadError(validated)) {
+    return validated;
+  }
+  const { realPath, size } = validated;
+  const truncated = size > options.maxDisplayRead;
+  const bytesToRead = Math.min(size, options.maxDisplayRead);
+  try {
+    const buffer = Buffer.alloc(bytesToRead);
+    const fd = openSync(realPath, "r");
+    let bytesRead;
+    try {
+      bytesRead = readSync(fd, buffer, 0, bytesToRead, 0);
+    } finally {
+      closeSync(fd);
+    }
+    return {
+      content: buffer.subarray(0, bytesRead).toString("utf-8"),
+      truncated
+    };
+  } catch {
+    return { error: "Failed to read file" };
+  }
+}
+function getValidatedPath(filePath, options) {
+  return validateFile(filePath, options);
+}
+function validateFile(filePath, options) {
+  if (!isAbsolute(filePath)) {
+    return { error: "Relative file paths are not allowed" };
+  }
+  const absolutePath = resolve(filePath);
+  let realPath;
+  try {
+    realPath = realpathSync(absolutePath);
+  } catch {
+    return { error: "File not found or not accessible" };
+  }
+  const fileDir = dirname(realPath);
+  const allowed = options.allowedDirs.some((dir) => {
+    try {
+      return fileDir === realpathSync(resolve(dir));
+    } catch {
+      return false;
+    }
+  });
+  if (!allowed) {
+    return { error: "File is not in an allowed directory" };
+  }
+  let stat;
+  try {
+    stat = statSync(realPath);
+  } catch {
+    return { error: "File not found or not accessible" };
+  }
+  if (!stat.isFile()) {
+    return { error: "Path is not a regular file" };
+  }
+  return { realPath, size: stat.size };
+}
+function formatSize(bytes) {
+  if (bytes < 1024) {
+    return `${String(bytes)} B`;
+  }
+  if (bytes < 1024 * 1024) {
+    return `${String(Math.round(bytes / 1024))} KiB`;
+  }
+  return `${String(Math.round(bytes / (1024 * 1024)))} MiB`;
+}
+
+// src/steps/io.ts
+function readStepFile(step, outputKey, readerOpts, forDisplay) {
+  const filePath = step.outputs?.[outputKey];
+  if (!filePath) return { noFile: true };
+  const result = forDisplay ? readForDisplay(filePath, readerOpts) : readForParse(filePath, readerOpts);
+  if (isReadError(result)) return { error: result.error };
+  if (result.truncated) {
+    return { content: result.content, truncated: true };
+  }
+  return { content: result.content };
+}
+function readStepStdout(step, readerOpts) {
+  return readStepFile(step, OUTPUT_STDOUT_FILE, readerOpts, false);
+}
+function readStepStdoutForDisplay(step, readerOpts) {
+  return readStepFile(step, OUTPUT_STDOUT_FILE, readerOpts, true);
+}
+function readStepStderrForDisplay(step, readerOpts) {
+  return readStepFile(step, OUTPUT_STDERR_FILE, readerOpts, true);
+}
+function getStepStdoutPath(step, readerOpts) {
+  const filePath = step.outputs?.[OUTPUT_STDOUT_FILE];
+  if (!filePath) return void 0;
+  const result = getValidatedPath(filePath, readerOpts);
+  if ("error" in result) return void 0;
+  return result.realPath;
+}
+
+// src/builder/step-issues.ts
+function buildStepIssue(step, stepId, readerOpts, diagnostic) {
+  const outcome = getStepOutcome(step);
+  const isFailed = outcome === "failure";
+  const exitCode = getExitCode(step);
+  let heading;
+  if (isFailed) {
+    heading = `\`${stepId}\` failed`;
+  } else if (diagnostic) {
+    heading = `\`${stepId}\`: output could not be parsed`;
+  } else {
+    heading = `\`${stepId}\` ${outcome}`;
+  }
+  const stdoutRead = readStepStdoutForDisplay(step, readerOpts);
+  const stderrRead = readStepStderrForDisplay(step, readerOpts);
+  const stderrContent = stderrRead.content !== void 0 && stderrRead.content.trim().length > 0 ? stderrRead.content : void 0;
+  const issue = {
+    id: stepId,
+    heading,
+    isFailed,
+    ...exitCode !== void 0 ? { exitCode } : {},
+    ...diagnostic !== void 0 ? { diagnostic } : {},
+    ...stdoutRead.content !== void 0 ? { stdout: stdoutRead.content } : {},
+    ...stdoutRead.truncated === true ? { stdoutTruncated: true } : {},
+    ...stdoutRead.error !== void 0 ? { stdoutError: stdoutRead.error } : {},
+    ...stderrContent !== void 0 ? { stderr: stderrContent } : {},
+    ...stderrContent !== void 0 && stderrRead.truncated === true ? { stderrTruncated: true } : {},
+    ...stderrRead.error !== void 0 ? { stderrError: stderrRead.error } : {}
+  };
+  return issue;
+}
+function shouldCreateStepIssue(step, readerOpts, diagnostic) {
+  const outcome = getStepOutcome(step);
+  if (outcome === "failure") return true;
+  if (diagnostic !== void 0) return true;
+  const stderrRead = readStepStderrForDisplay(step, readerOpts);
+  return stderrRead.content !== void 0 && stderrRead.content.trim().length > 0;
+}
+
+// src/model/status-icons.ts
+var STATUS_SUCCESS = "\u2705";
+var STATUS_FAILURE = "\u274C";
+var DIAGNOSTIC_ERROR = "\u{1F6A8}";
+var DIAGNOSTIC_WARNING = "\u26A0\uFE0F";
+var MODULE_ICON = "\u{1F4E6}";
+var DRIFT_ICON = "\u{1F500}";
+var INFO_ICON = "\u2139\uFE0F";
+var ARTIFACT_ICON = "\u{1F4CE}";
+
+// src/builder/title.ts
+function buildTitle(report) {
+  const wsPrefix = report.workspace ? `\`${report.workspace}\` ` : "";
+  if (report.error !== void 0) {
+    return `${STATUS_FAILURE} ${wsPrefix}Report Generation Failed`;
+  }
+  const hasIacStepFailure = hasIacFailure(report);
+  const hasAnyStepFailure = hasAnyFailure(report);
+  if (hasIacStepFailure) {
+    const op = operationLabel(report.operation);
+    const label = op ? `${op} Failed` : "Failed";
+    return `${STATUS_FAILURE} ${wsPrefix}${label}`;
+  }
+  if (report.summary) {
+    return buildSummaryTitle(
+      report.summary,
+      report.operation ?? "plan",
+      wsPrefix,
+      hasAnyStepFailure
+    );
+  }
+  if (report.operationOutcome === "skipped") {
+    const op = operationLabel(report.operation);
+    const label = op ? `${op} Skipped` : "Skipped";
+    return `${DIAGNOSTIC_WARNING} ${wsPrefix}${label}`;
+  }
+  if (report.steps.length > 0 && report.steps.every((s) => s.outcome === "skipped")) {
+    return `${DIAGNOSTIC_WARNING} ${wsPrefix}All Steps Skipped`;
+  }
+  if (hasAnyStepFailure || report.issues.some((i) => i.isFailed)) {
+    const failLabel = singleFailedStepLabel(report);
+    return `${STATUS_FAILURE} ${wsPrefix}${failLabel}`;
+  }
+  const opLabel = report.operation ? `${operationLabel(report.operation)} ` : "";
+  return `${STATUS_SUCCESS} ${wsPrefix}${opLabel}Succeeded`;
+}
+function buildPlanCountParts(summary) {
+  const counts = /* @__PURE__ */ new Map();
+  for (const group of summary.actions) {
+    const label = planActionLabel(group.action);
+    counts.set(label, (counts.get(label) ?? 0) + group.total);
+  }
+  return formatCountParts(counts, "to ");
+}
+function buildApplyCountParts(summary) {
+  const counts = /* @__PURE__ */ new Map();
+  for (const group of summary.actions) {
+    const label = applyActionLabel(group.action);
+    counts.set(label, (counts.get(label) ?? 0) + group.total);
+  }
+  return formatCountParts(counts, "");
+}
+function buildFailureCountParts(summary) {
+  const total = summary.failures.reduce((sum, g) => sum + g.total, 0);
+  if (total === 0) return [];
+  return [`${String(total)} failed`];
+}
+function buildSummaryTitle(summary, operation, wsPrefix, hasAnyStepFailure) {
+  const hasFailures = summary.failures.length > 0;
+  const icon = hasFailures || hasAnyStepFailure ? STATUS_FAILURE : STATUS_SUCCESS;
+  if (operation === "apply" || operation === "destroy") {
+    const parts2 = buildApplyCountParts(summary);
+    if (hasFailures) {
+      const failParts = buildFailureCountParts(summary);
+      return `${icon} ${wsPrefix}Apply Failed: ${[...failParts, ...parts2].join(", ")}`;
+    }
+    if (parts2.length === 0) {
+      return `${icon} ${wsPrefix}Apply Complete`;
+    }
+    return `${icon} ${wsPrefix}Apply: ${parts2.join(", ")}`;
+  }
+  const totalActions = summary.actions.reduce((sum, g) => sum + g.total, 0);
+  if (totalActions === 0 && !hasFailures && !hasAnyStepFailure) {
+    return `${icon} ${wsPrefix}No Changes`;
+  }
+  if (hasFailures || hasAnyStepFailure) {
+    return `${icon} ${wsPrefix}Plan Failed`;
+  }
+  const parts = buildPlanCountParts(summary);
+  return `${icon} ${wsPrefix}Plan: ${parts.join(", ")}`;
+}
+function operationLabel(operation) {
+  switch (operation) {
+    case "apply":
+      return "Apply";
+    case "destroy":
+      return "Destroy";
+    case "plan":
+      return "Plan";
+    default:
+      return "";
+  }
+}
+function hasIacFailure(report) {
+  const iacRoles = /* @__PURE__ */ new Set(["plan", "apply", "show-plan", "validate", "init"]);
+  return report.steps.some((s) => s.outcome === "failure" && iacRoles.has(s.id)) || report.issues.some((i) => i.isFailed && iacRoles.has(i.id));
+}
+function hasAnyFailure(report) {
+  return report.steps.some((s) => s.outcome === "failure");
+}
+function singleFailedStepLabel(report) {
+  const failedSteps = report.steps.filter((s) => s.outcome === "failure");
+  if (failedSteps.length === 1) {
+    const name = failedSteps[0]?.id ?? "unknown";
+    return `\`${name}\` Failed`;
+  }
+  return "Failed";
+}
+function formatCountParts(counts, prefix) {
+  const parts = [];
+  for (const [label, count] of counts) {
+    parts.push(`${String(count)} ${prefix}${label}`);
+  }
+  return parts;
+}
+function planActionLabel(action) {
+  switch (action) {
+    case "create":
+      return "add";
+    case "update":
+      return "change";
+    case "delete":
+      return "destroy";
+    case "replace":
+      return "replace";
+    case "import":
+      return "import";
+    case "move":
+      return "move";
+    case "forget":
+      return "forget";
+    default:
+      return action;
+  }
+}
+function applyActionLabel(action) {
+  switch (action) {
+    case "create":
+      return "added";
+    case "update":
+      return "changed";
+    case "delete":
+      return "destroyed";
+    case "replace":
+      return "replaced";
+    case "import":
+      return "imported";
+    case "move":
+      return "moved";
+    case "forget":
+      return "forgotten";
+    default:
+      return action;
+  }
+}
+
 // src/parser/plan.ts
 function parsePlan(json) {
   let parsed;
@@ -129,6 +577,121 @@ function detectFromRawText(content) {
   if (sample.includes("opentofu")) return "tofu";
   if (sample.includes("terraform")) return "terraform";
   return void 0;
+}
+
+// src/builder/process-helpers.ts
+function uiDiagnosticToModel(d, source) {
+  const base = {
+    severity: d.severity,
+    summary: d.summary,
+    detail: d.detail,
+    source
+  };
+  if (d.address !== void 0) base["address"] = d.address;
+  if (d.range !== void 0) base["range"] = d.range;
+  if (d.snippet !== void 0) base["snippet"] = d.snippet;
+  return base;
+}
+function extractJsonlResourceAddress(obj) {
+  const type = obj["type"];
+  if (typeof type !== "string") return void 0;
+  if (type === "apply_start" || type === "apply_progress" || type === "apply_complete" || type === "apply_errored" || type === "refresh_start" || type === "refresh_complete" || type === "provision_start" || type === "provision_progress" || type === "provision_complete" || type === "provision_errored") {
+    const hook = obj["hook"];
+    if (typeof hook !== "object" || hook === null) return void 0;
+    const resource = hook["resource"];
+    if (typeof resource !== "object" || resource === null) return void 0;
+    const addr = resource["addr"];
+    return typeof addr === "string" ? addr : void 0;
+  }
+  if (type === "planned_change" || type === "resource_drift") {
+    const change = obj["change"];
+    if (typeof change !== "object" || change === null) return void 0;
+    const resource = change["resource"];
+    if (typeof resource !== "object" || resource === null) return void 0;
+    const addr = resource["addr"];
+    return typeof addr === "string" ? addr : void 0;
+  }
+  if (type === "diagnostic") {
+    const diagnostic = obj["diagnostic"];
+    if (typeof diagnostic !== "object" || diagnostic === null) return void 0;
+    const addr = diagnostic["address"];
+    return typeof addr === "string" ? addr : void 0;
+  }
+  return void 0;
+}
+function filterJsonlByAddresses(content, addresses) {
+  const lines = content.split("\n");
+  const filtered = [];
+  for (const line of lines) {
+    if (line.trim() === "") {
+      filtered.push(line);
+      continue;
+    }
+    let parsed;
+    try {
+      parsed = JSON.parse(line);
+    } catch {
+      filtered.push(line);
+      continue;
+    }
+    if (typeof parsed !== "object" || parsed === null || Array.isArray(parsed)) {
+      filtered.push(line);
+      continue;
+    }
+    const addr = extractJsonlResourceAddress(parsed);
+    if (addr === void 0 || addresses.has(addr)) {
+      filtered.push(line);
+    }
+  }
+  return filtered.join("\n");
+}
+function filterStepIssueStdout(report, stepId, diagnostics) {
+  const addresses = /* @__PURE__ */ new Set();
+  for (const d of diagnostics) {
+    if (d.address === void 0) return;
+    addresses.add(d.address);
+  }
+  if (addresses.size === 0) return;
+  const idx = report.issues.findIndex((i) => i.id === stepId);
+  if (idx < 0) return;
+  const issue = report.issues[idx];
+  if (issue === void 0) return;
+  if (issue.stdout === void 0) return;
+  const filtered = filterJsonlByAddresses(issue.stdout, addresses);
+  report.issues[idx] = { ...issue, stdout: filtered };
+}
+function addScannerWarnings(report, scan, stepLabel) {
+  if (scan.unparseableLines > 0) {
+    report.warnings.push(
+      `${String(scan.unparseableLines)} line(s) in ${stepLabel} output could not be parsed as JSON`
+    );
+  }
+  if (scan.unknownTypeLines > 0) {
+    report.warnings.push(
+      `${String(scan.unknownTypeLines)} line(s) in ${stepLabel} output had unrecognized message types`
+    );
+  }
+}
+
+// src/builder/process-validate.ts
+function processValidateStep(step, stepId, report, readerOpts) {
+  const outcome = getStepOutcome(step);
+  if (outcome === "failure") {
+    report.issues.push(buildStepIssue(step, stepId, readerOpts));
+  }
+  const stdoutRead = readStepStdout(step, readerOpts);
+  if (stdoutRead.content !== void 0) {
+    try {
+      const validateOutput = parseValidateOutput(stdoutRead.content);
+      if (validateOutput.diagnostics.length > 0) {
+        const diagnostics = validateOutput.diagnostics.map(
+          (d) => uiDiagnosticToModel(d, "validate")
+        );
+        report.diagnostics = [...report.diagnostics ?? [], ...diagnostics];
+      }
+    } catch {
+    }
+  }
 }
 
 // src/builder/action.ts
@@ -706,698 +1269,6 @@ function resolveOutputValues(report, outputsMessage) {
   }
 }
 
-// src/builder/state-enrichment.ts
-var LARGE_LINE_THRESHOLD3 = 3;
-function enrichReportFromState(report, state) {
-  const stateResources = state.resources;
-  const hasResources = stateResources !== void 0 && stateResources.length > 0;
-  const hasOutputs = state.outputs !== void 0 && Object.keys(state.outputs).length > 0;
-  if (!hasResources && !hasOutputs) return;
-  const instanceMap = hasResources ? buildInstanceMap(stateResources) : /* @__PURE__ */ new Map();
-  let enrichedAny = false;
-  for (const resource of report.resources ?? []) {
-    if (!resource.hasAttributeDetail) continue;
-    const flat = instanceMap.get(resource.address);
-    if (flat !== void 0) {
-      for (const attr of resource.attributes) {
-        if (!attr.isKnownAfterApply) continue;
-        if (attr.isSensitive) continue;
-        if (flat.sensitiveNames.has(attr.name)) {
-          attr.isSensitive = true;
-          attr.after = SENSITIVE_MASK;
-          attr.isKnownAfterApply = false;
-          enrichedAny = true;
-        } else {
-          const resolved = resolveFromInstance(flat, attr.name);
-          if (resolved !== void 0) {
-            attr.after = resolved;
-            attr.isKnownAfterApply = false;
-            attr.isLarge = isLargeValue3(resolved);
-            enrichedAny = true;
-          }
-        }
-      }
-    }
-    resource.allUnknownAfterApply = false;
-  }
-  const stateOutputs = state.outputs;
-  if (stateOutputs !== void 0) {
-    for (const output of report.outputs ?? []) {
-      if (!output.isKnownAfterApply) continue;
-      if (output.isSensitive) continue;
-      const stateOutput = stateOutputs[output.name];
-      if (stateOutput === void 0) continue;
-      if (stateOutput.sensitive === true) {
-        output.isSensitive = true;
-        output.after = SENSITIVE_MASK;
-        output.isKnownAfterApply = false;
-        enrichedAny = true;
-      } else if (stateOutput.value !== void 0) {
-        output.after = stringifyValue(stateOutput.value);
-        output.isKnownAfterApply = false;
-        output.isLarge = isLargeValue3(output.after);
-        enrichedAny = true;
-      }
-    }
-  }
-  if (enrichedAny) {
-    report.stateEnriched = true;
-  }
-}
-function buildInstanceMap(resources) {
-  const map = /* @__PURE__ */ new Map();
-  for (const res of resources) {
-    for (const inst of res.instances ?? []) {
-      const address = buildAddress(res, inst);
-      const rawValues = inst.attributes;
-      const flatValues = rawValues !== void 0 ? flatten(rawValues) : /* @__PURE__ */ new Map();
-      const sensitiveNames = extractSensitiveNames(inst);
-      map.set(address, { rawValues, flatValues, sensitiveNames });
-    }
-  }
-  return map;
-}
-function buildAddress(res, inst) {
-  let address = "";
-  if (res.module !== void 0 && res.module !== "") {
-    address = `${res.module}.`;
-  }
-  address += `${res.type}.${res.name}`;
-  if (inst.index_key !== void 0) {
-    if (typeof inst.index_key === "number") {
-      address += `[${String(inst.index_key)}]`;
-    } else {
-      address += `["${inst.index_key}"]`;
-    }
-  }
-  return address;
-}
-function extractSensitiveNames(inst) {
-  const names = /* @__PURE__ */ new Set();
-  for (const path of inst.sensitive_attributes ?? []) {
-    const first = path[0];
-    if (first?.type === "get_attr") {
-      names.add(first.value);
-    }
-  }
-  return names;
-}
-function resolveFromInstance(inst, attrName) {
-  if (inst.rawValues !== void 0 && attrName in inst.rawValues) {
-    return stringifyValue(inst.rawValues[attrName]);
-  }
-  if (inst.flatValues.has(attrName)) {
-    return inst.flatValues.get(attrName) ?? null;
-  }
-  return void 0;
-}
-function stringifyValue(value) {
-  if (value === null) return null;
-  if (typeof value === "string") return value;
-  if (typeof value === "number" || typeof value === "boolean") {
-    return String(value);
-  }
-  return JSON.stringify(value);
-}
-function isLargeValue3(value) {
-  if (value === null) return false;
-  const trimmed = value.trim();
-  if (trimmed.startsWith("{") || trimmed.startsWith("[") || trimmed.startsWith("<")) {
-    return true;
-  }
-  let count = 0;
-  for (const ch of value) {
-    if (ch === "\n") {
-      count++;
-      if (count > LARGE_LINE_THRESHOLD3) return true;
-    }
-  }
-  return false;
-}
-
-// src/model/step-commands.ts
-function expectedCommand(tool, role) {
-  const prefix = tool !== void 0 ? `${tool} ` : "";
-  switch (role) {
-    case "show-plan":
-      return `${prefix}show -json <tfplan>`;
-    case "plan":
-      return `${prefix}plan -json -out=<tfplan>`;
-    case "apply":
-      return `${prefix}apply -json <tfplan>`;
-    case "validate":
-      return `${prefix}validate -json`;
-    case "init":
-      return `${prefix}init -json`;
-    case "state":
-      return `${prefix}state pull`;
-  }
-}
-
-// src/steps/parse.ts
-function parseSteps(json) {
-  let parsed;
-  try {
-    parsed = JSON.parse(json);
-  } catch {
-    throw new Error("Steps context is not valid JSON");
-  }
-  if (typeof parsed !== "object" || parsed === null || Array.isArray(parsed)) {
-    throw new Error("Steps context must be a JSON object");
-  }
-  const raw = parsed;
-  const result = {};
-  for (const [stepId, value] of Object.entries(raw)) {
-    result[stepId] = validateStepData(stepId, value);
-  }
-  return result;
-}
-function validateStepData(stepId, raw) {
-  if (typeof raw !== "object" || raw === null || Array.isArray(raw)) {
-    throw new Error(`Steps context: step "${stepId}" must be an object`);
-  }
-  const obj = raw;
-  const outcome = validateOptionalString(obj["outcome"], stepId, "outcome");
-  const conclusion = validateOptionalString(
-    obj["conclusion"],
-    stepId,
-    "conclusion"
-  );
-  const outputs = validateOutputs(obj["outputs"], stepId);
-  return {
-    ...outcome !== void 0 ? { outcome } : {},
-    ...conclusion !== void 0 ? { conclusion } : {},
-    ...outputs !== void 0 ? { outputs } : {}
-  };
-}
-function validateOptionalString(value, stepId, field) {
-  if (value === void 0 || value === null) {
-    return void 0;
-  }
-  if (typeof value !== "string") {
-    throw new Error(
-      `Steps context: step "${stepId}" field "${field}" must be a string`
-    );
-  }
-  return value;
-}
-function validateOutputs(value, stepId) {
-  if (value === void 0 || value === null) {
-    return void 0;
-  }
-  if (typeof value !== "object" || Array.isArray(value)) {
-    throw new Error(
-      `Steps context: step "${stepId}" field "outputs" must be an object`
-    );
-  }
-  const raw = value;
-  const result = {};
-  for (const [key, val] of Object.entries(raw)) {
-    if (typeof val === "string") {
-      result[key] = val;
-    }
-  }
-  return result;
-}
-
-// src/steps/types.ts
-var DEFAULT_MAX_FILE_SIZE = 256 * 1024 * 1024;
-var DEFAULT_MAX_DISPLAY_READ = 64 * 1024;
-var DEFAULT_INIT_STEP = "init";
-var DEFAULT_VALIDATE_STEP = "validate";
-var DEFAULT_PLAN_STEP = "plan";
-var DEFAULT_SHOW_PLAN_STEP = "show-plan";
-var DEFAULT_APPLY_STEP = "apply";
-var DEFAULT_STATE_STEP = "state";
-var OUTPUT_STDOUT_FILE = "stdout_file";
-var OUTPUT_STDERR_FILE = "stderr_file";
-var OUTPUT_EXIT_CODE = "exit_code";
-
-// src/steps/outcomes.ts
-function getStepOutcome(step) {
-  return step.outcome ?? step.conclusion ?? "unknown";
-}
-function getExitCode(step) {
-  return step.outputs?.[OUTPUT_EXIT_CODE] ?? void 0;
-}
-function buildStepOutcomes(steps, excludeIds) {
-  return Object.entries(steps).filter(([id]) => !excludeIds?.has(id)).map(([id, step]) => {
-    const outcome = getStepOutcome(step);
-    const exitCode = getExitCode(step);
-    return exitCode !== void 0 ? { id, outcome, exitCode } : { id, outcome };
-  });
-}
-
-// src/steps/reader.ts
-import {
-  realpathSync,
-  statSync,
-  readFileSync,
-  openSync,
-  readSync,
-  closeSync
-} from "node:fs";
-import { dirname, isAbsolute, resolve } from "node:path";
-function isReadError(result) {
-  return "error" in result;
-}
-function readForParse(filePath, options) {
-  const validated = validateFile(filePath, options);
-  if (isReadError(validated)) {
-    return validated;
-  }
-  const { realPath, size } = validated;
-  if (size > options.maxFileSize) {
-    return {
-      error: `File exceeds maximum size for parsing (${formatSize(size)} > ${formatSize(options.maxFileSize)})`
-    };
-  }
-  try {
-    const content = readFileSync(realPath, "utf-8");
-    return { content, truncated: false };
-  } catch {
-    return { error: "Failed to read file" };
-  }
-}
-function readForDisplay(filePath, options) {
-  const validated = validateFile(filePath, options);
-  if (isReadError(validated)) {
-    return validated;
-  }
-  const { realPath, size } = validated;
-  const truncated = size > options.maxDisplayRead;
-  const bytesToRead = Math.min(size, options.maxDisplayRead);
-  try {
-    const buffer = Buffer.alloc(bytesToRead);
-    const fd = openSync(realPath, "r");
-    let bytesRead;
-    try {
-      bytesRead = readSync(fd, buffer, 0, bytesToRead, 0);
-    } finally {
-      closeSync(fd);
-    }
-    return {
-      content: buffer.subarray(0, bytesRead).toString("utf-8"),
-      truncated
-    };
-  } catch {
-    return { error: "Failed to read file" };
-  }
-}
-function getValidatedPath(filePath, options) {
-  return validateFile(filePath, options);
-}
-function validateFile(filePath, options) {
-  if (!isAbsolute(filePath)) {
-    return { error: "Relative file paths are not allowed" };
-  }
-  const absolutePath = resolve(filePath);
-  let realPath;
-  try {
-    realPath = realpathSync(absolutePath);
-  } catch {
-    return { error: "File not found or not accessible" };
-  }
-  const fileDir = dirname(realPath);
-  const allowed = options.allowedDirs.some((dir) => {
-    try {
-      return fileDir === realpathSync(resolve(dir));
-    } catch {
-      return false;
-    }
-  });
-  if (!allowed) {
-    return { error: "File is not in an allowed directory" };
-  }
-  let stat;
-  try {
-    stat = statSync(realPath);
-  } catch {
-    return { error: "File not found or not accessible" };
-  }
-  if (!stat.isFile()) {
-    return { error: "Path is not a regular file" };
-  }
-  return { realPath, size: stat.size };
-}
-function formatSize(bytes) {
-  if (bytes < 1024) {
-    return `${String(bytes)} B`;
-  }
-  if (bytes < 1024 * 1024) {
-    return `${String(Math.round(bytes / 1024))} KiB`;
-  }
-  return `${String(Math.round(bytes / (1024 * 1024)))} MiB`;
-}
-
-// src/steps/io.ts
-function readStepFile(step, outputKey, readerOpts, forDisplay) {
-  const filePath = step.outputs?.[outputKey];
-  if (!filePath) return { noFile: true };
-  const result = forDisplay ? readForDisplay(filePath, readerOpts) : readForParse(filePath, readerOpts);
-  if (isReadError(result)) return { error: result.error };
-  if (result.truncated) {
-    return { content: result.content, truncated: true };
-  }
-  return { content: result.content };
-}
-function readStepStdout(step, readerOpts) {
-  return readStepFile(step, OUTPUT_STDOUT_FILE, readerOpts, false);
-}
-function readStepStdoutForDisplay(step, readerOpts) {
-  return readStepFile(step, OUTPUT_STDOUT_FILE, readerOpts, true);
-}
-function readStepStderrForDisplay(step, readerOpts) {
-  return readStepFile(step, OUTPUT_STDERR_FILE, readerOpts, true);
-}
-function getStepStdoutPath(step, readerOpts) {
-  const filePath = step.outputs?.[OUTPUT_STDOUT_FILE];
-  if (!filePath) return void 0;
-  const result = getValidatedPath(filePath, readerOpts);
-  if ("error" in result) return void 0;
-  return result.realPath;
-}
-
-// src/builder/step-issues.ts
-function buildStepIssue(step, stepId, readerOpts, diagnostic) {
-  const outcome = getStepOutcome(step);
-  const isFailed = outcome === "failure";
-  const exitCode = getExitCode(step);
-  let heading;
-  if (isFailed) {
-    heading = `\`${stepId}\` failed`;
-  } else if (diagnostic) {
-    heading = `\`${stepId}\`: output could not be parsed`;
-  } else {
-    heading = `\`${stepId}\` ${outcome}`;
-  }
-  const stdoutRead = readStepStdoutForDisplay(step, readerOpts);
-  const stderrRead = readStepStderrForDisplay(step, readerOpts);
-  const stderrContent = stderrRead.content !== void 0 && stderrRead.content.trim().length > 0 ? stderrRead.content : void 0;
-  const issue = {
-    id: stepId,
-    heading,
-    isFailed,
-    ...exitCode !== void 0 ? { exitCode } : {},
-    ...diagnostic !== void 0 ? { diagnostic } : {},
-    ...stdoutRead.content !== void 0 ? { stdout: stdoutRead.content } : {},
-    ...stdoutRead.truncated === true ? { stdoutTruncated: true } : {},
-    ...stdoutRead.error !== void 0 ? { stdoutError: stdoutRead.error } : {},
-    ...stderrContent !== void 0 ? { stderr: stderrContent } : {},
-    ...stderrContent !== void 0 && stderrRead.truncated === true ? { stderrTruncated: true } : {},
-    ...stderrRead.error !== void 0 ? { stderrError: stderrRead.error } : {}
-  };
-  return issue;
-}
-function shouldCreateStepIssue(step, readerOpts, diagnostic) {
-  const outcome = getStepOutcome(step);
-  if (outcome === "failure") return true;
-  if (diagnostic !== void 0) return true;
-  const stderrRead = readStepStderrForDisplay(step, readerOpts);
-  return stderrRead.content !== void 0 && stderrRead.content.trim().length > 0;
-}
-
-// src/model/status-icons.ts
-var STATUS_SUCCESS = "\u2705";
-var STATUS_FAILURE = "\u274C";
-var DIAGNOSTIC_ERROR = "\u{1F6A8}";
-var DIAGNOSTIC_WARNING = "\u26A0\uFE0F";
-var MODULE_ICON = "\u{1F4E6}";
-var DRIFT_ICON = "\u{1F500}";
-var INFO_ICON = "\u2139\uFE0F";
-var ARTIFACT_ICON = "\u{1F4CE}";
-
-// src/builder/title.ts
-function buildTitle(report) {
-  const wsPrefix = report.workspace ? `\`${report.workspace}\` ` : "";
-  if (report.error !== void 0) {
-    return `${STATUS_FAILURE} ${wsPrefix}Report Generation Failed`;
-  }
-  const hasIacStepFailure = hasIacFailure(report);
-  const hasAnyStepFailure = hasAnyFailure(report);
-  if (hasIacStepFailure) {
-    const op = operationLabel(report.operation);
-    const label = op ? `${op} Failed` : "Failed";
-    return `${STATUS_FAILURE} ${wsPrefix}${label}`;
-  }
-  if (report.summary) {
-    return buildSummaryTitle(
-      report.summary,
-      report.operation ?? "plan",
-      wsPrefix,
-      hasAnyStepFailure
-    );
-  }
-  if (report.operationOutcome === "skipped") {
-    const op = operationLabel(report.operation);
-    const label = op ? `${op} Skipped` : "Skipped";
-    return `${DIAGNOSTIC_WARNING} ${wsPrefix}${label}`;
-  }
-  if (report.steps.length > 0 && report.steps.every((s) => s.outcome === "skipped")) {
-    return `${DIAGNOSTIC_WARNING} ${wsPrefix}All Steps Skipped`;
-  }
-  if (hasAnyStepFailure || report.issues.some((i) => i.isFailed)) {
-    const failLabel = singleFailedStepLabel(report);
-    return `${STATUS_FAILURE} ${wsPrefix}${failLabel}`;
-  }
-  const opLabel = report.operation ? `${operationLabel(report.operation)} ` : "";
-  return `${STATUS_SUCCESS} ${wsPrefix}${opLabel}Succeeded`;
-}
-function buildPlanCountParts(summary) {
-  const counts = /* @__PURE__ */ new Map();
-  for (const group of summary.actions) {
-    const label = planActionLabel(group.action);
-    counts.set(label, (counts.get(label) ?? 0) + group.total);
-  }
-  return formatCountParts(counts, "to ");
-}
-function buildApplyCountParts(summary) {
-  const counts = /* @__PURE__ */ new Map();
-  for (const group of summary.actions) {
-    const label = applyActionLabel(group.action);
-    counts.set(label, (counts.get(label) ?? 0) + group.total);
-  }
-  return formatCountParts(counts, "");
-}
-function buildFailureCountParts(summary) {
-  const total = summary.failures.reduce((sum, g) => sum + g.total, 0);
-  if (total === 0) return [];
-  return [`${String(total)} failed`];
-}
-function buildSummaryTitle(summary, operation, wsPrefix, hasAnyStepFailure) {
-  const hasFailures = summary.failures.length > 0;
-  const icon = hasFailures || hasAnyStepFailure ? STATUS_FAILURE : STATUS_SUCCESS;
-  if (operation === "apply" || operation === "destroy") {
-    const parts2 = buildApplyCountParts(summary);
-    if (hasFailures) {
-      const failParts = buildFailureCountParts(summary);
-      return `${icon} ${wsPrefix}Apply Failed: ${[...failParts, ...parts2].join(", ")}`;
-    }
-    if (parts2.length === 0) {
-      return `${icon} ${wsPrefix}Apply Complete`;
-    }
-    return `${icon} ${wsPrefix}Apply: ${parts2.join(", ")}`;
-  }
-  const totalActions = summary.actions.reduce((sum, g) => sum + g.total, 0);
-  if (totalActions === 0 && !hasFailures && !hasAnyStepFailure) {
-    return `${icon} ${wsPrefix}No Changes`;
-  }
-  if (hasFailures || hasAnyStepFailure) {
-    return `${icon} ${wsPrefix}Plan Failed`;
-  }
-  const parts = buildPlanCountParts(summary);
-  return `${icon} ${wsPrefix}Plan: ${parts.join(", ")}`;
-}
-function operationLabel(operation) {
-  switch (operation) {
-    case "apply":
-      return "Apply";
-    case "destroy":
-      return "Destroy";
-    case "plan":
-      return "Plan";
-    default:
-      return "";
-  }
-}
-function hasIacFailure(report) {
-  const iacRoles = /* @__PURE__ */ new Set(["plan", "apply", "show-plan", "validate", "init"]);
-  return report.steps.some((s) => s.outcome === "failure" && iacRoles.has(s.id)) || report.issues.some((i) => i.isFailed && iacRoles.has(i.id));
-}
-function hasAnyFailure(report) {
-  return report.steps.some((s) => s.outcome === "failure");
-}
-function singleFailedStepLabel(report) {
-  const failedSteps = report.steps.filter((s) => s.outcome === "failure");
-  if (failedSteps.length === 1) {
-    const name = failedSteps[0]?.id ?? "unknown";
-    return `\`${name}\` Failed`;
-  }
-  return "Failed";
-}
-function formatCountParts(counts, prefix) {
-  const parts = [];
-  for (const [label, count] of counts) {
-    parts.push(`${String(count)} ${prefix}${label}`);
-  }
-  return parts;
-}
-function planActionLabel(action) {
-  switch (action) {
-    case "create":
-      return "add";
-    case "update":
-      return "change";
-    case "delete":
-      return "destroy";
-    case "replace":
-      return "replace";
-    case "import":
-      return "import";
-    case "move":
-      return "move";
-    case "forget":
-      return "forget";
-    default:
-      return action;
-  }
-}
-function applyActionLabel(action) {
-  switch (action) {
-    case "create":
-      return "added";
-    case "update":
-      return "changed";
-    case "delete":
-      return "destroyed";
-    case "replace":
-      return "replaced";
-    case "import":
-      return "imported";
-    case "move":
-      return "moved";
-    case "forget":
-      return "forgotten";
-    default:
-      return action;
-  }
-}
-
-// src/builder/process-helpers.ts
-function uiDiagnosticToModel(d, source) {
-  const base = {
-    severity: d.severity,
-    summary: d.summary,
-    detail: d.detail,
-    source
-  };
-  if (d.address !== void 0) base["address"] = d.address;
-  if (d.range !== void 0) base["range"] = d.range;
-  if (d.snippet !== void 0) base["snippet"] = d.snippet;
-  return base;
-}
-function extractJsonlResourceAddress(obj) {
-  const type = obj["type"];
-  if (typeof type !== "string") return void 0;
-  if (type === "apply_start" || type === "apply_progress" || type === "apply_complete" || type === "apply_errored" || type === "refresh_start" || type === "refresh_complete" || type === "provision_start" || type === "provision_progress" || type === "provision_complete" || type === "provision_errored") {
-    const hook = obj["hook"];
-    if (typeof hook !== "object" || hook === null) return void 0;
-    const resource = hook["resource"];
-    if (typeof resource !== "object" || resource === null) return void 0;
-    const addr = resource["addr"];
-    return typeof addr === "string" ? addr : void 0;
-  }
-  if (type === "planned_change" || type === "resource_drift") {
-    const change = obj["change"];
-    if (typeof change !== "object" || change === null) return void 0;
-    const resource = change["resource"];
-    if (typeof resource !== "object" || resource === null) return void 0;
-    const addr = resource["addr"];
-    return typeof addr === "string" ? addr : void 0;
-  }
-  if (type === "diagnostic") {
-    const diagnostic = obj["diagnostic"];
-    if (typeof diagnostic !== "object" || diagnostic === null) return void 0;
-    const addr = diagnostic["address"];
-    return typeof addr === "string" ? addr : void 0;
-  }
-  return void 0;
-}
-function filterJsonlByAddresses(content, addresses) {
-  const lines = content.split("\n");
-  const filtered = [];
-  for (const line of lines) {
-    if (line.trim() === "") {
-      filtered.push(line);
-      continue;
-    }
-    let parsed;
-    try {
-      parsed = JSON.parse(line);
-    } catch {
-      filtered.push(line);
-      continue;
-    }
-    if (typeof parsed !== "object" || parsed === null || Array.isArray(parsed)) {
-      filtered.push(line);
-      continue;
-    }
-    const addr = extractJsonlResourceAddress(parsed);
-    if (addr === void 0 || addresses.has(addr)) {
-      filtered.push(line);
-    }
-  }
-  return filtered.join("\n");
-}
-function filterStepIssueStdout(report, stepId, diagnostics) {
-  const addresses = /* @__PURE__ */ new Set();
-  for (const d of diagnostics) {
-    if (d.address === void 0) return;
-    addresses.add(d.address);
-  }
-  if (addresses.size === 0) return;
-  const idx = report.issues.findIndex((i) => i.id === stepId);
-  if (idx < 0) return;
-  const issue = report.issues[idx];
-  if (issue === void 0) return;
-  if (issue.stdout === void 0) return;
-  const filtered = filterJsonlByAddresses(issue.stdout, addresses);
-  report.issues[idx] = { ...issue, stdout: filtered };
-}
-function addScannerWarnings(report, scan, stepLabel) {
-  if (scan.unparseableLines > 0) {
-    report.warnings.push(
-      `${String(scan.unparseableLines)} line(s) in ${stepLabel} output could not be parsed as JSON`
-    );
-  }
-  if (scan.unknownTypeLines > 0) {
-    report.warnings.push(
-      `${String(scan.unknownTypeLines)} line(s) in ${stepLabel} output had unrecognized message types`
-    );
-  }
-}
-
-// src/builder/process-validate.ts
-function processValidateStep(step, stepId, report, readerOpts) {
-  const outcome = getStepOutcome(step);
-  if (outcome === "failure") {
-    report.issues.push(buildStepIssue(step, stepId, readerOpts));
-  }
-  const stdoutRead = readStepStdout(step, readerOpts);
-  if (stdoutRead.content !== void 0) {
-    try {
-      const validateOutput = parseValidateOutput(stdoutRead.content);
-      if (validateOutput.diagnostics.length > 0) {
-        const diagnostics = validateOutput.diagnostics.map(
-          (d) => uiDiagnosticToModel(d, "validate")
-        );
-        report.diagnostics = [...report.diagnostics ?? [], ...diagnostics];
-      }
-    } catch {
-    }
-  }
-}
-
 // src/jsonl-scanner/scan.ts
 import { openSync as openSync2, readSync as readSync2, closeSync as closeSync2, fstatSync } from "node:fs";
 var CHUNK_SIZE = 64 * 1024;
@@ -1932,6 +1803,135 @@ function enrichFromApplyJsonl(filePath, report, readerOpts, showPlanParsed) {
     report.operation = "apply";
   }
   addScannerWarnings(report, scan, "apply");
+}
+
+// src/builder/state-enrichment.ts
+var LARGE_LINE_THRESHOLD3 = 3;
+function enrichReportFromState(report, state) {
+  const stateResources = state.resources;
+  const hasResources = stateResources !== void 0 && stateResources.length > 0;
+  const hasOutputs = state.outputs !== void 0 && Object.keys(state.outputs).length > 0;
+  if (!hasResources && !hasOutputs) return;
+  const instanceMap = hasResources ? buildInstanceMap(stateResources) : /* @__PURE__ */ new Map();
+  let enrichedAny = false;
+  for (const resource of report.resources ?? []) {
+    if (!resource.hasAttributeDetail) continue;
+    const flat = instanceMap.get(resource.address);
+    if (flat !== void 0) {
+      for (const attr of resource.attributes) {
+        if (!attr.isKnownAfterApply) continue;
+        if (attr.isSensitive) continue;
+        if (flat.sensitiveNames.has(attr.name)) {
+          attr.isSensitive = true;
+          attr.after = SENSITIVE_MASK;
+          attr.isKnownAfterApply = false;
+          enrichedAny = true;
+        } else {
+          const resolved = resolveFromInstance(flat, attr.name);
+          if (resolved !== void 0) {
+            attr.after = resolved;
+            attr.isKnownAfterApply = false;
+            attr.isLarge = isLargeValue3(resolved);
+            enrichedAny = true;
+          }
+        }
+      }
+    }
+    resource.allUnknownAfterApply = false;
+  }
+  const stateOutputs = state.outputs;
+  if (stateOutputs !== void 0) {
+    for (const output of report.outputs ?? []) {
+      if (!output.isKnownAfterApply) continue;
+      if (output.isSensitive) continue;
+      const stateOutput = stateOutputs[output.name];
+      if (stateOutput === void 0) continue;
+      if (stateOutput.sensitive === true) {
+        output.isSensitive = true;
+        output.after = SENSITIVE_MASK;
+        output.isKnownAfterApply = false;
+        enrichedAny = true;
+      } else if (stateOutput.value !== void 0) {
+        output.after = stringifyValue(stateOutput.value);
+        output.isKnownAfterApply = false;
+        output.isLarge = isLargeValue3(output.after);
+        enrichedAny = true;
+      }
+    }
+  }
+  if (enrichedAny) {
+    report.stateEnriched = true;
+  }
+}
+function buildInstanceMap(resources) {
+  const map = /* @__PURE__ */ new Map();
+  for (const res of resources) {
+    for (const inst of res.instances ?? []) {
+      const address = buildAddress(res, inst);
+      const rawValues = inst.attributes;
+      const flatValues = rawValues !== void 0 ? flatten(rawValues) : /* @__PURE__ */ new Map();
+      const sensitiveNames = extractSensitiveNames(inst);
+      map.set(address, { rawValues, flatValues, sensitiveNames });
+    }
+  }
+  return map;
+}
+function buildAddress(res, inst) {
+  let address = "";
+  if (res.module !== void 0 && res.module !== "") {
+    address = `${res.module}.`;
+  }
+  address += `${res.type}.${res.name}`;
+  if (inst.index_key !== void 0) {
+    if (typeof inst.index_key === "number") {
+      address += `[${String(inst.index_key)}]`;
+    } else {
+      address += `["${inst.index_key}"]`;
+    }
+  }
+  return address;
+}
+function extractSensitiveNames(inst) {
+  const names = /* @__PURE__ */ new Set();
+  for (const path of inst.sensitive_attributes ?? []) {
+    const first = path[0];
+    if (first?.type === "get_attr") {
+      names.add(first.value);
+    }
+  }
+  return names;
+}
+function resolveFromInstance(inst, attrName) {
+  if (inst.rawValues !== void 0 && attrName in inst.rawValues) {
+    return stringifyValue(inst.rawValues[attrName]);
+  }
+  if (inst.flatValues.has(attrName)) {
+    return inst.flatValues.get(attrName) ?? null;
+  }
+  return void 0;
+}
+function stringifyValue(value) {
+  if (value === null) return null;
+  if (typeof value === "string") return value;
+  if (typeof value === "number" || typeof value === "boolean") {
+    return String(value);
+  }
+  return JSON.stringify(value);
+}
+function isLargeValue3(value) {
+  if (value === null) return false;
+  const trimmed = value.trim();
+  if (trimmed.startsWith("{") || trimmed.startsWith("[") || trimmed.startsWith("<")) {
+    return true;
+  }
+  let count = 0;
+  for (const ch of value) {
+    if (ch === "\n") {
+      count++;
+      if (count > LARGE_LINE_THRESHOLD3) return true;
+    }
+  }
+  return false;
 }
 
 // src/builder/report-from-steps.ts
@@ -3738,7 +3738,7 @@ function splitAroundCategories(sections) {
   return { prefix, suffix };
 }
 
-// src/index.ts
+// src/pipelines/steps.ts
 var DEFAULT_MAX_OUTPUT_LENGTH = 64512;
 function reportFromSteps(stepsJson, options) {
   try {

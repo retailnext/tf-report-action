@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { planToMarkdown } from "../../src/index.js";
+import { planToMarkdown } from "../../src/pipelines/plan.js";
 
 /** Minimal valid plan JSON used as a baseline across tests. */
 const EMPTY_PLAN = JSON.stringify({
