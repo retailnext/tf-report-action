@@ -942,11 +942,15 @@ function buildDriftChanges(plan, options) {
     const action = refineAction(determineAction(rc.change.actions), rc);
     const address = rc.address ?? `${rc.type ?? "unknown"}.${rc.name ?? "unknown"}`;
     const attributes = buildAttributeChanges(rc.change, options);
+    const changedOnlyAttributes = buildAttributeChanges(rc.change, {
+      ...options,
+      showUnchangedAttributes: false
+    });
     const allUnknownAfterApply = isAllUnknownAfterApply(rc, attributes);
     if (registry.shouldSuppressDrift(
       rc.type ?? "unknown",
       rc.mode ?? "managed",
-      attributes
+      changedOnlyAttributes
     ))
       continue;
     result.push({
