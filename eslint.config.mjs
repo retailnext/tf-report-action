@@ -103,6 +103,7 @@ export default tseslint.config(
                 "../steps/*",
                 "../jsonl-scanner/*",
                 "../tfjson/*",
+                "../drift-filter/*",
               ],
               message:
                 "The action layer may only import from src/pipelines/, src/model/, src/github/, src/env/, src/http/, src/logger/, src/inputs/, and src/comment/.",
