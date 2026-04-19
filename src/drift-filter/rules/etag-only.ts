@@ -1,5 +1,4 @@
 import type { DriftRule } from "../registry.js";
-import type { AttributeChange } from "../../model/attribute.js";
 
 /**
  * Suppresses drift for any resource type where the only changed attribute is `etag`.
@@ -11,6 +10,8 @@ import type { AttributeChange } from "../../model/attribute.js";
 export const suppressEtagOnlyDrift: DriftRule = (
   _type: string,
   _mode: string,
-  attributes: AttributeChange[],
-): boolean =>
-  attributes.length > 0 && attributes.every((a) => a.name === "etag");
+  attributes,
+): boolean => {
+  const changed = attributes.filter((a) => a.before !== a.after);
+  return changed.length > 0 && changed.every((a) => a.name === "etag");
+};

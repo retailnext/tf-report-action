@@ -1,5 +1,4 @@
 import type { DriftRule } from "../registry.js";
-import type { AttributeChange } from "../../model/attribute.js";
 
 const BORING_ATTRIBUTES = new Set(["metageneration", "update_time"]);
 
@@ -13,8 +12,11 @@ const BORING_ATTRIBUTES = new Set(["metageneration", "update_time"]);
 export const suppressGoogleStorageManagedFolderMetaBoring: DriftRule = (
   type: string,
   _mode: string,
-  attributes: AttributeChange[],
-): boolean =>
-  type === "google_storage_managed_folder" &&
-  attributes.length > 0 &&
-  attributes.every((a) => BORING_ATTRIBUTES.has(a.name));
+  attributes,
+): boolean => {
+  if (type !== "google_storage_managed_folder") return false;
+  const changed = attributes.filter((a) => a.before !== a.after);
+  return (
+    changed.length > 0 && changed.every((a) => BORING_ATTRIBUTES.has(a.name))
+  );
+};

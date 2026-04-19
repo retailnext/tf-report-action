@@ -6,9 +6,11 @@ import { suppressGoogleStorageManagedFolderMetaBoring } from "./rules/google-sto
 /**
  * A drift suppression rule.
  *
- * Called with the resource type, mode, and built attribute changes for a single
- * drift entry. Returns `true` if the drift should be omitted from the report.
+ * Called with the resource type, mode, and the full set of attribute values
+ * for the drift entry — including attributes that did not change. Use
+ * `before !== after` to distinguish changed attributes from unchanged ones.
  *
+ * Returns `true` if the drift should be omitted from the report.
  * Rules are pure predicates with no side effects.
  */
 export type DriftRule = (

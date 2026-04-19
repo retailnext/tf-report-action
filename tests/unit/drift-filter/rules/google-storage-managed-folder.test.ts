@@ -4,7 +4,7 @@ import type { AttributeChange } from "../../../../src/model/attribute.js";
 
 const TYPE = "google_storage_managed_folder";
 
-function attr(name: string): AttributeChange {
+function changed(name: string): AttributeChange {
   return {
     name,
     before: "old",
@@ -15,11 +15,22 @@ function attr(name: string): AttributeChange {
   };
 }
 
+function unchanged(name: string): AttributeChange {
+  return {
+    name,
+    before: "same",
+    after: "same",
+    isSensitive: false,
+    isLarge: false,
+    isKnownAfterApply: false,
+  };
+}
+
 describe("suppressGoogleStorageManagedFolderMetaBoring", () => {
   it("returns true when only update_time changed", () => {
     expect(
       suppressGoogleStorageManagedFolderMetaBoring(TYPE, "managed", [
-        attr("update_time"),
+        changed("update_time"),
       ]),
     ).toBe(true);
   });
@@ -27,7 +38,7 @@ describe("suppressGoogleStorageManagedFolderMetaBoring", () => {
   it("returns true when only metageneration changed", () => {
     expect(
       suppressGoogleStorageManagedFolderMetaBoring(TYPE, "managed", [
-        attr("metageneration"),
+        changed("metageneration"),
       ]),
     ).toBe(true);
   });
@@ -35,17 +46,27 @@ describe("suppressGoogleStorageManagedFolderMetaBoring", () => {
   it("returns true when both boring attributes changed", () => {
     expect(
       suppressGoogleStorageManagedFolderMetaBoring(TYPE, "managed", [
-        attr("metageneration"),
-        attr("update_time"),
+        changed("metageneration"),
+        changed("update_time"),
       ]),
     ).toBe(true);
   });
 
-  it("returns false when a non-boring attribute is also present", () => {
+  it("returns true when boring attributes changed and other attributes are unchanged", () => {
     expect(
       suppressGoogleStorageManagedFolderMetaBoring(TYPE, "managed", [
-        attr("metageneration"),
-        attr("force_destroy"),
+        changed("metageneration"),
+        unchanged("name"),
+        unchanged("bucket"),
+      ]),
+    ).toBe(true);
+  });
+
+  it("returns false when a non-boring attribute is also changed", () => {
+    expect(
+      suppressGoogleStorageManagedFolderMetaBoring(TYPE, "managed", [
+        changed("metageneration"),
+        changed("force_destroy"),
       ]),
     ).toBe(false);
   });
@@ -55,21 +76,30 @@ describe("suppressGoogleStorageManagedFolderMetaBoring", () => {
       suppressGoogleStorageManagedFolderMetaBoring(
         "google_storage_bucket",
         "managed",
-        [attr("metageneration")],
+        [changed("metageneration")],
       ),
     ).toBe(false);
   });
 
-  it("returns false when attributes is empty (no visible change to suppress)", () => {
+  it("returns false when attributes is empty", () => {
     expect(
       suppressGoogleStorageManagedFolderMetaBoring(TYPE, "managed", []),
+    ).toBe(false);
+  });
+
+  it("returns false when all attributes are unchanged", () => {
+    expect(
+      suppressGoogleStorageManagedFolderMetaBoring(TYPE, "managed", [
+        unchanged("metageneration"),
+        unchanged("update_time"),
+      ]),
     ).toBe(false);
   });
 
   it("ignores mode", () => {
     expect(
       suppressGoogleStorageManagedFolderMetaBoring(TYPE, "data", [
-        attr("update_time"),
+        changed("update_time"),
       ]),
     ).toBe(true);
   });

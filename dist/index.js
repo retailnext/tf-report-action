@@ -875,11 +875,18 @@ function buildAttributeChanges(change, options) {
 var suppressDataSourceDrift = (_type, mode) => mode === "data";
 
 // src/drift-filter/rules/etag-only.ts
-var suppressEtagOnlyDrift = (_type, _mode, attributes) => attributes.length > 0 && attributes.every((a) => a.name === "etag");
+var suppressEtagOnlyDrift = (_type, _mode, attributes) => {
+  const changed = attributes.filter((a) => a.before !== a.after);
+  return changed.length > 0 && changed.every((a) => a.name === "etag");
+};
 
 // src/drift-filter/rules/google-storage-managed-folder.ts
 var BORING_ATTRIBUTES = /* @__PURE__ */ new Set(["metageneration", "update_time"]);
-var suppressGoogleStorageManagedFolderMetaBoring = (type, _mode, attributes) => type === "google_storage_managed_folder" && attributes.length > 0 && attributes.every((a) => BORING_ATTRIBUTES.has(a.name));
+var suppressGoogleStorageManagedFolderMetaBoring = (type, _mode, attributes) => {
+  if (type !== "google_storage_managed_folder") return false;
+  const changed = attributes.filter((a) => a.before !== a.after);
+  return changed.length > 0 && changed.every((a) => BORING_ATTRIBUTES.has(a.name));
+};
 
 // src/drift-filter/registry.ts
 var DriftRuleRegistry = class {
@@ -942,15 +949,15 @@ function buildDriftChanges(plan, options) {
     const action = refineAction(determineAction(rc.change.actions), rc);
     const address = rc.address ?? `${rc.type ?? "unknown"}.${rc.name ?? "unknown"}`;
     const attributes = buildAttributeChanges(rc.change, options);
-    const changedOnlyAttributes = buildAttributeChanges(rc.change, {
+    const allAttributesForSuppression = buildAttributeChanges(rc.change, {
       ...options,
-      showUnchangedAttributes: false
+      showUnchangedAttributes: true
     });
     const allUnknownAfterApply = isAllUnknownAfterApply(rc, attributes);
     if (registry.shouldSuppressDrift(
       rc.type ?? "unknown",
       rc.mode ?? "managed",
-      changedOnlyAttributes
+      allAttributesForSuppression
     ))
       continue;
     result.push({

@@ -6,7 +6,7 @@ import {
 } from "../../../src/drift-filter/registry.js";
 import type { AttributeChange } from "../../../src/model/attribute.js";
 
-function attr(name: string): AttributeChange {
+function changed(name: string): AttributeChange {
   return {
     name,
     before: "old",
@@ -16,6 +16,9 @@ function attr(name: string): AttributeChange {
     isKnownAfterApply: false,
   };
 }
+
+// Keep `attr` as an alias so existing tests don't need rewriting.
+const attr = changed;
 
 const NEVER: DriftRule = () => false;
 const ALWAYS: DriftRule = () => true;
@@ -108,5 +111,23 @@ describe("createDefaultDriftRuleRegistry", () => {
         attr("instance_type"),
       ]),
     ).toBe(false);
+  });
+
+  it("suppresses etag-only drift when unchanged attrs are also present", () => {
+    const registry = createDefaultDriftRuleRegistry();
+    const unchangedAttr = {
+      name: "bucket",
+      before: "same",
+      after: "same",
+      isSensitive: false,
+      isLarge: false,
+      isKnownAfterApply: false,
+    };
+    expect(
+      registry.shouldSuppressDrift("aws_s3_bucket", "managed", [
+        attr("etag"),
+        unchangedAttr,
+      ]),
+    ).toBe(true);
   });
 });

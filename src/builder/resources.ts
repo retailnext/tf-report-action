@@ -89,9 +89,9 @@ export function buildDriftChanges(
       rc.address ?? `${rc.type ?? "unknown"}.${rc.name ?? "unknown"}`;
 
     const attributes = buildAttributeChanges(rc.change, options);
-    const changedOnlyAttributes = buildAttributeChanges(rc.change, {
+    const allAttributesForSuppression = buildAttributeChanges(rc.change, {
       ...options,
-      showUnchangedAttributes: false,
+      showUnchangedAttributes: true,
     });
     const allUnknownAfterApply = isAllUnknownAfterApply(rc, attributes);
 
@@ -99,7 +99,7 @@ export function buildDriftChanges(
       registry.shouldSuppressDrift(
         rc.type ?? "unknown",
         rc.mode ?? "managed",
-        changedOnlyAttributes,
+        allAttributesForSuppression,
       )
     )
       continue;
