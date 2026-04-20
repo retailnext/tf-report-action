@@ -487,18 +487,85 @@ describe("run — always-upload-report", () => {
 // ---------------------------------------------------------------------------
 
 describe("run — artifact naming", () => {
-  // These tests cannot easily force truncation through the public API since
-  // COMMENT_LIMIT is a constant. The artifact naming logic is in the truncation
-  // branch which only runs when wasTruncated is true. We verify the naming
-  // convention indirectly — the buildLogsNotice tests below exercise the
-  // non-truncation path, and the artifact-upload.test.ts tests verify the
-  // upload orchestrator in isolation.
-  //
-  // The important contract: artifact name = `${workspace}-${operation}-report.html` when
-  // both workspace and operation are set, falling back gracefully:
-  //   no operation → `${workspace}-report.html`
-  //   no workspace → `${operation}-report.html`
-  //   neither      → `report.html`
+  function stepsWithOp(op: "plan" | "apply"): string {
+    return JSON.stringify({
+      [op]: { outcome: "success", conclusion: "success", outputs: {} },
+    });
+  }
+
+  function captureArtifactName(env: Env): Promise<string | undefined> {
+    let capturedName: string | undefined;
+    const { client } = mockClient();
+    const fakeTryUpload = (
+      params: import("../../../src/action/artifact-upload.js").TryUploadParams,
+    ): Promise<string | undefined> => {
+      capturedName = params.artifactName;
+      return Promise.resolve(undefined);
+    };
+    return run(
+      env,
+      quietDeps({
+        clientFactory: () => client,
+        tryUploadFullReport: fakeTryUpload,
+      }),
+    ).then(() => capturedName);
+  }
+
+  it("workspace + plan operation → {workspace}-plan-report.html", async () => {
+    const name = await captureArtifactName(
+      baseEnv({
+        INPUT_WORKSPACE: "staging",
+        INPUT_STEPS: stepsWithOp("plan"),
+        "INPUT_ALWAYS-UPLOAD-REPORT": "true",
+      }),
+    );
+    expect(name).toBe("staging-plan-report.html");
+  });
+
+  it("workspace + apply operation → {workspace}-apply-report.html", async () => {
+    const name = await captureArtifactName(
+      baseEnv({
+        INPUT_WORKSPACE: "staging",
+        INPUT_STEPS: stepsWithOp("apply"),
+        "INPUT_ALWAYS-UPLOAD-REPORT": "true",
+      }),
+    );
+    expect(name).toBe("staging-apply-report.html");
+  });
+
+  it("workspace + no operation → {workspace}-report.html", async () => {
+    const name = await captureArtifactName(
+      baseEnv({
+        INPUT_WORKSPACE: "staging",
+        "INPUT_ALWAYS-UPLOAD-REPORT": "true",
+      }),
+    );
+    expect(name).toBe("staging-report.html");
+  });
+
+  it("auto-derived workspace + plan operation → {workflow}/{job}-plan-report.html", async () => {
+    const name = await captureArtifactName(
+      baseEnv({
+        GITHUB_WORKFLOW: "Deploy",
+        GITHUB_JOB: "terraform",
+        INPUT_STEPS: stepsWithOp("plan"),
+        "INPUT_ALWAYS-UPLOAD-REPORT": "true",
+      }),
+    );
+    expect(name).toBe("Deploy/terraform-plan-report.html");
+  });
+
+  it("auto-derived workspace + no operation → {workflow}/{job}-report.html", async () => {
+    const name = await captureArtifactName(
+      baseEnv({
+        GITHUB_WORKFLOW: "Deploy",
+        GITHUB_JOB: "terraform",
+        "INPUT_ALWAYS-UPLOAD-REPORT": "true",
+      }),
+    );
+    expect(name).toBe("Deploy/terraform-report.html");
+  });
+
   it("workspace is included in the dedup marker", async () => {
     let postedBody = "";
     const { client } = mockClient({
