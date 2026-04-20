@@ -4678,8 +4678,10 @@ async function tryUploadFullReport(params) {
       mode: "gfm",
       context: params.repoContext
     });
-    const htmlPage = buildHtmlPage(htmlFragment, params.artifactName);
-    const filename = `${params.artifactName}.html`;
+    const dotIndex = params.artifactName.lastIndexOf(".");
+    const pageTitle = dotIndex > 0 ? params.artifactName.slice(0, dotIndex) : params.artifactName;
+    const htmlPage = buildHtmlPage(htmlFragment, pageTitle);
+    const filename = params.artifactName;
     const serverUrl = params.env["GITHUB_SERVER_URL"];
     const uploader = createArtifactUploader({
       runtimeToken,
@@ -4778,7 +4780,8 @@ async function run(env = process.env, deps) {
     let artifactUrl;
     if (shouldUpload) {
       const opLabel = operation ?? "report";
-      const artifactName = inputs.workspace ? `${inputs.workspace}-${opLabel}` : opLabel;
+      const artifactStem = inputs.workspace ? `${inputs.workspace}-${opLabel}-report` : `${opLabel}-report`;
+      const artifactName = `${artifactStem}.html`;
       artifactUrl = await tryUpload({
         fullMarkdown,
         renderMarkdown: client.renderMarkdown.bind(client),

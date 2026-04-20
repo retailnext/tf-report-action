@@ -73,7 +73,7 @@ function baseParams(overrides: Partial<TryUploadParams> = {}): TryUploadParams {
     renderMarkdown: fakeRenderMarkdown(),
     env: baseEnv(),
     repoContext: "owner/repo",
-    artifactName: "cluster-plan",
+    artifactName: "cluster-plan-report.html",
     logger: nullLogger(),
     deps: {
       transport: sequenceTransport(),

@@ -494,8 +494,8 @@ describe("run — artifact naming", () => {
   // non-truncation path, and the artifact-upload.test.ts tests verify the
   // upload orchestrator in isolation.
   //
-  // The important contract: artifact name = `${workspace}-${operation}` when
-  // workspace is set, or just `${operation}` otherwise, with "report" as
+  // The important contract: artifact name = `${workspace}-${operation}-report.html` when
+  // workspace is set, or `${operation}-report.html` otherwise, with "report.html" as
   // fallback for undefined operation.
   it("workspace is included in the dedup marker", async () => {
     let postedBody = "";

@@ -42,7 +42,7 @@ export interface TryUploadParams {
   readonly env: Env;
   /** Repository context string, e.g. "owner/repo". */
   readonly repoContext: string;
-  /** Artifact display name and filename stem, e.g. "cluster-plan". */
+  /** Artifact display name and filename, e.g. "cluster-plan-report.html". */
   readonly artifactName: string;
   /** Logger for warnings on failure. */
   readonly logger: Logger;
@@ -80,9 +80,14 @@ export async function tryUploadFullReport(
       context: params.repoContext,
     });
 
-    const htmlPage = buildHtmlPage(htmlFragment, params.artifactName);
+    const dotIndex = params.artifactName.lastIndexOf(".");
+    const pageTitle =
+      dotIndex > 0
+        ? params.artifactName.slice(0, dotIndex)
+        : params.artifactName;
+    const htmlPage = buildHtmlPage(htmlFragment, pageTitle);
 
-    const filename = `${params.artifactName}.html`;
+    const filename = params.artifactName;
     const serverUrl = params.env["GITHUB_SERVER_URL"];
     const uploader = createArtifactUploader({
       runtimeToken,
