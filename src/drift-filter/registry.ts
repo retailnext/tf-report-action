@@ -1,7 +1,11 @@
 import type { AttributeChange } from "../model/attribute.js";
+import { suppressGoogleArtifactRegistryRepositoryUpdateTime } from "./rules/google-artifact-registry-repository.js";
+import { suppressGoogleComputeManagedSslCertificateExpireTime } from "./rules/google-compute-managed-ssl-certificate.js";
+import { suppressGoogleComputeUrlMapFingerprint } from "./rules/google-compute-url-map.js";
 import { suppressDataSourceDrift } from "./rules/data-source.js";
 import { suppressEtagOnlyDrift } from "./rules/etag-only.js";
 import { suppressGoogleStorageManagedFolderMetaBoring } from "./rules/google-storage-managed-folder.js";
+import { suppressGoogleStorageBucketUpdated } from "./rules/google-storage-bucket.js";
 
 /**
  * A drift suppression rule.
@@ -59,10 +63,22 @@ export class DriftRuleRegistry {
  * - Resources where the only changed attribute is `etag` are suppressed.
  * - `google_storage_managed_folder` resources where only `metageneration`
  *   and/or `update_time` changed are suppressed.
+ * - `google_compute_managed_ssl_certificate` resources where only `expire_time`
+ *   changed are suppressed.
+ * - `google_compute_url_map` resources where only `fingerprint` changed are
+ *   suppressed.
+ * - `google_artifact_registry_repository` resources where only `update_time`
+ *   changed are suppressed.
+ * - `google_storage_bucket` resources where only `updated` changed are
+ *   suppressed.
  */
 export function createDefaultDriftRuleRegistry(): DriftRuleRegistry {
   return new DriftRuleRegistry()
     .register(suppressDataSourceDrift)
     .register(suppressEtagOnlyDrift)
-    .register(suppressGoogleStorageManagedFolderMetaBoring);
+    .register(suppressGoogleStorageManagedFolderMetaBoring)
+    .register(suppressGoogleComputeManagedSslCertificateExpireTime)
+    .register(suppressGoogleComputeUrlMapFingerprint)
+    .register(suppressGoogleArtifactRegistryRepositoryUpdateTime)
+    .register(suppressGoogleStorageBucketUpdated);
 }

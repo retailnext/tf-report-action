@@ -871,6 +871,27 @@ function buildAttributeChanges(change, options) {
   return result;
 }
 
+// src/drift-filter/rules/google-artifact-registry-repository.ts
+var suppressGoogleArtifactRegistryRepositoryUpdateTime = (type, _mode, attributes) => {
+  if (type !== "google_artifact_registry_repository") return false;
+  const changed = attributes.filter((a) => a.before !== a.after);
+  return changed.length > 0 && changed.every((a) => a.name === "update_time");
+};
+
+// src/drift-filter/rules/google-compute-managed-ssl-certificate.ts
+var suppressGoogleComputeManagedSslCertificateExpireTime = (type, _mode, attributes) => {
+  if (type !== "google_compute_managed_ssl_certificate") return false;
+  const changed = attributes.filter((a) => a.before !== a.after);
+  return changed.length > 0 && changed.every((a) => a.name === "expire_time");
+};
+
+// src/drift-filter/rules/google-compute-url-map.ts
+var suppressGoogleComputeUrlMapFingerprint = (type, _mode, attributes) => {
+  if (type !== "google_compute_url_map") return false;
+  const changed = attributes.filter((a) => a.before !== a.after);
+  return changed.length > 0 && changed.every((a) => a.name === "fingerprint");
+};
+
 // src/drift-filter/rules/data-source.ts
 var suppressDataSourceDrift = (_type, mode) => mode === "data";
 
@@ -886,6 +907,13 @@ var suppressGoogleStorageManagedFolderMetaBoring = (type, _mode, attributes) => 
   if (type !== "google_storage_managed_folder") return false;
   const changed = attributes.filter((a) => a.before !== a.after);
   return changed.length > 0 && changed.every((a) => BORING_ATTRIBUTES.has(a.name));
+};
+
+// src/drift-filter/rules/google-storage-bucket.ts
+var suppressGoogleStorageBucketUpdated = (type, _mode, attributes) => {
+  if (type !== "google_storage_bucket") return false;
+  const changed = attributes.filter((a) => a.before !== a.after);
+  return changed.length > 0 && changed.every((a) => a.name === "updated");
 };
 
 // src/drift-filter/registry.ts
@@ -907,7 +935,7 @@ var DriftRuleRegistry = class {
   }
 };
 function createDefaultDriftRuleRegistry() {
-  return new DriftRuleRegistry().register(suppressDataSourceDrift).register(suppressEtagOnlyDrift).register(suppressGoogleStorageManagedFolderMetaBoring);
+  return new DriftRuleRegistry().register(suppressDataSourceDrift).register(suppressEtagOnlyDrift).register(suppressGoogleStorageManagedFolderMetaBoring).register(suppressGoogleComputeManagedSslCertificateExpireTime).register(suppressGoogleComputeUrlMapFingerprint).register(suppressGoogleArtifactRegistryRepositoryUpdateTime).register(suppressGoogleStorageBucketUpdated);
 }
 
 // src/builder/resources.ts
