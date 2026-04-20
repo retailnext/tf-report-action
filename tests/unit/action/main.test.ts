@@ -495,8 +495,10 @@ describe("run — artifact naming", () => {
   // upload orchestrator in isolation.
   //
   // The important contract: artifact name = `${workspace}-${operation}-report.html` when
-  // workspace is set, or `${operation}-report.html` otherwise, with "report.html" as
-  // fallback for undefined operation.
+  // both workspace and operation are set, falling back gracefully:
+  //   no operation → `${workspace}-report.html`
+  //   no workspace → `${operation}-report.html`
+  //   neither      → `report.html`
   it("workspace is included in the dedup marker", async () => {
     let postedBody = "";
     const { client } = mockClient({

@@ -4779,9 +4779,9 @@ async function run(env = process.env, deps) {
     const shouldUpload = wasTruncated || inputs.alwaysUploadReport;
     let artifactUrl;
     if (shouldUpload) {
-      const opLabel = operation ?? "report";
-      const artifactStem = inputs.workspace ? `${inputs.workspace}-${opLabel}-report` : `${opLabel}-report`;
-      const artifactName = `${artifactStem}.html`;
+      const workspacePart = inputs.workspace ? `${inputs.workspace}-` : "";
+      const opPart = operation !== void 0 ? `${operation}-` : "";
+      const artifactName = `${workspacePart}${opPart}report.html`;
       artifactUrl = await tryUpload({
         fullMarkdown,
         renderMarkdown: client.renderMarkdown.bind(client),

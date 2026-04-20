@@ -182,11 +182,9 @@ export async function run(
     let artifactUrl: string | undefined;
 
     if (shouldUpload) {
-      const opLabel = operation ?? "report";
-      const artifactStem = inputs.workspace
-        ? `${inputs.workspace}-${opLabel}-report`
-        : `${opLabel}-report`;
-      const artifactName = `${artifactStem}.html`;
+      const workspacePart = inputs.workspace ? `${inputs.workspace}-` : "";
+      const opPart = operation !== undefined ? `${operation}-` : "";
+      const artifactName = `${workspacePart}${opPart}report.html`;
 
       artifactUrl = await tryUpload({
         fullMarkdown,
