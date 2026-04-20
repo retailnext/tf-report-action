@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, afterEach } from "vitest";
-import { run } from "../../../src/action/main.js";
+import { run, sanitizeArtifactSegment } from "../../../src/action/main.js";
 import { formatTimestamp } from "../../../src/comment/footer.js";
 import type { Env } from "../../../src/env/index.js";
 import type {
@@ -487,16 +487,98 @@ describe("run — always-upload-report", () => {
 // ---------------------------------------------------------------------------
 
 describe("run — artifact naming", () => {
-  // These tests cannot easily force truncation through the public API since
-  // COMMENT_LIMIT is a constant. The artifact naming logic is in the truncation
-  // branch which only runs when wasTruncated is true. We verify the naming
-  // convention indirectly — the buildLogsNotice tests below exercise the
-  // non-truncation path, and the artifact-upload.test.ts tests verify the
-  // upload orchestrator in isolation.
-  //
-  // The important contract: artifact name = `${workspace}-${operation}` when
-  // workspace is set, or just `${operation}` otherwise, with "report" as
-  // fallback for undefined operation.
+  function stepsWithOp(op: "plan" | "apply"): string {
+    return JSON.stringify({
+      [op]: { outcome: "success", conclusion: "success", outputs: {} },
+    });
+  }
+
+  function captureArtifactName(env: Env): Promise<string | undefined> {
+    let capturedName: string | undefined;
+    const { client } = mockClient();
+    const fakeTryUpload = (
+      params: import("../../../src/action/artifact-upload.js").TryUploadParams,
+    ): Promise<string | undefined> => {
+      capturedName = params.artifactName;
+      return Promise.resolve(undefined);
+    };
+    return run(
+      env,
+      quietDeps({
+        clientFactory: () => client,
+        tryUploadFullReport: fakeTryUpload,
+      }),
+    ).then(() => capturedName);
+  }
+
+  it("workspace + plan operation → {workspace}-plan-report.html", async () => {
+    const name = await captureArtifactName(
+      baseEnv({
+        INPUT_WORKSPACE: "staging",
+        INPUT_STEPS: stepsWithOp("plan"),
+        "INPUT_ALWAYS-UPLOAD-REPORT": "true",
+      }),
+    );
+    expect(name).toBe("staging-plan-report.html");
+  });
+
+  it("workspace + apply operation → {workspace}-apply-report.html", async () => {
+    const name = await captureArtifactName(
+      baseEnv({
+        INPUT_WORKSPACE: "staging",
+        INPUT_STEPS: stepsWithOp("apply"),
+        "INPUT_ALWAYS-UPLOAD-REPORT": "true",
+      }),
+    );
+    expect(name).toBe("staging-apply-report.html");
+  });
+
+  it("workspace + no operation → {workspace}-report.html", async () => {
+    const name = await captureArtifactName(
+      baseEnv({
+        INPUT_WORKSPACE: "staging",
+        "INPUT_ALWAYS-UPLOAD-REPORT": "true",
+      }),
+    );
+    expect(name).toBe("staging-report.html");
+  });
+
+  it("auto-derived workspace + plan operation → sanitized name without /", async () => {
+    const name = await captureArtifactName(
+      baseEnv({
+        GITHUB_WORKFLOW: "Deploy",
+        GITHUB_JOB: "terraform",
+        INPUT_STEPS: stepsWithOp("plan"),
+        "INPUT_ALWAYS-UPLOAD-REPORT": "true",
+      }),
+    );
+    expect(name).toBe("Deploy-terraform-plan-report.html");
+  });
+
+  it("auto-derived workspace + no operation → sanitized name without /", async () => {
+    const name = await captureArtifactName(
+      baseEnv({
+        GITHUB_WORKFLOW: "Deploy",
+        GITHUB_JOB: "terraform",
+        "INPUT_ALWAYS-UPLOAD-REPORT": "true",
+      }),
+    );
+    expect(name).toBe("Deploy-terraform-report.html");
+  });
+
+  it("workspace with special chars is sanitized in artifact name", async () => {
+    const name = await captureArtifactName(
+      baseEnv({
+        INPUT_WORKSPACE: "my workspace: *special*",
+        INPUT_STEPS: stepsWithOp("plan"),
+        "INPUT_ALWAYS-UPLOAD-REPORT": "true",
+      }),
+    );
+    // / \ : * ? " < > | and spaces must not appear in the artifact name
+    expect(name).not.toMatch(/[/\\:*?"<>| ]/);
+    expect(name).toBe("my-workspace-special-plan-report.html");
+  });
+
   it("workspace is included in the dedup marker", async () => {
     let postedBody = "";
     const { client } = mockClient({
@@ -514,6 +596,50 @@ describe("run — artifact naming", () => {
     );
 
     expect(postedBody).toContain('<!-- tf-report-action:"staging" -->');
+  });
+});
+
+// ---------------------------------------------------------------------------
+// sanitizeArtifactSegment
+// ---------------------------------------------------------------------------
+
+describe("sanitizeArtifactSegment", () => {
+  it("passes through safe characters unchanged", () => {
+    expect(sanitizeArtifactSegment("cluster-plan")).toBe("cluster-plan");
+    expect(sanitizeArtifactSegment("my_workspace.v2")).toBe("my_workspace.v2");
+  });
+
+  it("replaces / with -", () => {
+    expect(sanitizeArtifactSegment("Deploy/terraform")).toBe(
+      "Deploy-terraform",
+    );
+    expect(sanitizeArtifactSegment("CI/plan")).toBe("CI-plan");
+  });
+
+  it("replaces backslash with -", () => {
+    expect(sanitizeArtifactSegment("windows\\path")).toBe("windows-path");
+  });
+
+  it('replaces : * ? " < > | with -', () => {
+    expect(sanitizeArtifactSegment('a:b*c?d"e<f>g|h')).toBe("a-b-c-d-e-f-g-h");
+  });
+
+  it("replaces spaces with -", () => {
+    expect(sanitizeArtifactSegment("my workspace")).toBe("my-workspace");
+  });
+
+  it("collapses consecutive special characters to a single -", () => {
+    expect(sanitizeArtifactSegment("a//b")).toBe("a-b");
+    expect(sanitizeArtifactSegment("a / b")).toBe("a-b");
+    expect(sanitizeArtifactSegment("my workspace: *special*")).toBe(
+      "my-workspace-special",
+    );
+  });
+
+  it("trims leading and trailing hyphens", () => {
+    expect(sanitizeArtifactSegment("/leading")).toBe("leading");
+    expect(sanitizeArtifactSegment("trailing/")).toBe("trailing");
+    expect(sanitizeArtifactSegment("/both/")).toBe("both");
   });
 });
 

@@ -4678,8 +4678,10 @@ async function tryUploadFullReport(params) {
       mode: "gfm",
       context: params.repoContext
     });
-    const htmlPage = buildHtmlPage(htmlFragment, params.artifactName);
-    const filename = `${params.artifactName}.html`;
+    const dotIndex = params.artifactName.lastIndexOf(".");
+    const pageTitle = dotIndex > 0 ? params.artifactName.slice(0, dotIndex) : params.artifactName;
+    const htmlPage = buildHtmlPage(htmlFragment, pageTitle);
+    const filename = params.artifactName;
     const serverUrl = params.env["GITHUB_SERVER_URL"];
     const uploader = createArtifactUploader({
       runtimeToken,
@@ -4777,8 +4779,9 @@ async function run(env = process.env, deps) {
     const shouldUpload = wasTruncated || inputs.alwaysUploadReport;
     let artifactUrl;
     if (shouldUpload) {
-      const opLabel = operation ?? "report";
-      const artifactName = inputs.workspace ? `${inputs.workspace}-${opLabel}` : opLabel;
+      const workspacePart = inputs.workspace ? `${sanitizeArtifactSegment(inputs.workspace)}-` : "";
+      const opPart = operation !== void 0 ? `${operation}-` : "";
+      const artifactName = `${workspacePart}${opPart}report.html`;
       artifactUrl = await tryUpload({
         fullMarkdown,
         renderMarkdown: client.renderMarkdown.bind(client),
@@ -4821,10 +4824,14 @@ async function run(env = process.env, deps) {
     exit(1);
   }
 }
+function sanitizeArtifactSegment(value) {
+  return value.replace(/[^A-Za-z0-9._-]/g, "-").replace(/-{2,}/g, "-").replace(/^-+|-+$/g, "");
+}
 if (import.meta.url === `file://${process.argv[1] ?? ""}` || import.meta.url.endsWith(process.argv[1] ?? "")) {
   void run();
 }
 export {
-  run
+  run,
+  sanitizeArtifactSegment
 };
 //# sourceMappingURL=index.js.map

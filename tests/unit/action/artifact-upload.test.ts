@@ -73,7 +73,7 @@ function baseParams(overrides: Partial<TryUploadParams> = {}): TryUploadParams {
     renderMarkdown: fakeRenderMarkdown(),
     env: baseEnv(),
     repoContext: "owner/repo",
-    artifactName: "cluster-plan",
+    artifactName: "cluster-plan-report.html",
     logger: nullLogger(),
     deps: {
       transport: sequenceTransport(),
@@ -249,6 +249,104 @@ describe("tryUploadFullReport", () => {
 
     expect(url).toBeDefined();
     expect(capturedText).toBe("# Full Report Content");
+  });
+
+  it("strips .html extension from the HTML page <title>", async () => {
+    let blobBody = "";
+    let callCount = 0;
+    const capturingTransport: ArtifactTransport = (
+      _method,
+      _url,
+      _headers,
+      body,
+    ) => {
+      callCount++;
+      if (callCount === 1) {
+        return Promise.resolve({
+          status: 200,
+          headers: {},
+          body: JSON.stringify({
+            ok: true,
+            signed_upload_url: "https://blob.example.com/upload?sig=test",
+          }),
+        });
+      }
+      if (callCount === 2) {
+        blobBody = body ?? "";
+        return Promise.resolve({ status: 201, headers: {}, body: "" });
+      }
+      return Promise.resolve({
+        status: 200,
+        headers: {},
+        body: JSON.stringify({ ok: true, artifact_id: "1" }),
+      });
+    };
+
+    await tryUploadFullReport(
+      baseParams({
+        artifactName: "cluster-plan-report.html",
+        deps: {
+          transport: capturingTransport,
+          sleep: async () => {
+            /* no-op */
+          },
+        },
+      }),
+    );
+
+    expect(blobBody).toContain("<title>cluster-plan-report</title>");
+    expect(blobBody).not.toContain("<title>cluster-plan-report.html</title>");
+  });
+
+  it("sends text/html Content-Type for .html artifact name", async () => {
+    const createArtifactBodies: string[] = [];
+    let callCount = 0;
+    const capturingTransport: ArtifactTransport = (
+      _method,
+      _url,
+      _headers,
+      body,
+    ) => {
+      callCount++;
+      if (callCount === 1) {
+        createArtifactBodies.push(body ?? "");
+        return Promise.resolve({
+          status: 200,
+          headers: {},
+          body: JSON.stringify({
+            ok: true,
+            signed_upload_url: "https://blob.example.com/upload?sig=test",
+          }),
+        });
+      }
+      if (callCount === 2) {
+        return Promise.resolve({ status: 201, headers: {}, body: "" });
+      }
+      return Promise.resolve({
+        status: 200,
+        headers: {},
+        body: JSON.stringify({ ok: true, artifact_id: "1" }),
+      });
+    };
+
+    await tryUploadFullReport(
+      baseParams({
+        artifactName: "cluster-plan-report.html",
+        deps: {
+          transport: capturingTransport,
+          sleep: async () => {
+            /* no-op */
+          },
+        },
+      }),
+    );
+
+    expect(createArtifactBodies).toHaveLength(1);
+    const parsed = JSON.parse(createArtifactBodies[0] ?? "{}") as Record<
+      string,
+      unknown
+    >;
+    expect(parsed["mime_type"]).toBe("text/html");
   });
 
   it("passes repoContext to renderMarkdown", async () => {

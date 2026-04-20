@@ -182,10 +182,11 @@ export async function run(
     let artifactUrl: string | undefined;
 
     if (shouldUpload) {
-      const opLabel = operation ?? "report";
-      const artifactName = inputs.workspace
-        ? `${inputs.workspace}-${opLabel}`
-        : opLabel;
+      const workspacePart = inputs.workspace
+        ? `${sanitizeArtifactSegment(inputs.workspace)}-`
+        : "";
+      const opPart = operation !== undefined ? `${operation}-` : "";
+      const artifactName = `${workspacePart}${opPart}report.html`;
 
       artifactUrl = await tryUpload({
         fullMarkdown,
@@ -234,6 +235,28 @@ export async function run(
     logger.error(message);
     exit(1);
   }
+}
+
+// ---------------------------------------------------------------------------
+// Artifact name helpers
+// ---------------------------------------------------------------------------
+
+/**
+ * Sanitize a workspace name for use as a segment in an artifact filename.
+ *
+ * GitHub artifact names must not contain characters that are illegal in URLs
+ * or on common filesystems (`/`, `\`, `:`, `*`, `?`, `"`, `<`, `>`, `|`).
+ * The auto-derived workspace (`GITHUB_WORKFLOW/GITHUB_JOB`) contains `/`,
+ * and user-provided workspace values may contain other special characters.
+ *
+ * Replaces every character outside `[A-Za-z0-9._-]` with `-`, collapses
+ * consecutive hyphens to a single one, and trims leading/trailing hyphens.
+ */
+export function sanitizeArtifactSegment(value: string): string {
+  return value
+    .replace(/[^A-Za-z0-9._-]/g, "-")
+    .replace(/-{2,}/g, "-")
+    .replace(/^-+|-+$/g, "");
 }
 
 // ---------------------------------------------------------------------------
