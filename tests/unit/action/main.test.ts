@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, afterEach } from "vitest";
-import { run } from "../../../src/action/main.js";
+import { run, sanitizeArtifactSegment } from "../../../src/action/main.js";
 import { formatTimestamp } from "../../../src/comment/footer.js";
 import type { Env } from "../../../src/env/index.js";
 import type {
@@ -543,7 +543,7 @@ describe("run — artifact naming", () => {
     expect(name).toBe("staging-report.html");
   });
 
-  it("auto-derived workspace + plan operation → {workflow}/{job}-plan-report.html", async () => {
+  it("auto-derived workspace + plan operation → sanitized name without /", async () => {
     const name = await captureArtifactName(
       baseEnv({
         GITHUB_WORKFLOW: "Deploy",
@@ -552,10 +552,10 @@ describe("run — artifact naming", () => {
         "INPUT_ALWAYS-UPLOAD-REPORT": "true",
       }),
     );
-    expect(name).toBe("Deploy/terraform-plan-report.html");
+    expect(name).toBe("Deploy-terraform-plan-report.html");
   });
 
-  it("auto-derived workspace + no operation → {workflow}/{job}-report.html", async () => {
+  it("auto-derived workspace + no operation → sanitized name without /", async () => {
     const name = await captureArtifactName(
       baseEnv({
         GITHUB_WORKFLOW: "Deploy",
@@ -563,7 +563,20 @@ describe("run — artifact naming", () => {
         "INPUT_ALWAYS-UPLOAD-REPORT": "true",
       }),
     );
-    expect(name).toBe("Deploy/terraform-report.html");
+    expect(name).toBe("Deploy-terraform-report.html");
+  });
+
+  it("workspace with special chars is sanitized in artifact name", async () => {
+    const name = await captureArtifactName(
+      baseEnv({
+        INPUT_WORKSPACE: "my workspace: *special*",
+        INPUT_STEPS: stepsWithOp("plan"),
+        "INPUT_ALWAYS-UPLOAD-REPORT": "true",
+      }),
+    );
+    // / \ : * ? " < > | and spaces must not appear in the artifact name
+    expect(name).not.toMatch(/[/\\:*?"<>| ]/);
+    expect(name).toBe("my-workspace-special-plan-report.html");
   });
 
   it("workspace is included in the dedup marker", async () => {
@@ -583,6 +596,50 @@ describe("run — artifact naming", () => {
     );
 
     expect(postedBody).toContain('<!-- tf-report-action:"staging" -->');
+  });
+});
+
+// ---------------------------------------------------------------------------
+// sanitizeArtifactSegment
+// ---------------------------------------------------------------------------
+
+describe("sanitizeArtifactSegment", () => {
+  it("passes through safe characters unchanged", () => {
+    expect(sanitizeArtifactSegment("cluster-plan")).toBe("cluster-plan");
+    expect(sanitizeArtifactSegment("my_workspace.v2")).toBe("my_workspace.v2");
+  });
+
+  it("replaces / with -", () => {
+    expect(sanitizeArtifactSegment("Deploy/terraform")).toBe(
+      "Deploy-terraform",
+    );
+    expect(sanitizeArtifactSegment("CI/plan")).toBe("CI-plan");
+  });
+
+  it("replaces backslash with -", () => {
+    expect(sanitizeArtifactSegment("windows\\path")).toBe("windows-path");
+  });
+
+  it('replaces : * ? " < > | with -', () => {
+    expect(sanitizeArtifactSegment('a:b*c?d"e<f>g|h')).toBe("a-b-c-d-e-f-g-h");
+  });
+
+  it("replaces spaces with -", () => {
+    expect(sanitizeArtifactSegment("my workspace")).toBe("my-workspace");
+  });
+
+  it("collapses consecutive special characters to a single -", () => {
+    expect(sanitizeArtifactSegment("a//b")).toBe("a-b");
+    expect(sanitizeArtifactSegment("a / b")).toBe("a-b");
+    expect(sanitizeArtifactSegment("my workspace: *special*")).toBe(
+      "my-workspace-special",
+    );
+  });
+
+  it("trims leading and trailing hyphens", () => {
+    expect(sanitizeArtifactSegment("/leading")).toBe("leading");
+    expect(sanitizeArtifactSegment("trailing/")).toBe("trailing");
+    expect(sanitizeArtifactSegment("/both/")).toBe("both");
   });
 });
 

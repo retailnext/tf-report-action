@@ -4779,7 +4779,7 @@ async function run(env = process.env, deps) {
     const shouldUpload = wasTruncated || inputs.alwaysUploadReport;
     let artifactUrl;
     if (shouldUpload) {
-      const workspacePart = inputs.workspace ? `${inputs.workspace}-` : "";
+      const workspacePart = inputs.workspace ? `${sanitizeArtifactSegment(inputs.workspace)}-` : "";
       const opPart = operation !== void 0 ? `${operation}-` : "";
       const artifactName = `${workspacePart}${opPart}report.html`;
       artifactUrl = await tryUpload({
@@ -4824,10 +4824,14 @@ async function run(env = process.env, deps) {
     exit(1);
   }
 }
+function sanitizeArtifactSegment(value) {
+  return value.replace(/[^A-Za-z0-9._-]/g, "-").replace(/-{2,}/g, "-").replace(/^-+|-+$/g, "");
+}
 if (import.meta.url === `file://${process.argv[1] ?? ""}` || import.meta.url.endsWith(process.argv[1] ?? "")) {
   void run();
 }
 export {
-  run
+  run,
+  sanitizeArtifactSegment
 };
 //# sourceMappingURL=index.js.map
