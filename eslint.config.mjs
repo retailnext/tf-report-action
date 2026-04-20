@@ -80,7 +80,7 @@ export default tseslint.config(
     },
   },
   {
-    // The action layer may only import from entry points, model, github, env,
+    // The action layer may only import from pipelines, model, github, env,
     // http, logger, inputs, and comment. It must not reach into internal
     // library modules.
     files: ["src/action/**/*.ts"],
@@ -103,9 +103,10 @@ export default tseslint.config(
                 "../steps/*",
                 "../jsonl-scanner/*",
                 "../tfjson/*",
+                "../drift-filter/*",
               ],
               message:
-                "The action layer may only import from src/index.js, src/model/, src/github/, src/env/, src/http/, src/logger/, src/inputs/, and src/comment/.",
+                "The action layer may only import from src/pipelines/, src/model/, src/github/, src/env/, src/http/, src/logger/, src/inputs/, and src/comment/.",
             },
           ],
         },

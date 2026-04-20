@@ -6,7 +6,7 @@
 as PR comments or status issues. It converts plan and apply outputs into rich Markdown
 with attribute-level diffs, module grouping, and tiered degradation.
 
-The rendering engine provides three internal entry points:
+The rendering engine provides three internal pipeline functions (in `src/pipelines/`):
 
 - `planToMarkdown(json, options?)` — converts plan JSON (from `show -json <planfile>`)
   into a plan report
@@ -120,12 +120,12 @@ each other**.
 | -------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `src/compose/` | Budget-aware progressive enhancement assembly. Renders categories at progressive tiers (flat listing → compact → attrs → full diffs) within an output size limit. Notice builders for truncation/logs/artifact. |
 
-### Layer 5 — Entry points and comment construction
+### Layer 5 — Pipelines and comment construction
 
-| Module         | Responsibility                                                                                                                                                                                           |
-| -------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `src/index.ts` | Rendering API: `planToMarkdown`, `applyToMarkdown`, `reportFromSteps`. Three pipelines all following parse → build → render (→ compose).                                                                 |
-| `src/comment/` | Comment structure: footer, marker, body assembly. Everything about how the final GitHub comment is constructed that does NOT require GitHub API calls. Pure functions operating on strings and env vars. |
+| Module           | Responsibility                                                                                                                                                                                                                                              |
+| ---------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `src/pipelines/` | Three end-to-end report generation pipelines: `planToMarkdown` (`plan.ts`), `applyToMarkdown` (`apply.ts`), `reportFromSteps` (`steps.ts`). Each follows parse → build → render (→ compose). No barrel — consumers import from the specific file they need. |
+| `src/comment/`   | Comment structure: footer, marker, body assembly. Everything about how the final GitHub comment is constructed that does NOT require GitHub API calls. Pure functions operating on strings and env vars.                                                    |
 
 ### Layer 6 — Action (depends on Layers 0–5)
 
@@ -153,8 +153,8 @@ each other**.
 | `renderer/`      | `diff/`, `raw-formatter/`                                                              |
 | `compose/`       | `renderer/`, `diff/`                                                                   |
 | `comment/`       | `env/`, `compose/`                                                                     |
-| `index.ts`       | `parser/`, `builder/`, `renderer/`, `compose/`, `steps/`, `env/`                       |
-| `action/`        | `index.ts`, `model/`, `github/`, `env/`, `http/`, `logger/`, `inputs/`, `comment/`     |
+| `pipelines/`     | `parser/`, `builder/`, `renderer/`, `compose/`, `steps/`, `env/`                       |
+| `action/`        | `pipelines/`, `model/`, `github/`, `env/`, `http/`, `logger/`, `inputs/`, `comment/`   |
 
 **Additional constraints:**
 
@@ -177,6 +177,16 @@ each other**.
 colocated. Shared consumers and shared pipeline flow are not justifications
 for colocation. The **only** valid reason for code to be in the same file or
 directory is that it addresses the **same conceptual responsibility**.
+
+**Antipattern example (do not do this):** A function is currently only called
+from `src/action/`. The reasoning "it's used by the action, so put it in
+`src/action/`" is the exact colocation-by-consumer error this rule prohibits.
+`src/action/` has a single stated responsibility (guarded `main()`, GitHub API
+orchestration, DI wiring, artifact upload). A function that orchestrates the
+parse→build→render→compose pipeline does not belong there — it belongs in
+`src/pipelines/`, which has "pipeline orchestration" as its stated
+responsibility. Always check the stated responsibility of the target directory
+before adding code, and only add code if the new concern matches it exactly.
 
 ### Integration-Excluded Code Rule
 
@@ -223,6 +233,13 @@ unrelated responsibilities is.
   It is **ALWAYS WRONG** to treat any internal interface as important or to
   use backwards compatibility as a reason to preserve dead code, deprecated
   aliases, or suboptimal designs.
+- **No exports from `src/` root files**: Root-level files directly under `src/`
+  (i.e., `src/*.ts`) must contain **no `export` statements**. There is no
+  library API. The bundle entry point is `src/action/main.ts` (via esbuild).
+  All shared code lives in named modules (`src/<module>/`). Callers import
+  directly from the module that owns the code — never from a root-level
+  convenience hub. This is enforced by a governance test
+  (`tests/unit/governance/no-src-root-exports.test.ts`).
 
 ### New Module Checklist
 

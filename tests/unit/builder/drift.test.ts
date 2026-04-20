@@ -1,6 +1,10 @@
 import { describe, it, expect } from "vitest";
 import { buildDriftChanges } from "../../../src/builder/resources.js";
 import { buildReport } from "../../../src/builder/index.js";
+import {
+  DriftRuleRegistry,
+  type DriftRule,
+} from "../../../src/drift-filter/registry.js";
 import type { Plan } from "../../../src/tfjson/plan.js";
 import type { ResourceChange as TFResourceChange } from "../../../src/tfjson/resource.js";
 
@@ -29,6 +33,11 @@ function makeDriftEntry(
     },
     ...overrides,
   } as TFResourceChange;
+}
+
+/** A registry containing a single rule. */
+function registryWith(rule: DriftRule): DriftRuleRegistry {
+  return new DriftRuleRegistry().register(rule);
 }
 
 describe("buildDriftChanges", () => {
@@ -67,7 +76,7 @@ describe("buildDriftChanges", () => {
     expect(result[0]!.action).toBe("update");
   });
 
-  it("skips data sources in drift entries", () => {
+  it("skips data sources in drift entries via default registry", () => {
     const plan = basePlan([
       makeDriftEntry({
         address: "data.aws_ami.latest",
@@ -79,6 +88,48 @@ describe("buildDriftChanges", () => {
 
     const result = buildDriftChanges(plan, {});
     expect(result).toHaveLength(0);
+  });
+
+  it("suppresses drift when injected registry rule matches", () => {
+    const suppressAll: DriftRule = () => true;
+    const plan = basePlan([
+      makeDriftEntry({
+        change: {
+          actions: ["update"],
+          before: { value: "old" },
+          after: { value: "new" },
+          before_sensitive: false,
+          after_sensitive: false,
+          after_unknown: false,
+        },
+      }),
+    ]);
+
+    const result = buildDriftChanges(plan, {
+      driftRuleRegistry: registryWith(suppressAll),
+    });
+    expect(result).toHaveLength(0);
+  });
+
+  it("keeps drift when injected registry rule does not match", () => {
+    const suppressNone: DriftRule = () => false;
+    const plan = basePlan([
+      makeDriftEntry({
+        change: {
+          actions: ["update"],
+          before: { value: "old" },
+          after: { value: "new" },
+          before_sensitive: false,
+          after_sensitive: false,
+          after_unknown: false,
+        },
+      }),
+    ]);
+
+    const result = buildDriftChanges(plan, {
+      driftRuleRegistry: registryWith(suppressNone),
+    });
+    expect(result).toHaveLength(1);
   });
 });
 

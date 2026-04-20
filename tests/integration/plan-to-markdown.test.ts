@@ -1,6 +1,7 @@
 import { describe, it, expect, beforeAll } from "vitest";
-import { planToMarkdown } from "../../src/index.js";
-import type { Options } from "../../src/index.js";
+import { planToMarkdown } from "../../src/pipelines/plan.js";
+import type { BuildOptions } from "../../src/builder/options.js";
+import type { RenderOptions } from "../../src/model/render-options.js";
 import {
   discoverPlanFixtures,
   assertCorrectToolName,
@@ -23,7 +24,10 @@ beforeAll(() => {
  * Option variants to run for every fixture.
  * Each variant produces a separate snapshot so output differences per option are tracked.
  */
-const OPTION_VARIANTS: { name: string; options: Options }[] = [
+const OPTION_VARIANTS: {
+  name: string;
+  options: BuildOptions & RenderOptions;
+}[] = [
   { name: "default", options: {} },
   {
     name: "showUnchangedAttributes",

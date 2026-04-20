@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeAll } from "vitest";
-import { reportFromSteps } from "../../src/index.js";
-import type { ReportOptions } from "../../src/index.js";
+import { reportFromSteps } from "../../src/pipelines/steps.js";
+import type { ReportOptions } from "../../src/builder/report-from-steps.js";
 import {
   discoverStepsFixtures,
   discoverPlanStepsFixtures,

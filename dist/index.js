@@ -1,802 +1,3 @@
-// src/parser/plan.ts
-function parsePlan(json) {
-  let parsed;
-  try {
-    parsed = JSON.parse(json);
-  } catch {
-    throw new Error("Failed to parse plan JSON: input is not valid JSON");
-  }
-  if (typeof parsed !== "object" || parsed === null || Array.isArray(parsed)) {
-    throw new Error("Plan JSON must be a JSON object");
-  }
-  const obj = parsed;
-  const formatVersion = obj["format_version"];
-  if (typeof formatVersion !== "string") {
-    throw new Error("Plan JSON is missing required field: format_version");
-  }
-  const majorStr = formatVersion.split(".")[0] ?? "0";
-  const major = parseInt(majorStr, 10);
-  if (isNaN(major) || major > 1) {
-    throw new Error(
-      `Unsupported plan format_version: ${formatVersion} (major version ${String(major)} > 1)`
-    );
-  }
-  return parsed;
-}
-
-// src/parser/state.ts
-function parseState(json) {
-  let parsed;
-  try {
-    parsed = JSON.parse(json);
-  } catch {
-    throw new Error("Failed to parse state JSON: input is not valid JSON");
-  }
-  if (typeof parsed !== "object" || parsed === null || Array.isArray(parsed)) {
-    throw new Error("State JSON must be a JSON object");
-  }
-  const obj = parsed;
-  const version = obj["version"];
-  if (typeof version !== "number") {
-    throw new Error("State JSON is missing required field: version");
-  }
-  if (version > 4) {
-    throw new Error(
-      `Unsupported state version: ${String(version)} (expected <= 4)`
-    );
-  }
-  return parsed;
-}
-
-// src/parser/validate-output.ts
-function parseValidateOutput(json) {
-  let parsed;
-  try {
-    parsed = JSON.parse(json);
-  } catch {
-    throw new Error("Failed to parse validate output: input is not valid JSON");
-  }
-  if (typeof parsed !== "object" || parsed === null || Array.isArray(parsed)) {
-    throw new Error("Validate output must be a JSON object");
-  }
-  const obj = parsed;
-  const formatVersion = obj["format_version"];
-  if (typeof formatVersion !== "string") {
-    throw new Error(
-      "Validate output is missing required field: format_version"
-    );
-  }
-  const majorStr = formatVersion.split(".")[0] ?? "0";
-  const major = parseInt(majorStr, 10);
-  if (isNaN(major) || major > 1) {
-    throw new Error(
-      `Unsupported validate format_version: ${formatVersion} (major version ${String(major)} > 1)`
-    );
-  }
-  if (typeof obj["valid"] !== "boolean") {
-    throw new Error(
-      "Validate output is missing required field: valid (boolean)"
-    );
-  }
-  if (!Array.isArray(obj["diagnostics"])) {
-    throw new Error(
-      "Validate output is missing required field: diagnostics (array)"
-    );
-  }
-  return parsed;
-}
-
-// src/parser/detect-tool.ts
-function detectToolFromPlan(plan) {
-  if (plan.applyable !== void 0) return "terraform";
-  if (plan.timestamp !== void 0) return "tofu";
-  const version = plan.terraform_version;
-  if (version !== void 0) {
-    const lower = version.toLowerCase();
-    if (lower.includes("tofu")) return "tofu";
-  }
-  return void 0;
-}
-function detectToolFromOutput(content) {
-  if (content === void 0 || content.length === 0) return void 0;
-  const versionResult = detectFromVersionMessage(content);
-  if (versionResult !== void 0) return versionResult;
-  return detectFromRawText(content);
-}
-function detectFromVersionMessage(content) {
-  const lines = content.split("\n", 5);
-  for (const line of lines) {
-    const trimmed = line.trim();
-    if (trimmed.length === 0 || !trimmed.startsWith("{")) continue;
-    let parsed;
-    try {
-      parsed = JSON.parse(trimmed);
-    } catch {
-      continue;
-    }
-    if (typeof parsed !== "object" || parsed === null || Array.isArray(parsed)) {
-      continue;
-    }
-    const obj = parsed;
-    if (obj["type"] !== "version") continue;
-    if ("tofu" in obj) return "tofu";
-    if ("terraform" in obj) return "terraform";
-  }
-  return void 0;
-}
-function detectFromRawText(content) {
-  const sample = content.slice(0, 4096).toLowerCase();
-  if (sample.includes("opentofu")) return "tofu";
-  if (sample.includes("terraform")) return "terraform";
-  return void 0;
-}
-
-// src/builder/action.ts
-function determineAction(actions) {
-  const [first, second] = actions;
-  if (second !== void 0) {
-    return "replace";
-  }
-  switch (first) {
-    case "create":
-      return "create";
-    case "delete":
-      return "delete";
-    case "update":
-      return "update";
-    case "no-op":
-      return "no-op";
-    case "read":
-      return "read";
-    case "forget":
-      return "forget";
-  }
-  return "unknown";
-}
-
-// src/flattener/index.ts
-function flatten(value) {
-  const result = /* @__PURE__ */ new Map();
-  flattenInto(value, "", result);
-  return result;
-}
-function flattenInto(value, prefix, result) {
-  if (value === null) {
-    result.set(prefix, null);
-  } else if (typeof value === "string") {
-    result.set(prefix, value);
-  } else if (typeof value === "number") {
-    result.set(prefix, String(value));
-  } else if (typeof value === "boolean") {
-    result.set(prefix, value ? "true" : "false");
-  } else if (Array.isArray(value)) {
-    for (let i = 0; i < value.length; i++) {
-      const child = value[i];
-      if (child !== void 0) {
-        flattenInto(
-          child,
-          prefix === "" ? `[${String(i)}]` : `${prefix}[${String(i)}]`,
-          result
-        );
-      }
-    }
-  } else {
-    for (const [key, child] of Object.entries(value)) {
-      if (child !== void 0) {
-        flattenInto(child, prefix === "" ? key : `${prefix}.${key}`, result);
-      }
-    }
-  }
-}
-
-// src/sensitivity/index.ts
-function getHierarchicalPaths(key) {
-  const paths = [];
-  const seen = /* @__PURE__ */ new Set();
-  let current = key;
-  while (current.length > 0) {
-    if (!seen.has(current)) {
-      seen.add(current);
-      paths.push(current);
-    }
-    const dotIdx = current.lastIndexOf(".");
-    const bracketIdx = current.lastIndexOf("[");
-    if (dotIdx > bracketIdx && dotIdx !== -1) {
-      current = current.slice(0, dotIdx);
-    } else if (bracketIdx !== -1) {
-      current = current.slice(0, bracketIdx);
-    } else {
-      break;
-    }
-  }
-  return paths;
-}
-function isSensitive(key, beforeSensitive, afterSensitive) {
-  if (beforeSensitive.get("") === "true" || afterSensitive.get("") === "true") {
-    return true;
-  }
-  for (const path of getHierarchicalPaths(key)) {
-    if (beforeSensitive.get(path) === "true" || afterSensitive.get(path) === "true") {
-      return true;
-    }
-  }
-  return false;
-}
-
-// src/model/sentinels.ts
-var SENSITIVE_MASK = "(sensitive)";
-var KNOWN_AFTER_APPLY = "(known after apply)";
-var VALUE_NOT_IN_PLAN = "(value not in plan)";
-
-// src/builder/attributes.ts
-var LARGE_LINE_THRESHOLD = 3;
-function shadowToMap(shadow) {
-  if (shadow === void 0) return /* @__PURE__ */ new Map();
-  if (typeof shadow === "boolean") {
-    const m = /* @__PURE__ */ new Map();
-    m.set("", shadow ? "true" : "false");
-    return m;
-  }
-  return flatten(shadow);
-}
-function isUnknownAfterApply(key, unknownMap) {
-  if (unknownMap.get("") === "true") return true;
-  return unknownMap.get(key) === "true";
-}
-function isLargeValue(value) {
-  if (value === null) return false;
-  const trimmed = value.trim();
-  if (trimmed.startsWith("{") || trimmed.startsWith("[") || trimmed.startsWith("<")) {
-    return true;
-  }
-  let count = 0;
-  for (const ch of value) {
-    if (ch === "\n") {
-      count++;
-      if (count > LARGE_LINE_THRESHOLD) return true;
-    }
-  }
-  return false;
-}
-function buildAttributeChanges(change, options) {
-  const before = change.before ?? null;
-  const after = change.after ?? null;
-  const beforeSensitiveMap = shadowToMap(change.before_sensitive);
-  const afterSensitiveMap = shadowToMap(change.after_sensitive);
-  const unknownMap = shadowToMap(change.after_unknown);
-  const allUnknown = unknownMap.get("") === "true";
-  const beforeFlat = before ? flatten(before) : /* @__PURE__ */ new Map();
-  const afterFlat = after ? flatten(after) : /* @__PURE__ */ new Map();
-  const flatKeys = /* @__PURE__ */ new Set();
-  for (const [k] of beforeFlat) flatKeys.add(k);
-  for (const [k] of afterFlat) flatKeys.add(k);
-  for (const [k, v] of unknownMap) {
-    if (k !== "" && v === "true") flatKeys.add(k);
-  }
-  const result = [];
-  for (const key of flatKeys) {
-    const sensitive = isSensitive(key, beforeSensitiveMap, afterSensitiveMap);
-    let beforeVal;
-    let afterVal;
-    if (sensitive) {
-      beforeVal = beforeFlat.has(key) ? SENSITIVE_MASK : null;
-      afterVal = afterFlat.has(key) || isUnknownAfterApply(key, unknownMap) ? SENSITIVE_MASK : null;
-    } else {
-      beforeVal = beforeFlat.has(key) ? beforeFlat.get(key) ?? null : null;
-      if (allUnknown || isUnknownAfterApply(key, unknownMap)) {
-        afterVal = KNOWN_AFTER_APPLY;
-      } else {
-        afterVal = afterFlat.has(key) ? afterFlat.get(key) ?? null : null;
-      }
-    }
-    const isKnownAfterApply = !sensitive && (allUnknown || isUnknownAfterApply(key, unknownMap));
-    const hasSensitiveValue = sensitive && (beforeFlat.has(key) || afterFlat.has(key));
-    if (!options.showUnchangedAttributes && beforeVal === afterVal && !isKnownAfterApply && !hasSensitiveValue) {
-      continue;
-    }
-    const large = isLargeValue(sensitive ? null : beforeVal) || isLargeValue(sensitive || isKnownAfterApply ? null : afterVal);
-    result.push({
-      name: key,
-      before: beforeVal,
-      after: afterVal,
-      isSensitive: sensitive,
-      isLarge: large,
-      isKnownAfterApply
-    });
-  }
-  result.sort((a, b) => a.name.localeCompare(b.name));
-  return result;
-}
-
-// src/builder/resources.ts
-function refineAction(base, rc) {
-  if (base !== "no-op") return base;
-  if (rc.previous_address) return "move";
-  if (rc.change.importing) return "import";
-  return "no-op";
-}
-function buildResourceChanges(plan, options) {
-  const resourceChanges = plan.resource_changes ?? [];
-  const result = [];
-  for (const rc of resourceChanges) {
-    if (shouldSkip(rc)) continue;
-    const action = refineAction(determineAction(rc.change.actions), rc);
-    if (action === "no-op") continue;
-    const address = rc.address ?? `${rc.type ?? "unknown"}.${rc.name ?? "unknown"}`;
-    const attributes = buildAttributeChanges(rc.change, options);
-    const allUnknownAfterApply = isAllUnknownAfterApply(rc, attributes);
-    result.push({
-      address,
-      type: rc.type ?? "unknown",
-      action,
-      actionReason: rc.action_reason ?? null,
-      attributes,
-      hasAttributeDetail: true,
-      importId: rc.change.importing?.id ?? null,
-      movedFromAddress: rc.previous_address ?? null,
-      allUnknownAfterApply
-    });
-  }
-  return result;
-}
-function buildDriftChanges(plan, options) {
-  const driftChanges = plan.resource_drift ?? [];
-  const result = [];
-  for (const rc of driftChanges) {
-    if (shouldSkip(rc)) continue;
-    const action = refineAction(determineAction(rc.change.actions), rc);
-    const address = rc.address ?? `${rc.type ?? "unknown"}.${rc.name ?? "unknown"}`;
-    const attributes = buildAttributeChanges(rc.change, options);
-    const allUnknownAfterApply = isAllUnknownAfterApply(rc, attributes);
-    result.push({
-      address,
-      type: rc.type ?? "unknown",
-      action,
-      actionReason: rc.action_reason ?? null,
-      attributes,
-      hasAttributeDetail: true,
-      importId: rc.change.importing?.id ?? null,
-      movedFromAddress: rc.previous_address ?? null,
-      allUnknownAfterApply
-    });
-  }
-  return result;
-}
-function shouldSkip(rc) {
-  if (rc.mode === "data") {
-    return true;
-  }
-  return false;
-}
-function isAllUnknownAfterApply(rc, attributes) {
-  if (rc.change.after_unknown === true) return true;
-  if (attributes.length > 0 && attributes.every((a) => a.isKnownAfterApply)) {
-    return true;
-  }
-  return false;
-}
-function buildResourcesFromScan(changes) {
-  const result = [];
-  for (const change of changes) {
-    if (change.action === "no-op") continue;
-    result.push({
-      address: change.address,
-      type: change.resourceType,
-      action: change.action,
-      actionReason: change.reason ?? null,
-      attributes: [],
-      hasAttributeDetail: false,
-      importId: null,
-      movedFromAddress: null,
-      allUnknownAfterApply: false
-    });
-  }
-  return result;
-}
-
-// src/builder/summary.ts
-var SUMMARY_ACTIONS = [
-  "create",
-  "update",
-  "replace",
-  "delete",
-  "move",
-  "import",
-  "forget"
-];
-function buildSummary(resources) {
-  return {
-    actions: buildActionGroups(resources, SUMMARY_ACTIONS),
-    failures: []
-  };
-}
-function buildApplySummary(resources, failedAddresses) {
-  const succeeded = resources.filter((r) => !failedAddresses.has(r.address));
-  const failed = resources.filter((r) => failedAddresses.has(r.address));
-  return {
-    actions: buildActionGroups(succeeded, SUMMARY_ACTIONS),
-    failures: buildActionGroups(failed, SUMMARY_ACTIONS)
-  };
-}
-function buildActionGroups(resources, actionOrder) {
-  const buckets = /* @__PURE__ */ new Map();
-  const actionSet = new Set(actionOrder);
-  for (const r of resources) {
-    if (!actionSet.has(r.action)) continue;
-    let typeCounts = buckets.get(r.action);
-    if (!typeCounts) {
-      typeCounts = /* @__PURE__ */ new Map();
-      buckets.set(r.action, typeCounts);
-    }
-    typeCounts.set(r.type, (typeCounts.get(r.type) ?? 0) + 1);
-  }
-  const groups = [];
-  for (const action of actionOrder) {
-    const typeCounts = buckets.get(action);
-    if (!typeCounts) continue;
-    const resourceTypes = [...typeCounts.entries()].map(([type, count]) => ({ type, count })).sort((a, b) => b.count - a.count || a.type.localeCompare(b.type));
-    const total = resourceTypes.reduce((sum, rt) => sum + rt.count, 0);
-    groups.push({ action, resourceTypes, total });
-  }
-  return groups;
-}
-function buildSummaryFromScan(changes) {
-  return {
-    actions: buildActionGroupsFromScan(changes, SUMMARY_ACTIONS),
-    failures: []
-  };
-}
-function buildActionGroupsFromScan(changes, actionOrder) {
-  const buckets = /* @__PURE__ */ new Map();
-  const actionSet = new Set(actionOrder);
-  for (const c of changes) {
-    if (!actionSet.has(c.action)) continue;
-    let typeCounts = buckets.get(c.action);
-    if (!typeCounts) {
-      typeCounts = /* @__PURE__ */ new Map();
-      buckets.set(c.action, typeCounts);
-    }
-    typeCounts.set(c.resourceType, (typeCounts.get(c.resourceType) ?? 0) + 1);
-  }
-  const groups = [];
-  for (const action of actionOrder) {
-    const typeCounts = buckets.get(action);
-    if (!typeCounts) continue;
-    const resourceTypes = [...typeCounts.entries()].map(([type, count]) => ({ type, count })).sort((a, b) => b.count - a.count || a.type.localeCompare(b.type));
-    const total = resourceTypes.reduce((sum, rt) => sum + rt.count, 0);
-    groups.push({ action, resourceTypes, total });
-  }
-  return groups;
-}
-
-// src/builder/outputs.ts
-var LARGE_LINE_THRESHOLD2 = 3;
-function buildOutputChanges(plan) {
-  const outputChanges = plan.output_changes;
-  if (!outputChanges) return [];
-  const result = [];
-  for (const [name, change] of Object.entries(outputChanges)) {
-    const action = determineAction(change.actions);
-    if (action === "no-op") continue;
-    const isSensitive2 = change.before_sensitive === true || change.after_sensitive === true;
-    const before = isSensitive2 ? null : valueToString(change.before ?? null);
-    let after;
-    let isKnownAfterApply = false;
-    if (isSensitive2) {
-      after = null;
-    } else if (change.after_unknown === true) {
-      after = KNOWN_AFTER_APPLY;
-      isKnownAfterApply = true;
-    } else {
-      after = valueToString(change.after ?? null);
-    }
-    const isLarge = isLargeValue2(isSensitive2 ? null : before) || isLargeValue2(isSensitive2 || isKnownAfterApply ? null : after);
-    result.push({
-      name,
-      action,
-      before,
-      after,
-      isSensitive: isSensitive2,
-      isLarge,
-      isKnownAfterApply
-    });
-  }
-  return result;
-}
-function valueToString(val) {
-  if (val === null || val === void 0) return null;
-  if (typeof val === "string") return val;
-  if (typeof val === "number" || typeof val === "boolean") return String(val);
-  return JSON.stringify(val, null, 2);
-}
-function isLargeValue2(value) {
-  if (value === null) return false;
-  const trimmed = value.trim();
-  if (trimmed.startsWith("{") || trimmed.startsWith("[") || trimmed.startsWith("<")) {
-    return true;
-  }
-  let count = 0;
-  for (const ch of value) {
-    if (ch === "\n") {
-      count++;
-      if (count > LARGE_LINE_THRESHOLD2) return true;
-    }
-  }
-  return false;
-}
-
-// src/builder/index.ts
-function buildReport(plan, options = {}) {
-  const resources = buildResourceChanges(plan, options);
-  const driftResources = buildDriftChanges(plan, options);
-  const summary = buildSummary(resources);
-  const outputs = buildOutputChanges(plan);
-  return {
-    title: "",
-    issues: [],
-    steps: [],
-    warnings: [],
-    rawStdout: [],
-    operation: "plan",
-    ...plan.terraform_version !== void 0 ? { toolVersion: plan.terraform_version } : {},
-    formatVersion: plan.format_version,
-    ...plan.timestamp !== void 0 ? { timestamp: plan.timestamp } : {},
-    summary,
-    resources,
-    outputs,
-    driftResources
-  };
-}
-
-// src/builder/apply.ts
-function buildApplyReport(plan, scanResult, options = {}) {
-  const report = buildReport(plan, options);
-  const stateOnlyAddresses = extractStateOnlyAddresses(plan);
-  const appliedAddresses = /* @__PURE__ */ new Set([
-    ...scanResult.applyStatuses.map((s) => s.address),
-    ...stateOnlyAddresses.keys()
-  ]);
-  const plannedAddresses = /* @__PURE__ */ new Map();
-  for (const change of scanResult.plannedChanges) {
-    plannedAddresses.set(change.address, change.action);
-  }
-  const stateOnlyStatuses = buildStateOnlyStatuses(stateOnlyAddresses);
-  const diagnostics = scanResult.diagnostics.map((d) => ({
-    ...d,
-    source: "apply"
-  }));
-  filterPhantomResources(report, appliedAddresses);
-  replaceKnownAfterApply(report);
-  const notStartedStatuses = buildNotStartedStatuses(
-    plannedAddresses,
-    appliedAddresses
-  );
-  const allStatuses = [
-    ...scanResult.applyStatuses,
-    ...stateOnlyStatuses,
-    ...notStartedStatuses
-  ];
-  if (scanResult.outputsMessage) {
-    resolveOutputValues(report, scanResult.outputsMessage);
-  }
-  const failedAddresses = new Set(
-    scanResult.applyStatuses.filter((s) => !s.success).map((s) => s.address)
-  );
-  report.summary = buildApplySummary(report.resources ?? [], failedAddresses);
-  if (diagnostics.length > 0) {
-    report.diagnostics = diagnostics;
-  }
-  if (allStatuses.length > 0) {
-    report.applyStatuses = allStatuses;
-  }
-  report.operation = "apply";
-  if (scanResult.tool !== void 0) {
-    report.tool = scanResult.tool;
-  }
-  return report;
-}
-function extractStateOnlyAddresses(plan) {
-  const addresses = /* @__PURE__ */ new Map();
-  for (const rc of plan.resource_changes ?? []) {
-    if (rc.mode === "data") continue;
-    const actions = rc.change.actions;
-    if (actions.length !== 1) continue;
-    const action = actions[0];
-    if (action === "forget") {
-      if (rc.address) addresses.set(rc.address, "forget");
-    } else if (action === "no-op") {
-      if (rc.previous_address) {
-        if (rc.address) addresses.set(rc.address, "move");
-      } else if (rc.change.importing) {
-        if (rc.address) addresses.set(rc.address, "import");
-      }
-    }
-  }
-  return addresses;
-}
-function buildStateOnlyStatuses(stateOnlyAddresses) {
-  return [...stateOnlyAddresses.entries()].map(([address, action]) => ({
-    address,
-    action,
-    success: true
-  }));
-}
-function buildNotStartedStatuses(plannedAddresses, appliedAddresses) {
-  const notStarted = [];
-  for (const [addr, action] of plannedAddresses) {
-    if (!appliedAddresses.has(addr)) {
-      notStarted.push({
-        address: addr,
-        action,
-        success: false
-      });
-    }
-  }
-  return notStarted;
-}
-function filterPhantomResources(report, appliedAddresses) {
-  if (!report.resources) return;
-  report.resources = report.resources.filter(
-    (r) => appliedAddresses.has(r.address)
-  );
-}
-function replaceKnownAfterApply(report) {
-  for (const resource of report.resources ?? []) {
-    for (const attr of resource.attributes) {
-      if (attr.isKnownAfterApply) {
-        attr.after = VALUE_NOT_IN_PLAN;
-      }
-    }
-  }
-  for (const output of report.outputs ?? []) {
-    if (output.isKnownAfterApply) {
-      output.after = VALUE_NOT_IN_PLAN;
-    }
-  }
-}
-function resolveOutputValues(report, outputsMessage) {
-  for (const output of report.outputs ?? []) {
-    const resolved = outputsMessage.outputs[output.name];
-    if (!resolved) continue;
-    if (output.isSensitive || resolved.sensitive) continue;
-    if (output.isKnownAfterApply) {
-      const val = resolved.value;
-      if (val !== void 0 && val !== null) {
-        output.after = typeof val === "string" ? val : JSON.stringify(val, null, 2);
-      }
-    }
-  }
-}
-
-// src/builder/state-enrichment.ts
-var LARGE_LINE_THRESHOLD3 = 3;
-function enrichReportFromState(report, state) {
-  const stateResources = state.resources;
-  const hasResources = stateResources !== void 0 && stateResources.length > 0;
-  const hasOutputs = state.outputs !== void 0 && Object.keys(state.outputs).length > 0;
-  if (!hasResources && !hasOutputs) return;
-  const instanceMap = hasResources ? buildInstanceMap(stateResources) : /* @__PURE__ */ new Map();
-  let enrichedAny = false;
-  for (const resource of report.resources ?? []) {
-    if (!resource.hasAttributeDetail) continue;
-    const flat = instanceMap.get(resource.address);
-    if (flat !== void 0) {
-      for (const attr of resource.attributes) {
-        if (!attr.isKnownAfterApply) continue;
-        if (attr.isSensitive) continue;
-        if (flat.sensitiveNames.has(attr.name)) {
-          attr.isSensitive = true;
-          attr.after = SENSITIVE_MASK;
-          attr.isKnownAfterApply = false;
-          enrichedAny = true;
-        } else {
-          const resolved = resolveFromInstance(flat, attr.name);
-          if (resolved !== void 0) {
-            attr.after = resolved;
-            attr.isKnownAfterApply = false;
-            attr.isLarge = isLargeValue3(resolved);
-            enrichedAny = true;
-          }
-        }
-      }
-    }
-    resource.allUnknownAfterApply = false;
-  }
-  const stateOutputs = state.outputs;
-  if (stateOutputs !== void 0) {
-    for (const output of report.outputs ?? []) {
-      if (!output.isKnownAfterApply) continue;
-      if (output.isSensitive) continue;
-      const stateOutput = stateOutputs[output.name];
-      if (stateOutput === void 0) continue;
-      if (stateOutput.sensitive === true) {
-        output.isSensitive = true;
-        output.after = SENSITIVE_MASK;
-        output.isKnownAfterApply = false;
-        enrichedAny = true;
-      } else if (stateOutput.value !== void 0) {
-        output.after = stringifyValue(stateOutput.value);
-        output.isKnownAfterApply = false;
-        output.isLarge = isLargeValue3(output.after);
-        enrichedAny = true;
-      }
-    }
-  }
-  if (enrichedAny) {
-    report.stateEnriched = true;
-  }
-}
-function buildInstanceMap(resources) {
-  const map = /* @__PURE__ */ new Map();
-  for (const res of resources) {
-    for (const inst of res.instances ?? []) {
-      const address = buildAddress(res, inst);
-      const rawValues = inst.attributes;
-      const flatValues = rawValues !== void 0 ? flatten(rawValues) : /* @__PURE__ */ new Map();
-      const sensitiveNames = extractSensitiveNames(inst);
-      map.set(address, { rawValues, flatValues, sensitiveNames });
-    }
-  }
-  return map;
-}
-function buildAddress(res, inst) {
-  let address = "";
-  if (res.module !== void 0 && res.module !== "") {
-    address = `${res.module}.`;
-  }
-  address += `${res.type}.${res.name}`;
-  if (inst.index_key !== void 0) {
-    if (typeof inst.index_key === "number") {
-      address += `[${String(inst.index_key)}]`;
-    } else {
-      address += `["${inst.index_key}"]`;
-    }
-  }
-  return address;
-}
-function extractSensitiveNames(inst) {
-  const names = /* @__PURE__ */ new Set();
-  for (const path of inst.sensitive_attributes ?? []) {
-    const first = path[0];
-    if (first?.type === "get_attr") {
-      names.add(first.value);
-    }
-  }
-  return names;
-}
-function resolveFromInstance(inst, attrName) {
-  if (inst.rawValues !== void 0 && attrName in inst.rawValues) {
-    return stringifyValue(inst.rawValues[attrName]);
-  }
-  if (inst.flatValues.has(attrName)) {
-    return inst.flatValues.get(attrName) ?? null;
-  }
-  return void 0;
-}
-function stringifyValue(value) {
-  if (value === null) return null;
-  if (typeof value === "string") return value;
-  if (typeof value === "number" || typeof value === "boolean") {
-    return String(value);
-  }
-  return JSON.stringify(value);
-}
-function isLargeValue3(value) {
-  if (value === null) return false;
-  const trimmed = value.trim();
-  if (trimmed.startsWith("{") || trimmed.startsWith("[") || trimmed.startsWith("<")) {
-    return true;
-  }
-  let count = 0;
-  for (const ch of value) {
-    if (ch === "\n") {
-      count++;
-      if (count > LARGE_LINE_THRESHOLD3) return true;
-    }
-  }
-  return false;
-}
-
 // src/model/step-commands.ts
 function expectedCommand(tool, role) {
   const prefix = tool !== void 0 ? `${tool} ` : "";
@@ -1245,6 +446,139 @@ function applyActionLabel(action) {
   }
 }
 
+// src/parser/plan.ts
+function parsePlan(json) {
+  let parsed;
+  try {
+    parsed = JSON.parse(json);
+  } catch {
+    throw new Error("Failed to parse plan JSON: input is not valid JSON");
+  }
+  if (typeof parsed !== "object" || parsed === null || Array.isArray(parsed)) {
+    throw new Error("Plan JSON must be a JSON object");
+  }
+  const obj = parsed;
+  const formatVersion = obj["format_version"];
+  if (typeof formatVersion !== "string") {
+    throw new Error("Plan JSON is missing required field: format_version");
+  }
+  const majorStr = formatVersion.split(".")[0] ?? "0";
+  const major = parseInt(majorStr, 10);
+  if (isNaN(major) || major > 1) {
+    throw new Error(
+      `Unsupported plan format_version: ${formatVersion} (major version ${String(major)} > 1)`
+    );
+  }
+  return parsed;
+}
+
+// src/parser/state.ts
+function parseState(json) {
+  let parsed;
+  try {
+    parsed = JSON.parse(json);
+  } catch {
+    throw new Error("Failed to parse state JSON: input is not valid JSON");
+  }
+  if (typeof parsed !== "object" || parsed === null || Array.isArray(parsed)) {
+    throw new Error("State JSON must be a JSON object");
+  }
+  const obj = parsed;
+  const version = obj["version"];
+  if (typeof version !== "number") {
+    throw new Error("State JSON is missing required field: version");
+  }
+  if (version > 4) {
+    throw new Error(
+      `Unsupported state version: ${String(version)} (expected <= 4)`
+    );
+  }
+  return parsed;
+}
+
+// src/parser/validate-output.ts
+function parseValidateOutput(json) {
+  let parsed;
+  try {
+    parsed = JSON.parse(json);
+  } catch {
+    throw new Error("Failed to parse validate output: input is not valid JSON");
+  }
+  if (typeof parsed !== "object" || parsed === null || Array.isArray(parsed)) {
+    throw new Error("Validate output must be a JSON object");
+  }
+  const obj = parsed;
+  const formatVersion = obj["format_version"];
+  if (typeof formatVersion !== "string") {
+    throw new Error(
+      "Validate output is missing required field: format_version"
+    );
+  }
+  const majorStr = formatVersion.split(".")[0] ?? "0";
+  const major = parseInt(majorStr, 10);
+  if (isNaN(major) || major > 1) {
+    throw new Error(
+      `Unsupported validate format_version: ${formatVersion} (major version ${String(major)} > 1)`
+    );
+  }
+  if (typeof obj["valid"] !== "boolean") {
+    throw new Error(
+      "Validate output is missing required field: valid (boolean)"
+    );
+  }
+  if (!Array.isArray(obj["diagnostics"])) {
+    throw new Error(
+      "Validate output is missing required field: diagnostics (array)"
+    );
+  }
+  return parsed;
+}
+
+// src/parser/detect-tool.ts
+function detectToolFromPlan(plan) {
+  if (plan.applyable !== void 0) return "terraform";
+  if (plan.timestamp !== void 0) return "tofu";
+  const version = plan.terraform_version;
+  if (version !== void 0) {
+    const lower = version.toLowerCase();
+    if (lower.includes("tofu")) return "tofu";
+  }
+  return void 0;
+}
+function detectToolFromOutput(content) {
+  if (content === void 0 || content.length === 0) return void 0;
+  const versionResult = detectFromVersionMessage(content);
+  if (versionResult !== void 0) return versionResult;
+  return detectFromRawText(content);
+}
+function detectFromVersionMessage(content) {
+  const lines = content.split("\n", 5);
+  for (const line of lines) {
+    const trimmed = line.trim();
+    if (trimmed.length === 0 || !trimmed.startsWith("{")) continue;
+    let parsed;
+    try {
+      parsed = JSON.parse(trimmed);
+    } catch {
+      continue;
+    }
+    if (typeof parsed !== "object" || parsed === null || Array.isArray(parsed)) {
+      continue;
+    }
+    const obj = parsed;
+    if (obj["type"] !== "version") continue;
+    if ("tofu" in obj) return "tofu";
+    if ("terraform" in obj) return "terraform";
+  }
+  return void 0;
+}
+function detectFromRawText(content) {
+  const sample = content.slice(0, 4096).toLowerCase();
+  if (sample.includes("opentofu")) return "tofu";
+  if (sample.includes("terraform")) return "terraform";
+  return void 0;
+}
+
 // src/builder/process-helpers.ts
 function uiDiagnosticToModel(d, source) {
   const base = {
@@ -1356,6 +690,592 @@ function processValidateStep(step, stepId, report, readerOpts) {
         report.diagnostics = [...report.diagnostics ?? [], ...diagnostics];
       }
     } catch {
+    }
+  }
+}
+
+// src/builder/action.ts
+function determineAction(actions) {
+  const [first, second] = actions;
+  if (second !== void 0) {
+    return "replace";
+  }
+  switch (first) {
+    case "create":
+      return "create";
+    case "delete":
+      return "delete";
+    case "update":
+      return "update";
+    case "no-op":
+      return "no-op";
+    case "read":
+      return "read";
+    case "forget":
+      return "forget";
+  }
+  return "unknown";
+}
+
+// src/flattener/index.ts
+function flatten(value) {
+  const result = /* @__PURE__ */ new Map();
+  flattenInto(value, "", result);
+  return result;
+}
+function flattenInto(value, prefix, result) {
+  if (value === null) {
+    result.set(prefix, null);
+  } else if (typeof value === "string") {
+    result.set(prefix, value);
+  } else if (typeof value === "number") {
+    result.set(prefix, String(value));
+  } else if (typeof value === "boolean") {
+    result.set(prefix, value ? "true" : "false");
+  } else if (Array.isArray(value)) {
+    for (let i = 0; i < value.length; i++) {
+      const child = value[i];
+      if (child !== void 0) {
+        flattenInto(
+          child,
+          prefix === "" ? `[${String(i)}]` : `${prefix}[${String(i)}]`,
+          result
+        );
+      }
+    }
+  } else {
+    for (const [key, child] of Object.entries(value)) {
+      if (child !== void 0) {
+        flattenInto(child, prefix === "" ? key : `${prefix}.${key}`, result);
+      }
+    }
+  }
+}
+
+// src/sensitivity/index.ts
+function getHierarchicalPaths(key) {
+  const paths = [];
+  const seen = /* @__PURE__ */ new Set();
+  let current = key;
+  while (current.length > 0) {
+    if (!seen.has(current)) {
+      seen.add(current);
+      paths.push(current);
+    }
+    const dotIdx = current.lastIndexOf(".");
+    const bracketIdx = current.lastIndexOf("[");
+    if (dotIdx > bracketIdx && dotIdx !== -1) {
+      current = current.slice(0, dotIdx);
+    } else if (bracketIdx !== -1) {
+      current = current.slice(0, bracketIdx);
+    } else {
+      break;
+    }
+  }
+  return paths;
+}
+function isSensitive(key, beforeSensitive, afterSensitive) {
+  if (beforeSensitive.get("") === "true" || afterSensitive.get("") === "true") {
+    return true;
+  }
+  for (const path of getHierarchicalPaths(key)) {
+    if (beforeSensitive.get(path) === "true" || afterSensitive.get(path) === "true") {
+      return true;
+    }
+  }
+  return false;
+}
+
+// src/model/sentinels.ts
+var SENSITIVE_MASK = "(sensitive)";
+var KNOWN_AFTER_APPLY = "(known after apply)";
+var VALUE_NOT_IN_PLAN = "(value not in plan)";
+
+// src/builder/attributes.ts
+var LARGE_LINE_THRESHOLD = 3;
+function shadowToMap(shadow) {
+  if (shadow === void 0) return /* @__PURE__ */ new Map();
+  if (typeof shadow === "boolean") {
+    const m = /* @__PURE__ */ new Map();
+    m.set("", shadow ? "true" : "false");
+    return m;
+  }
+  return flatten(shadow);
+}
+function isUnknownAfterApply(key, unknownMap) {
+  if (unknownMap.get("") === "true") return true;
+  return unknownMap.get(key) === "true";
+}
+function isLargeValue(value) {
+  if (value === null) return false;
+  const trimmed = value.trim();
+  if (trimmed.startsWith("{") || trimmed.startsWith("[") || trimmed.startsWith("<")) {
+    return true;
+  }
+  let count = 0;
+  for (const ch of value) {
+    if (ch === "\n") {
+      count++;
+      if (count > LARGE_LINE_THRESHOLD) return true;
+    }
+  }
+  return false;
+}
+function buildAttributeChanges(change, options) {
+  const before = change.before ?? null;
+  const after = change.after ?? null;
+  const beforeSensitiveMap = shadowToMap(change.before_sensitive);
+  const afterSensitiveMap = shadowToMap(change.after_sensitive);
+  const unknownMap = shadowToMap(change.after_unknown);
+  const allUnknown = unknownMap.get("") === "true";
+  const beforeFlat = before ? flatten(before) : /* @__PURE__ */ new Map();
+  const afterFlat = after ? flatten(after) : /* @__PURE__ */ new Map();
+  const flatKeys = /* @__PURE__ */ new Set();
+  for (const [k] of beforeFlat) flatKeys.add(k);
+  for (const [k] of afterFlat) flatKeys.add(k);
+  for (const [k, v] of unknownMap) {
+    if (k !== "" && v === "true") flatKeys.add(k);
+  }
+  const result = [];
+  for (const key of flatKeys) {
+    const sensitive = isSensitive(key, beforeSensitiveMap, afterSensitiveMap);
+    let beforeVal;
+    let afterVal;
+    if (sensitive) {
+      beforeVal = beforeFlat.has(key) ? SENSITIVE_MASK : null;
+      afterVal = afterFlat.has(key) || isUnknownAfterApply(key, unknownMap) ? SENSITIVE_MASK : null;
+    } else {
+      beforeVal = beforeFlat.has(key) ? beforeFlat.get(key) ?? null : null;
+      if (allUnknown || isUnknownAfterApply(key, unknownMap)) {
+        afterVal = KNOWN_AFTER_APPLY;
+      } else {
+        afterVal = afterFlat.has(key) ? afterFlat.get(key) ?? null : null;
+      }
+    }
+    const isKnownAfterApply = !sensitive && (allUnknown || isUnknownAfterApply(key, unknownMap));
+    const hasSensitiveValue = sensitive && (beforeFlat.has(key) || afterFlat.has(key));
+    if (!options.showUnchangedAttributes && beforeVal === afterVal && !isKnownAfterApply && !hasSensitiveValue) {
+      continue;
+    }
+    const large = isLargeValue(sensitive ? null : beforeVal) || isLargeValue(sensitive || isKnownAfterApply ? null : afterVal);
+    result.push({
+      name: key,
+      before: beforeVal,
+      after: afterVal,
+      isSensitive: sensitive,
+      isLarge: large,
+      isKnownAfterApply
+    });
+  }
+  result.sort((a, b) => a.name.localeCompare(b.name));
+  return result;
+}
+
+// src/drift-filter/rules/data-source.ts
+var suppressDataSourceDrift = (_type, mode) => mode === "data";
+
+// src/drift-filter/rules/etag-only.ts
+var suppressEtagOnlyDrift = (_type, _mode, attributes) => {
+  const changed = attributes.filter((a) => a.before !== a.after);
+  return changed.length > 0 && changed.every((a) => a.name === "etag");
+};
+
+// src/drift-filter/rules/google-storage-managed-folder.ts
+var BORING_ATTRIBUTES = /* @__PURE__ */ new Set(["metageneration", "update_time"]);
+var suppressGoogleStorageManagedFolderMetaBoring = (type, _mode, attributes) => {
+  if (type !== "google_storage_managed_folder") return false;
+  const changed = attributes.filter((a) => a.before !== a.after);
+  return changed.length > 0 && changed.every((a) => BORING_ATTRIBUTES.has(a.name));
+};
+
+// src/drift-filter/registry.ts
+var DriftRuleRegistry = class {
+  rules = [];
+  /**
+   * Registers a drift suppression rule. Returns `this` for chaining.
+   */
+  register(rule) {
+    this.rules.push(rule);
+    return this;
+  }
+  /**
+   * Returns `true` if any registered rule indicates this drift entry should be
+   * suppressed from the report.
+   */
+  shouldSuppressDrift(type, mode, attributes) {
+    return this.rules.some((rule) => rule(type, mode, attributes));
+  }
+};
+function createDefaultDriftRuleRegistry() {
+  return new DriftRuleRegistry().register(suppressDataSourceDrift).register(suppressEtagOnlyDrift).register(suppressGoogleStorageManagedFolderMetaBoring);
+}
+
+// src/builder/resources.ts
+function refineAction(base, rc) {
+  if (base !== "no-op") return base;
+  if (rc.previous_address) return "move";
+  if (rc.change.importing) return "import";
+  return "no-op";
+}
+function buildResourceChanges(plan, options) {
+  const resourceChanges = plan.resource_changes ?? [];
+  const result = [];
+  for (const rc of resourceChanges) {
+    if (shouldSkip(rc)) continue;
+    const action = refineAction(determineAction(rc.change.actions), rc);
+    if (action === "no-op") continue;
+    const address = rc.address ?? `${rc.type ?? "unknown"}.${rc.name ?? "unknown"}`;
+    const attributes = buildAttributeChanges(rc.change, options);
+    const allUnknownAfterApply = isAllUnknownAfterApply(rc, attributes);
+    result.push({
+      address,
+      type: rc.type ?? "unknown",
+      action,
+      actionReason: rc.action_reason ?? null,
+      attributes,
+      hasAttributeDetail: true,
+      importId: rc.change.importing?.id ?? null,
+      movedFromAddress: rc.previous_address ?? null,
+      allUnknownAfterApply
+    });
+  }
+  return result;
+}
+function buildDriftChanges(plan, options) {
+  const driftChanges = plan.resource_drift ?? [];
+  const result = [];
+  const registry = options.driftRuleRegistry ?? createDefaultDriftRuleRegistry();
+  for (const rc of driftChanges) {
+    const action = refineAction(determineAction(rc.change.actions), rc);
+    const address = rc.address ?? `${rc.type ?? "unknown"}.${rc.name ?? "unknown"}`;
+    const attributes = buildAttributeChanges(rc.change, options);
+    const allAttributesForSuppression = buildAttributeChanges(rc.change, {
+      ...options,
+      showUnchangedAttributes: true
+    });
+    const allUnknownAfterApply = isAllUnknownAfterApply(rc, attributes);
+    if (registry.shouldSuppressDrift(
+      rc.type ?? "unknown",
+      rc.mode ?? "managed",
+      allAttributesForSuppression
+    ))
+      continue;
+    result.push({
+      address,
+      type: rc.type ?? "unknown",
+      action,
+      actionReason: rc.action_reason ?? null,
+      attributes,
+      hasAttributeDetail: true,
+      importId: rc.change.importing?.id ?? null,
+      movedFromAddress: rc.previous_address ?? null,
+      allUnknownAfterApply
+    });
+  }
+  return result;
+}
+function shouldSkip(rc) {
+  if (rc.mode === "data") {
+    return true;
+  }
+  return false;
+}
+function isAllUnknownAfterApply(rc, attributes) {
+  if (rc.change.after_unknown === true) return true;
+  if (attributes.length > 0 && attributes.every((a) => a.isKnownAfterApply)) {
+    return true;
+  }
+  return false;
+}
+function buildResourcesFromScan(changes) {
+  const result = [];
+  for (const change of changes) {
+    if (change.action === "no-op") continue;
+    result.push({
+      address: change.address,
+      type: change.resourceType,
+      action: change.action,
+      actionReason: change.reason ?? null,
+      attributes: [],
+      hasAttributeDetail: false,
+      importId: null,
+      movedFromAddress: null,
+      allUnknownAfterApply: false
+    });
+  }
+  return result;
+}
+
+// src/builder/summary.ts
+var SUMMARY_ACTIONS = [
+  "create",
+  "update",
+  "replace",
+  "delete",
+  "move",
+  "import",
+  "forget"
+];
+function buildSummary(resources) {
+  return {
+    actions: buildActionGroups(resources, SUMMARY_ACTIONS),
+    failures: []
+  };
+}
+function buildApplySummary(resources, failedAddresses) {
+  const succeeded = resources.filter((r) => !failedAddresses.has(r.address));
+  const failed = resources.filter((r) => failedAddresses.has(r.address));
+  return {
+    actions: buildActionGroups(succeeded, SUMMARY_ACTIONS),
+    failures: buildActionGroups(failed, SUMMARY_ACTIONS)
+  };
+}
+function buildActionGroups(resources, actionOrder) {
+  const buckets = /* @__PURE__ */ new Map();
+  const actionSet = new Set(actionOrder);
+  for (const r of resources) {
+    if (!actionSet.has(r.action)) continue;
+    let typeCounts = buckets.get(r.action);
+    if (!typeCounts) {
+      typeCounts = /* @__PURE__ */ new Map();
+      buckets.set(r.action, typeCounts);
+    }
+    typeCounts.set(r.type, (typeCounts.get(r.type) ?? 0) + 1);
+  }
+  const groups = [];
+  for (const action of actionOrder) {
+    const typeCounts = buckets.get(action);
+    if (!typeCounts) continue;
+    const resourceTypes = [...typeCounts.entries()].map(([type, count]) => ({ type, count })).sort((a, b) => b.count - a.count || a.type.localeCompare(b.type));
+    const total = resourceTypes.reduce((sum, rt) => sum + rt.count, 0);
+    groups.push({ action, resourceTypes, total });
+  }
+  return groups;
+}
+function buildSummaryFromScan(changes) {
+  return {
+    actions: buildActionGroupsFromScan(changes, SUMMARY_ACTIONS),
+    failures: []
+  };
+}
+function buildActionGroupsFromScan(changes, actionOrder) {
+  const buckets = /* @__PURE__ */ new Map();
+  const actionSet = new Set(actionOrder);
+  for (const c of changes) {
+    if (!actionSet.has(c.action)) continue;
+    let typeCounts = buckets.get(c.action);
+    if (!typeCounts) {
+      typeCounts = /* @__PURE__ */ new Map();
+      buckets.set(c.action, typeCounts);
+    }
+    typeCounts.set(c.resourceType, (typeCounts.get(c.resourceType) ?? 0) + 1);
+  }
+  const groups = [];
+  for (const action of actionOrder) {
+    const typeCounts = buckets.get(action);
+    if (!typeCounts) continue;
+    const resourceTypes = [...typeCounts.entries()].map(([type, count]) => ({ type, count })).sort((a, b) => b.count - a.count || a.type.localeCompare(b.type));
+    const total = resourceTypes.reduce((sum, rt) => sum + rt.count, 0);
+    groups.push({ action, resourceTypes, total });
+  }
+  return groups;
+}
+
+// src/builder/outputs.ts
+var LARGE_LINE_THRESHOLD2 = 3;
+function buildOutputChanges(plan) {
+  const outputChanges = plan.output_changes;
+  if (!outputChanges) return [];
+  const result = [];
+  for (const [name, change] of Object.entries(outputChanges)) {
+    const action = determineAction(change.actions);
+    if (action === "no-op") continue;
+    const isSensitive2 = change.before_sensitive === true || change.after_sensitive === true;
+    const before = isSensitive2 ? null : valueToString(change.before ?? null);
+    let after;
+    let isKnownAfterApply = false;
+    if (isSensitive2) {
+      after = null;
+    } else if (change.after_unknown === true) {
+      after = KNOWN_AFTER_APPLY;
+      isKnownAfterApply = true;
+    } else {
+      after = valueToString(change.after ?? null);
+    }
+    const isLarge = isLargeValue2(isSensitive2 ? null : before) || isLargeValue2(isSensitive2 || isKnownAfterApply ? null : after);
+    result.push({
+      name,
+      action,
+      before,
+      after,
+      isSensitive: isSensitive2,
+      isLarge,
+      isKnownAfterApply
+    });
+  }
+  return result;
+}
+function valueToString(val) {
+  if (val === null || val === void 0) return null;
+  if (typeof val === "string") return val;
+  if (typeof val === "number" || typeof val === "boolean") return String(val);
+  return JSON.stringify(val, null, 2);
+}
+function isLargeValue2(value) {
+  if (value === null) return false;
+  const trimmed = value.trim();
+  if (trimmed.startsWith("{") || trimmed.startsWith("[") || trimmed.startsWith("<")) {
+    return true;
+  }
+  let count = 0;
+  for (const ch of value) {
+    if (ch === "\n") {
+      count++;
+      if (count > LARGE_LINE_THRESHOLD2) return true;
+    }
+  }
+  return false;
+}
+
+// src/builder/index.ts
+function buildReport(plan, options = {}) {
+  const resources = buildResourceChanges(plan, options);
+  const driftResources = buildDriftChanges(plan, options);
+  const summary = buildSummary(resources);
+  const outputs = buildOutputChanges(plan);
+  return {
+    title: "",
+    issues: [],
+    steps: [],
+    warnings: [],
+    rawStdout: [],
+    operation: "plan",
+    ...plan.terraform_version !== void 0 ? { toolVersion: plan.terraform_version } : {},
+    formatVersion: plan.format_version,
+    ...plan.timestamp !== void 0 ? { timestamp: plan.timestamp } : {},
+    summary,
+    resources,
+    outputs,
+    driftResources
+  };
+}
+
+// src/builder/apply.ts
+function buildApplyReport(plan, scanResult, options = {}) {
+  const report = buildReport(plan, options);
+  const stateOnlyAddresses = extractStateOnlyAddresses(plan);
+  const appliedAddresses = /* @__PURE__ */ new Set([
+    ...scanResult.applyStatuses.map((s) => s.address),
+    ...stateOnlyAddresses.keys()
+  ]);
+  const plannedAddresses = /* @__PURE__ */ new Map();
+  for (const change of scanResult.plannedChanges) {
+    plannedAddresses.set(change.address, change.action);
+  }
+  const stateOnlyStatuses = buildStateOnlyStatuses(stateOnlyAddresses);
+  const diagnostics = scanResult.diagnostics.map((d) => ({
+    ...d,
+    source: "apply"
+  }));
+  filterPhantomResources(report, appliedAddresses);
+  replaceKnownAfterApply(report);
+  const notStartedStatuses = buildNotStartedStatuses(
+    plannedAddresses,
+    appliedAddresses
+  );
+  const allStatuses = [
+    ...scanResult.applyStatuses,
+    ...stateOnlyStatuses,
+    ...notStartedStatuses
+  ];
+  if (scanResult.outputsMessage) {
+    resolveOutputValues(report, scanResult.outputsMessage);
+  }
+  const failedAddresses = new Set(
+    scanResult.applyStatuses.filter((s) => !s.success).map((s) => s.address)
+  );
+  report.summary = buildApplySummary(report.resources ?? [], failedAddresses);
+  if (diagnostics.length > 0) {
+    report.diagnostics = diagnostics;
+  }
+  if (allStatuses.length > 0) {
+    report.applyStatuses = allStatuses;
+  }
+  report.operation = "apply";
+  if (scanResult.tool !== void 0) {
+    report.tool = scanResult.tool;
+  }
+  return report;
+}
+function extractStateOnlyAddresses(plan) {
+  const addresses = /* @__PURE__ */ new Map();
+  for (const rc of plan.resource_changes ?? []) {
+    if (rc.mode === "data") continue;
+    const actions = rc.change.actions;
+    if (actions.length !== 1) continue;
+    const action = actions[0];
+    if (action === "forget") {
+      if (rc.address) addresses.set(rc.address, "forget");
+    } else if (action === "no-op") {
+      if (rc.previous_address) {
+        if (rc.address) addresses.set(rc.address, "move");
+      } else if (rc.change.importing) {
+        if (rc.address) addresses.set(rc.address, "import");
+      }
+    }
+  }
+  return addresses;
+}
+function buildStateOnlyStatuses(stateOnlyAddresses) {
+  return [...stateOnlyAddresses.entries()].map(([address, action]) => ({
+    address,
+    action,
+    success: true
+  }));
+}
+function buildNotStartedStatuses(plannedAddresses, appliedAddresses) {
+  const notStarted = [];
+  for (const [addr, action] of plannedAddresses) {
+    if (!appliedAddresses.has(addr)) {
+      notStarted.push({
+        address: addr,
+        action,
+        success: false
+      });
+    }
+  }
+  return notStarted;
+}
+function filterPhantomResources(report, appliedAddresses) {
+  if (!report.resources) return;
+  report.resources = report.resources.filter(
+    (r) => appliedAddresses.has(r.address)
+  );
+}
+function replaceKnownAfterApply(report) {
+  for (const resource of report.resources ?? []) {
+    for (const attr of resource.attributes) {
+      if (attr.isKnownAfterApply) {
+        attr.after = VALUE_NOT_IN_PLAN;
+      }
+    }
+  }
+  for (const output of report.outputs ?? []) {
+    if (output.isKnownAfterApply) {
+      output.after = VALUE_NOT_IN_PLAN;
+    }
+  }
+}
+function resolveOutputValues(report, outputsMessage) {
+  for (const output of report.outputs ?? []) {
+    const resolved = outputsMessage.outputs[output.name];
+    if (!resolved) continue;
+    if (output.isSensitive || resolved.sensitive) continue;
+    if (output.isKnownAfterApply) {
+      const val = resolved.value;
+      if (val !== void 0 && val !== null) {
+        output.after = typeof val === "string" ? val : JSON.stringify(val, null, 2);
+      }
     }
   }
 }
@@ -1894,6 +1814,135 @@ function enrichFromApplyJsonl(filePath, report, readerOpts, showPlanParsed) {
     report.operation = "apply";
   }
   addScannerWarnings(report, scan, "apply");
+}
+
+// src/builder/state-enrichment.ts
+var LARGE_LINE_THRESHOLD3 = 3;
+function enrichReportFromState(report, state) {
+  const stateResources = state.resources;
+  const hasResources = stateResources !== void 0 && stateResources.length > 0;
+  const hasOutputs = state.outputs !== void 0 && Object.keys(state.outputs).length > 0;
+  if (!hasResources && !hasOutputs) return;
+  const instanceMap = hasResources ? buildInstanceMap(stateResources) : /* @__PURE__ */ new Map();
+  let enrichedAny = false;
+  for (const resource of report.resources ?? []) {
+    if (!resource.hasAttributeDetail) continue;
+    const flat = instanceMap.get(resource.address);
+    if (flat !== void 0) {
+      for (const attr of resource.attributes) {
+        if (!attr.isKnownAfterApply) continue;
+        if (attr.isSensitive) continue;
+        if (flat.sensitiveNames.has(attr.name)) {
+          attr.isSensitive = true;
+          attr.after = SENSITIVE_MASK;
+          attr.isKnownAfterApply = false;
+          enrichedAny = true;
+        } else {
+          const resolved = resolveFromInstance(flat, attr.name);
+          if (resolved !== void 0) {
+            attr.after = resolved;
+            attr.isKnownAfterApply = false;
+            attr.isLarge = isLargeValue3(resolved);
+            enrichedAny = true;
+          }
+        }
+      }
+    }
+    resource.allUnknownAfterApply = false;
+  }
+  const stateOutputs = state.outputs;
+  if (stateOutputs !== void 0) {
+    for (const output of report.outputs ?? []) {
+      if (!output.isKnownAfterApply) continue;
+      if (output.isSensitive) continue;
+      const stateOutput = stateOutputs[output.name];
+      if (stateOutput === void 0) continue;
+      if (stateOutput.sensitive === true) {
+        output.isSensitive = true;
+        output.after = SENSITIVE_MASK;
+        output.isKnownAfterApply = false;
+        enrichedAny = true;
+      } else if (stateOutput.value !== void 0) {
+        output.after = stringifyValue(stateOutput.value);
+        output.isKnownAfterApply = false;
+        output.isLarge = isLargeValue3(output.after);
+        enrichedAny = true;
+      }
+    }
+  }
+  if (enrichedAny) {
+    report.stateEnriched = true;
+  }
+}
+function buildInstanceMap(resources) {
+  const map = /* @__PURE__ */ new Map();
+  for (const res of resources) {
+    for (const inst of res.instances ?? []) {
+      const address = buildAddress(res, inst);
+      const rawValues = inst.attributes;
+      const flatValues = rawValues !== void 0 ? flatten(rawValues) : /* @__PURE__ */ new Map();
+      const sensitiveNames = extractSensitiveNames(inst);
+      map.set(address, { rawValues, flatValues, sensitiveNames });
+    }
+  }
+  return map;
+}
+function buildAddress(res, inst) {
+  let address = "";
+  if (res.module !== void 0 && res.module !== "") {
+    address = `${res.module}.`;
+  }
+  address += `${res.type}.${res.name}`;
+  if (inst.index_key !== void 0) {
+    if (typeof inst.index_key === "number") {
+      address += `[${String(inst.index_key)}]`;
+    } else {
+      address += `["${inst.index_key}"]`;
+    }
+  }
+  return address;
+}
+function extractSensitiveNames(inst) {
+  const names = /* @__PURE__ */ new Set();
+  for (const path of inst.sensitive_attributes ?? []) {
+    const first = path[0];
+    if (first?.type === "get_attr") {
+      names.add(first.value);
+    }
+  }
+  return names;
+}
+function resolveFromInstance(inst, attrName) {
+  if (inst.rawValues !== void 0 && attrName in inst.rawValues) {
+    return stringifyValue(inst.rawValues[attrName]);
+  }
+  if (inst.flatValues.has(attrName)) {
+    return inst.flatValues.get(attrName) ?? null;
+  }
+  return void 0;
+}
+function stringifyValue(value) {
+  if (value === null) return null;
+  if (typeof value === "string") return value;
+  if (typeof value === "number" || typeof value === "boolean") {
+    return String(value);
+  }
+  return JSON.stringify(value);
+}
+function isLargeValue3(value) {
+  if (value === null) return false;
+  const trimmed = value.trim();
+  if (trimmed.startsWith("{") || trimmed.startsWith("[") || trimmed.startsWith("<")) {
+    return true;
+  }
+  let count = 0;
+  for (const ch of value) {
+    if (ch === "\n") {
+      count++;
+      if (count > LARGE_LINE_THRESHOLD3) return true;
+    }
+  }
+  return false;
 }
 
 // src/builder/report-from-steps.ts
@@ -3700,7 +3749,7 @@ function splitAroundCategories(sections) {
   return { prefix, suffix };
 }
 
-// src/index.ts
+// src/pipelines/steps.ts
 var DEFAULT_MAX_OUTPUT_LENGTH = 64512;
 function reportFromSteps(stepsJson, options) {
   try {

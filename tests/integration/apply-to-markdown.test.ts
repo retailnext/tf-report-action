@@ -1,6 +1,7 @@
 import { describe, it, expect, beforeAll } from "vitest";
-import { applyToMarkdown } from "../../src/index.js";
-import type { Options } from "../../src/index.js";
+import { applyToMarkdown } from "../../src/pipelines/apply.js";
+import type { BuildOptions } from "../../src/builder/options.js";
+import type { RenderOptions } from "../../src/model/render-options.js";
 import {
   discoverApplyFixtures,
   assertCorrectToolName,
@@ -17,9 +18,10 @@ beforeAll(() => {
   }
 });
 
-const OPTION_VARIANTS: { name: string; options: Options }[] = [
-  { name: "default", options: {} },
-];
+const OPTION_VARIANTS: {
+  name: string;
+  options: BuildOptions & RenderOptions;
+}[] = [{ name: "default", options: {} }];
 
 describe("applyToMarkdown integration", () => {
   for (const { label, planJson, applyJsonl } of fixtures) {

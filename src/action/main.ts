@@ -10,8 +10,8 @@
  */
 
 import type { Env } from "../env/index.js";
-import type { ReportOptions } from "../index.js";
-import { reportFromSteps } from "../index.js";
+import type { ReportOptions } from "../pipelines/steps.js";
+import { reportFromSteps } from "../pipelines/steps.js";
 import type { GitHubClient, GitHubClientDeps } from "../github/index.js";
 import { createGitHubClient } from "../github/index.js";
 import { httpRequest } from "../http/index.js";

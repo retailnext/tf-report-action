@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeAll, afterAll } from "vitest";
-import { reportFromSteps } from "../../src/index.js";
-import type { ReportOptions } from "../../src/index.js";
+import { reportFromSteps } from "../../src/pipelines/steps.js";
+import type { ReportOptions } from "../../src/builder/report-from-steps.js";
 import { mkdtempSync, writeFileSync, realpathSync, rmSync } from "node:fs";
 import { join } from "node:path";
 import { tmpdir } from "node:os";

@@ -6,6 +6,7 @@ import type { BuildOptions } from "./options.js";
 import type { PlannedChange } from "../jsonl-scanner/types.js";
 import { determineAction } from "./action.js";
 import { buildAttributeChanges } from "./attributes.js";
+import { createDefaultDriftRuleRegistry } from "../drift-filter/index.js";
 
 /**
  * Refine a base action using resource metadata.
@@ -69,7 +70,8 @@ export function buildResourceChanges(
  * Maps each entry in plan.resource_drift to a ModelResourceChange.
  * Uses the same transformation as buildResourceChanges — drift entries
  * use the same ResourceChange schema, just from a different source field.
- * Data sources are excluded, same as for planned changes.
+ * Drift entries are passed through the drift suppression registry; by default,
+ * data sources and other unimportant drift are omitted.
  * No-op drift entries are kept (drift detection is always informational).
  */
 export function buildDriftChanges(
@@ -78,16 +80,29 @@ export function buildDriftChanges(
 ): ModelResourceChange[] {
   const driftChanges = plan.resource_drift ?? [];
   const result: ModelResourceChange[] = [];
+  const registry =
+    options.driftRuleRegistry ?? createDefaultDriftRuleRegistry();
 
   for (const rc of driftChanges) {
-    if (shouldSkip(rc)) continue;
-
     const action = refineAction(determineAction(rc.change.actions), rc);
     const address =
       rc.address ?? `${rc.type ?? "unknown"}.${rc.name ?? "unknown"}`;
 
     const attributes = buildAttributeChanges(rc.change, options);
+    const allAttributesForSuppression = buildAttributeChanges(rc.change, {
+      ...options,
+      showUnchangedAttributes: true,
+    });
     const allUnknownAfterApply = isAllUnknownAfterApply(rc, attributes);
+
+    if (
+      registry.shouldSuppressDrift(
+        rc.type ?? "unknown",
+        rc.mode ?? "managed",
+        allAttributesForSuppression,
+      )
+    )
+      continue;
 
     result.push({
       address,
