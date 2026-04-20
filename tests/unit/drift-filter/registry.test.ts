@@ -103,6 +103,46 @@ describe("createDefaultDriftRuleRegistry", () => {
     ).toBe(true);
   });
 
+  it("suppresses google_compute_managed_ssl_certificate expire_time-only drift", () => {
+    const registry = createDefaultDriftRuleRegistry();
+    expect(
+      registry.shouldSuppressDrift(
+        "google_compute_managed_ssl_certificate",
+        "managed",
+        [attr("expire_time")],
+      ),
+    ).toBe(true);
+  });
+
+  it("suppresses google_compute_url_map fingerprint-only drift", () => {
+    const registry = createDefaultDriftRuleRegistry();
+    expect(
+      registry.shouldSuppressDrift("google_compute_url_map", "managed", [
+        attr("fingerprint"),
+      ]),
+    ).toBe(true);
+  });
+
+  it("suppresses google_artifact_registry_repository update_time-only drift", () => {
+    const registry = createDefaultDriftRuleRegistry();
+    expect(
+      registry.shouldSuppressDrift(
+        "google_artifact_registry_repository",
+        "managed",
+        [attr("update_time")],
+      ),
+    ).toBe(true);
+  });
+
+  it("suppresses google_storage_bucket updated-only drift", () => {
+    const registry = createDefaultDriftRuleRegistry();
+    expect(
+      registry.shouldSuppressDrift("google_storage_bucket", "managed", [
+        attr("updated"),
+      ]),
+    ).toBe(true);
+  });
+
   it("does not suppress managed resource with non-boring changes", () => {
     const registry = createDefaultDriftRuleRegistry();
     expect(
