@@ -20,13 +20,18 @@ const ENTITY_MAP: ReadonlyMap<string, number> = new Map([
  * the escaped string.
  *
  * Scans for `&`, `<`, `>`, `"` and accounts for entity expansion.
- * All other characters pass through at length 1.
+ * All other characters pass through at their code-unit length (which
+ * matters for supplementary-plane characters like emoji that occupy
+ * 2 UTF-16 code units but are 1 code point).
  */
 export function htmlEscapeSize(text: string): number {
   let size = 0;
   for (const ch of text) {
     const entityLen = ENTITY_MAP.get(ch);
-    size += entityLen ?? 1;
+    // Use entityLen for special characters; for all others, use ch.length
+    // which correctly accounts for supplementary-plane characters (emoji
+    // etc.) that occupy 2 UTF-16 code units but are 1 code point.
+    size += entityLen ?? ch.length;
   }
   return size;
 }

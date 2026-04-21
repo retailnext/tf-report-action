@@ -344,34 +344,50 @@ export class Table implements Renderable {
  * A collapsible `<details>` block.
  *
  * Both markdown (GitHub) and HTML use the same `<details>`/`<summary>` tags.
- * The content is a child {@link Renderable} placed inside the block.
+ * The summary is a {@link Renderable} whose HTML output is placed inside
+ * `<summary>` tags (always HTML context, even in markdown format).
+ * The content is a child {@link Renderable} rendered in the requested format.
  *
  * In markdown format, a blank line is emitted after `<summary>` so that
  * GitHub renders the content as markdown (not inline HTML).
  */
 export class Details implements Renderable {
-  private readonly summary: string;
+  private readonly summary: Renderable;
   private readonly content: Renderable;
   private readonly open: boolean;
   private readonly mdSize: number;
   private readonly htSize: number;
 
-  constructor(summary: string, content: Renderable, open = false) {
+  constructor(summary: Renderable, content: Renderable, open = false) {
     this.summary = summary;
     this.content = content;
     this.open = open;
 
-    // Markdown: "<details[ open]>\n<summary>escaped</summary>\n\ncontent\n\n</details>\n\n"
-    const escapedSummary = htmlEscape(summary);
+    // Summary is always rendered as HTML (inside <summary> tags)
+    const summaryHtmlSize = summary.size("html");
     const openTag = open ? "<details open>" : "<details>";
-    const mdPrefix = `${openTag}\n<summary>${escapedSummary}</summary>\n\n`;
-    const mdSuffix = "\n\n</details>\n\n";
-    this.mdSize = mdPrefix.length + content.size("markdown") + mdSuffix.length;
 
-    // HTML: same structure but content is HTML-rendered
-    const htPrefix = `${openTag}\n<summary>${escapedSummary}</summary>\n`;
-    const htSuffix = "\n</details>\n";
-    this.htSize = htPrefix.length + content.size("html") + htSuffix.length;
+    // Markdown: "<details[ open]>\n<summary>html</summary>\n\ncontent\n\n</details>\n\n"
+    const mdPre = `${openTag}\n<summary>`;
+    const mdMid = "</summary>\n\n";
+    const mdPost = "\n\n</details>\n\n";
+    this.mdSize =
+      mdPre.length +
+      summaryHtmlSize +
+      mdMid.length +
+      content.size("markdown") +
+      mdPost.length;
+
+    // HTML: "<details[ open]>\n<summary>html</summary>\ncontent\n</details>\n"
+    const htPre = `${openTag}\n<summary>`;
+    const htMid = "</summary>\n";
+    const htPost = "\n</details>\n";
+    this.htSize =
+      htPre.length +
+      summaryHtmlSize +
+      htMid.length +
+      content.size("html") +
+      htPost.length;
   }
 
   size(format: OutputFormat): number {
@@ -379,12 +395,12 @@ export class Details implements Renderable {
   }
 
   render(format: OutputFormat): string {
-    const escapedSummary = htmlEscape(this.summary);
+    const summaryHtml = this.summary.render("html");
     const openTag = this.open ? "<details open>" : "<details>";
     if (format === "markdown") {
-      return `${openTag}\n<summary>${escapedSummary}</summary>\n\n${this.content.render("markdown")}\n\n</details>\n\n`;
+      return `${openTag}\n<summary>${summaryHtml}</summary>\n\n${this.content.render("markdown")}\n\n</details>\n\n`;
     }
-    return `${openTag}\n<summary>${escapedSummary}</summary>\n${this.content.render("html")}\n</details>\n`;
+    return `${openTag}\n<summary>${summaryHtml}</summary>\n${this.content.render("html")}\n</details>\n`;
   }
 }
 

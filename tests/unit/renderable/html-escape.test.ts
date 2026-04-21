@@ -85,6 +85,11 @@ describe("htmlEscapeSize matches htmlEscape().length", () => {
     '"""',
     "no special chars here 123",
     'mixed <b>bold</b> & "quoted" text > 0',
+    // Supplementary-plane characters (2 UTF-16 code units each)
+    "🔧 wrench",
+    "✅ ❌ 🔧 ⚠️ 🔄",
+    "emoji & <special> 🎉",
+    "𝄞 music",
   ];
 
   for (const input of testCases) {

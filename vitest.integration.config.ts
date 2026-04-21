@@ -99,6 +99,10 @@ export default defineConfig({
         // foundation (Layer 1) not yet wired into the pipeline entry points.
         // Covered by unit tests.
         "src/renderable/**",
+        // The elements module defines domain-specific ReportElement classes
+        // that compose primitives into report sections. It is not yet wired
+        // into the pipeline entry points (Phase 4). Covered by unit tests.
+        "src/elements/**",
       ],
       thresholds: {
         lines: 90,

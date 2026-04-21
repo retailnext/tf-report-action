@@ -278,7 +278,7 @@ describe("Table", () => {
 
 describe("Details", () => {
   it("renders markdown details", () => {
-    const d = new Details("Summary", new RawText("Content"));
+    const d = new Details(new RawText("Summary"), new RawText("Content"));
     const md = d.render("markdown");
     expect(md).toContain("<details>");
     expect(md).toContain("<summary>Summary</summary>");
@@ -287,7 +287,7 @@ describe("Details", () => {
   });
 
   it("renders HTML details", () => {
-    const d = new Details("Summary", new RawText("Content"));
+    const d = new Details(new RawText("Summary"), new RawText("Content"));
     const html = d.render("html");
     expect(html).toContain("<details>");
     expect(html).toContain("<summary>Summary</summary>");
@@ -296,26 +296,40 @@ describe("Details", () => {
   });
 
   it("supports open attribute", () => {
-    const d = new Details("S", new RawText("C"), true);
+    const d = new Details(new RawText("S"), new RawText("C"), true);
     expect(d.render("markdown")).toContain("<details open>");
     expect(d.render("html")).toContain("<details open>");
   });
 
-  it("escapes HTML in summary", () => {
-    const d = new Details("A & B <C>", EMPTY);
+  it("escapes HTML in RawText summary", () => {
+    const d = new Details(new RawText("A & B <C>"), EMPTY);
     expect(d.render("markdown")).toContain(
       "<summary>A &amp; B &lt;C&gt;</summary>",
     );
   });
 
+  it("passes through HtmlText summary unchanged", () => {
+    const d = new Details(new HtmlText("<strong>Type</strong> name"), EMPTY);
+    expect(d.render("markdown")).toContain(
+      "<summary><strong>Type</strong> name</summary>",
+    );
+  });
+
   it("satisfies size invariant", () => {
     assertSizeInvariant(
-      new Details("Summary", new RawText("body text")),
+      new Details(new RawText("Summary"), new RawText("body text")),
       "Details",
     );
     assertSizeInvariant(
-      new Details("Open", new CodeBlock("code", "js"), true),
+      new Details(new RawText("Open"), new CodeBlock("code", "js"), true),
       "Details open",
+    );
+    assertSizeInvariant(
+      new Details(
+        new HtmlText("<strong>Bold</strong>"),
+        new RawText("content"),
+      ),
+      "Details with HtmlText summary",
     );
   });
 });
@@ -421,7 +435,7 @@ describe("composite tree", () => {
       new Heading("Report", 2),
       new Paragraph("Summary of changes"),
       new Details(
-        "Resource changes",
+        new RawText("Resource changes"),
         new Sequence([
           new Table(
             [new RawText("Name"), new RawText("Action")],

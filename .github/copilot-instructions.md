@@ -114,6 +114,7 @@ each other**.
 | Module          | Responsibility                                                                                                                                                                                                                                                                                                                              |
 | --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `src/renderer/` | Render any `Report` variant to Markdown. Groups resources by module address (derived from address + type) for display — module grouping is a renderer concern. StructuredReport → full Markdown string, TextFallbackReport/WorkflowReport/ErrorReport → Section arrays. Title, step issue, step table, and variant-specific body renderers. |
+| `src/elements/` | Domain-specific `ReportElement` classes that compose primitive `Renderable` objects (from `renderable/`) into dual-format report sections. Each class holds pre-built renderable trees at multiple detail levels and renders to both Markdown and HTML on demand. Replaces `renderer/` during migration (both coexist temporarily).         |
 
 ### Layer 4b — Composition (depends on Layers 0–4a)
 
@@ -153,6 +154,7 @@ each other**.
 | `inputs/`        | `env/`                                                                                 |
 | `builder/`       | `tfjson/`, `flattener/`, `sensitivity/`, `steps/`, `env/`, `parser/`, `jsonl-scanner/` |
 | `renderer/`      | `diff/`, `raw-formatter/`                                                              |
+| `elements/`      | `renderable/`, `diff/`, `flattener/`, `sensitivity/`                                   |
 | `compose/`       | `renderer/`, `diff/`                                                                   |
 | `comment/`       | `env/`, `compose/`                                                                     |
 | `pipelines/`     | `parser/`, `builder/`, `renderer/`, `compose/`, `steps/`, `env/`                       |
