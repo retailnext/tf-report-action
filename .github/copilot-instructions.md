@@ -66,13 +66,14 @@ Follow these boundaries strictly — do not add cross-cutting logic.
 
 ### Layer 1 — Pure algorithms (depend only on Layer 0)
 
-| Module               | Responsibility                                                                                |
-| -------------------- | --------------------------------------------------------------------------------------------- |
-| `src/diff/`          | Pure LCS, line-diff, char-diff, and context-diff algorithms with diff formatting. No I/O.     |
-| `src/flattener/`     | Flatten nested `JsonValue` → `Map<string, string \| null>` with dotted-path keys.             |
-| `src/sensitivity/`   | Detect whether a flattened attribute path is sensitive. Pure predicate.                       |
-| `src/raw-formatter/` | Format raw command output (JSON Lines, validate results, plain text) into Markdown fragments. |
-| `src/jsonl-scanner/` | Scan and classify JSON Lines output from Terraform/OpenTofu commands into structured results. |
+| Module               | Responsibility                                                                                                                                                                                                       |
+| -------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `src/diff/`          | Pure LCS, line-diff, char-diff, and context-diff algorithms with diff formatting. No I/O.                                                                                                                            |
+| `src/flattener/`     | Flatten nested `JsonValue` → `Map<string, string \| null>` with dotted-path keys.                                                                                                                                    |
+| `src/sensitivity/`   | Detect whether a flattened attribute path is sensitive. Pure predicate.                                                                                                                                              |
+| `src/raw-formatter/` | Format raw command output (JSON Lines, validate results, plain text) into Markdown fragments.                                                                                                                        |
+| `src/jsonl-scanner/` | Scan and classify JSON Lines output from Terraform/OpenTofu commands into structured results.                                                                                                                        |
+| `src/renderable/`    | Core `Renderable` interface, `OutputFormat` type, `ReportElement`/`ComposedReport` interfaces, primitive renderable classes (Heading, Table, CodeBlock, etc.), and HTML escaping with size estimation. Pure, no I/O. |
 
 ### Layer 2 — I/O and parsing (depend on Layers 0–1)
 
@@ -141,6 +142,7 @@ each other**.
 | `flattener/`     | _(nothing)_                                                                            |
 | `sensitivity/`   | _(nothing)_                                                                            |
 | `raw-formatter/` | _(nothing)_                                                                            |
+| `renderable/`    | _(nothing)_                                                                            |
 | `jsonl-scanner/` | `tfjson/`                                                                              |
 | `env/`           | _(nothing)_                                                                            |
 | `http/`          | `env/`                                                                                 |

@@ -94,6 +94,11 @@ export default defineConfig({
         // The comment module assembles comment bodies/footers/markers —
         // action-specific output not reachable via reportFromSteps.
         "src/comment/**",
+        // The renderable module defines the Renderable interface, primitive
+        // renderable classes, and HTML escaping utilities. It is a pure
+        // foundation (Layer 1) not yet wired into the pipeline entry points.
+        // Covered by unit tests.
+        "src/renderable/**",
       ],
       thresholds: {
         lines: 90,
