@@ -12,7 +12,7 @@ import type { ScanResult } from "../jsonl-scanner/types.js";
 import { getStepOutcome } from "../steps/outcomes.js";
 import {
   readStepStdout,
-  readStepStdoutForDisplay,
+  peekStepStdout,
   getStepStdoutPath,
 } from "../steps/io.js";
 import { detectToolFromOutput } from "../parser/index.js";
@@ -46,7 +46,7 @@ export function processApplyStep(
 
   const path = getStepStdoutPath(step, readerOpts);
   if (path) {
-    const peek = readStepStdoutForDisplay(step, readerOpts);
+    const peek = peekStepStdout(step, readerOpts);
     if (peek.content !== undefined) {
       const firstLines = peek.content.split("\n", 10);
       if (isJsonLines(firstLines)) {
@@ -72,7 +72,6 @@ export function processApplyStep(
         stepId,
         label: "Apply Output",
         content: read.content,
-        truncated: read.truncated === true,
       });
     } else if (read.error) {
       report.warnings.push(`apply stdout: ${read.error}`);

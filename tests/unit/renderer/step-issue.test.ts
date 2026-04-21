@@ -53,16 +53,15 @@ describe("renderStepIssue", () => {
     expect(section.full).toContain("Plan: 0 to add");
   });
 
-  it("appends truncation indicator to stdout when stdoutTruncated is true", () => {
+  it("does not append truncation indicator (truncation removed)", () => {
     const issue: StepIssue = {
       id: "plan",
       heading: "`plan` failed",
       isFailed: true,
       stdout: "partial output",
-      stdoutTruncated: true,
     };
     const section = renderStepIssue(issue);
-    expect(section.full).toContain("… (truncated)");
+    expect(section.full).not.toContain("… (truncated)");
   });
 
   it("renders stderr in a code block inside details", () => {
@@ -79,16 +78,16 @@ describe("renderStepIssue", () => {
     );
   });
 
-  it("appends truncation indicator to stderr when stderrTruncated is true", () => {
+  it("renders stderr without truncation indicator", () => {
     const issue: StepIssue = {
       id: "init",
       heading: "`init` failed",
       isFailed: true,
       stderr: "partial error",
-      stderrTruncated: true,
     };
     const section = renderStepIssue(issue);
-    expect(section.full).toContain("partial error\n… (truncated)");
+    expect(section.full).toContain("partial error");
+    expect(section.full).not.toContain("… (truncated)");
   });
 
   it("shows stdoutError warning when stdout is not available", () => {

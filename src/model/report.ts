@@ -40,8 +40,6 @@ export interface RawStepStdout {
   readonly label: string;
   /** The raw stdout content. */
   readonly content: string;
-  /** Whether the content was truncated due to size limits. */
-  readonly truncated: boolean;
 }
 
 // ---------------------------------------------------------------------------

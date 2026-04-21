@@ -446,19 +446,6 @@ describe("reportFromSteps — manual error fixtures", () => {
       // The heading uses the DIAGNOSTIC_WARNING icon and includes outcome
       expect(result).toContain("`build` success");
     });
-
-    it("truncates stderr when maxDisplayRead is very small", () => {
-      const resolved = resolveStepFilePaths(
-        fixture.stepsJson,
-        fixture.fixtureDir,
-      );
-      const result = reportFromSteps(resolved, {
-        allowedDirs: [fixture.fixtureDir],
-        env: NO_GITHUB_ENV,
-        maxDisplayRead: 1,
-      }).markdown;
-      expect(result).toContain("… (truncated)");
-    });
   });
 
   describe("failed-plan-unreadable-outputs (absolute paths to nonexistent files)", () => {

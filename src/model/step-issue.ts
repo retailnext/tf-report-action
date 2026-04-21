@@ -30,15 +30,11 @@ export interface StepIssue {
 
   /** Step stdout content, if available. */
   readonly stdout?: string;
-  /** Whether stdout was truncated. */
-  readonly stdoutTruncated?: boolean;
   /** Error message if stdout could not be read. */
   readonly stdoutError?: string;
 
   /** Step stderr content, if available. */
   readonly stderr?: string;
-  /** Whether stderr was truncated. */
-  readonly stderrTruncated?: boolean;
   /** Error message if stderr could not be read. */
   readonly stderrError?: string;
 

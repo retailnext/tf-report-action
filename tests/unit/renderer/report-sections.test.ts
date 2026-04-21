@@ -113,7 +113,6 @@ describe("renderReportSections", () => {
             stepId: "plan",
             label: "Plan Output",
             content: "Plan: 1 to add",
-            truncated: false,
           },
         ],
         workspace: "prod",

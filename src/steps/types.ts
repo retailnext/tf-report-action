@@ -87,9 +87,6 @@ export type { Env } from "../env/index.js";
 /** Default maximum file size for parse reads (256 MiB). */
 export const DEFAULT_MAX_FILE_SIZE = 256 * 1024 * 1024;
 
-/** Default maximum bytes to read for display-only reads (64 KiB). */
-export const DEFAULT_MAX_DISPLAY_READ = 64 * 1024;
-
 /**
  * Options for the secure file reader.
  *
@@ -101,8 +98,6 @@ export interface ReaderOptions {
   readonly allowedDirs: readonly string[];
   /** Maximum file size in bytes for parse reads. */
   readonly maxFileSize: number;
-  /** Maximum bytes to read for display-only reads. */
-  readonly maxDisplayRead: number;
 }
 
 // ---------------------------------------------------------------------------

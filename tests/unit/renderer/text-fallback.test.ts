@@ -21,7 +21,6 @@ describe("renderTextFallbackBody", () => {
           stepId: "plan",
           label: "Plan Output",
           content: "Plan: 1 to add, 0 to change, 0 to destroy.",
-          truncated: false,
         },
       ],
     });
@@ -40,13 +39,11 @@ describe("renderTextFallbackBody", () => {
           stepId: "plan",
           label: "Plan Output",
           content: "Plan output text",
-          truncated: false,
         },
         {
           stepId: "apply",
           label: "Apply Output",
           content: "Apply output text",
-          truncated: false,
         },
       ],
     });
@@ -60,36 +57,19 @@ describe("renderTextFallbackBody", () => {
     expect(applySection!.compact).toContain("_(omitted due to size)_");
   });
 
-  it("appends truncation indicator for truncated plan content", () => {
+  it("does not append truncation indicators (truncation removed)", () => {
     const report = makeReport({
       rawStdout: [
         {
           stepId: "plan",
           label: "Plan Output",
           content: "partial plan",
-          truncated: true,
         },
       ],
     });
     const sections = renderTextFallbackBody(report);
     const planSection = sections.find((s) => s.id === "raw-plan");
-    expect(planSection!.full).toContain("… (truncated)");
-  });
-
-  it("appends truncation indicator for truncated apply content", () => {
-    const report = makeReport({
-      rawStdout: [
-        {
-          stepId: "apply",
-          label: "Apply Output",
-          content: "partial apply",
-          truncated: true,
-        },
-      ],
-    });
-    const sections = renderTextFallbackBody(report);
-    const applySection = sections.find((s) => s.id === "raw-apply");
-    expect(applySection!.full).toContain("… (truncated)");
+    expect(planSection!.full).not.toContain("… (truncated)");
   });
 
   it("does not render warnings (handled by renderReportSections)", () => {
@@ -99,7 +79,6 @@ describe("renderTextFallbackBody", () => {
           stepId: "plan",
           label: "Plan Output",
           content: "plan text",
-          truncated: false,
         },
       ],
       warnings: ["Could not read plan file"],

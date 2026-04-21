@@ -546,8 +546,10 @@ referenced by exec-action step outputs:
   (no subdirectory traversal). Default: `RUNNER_TEMP` or the OS temp directory.
 - **Regular files only** — rejects symlinks-to-non-regular-files, devices, FIFOs,
   sockets, and directories.
-- **Two read strategies**: parse reads (full file, bounded by `maxFileSize` = 256 MiB)
-  and display reads (first `maxDisplayRead` = 64 KiB bytes only).
+- **Read strategies**: parse reads load the full file, bounded by `maxFileSize`
+  (256 MiB). Peek reads load only the first 8 KiB for format detection (e.g.
+  JSONL). There is no separate display-truncation path — all content reaches
+  the rendering layer intact, and budget/composition decides what fits.
 - **Error messages** must never contain file paths (may reveal runner directory structure).
 
 ## Steps Context

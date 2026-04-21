@@ -7,8 +7,6 @@
 export interface StepFileRead {
   /** The file content, if successfully read. */
   readonly content?: string;
-  /** Whether the content was truncated. */
-  readonly truncated?: boolean;
   /** Error message if the read failed. */
   readonly error?: string;
   /** True when the step had no file path configured. */

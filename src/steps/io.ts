@@ -11,35 +11,28 @@ import type { StepData, ReaderOptions } from "./types.js";
 import type { StepFileRead } from "../model/step-file-read.js";
 import {
   readForParse,
-  readForDisplay,
+  readPeek,
   isReadError,
   getValidatedPath,
 } from "./reader.js";
 import { OUTPUT_STDOUT_FILE, OUTPUT_STDERR_FILE } from "./types.js";
 
 /**
- * Read a step output file by output key.
+ * Read a step output file by output key (full content, bounded by maxFileSize).
  *
  * @param step - Step data containing outputs with file paths
  * @param outputKey - The output key (e.g. "stdout_file", "stderr_file")
  * @param readerOpts - Security and size constraints
- * @param forDisplay - If true, reads only a prefix for display; if false, reads full content for parsing
  */
 export function readStepFile(
   step: StepData,
   outputKey: string,
   readerOpts: ReaderOptions,
-  forDisplay: boolean,
 ): StepFileRead {
   const filePath = step.outputs?.[outputKey];
   if (!filePath) return { noFile: true };
-  const result = forDisplay
-    ? readForDisplay(filePath, readerOpts)
-    : readForParse(filePath, readerOpts);
+  const result = readForParse(filePath, readerOpts);
   if (isReadError(result)) return { error: result.error };
-  if (result.truncated) {
-    return { content: result.content, truncated: true };
-  }
   return { content: result.content };
 }
 
@@ -48,23 +41,49 @@ export function readStepStdout(
   step: StepData,
   readerOpts: ReaderOptions,
 ): StepFileRead {
-  return readStepFile(step, OUTPUT_STDOUT_FILE, readerOpts, false);
+  return readStepFile(step, OUTPUT_STDOUT_FILE, readerOpts);
 }
 
-/** Read a step's stdout file for display (first maxDisplayRead bytes). */
-export function readStepStdoutForDisplay(
+/** Read a step's stderr file (full content, bounded by maxFileSize). */
+export function readStepStderr(
   step: StepData,
   readerOpts: ReaderOptions,
 ): StepFileRead {
-  return readStepFile(step, OUTPUT_STDOUT_FILE, readerOpts, true);
+  return readStepFile(step, OUTPUT_STDERR_FILE, readerOpts);
 }
 
-/** Read a step's stderr file for display (first maxDisplayRead bytes). */
-export function readStepStderrForDisplay(
+/**
+ * Peek at the first bytes of a step's stdout file for format detection.
+ *
+ * Reads only a small prefix (8 KiB) — enough to check whether the file
+ * contains JSONL output without loading the full content.
+ */
+export function peekStepStdout(
   step: StepData,
   readerOpts: ReaderOptions,
 ): StepFileRead {
-  return readStepFile(step, OUTPUT_STDERR_FILE, readerOpts, true);
+  const filePath = step.outputs?.[OUTPUT_STDOUT_FILE];
+  if (!filePath) return { noFile: true };
+  const result = readPeek(filePath, readerOpts);
+  if (isReadError(result)) return { error: result.error };
+  return { content: result.content };
+}
+
+/**
+ * Peek at the first bytes of a step's stderr file for content detection.
+ *
+ * Reads only a small prefix — enough to determine whether stderr has
+ * non-whitespace content without loading a potentially large file.
+ */
+export function peekStepStderr(
+  step: StepData,
+  readerOpts: ReaderOptions,
+): StepFileRead {
+  const filePath = step.outputs?.[OUTPUT_STDERR_FILE];
+  if (!filePath) return { noFile: true };
+  const result = readPeek(filePath, readerOpts);
+  if (isReadError(result)) return { error: result.error };
+  return { content: result.content };
 }
 
 /**

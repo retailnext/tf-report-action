@@ -23,12 +23,9 @@ import { formatRawOutput } from "../raw-formatter/index.js";
 export function renderTextFallbackBody(report: Report): Section[] {
   const sections: Section[] = [];
   for (const raw of report.rawStdout) {
-    const displayContent = raw.truncated
-      ? raw.content + "\n… (truncated)"
-      : raw.content;
     sections.push({
       id: `raw-${raw.stepId}`,
-      full: `### ${raw.label}\n\n${formatRawOutput(displayContent)}\n\n`,
+      full: `### ${raw.label}\n\n${formatRawOutput(raw.content)}\n\n`,
       compact: `### ${raw.label}\n\n_(omitted due to size)_\n\n`,
     });
   }

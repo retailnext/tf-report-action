@@ -85,7 +85,6 @@ function validateOutputs(value, stepId) {
 
 // src/steps/types.ts
 var DEFAULT_MAX_FILE_SIZE = 256 * 1024 * 1024;
-var DEFAULT_MAX_DISPLAY_READ = 64 * 1024;
 var DEFAULT_INIT_STEP = "init";
 var DEFAULT_VALIDATE_STEP = "validate";
 var DEFAULT_PLAN_STEP = "plan";
@@ -142,14 +141,14 @@ function readForParse(filePath, options) {
     return { error: "Failed to read file" };
   }
 }
-function readForDisplay(filePath, options) {
+var PEEK_SIZE = 8 * 1024;
+function readPeek(filePath, options) {
   const validated = validateFile(filePath, options);
   if (isReadError(validated)) {
     return validated;
   }
   const { realPath, size } = validated;
-  const truncated = size > options.maxDisplayRead;
-  const bytesToRead = Math.min(size, options.maxDisplayRead);
+  const bytesToRead = Math.min(size, PEEK_SIZE);
   try {
     const buffer = Buffer.alloc(bytesToRead);
     const fd = openSync(realPath, "r");
@@ -161,7 +160,7 @@ function readForDisplay(filePath, options) {
     }
     return {
       content: buffer.subarray(0, bytesRead).toString("utf-8"),
-      truncated
+      truncated: size > PEEK_SIZE
     };
   } catch {
     return { error: "Failed to read file" };
@@ -214,24 +213,32 @@ function formatSize(bytes) {
 }
 
 // src/steps/io.ts
-function readStepFile(step, outputKey, readerOpts, forDisplay) {
+function readStepFile(step, outputKey, readerOpts) {
   const filePath = step.outputs?.[outputKey];
   if (!filePath) return { noFile: true };
-  const result = forDisplay ? readForDisplay(filePath, readerOpts) : readForParse(filePath, readerOpts);
+  const result = readForParse(filePath, readerOpts);
   if (isReadError(result)) return { error: result.error };
-  if (result.truncated) {
-    return { content: result.content, truncated: true };
-  }
   return { content: result.content };
 }
 function readStepStdout(step, readerOpts) {
-  return readStepFile(step, OUTPUT_STDOUT_FILE, readerOpts, false);
+  return readStepFile(step, OUTPUT_STDOUT_FILE, readerOpts);
 }
-function readStepStdoutForDisplay(step, readerOpts) {
-  return readStepFile(step, OUTPUT_STDOUT_FILE, readerOpts, true);
+function readStepStderr(step, readerOpts) {
+  return readStepFile(step, OUTPUT_STDERR_FILE, readerOpts);
 }
-function readStepStderrForDisplay(step, readerOpts) {
-  return readStepFile(step, OUTPUT_STDERR_FILE, readerOpts, true);
+function peekStepStdout(step, readerOpts) {
+  const filePath = step.outputs?.[OUTPUT_STDOUT_FILE];
+  if (!filePath) return { noFile: true };
+  const result = readPeek(filePath, readerOpts);
+  if (isReadError(result)) return { error: result.error };
+  return { content: result.content };
+}
+function peekStepStderr(step, readerOpts) {
+  const filePath = step.outputs?.[OUTPUT_STDERR_FILE];
+  if (!filePath) return { noFile: true };
+  const result = readPeek(filePath, readerOpts);
+  if (isReadError(result)) return { error: result.error };
+  return { content: result.content };
 }
 function getStepStdoutPath(step, readerOpts) {
   const filePath = step.outputs?.[OUTPUT_STDOUT_FILE];
@@ -254,8 +261,8 @@ function buildStepIssue(step, stepId, readerOpts, diagnostic) {
   } else {
     heading = `\`${stepId}\` ${outcome}`;
   }
-  const stdoutRead = readStepStdoutForDisplay(step, readerOpts);
-  const stderrRead = readStepStderrForDisplay(step, readerOpts);
+  const stdoutRead = readStepStdout(step, readerOpts);
+  const stderrRead = readStepStderr(step, readerOpts);
   const stderrContent = stderrRead.content !== void 0 && stderrRead.content.trim().length > 0 ? stderrRead.content : void 0;
   const issue = {
     id: stepId,
@@ -264,10 +271,8 @@ function buildStepIssue(step, stepId, readerOpts, diagnostic) {
     ...exitCode !== void 0 ? { exitCode } : {},
     ...diagnostic !== void 0 ? { diagnostic } : {},
     ...stdoutRead.content !== void 0 ? { stdout: stdoutRead.content } : {},
-    ...stdoutRead.truncated === true ? { stdoutTruncated: true } : {},
     ...stdoutRead.error !== void 0 ? { stdoutError: stdoutRead.error } : {},
     ...stderrContent !== void 0 ? { stderr: stderrContent } : {},
-    ...stderrContent !== void 0 && stderrRead.truncated === true ? { stderrTruncated: true } : {},
     ...stderrRead.error !== void 0 ? { stderrError: stderrRead.error } : {}
   };
   return issue;
@@ -276,8 +281,8 @@ function shouldCreateStepIssue(step, readerOpts, diagnostic) {
   const outcome = getStepOutcome(step);
   if (outcome === "failure") return true;
   if (diagnostic !== void 0) return true;
-  const stderrRead = readStepStderrForDisplay(step, readerOpts);
-  return stderrRead.content !== void 0 && stderrRead.content.trim().length > 0;
+  const stderrPeek = peekStepStderr(step, readerOpts);
+  return stderrPeek.content !== void 0 && stderrPeek.content.trim().length > 0;
 }
 
 // src/model/status-icons.ts
@@ -1695,7 +1700,7 @@ function processPlanStep(step, stepId, report, readerOpts, showPlanParsed) {
   }
   const path = getStepStdoutPath(step, readerOpts);
   if (path) {
-    const peek = readStepStdoutForDisplay(step, readerOpts);
+    const peek = peekStepStdout(step, readerOpts);
     if (peek.content !== void 0) {
       const firstLines = peek.content.split("\n", 10);
       if (isJsonLines(firstLines)) {
@@ -1717,8 +1722,7 @@ function processPlanStep(step, stepId, report, readerOpts, showPlanParsed) {
       report.rawStdout.push({
         stepId,
         label: "Plan Output",
-        content: read.content,
-        truncated: read.truncated === true
+        content: read.content
       });
     } else if (read.error) {
       report.warnings.push(`plan stdout: ${read.error}`);
@@ -1770,7 +1774,7 @@ function processApplyStep(step, stepId, report, readerOpts, showPlanParsed) {
   }
   const path = getStepStdoutPath(step, readerOpts);
   if (path) {
-    const peek = readStepStdoutForDisplay(step, readerOpts);
+    const peek = peekStepStdout(step, readerOpts);
     if (peek.content !== void 0) {
       const firstLines = peek.content.split("\n", 10);
       if (isJsonLines(firstLines)) {
@@ -1792,8 +1796,7 @@ function processApplyStep(step, stepId, report, readerOpts, showPlanParsed) {
       report.rawStdout.push({
         stepId,
         label: "Apply Output",
-        content: read.content,
-        truncated: read.truncated === true
+        content: read.content
       });
     } else if (read.error) {
       report.warnings.push(`apply stdout: ${read.error}`);
@@ -2004,8 +2007,7 @@ function buildReportFromSteps(stepsJson, options) {
   ]);
   const readerOpts = {
     allowedDirs: options?.allowedDirs ?? [env["RUNNER_TEMP"] ?? tmpdir()],
-    maxFileSize: DEFAULT_MAX_FILE_SIZE,
-    maxDisplayRead: options?.maxDisplayRead ?? DEFAULT_MAX_DISPLAY_READ
+    maxFileSize: DEFAULT_MAX_FILE_SIZE
   };
   const parseResult = parseSteps(stepsJson);
   if (typeof parseResult === "string") {
@@ -3301,8 +3303,7 @@ function renderStepIssue(issue) {
 `;
   }
   if (issue.stdout !== void 0) {
-    const displayContent = issue.stdoutTruncated === true ? issue.stdout + "\n\u2026 (truncated)" : issue.stdout;
-    const formatted = formatRawOutput(displayContent);
+    const formatted = formatRawOutput(issue.stdout);
     content += `<details open>
 <summary>stdout</summary>
 
@@ -3317,8 +3318,7 @@ ${formatted}
 `;
   }
   if (issue.stderr !== void 0) {
-    const displayContent = issue.stderrTruncated === true ? issue.stderr + "\n\u2026 (truncated)" : issue.stderr;
-    const formattedStderr = formatRawOutput(displayContent);
+    const formattedStderr = formatRawOutput(issue.stderr);
     content += `<details open>
 <summary>stderr</summary>
 
@@ -3348,12 +3348,11 @@ ${formattedStderr}
 function renderTextFallbackBody(report) {
   const sections = [];
   for (const raw of report.rawStdout) {
-    const displayContent = raw.truncated ? raw.content + "\n\u2026 (truncated)" : raw.content;
     sections.push({
       id: `raw-${raw.stepId}`,
       full: `### ${raw.label}
 
-${formatRawOutput(displayContent)}
+${formatRawOutput(raw.content)}
 
 `,
       compact: `### ${raw.label}
@@ -3451,8 +3450,7 @@ function renderReportSections(report, options) {
 function renderRawStdoutSections(report) {
   const sections = [];
   for (const raw of report.rawStdout) {
-    const displayContent = raw.truncated ? raw.content + "\n\u2026 (truncated)" : raw.content;
-    const formatted = formatRawOutput(displayContent);
+    const formatted = formatRawOutput(raw.content);
     const escapedLabel = MarkdownWriter.escapeHtml(raw.label);
     const full = `<details><summary>${escapedLabel}</summary>
 

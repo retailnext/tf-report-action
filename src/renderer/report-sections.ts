@@ -81,10 +81,7 @@ export function renderReportSections(
 function renderRawStdoutSections(report: Report): Section[] {
   const sections: Section[] = [];
   for (const raw of report.rawStdout) {
-    const displayContent = raw.truncated
-      ? raw.content + "\n… (truncated)"
-      : raw.content;
-    const formatted = formatRawOutput(displayContent);
+    const formatted = formatRawOutput(raw.content);
     const escapedLabel = MarkdownWriter.escapeHtml(raw.label);
     const full = `<details><summary>${escapedLabel}</summary>\n\n${formatted}\n\n</details>\n\n`;
     sections.push({ id: `raw-${raw.stepId}`, full });

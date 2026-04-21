@@ -33,7 +33,6 @@ import {
   DEFAULT_APPLY_STEP,
   DEFAULT_STATE_STEP,
   DEFAULT_MAX_FILE_SIZE,
-  DEFAULT_MAX_DISPLAY_READ,
 } from "../steps/types.js";
 import { getStepOutcome, buildStepOutcomes } from "../steps/outcomes.js";
 import { buildStepIssue, shouldCreateStepIssue } from "./step-issues.js";
@@ -67,11 +66,6 @@ export interface ReportOptions extends BuildOptions, RenderOptions {
    * to override auto-detection.
    */
   tool?: Tool;
-  /**
-   * Maximum bytes to read from a step's stdout/stderr file for display.
-   * Default: 64 KiB. Set lower in tests to exercise truncation paths.
-   */
-  maxDisplayRead?: number;
   /** Step ID for the init step. Default: "init" */
   initStepId?: string;
   /** Step ID for the validate step. Default: "validate" */
@@ -138,7 +132,6 @@ export function buildReportFromSteps(
   const readerOpts: ReaderOptions = {
     allowedDirs: options?.allowedDirs ?? [env["RUNNER_TEMP"] ?? tmpdir()],
     maxFileSize: DEFAULT_MAX_FILE_SIZE,
-    maxDisplayRead: options?.maxDisplayRead ?? DEFAULT_MAX_DISPLAY_READ,
   };
 
   // Parse steps JSON
