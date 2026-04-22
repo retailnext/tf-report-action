@@ -72,3 +72,6 @@ export { TextFallbackElement } from "./text-fallback.js";
 // Factory
 export { buildReportElements } from "./report-elements.js";
 export type { BuildElementsOptions } from "./report-elements.js";
+
+// ComposedReport
+export { composeReport } from "./composed-report.js";
