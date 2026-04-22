@@ -4843,7 +4843,7 @@ function calculateBudget(footerLength) {
   return Math.max(0, COMMENT_LIMIT - footerLength - OVERHEAD_RESERVE);
 }
 
-// src/compose/notices.ts
+// src/comment/notices.ts
 function buildTruncationNotice(link) {
   if (link !== void 0) {
     return `

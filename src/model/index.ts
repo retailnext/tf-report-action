@@ -11,8 +11,6 @@ export type {
 export type { Report, RawStepStdout, Tool } from "./report.js";
 export type { Diagnostic } from "./diagnostic.js";
 export type { ApplyStatus } from "./apply-status.js";
-export type { Section } from "./section.js";
-export type { CompositionResult } from "./composition-result.js";
 export type { StepIssue } from "./step-issue.js";
 export type { StepOutcome } from "./step-outcome.js";
 export type { StepFileRead } from "./step-file-read.js";

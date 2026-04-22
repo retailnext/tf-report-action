@@ -2,11 +2,9 @@
  * Post-composition notice builders.
  *
  * Produces the truncation warning, logs link, and artifact link appended
- * after a composed report. These are composition concerns — they depend
- * on whether the output was truncated and whether an artifact was uploaded.
- *
- * Moved from compositor/truncation.ts to compose/ because the composition
- * pipeline (not the action entry point) should own notice lifecycle.
+ * after a composed report. These are comment-assembly concerns — they
+ * depend on whether the output was truncated and whether an artifact
+ * was uploaded.
  */
 
 import {

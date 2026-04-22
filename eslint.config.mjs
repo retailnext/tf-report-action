@@ -51,9 +51,9 @@ export default tseslint.config(
   },
   {
     // Sentinel string constants must only be used in the builder layer (where they
-    // are assigned as display text). The renderer and other modules must use boolean
-    // flags (isSensitive, isKnownAfterApply) for logic, never string comparison.
-    files: ["src/renderer/**/*.ts"],
+    // are assigned as display text). The elements layer must use boolean flags
+    // (isSensitive, isKnownAfterApply) for logic, never string comparison.
+    files: ["src/elements/**/*.ts"],
     rules: {
       "no-restricted-imports": [
         "error",
@@ -62,7 +62,7 @@ export default tseslint.config(
             {
               name: "../model/sentinels.js",
               message:
-                "Renderer must not import sentinel strings. Use boolean flags (isSensitive, isKnownAfterApply) instead of string comparison.",
+                "Elements must not import sentinel strings. Use boolean flags (isSensitive, isKnownAfterApply) instead of string comparison.",
             },
           ],
         },
@@ -92,21 +92,19 @@ export default tseslint.config(
             {
               group: [
                 "../builder/*",
-                "../renderer/*",
-                "../compositor/*",
-                "../compose/*",
                 "../diff/*",
                 "../flattener/*",
                 "../sensitivity/*",
-                "../raw-formatter/*",
                 "../parser/*",
                 "../steps/*",
                 "../jsonl-scanner/*",
                 "../tfjson/*",
                 "../drift-filter/*",
+                "../renderable/*",
+                "../elements/*",
               ],
               message:
-                "The action layer may only import from src/pipelines/, src/model/, src/github/, src/env/, src/http/, src/logger/, src/inputs/, and src/comment/.",
+                "The action layer may only import from src/pipelines/, src/model/, src/github/, src/env/, src/http/, src/logger/, src/inputs/, src/html/, and src/comment/.",
             },
           ],
         },
@@ -114,7 +112,7 @@ export default tseslint.config(
     },
   },
   {
-    // The comment module may only import from env/ and compose/notices.
+    // The comment module may only import from env/ and model/ (status icons).
     files: ["src/comment/**/*.ts"],
     rules: {
       "no-restricted-imports": [
@@ -124,12 +122,9 @@ export default tseslint.config(
             {
               group: [
                 "../builder/*",
-                "../renderer/*",
-                "../compositor/*",
                 "../diff/*",
                 "../flattener/*",
                 "../sensitivity/*",
-                "../raw-formatter/*",
                 "../parser/*",
                 "../steps/*",
                 "../jsonl-scanner/*",
@@ -141,10 +136,13 @@ export default tseslint.config(
                 "../inputs/*",
                 "../html/*",
                 "../artifact/*",
+                "../renderable/*",
+                "../elements/*",
+                "../pipelines/*",
                 "../index.js",
               ],
               message:
-                "The comment module may only import from src/env/ and src/compose/.",
+                "The comment module may only import from src/env/ and src/model/.",
             },
           ],
         },
@@ -163,13 +161,9 @@ export default tseslint.config(
             {
               group: [
                 "../builder/*",
-                "../renderer/*",
-                "../compositor/*",
-                "../compose/*",
                 "../diff/*",
                 "../flattener/*",
                 "../sensitivity/*",
-                "../raw-formatter/*",
                 "../parser/*",
                 "../steps/*",
                 "../jsonl-scanner/*",
@@ -180,6 +174,9 @@ export default tseslint.config(
                 "../inputs/*",
                 "../env/*",
                 "../model/*",
+                "../renderable/*",
+                "../elements/*",
+                "../pipelines/*",
                 "../index.js",
               ],
               message: "The GitHub client may only import from src/http/.",
@@ -200,13 +197,9 @@ export default tseslint.config(
             {
               group: [
                 "../builder/*",
-                "../renderer/*",
-                "../compositor/*",
-                "../compose/*",
                 "../diff/*",
                 "../flattener/*",
                 "../sensitivity/*",
-                "../raw-formatter/*",
                 "../parser/*",
                 "../steps/*",
                 "../jsonl-scanner/*",
@@ -217,6 +210,9 @@ export default tseslint.config(
                 "../inputs/*",
                 "../model/*",
                 "../github/*",
+                "../renderable/*",
+                "../elements/*",
+                "../pipelines/*",
                 "../index.js",
               ],
               message: "The HTTP module may only import from src/env/.",

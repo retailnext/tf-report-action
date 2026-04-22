@@ -24,14 +24,12 @@ export default defineConfig({
         // model type-only files (no executable code)
         "src/model/apply-status.ts",
         "src/model/attribute.ts",
-        "src/model/composition-result.ts",
         "src/model/diagnostic.ts",
         "src/model/index.ts", // barrel re-exports; tests import from specific files
         "src/model/output.ts",
         "src/model/render-options.ts",
         "src/model/report.ts",
         "src/model/resource.ts",
-        "src/model/section.ts",
         "src/model/step-file-read.ts",
         "src/model/step-issue.ts",
         "src/model/step-outcome.ts",
@@ -44,8 +42,6 @@ export default defineConfig({
         "src/**/*.d.ts",
         "src/diff/types.ts",
         "src/builder/options.ts",
-        "src/renderer/options.ts",
-        "src/renderer/render-mode.ts",
         // steps/types.ts has runtime guard functions; the one guarding
         // OUTPUT_EXIT_CODE is not reachable through standard fixtures.
         "src/steps/types.ts",
@@ -105,25 +101,36 @@ export default defineConfig({
         // The comment module assembles comment bodies/footers/markers —
         // action-specific output not reachable via reportFromSteps.
         "src/comment/**",
-        // The renderable module provides primitives exercised through the
-        // pipeline entry points (reportFromSteps, planToMarkdown, applyToMarkdown).
-        // However, not all primitives are reachable through fixtures — e.g., Empty
-        // and some HTML-specific paths require specific conditions. The module is
-        // thoroughly covered by unit tests.
-        // TODO: Remove this exclusion after Phase 5 cleanup when integration
-        // coverage for the new pipeline is fully verified.
-        "src/renderable/**",
-        // The elements module is exercised through reportFromSteps but some
-        // element classes (WorkflowElement, TextFallbackElement error paths)
-        // are not reachable through the standard generated fixtures.
-        // TODO: Remove this exclusion after Phase 5 cleanup.
-        "src/elements/**",
-        // Dead code — superseded by src/elements/ and src/renderable/ (Phase 4).
-        // Will be deleted in Phase 5 cleanup.
-        "src/renderer/**",
-        "src/compose/**",
-        "src/raw-formatter/**",
-        "src/diff/context-diff.ts", // only used by old renderer
+        // Type-only file — interfaces with no executable code.
+        "src/renderable/types.ts",
+        // Barrel re-exports — no executable logic.
+        "src/renderable/index.ts",
+        "src/elements/index.ts",
+        // Renderable primitives have many format-specific branches (markdown vs
+        // HTML headings, tables, code blocks, blockquotes). Integration tests
+        // only exercise the markdown path for snapshots. HTML paths and edge
+        // cases (empty tables, zero-row, Blockquote) are covered by unit tests.
+        "src/renderable/primitives.ts",
+        // ErrorElement is only produced on pipeline/parse failures —
+        // integration tests supply valid fixture data. Covered by unit tests.
+        "src/elements/error.ts",
+        // TitleElement has branches for every report variant (workflow,
+        // text-fallback, error) and many action/status combinations.
+        // Integration fixtures only exercise the structured-report path.
+        // Covered comprehensively by unit tests.
+        "src/elements/title.ts",
+        // TextFallbackElement/WorkflowElement are produced only when no
+        // structured plan data is available — integration fixtures always
+        // provide valid plan JSON. Covered by unit tests.
+        "src/elements/text-fallback.ts",
+        "src/elements/workflow.ts",
+        // RawOutputElement has branches for JSONL, validate, and plain-text
+        // formats at multiple detail levels. Not all combinations are
+        // exercised by integration fixtures. Covered by unit tests.
+        "src/elements/raw-output.ts",
+        // RawStdoutElement is a small wrapper; its size-limited truncation
+        // path is not exercised by standard fixtures. Covered by unit tests.
+        "src/elements/raw-stdout.ts",
       ],
       thresholds: {
         lines: 90,

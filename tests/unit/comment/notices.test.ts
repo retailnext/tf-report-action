@@ -3,7 +3,7 @@ import {
   buildTruncationNotice,
   buildLogsNotice,
   buildArtifactNotice,
-} from "../../../src/compose/notices.js";
+} from "../../../src/comment/notices.js";
 
 describe("buildTruncationNotice", () => {
   it("includes a clickable link when link is provided", () => {
