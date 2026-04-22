@@ -132,7 +132,6 @@ export async function run(
     const reportOptions: ReportOptions = {
       workspace: inputs.workspace,
       env,
-      maxOutputLength: 0,
       initStepId: inputs.initStepId,
       validateStepId: inputs.validateStepId,
       planStepId: inputs.planStepId,
@@ -166,16 +165,15 @@ export async function run(
       transport,
     });
 
-    // First pass: full budget (no truncation notice reservation)
+    // Build the report once — render at different budgets/formats as needed
     const fullBudget = calculateBudget(footer.length);
-    const result = reportFromSteps(inputs.steps, {
-      ...reportOptions,
-      maxOutputLength: fullBudget,
-    });
+    const result = reportFromSteps(inputs.steps, reportOptions);
+    const { operation, hasUnresolvedFailures } = result;
 
-    let { markdown } = result;
-    const { fullMarkdown, wasTruncated, operation, hasUnresolvedFailures } =
-      result;
+    // First render: full budget (no truncation notice reservation)
+    const mdResult = result.report.render("markdown", fullBudget);
+    let markdown = mdResult.output;
+    const wasTruncated = mdResult.truncated;
 
     // Upload artifact when truncated or always-upload-report enabled
     const shouldUpload = wasTruncated || inputs.alwaysUploadReport;
@@ -188,11 +186,11 @@ export async function run(
       const opPart = operation !== undefined ? `${operation}-` : "";
       const artifactName = `${workspacePart}${opPart}report.html`;
 
+      // Render full-detail HTML natively — no GitHub /markdown API call
+      const htmlResult = result.report.render("html");
       artifactUrl = await tryUpload({
-        fullMarkdown,
-        renderMarkdown: client.renderMarkdown.bind(client),
+        htmlContent: htmlResult.output,
         env,
-        repoContext: `${owner}/${repo}`,
         artifactName,
         logger,
         deps: { transport },
@@ -202,14 +200,11 @@ export async function run(
     if (wasTruncated) {
       const truncationNotice = buildTruncation(artifactUrl, logsUrl);
 
-      // Second pass: reserve space for truncation notice
+      // Re-render at reduced budget to make room for truncation notice
       const reducedBudget = Math.max(0, fullBudget - truncationNotice.length);
-      ({ markdown } = reportFromSteps(inputs.steps, {
-        ...reportOptions,
-        maxOutputLength: reducedBudget,
-      }));
-
-      markdown += truncationNotice;
+      markdown =
+        result.report.render("markdown", reducedBudget).output +
+        truncationNotice;
     }
 
     const body = assembleCommentBody(markdown, footer, {

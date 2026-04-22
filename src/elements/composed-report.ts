@@ -100,9 +100,11 @@ class ComposedReportImpl implements ComposedReport {
       }
     }
 
-    // If no flex elements, render everything at max
+    // If no flex elements, render everything at max — but report
+    // truncated if even the fixed cost exceeds the budget.
     if (this.flexEntries.length === 0) {
-      return this.renderAtLevels(format, maxLevels, false);
+      const truncated = fixedCost > limit;
+      return this.renderAtLevels(format, maxLevels, truncated);
     }
 
     // Start all flex elements at level 0

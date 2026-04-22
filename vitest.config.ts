@@ -32,6 +32,12 @@ export default defineConfig({
         "src/builder/options.ts",
         "src/renderer/options.ts",
         "src/renderer/render-mode.ts",
+        // Dead code — superseded by src/elements/ and src/renderable/ (Phase 4).
+        // Will be deleted in Phase 5 cleanup.
+        "src/renderer/**",
+        "src/compose/**",
+        "src/raw-formatter/**",
+        "src/diff/context-diff.ts", // only used by old renderer
         // Test helper files must not appear in source coverage
         "tests/**",
       ],

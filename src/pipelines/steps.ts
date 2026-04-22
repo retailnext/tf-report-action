@@ -1,27 +1,32 @@
 import type { ReportOptions } from "../builder/report-from-steps.js";
 export type { ReportOptions };
+import type { ComposedReport } from "../renderable/types.js";
 import { buildReportFromSteps } from "../builder/report-from-steps.js";
-import { renderReportSections } from "../renderer/report-sections.js";
-import { composeWithBudget } from "../compose/index.js";
+import { buildReportElements } from "../elements/report-elements.js";
+import { composeReport } from "../elements/composed-report.js";
 import { STATUS_FAILURE } from "../model/status-icons.js";
-
-/** Default maximum output length (63 KiB). */
-const DEFAULT_MAX_OUTPUT_LENGTH = 64512;
+import { RawText } from "../renderable/primitives.js";
 
 /**
  * Result of generating a report from a GitHub Actions steps context.
  *
- * Separates the budget-constrained markdown (for the comment body)
- * from the un-truncated full markdown (for artifact upload) so that
- * callers can handle truncation notices and artifact upload independently.
+ * The report is a {@link ComposedReport} that can render itself to markdown
+ * or HTML on demand with optional budget constraints. The caller decides
+ * format and limit:
+ *
+ * ```typescript
+ * const result = reportFromSteps(stepsJson, options);
+ * const md = result.report.render("markdown", budget);
+ * if (md.truncated) {
+ *   const html = result.report.render("html"); // full detail
+ *   uploadArtifact(buildHtmlPage(html.output, title));
+ * }
+ * postComment(md.output);
+ * ```
  */
 export interface ReportFromStepsResult {
-  /** Budget-constrained markdown (without truncation notice). */
-  readonly markdown: string;
-  /** Un-truncated markdown (all sections at full size, for artifact upload). */
-  readonly fullMarkdown: string;
-  /** Whether any section was degraded or omitted. */
-  readonly wasTruncated: boolean;
+  /** The assembled report, ready for rendering at any format and budget. */
+  readonly report: ComposedReport;
   /** The detected operation type, if determinable from step context. */
   readonly operation?: "plan" | "apply" | "destroy";
   /** Whether any step failed without captured stdout/stderr output. */
@@ -31,60 +36,45 @@ export interface ReportFromStepsResult {
 /**
  * Generates a report from a GitHub Actions steps context JSON string.
  *
- * **Never throws.** All errors are rendered as markdown content. The
- * budget-constrained output is in `markdown`; the un-truncated version
- * is in `fullMarkdown`.
+ * **Never throws.** All errors become report content. Returns a
+ * {@link ReportFromStepsResult} whose `report` field renders to markdown
+ * or HTML on demand.
  *
- * The `markdown` field does **not** include a truncation notice — the
- * caller is responsible for building and appending one (e.g. with a
- * link to an uploaded artifact or to workflow logs).
- *
- * This is the third pipeline, following the same parse → build → render → compose
- * pattern as planToMarkdown and applyToMarkdown.
+ * This is the third pipeline, following the same parse → build → compose
+ * pattern as planReport and applyReport, but with error wrapping.
  *
  * @param stepsJson - JSON-encoded GitHub Actions steps context
  * @param options - Report generation options
- * @returns Structured result with budget-constrained and full markdown
+ * @returns Structured result with a renderable report and metadata
  */
 export function reportFromSteps(
   stepsJson: string,
   options?: ReportOptions,
 ): ReportFromStepsResult {
   try {
-    const maxOutputLength =
-      options?.maxOutputLength ?? DEFAULT_MAX_OUTPUT_LENGTH;
-
-    // Build: parse steps → detect tier → build appropriate Report variant
     const report = buildReportFromSteps(stepsJson, options);
-
-    // Render: Report → Section[] (used for fullMarkdown and fixed content)
-    const sections = renderReportSections(report, options);
-
-    // Full markdown: all sections at full size (for artifact upload)
-    const fullMarkdown = sections.map((s) => s.full).join("");
-
-    // Compose progressively: fixed content + flex categories within budget
-    const result = composeWithBudget(
-      sections,
-      report,
-      options ?? {},
-      maxOutputLength,
-    );
+    const elements = buildReportElements(report, options);
+    const composed = composeReport(elements);
 
     return {
-      markdown: result.markdown,
-      fullMarkdown,
-      wasTruncated: result.wasTruncated,
+      report: composed,
       ...(report.operation !== undefined && { operation: report.operation }),
       hasUnresolvedFailures: report.hasUnresolvedFailures ?? false,
     };
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : "Unknown error";
-    const errorMarkdown = `## ${STATUS_FAILURE} Report Generation Failed\n\nAn unexpected error occurred while generating the report:\n\n\`\`\`\n${message}\n\`\`\`\n`;
+    const errorRenderable = new RawText(
+      `## ${STATUS_FAILURE} Report Generation Failed\n\nAn unexpected error occurred while generating the report:\n\n\`\`\`\n${message}\n\`\`\`\n`,
+    );
+    const errorReport: ComposedReport = {
+      render: () => ({
+        output: errorRenderable.render("markdown"),
+        truncated: false,
+      }),
+      fullSize: (format) => errorRenderable.size(format),
+    };
     return {
-      markdown: errorMarkdown,
-      fullMarkdown: errorMarkdown,
-      wasTruncated: false,
+      report: errorReport,
       hasUnresolvedFailures: false,
     };
   }

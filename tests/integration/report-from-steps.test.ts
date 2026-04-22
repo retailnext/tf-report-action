@@ -66,7 +66,9 @@ describe("reportFromSteps integration — generated fixtures", () => {
           allowedDirs: [fixtureDir],
           env: NO_GITHUB_ENV,
         };
-        const result = reportFromSteps(resolved, options).markdown;
+        const result = reportFromSteps(resolved, options).report.render(
+          "markdown",
+        ).output;
         expect(result).toMatchSnapshot();
         assertCorrectToolName(result, label);
       });
@@ -78,7 +80,9 @@ describe("reportFromSteps integration — generated fixtures", () => {
           workspace: "test-workspace",
           env: NO_GITHUB_ENV,
         };
-        const result = reportFromSteps(resolved, options).markdown;
+        const result = reportFromSteps(resolved, options).report.render(
+          "markdown",
+        ).output;
         expect(result).toMatchSnapshot();
       });
     });
@@ -130,7 +134,7 @@ describe("reportFromSteps integration — custom step IDs", () => {
         const defaultResult = reportFromSteps(defaultResolved, {
           allowedDirs: [fixtureDir],
           env: NO_GITHUB_ENV,
-        }).markdown;
+        }).report.render("markdown").output;
 
         // Render with custom step IDs
         const renamedJson = renameStepKeys(stepsJson, CUSTOM_STEP_IDS);
@@ -139,7 +143,7 @@ describe("reportFromSteps integration — custom step IDs", () => {
           allowedDirs: [fixtureDir],
           env: NO_GITHUB_ENV,
           ...CUSTOM_STEP_ID_OPTIONS,
-        }).markdown;
+        }).report.render("markdown").output;
 
         // Both should produce the same report tier (structured, not degraded)
         // Step IDs appear in step tables and error headings, so exact match
@@ -174,7 +178,7 @@ describe("reportFromSteps integration — custom step IDs", () => {
         const defaultResult = reportFromSteps(defaultResolved, {
           allowedDirs: [fixtureDir],
           env: NO_GITHUB_ENV,
-        }).markdown;
+        }).report.render("markdown").output;
 
         const renamedJson = renameStepKeys(stepsJson, CUSTOM_STEP_IDS);
         const renamedResolved = resolveStepFilePaths(renamedJson, fixtureDir);
@@ -182,7 +186,7 @@ describe("reportFromSteps integration — custom step IDs", () => {
           allowedDirs: [fixtureDir],
           env: NO_GITHUB_ENV,
           ...CUSTOM_STEP_ID_OPTIONS,
-        }).markdown;
+        }).report.render("markdown").output;
 
         // Both should produce plan content (not degraded)
         const defaultHasPlan = /Plan Summary|Plan Output|No Changes/.test(
@@ -208,7 +212,7 @@ describe("reportFromSteps integration — custom step IDs", () => {
       allowedDirs: [fixture.fixtureDir],
       env: NO_GITHUB_ENV,
       ...CUSTOM_STEP_ID_OPTIONS,
-    }).markdown;
+    }).report.render("markdown").output;
 
     // Should NOT contain structured plan/apply output
     expect(result).not.toContain("Plan Summary");
@@ -227,7 +231,9 @@ describe("reportFromSteps integration — plan-only fixtures", () => {
           allowedDirs: [fixtureDir],
           env: NO_GITHUB_ENV,
         };
-        const result = reportFromSteps(resolved, options).markdown;
+        const result = reportFromSteps(resolved, options).report.render(
+          "markdown",
+        ).output;
         expect(result).toMatchSnapshot();
         assertCorrectToolName(result, label);
       });
@@ -238,7 +244,9 @@ describe("reportFromSteps integration — plan-only fixtures", () => {
           allowedDirs: [fixtureDir],
           env: NO_GITHUB_ENV,
         };
-        const result = reportFromSteps(resolved, options).markdown;
+        const result = reportFromSteps(resolved, options).report.render(
+          "markdown",
+        ).output;
         // Plan-only should never show "Apply Summary" or "Apply Output"
         expect(result).not.toContain("Apply Summary");
         expect(result).not.toContain("Apply Output");
@@ -262,7 +270,9 @@ describe("reportFromSteps integration — no-show fixtures (Tier 3)", () => {
           allowedDirs: [fixtureDir],
           env: NO_GITHUB_ENV,
         };
-        const result = reportFromSteps(resolved, options).markdown;
+        const result = reportFromSteps(resolved, options).report.render(
+          "markdown",
+        ).output;
         expect(result).toMatchSnapshot();
         assertCorrectToolName(result, label);
       });
@@ -273,7 +283,9 @@ describe("reportFromSteps integration — no-show fixtures (Tier 3)", () => {
           allowedDirs: [fixtureDir],
           env: NO_GITHUB_ENV,
         };
-        const result = reportFromSteps(resolved, options).markdown;
+        const result = reportFromSteps(resolved, options).report.render(
+          "markdown",
+        ).output;
         // Tier 2 produces structured output from JSONL scanning, or no-change plan with just step table.
         // When structured data is available, should have a warning about limited detail.
         // When no changes were detected, just step statuses are shown.
@@ -295,7 +307,9 @@ describe("reportFromSteps integration — apply-no-show fixtures", () => {
           allowedDirs: [fixtureDir],
           env: NO_GITHUB_ENV,
         };
-        const result = reportFromSteps(resolved, options).markdown;
+        const result = reportFromSteps(resolved, options).report.render(
+          "markdown",
+        ).output;
         expect(result).toMatchSnapshot();
         assertCorrectToolName(result, label);
       });
@@ -306,7 +320,9 @@ describe("reportFromSteps integration — apply-no-show fixtures", () => {
           allowedDirs: [fixtureDir],
           env: NO_GITHUB_ENV,
         };
-        const result = reportFromSteps(resolved, options).markdown;
+        const result = reportFromSteps(resolved, options).report.render(
+          "markdown",
+        ).output;
         // Should have structured content, raw output blocks, or at minimum step statuses
         expect(result).toMatch(
           /Plan Summary|Apply Summary|Plan Output|Apply Output|No readable output|raw command output|stdout_file output missing|failed|attribute details|Steps/,
@@ -327,7 +343,9 @@ describe("reportFromSteps integration — apply-only fixtures", () => {
           allowedDirs: [fixtureDir],
           env: NO_GITHUB_ENV,
         };
-        const result = reportFromSteps(resolved, options).markdown;
+        const result = reportFromSteps(resolved, options).report.render(
+          "markdown",
+        ).output;
         expect(result).toMatchSnapshot();
         assertCorrectToolName(result, label);
       });
@@ -338,7 +356,9 @@ describe("reportFromSteps integration — apply-only fixtures", () => {
           allowedDirs: [fixtureDir],
           env: NO_GITHUB_ENV,
         };
-        const result = reportFromSteps(resolved, options).markdown;
+        const result = reportFromSteps(resolved, options).report.render(
+          "markdown",
+        ).output;
         // No plan step means no Plan Output section
         expect(result).not.toContain("Plan Output");
         // Should have either apply content, step table, or note about unavailable output
@@ -363,7 +383,7 @@ describe("reportFromSteps — action classification", () => {
     const result = reportFromSteps(resolved, {
       allowedDirs: [fixture!.fixtureDir],
       env: NO_GITHUB_ENV,
-    }).markdown;
+    }).report.render("markdown").output;
     expect(result).toContain("No Changes");
     expect(result).not.toContain("Resource Changes");
   });
@@ -382,7 +402,7 @@ describe("reportFromSteps — action classification", () => {
       const result = reportFromSteps(resolved, {
         allowedDirs: [fixture!.fixtureDir],
         env: NO_GITHUB_ENV,
-      }).markdown;
+      }).report.render("markdown").output;
       expect(result).toContain("1 to move");
       expect(result).toContain("🚚");
       expect(result).toContain("Move");
@@ -404,7 +424,7 @@ describe("reportFromSteps — action classification", () => {
       const result = reportFromSteps(resolved, {
         allowedDirs: [fixture!.fixtureDir],
         env: NO_GITHUB_ENV,
-      }).markdown;
+      }).report.render("markdown").output;
       expect(result).toContain("1 to import");
       expect(result).toContain("📥");
       expect(result).toContain("Import");
@@ -424,7 +444,7 @@ describe("reportFromSteps — action classification", () => {
     const result = reportFromSteps(resolved, {
       allowedDirs: [fixture!.fixtureDir],
       env: NO_GITHUB_ENV,
-    }).markdown;
+    }).report.render("markdown").output;
     expect(result).toContain("1 to forget");
     expect(result).toContain("👋");
     expect(result).toContain("Forget");
@@ -443,7 +463,7 @@ describe("reportFromSteps — action classification", () => {
     const result = reportFromSteps(resolved, {
       allowedDirs: [fixture!.fixtureDir],
       env: NO_GITHUB_ENV,
-    }).markdown;
+    }).report.render("markdown").output;
     expect(result).toContain("1 to forget");
     expect(result).toContain("👋");
     expect(result).toContain("Forget");
@@ -469,7 +489,7 @@ describe("reportFromSteps — forget in apply output", () => {
         const result = reportFromSteps(resolved, {
           allowedDirs: [fixture!.fixtureDir],
           env: NO_GITHUB_ENV,
-        }).markdown;
+        }).report.render("markdown").output;
         expect(result).not.toContain("No Changes");
         expect(result).toContain("ephemeral");
       });
@@ -484,7 +504,7 @@ describe("reportFromSteps — forget in apply output", () => {
         const result = reportFromSteps(resolved, {
           allowedDirs: [fixture!.fixtureDir],
           env: NO_GITHUB_ENV,
-        }).markdown;
+        }).report.render("markdown").output;
         expect(result).toContain("👋");
         expect(result).toContain("Forgotten");
       });
@@ -499,7 +519,7 @@ describe("reportFromSteps — forget in apply output", () => {
         const result = reportFromSteps(resolved, {
           allowedDirs: [fixture!.fixtureDir],
           env: NO_GITHUB_ENV,
-        }).markdown;
+        }).report.render("markdown").output;
         expect(result).toContain("## Apply Summary");
         expect(result).not.toContain("## Plan Summary");
       });
@@ -525,7 +545,7 @@ describe("reportFromSteps — state-only operations in apply output", () => {
         const result = reportFromSteps(resolved, {
           allowedDirs: [fixture!.fixtureDir],
           env: NO_GITHUB_ENV,
-        }).markdown;
+        }).report.render("markdown").output;
         expect(result).not.toContain("No Changes");
         expect(result).toContain("renamed");
       });
@@ -540,7 +560,7 @@ describe("reportFromSteps — state-only operations in apply output", () => {
         const result = reportFromSteps(resolved, {
           allowedDirs: [fixture!.fixtureDir],
           env: NO_GITHUB_ENV,
-        }).markdown;
+        }).report.render("markdown").output;
         expect(result).toContain("🚚");
         expect(result).toContain("Moved");
       });
@@ -555,7 +575,7 @@ describe("reportFromSteps — state-only operations in apply output", () => {
         const result = reportFromSteps(resolved, {
           allowedDirs: [fixture!.fixtureDir],
           env: NO_GITHUB_ENV,
-        }).markdown;
+        }).report.render("markdown").output;
         expect(result).toContain("## Apply Summary");
         expect(result).not.toContain("## Plan Summary");
       });
@@ -577,7 +597,7 @@ describe("reportFromSteps — state-only operations in apply output", () => {
         const result = reportFromSteps(resolved, {
           allowedDirs: [fixture!.fixtureDir],
           env: NO_GITHUB_ENV,
-        }).markdown;
+        }).report.render("markdown").output;
         expect(result).not.toContain("No Changes");
         expect(result).toContain("imported");
       });
@@ -592,7 +612,7 @@ describe("reportFromSteps — state-only operations in apply output", () => {
         const result = reportFromSteps(resolved, {
           allowedDirs: [fixture!.fixtureDir],
           env: NO_GITHUB_ENV,
-        }).markdown;
+        }).report.render("markdown").output;
         expect(result).toContain("📥");
         expect(result).toContain("Imported");
       });
@@ -607,7 +627,7 @@ describe("reportFromSteps — state-only operations in apply output", () => {
         const result = reportFromSteps(resolved, {
           allowedDirs: [fixture!.fixtureDir],
           env: NO_GITHUB_ENV,
-        }).markdown;
+        }).report.render("markdown").output;
         expect(result).toContain("## Apply Summary");
         expect(result).not.toContain("## Plan Summary");
       });
@@ -628,7 +648,9 @@ describe("reportFromSteps integration — manual fixtures", () => {
           allowedDirs: [fixtureDir],
           env: NO_GITHUB_ENV,
         };
-        const result = reportFromSteps(resolved, options).markdown;
+        const result = reportFromSteps(resolved, options).report.render(
+          "markdown",
+        ).output;
         expect(result).toMatchSnapshot();
         assertCorrectToolName(result, label);
       });
@@ -651,7 +673,7 @@ describe("reportFromSteps integration — error fixture scenarios", () => {
     const result = reportFromSteps(resolved, {
       allowedDirs: [fixture!.fixtureDir],
       env: NO_GITHUB_ENV,
-    }).markdown;
+    }).report.render("markdown").output;
     // Should show the failed validate step
     expect(result).toContain("`validate` failed");
     // Should show failure icon
@@ -671,7 +693,7 @@ describe("reportFromSteps integration — error fixture scenarios", () => {
       allowedDirs: [fixture!.fixtureDir],
       workspace: "my-ws",
       env: NO_GITHUB_ENV,
-    }).markdown;
+    }).report.render("markdown").output;
     expect(result).toContain("`my-ws`");
     expect(result).toContain("❌");
   });
@@ -688,7 +710,7 @@ describe("reportFromSteps integration — error fixture scenarios", () => {
     const result = reportFromSteps(resolved, {
       allowedDirs: [fixture!.fixtureDir],
       env: NO_GITHUB_ENV,
-    }).markdown;
+    }).report.render("markdown").output;
     // Should show failure icon
     expect(result).toContain("❌");
     // Plan failed — should have step issue with plan failure details
@@ -707,7 +729,7 @@ describe("reportFromSteps integration — error fixture scenarios", () => {
     const result = reportFromSteps(resolved, {
       allowedDirs: [fixture!.fixtureDir],
       env: NO_GITHUB_ENV,
-    }).markdown;
+    }).report.render("markdown").output;
     expect(result).toContain("❌");
     expect(result).not.toContain("Apply");
   });
@@ -724,7 +746,7 @@ describe("reportFromSteps integration — error fixture scenarios", () => {
     const result = reportFromSteps(resolved, {
       allowedDirs: [fixture!.fixtureDir],
       env: NO_GITHUB_ENV,
-    }).markdown;
+    }).report.render("markdown").output;
     // Validate failed, plan was skipped (no stdout_file) → Tier 3 with no readable output
     expect(result).toContain("`validate` failed");
     // Should show step status table since no output is available
@@ -744,7 +766,7 @@ describe("reportFromSteps integration — error fixture scenarios", () => {
     const result = reportFromSteps(resolved, {
       allowedDirs: [fixture!.fixtureDir],
       env: NO_GITHUB_ENV,
-    }).markdown;
+    }).report.render("markdown").output;
     // Should produce structured output from JSONL scanning (Tier 2)
     // with a warning about limited attribute detail
     expect(result).toContain("attribute details are not available");
@@ -762,9 +784,8 @@ describe("reportFromSteps integration — error fixture scenarios", () => {
     );
     const result = reportFromSteps(resolved, {
       allowedDirs: [fixture!.fixtureDir],
-      maxOutputLength: 500,
       env: NO_GITHUB_ENV,
-    }).markdown;
+    }).report.render("markdown", 500).output;
     expect(result.length).toBeLessThanOrEqual(500);
   });
 
@@ -777,16 +798,15 @@ describe("reportFromSteps integration — error fixture scenarios", () => {
       fixture!.stepsJson,
       fixture!.fixtureDir,
     );
-    const { wasTruncated } = reportFromSteps(resolved, {
+    const { truncated } = reportFromSteps(resolved, {
       allowedDirs: [fixture!.fixtureDir],
-      maxOutputLength: 50,
       env: {
         GITHUB_REPOSITORY: "owner/repo",
         GITHUB_RUN_ID: "99999",
         GITHUB_RUN_ATTEMPT: "2",
       },
-    });
-    expect(wasTruncated).toBe(true);
+    }).report.render("markdown", 1);
+    expect(truncated).toBe(true);
   });
 
   it("invocation-variants: shows structured plan from show-plan even though apply was not -json", () => {
@@ -801,7 +821,7 @@ describe("reportFromSteps integration — error fixture scenarios", () => {
     const result = reportFromSteps(resolved, {
       allowedDirs: [fixture!.fixtureDir],
       env: NO_GITHUB_ENV,
-    }).markdown;
+    }).report.render("markdown").output;
     // Should show structured content (show-plan JSON was available)
     expect(result).toMatch(/Plan Summary|Apply Summary/);
     // Apply ran but was not -json, so scanner finds no records — this results
@@ -823,7 +843,7 @@ describe("reportFromSteps integration — error fixture scenarios", () => {
     const result = reportFromSteps(resolved, {
       allowedDirs: [fixture!.fixtureDir],
       env: NO_GITHUB_ENV,
-    }).markdown;
+    }).report.render("markdown").output;
     // Should show JSONL-enriched report with apply data
     expect(result).toMatch(/Apply|attribute details/);
   });
@@ -840,7 +860,7 @@ describe("reportFromSteps integration — error fixture scenarios", () => {
     const result = reportFromSteps(resolved, {
       allowedDirs: [fixture!.fixtureDir],
       env: NO_GITHUB_ENV,
-    }).markdown;
+    }).report.render("markdown").output;
     // No plan step, so no Plan Output section
     expect(result).not.toContain("Plan Output");
     // Should have apply content
@@ -860,15 +880,17 @@ describe("reportFromSteps integration — targeted scenarios", () => {
     );
     const options: ReportOptions = {
       allowedDirs: [fixture!.fixtureDir],
-      maxOutputLength: 500,
       env: {
         GITHUB_REPOSITORY: "owner/repo",
         GITHUB_RUN_ID: "12345",
         GITHUB_RUN_ATTEMPT: "1",
       },
     };
-    const { wasTruncated } = reportFromSteps(resolved, options);
-    expect(wasTruncated).toBe(true);
+    const { truncated } = reportFromSteps(resolved, options).report.render(
+      "markdown",
+      500,
+    );
+    expect(truncated).toBe(true);
   });
 
   it("includes workspace dedup marker when workspace is set", () => {
@@ -883,7 +905,9 @@ describe("reportFromSteps integration — targeted scenarios", () => {
       workspace: "my-workspace",
       env: NO_GITHUB_ENV,
     };
-    const result = reportFromSteps(resolved, options).markdown;
+    const result = reportFromSteps(resolved, options).report.render(
+      "markdown",
+    ).output;
     expect(result).toContain('<!-- tf-report-action:"my-workspace" -->');
     expect(result).toContain("`my-workspace`");
   });
@@ -897,30 +921,37 @@ describe("reportFromSteps integration — targeted scenarios", () => {
     );
     const options: ReportOptions = {
       allowedDirs: [fixture!.fixtureDir],
-      maxOutputLength: 700,
       env: NO_GITHUB_ENV,
     };
-    const result = reportFromSteps(resolved, options).markdown;
+    const result = reportFromSteps(resolved, options).report.render(
+      "markdown",
+      700,
+    ).output;
     expect(result.length).toBeLessThanOrEqual(700);
   });
 
-  it("respects budget even when tier-1 listing alone would overflow", () => {
+  it("reports truncated when budget is tight for tier-1 listing", () => {
     const fixture = generatedFixtures[0];
     expect(fixture).toBeDefined();
     const resolved = resolveStepFilePaths(
       fixture!.stepsJson,
       fixture!.fixtureDir,
     );
-    // Budget tight enough to force tier-1 listing truncation
-    // but large enough to accommodate the fixed prefix (title, summary)
+    // Budget tight enough to force truncation — when even the minimum
+    // level exceeds the budget, the report is returned at level 0 with
+    // truncated=true. The caller is responsible for handling truncation.
     const options: ReportOptions = {
       allowedDirs: [fixture!.fixtureDir],
-      maxOutputLength: 350,
       env: NO_GITHUB_ENV,
     };
     const result = reportFromSteps(resolved, options);
-    expect(result.markdown.length).toBeLessThanOrEqual(350);
-    expect(result.wasTruncated).toBe(true);
+    const mdResult = result.report.render("markdown", 350);
+    expect(mdResult.truncated).toBe(true);
+    // At minimum level, output should be smaller than the full output
+    const fullResult = result.report.render("markdown");
+    expect(mdResult.output.length).toBeLessThanOrEqual(
+      fullResult.output.length,
+    );
   });
 
   it("produces Tier 1 report for fixtures with show-plan.stdout", () => {
@@ -936,7 +967,9 @@ describe("reportFromSteps integration — targeted scenarios", () => {
       allowedDirs: [fixture!.fixtureDir],
       env: NO_GITHUB_ENV,
     };
-    const result = reportFromSteps(resolved, options).markdown;
+    const result = reportFromSteps(resolved, options).report.render(
+      "markdown",
+    ).output;
     // Tier 1 report has structured summary (Plan or Apply depending on step presence)
     expect(result).toMatch(/Plan Summary|Apply Summary/);
   });
@@ -954,7 +987,9 @@ describe("reportFromSteps integration — targeted scenarios", () => {
       allowedDirs: [fixture.fixtureDir],
       env: NO_GITHUB_ENV,
     };
-    const result = reportFromSteps(resolved, options).markdown;
+    const result = reportFromSteps(resolved, options).report.render(
+      "markdown",
+    ).output;
     expect(result).toContain("Apply");
   });
 
@@ -971,14 +1006,16 @@ describe("reportFromSteps integration — targeted scenarios", () => {
       allowedDirs: [fixture.fixtureDir],
       env: NO_GITHUB_ENV,
     };
-    const result = reportFromSteps(resolved, options).markdown;
+    const result = reportFromSteps(resolved, options).report.render(
+      "markdown",
+    ).output;
     expect(result).toContain("❌");
   });
 
   it("handles invalid steps JSON gracefully", () => {
     const result = reportFromSteps("not valid json", {
       env: NO_GITHUB_ENV,
-    }).markdown;
+    }).report.render("markdown").output;
     expect(result).toBeTruthy();
     expect(result.length).toBeGreaterThan(0);
   });
@@ -986,7 +1023,7 @@ describe("reportFromSteps integration — targeted scenarios", () => {
   it("handles empty steps gracefully", () => {
     const result = reportFromSteps("{}", {
       env: NO_GITHUB_ENV,
-    }).markdown;
+    }).report.render("markdown").output;
     expect(result).toBeTruthy();
     expect(result.length).toBeGreaterThan(0);
   });
@@ -1007,7 +1044,7 @@ describe("reportFromSteps integration — rendering quality", () => {
     const result = reportFromSteps(resolved, {
       allowedDirs: [fixture!.fixtureDir],
       env: NO_GITHUB_ENV,
-    }).markdown;
+    }).report.render("markdown").output;
     expect(result).toContain("Plan Failed");
     expect(result).toContain("❌");
   });
@@ -1024,7 +1061,7 @@ describe("reportFromSteps integration — rendering quality", () => {
     const result = reportFromSteps(resolved, {
       allowedDirs: [fixture!.fixtureDir],
       env: NO_GITHUB_ENV,
-    }).markdown;
+    }).report.render("markdown").output;
     // Should format diagnostics with severity icons and summary text
     expect(result).toContain("🚨");
     expect(result).toContain("**Reference to undeclared input variable**");
@@ -1045,7 +1082,7 @@ describe("reportFromSteps integration — rendering quality", () => {
     const result = reportFromSteps(resolved, {
       allowedDirs: [fixture!.fixtureDir],
       env: NO_GITHUB_ENV,
-    }).markdown;
+    }).report.render("markdown").output;
     // JSONL scanner produces structured data — summary and resource list
     expect(result).toMatch(/Apply.*replaced|Apply Summary/);
     // Warning about missing attribute detail
@@ -1064,7 +1101,7 @@ describe("reportFromSteps integration — rendering quality", () => {
     const result = reportFromSteps(resolved, {
       allowedDirs: [fixture!.fixtureDir],
       env: NO_GITHUB_ENV,
-    }).markdown;
+    }).report.render("markdown").output;
     expect(result).toContain("❌");
     expect(result).toContain("Apply Failed");
   });
@@ -1081,7 +1118,7 @@ describe("reportFromSteps integration — rendering quality", () => {
     const result = reportFromSteps(resolved, {
       allowedDirs: [fixture!.fixtureDir],
       env: NO_GITHUB_ENV,
-    }).markdown;
+    }).report.render("markdown").output;
     expect(result).toContain("✅");
     expect(result).toContain("Plan");
     // Warning callout for limited attribute detail
@@ -1101,7 +1138,7 @@ describe("reportFromSteps integration — rendering quality", () => {
     const result = reportFromSteps(resolved, {
       allowedDirs: [fixture!.fixtureDir],
       env: NO_GITHUB_ENV,
-    }).markdown;
+    }).report.render("markdown").output;
     // Title should NOT show ❌ — all steps succeeded
     expect(result).toMatch(/^## ✅/);
     // Should mention parse failure for show-plan
@@ -1124,7 +1161,7 @@ describe("reportFromSteps integration — rendering quality", () => {
     const result = reportFromSteps(resolved, {
       allowedDirs: [fixture!.fixtureDir],
       env: NO_GITHUB_ENV,
-    }).markdown;
+    }).report.render("markdown").output;
     expect(result).toContain("stdout_file output missing in steps");
     expect(result).not.toContain("configured");
     // Each error line should have ⚠️
@@ -1147,7 +1184,7 @@ describe("reportFromSteps integration — rendering quality", () => {
     const result = reportFromSteps(resolved, {
       allowedDirs: [fixture!.fixtureDir],
       env: NO_GITHUB_ENV,
-    }).markdown;
+    }).report.render("markdown").output;
     expect(result).toContain("❌");
     expect(result).toContain("`test` Failed");
   });
@@ -1164,7 +1201,7 @@ describe("reportFromSteps integration — rendering quality", () => {
     const result = reportFromSteps(resolved, {
       allowedDirs: [fixture!.fixtureDir],
       env: NO_GITHUB_ENV,
-    }).markdown;
+    }).report.render("markdown").output;
     expect(result).toContain("✅");
     expect(result).toContain("Succeeded");
     expect(result).not.toContain("❌");
@@ -1198,7 +1235,7 @@ describe("reportFromSteps — state enrichment", () => {
     const result = reportFromSteps(resolved, {
       allowedDirs: [fixture!.fixtureDir],
       env: NO_GITHUB_ENV,
-    }).markdown;
+    }).report.render("markdown").output;
     // With state, unknown values should be resolved — no placeholder text
     expect(result).not.toContain("(value not in plan)");
     // Should NOT show the missing-state warning
@@ -1218,7 +1255,7 @@ describe("reportFromSteps — state enrichment", () => {
     const result = reportFromSteps(resolved, {
       allowedDirs: [fixture!.fixtureDir],
       env: NO_GITHUB_ENV,
-    }).markdown;
+    }).report.render("markdown").output;
     // Without state, should show the warning
     expect(result).toContain("could not be resolved");
     expect(result).toContain("state pull");
@@ -1236,7 +1273,7 @@ describe("reportFromSteps — state enrichment", () => {
     const result = reportFromSteps(resolved, {
       allowedDirs: [fixture!.fixtureDir],
       env: NO_GITHUB_ENV,
-    }).markdown;
+    }).report.render("markdown").output;
     // Plan-only reports never show the missing-state warning
     expect(result).not.toContain("could not be resolved");
     expect(result).not.toContain("state pull");
@@ -1255,7 +1292,7 @@ describe("reportFromSteps — state enrichment", () => {
     const result = reportFromSteps(resolved, {
       allowedDirs: [fixture!.fixtureDir],
       env: NO_GITHUB_ENV,
-    }).markdown;
+    }).report.render("markdown").output;
     // Sensitive values must be masked, not revealed
     expect(result).not.toContain("updated-secret-value");
     // Should not show missing-state warning (state is available)
@@ -1270,7 +1307,9 @@ describe("reportFromSteps — state enrichment", () => {
         allowedDirs: [fixtureDir],
         env: NO_GITHUB_ENV,
       };
-      const result = reportFromSteps(resolved, options).markdown;
+      const result = reportFromSteps(resolved, options).report.render(
+        "markdown",
+      ).output;
       expect(result).toMatchSnapshot();
       assertCorrectToolName(result, label);
     });
@@ -1305,7 +1344,7 @@ describe("reportFromSteps — sensitive value masking", () => {
       const result = reportFromSteps(resolved, {
         allowedDirs: [fixture.fixtureDir],
         env: NO_GITHUB_ENV,
-      }).markdown;
+      }).report.render("markdown").output;
       assertNoSecretLeaks(result, fixture.label);
     });
   }
@@ -1321,7 +1360,7 @@ describe("reportFromSteps — sensitive value masking", () => {
       const result = reportFromSteps(resolved, {
         allowedDirs: [fixture.fixtureDir],
         env: NO_GITHUB_ENV,
-      }).markdown;
+      }).report.render("markdown").output;
       assertNoSecretLeaks(result, fixture.label);
     });
   }
@@ -1337,7 +1376,7 @@ describe("reportFromSteps — sensitive value masking", () => {
       const result = reportFromSteps(resolved, {
         allowedDirs: [fixture.fixtureDir],
         env: NO_GITHUB_ENV,
-      }).markdown;
+      }).report.render("markdown").output;
       assertNoSecretLeaks(result, fixture.label);
     });
   }
@@ -1353,7 +1392,7 @@ describe("reportFromSteps — sensitive value masking", () => {
       const result = reportFromSteps(resolved, {
         allowedDirs: [fixture.fixtureDir],
         env: NO_GITHUB_ENV,
-      }).markdown;
+      }).report.render("markdown").output;
       assertNoSecretLeaks(result, fixture.label);
     });
   }
@@ -1369,7 +1408,7 @@ describe("reportFromSteps — sensitive value masking", () => {
       const result = reportFromSteps(resolved, {
         allowedDirs: [fixture.fixtureDir],
         env: NO_GITHUB_ENV,
-      }).markdown;
+      }).report.render("markdown").output;
       assertNoSecretLeaks(result, fixture.label);
     });
   }

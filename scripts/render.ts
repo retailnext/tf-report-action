@@ -34,7 +34,7 @@ import { reportFromSteps } from "../src/pipelines/steps.js";
 import type { ReportOptions } from "../src/pipelines/steps.js";
 import type { BuildOptions } from "../src/builder/options.js";
 import type { RenderOptions } from "../src/model/render-options.js";
-import { MARKDOWN_CSS, COPY_BUTTON_JS } from "../src/html/index.js";
+import { buildHtmlPage, MARKDOWN_CSS } from "../src/html/index.js";
 
 // ---------------------------------------------------------------------------
 // Argument parsing
@@ -188,55 +188,18 @@ const { file, format, output, gallery, noOpen, options, reportOptions } =
 const effectiveNoOpen = noOpen || format === "markdown" || output !== null;
 
 // ---------------------------------------------------------------------------
-// Shared: Build HTML and write to /tmp
+// Output helpers
 // ---------------------------------------------------------------------------
 
-/** Escape a string for safe embedding in a JS template literal inside HTML. */
-function escapeForTemplateLiteral(s: string): string {
-  return s.replace(/\\/g, "\\\\").replace(/`/g, "\\`").replace(/\$\{/g, "\\${");
-}
-
-/** Build a self-contained HTML page that renders the given markdown via CDN libs. */
-function buildSingleHtml(markdown: string, title: string | undefined): string {
-  const escapedMarkdown = escapeForTemplateLiteral(markdown);
-  return `<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>${title ? title + " — " : ""}Plan Preview</title>
-  <style>
-    body { max-width: 1012px; margin: 0 auto; padding: 32px; background: #fff; }
-    ${MARKDOWN_CSS}
-  </style>
-</head>
-<body>
-  <div id="content" class="markdown-body"></div>
-  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/dompurify/dist/purify.min.js"></script>
-  <script>
-    const markdown = \`${escapedMarkdown}\`;
-    const html = DOMPurify.sanitize(marked.parse(markdown));
-    document.getElementById('content').innerHTML = html;
-  </script>
-  <script>${COPY_BUTTON_JS}</script>
-</body>
-</html>`;
-}
-
-/** Write output in the requested format and optionally open a browser. */
-async function writeOutput(
-  markdown: string,
-  title: string | undefined,
-  fmt: "html" | "markdown",
+/** Write output content to a file or stdout, and optionally open a browser. */
+async function writeOutputContent(
+  content: string,
+  ext: string,
   outputPath: string | null,
   suppressOpen: boolean,
 ): Promise<void> {
-  const content = fmt === "html" ? buildSingleHtml(markdown, title) : markdown;
-  const ext = fmt === "html" ? ".html" : ".md";
-
   // Determine where to write
-  if (outputPath === "-" || (outputPath === null && fmt === "markdown")) {
+  if (outputPath === "-" || (outputPath === null && ext === ".md")) {
     process.stdout.write(content);
     return;
   }
@@ -251,7 +214,7 @@ async function writeOutput(
     process.exit(1);
   }
 
-  if (!suppressOpen && fmt === "html") {
+  if (!suppressOpen && ext === ".html") {
     try {
       const opener =
         process.platform === "darwin"
@@ -343,7 +306,7 @@ if (gallery) {
     };
 
     try {
-      const md = reportFromSteps(json, opts).markdown;
+      const md = reportFromSteps(json, opts).report.render("markdown").output;
       entries.push({ path: relPath, markdown: md });
     } catch {
       entries.push({
@@ -762,6 +725,17 @@ if (!gallery) {
     stepsJson = resolveRelativeFilePaths(stepsJson, stepsDir, join, isAbsolute);
   }
 
-  const markdown = reportFromSteps(stepsJson, stepsOpts).markdown;
-  await writeOutput(markdown, options.title, format, output, effectiveNoOpen);
+  const result = reportFromSteps(stepsJson, stepsOpts);
+  const maxLen =
+    stepsOpts.maxOutputLength !== undefined
+      ? stepsOpts.maxOutputLength
+      : undefined;
+  if (format === "html") {
+    const htmlResult = result.report.render("html", maxLen);
+    const htmlPage = buildHtmlPage(htmlResult.output, options.title);
+    await writeOutputContent(htmlPage, ".html", output, effectiveNoOpen);
+  } else {
+    const mdResult = result.report.render("markdown", maxLen);
+    await writeOutputContent(mdResult.output, ".md", output, effectiveNoOpen);
+  }
 }
