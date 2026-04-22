@@ -67,8 +67,8 @@ export function reportFromSteps(
       `## ${STATUS_FAILURE} Report Generation Failed\n\nAn unexpected error occurred while generating the report:\n\n\`\`\`\n${message}\n\`\`\`\n`,
     );
     const errorReport: ComposedReport = {
-      render: () => ({
-        output: errorRenderable.render("markdown"),
+      render: (format) => ({
+        output: errorRenderable.render(format),
         truncated: false,
       }),
       fullSize: (format) => errorRenderable.size(format),

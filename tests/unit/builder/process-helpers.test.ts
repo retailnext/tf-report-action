@@ -251,7 +251,6 @@ describe("filterStepIssueStdout", () => {
       heading: "`apply` failed",
       isFailed: true,
       exitCode: "1",
-      stdoutTruncated: true,
       stderr: "some error",
       stdout: [keptLine, droppedLine].join("\n"),
     };
@@ -261,7 +260,6 @@ describe("filterStepIssueStdout", () => {
 
     const result = report.issues[0];
     expect(result?.exitCode).toBe("1");
-    expect(result?.stdoutTruncated).toBe(true);
     expect(result?.stderr).toBe("some error");
   });
 });

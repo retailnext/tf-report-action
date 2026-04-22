@@ -580,7 +580,7 @@ describe("dynamic titles", () => {
 // ─── 7. Output Size Limits ──────────────────────────────────────────────────
 
 describe("output size limits", () => {
-  it("constrains markdown length to maxOutputLength", () => {
+  it("constrains markdown length to render budget", () => {
     const planFile = writeFile("trunc-plan.json", MINIMAL_PLAN);
     const { output: markdown } = reportFromSteps(
       stepsJson({

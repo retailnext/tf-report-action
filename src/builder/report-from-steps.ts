@@ -53,8 +53,6 @@ import { tmpdir } from "node:os";
 export interface ReportOptions extends BuildOptions, RenderOptions {
   /** Directories from which stdout/stderr files may be read. Defaults to RUNNER_TEMP or OS temp. */
   allowedDirs?: readonly string[];
-  /** Maximum total output length in characters. Default: 63 * 1024 */
-  maxOutputLength?: number;
   /** Workspace name — used in the title and dedup marker. */
   workspace?: string;
   /** Environment variables (defaults to process.env). Injected for testability. */

@@ -4349,8 +4349,8 @@ ${message}
 `
     );
     const errorReport = {
-      render: () => ({
-        output: errorRenderable.render("markdown"),
+      render: (format) => ({
+        output: errorRenderable.render(format),
         truncated: false
       }),
       fullSize: (format) => errorRenderable.size(format)
