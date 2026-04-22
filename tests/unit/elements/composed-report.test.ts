@@ -350,7 +350,6 @@ describe("ComposedReport", () => {
               importId: null,
               movedFromAddress: null,
               allUnknownAfterApply: false,
-              isSensitive: false,
             },
           ],
         },

@@ -2,12 +2,14 @@ import { describe, it, expect } from "vitest";
 import { buildOutputChanges } from "../../../src/builder/outputs.js";
 import type { Plan } from "../../../src/tfjson/plan.js";
 
-function makePlan(outputChanges: Plan["output_changes"]): Plan {
+function makePlan(
+  outputChanges?: Record<string, Record<string, unknown>>,
+): Plan {
   return {
     format_version: "1.2",
     resource_changes: [],
-    output_changes: outputChanges,
-  } as Plan;
+    ...(outputChanges !== undefined && { output_changes: outputChanges }),
+  } as unknown as Plan;
 }
 
 describe("buildOutputChanges", () => {

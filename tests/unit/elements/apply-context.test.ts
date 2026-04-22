@@ -68,8 +68,8 @@ describe("buildFailedSet", () => {
     const set = buildFailedSet(
       makeReport({
         applyStatuses: [
-          { address: "aws_instance.a", success: false },
-          { address: "aws_instance.b", success: true },
+          { address: "aws_instance.a", success: false, action: "update" },
+          { address: "aws_instance.b", success: true, action: "update" },
         ],
       }),
     );
@@ -223,7 +223,9 @@ describe("buildApplyContextFn", () => {
     const fn = buildApplyContextFn(
       makeReport({
         operation: "apply",
-        applyStatuses: [{ address: "aws_instance.web", success: false }],
+        applyStatuses: [
+          { address: "aws_instance.web", success: false, action: "update" },
+        ],
         diagnostics: [
           makeDiag({ address: "aws_instance.web", summary: "failed" }),
         ],

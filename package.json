@@ -14,7 +14,7 @@
     "node": ">=24.0.0"
   },
   "scripts": {
-    "typecheck": "tsc --noEmit",
+    "typecheck": "tsc --noEmit -p tsconfig.test.json",
     "lint": "npm run lint:es && npm run lint:markdown && npm run lint:text && npm run format:check",
     "lint:es": "eslint src tests",
     "lint:markdown": "markdownlint-cli2 '**/*.md' '#node_modules'",

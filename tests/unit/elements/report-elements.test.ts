@@ -15,7 +15,6 @@ function makeResource(overrides?: Partial<ResourceChange>): ResourceChange {
     importId: null,
     movedFromAddress: null,
     allUnknownAfterApply: false,
-    isSensitive: false,
     ...overrides,
   };
 }
