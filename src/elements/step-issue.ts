@@ -11,13 +11,13 @@ import type { Renderable, OutputFormat } from "../renderable/types.js";
 import type { ReportElement } from "../renderable/types.js";
 import type { StepIssue } from "../model/step-issue.js";
 import {
-  Heading,
   Paragraph,
   Blockquote,
   Details,
   Sequence,
   RawText,
 } from "../renderable/primitives.js";
+import { htmlEscape } from "../renderable/html-escape.js";
 import { STATUS_FAILURE, DIAGNOSTIC_WARNING } from "../model/status-icons.js";
 import { buildRawOutputRenderable } from "./raw-output.js";
 
@@ -30,36 +30,64 @@ export class StepIssueElement implements ReportElement {
   readonly fixed = false;
   readonly levels = 2;
 
-  private readonly compact: Renderable;
-  private readonly full: Renderable;
+  private readonly issue: StepIssue;
 
   constructor(issue: StepIssue) {
     this.id = `issue-${issue.id}`;
-    const icon = issue.isFailed ? STATUS_FAILURE : DIAGNOSTIC_WARNING;
-    const headingRenderable = new Heading(`${icon} ${issue.heading}`, 3);
-
-    this.compact = headingRenderable;
-    this.full = buildFullIssue(issue, icon, headingRenderable);
+    this.issue = issue;
   }
 
   size(format: OutputFormat, level: number): number {
-    const r = level === 0 ? this.compact : this.full;
-    return r.size(format);
+    if (level === 0) {
+      return renderIssueHeading(this.issue, format).length;
+    }
+    return renderFullIssue(this.issue, format).length;
   }
 
   render(format: OutputFormat, level: number): string {
-    const r = level === 0 ? this.compact : this.full;
-    return r.render(format);
+    if (level === 0) {
+      return renderIssueHeading(this.issue, format);
+    }
+    return renderFullIssue(this.issue, format);
   }
 }
 
-/** Builds the full issue renderable with all details. */
-function buildFullIssue(
-  issue: StepIssue,
-  icon: string,
-  headingRenderable: Renderable,
-): Renderable {
-  const parts: Renderable[] = [headingRenderable];
+// ---------------------------------------------------------------------------
+// Heading rendering
+// ---------------------------------------------------------------------------
+
+/** Render the step issue heading with code-styled step ID. */
+function renderIssueHeading(issue: StepIssue, format: OutputFormat): string {
+  const icon = issue.isFailed ? STATUS_FAILURE : DIAGNOSTIC_WARNING;
+  const suffix = issueHeadingSuffix(issue);
+  const stepId = issue.id;
+
+  if (format === "markdown") {
+    return `### ${icon} \`${stepId}\`${suffix}\n\n`;
+  }
+  return `<h3>${icon} <code>${htmlEscape(stepId)}</code>${htmlEscape(suffix)}</h3>\n`;
+}
+
+/** Derive the heading suffix from the issue reason. */
+function issueHeadingSuffix(issue: StepIssue): string {
+  switch (issue.reason) {
+    case "failed":
+      return " failed";
+    case "parse-error":
+      return ": output could not be parsed";
+    case "outcome":
+      return issue.outcome !== undefined ? ` ${issue.outcome}` : "";
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Full issue rendering
+// ---------------------------------------------------------------------------
+
+/** Render the full issue with heading + details. */
+function renderFullIssue(issue: StepIssue, format: OutputFormat): string {
+  const heading = renderIssueHeading(issue, format);
+  const parts: Renderable[] = [];
 
   if (issue.exitCode !== undefined) {
     parts.push(new ExitCodeParagraph(issue.exitCode));
@@ -100,7 +128,8 @@ function buildFullIssue(
     parts.push(new Paragraph("No output captured."));
   }
 
-  return new Sequence(parts);
+  const body = new Sequence(parts);
+  return heading + body.render(format);
 }
 
 /** Exit code paragraph. */

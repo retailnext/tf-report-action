@@ -36,7 +36,7 @@ describe("buildStepIssue", () => {
 
     const issue = buildStepIssue(step, "init", opts);
     expect(issue.id).toBe("init");
-    expect(issue.heading).toBe("`init` failed");
+    expect(issue.reason).toBe("failed");
     expect(issue.isFailed).toBe(true);
     expect(issue.stdout).toBe("command output");
     expect(issue.stderr).toBe("Error: something broke");
@@ -57,7 +57,7 @@ describe("buildStepIssue", () => {
       "Plan output could not be parsed",
     );
     expect(issue.id).toBe("show-plan");
-    expect(issue.heading).toBe("`show-plan`: output could not be parsed");
+    expect(issue.reason).toBe("parse-error");
     expect(issue.isFailed).toBe(false);
     expect(issue.diagnostic).toBe("Plan output could not be parsed");
     expect(issue.stdout).toBe("plan output");
@@ -68,7 +68,7 @@ describe("buildStepIssue", () => {
 
     const issue = buildStepIssue(step, "validate", opts);
     expect(issue.id).toBe("validate");
-    expect(issue.heading).toBe("`validate` failed");
+    expect(issue.reason).toBe("failed");
     expect(issue.isFailed).toBe(true);
     expect(issue.stdout).toBeUndefined();
     expect(issue.stderr).toBeUndefined();
@@ -78,7 +78,8 @@ describe("buildStepIssue", () => {
     const step: StepData = { outcome: "cancelled" };
 
     const issue = buildStepIssue(step, "plan", opts);
-    expect(issue.heading).toBe("`plan` cancelled");
+    expect(issue.reason).toBe("outcome");
+    expect(issue.outcome).toBe("cancelled");
     expect(issue.isFailed).toBe(false);
   });
 

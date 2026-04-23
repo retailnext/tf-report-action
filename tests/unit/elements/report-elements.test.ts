@@ -22,7 +22,7 @@ function makeResource(overrides?: Partial<ResourceChange>): ResourceChange {
 /** Minimal empty report with required fields. */
 function emptyReport(overrides?: Partial<Report>): Report {
   return {
-    title: "Test Report",
+    title: { status: "success", body: { kind: "no-changes" } },
     issues: [],
     steps: [],
     warnings: [],
@@ -58,7 +58,7 @@ describe("buildReportElements", () => {
         issues: [
           {
             id: "init",
-            heading: "`init` failed",
+            reason: "failed",
             isFailed: true,
             stderr: "error output",
           },
@@ -193,7 +193,8 @@ describe("buildReportElements", () => {
         issues: [
           {
             id: "validate",
-            heading: "`validate` warning",
+            reason: "outcome",
+            outcome: "success",
             isFailed: false,
             stderr: "deprecation notice",
           },

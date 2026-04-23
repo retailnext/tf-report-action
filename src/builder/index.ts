@@ -19,7 +19,7 @@ export function buildReport(plan: Plan, options: BuildOptions = {}): Report {
   const outputs = buildOutputChanges(plan);
 
   return {
-    title: "",
+    title: { status: "success", body: { kind: "no-changes" } },
     issues: [],
     steps: [],
     warnings: [],

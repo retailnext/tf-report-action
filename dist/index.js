@@ -253,20 +253,23 @@ function buildStepIssue(step, stepId, readerOpts, diagnostic) {
   const outcome = getStepOutcome(step);
   const isFailed = outcome === "failure";
   const exitCode = getExitCode(step);
-  let heading;
+  let reason;
+  let stepOutcome;
   if (isFailed) {
-    heading = `\`${stepId}\` failed`;
+    reason = "failed";
   } else if (diagnostic) {
-    heading = `\`${stepId}\`: output could not be parsed`;
+    reason = "parse-error";
   } else {
-    heading = `\`${stepId}\` ${outcome}`;
+    reason = "outcome";
+    stepOutcome = outcome;
   }
   const stdoutRead = readStepStdout(step, readerOpts);
   const stderrRead = readStepStderr(step, readerOpts);
   const stderrContent = stderrRead.content !== void 0 && stderrRead.content.trim().length > 0 ? stderrRead.content : void 0;
   const issue = {
     id: stepId,
-    heading,
+    reason,
+    ...stepOutcome !== void 0 ? { outcome: stepOutcome } : {},
     isFailed,
     ...exitCode !== void 0 ? { exitCode } : {},
     ...diagnostic !== void 0 ? { diagnostic } : {},
@@ -285,107 +288,166 @@ function shouldCreateStepIssue(step, readerOpts, diagnostic) {
   return stderrPeek.content !== void 0 && stderrPeek.content.trim().length > 0;
 }
 
-// src/model/status-icons.ts
-var STATUS_SUCCESS = "\u2705";
-var STATUS_FAILURE = "\u274C";
-var DIAGNOSTIC_ERROR = "\u{1F6A8}";
-var DIAGNOSTIC_WARNING = "\u26A0\uFE0F";
-var MODULE_ICON = "\u{1F4E6}";
-var DRIFT_ICON = "\u{1F500}";
-var INFO_ICON = "\u2139\uFE0F";
-var ARTIFACT_ICON = "\u{1F4CE}";
-
 // src/builder/title.ts
 function buildTitle(report) {
-  const wsPrefix = report.workspace ? `\`${report.workspace}\` ` : "";
+  const workspace = report.workspace;
   if (report.error !== void 0) {
-    return `${STATUS_FAILURE} ${wsPrefix}Report Generation Failed`;
+    return {
+      status: "failure",
+      ...workspace !== void 0 ? { workspace } : {},
+      body: { kind: "error" }
+    };
   }
   const hasIacStepFailure = hasIacFailure(report);
   const hasAnyStepFailure = hasAnyFailure(report);
   if (hasIacStepFailure) {
-    const op = operationLabel(report.operation);
-    const label = op ? `${op} Failed` : "Failed";
-    return `${STATUS_FAILURE} ${wsPrefix}${label}`;
+    const op = normalizeOperation(report.operation);
+    return {
+      status: "failure",
+      ...workspace !== void 0 ? { workspace } : {},
+      body: op !== void 0 ? { kind: "operation-failed", operation: op } : { kind: "generic-failed" }
+    };
   }
   if (report.summary) {
     return buildSummaryTitle(
       report.summary,
       report.operation ?? "plan",
-      wsPrefix,
+      workspace,
       hasAnyStepFailure
     );
   }
   if (report.operationOutcome === "skipped") {
-    const op = operationLabel(report.operation);
-    const label = op ? `${op} Skipped` : "Skipped";
-    return `${DIAGNOSTIC_WARNING} ${wsPrefix}${label}`;
+    return {
+      status: "warning",
+      ...workspace !== void 0 ? { workspace } : {},
+      body: {
+        kind: "operation-skipped",
+        ...(() => {
+          const op = normalizeOperation(report.operation);
+          return op !== void 0 ? { operation: op } : {};
+        })()
+      }
+    };
   }
   if (report.steps.length > 0 && report.steps.every((s) => s.outcome === "skipped")) {
-    return `${DIAGNOSTIC_WARNING} ${wsPrefix}All Steps Skipped`;
+    return {
+      status: "warning",
+      ...workspace !== void 0 ? { workspace } : {},
+      body: { kind: "all-skipped" }
+    };
   }
   if (hasAnyStepFailure || report.issues.some((i) => i.isFailed)) {
-    const failLabel = singleFailedStepLabel(report);
-    return `${STATUS_FAILURE} ${wsPrefix}${failLabel}`;
+    return {
+      status: "failure",
+      ...workspace !== void 0 ? { workspace } : {},
+      body: buildFailedBody(report)
+    };
   }
-  const opLabel = report.operation ? `${operationLabel(report.operation)} ` : "";
-  return `${STATUS_SUCCESS} ${wsPrefix}${opLabel}Succeeded`;
+  return {
+    status: "success",
+    ...workspace !== void 0 ? { workspace } : {},
+    body: {
+      kind: "succeeded",
+      ...(() => {
+        const op = normalizeOperation(report.operation);
+        return op !== void 0 ? { operation: op } : {};
+      })()
+    }
+  };
 }
-function buildPlanCountParts(summary) {
+function buildPlanCounts(summary) {
   const counts = /* @__PURE__ */ new Map();
   for (const group of summary.actions) {
-    const label = planActionLabel(group.action);
-    counts.set(label, (counts.get(label) ?? 0) + group.total);
+    counts.set(group.action, (counts.get(group.action) ?? 0) + group.total);
   }
-  return formatCountParts(counts, "to ");
+  return mapToActionCounts(counts);
 }
-function buildApplyCountParts(summary) {
+function buildApplyCounts(summary) {
   const counts = /* @__PURE__ */ new Map();
   for (const group of summary.actions) {
-    const label = applyActionLabel(group.action);
-    counts.set(label, (counts.get(label) ?? 0) + group.total);
+    counts.set(group.action, (counts.get(group.action) ?? 0) + group.total);
   }
-  return formatCountParts(counts, "");
+  return mapToActionCounts(counts);
 }
-function buildFailureCountParts(summary) {
+function buildFailureCounts(summary) {
   const total = summary.failures.reduce((sum, g) => sum + g.total, 0);
   if (total === 0) return [];
-  return [`${String(total)} failed`];
+  return [{ action: "failed", count: total }];
 }
-function buildSummaryTitle(summary, operation, wsPrefix, hasAnyStepFailure) {
+function buildSummaryTitle(summary, operation, workspace, hasAnyStepFailure) {
   const hasFailures = summary.failures.length > 0;
-  const icon = hasFailures || hasAnyStepFailure ? STATUS_FAILURE : STATUS_SUCCESS;
+  const status = hasFailures || hasAnyStepFailure ? "failure" : "success";
   if (operation === "apply" || operation === "destroy") {
-    const parts2 = buildApplyCountParts(summary);
+    const counts2 = buildApplyCounts(summary);
+    const failures = buildFailureCounts(summary);
+    const failureTotal = summary.failures.reduce((sum, g) => sum + g.total, 0);
     if (hasFailures) {
-      const failParts = buildFailureCountParts(summary);
-      return `${icon} ${wsPrefix}Apply Failed: ${[...failParts, ...parts2].join(", ")}`;
+      return {
+        status,
+        ...workspace !== void 0 ? { workspace } : {},
+        body: {
+          kind: "summary",
+          operation,
+          counts: counts2,
+          failures,
+          failureTotal,
+          hasStepFailure: hasAnyStepFailure
+        }
+      };
     }
-    if (parts2.length === 0) {
-      return `${icon} ${wsPrefix}Apply Complete`;
-    }
-    return `${icon} ${wsPrefix}Apply: ${parts2.join(", ")}`;
+    return {
+      status,
+      ...workspace !== void 0 ? { workspace } : {},
+      body: {
+        kind: "summary",
+        operation,
+        counts: counts2,
+        failures: [],
+        failureTotal: 0,
+        hasStepFailure: hasAnyStepFailure
+      }
+    };
   }
   const totalActions = summary.actions.reduce((sum, g) => sum + g.total, 0);
   if (totalActions === 0 && !hasFailures && !hasAnyStepFailure) {
-    return `${icon} ${wsPrefix}No Changes`;
+    return {
+      status,
+      ...workspace !== void 0 ? { workspace } : {},
+      body: { kind: "no-changes" }
+    };
   }
   if (hasFailures || hasAnyStepFailure) {
-    return `${icon} ${wsPrefix}Plan Failed`;
+    return {
+      status,
+      ...workspace !== void 0 ? { workspace } : {},
+      body: {
+        kind: "operation-failed",
+        operation: "plan"
+      }
+    };
   }
-  const parts = buildPlanCountParts(summary);
-  return `${icon} ${wsPrefix}Plan: ${parts.join(", ")}`;
+  const counts = buildPlanCounts(summary);
+  return {
+    status,
+    ...workspace !== void 0 ? { workspace } : {},
+    body: {
+      kind: "summary",
+      operation: "plan",
+      counts,
+      failures: [],
+      failureTotal: 0,
+      hasStepFailure: false
+    }
+  };
 }
-function operationLabel(operation) {
+function normalizeOperation(operation) {
   switch (operation) {
     case "apply":
-      return "Apply";
     case "destroy":
-      return "Destroy";
     case "plan":
-      return "Plan";
+      return operation;
     default:
-      return "";
+      return void 0;
   }
 }
 function hasIacFailure(report) {
@@ -395,60 +457,20 @@ function hasIacFailure(report) {
 function hasAnyFailure(report) {
   return report.steps.some((s) => s.outcome === "failure");
 }
-function singleFailedStepLabel(report) {
+function buildFailedBody(report) {
   const failedSteps = report.steps.filter((s) => s.outcome === "failure");
   if (failedSteps.length === 1) {
     const name = failedSteps[0]?.id ?? "unknown";
-    return `\`${name}\` Failed`;
+    return { kind: "step-failed", stepId: name };
   }
-  return "Failed";
+  return { kind: "generic-failed" };
 }
-function formatCountParts(counts, prefix) {
-  const parts = [];
-  for (const [label, count] of counts) {
-    parts.push(`${String(count)} ${prefix}${label}`);
+function mapToActionCounts(counts) {
+  const result = [];
+  for (const [action, count] of counts) {
+    result.push({ action, count });
   }
-  return parts;
-}
-function planActionLabel(action) {
-  switch (action) {
-    case "create":
-      return "add";
-    case "update":
-      return "change";
-    case "delete":
-      return "destroy";
-    case "replace":
-      return "replace";
-    case "import":
-      return "import";
-    case "move":
-      return "move";
-    case "forget":
-      return "forget";
-    default:
-      return action;
-  }
-}
-function applyActionLabel(action) {
-  switch (action) {
-    case "create":
-      return "added";
-    case "update":
-      return "changed";
-    case "delete":
-      return "destroyed";
-    case "replace":
-      return "replaced";
-    case "import":
-      return "imported";
-    case "move":
-      return "moved";
-    case "forget":
-      return "forgotten";
-    default:
-      return action;
-  }
+  return result;
 }
 
 // src/parser/plan.ts
@@ -1177,7 +1199,7 @@ function buildReport(plan, options = {}) {
   const summary = buildSummary(resources);
   const outputs = buildOutputChanges(plan);
   return {
-    title: "",
+    title: { status: "success", body: { kind: "no-changes" } },
     issues: [],
     steps: [],
     warnings: [],
@@ -1980,7 +2002,7 @@ function isLargeValue3(value) {
 import { tmpdir } from "node:os";
 function createEmptyReport() {
   return {
-    title: "",
+    title: { status: "success", body: { kind: "no-changes" } },
     issues: [],
     steps: [],
     warnings: [],
@@ -2454,24 +2476,172 @@ var Sequence = class {
   }
 };
 
+// src/model/status-icons.ts
+var STATUS_SUCCESS = "\u2705";
+var STATUS_FAILURE = "\u274C";
+var DIAGNOSTIC_ERROR = "\u{1F6A8}";
+var DIAGNOSTIC_WARNING = "\u26A0\uFE0F";
+var MODULE_ICON = "\u{1F4E6}";
+var DRIFT_ICON = "\u{1F500}";
+var INFO_ICON = "\u2139\uFE0F";
+var ARTIFACT_ICON = "\u{1F4CE}";
+
 // src/elements/title.ts
 var TitleElement = class {
   id = "title";
   fixed = true;
   levels = 1;
-  renderable;
+  title;
   constructor(title) {
-    this.renderable = new Heading(title, 2);
+    this.title = title;
   }
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   size(format, _level) {
-    return this.renderable.size(format);
+    return renderTitle(this.title, format).length;
   }
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   render(format, _level) {
-    return this.renderable.render(format);
+    return renderTitle(this.title, format);
   }
 };
+function renderTitle(title, format) {
+  const icon = statusIcon(title.status);
+  const ws = renderWorkspace(title.workspace, format);
+  const bodyText = renderTitleBody(title.body, format);
+  const content = [icon, ws, bodyText].filter(Boolean).join(" ");
+  if (format === "markdown") {
+    return `## ${content}
+
+`;
+  }
+  return `<h2>${content}</h2>
+`;
+}
+function renderWorkspace(workspace, format) {
+  if (workspace === void 0) return "";
+  if (format === "markdown") {
+    return `\`${workspace}\``;
+  }
+  return `<code>${htmlEscape(workspace)}</code>`;
+}
+function renderTitleBody(body, format) {
+  switch (body.kind) {
+    case "summary":
+      return renderSummaryBody(body);
+    case "no-changes":
+      return "No Changes";
+    case "error":
+      return "Report Generation Failed";
+    case "operation-failed":
+      return `${operationLabel(body.operation)} Failed`;
+    case "step-failed":
+      return renderStepFailed(body.stepId, format);
+    case "generic-failed":
+      return "Failed";
+    case "operation-skipped":
+      return body.operation !== void 0 ? `${operationLabel(body.operation)} Skipped` : "Skipped";
+    case "all-skipped":
+      return "All Steps Skipped";
+    case "succeeded":
+      return body.operation !== void 0 ? `${operationLabel(body.operation)} Succeeded` : "Succeeded";
+  }
+}
+function renderStepFailed(stepId, format) {
+  if (format === "markdown") {
+    return `\`${stepId}\` Failed`;
+  }
+  return `<code>${htmlEscape(stepId)}</code> Failed`;
+}
+function renderSummaryBody(body) {
+  const isApply = body.operation === "apply" || body.operation === "destroy";
+  if (isApply) {
+    if (body.failureTotal > 0) {
+      const failParts = formatFailureParts(body.failures);
+      const countParts = formatApplyCountParts(body.counts);
+      return `Apply Failed: ${[...failParts, ...countParts].join(", ")}`;
+    }
+    const parts2 = formatApplyCountParts(body.counts);
+    if (parts2.length === 0) {
+      return "Apply Complete";
+    }
+    return `Apply: ${parts2.join(", ")}`;
+  }
+  const parts = formatPlanCountParts(body.counts);
+  return `Plan: ${parts.join(", ")}`;
+}
+function formatPlanCountParts(counts) {
+  return counts.map(
+    (c) => `${String(c.count)} to ${planActionLabel(c.action)}`
+  );
+}
+function formatApplyCountParts(counts) {
+  return counts.map((c) => `${String(c.count)} ${applyActionLabel(c.action)}`);
+}
+function formatFailureParts(failures) {
+  return failures.map((f) => `${String(f.count)} ${f.action}`);
+}
+function planActionLabel(action) {
+  switch (action) {
+    case "create":
+      return "add";
+    case "update":
+      return "change";
+    case "delete":
+      return "destroy";
+    case "replace":
+      return "replace";
+    case "import":
+      return "import";
+    case "move":
+      return "move";
+    case "forget":
+      return "forget";
+    default:
+      return action;
+  }
+}
+function applyActionLabel(action) {
+  switch (action) {
+    case "create":
+      return "added";
+    case "update":
+      return "changed";
+    case "delete":
+      return "destroyed";
+    case "replace":
+      return "replaced";
+    case "import":
+      return "imported";
+    case "move":
+      return "moved";
+    case "forget":
+      return "forgotten";
+    default:
+      return action;
+  }
+}
+function operationLabel(operation) {
+  switch (operation) {
+    case "apply":
+      return "Apply";
+    case "destroy":
+      return "Destroy";
+    case "plan":
+      return "Plan";
+    default:
+      return operation;
+  }
+}
+function statusIcon(status) {
+  switch (status) {
+    case "success":
+      return STATUS_SUCCESS;
+    case "failure":
+      return STATUS_FAILURE;
+    case "warning":
+      return DIAGNOSTIC_WARNING;
+  }
+}
 var MarkerElement = class {
   id = "marker";
   fixed = true;
@@ -2548,6 +2718,17 @@ function escapeMarkerWorkspace(workspace) {
   return workspace.replace(/\\/g, "\\\\").replace(/"/g, '\\"').replace(/--/g, "-\u200B-");
 }
 
+// src/renderable/helpers.ts
+function renderNote(text, format) {
+  return format === "markdown" ? `_${text}_
+
+` : `<p><em>${htmlEscape(text)}</em></p>
+`;
+}
+function noteSize(text, format) {
+  return renderNote(text, format).length;
+}
+
 // src/model/plan-action.ts
 var ACTION_SYMBOLS = {
   create: "\u2795",
@@ -2616,7 +2797,7 @@ function buildSummaryRenderable(headingText, summary, isApply) {
   const labels = isApply ? APPLY_LABELS : PLAN_LABELS;
   const hasContent = summary.actions.length > 0 || summary.failures.length > 0;
   if (!hasContent) {
-    parts.push(new Paragraph("_No changes._"));
+    parts.push(new NoteRenderable("No changes."));
     return new Sequence(parts);
   }
   const headers = [
@@ -2670,6 +2851,18 @@ var BoldText = class {
     return format === "markdown" ? this.mdStr : this.htStr;
   }
 };
+var NoteRenderable = class {
+  text;
+  constructor(text) {
+    this.text = text;
+  }
+  size(format) {
+    return noteSize(this.text, format);
+  }
+  render(format) {
+    return renderNote(this.text, format);
+  }
+};
 
 // src/elements/diagnostics.ts
 var DiagnosticsElement = class {
@@ -2695,13 +2888,13 @@ function buildDiagnosticsRenderable(diagnostics, headingLevel) {
   const warnings = diagnostics.filter((d) => d.severity === "warning");
   const parts = [];
   if (errors.length > 0) {
-    parts.push(new Heading("Errors", headingLevel));
+    parts.push(new PlainHeading("Errors", headingLevel));
     for (const diag of errors) {
       parts.push(buildDiagnosticRenderable(diag));
     }
   }
   if (warnings.length > 0) {
-    parts.push(new Heading("Warnings", headingLevel));
+    parts.push(new PlainHeading("Warnings", headingLevel));
     for (const diag of warnings) {
       parts.push(buildDiagnosticRenderable(diag));
     }
@@ -2710,16 +2903,12 @@ function buildDiagnosticsRenderable(diagnostics, headingLevel) {
   return new Sequence(parts);
 }
 function buildDiagnosticRenderable(diag) {
-  const prefix = diag.severity === "error" ? DIAGNOSTIC_ERROR : DIAGNOSTIC_WARNING;
-  const addressSuffix = diag.address !== void 0 ? ` \u2014 \`${diag.address}\`` : "";
   const parts = [];
   parts.push(
-    new DiagnosticSummary(
-      `${prefix} **${htmlEscape(diag.summary)}**${addressSuffix}`
-    )
+    new DiagnosticSummaryLine(diag.severity, diag.summary, diag.address)
   );
   if (diag.detail) {
-    parts.push(new Blockquote(htmlEscape(diag.detail)));
+    parts.push(new Blockquote(diag.detail));
   }
   if (diag.snippet !== void 0) {
     parts.push(buildSnippetRenderable(diag.snippet, diag.range?.filename));
@@ -2731,27 +2920,29 @@ function buildDiagnosticRenderable(diag) {
 }
 function buildSnippetRenderable(snippet, filename) {
   const parts = [];
-  const location = filename !== void 0 ? `\`${snippet.code}\` in ${htmlEscape(snippet.context)} (\`${filename}\`:${String(snippet.start_line)})` : `\`${snippet.code}\` in ${htmlEscape(snippet.context)}`;
-  parts.push(new Blockquote(location));
+  parts.push(
+    new DiagnosticSnippetLine(
+      snippet.code,
+      snippet.context,
+      filename,
+      snippet.start_line
+    )
+  );
   if (snippet.values.length > 0) {
     for (const val of snippet.values) {
-      parts.push(
-        new Blockquote(
-          `${htmlEscape(val.traversal)} = ${htmlEscape(val.statement)}`
-        )
-      );
+      parts.push(new DiagnosticSnippetValue(val.traversal, val.statement));
     }
   }
   return new Sequence(parts);
 }
-var DiagnosticSummary = class {
+var PlainHeading = class {
   mdStr;
   htStr;
-  constructor(text) {
-    this.mdStr = `${text}
+  constructor(text, level) {
+    this.mdStr = `${"#".repeat(level)} ${text}
 
 `;
-    this.htStr = `<p>${text}</p>
+    this.htStr = `<h${String(level)}>${htmlEscape(text)}</h${String(level)}>
 `;
   }
   size(format) {
@@ -2759,6 +2950,77 @@ var DiagnosticSummary = class {
   }
   render(format) {
     return format === "markdown" ? this.mdStr : this.htStr;
+  }
+};
+var DiagnosticSummaryLine = class {
+  severity;
+  summary;
+  address;
+  constructor(severity, summary, address) {
+    this.severity = severity;
+    this.summary = summary;
+    this.address = address;
+  }
+  size(format) {
+    return this.render(format).length;
+  }
+  render(format) {
+    const icon = this.severity === "error" ? DIAGNOSTIC_ERROR : DIAGNOSTIC_WARNING;
+    if (format === "markdown") {
+      const addr2 = this.address !== void 0 ? ` \u2014 \`${this.address}\`` : "";
+      return `${icon} **${this.summary}**${addr2}
+
+`;
+    }
+    const addr = this.address !== void 0 ? ` \u2014 <code>${htmlEscape(this.address)}</code>` : "";
+    return `<p>${icon} <strong>${htmlEscape(this.summary)}</strong>${addr}</p>
+`;
+  }
+};
+var DiagnosticSnippetLine = class {
+  code;
+  context;
+  filename;
+  startLine;
+  constructor(code, context, filename, startLine) {
+    this.code = code;
+    this.context = context;
+    this.filename = filename;
+    this.startLine = startLine;
+  }
+  size(format) {
+    return this.render(format).length;
+  }
+  render(format) {
+    if (format === "markdown") {
+      const loc2 = this.filename !== void 0 ? `\`${this.code}\` in ${this.context} (\`${this.filename}\`:${String(this.startLine)})` : `\`${this.code}\` in ${this.context}`;
+      return `> ${loc2}
+
+`;
+    }
+    const loc = this.filename !== void 0 ? `<code>${htmlEscape(this.code)}</code> in ${htmlEscape(this.context)} (<code>${htmlEscape(this.filename)}</code>:${String(this.startLine)})` : `<code>${htmlEscape(this.code)}</code> in ${htmlEscape(this.context)}`;
+    return `<blockquote><p>${loc}</p></blockquote>
+`;
+  }
+};
+var DiagnosticSnippetValue = class {
+  traversal;
+  statement;
+  constructor(traversal, statement) {
+    this.traversal = traversal;
+    this.statement = statement;
+  }
+  size(format) {
+    return this.render(format).length;
+  }
+  render(format) {
+    if (format === "markdown") {
+      return `> ${this.traversal} = ${this.statement}
+
+`;
+    }
+    return `<blockquote><p>${htmlEscape(this.traversal)} = ${htmlEscape(this.statement)}</p></blockquote>
+`;
   }
 };
 var BlankLine = class {
@@ -3130,26 +3392,49 @@ var StepIssueElement = class {
   id;
   fixed = false;
   levels = 2;
-  compact;
-  full;
+  issue;
   constructor(issue) {
     this.id = `issue-${issue.id}`;
-    const icon = issue.isFailed ? STATUS_FAILURE : DIAGNOSTIC_WARNING;
-    const headingRenderable = new Heading(`${icon} ${issue.heading}`, 3);
-    this.compact = headingRenderable;
-    this.full = buildFullIssue(issue, icon, headingRenderable);
+    this.issue = issue;
   }
   size(format, level) {
-    const r = level === 0 ? this.compact : this.full;
-    return r.size(format);
+    if (level === 0) {
+      return renderIssueHeading(this.issue, format).length;
+    }
+    return renderFullIssue(this.issue, format).length;
   }
   render(format, level) {
-    const r = level === 0 ? this.compact : this.full;
-    return r.render(format);
+    if (level === 0) {
+      return renderIssueHeading(this.issue, format);
+    }
+    return renderFullIssue(this.issue, format);
   }
 };
-function buildFullIssue(issue, icon, headingRenderable) {
-  const parts = [headingRenderable];
+function renderIssueHeading(issue, format) {
+  const icon = issue.isFailed ? STATUS_FAILURE : DIAGNOSTIC_WARNING;
+  const suffix = issueHeadingSuffix(issue);
+  const stepId = issue.id;
+  if (format === "markdown") {
+    return `### ${icon} \`${stepId}\`${suffix}
+
+`;
+  }
+  return `<h3>${icon} <code>${htmlEscape(stepId)}</code>${htmlEscape(suffix)}</h3>
+`;
+}
+function issueHeadingSuffix(issue) {
+  switch (issue.reason) {
+    case "failed":
+      return " failed";
+    case "parse-error":
+      return ": output could not be parsed";
+    case "outcome":
+      return issue.outcome !== void 0 ? ` ${issue.outcome}` : "";
+  }
+}
+function renderFullIssue(issue, format) {
+  const heading = renderIssueHeading(issue, format);
+  const parts = [];
   if (issue.exitCode !== void 0) {
     parts.push(new ExitCodeParagraph(issue.exitCode));
   }
@@ -3179,7 +3464,8 @@ function buildFullIssue(issue, icon, headingRenderable) {
   if (issue.stdout === void 0 && issue.stderr === void 0 && issue.stdoutError === void 0 && issue.stderrError === void 0) {
     parts.push(new Paragraph("No output captured."));
   }
-  return new Sequence(parts);
+  const body = new Sequence(parts);
+  return heading + body.render(format);
 }
 var ExitCodeParagraph = class {
   mdStr;
@@ -3221,27 +3507,25 @@ var TextFallbackElement = class {
   id;
   fixed = false;
   levels = 2;
-  compact;
+  heading;
   full;
+  noteText = "omitted due to size";
   constructor(stepId, label, content) {
     this.id = `raw-${stepId}`;
-    const headingRenderable = new Heading(label, 3);
-    this.compact = new Sequence([
-      headingRenderable,
-      new Paragraph("_(omitted due to size)_")
-    ]);
-    this.full = new Sequence([
-      headingRenderable,
-      buildRawOutputRenderable(content)
-    ]);
+    this.heading = new Heading(label, 3);
+    this.full = new Sequence([this.heading, buildRawOutputRenderable(content)]);
   }
   size(format, level) {
-    const r = level === 0 ? this.compact : this.full;
-    return r.size(format);
+    if (level === 0) {
+      return this.heading.size(format) + noteSize(this.noteText, format);
+    }
+    return this.full.size(format);
   }
   render(format, level) {
-    const r = level === 0 ? this.compact : this.full;
-    return r.render(format);
+    if (level === 0) {
+      return this.heading.render(format) + renderNote(this.noteText, format);
+    }
+    return this.full.render(format);
   }
 };
 
@@ -3406,9 +3690,6 @@ function groupByModule(resources) {
     if (b === "") return 1;
     return a.localeCompare(b);
   }).map(([moduleAddress, grouped]) => ({ moduleAddress, resources: grouped }));
-}
-function moduleLabel(moduleAddress) {
-  return moduleAddress === "" ? "root" : `\`${moduleAddress}\``;
 }
 
 // src/diff/lcs.ts
@@ -3738,10 +4019,10 @@ function buildAttributeRenderable(resource, options, diffCache, level) {
   const diffFormat = options.diffFormat ?? "inline";
   const useCharDiff = level >= 3;
   if (resource.allUnknownAfterApply) {
-    return new Paragraph("_(all values known after apply)_");
+    return new NoteRenderable2("all values known after apply");
   }
   if (resource.attributes.length === 0 && resource.hasAttributeDetail) {
-    return new Paragraph("_No attribute changes._");
+    return new NoteRenderable2("No attribute changes.");
   }
   if (resource.attributes.length === 0) {
     return EMPTY;
@@ -3791,8 +4072,7 @@ function buildInlineDiagnostics(diagnostics) {
   const warnings = diagnostics.filter((d) => d.severity === "warning");
   const parts = [];
   for (const diag of [...errors, ...warnings]) {
-    const prefix = diag.severity === "error" ? DIAGNOSTIC_ERROR : DIAGNOSTIC_WARNING;
-    parts.push(new DiagLine(`${prefix} **${htmlEscape(diag.summary)}**`));
+    parts.push(new ResourceDiagnosticLine(diag.severity, diag.summary));
     if (diag.detail) {
       parts.push(new CodeBlock(diag.detail));
     }
@@ -3816,21 +4096,37 @@ var MetadataParagraph = class {
     return format === "markdown" ? this.mdStr : this.htStr;
   }
 };
-var DiagLine = class {
-  mdStr;
-  htStr;
-  constructor(text) {
-    this.mdStr = `${text}
-
-`;
-    this.htStr = `<p>${text}</p>
-`;
+var ResourceDiagnosticLine = class {
+  severity;
+  summary;
+  constructor(severity, summary) {
+    this.severity = severity;
+    this.summary = summary;
   }
   size(format) {
-    return format === "markdown" ? this.mdStr.length : this.htStr.length;
+    return this.render(format).length;
   }
   render(format) {
-    return format === "markdown" ? this.mdStr : this.htStr;
+    const icon = this.severity === "error" ? DIAGNOSTIC_ERROR : DIAGNOSTIC_WARNING;
+    if (format === "markdown") {
+      return `${icon} **${this.summary}**
+
+`;
+    }
+    return `<p>${icon} <strong>${htmlEscape(this.summary)}</strong></p>
+`;
+  }
+};
+var NoteRenderable2 = class {
+  text;
+  constructor(text) {
+    this.text = text;
+  }
+  size(format) {
+    return renderNote(this.text, format).length;
+  }
+  render(format) {
+    return renderNote(this.text, format);
   }
 };
 function escapeCell2(value) {
@@ -3845,10 +4141,8 @@ function inlineCodeCell2(value) {
 
 // src/elements/module-group.ts
 function buildModuleGroupRenderable(moduleAddress, resources, options, diffCache, level, applyContextFn) {
-  const label = moduleLabel(moduleAddress);
-  const parts = [
-    new Heading(`${MODULE_ICON} Module: ${label}`, 3)
-  ];
+  const heading = new ModuleHeading(moduleAddress);
+  const parts = [heading];
   for (const resource of resources) {
     const applyContext = applyContextFn?.(resource.address);
     parts.push(
@@ -3863,6 +4157,32 @@ function buildModuleGroupRenderable(moduleAddress, resources, options, diffCache
   }
   return new Sequence(parts);
 }
+var ModuleHeading = class {
+  moduleAddress;
+  constructor(moduleAddress) {
+    this.moduleAddress = moduleAddress;
+  }
+  size(format) {
+    return this.render(format).length;
+  }
+  render(format) {
+    const label = this.renderLabel(format);
+    if (format === "markdown") {
+      return `### ${MODULE_ICON} Module: ${label}
+
+`;
+    }
+    return `<h3>${MODULE_ICON} Module: ${label}</h3>
+`;
+  }
+  renderLabel(format) {
+    if (this.moduleAddress === "") return "root";
+    if (format === "markdown") {
+      return `\`${this.moduleAddress}\``;
+    }
+    return `<code>${htmlEscape(this.moduleAddress)}</code>`;
+  }
+};
 
 // src/elements/outputs.ts
 function buildOutputsRenderable(outputs, options, diffCache, level) {

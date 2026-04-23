@@ -33,13 +33,15 @@ export function buildStepIssue(
   const isFailed = outcome === "failure";
   const exitCode = getExitCode(step);
 
-  let heading: string;
+  let reason: "failed" | "parse-error" | "outcome";
+  let stepOutcome: string | undefined;
   if (isFailed) {
-    heading = `\`${stepId}\` failed`;
+    reason = "failed";
   } else if (diagnostic) {
-    heading = `\`${stepId}\`: output could not be parsed`;
+    reason = "parse-error";
   } else {
-    heading = `\`${stepId}\` ${outcome}`;
+    reason = "outcome";
+    stepOutcome = outcome;
   }
 
   const stdoutRead = readStepStdout(step, readerOpts);
@@ -57,7 +59,8 @@ export function buildStepIssue(
 
   const issue: StepIssue = {
     id: stepId,
-    heading,
+    reason,
+    ...(stepOutcome !== undefined ? { outcome: stepOutcome } : {}),
     isFailed,
     ...(exitCode !== undefined ? { exitCode } : {}),
     ...(diagnostic !== undefined ? { diagnostic } : {}),

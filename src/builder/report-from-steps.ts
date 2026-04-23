@@ -81,7 +81,7 @@ export interface ReportOptions extends BuildOptions, RenderOptions {
 /** Create an empty Report with required fields initialized. */
 function createEmptyReport(): Report {
   return {
-    title: "",
+    title: { status: "success", body: { kind: "no-changes" } },
     issues: [],
     steps: [],
     warnings: [],

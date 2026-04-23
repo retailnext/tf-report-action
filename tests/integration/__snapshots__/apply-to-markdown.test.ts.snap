@@ -1,7 +1,7 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
 exports[`applyToMarkdown integration > terraform/apply-error/0 > renders without error and matches snapshot [default] 1`] = `
-"## 
+"## ✅ Apply: 3 added
 
 ## Apply Summary
 
@@ -38,7 +38,7 @@ null_resource.will_fail
 terraform_data.depends_on_fail
 \`\`\`
 
-_(all values known after apply)_
+_all values known after apply_
 
 
 
@@ -72,7 +72,7 @@ terraform_data.success
 `;
 
 exports[`applyToMarkdown integration > terraform/apply-error/1 > renders without error and matches snapshot [default] 1`] = `
-"## 
+"## ❌ Apply Failed: 1 failed
 
 ## Apply Summary
 
@@ -117,7 +117,7 @@ Error running command 'exit 1': exit status 1. Output:
 `;
 
 exports[`applyToMarkdown integration > terraform/deferred-data-source/0 > renders without error and matches snapshot [default] 1`] = `
-"## 
+"## ✅ Apply: 5 added
 
 ## Apply Summary
 
@@ -195,7 +195,7 @@ terraform_data.independent
 terraform_data.worker_a
 \`\`\`
 
-_(all values known after apply)_
+_all values known after apply_
 
 
 
@@ -208,7 +208,7 @@ _(all values known after apply)_
 terraform_data.worker_b
 \`\`\`
 
-_(all values known after apply)_
+_all values known after apply_
 
 
 
@@ -221,7 +221,7 @@ _(all values known after apply)_
 terraform_data.worker_c
 \`\`\`
 
-_(all values known after apply)_
+_all values known after apply_
 
 
 
@@ -237,7 +237,7 @@ _(all values known after apply)_
 `;
 
 exports[`applyToMarkdown integration > terraform/deferred-data-source/1 > renders without error and matches snapshot [default] 1`] = `
-"## 
+"## ✅ Apply: 1 added, 1 changed
 
 ## Apply Summary
 
@@ -304,7 +304,7 @@ terraform_data.independent
 `;
 
 exports[`applyToMarkdown integration > terraform/deferred-data-source/2 > renders without error and matches snapshot [default] 1`] = `
-"## 
+"## ✅ Apply: 1 changed, 1 replaced
 
 ## Apply Summary
 
@@ -364,7 +364,7 @@ local_file.config
 terraform_data.worker_a
 \`\`\`
 
-_(all values known after apply)_
+_all values known after apply_
 
 
 
@@ -380,7 +380,7 @@ _(all values known after apply)_
 `;
 
 exports[`applyToMarkdown integration > terraform/error-stages/0 > renders without error and matches snapshot [default] 1`] = `
-"## 
+"## ✅ Apply: 1 added
 
 ## Apply Summary
 
@@ -413,7 +413,7 @@ null_resource.baseline
 `;
 
 exports[`applyToMarkdown integration > terraform/local-files/0 > renders without error and matches snapshot [default] 1`] = `
-"## 
+"## ✅ Apply: 1 added
 
 ## Apply Summary
 
@@ -484,7 +484,7 @@ Line 12: end of file
 `;
 
 exports[`applyToMarkdown integration > terraform/local-files/1 > renders without error and matches snapshot [default] 1`] = `
-"## 
+"## ✅ Apply: 1 replaced
 
 ## Apply Summary
 
@@ -551,7 +551,7 @@ local_file.readme
 `;
 
 exports[`applyToMarkdown integration > terraform/modules/0 > renders without error and matches snapshot [default] 1`] = `
-"## 
+"## ✅ Apply: 5 added
 
 ## Apply Summary
 
@@ -676,7 +676,7 @@ module.parent["2"].module.child.null_resource.item[1]
 `;
 
 exports[`applyToMarkdown integration > terraform/modules/1 > renders without error and matches snapshot [default] 1`] = `
-"## 
+"## ✅ Apply: 3 added, 2 replaced, 2 destroyed
 
 ## Apply Summary
 
@@ -829,7 +829,7 @@ module.parent["3"].module.child.null_resource.item[2]
 `;
 
 exports[`applyToMarkdown integration > terraform/null-lifecycle/0 > renders without error and matches snapshot [default] 1`] = `
-"## 
+"## ✅ Apply Complete
 
 ## Apply Summary
 
@@ -839,7 +839,7 @@ _No changes._
 `;
 
 exports[`applyToMarkdown integration > terraform/null-lifecycle/1 > renders without error and matches snapshot [default] 1`] = `
-"## 
+"## ✅ Apply: 4 added
 
 ## Apply Summary
 
@@ -935,7 +935,7 @@ terraform_data.meta
 `;
 
 exports[`applyToMarkdown integration > terraform/null-lifecycle/2 > renders without error and matches snapshot [default] 1`] = `
-"## 
+"## ✅ Apply: 1 changed, 1 replaced, 1 destroyed
 
 ## Apply Summary
 
@@ -1005,7 +1005,7 @@ terraform_data.meta
 `;
 
 exports[`applyToMarkdown integration > terraform/null-lifecycle/3 > renders without error and matches snapshot [default] 1`] = `
-"## 
+"## ✅ Apply Complete
 
 ## Apply Summary
 
@@ -1015,7 +1015,7 @@ _No changes._
 `;
 
 exports[`applyToMarkdown integration > terraform/null-lifecycle/4 > renders without error and matches snapshot [default] 1`] = `
-"## 
+"## ✅ Apply: 1 added
 
 ## Apply Summary
 
@@ -1088,7 +1088,7 @@ local_file.managed
 `;
 
 exports[`applyToMarkdown integration > terraform/sensitive-values/0 > renders without error and matches snapshot [default] 1`] = `
-"## 
+"## ✅ Apply: 1 added
 
 ## Apply Summary
 
@@ -1138,7 +1138,7 @@ local_sensitive_file.secret
 `;
 
 exports[`applyToMarkdown integration > terraform/sensitive-values/1 > renders without error and matches snapshot [default] 1`] = `
-"## 
+"## ✅ Apply: 1 replaced
 
 ## Apply Summary
 
@@ -1184,7 +1184,7 @@ local_sensitive_file.secret
 `;
 
 exports[`applyToMarkdown integration > terraform/state-operations/0 > renders without error and matches snapshot [default] 1`] = `
-"## 
+"## ✅ Apply: 4 added
 
 ## Apply Summary
 
@@ -1276,7 +1276,7 @@ random_string.existing
 `;
 
 exports[`applyToMarkdown integration > terraform/state-operations/1 > renders without error and matches snapshot [default] 1`] = `
-"## 
+"## ✅ Apply: 1 moved, 1 imported, 1 forgotten
 
 ## Apply Summary
 
@@ -1343,7 +1343,7 @@ _No attribute changes._
 `;
 
 exports[`applyToMarkdown integration > tofu/apply-error/0 > renders without error and matches snapshot [default] 1`] = `
-"## 
+"## ✅ Apply: 3 added
 
 ## Apply Summary
 
@@ -1380,7 +1380,7 @@ null_resource.will_fail
 terraform_data.depends_on_fail
 \`\`\`
 
-_(all values known after apply)_
+_all values known after apply_
 
 
 
@@ -1414,7 +1414,7 @@ terraform_data.success
 `;
 
 exports[`applyToMarkdown integration > tofu/apply-error/1 > renders without error and matches snapshot [default] 1`] = `
-"## 
+"## ❌ Apply Failed: 1 failed
 
 ## Apply Summary
 
@@ -1459,7 +1459,7 @@ Error running command 'exit 1': exit status 1. Output:
 `;
 
 exports[`applyToMarkdown integration > tofu/deferred-data-source/0 > renders without error and matches snapshot [default] 1`] = `
-"## 
+"## ✅ Apply: 5 added
 
 ## Apply Summary
 
@@ -1537,7 +1537,7 @@ terraform_data.independent
 terraform_data.worker_a
 \`\`\`
 
-_(all values known after apply)_
+_all values known after apply_
 
 
 
@@ -1550,7 +1550,7 @@ _(all values known after apply)_
 terraform_data.worker_b
 \`\`\`
 
-_(all values known after apply)_
+_all values known after apply_
 
 
 
@@ -1563,7 +1563,7 @@ _(all values known after apply)_
 terraform_data.worker_c
 \`\`\`
 
-_(all values known after apply)_
+_all values known after apply_
 
 
 
@@ -1579,7 +1579,7 @@ _(all values known after apply)_
 `;
 
 exports[`applyToMarkdown integration > tofu/deferred-data-source/1 > renders without error and matches snapshot [default] 1`] = `
-"## 
+"## ✅ Apply: 1 added, 1 changed
 
 ## Apply Summary
 
@@ -1646,7 +1646,7 @@ terraform_data.independent
 `;
 
 exports[`applyToMarkdown integration > tofu/deferred-data-source/2 > renders without error and matches snapshot [default] 1`] = `
-"## 
+"## ✅ Apply: 1 changed, 1 replaced
 
 ## Apply Summary
 
@@ -1706,7 +1706,7 @@ local_file.config
 terraform_data.worker_a
 \`\`\`
 
-_(all values known after apply)_
+_all values known after apply_
 
 
 
@@ -1722,7 +1722,7 @@ _(all values known after apply)_
 `;
 
 exports[`applyToMarkdown integration > tofu/error-stages/0 > renders without error and matches snapshot [default] 1`] = `
-"## 
+"## ✅ Apply: 1 added
 
 ## Apply Summary
 
@@ -1755,7 +1755,7 @@ null_resource.baseline
 `;
 
 exports[`applyToMarkdown integration > tofu/local-files/0 > renders without error and matches snapshot [default] 1`] = `
-"## 
+"## ✅ Apply: 1 added
 
 ## Apply Summary
 
@@ -1826,7 +1826,7 @@ Line 12: end of file
 `;
 
 exports[`applyToMarkdown integration > tofu/local-files/1 > renders without error and matches snapshot [default] 1`] = `
-"## 
+"## ✅ Apply: 1 replaced
 
 ## Apply Summary
 
@@ -1893,7 +1893,7 @@ local_file.readme
 `;
 
 exports[`applyToMarkdown integration > tofu/modules/0 > renders without error and matches snapshot [default] 1`] = `
-"## 
+"## ✅ Apply: 5 added
 
 ## Apply Summary
 
@@ -2018,7 +2018,7 @@ module.parent["2"].module.child.null_resource.item[1]
 `;
 
 exports[`applyToMarkdown integration > tofu/modules/1 > renders without error and matches snapshot [default] 1`] = `
-"## 
+"## ✅ Apply: 3 added, 2 replaced, 2 destroyed
 
 ## Apply Summary
 
@@ -2171,7 +2171,7 @@ module.parent["3"].module.child.null_resource.item[2]
 `;
 
 exports[`applyToMarkdown integration > tofu/null-lifecycle/0 > renders without error and matches snapshot [default] 1`] = `
-"## 
+"## ✅ Apply Complete
 
 ## Apply Summary
 
@@ -2181,7 +2181,7 @@ _No changes._
 `;
 
 exports[`applyToMarkdown integration > tofu/null-lifecycle/1 > renders without error and matches snapshot [default] 1`] = `
-"## 
+"## ✅ Apply: 4 added
 
 ## Apply Summary
 
@@ -2277,7 +2277,7 @@ terraform_data.meta
 `;
 
 exports[`applyToMarkdown integration > tofu/null-lifecycle/2 > renders without error and matches snapshot [default] 1`] = `
-"## 
+"## ✅ Apply: 1 changed, 1 replaced, 1 destroyed
 
 ## Apply Summary
 
@@ -2347,7 +2347,7 @@ terraform_data.meta
 `;
 
 exports[`applyToMarkdown integration > tofu/null-lifecycle/3 > renders without error and matches snapshot [default] 1`] = `
-"## 
+"## ✅ Apply Complete
 
 ## Apply Summary
 
@@ -2357,7 +2357,7 @@ _No changes._
 `;
 
 exports[`applyToMarkdown integration > tofu/null-lifecycle/4 > renders without error and matches snapshot [default] 1`] = `
-"## 
+"## ✅ Apply: 1 added
 
 ## Apply Summary
 
@@ -2430,7 +2430,7 @@ local_file.managed
 `;
 
 exports[`applyToMarkdown integration > tofu/sensitive-values/0 > renders without error and matches snapshot [default] 1`] = `
-"## 
+"## ✅ Apply: 1 added
 
 ## Apply Summary
 
@@ -2480,7 +2480,7 @@ local_sensitive_file.secret
 `;
 
 exports[`applyToMarkdown integration > tofu/sensitive-values/1 > renders without error and matches snapshot [default] 1`] = `
-"## 
+"## ✅ Apply: 1 replaced
 
 ## Apply Summary
 
@@ -2526,7 +2526,7 @@ local_sensitive_file.secret
 `;
 
 exports[`applyToMarkdown integration > tofu/state-operations/0 > renders without error and matches snapshot [default] 1`] = `
-"## 
+"## ✅ Apply: 4 added
 
 ## Apply Summary
 
@@ -2618,7 +2618,7 @@ random_string.existing
 `;
 
 exports[`applyToMarkdown integration > tofu/state-operations/1 > renders without error and matches snapshot [default] 1`] = `
-"## 
+"## ✅ Apply: 1 moved, 1 imported, 1 forgotten
 
 ## Apply Summary
 
@@ -2685,7 +2685,7 @@ _No attribute changes._
 `;
 
 exports[`applyToMarkdown — state enrichment > state-enriched snapshot: terraform/apply-error/0 1`] = `
-"## 
+"## ✅ Apply: 3 added
 
 ## Apply Summary
 
@@ -2799,7 +2799,7 @@ terraform_data.success
 `;
 
 exports[`applyToMarkdown — state enrichment > state-enriched snapshot: terraform/apply-error/1 1`] = `
-"## 
+"## ❌ Apply Failed: 1 failed
 
 ## Apply Summary
 
@@ -2844,7 +2844,7 @@ Error running command 'exit 1': exit status 1. Output:
 `;
 
 exports[`applyToMarkdown — state enrichment > state-enriched snapshot: terraform/deferred-data-source/0 1`] = `
-"## 
+"## ✅ Apply: 5 added
 
 ## Apply Summary
 
@@ -3078,7 +3078,7 @@ terraform_data.worker_c
 `;
 
 exports[`applyToMarkdown — state enrichment > state-enriched snapshot: terraform/deferred-data-source/1 1`] = `
-"## 
+"## ✅ Apply: 1 added, 1 changed
 
 ## Apply Summary
 
@@ -3170,7 +3170,7 @@ terraform_data.independent
 `;
 
 exports[`applyToMarkdown — state enrichment > state-enriched snapshot: terraform/deferred-data-source/2 1`] = `
-"## 
+"## ✅ Apply: 1 changed, 1 replaced
 
 ## Apply Summary
 
@@ -3286,7 +3286,7 @@ terraform_data.worker_a
 `;
 
 exports[`applyToMarkdown — state enrichment > state-enriched snapshot: terraform/error-stages/0 1`] = `
-"## 
+"## ✅ Apply: 1 added
 
 ## Apply Summary
 
@@ -3319,7 +3319,7 @@ null_resource.baseline
 `;
 
 exports[`applyToMarkdown — state enrichment > state-enriched snapshot: terraform/local-files/0 1`] = `
-"## 
+"## ✅ Apply: 1 added
 
 ## Apply Summary
 
@@ -3390,7 +3390,7 @@ Line 12: end of file
 `;
 
 exports[`applyToMarkdown — state enrichment > state-enriched snapshot: terraform/local-files/1 1`] = `
-"## 
+"## ✅ Apply: 1 replaced
 
 ## Apply Summary
 
@@ -3457,7 +3457,7 @@ local_file.readme
 `;
 
 exports[`applyToMarkdown — state enrichment > state-enriched snapshot: terraform/modules/0 1`] = `
-"## 
+"## ✅ Apply: 5 added
 
 ## Apply Summary
 
@@ -3582,7 +3582,7 @@ module.parent["2"].module.child.null_resource.item[1]
 `;
 
 exports[`applyToMarkdown — state enrichment > state-enriched snapshot: terraform/modules/1 1`] = `
-"## 
+"## ✅ Apply: 3 added, 2 replaced, 2 destroyed
 
 ## Apply Summary
 
@@ -3735,7 +3735,7 @@ module.parent["3"].module.child.null_resource.item[2]
 `;
 
 exports[`applyToMarkdown — state enrichment > state-enriched snapshot: terraform/null-lifecycle/0 1`] = `
-"## 
+"## ✅ Apply Complete
 
 ## Apply Summary
 
@@ -3745,7 +3745,7 @@ _No changes._
 `;
 
 exports[`applyToMarkdown — state enrichment > state-enriched snapshot: terraform/null-lifecycle/1 1`] = `
-"## 
+"## ✅ Apply: 4 added
 
 ## Apply Summary
 
@@ -3854,7 +3854,7 @@ terraform_data.meta
 `;
 
 exports[`applyToMarkdown — state enrichment > state-enriched snapshot: terraform/null-lifecycle/2 1`] = `
-"## 
+"## ✅ Apply: 1 changed, 1 replaced, 1 destroyed
 
 ## Apply Summary
 
@@ -3938,7 +3938,7 @@ terraform_data.meta
 `;
 
 exports[`applyToMarkdown — state enrichment > state-enriched snapshot: terraform/null-lifecycle/3 1`] = `
-"## 
+"## ✅ Apply Complete
 
 ## Apply Summary
 
@@ -3948,7 +3948,7 @@ _No changes._
 `;
 
 exports[`applyToMarkdown — state enrichment > state-enriched snapshot: terraform/null-lifecycle/4 1`] = `
-"## 
+"## ✅ Apply: 1 added
 
 ## Apply Summary
 
@@ -4021,7 +4021,7 @@ local_file.managed
 `;
 
 exports[`applyToMarkdown — state enrichment > state-enriched snapshot: terraform/sensitive-values/0 1`] = `
-"## 
+"## ✅ Apply: 1 added
 
 ## Apply Summary
 
@@ -4071,7 +4071,7 @@ local_sensitive_file.secret
 `;
 
 exports[`applyToMarkdown — state enrichment > state-enriched snapshot: terraform/sensitive-values/1 1`] = `
-"## 
+"## ✅ Apply: 1 replaced
 
 ## Apply Summary
 
@@ -4117,7 +4117,7 @@ local_sensitive_file.secret
 `;
 
 exports[`applyToMarkdown — state enrichment > state-enriched snapshot: terraform/state-operations/0 1`] = `
-"## 
+"## ✅ Apply: 4 added
 
 ## Apply Summary
 
@@ -4209,7 +4209,7 @@ random_string.existing
 `;
 
 exports[`applyToMarkdown — state enrichment > state-enriched snapshot: terraform/state-operations/1 1`] = `
-"## 
+"## ✅ Apply: 1 moved, 1 imported, 1 forgotten
 
 ## Apply Summary
 
@@ -4276,7 +4276,7 @@ _No attribute changes._
 `;
 
 exports[`applyToMarkdown — state enrichment > state-enriched snapshot: tofu/apply-error/0 1`] = `
-"## 
+"## ✅ Apply: 3 added
 
 ## Apply Summary
 
@@ -4390,7 +4390,7 @@ terraform_data.success
 `;
 
 exports[`applyToMarkdown — state enrichment > state-enriched snapshot: tofu/apply-error/1 1`] = `
-"## 
+"## ❌ Apply Failed: 1 failed
 
 ## Apply Summary
 
@@ -4435,7 +4435,7 @@ Error running command 'exit 1': exit status 1. Output:
 `;
 
 exports[`applyToMarkdown — state enrichment > state-enriched snapshot: tofu/deferred-data-source/0 1`] = `
-"## 
+"## ✅ Apply: 5 added
 
 ## Apply Summary
 
@@ -4669,7 +4669,7 @@ terraform_data.worker_c
 `;
 
 exports[`applyToMarkdown — state enrichment > state-enriched snapshot: tofu/deferred-data-source/1 1`] = `
-"## 
+"## ✅ Apply: 1 added, 1 changed
 
 ## Apply Summary
 
@@ -4761,7 +4761,7 @@ terraform_data.independent
 `;
 
 exports[`applyToMarkdown — state enrichment > state-enriched snapshot: tofu/deferred-data-source/2 1`] = `
-"## 
+"## ✅ Apply: 1 changed, 1 replaced
 
 ## Apply Summary
 
@@ -4877,7 +4877,7 @@ terraform_data.worker_a
 `;
 
 exports[`applyToMarkdown — state enrichment > state-enriched snapshot: tofu/error-stages/0 1`] = `
-"## 
+"## ✅ Apply: 1 added
 
 ## Apply Summary
 
@@ -4910,7 +4910,7 @@ null_resource.baseline
 `;
 
 exports[`applyToMarkdown — state enrichment > state-enriched snapshot: tofu/local-files/0 1`] = `
-"## 
+"## ✅ Apply: 1 added
 
 ## Apply Summary
 
@@ -4981,7 +4981,7 @@ Line 12: end of file
 `;
 
 exports[`applyToMarkdown — state enrichment > state-enriched snapshot: tofu/local-files/1 1`] = `
-"## 
+"## ✅ Apply: 1 replaced
 
 ## Apply Summary
 
@@ -5048,7 +5048,7 @@ local_file.readme
 `;
 
 exports[`applyToMarkdown — state enrichment > state-enriched snapshot: tofu/modules/0 1`] = `
-"## 
+"## ✅ Apply: 5 added
 
 ## Apply Summary
 
@@ -5173,7 +5173,7 @@ module.parent["2"].module.child.null_resource.item[1]
 `;
 
 exports[`applyToMarkdown — state enrichment > state-enriched snapshot: tofu/modules/1 1`] = `
-"## 
+"## ✅ Apply: 3 added, 2 replaced, 2 destroyed
 
 ## Apply Summary
 
@@ -5326,7 +5326,7 @@ module.parent["3"].module.child.null_resource.item[2]
 `;
 
 exports[`applyToMarkdown — state enrichment > state-enriched snapshot: tofu/null-lifecycle/0 1`] = `
-"## 
+"## ✅ Apply Complete
 
 ## Apply Summary
 
@@ -5336,7 +5336,7 @@ _No changes._
 `;
 
 exports[`applyToMarkdown — state enrichment > state-enriched snapshot: tofu/null-lifecycle/1 1`] = `
-"## 
+"## ✅ Apply: 4 added
 
 ## Apply Summary
 
@@ -5445,7 +5445,7 @@ terraform_data.meta
 `;
 
 exports[`applyToMarkdown — state enrichment > state-enriched snapshot: tofu/null-lifecycle/2 1`] = `
-"## 
+"## ✅ Apply: 1 changed, 1 replaced, 1 destroyed
 
 ## Apply Summary
 
@@ -5529,7 +5529,7 @@ terraform_data.meta
 `;
 
 exports[`applyToMarkdown — state enrichment > state-enriched snapshot: tofu/null-lifecycle/3 1`] = `
-"## 
+"## ✅ Apply Complete
 
 ## Apply Summary
 
@@ -5539,7 +5539,7 @@ _No changes._
 `;
 
 exports[`applyToMarkdown — state enrichment > state-enriched snapshot: tofu/null-lifecycle/4 1`] = `
-"## 
+"## ✅ Apply: 1 added
 
 ## Apply Summary
 
@@ -5612,7 +5612,7 @@ local_file.managed
 `;
 
 exports[`applyToMarkdown — state enrichment > state-enriched snapshot: tofu/sensitive-values/0 1`] = `
-"## 
+"## ✅ Apply: 1 added
 
 ## Apply Summary
 
@@ -5662,7 +5662,7 @@ local_sensitive_file.secret
 `;
 
 exports[`applyToMarkdown — state enrichment > state-enriched snapshot: tofu/sensitive-values/1 1`] = `
-"## 
+"## ✅ Apply: 1 replaced
 
 ## Apply Summary
 
@@ -5708,7 +5708,7 @@ local_sensitive_file.secret
 `;
 
 exports[`applyToMarkdown — state enrichment > state-enriched snapshot: tofu/state-operations/0 1`] = `
-"## 
+"## ✅ Apply: 4 added
 
 ## Apply Summary
 
@@ -5800,7 +5800,7 @@ random_string.existing
 `;
 
 exports[`applyToMarkdown — state enrichment > state-enriched snapshot: tofu/state-operations/1 1`] = `
-"## 
+"## ✅ Apply: 1 moved, 1 imported, 1 forgotten
 
 ## Apply Summary
 

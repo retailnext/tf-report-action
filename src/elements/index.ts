@@ -11,7 +11,6 @@ export {
   deriveModuleAddress,
   deriveInstanceName,
   groupByModule,
-  moduleLabel,
 } from "./address.js";
 export type { ModuleGroup } from "./address.js";
 

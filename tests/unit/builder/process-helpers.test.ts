@@ -142,7 +142,7 @@ describe("filterJsonlByAddresses", () => {
 
 function makeReport(issue: StepIssue): Report {
   return {
-    title: "",
+    title: { status: "success", body: { kind: "no-changes" } },
     issues: [issue],
     steps: [],
     warnings: [],
@@ -176,7 +176,7 @@ describe("filterStepIssueStdout", () => {
   it("filters stdout when all diagnostics have addresses", () => {
     const issue: StepIssue = {
       id: "apply",
-      heading: "`apply` failed",
+      reason: "failed",
       isFailed: true,
       stdout: [keptLine, droppedLine].join("\n"),
     };
@@ -191,7 +191,7 @@ describe("filterStepIssueStdout", () => {
   it("is a no-op when any diagnostic lacks an address", () => {
     const issue: StepIssue = {
       id: "apply",
-      heading: "`apply` failed",
+      reason: "failed",
       isFailed: true,
       stdout: [keptLine, droppedLine].join("\n"),
     };
@@ -206,7 +206,7 @@ describe("filterStepIssueStdout", () => {
   it("is a no-op when diagnostics array is empty", () => {
     const issue: StepIssue = {
       id: "apply",
-      heading: "`apply` failed",
+      reason: "failed",
       isFailed: true,
       stdout: droppedLine,
     };
@@ -221,7 +221,7 @@ describe("filterStepIssueStdout", () => {
   it("is a no-op when no issue with the given stepId exists", () => {
     const issue: StepIssue = {
       id: "plan",
-      heading: "`plan` failed",
+      reason: "failed",
       isFailed: true,
       stdout: droppedLine,
     };
@@ -235,7 +235,7 @@ describe("filterStepIssueStdout", () => {
   it("is a no-op when the issue has no stdout", () => {
     const issue: StepIssue = {
       id: "apply",
-      heading: "`apply` failed",
+      reason: "failed",
       isFailed: true,
     };
     const report = makeReport(issue);
@@ -248,7 +248,7 @@ describe("filterStepIssueStdout", () => {
   it("preserves other StepIssue fields when filtering", () => {
     const issue: StepIssue = {
       id: "apply",
-      heading: "`apply` failed",
+      reason: "failed",
       isFailed: true,
       exitCode: "1",
       stderr: "some error",

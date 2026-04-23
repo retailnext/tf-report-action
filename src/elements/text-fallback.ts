@@ -9,7 +9,8 @@
 
 import type { Renderable, OutputFormat } from "../renderable/types.js";
 import type { ReportElement } from "../renderable/types.js";
-import { Heading, Paragraph, Sequence } from "../renderable/primitives.js";
+import { Heading, Sequence } from "../renderable/primitives.js";
+import { renderNote, noteSize } from "../renderable/helpers.js";
 import { buildRawOutputRenderable } from "./raw-output.js";
 
 /**
@@ -20,30 +21,28 @@ export class TextFallbackElement implements ReportElement {
   readonly fixed = false;
   readonly levels = 2;
 
-  private readonly compact: Renderable;
+  private readonly heading: Renderable;
   private readonly full: Renderable;
+  private readonly noteText = "omitted due to size";
 
   constructor(stepId: string, label: string, content: string) {
     this.id = `raw-${stepId}`;
 
-    const headingRenderable = new Heading(label, 3);
-    this.compact = new Sequence([
-      headingRenderable,
-      new Paragraph("_(omitted due to size)_"),
-    ]);
-    this.full = new Sequence([
-      headingRenderable,
-      buildRawOutputRenderable(content),
-    ]);
+    this.heading = new Heading(label, 3);
+    this.full = new Sequence([this.heading, buildRawOutputRenderable(content)]);
   }
 
   size(format: OutputFormat, level: number): number {
-    const r = level === 0 ? this.compact : this.full;
-    return r.size(format);
+    if (level === 0) {
+      return this.heading.size(format) + noteSize(this.noteText, format);
+    }
+    return this.full.size(format);
   }
 
   render(format: OutputFormat, level: number): string {
-    const r = level === 0 ? this.compact : this.full;
-    return r.render(format);
+    if (level === 0) {
+      return this.heading.render(format) + renderNote(this.noteText, format);
+    }
+    return this.full.render(format);
   }
 }

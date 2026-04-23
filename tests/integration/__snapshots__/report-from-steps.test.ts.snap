@@ -1176,7 +1176,7 @@ exports[`reportFromSteps integration — apply-no-show fixtures > terraform/null
 
 > The condition could not be evaluated at this time, a result will be known when this plan is applied.
 
-> \`    condition     = null_resource.alpha.id != ""\` in check &quot;readiness&quot; (\`main.tf\`:50)
+> \`    condition     = null_resource.alpha.id != ""\` in check "readiness" (\`main.tf\`:50)
 
 > null_resource.alpha.id = is a string
 
@@ -1254,7 +1254,7 @@ exports[`reportFromSteps integration — apply-no-show fixtures > terraform/null
 
 > The condition could not be evaluated at this time, a result will be known when this plan is applied.
 
-> \`    condition     = null_resource.alpha.id != ""\` in check &quot;readiness&quot; (\`main.tf\`:39)
+> \`    condition     = null_resource.alpha.id != ""\` in check "readiness" (\`main.tf\`:39)
 
 > null_resource.alpha.id = is a string
 
@@ -2726,7 +2726,7 @@ exports[`reportFromSteps integration — apply-no-show fixtures > tofu/null-life
 
 > The condition could not be evaluated at this time, a result will be known when this plan is applied.
 
-> \`    condition     = null_resource.alpha.id != ""\` in check &quot;readiness&quot; (\`main.tf\`:50)
+> \`    condition     = null_resource.alpha.id != ""\` in check "readiness" (\`main.tf\`:50)
 
 > null_resource.alpha.id = is a string
 
@@ -2804,7 +2804,7 @@ exports[`reportFromSteps integration — apply-no-show fixtures > tofu/null-life
 
 > The condition could not be evaluated at this time, a result will be known when this plan is applied.
 
-> \`    condition     = null_resource.alpha.id != ""\` in check &quot;readiness&quot; (\`main.tf\`:39)
+> \`    condition     = null_resource.alpha.id != ""\` in check "readiness" (\`main.tf\`:39)
 
 > null_resource.alpha.id = is a string
 
@@ -8995,7 +8995,7 @@ exports[`reportFromSteps integration — generated fixtures > terraform/null-lif
 
 > The condition could not be evaluated at this time, a result will be known when this plan is applied.
 
-> \`    condition     = null_resource.alpha.id != ""\` in check &quot;readiness&quot; (\`main.tf\`:50)
+> \`    condition     = null_resource.alpha.id != ""\` in check "readiness" (\`main.tf\`:50)
 
 > null_resource.alpha.id = is a string
 
@@ -9115,7 +9115,7 @@ exports[`reportFromSteps integration — generated fixtures > terraform/null-lif
 
 > The condition could not be evaluated at this time, a result will be known when this plan is applied.
 
-> \`    condition     = null_resource.alpha.id != ""\` in check &quot;readiness&quot; (\`main.tf\`:50)
+> \`    condition     = null_resource.alpha.id != ""\` in check "readiness" (\`main.tf\`:50)
 
 > null_resource.alpha.id = is a string
 
@@ -9238,7 +9238,7 @@ exports[`reportFromSteps integration — generated fixtures > terraform/null-lif
 
 > The condition could not be evaluated at this time, a result will be known when this plan is applied.
 
-> \`    condition     = null_resource.alpha.id != ""\` in check &quot;readiness&quot; (\`main.tf\`:39)
+> \`    condition     = null_resource.alpha.id != ""\` in check "readiness" (\`main.tf\`:39)
 
 > null_resource.alpha.id = is a string
 
@@ -9333,7 +9333,7 @@ exports[`reportFromSteps integration — generated fixtures > terraform/null-lif
 
 > The condition could not be evaluated at this time, a result will be known when this plan is applied.
 
-> \`    condition     = null_resource.alpha.id != ""\` in check &quot;readiness&quot; (\`main.tf\`:39)
+> \`    condition     = null_resource.alpha.id != ""\` in check "readiness" (\`main.tf\`:39)
 
 > null_resource.alpha.id = is a string
 
@@ -13338,7 +13338,7 @@ exports[`reportFromSteps integration — generated fixtures > tofu/null-lifecycl
 
 > The condition could not be evaluated at this time, a result will be known when this plan is applied.
 
-> \`    condition     = null_resource.alpha.id != ""\` in check &quot;readiness&quot; (\`main.tf\`:50)
+> \`    condition     = null_resource.alpha.id != ""\` in check "readiness" (\`main.tf\`:50)
 
 > null_resource.alpha.id = is a string
 
@@ -13458,7 +13458,7 @@ exports[`reportFromSteps integration — generated fixtures > tofu/null-lifecycl
 
 > The condition could not be evaluated at this time, a result will be known when this plan is applied.
 
-> \`    condition     = null_resource.alpha.id != ""\` in check &quot;readiness&quot; (\`main.tf\`:50)
+> \`    condition     = null_resource.alpha.id != ""\` in check "readiness" (\`main.tf\`:50)
 
 > null_resource.alpha.id = is a string
 
@@ -13581,7 +13581,7 @@ exports[`reportFromSteps integration — generated fixtures > tofu/null-lifecycl
 
 > The condition could not be evaluated at this time, a result will be known when this plan is applied.
 
-> \`    condition     = null_resource.alpha.id != ""\` in check &quot;readiness&quot; (\`main.tf\`:39)
+> \`    condition     = null_resource.alpha.id != ""\` in check "readiness" (\`main.tf\`:39)
 
 > null_resource.alpha.id = is a string
 
@@ -13676,7 +13676,7 @@ exports[`reportFromSteps integration — generated fixtures > tofu/null-lifecycl
 
 > The condition could not be evaluated at this time, a result will be known when this plan is applied.
 
-> \`    condition     = null_resource.alpha.id != ""\` in check &quot;readiness&quot; (\`main.tf\`:39)
+> \`    condition     = null_resource.alpha.id != ""\` in check "readiness" (\`main.tf\`:39)
 
 > null_resource.alpha.id = is a string
 
@@ -15530,7 +15530,7 @@ exports[`reportFromSteps integration — no-show fixtures (Tier 3) > terraform/n
 
 > The condition could not be evaluated at this time, a result will be known when this plan is applied.
 
-> \`    condition     = null_resource.alpha.id != ""\` in check &quot;readiness&quot; (\`main.tf\`:50)
+> \`    condition     = null_resource.alpha.id != ""\` in check "readiness" (\`main.tf\`:50)
 
 > null_resource.alpha.id = is a string
 
@@ -15608,7 +15608,7 @@ exports[`reportFromSteps integration — no-show fixtures (Tier 3) > terraform/n
 
 > The condition could not be evaluated at this time, a result will be known when this plan is applied.
 
-> \`    condition     = null_resource.alpha.id != ""\` in check &quot;readiness&quot; (\`main.tf\`:39)
+> \`    condition     = null_resource.alpha.id != ""\` in check "readiness" (\`main.tf\`:39)
 
 > null_resource.alpha.id = is a string
 
@@ -16806,7 +16806,7 @@ exports[`reportFromSteps integration — no-show fixtures (Tier 3) > tofu/null-l
 
 > The condition could not be evaluated at this time, a result will be known when this plan is applied.
 
-> \`    condition     = null_resource.alpha.id != ""\` in check &quot;readiness&quot; (\`main.tf\`:50)
+> \`    condition     = null_resource.alpha.id != ""\` in check "readiness" (\`main.tf\`:50)
 
 > null_resource.alpha.id = is a string
 
@@ -16884,7 +16884,7 @@ exports[`reportFromSteps integration — no-show fixtures (Tier 3) > tofu/null-l
 
 > The condition could not be evaluated at this time, a result will be known when this plan is applied.
 
-> \`    condition     = null_resource.alpha.id != ""\` in check &quot;readiness&quot; (\`main.tf\`:39)
+> \`    condition     = null_resource.alpha.id != ""\` in check "readiness" (\`main.tf\`:39)
 
 > null_resource.alpha.id = is a string
 
@@ -17215,7 +17215,7 @@ null_resource.will_fail
 terraform_data.depends_on_fail
 \`\`\`
 
-_(all values known after apply)_
+_all values known after apply_
 
 
 
@@ -17287,7 +17287,7 @@ null_resource.will_fail
 terraform_data.depends_on_fail
 \`\`\`
 
-_(all values known after apply)_
+_all values known after apply_
 
 
 
@@ -17381,7 +17381,7 @@ terraform_data.independent
 terraform_data.worker_a
 \`\`\`
 
-_(all values known after apply)_
+_all values known after apply_
 
 
 
@@ -17394,7 +17394,7 @@ _(all values known after apply)_
 terraform_data.worker_b
 \`\`\`
 
-_(all values known after apply)_
+_all values known after apply_
 
 
 
@@ -17407,7 +17407,7 @@ _(all values known after apply)_
 terraform_data.worker_c
 \`\`\`
 
-_(all values known after apply)_
+_all values known after apply_
 
 
 
@@ -17487,7 +17487,7 @@ terraform_data.independent
 terraform_data.worker_a
 \`\`\`
 
-_(all values known after apply)_
+_all values known after apply_
 
 
 
@@ -17500,7 +17500,7 @@ _(all values known after apply)_
 terraform_data.worker_b
 \`\`\`
 
-_(all values known after apply)_
+_all values known after apply_
 
 
 
@@ -17513,7 +17513,7 @@ _(all values known after apply)_
 terraform_data.worker_c
 \`\`\`
 
-_(all values known after apply)_
+_all values known after apply_
 
 
 
@@ -17589,7 +17589,7 @@ local_file.config
 terraform_data.worker_a
 \`\`\`
 
-_(all values known after apply)_
+_all values known after apply_
 
 
 
@@ -17602,7 +17602,7 @@ _(all values known after apply)_
 terraform_data.worker_b
 \`\`\`
 
-_(all values known after apply)_
+_all values known after apply_
 
 
 
@@ -17615,7 +17615,7 @@ _(all values known after apply)_
 terraform_data.worker_c
 \`\`\`
 
-_(all values known after apply)_
+_all values known after apply_
 
 
 
@@ -18387,7 +18387,7 @@ exports[`reportFromSteps integration — plan-only fixtures > terraform/null-lif
 
 > The condition could not be evaluated at this time, a result will be known when this plan is applied.
 
-> \`    condition     = null_resource.alpha.id != ""\` in check &quot;readiness&quot; (\`main.tf\`:50)
+> \`    condition     = null_resource.alpha.id != ""\` in check "readiness" (\`main.tf\`:50)
 
 > null_resource.alpha.id = is a string
 
@@ -18496,7 +18496,7 @@ exports[`reportFromSteps integration — plan-only fixtures > terraform/null-lif
 
 > The condition could not be evaluated at this time, a result will be known when this plan is applied.
 
-> \`    condition     = null_resource.alpha.id != ""\` in check &quot;readiness&quot; (\`main.tf\`:39)
+> \`    condition     = null_resource.alpha.id != ""\` in check "readiness" (\`main.tf\`:39)
 
 > null_resource.alpha.id = is a string
 
@@ -18943,7 +18943,7 @@ null_resource.will_fail
 terraform_data.depends_on_fail
 \`\`\`
 
-_(all values known after apply)_
+_all values known after apply_
 
 
 
@@ -19015,7 +19015,7 @@ null_resource.will_fail
 terraform_data.depends_on_fail
 \`\`\`
 
-_(all values known after apply)_
+_all values known after apply_
 
 
 
@@ -19109,7 +19109,7 @@ terraform_data.independent
 terraform_data.worker_a
 \`\`\`
 
-_(all values known after apply)_
+_all values known after apply_
 
 
 
@@ -19122,7 +19122,7 @@ _(all values known after apply)_
 terraform_data.worker_b
 \`\`\`
 
-_(all values known after apply)_
+_all values known after apply_
 
 
 
@@ -19135,7 +19135,7 @@ _(all values known after apply)_
 terraform_data.worker_c
 \`\`\`
 
-_(all values known after apply)_
+_all values known after apply_
 
 
 
@@ -19215,7 +19215,7 @@ terraform_data.independent
 terraform_data.worker_a
 \`\`\`
 
-_(all values known after apply)_
+_all values known after apply_
 
 
 
@@ -19228,7 +19228,7 @@ _(all values known after apply)_
 terraform_data.worker_b
 \`\`\`
 
-_(all values known after apply)_
+_all values known after apply_
 
 
 
@@ -19241,7 +19241,7 @@ _(all values known after apply)_
 terraform_data.worker_c
 \`\`\`
 
-_(all values known after apply)_
+_all values known after apply_
 
 
 
@@ -19317,7 +19317,7 @@ local_file.config
 terraform_data.worker_a
 \`\`\`
 
-_(all values known after apply)_
+_all values known after apply_
 
 
 
@@ -19330,7 +19330,7 @@ _(all values known after apply)_
 terraform_data.worker_b
 \`\`\`
 
-_(all values known after apply)_
+_all values known after apply_
 
 
 
@@ -19343,7 +19343,7 @@ _(all values known after apply)_
 terraform_data.worker_c
 \`\`\`
 
-_(all values known after apply)_
+_all values known after apply_
 
 
 
@@ -20115,7 +20115,7 @@ exports[`reportFromSteps integration — plan-only fixtures > tofu/null-lifecycl
 
 > The condition could not be evaluated at this time, a result will be known when this plan is applied.
 
-> \`    condition     = null_resource.alpha.id != ""\` in check &quot;readiness&quot; (\`main.tf\`:50)
+> \`    condition     = null_resource.alpha.id != ""\` in check "readiness" (\`main.tf\`:50)
 
 > null_resource.alpha.id = is a string
 
@@ -20224,7 +20224,7 @@ exports[`reportFromSteps integration — plan-only fixtures > tofu/null-lifecycl
 
 > The condition could not be evaluated at this time, a result will be known when this plan is applied.
 
-> \`    condition     = null_resource.alpha.id != ""\` in check &quot;readiness&quot; (\`main.tf\`:39)
+> \`    condition     = null_resource.alpha.id != ""\` in check "readiness" (\`main.tf\`:39)
 
 > null_resource.alpha.id = is a string
 
@@ -20672,7 +20672,7 @@ null_resource.will_fail
 terraform_data.depends_on_fail
 \`\`\`
 
-_(all values known after apply)_
+_all values known after apply_
 
 
 
@@ -21085,7 +21085,7 @@ terraform_data.independent
 terraform_data.worker_a
 \`\`\`
 
-_(all values known after apply)_
+_all values known after apply_
 
 
 
@@ -21098,7 +21098,7 @@ _(all values known after apply)_
 terraform_data.worker_b
 \`\`\`
 
-_(all values known after apply)_
+_all values known after apply_
 
 
 
@@ -21111,7 +21111,7 @@ _(all values known after apply)_
 terraform_data.worker_c
 \`\`\`
 
-_(all values known after apply)_
+_all values known after apply_
 
 
 
@@ -21258,7 +21258,7 @@ local_file.config
 terraform_data.worker_a
 \`\`\`
 
-_(all values known after apply)_
+_all values known after apply_
 
 
 
@@ -22045,7 +22045,7 @@ exports[`reportFromSteps — state enrichment > no-state snapshot: terraform/nul
 
 > The condition could not be evaluated at this time, a result will be known when this plan is applied.
 
-> \`    condition     = null_resource.alpha.id != ""\` in check &quot;readiness&quot; (\`main.tf\`:50)
+> \`    condition     = null_resource.alpha.id != ""\` in check "readiness" (\`main.tf\`:50)
 
 > null_resource.alpha.id = is a string
 
@@ -22156,7 +22156,7 @@ exports[`reportFromSteps — state enrichment > no-state snapshot: terraform/nul
 
 > The condition could not be evaluated at this time, a result will be known when this plan is applied.
 
-> \`    condition     = null_resource.alpha.id != ""\` in check &quot;readiness&quot; (\`main.tf\`:39)
+> \`    condition     = null_resource.alpha.id != ""\` in check "readiness" (\`main.tf\`:39)
 
 > null_resource.alpha.id = is a string
 
@@ -22613,7 +22613,7 @@ null_resource.will_fail
 terraform_data.depends_on_fail
 \`\`\`
 
-_(all values known after apply)_
+_all values known after apply_
 
 
 
@@ -23026,7 +23026,7 @@ terraform_data.independent
 terraform_data.worker_a
 \`\`\`
 
-_(all values known after apply)_
+_all values known after apply_
 
 
 
@@ -23039,7 +23039,7 @@ _(all values known after apply)_
 terraform_data.worker_b
 \`\`\`
 
-_(all values known after apply)_
+_all values known after apply_
 
 
 
@@ -23052,7 +23052,7 @@ _(all values known after apply)_
 terraform_data.worker_c
 \`\`\`
 
-_(all values known after apply)_
+_all values known after apply_
 
 
 
@@ -23199,7 +23199,7 @@ local_file.config
 terraform_data.worker_a
 \`\`\`
 
-_(all values known after apply)_
+_all values known after apply_
 
 
 
@@ -23986,7 +23986,7 @@ exports[`reportFromSteps — state enrichment > no-state snapshot: tofu/null-lif
 
 > The condition could not be evaluated at this time, a result will be known when this plan is applied.
 
-> \`    condition     = null_resource.alpha.id != ""\` in check &quot;readiness&quot; (\`main.tf\`:50)
+> \`    condition     = null_resource.alpha.id != ""\` in check "readiness" (\`main.tf\`:50)
 
 > null_resource.alpha.id = is a string
 
@@ -24097,7 +24097,7 @@ exports[`reportFromSteps — state enrichment > no-state snapshot: tofu/null-lif
 
 > The condition could not be evaluated at this time, a result will be known when this plan is applied.
 
-> \`    condition     = null_resource.alpha.id != ""\` in check &quot;readiness&quot; (\`main.tf\`:39)
+> \`    condition     = null_resource.alpha.id != ""\` in check "readiness" (\`main.tf\`:39)
 
 > null_resource.alpha.id = is a string
 

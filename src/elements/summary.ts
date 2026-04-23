@@ -7,13 +7,8 @@ import type { Renderable, OutputFormat } from "../renderable/types.js";
 import type { ReportElement } from "../renderable/types.js";
 import type { Summary, SummaryActionGroup } from "../model/summary.js";
 import type { PlanAction } from "../model/plan-action.js";
-import {
-  Table,
-  RawText,
-  Heading,
-  Paragraph,
-  Sequence,
-} from "../renderable/primitives.js";
+import { Table, RawText, Heading, Sequence } from "../renderable/primitives.js";
+import { renderNote, noteSize } from "../renderable/helpers.js";
 import { ACTION_SYMBOLS } from "../model/plan-action.js";
 import { STATUS_FAILURE } from "../model/status-icons.js";
 
@@ -92,7 +87,7 @@ function buildSummaryRenderable(
   const hasContent = summary.actions.length > 0 || summary.failures.length > 0;
 
   if (!hasContent) {
-    parts.push(new Paragraph("_No changes._"));
+    parts.push(new NoteRenderable("No changes."));
     return new Sequence(parts);
   }
 
@@ -164,5 +159,22 @@ class BoldText implements Renderable {
 
   render(format: OutputFormat): string {
     return format === "markdown" ? this.mdStr : this.htStr;
+  }
+}
+
+/** Contextual note — italic in markdown, `<em>` in HTML. */
+class NoteRenderable implements Renderable {
+  private readonly text: string;
+
+  constructor(text: string) {
+    this.text = text;
+  }
+
+  size(format: OutputFormat): number {
+    return noteSize(this.text, format);
+  }
+
+  render(format: OutputFormat): string {
+    return renderNote(this.text, format);
   }
 }

@@ -17,7 +17,7 @@ function assertElementSizeInvariant(el: ReportElement, label?: string): void {
 
 const failedIssue: StepIssue = {
   id: "plan",
-  heading: "`plan` failed",
+  reason: "failed",
   isFailed: true,
   diagnostic: "Plan exited with error",
   stdout: "Error: resource not found",
@@ -27,7 +27,7 @@ const failedIssue: StepIssue = {
 
 const warningIssue: StepIssue = {
   id: "show-plan",
-  heading: "`show-plan` warning",
+  reason: "parse-error",
   isFailed: false,
   diagnostic: "Plan output could not be parsed",
 };
@@ -59,7 +59,7 @@ describe("StepIssueElement", () => {
     const el = new StepIssueElement(warningIssue);
     const md = el.render("markdown", 0);
     expect(md).toContain("⚠️");
-    expect(md).toContain("`show-plan` warning");
+    expect(md).toContain("`show-plan`: output could not be parsed");
   });
 
   it("level 1 renders full details with exit code", () => {
@@ -92,7 +92,7 @@ describe("StepIssueElement", () => {
   it("shows 'No output captured.' when no stdout/stderr/errors", () => {
     const issue: StepIssue = {
       id: "init",
-      heading: "`init` failed",
+      reason: "failed",
       isFailed: true,
     };
     const el = new StepIssueElement(issue);
@@ -103,7 +103,7 @@ describe("StepIssueElement", () => {
   it("renders stdoutError as warning blockquote", () => {
     const issue: StepIssue = {
       id: "plan",
-      heading: "`plan` failed",
+      reason: "failed",
       isFailed: true,
       stdoutError: "File not found",
     };
@@ -116,7 +116,7 @@ describe("StepIssueElement", () => {
   it("renders stderrError as warning blockquote", () => {
     const issue: StepIssue = {
       id: "plan",
-      heading: "`plan` failed",
+      reason: "failed",
       isFailed: true,
       stderrError: "Permission denied",
     };
@@ -153,7 +153,7 @@ describe("StepIssueElement", () => {
   it("satisfies the size invariant for issue with no output", () => {
     const issue: StepIssue = {
       id: "init",
-      heading: "`init` failed",
+      reason: "failed",
       isFailed: true,
     };
     assertElementSizeInvariant(new StepIssueElement(issue), "no-output");
@@ -162,7 +162,7 @@ describe("StepIssueElement", () => {
   it("satisfies the size invariant for issue with read errors", () => {
     const issue: StepIssue = {
       id: "plan",
-      heading: "`plan` failed",
+      reason: "failed",
       isFailed: true,
       stdoutError: "File not found",
       stderrError: "Permission denied",

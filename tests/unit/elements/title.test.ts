@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import type { ReportElement } from "../../../src/renderable/types.js";
+import type { ReportTitle } from "../../../src/model/report-title.js";
 import {
   TitleElement,
   MarkerElement,
@@ -24,35 +25,53 @@ function assertElementSizeInvariant(el: ReportElement, label?: string): void {
   }
 }
 
+const planTitle: ReportTitle = {
+  status: "success",
+  body: { kind: "succeeded", operation: "plan" },
+};
+
+const applyTitle: ReportTitle = {
+  status: "success",
+  body: { kind: "succeeded", operation: "apply" },
+};
+
 // ---------------------------------------------------------------------------
 // TitleElement
 // ---------------------------------------------------------------------------
 
 describe("TitleElement", () => {
   it("has correct metadata", () => {
-    const el = new TitleElement("Plan");
+    const el = new TitleElement(planTitle);
     expect(el.id).toBe("title");
     expect(el.fixed).toBe(true);
     expect(el.levels).toBe(1);
   });
 
   it("renders as H2 heading in markdown", () => {
-    const el = new TitleElement("Apply");
-    expect(el.render("markdown", 0)).toBe("## Apply\n\n");
+    const el = new TitleElement(applyTitle);
+    expect(el.render("markdown", 0)).toBe("## ✅ Apply Succeeded\n\n");
   });
 
   it("renders as H2 heading in HTML", () => {
-    const el = new TitleElement("Apply");
-    expect(el.render("html", 0)).toBe("<h2>Apply</h2>\n");
+    const el = new TitleElement(applyTitle);
+    expect(el.render("html", 0)).toBe("<h2>✅ Apply Succeeded</h2>\n");
   });
 
   it("satisfies the size invariant", () => {
-    assertElementSizeInvariant(new TitleElement("Some Title"));
+    assertElementSizeInvariant(
+      new TitleElement({ status: "success", body: { kind: "succeeded" } }),
+    );
   });
 
   it("escapes HTML entities in HTML format", () => {
-    const el = new TitleElement("Plan <staging>");
-    expect(el.render("html", 0)).toBe("<h2>Plan &lt;staging&gt;</h2>\n");
+    const el = new TitleElement({
+      status: "success",
+      workspace: "<staging>",
+      body: { kind: "succeeded", operation: "plan" },
+    });
+    expect(el.render("html", 0)).toBe(
+      "<h2>✅ <code>&lt;staging&gt;</code> Plan Succeeded</h2>\n",
+    );
     assertElementSizeInvariant(el, "title-with-entities");
   });
 });

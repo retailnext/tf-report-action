@@ -1,47 +1,55 @@
 /**
- * Unified title generation — builds report titles from any Report shape.
+ * Unified title generation — builds structured report titles from any
+ * Report shape.
  *
  * One `buildTitle(report)` handles all cases: structured plan/apply,
  * JSONL-enriched, text fallback, workflow-only, error, and all-steps-skipped.
  * Evaluated top-to-bottom with first-match-wins semantics.
  *
  * Title logic is part of the builder because it's about constructing
- * a meaningful data field (the title string) from business data (summary
- * counts, action types, failure state). The renderer just renders it.
+ * a meaningful data structure from business data (summary counts, action
+ * types, failure state). The element layer renders it.
  */
 
 import type { Report } from "../model/report.js";
 import type { Summary } from "../model/summary.js";
-import {
-  STATUS_SUCCESS,
-  STATUS_FAILURE,
-  DIAGNOSTIC_WARNING,
-} from "../model/status-icons.js";
+import type {
+  ReportTitle,
+  TitleBody,
+  TitleActionCount,
+  TitleOperation,
+  TitleStatus,
+} from "../model/report-title.js";
 
 /**
- * Build a title for any Report shape. Inspects available data (error,
- * summary, operation, step failures, all-skipped) and produces the
- * appropriate title.
+ * Build a structured title for any Report shape. Inspects available data
+ * (error, summary, operation, step failures, all-skipped) and produces
+ * the appropriate title.
  *
  * Evaluation order (first match wins):
- * 1. Error → "❌ Report Generation Failed"
- * 2. IaC step failures + operation → "❌ Plan/Apply Failed"
- * 3. Summary + apply + apply errors → "❌ Apply Failed: N failed, ..."
- * 4. Summary + apply + no changes → "✅ Apply Complete"
- * 5. Summary + apply + changes → "✅ Apply: N added, ..."
- * 6. Summary + plan + no changes → "✅ No Changes"
- * 7. Summary + plan + changes → "✅ Plan: N to add, ..."
- * 8. operationOutcome === "skipped" → "⚠️ Plan/Apply/Destroy Skipped"
- * 9. All steps skipped → "⚠️ All Steps Skipped"
- * 10. No summary + failures → "❌ Failed"
- * 11. No summary + all OK → "✅ Succeeded"
+ * 1. Error → "error"
+ * 2. IaC step failures + operation → "operation-failed"
+ * 3. Summary + apply + apply errors → "summary" with failures
+ * 4. Summary + apply + no changes → "summary" with empty counts
+ * 5. Summary + apply + changes → "summary" with counts
+ * 6. Summary + plan + no changes → "no-changes"
+ * 7. Summary + plan + changes → "summary" with counts
+ * 8. operationOutcome === "skipped" → "operation-skipped"
+ * 9. All steps skipped → "all-skipped"
+ * 10. No summary + single step failure → "step-failed"
+ * 11. No summary + multiple failures → "generic-failed"
+ * 12. No summary + all OK → "succeeded"
  */
-export function buildTitle(report: Report): string {
-  const wsPrefix = report.workspace ? `\`${report.workspace}\` ` : "";
+export function buildTitle(report: Report): ReportTitle {
+  const workspace = report.workspace;
 
   // 1. Error report
   if (report.error !== undefined) {
-    return `${STATUS_FAILURE} ${wsPrefix}Report Generation Failed`;
+    return {
+      status: "failure",
+      ...(workspace !== undefined ? { workspace } : {}),
+      body: { kind: "error" },
+    };
   }
 
   const hasIacStepFailure = hasIacFailure(report);
@@ -49,9 +57,15 @@ export function buildTitle(report: Report): string {
 
   // 2. IaC step failures
   if (hasIacStepFailure) {
-    const op = operationLabel(report.operation);
-    const label = op ? `${op} Failed` : "Failed";
-    return `${STATUS_FAILURE} ${wsPrefix}${label}`;
+    const op = normalizeOperation(report.operation);
+    return {
+      status: "failure",
+      ...(workspace !== undefined ? { workspace } : {}),
+      body:
+        op !== undefined
+          ? { kind: "operation-failed", operation: op }
+          : { kind: "generic-failed" },
+    };
   }
 
   // 3–7. Has summary (from show-plan JSON or JSONL scanner)
@@ -59,66 +73,86 @@ export function buildTitle(report: Report): string {
     return buildSummaryTitle(
       report.summary,
       report.operation ?? "plan",
-      wsPrefix,
+      workspace,
       hasAnyStepFailure,
     );
   }
 
   // 8. Primary operation step was skipped
   if (report.operationOutcome === "skipped") {
-    const op = operationLabel(report.operation);
-    const label = op ? `${op} Skipped` : "Skipped";
-    return `${DIAGNOSTIC_WARNING} ${wsPrefix}${label}`;
+    return {
+      status: "warning",
+      ...(workspace !== undefined ? { workspace } : {}),
+      body: {
+        kind: "operation-skipped",
+        ...(() => {
+          const op = normalizeOperation(report.operation);
+          return op !== undefined ? { operation: op } : {};
+        })(),
+      },
+    };
   }
 
-  // 9. All steps skipped (defense-in-depth: catches cases where operationOutcome is not set)
+  // 9. All steps skipped
   if (
     report.steps.length > 0 &&
     report.steps.every((s) => s.outcome === "skipped")
   ) {
-    return `${DIAGNOSTIC_WARNING} ${wsPrefix}All Steps Skipped`;
+    return {
+      status: "warning",
+      ...(workspace !== undefined ? { workspace } : {}),
+      body: { kind: "all-skipped" },
+    };
   }
 
   // 10–11. No summary — generic title based on failure state
   if (hasAnyStepFailure || report.issues.some((i) => i.isFailed)) {
-    const failLabel = singleFailedStepLabel(report);
-    return `${STATUS_FAILURE} ${wsPrefix}${failLabel}`;
+    return {
+      status: "failure",
+      ...(workspace !== undefined ? { workspace } : {}),
+      body: buildFailedBody(report),
+    };
   }
 
-  // Include operation label when known (e.g., "Plan Succeeded", "Apply Succeeded")
-  const opLabel = report.operation
-    ? `${operationLabel(report.operation)} `
-    : "";
-  return `${STATUS_SUCCESS} ${wsPrefix}${opLabel}Succeeded`;
+  // 12. Success
+  return {
+    status: "success",
+    ...(workspace !== undefined ? { workspace } : {}),
+    body: {
+      kind: "succeeded",
+      ...(() => {
+        const op = normalizeOperation(report.operation);
+        return op !== undefined ? { operation: op } : {};
+      })(),
+    },
+  };
 }
 
-// ─── Exported Helpers (used by renderers for summary tables) ────────────────
+// ─── Exported Helpers (used by summary table element) ───────────────────────
 
-/** Build count parts for plan titles (e.g. "3 to add, 1 to change"). */
-export function buildPlanCountParts(summary: Summary): string[] {
+/** Build count parts for plan titles (e.g. [{ action: "create", count: 3 }]). */
+export function buildPlanCounts(summary: Summary): TitleActionCount[] {
   const counts = new Map<string, number>();
   for (const group of summary.actions) {
-    const label = planActionLabel(group.action);
-    counts.set(label, (counts.get(label) ?? 0) + group.total);
+    counts.set(group.action, (counts.get(group.action) ?? 0) + group.total);
   }
-  return formatCountParts(counts, "to ");
+  return mapToActionCounts(counts);
 }
 
-/** Build count parts for apply titles (e.g. "3 added, 1 changed"). */
-export function buildApplyCountParts(summary: Summary): string[] {
+/** Build count parts for apply titles (e.g. [{ action: "create", count: 3 }]). */
+export function buildApplyCounts(summary: Summary): TitleActionCount[] {
   const counts = new Map<string, number>();
   for (const group of summary.actions) {
-    const label = applyActionLabel(group.action);
-    counts.set(label, (counts.get(label) ?? 0) + group.total);
+    counts.set(group.action, (counts.get(group.action) ?? 0) + group.total);
   }
-  return formatCountParts(counts, "");
+  return mapToActionCounts(counts);
 }
 
-/** Build failure count parts (e.g. "2 failed"). */
-export function buildFailureCountParts(summary: Summary): string[] {
+/** Build failure counts (e.g. [{ action: "failed", count: 2 }]). */
+export function buildFailureCounts(summary: Summary): TitleActionCount[] {
   const total = summary.failures.reduce((sum, g) => sum + g.total, 0);
   if (total === 0) return [];
-  return [`${String(total)} failed`];
+  return [{ action: "failed", count: total }];
 }
 
 // ─── Internal Helpers ───────────────────────────────────────────────────────
@@ -126,51 +160,96 @@ export function buildFailureCountParts(summary: Summary): string[] {
 /** Build title when a summary is available. */
 function buildSummaryTitle(
   summary: Summary,
-  operation: "plan" | "apply" | "destroy",
-  wsPrefix: string,
+  operation: TitleOperation,
+  workspace: string | undefined,
   hasAnyStepFailure: boolean,
-): string {
+): ReportTitle {
   const hasFailures = summary.failures.length > 0;
-  const icon =
-    hasFailures || hasAnyStepFailure ? STATUS_FAILURE : STATUS_SUCCESS;
+  const status: TitleStatus =
+    hasFailures || hasAnyStepFailure ? "failure" : "success";
 
   if (operation === "apply" || operation === "destroy") {
-    const parts = buildApplyCountParts(summary);
+    const counts = buildApplyCounts(summary);
+    const failures = buildFailureCounts(summary);
+    const failureTotal = summary.failures.reduce((sum, g) => sum + g.total, 0);
+
     if (hasFailures) {
-      const failParts = buildFailureCountParts(summary);
-      return `${icon} ${wsPrefix}Apply Failed: ${[...failParts, ...parts].join(", ")}`;
+      return {
+        status,
+        ...(workspace !== undefined ? { workspace } : {}),
+        body: {
+          kind: "summary",
+          operation,
+          counts,
+          failures,
+          failureTotal,
+          hasStepFailure: hasAnyStepFailure,
+        },
+      };
     }
-    if (parts.length === 0) {
-      return `${icon} ${wsPrefix}Apply Complete`;
-    }
-    return `${icon} ${wsPrefix}Apply: ${parts.join(", ")}`;
+
+    // Apply complete (including zero changes)
+    return {
+      status,
+      ...(workspace !== undefined ? { workspace } : {}),
+      body: {
+        kind: "summary",
+        operation,
+        counts,
+        failures: [],
+        failureTotal: 0,
+        hasStepFailure: hasAnyStepFailure,
+      },
+    };
   }
 
   // Plan mode
   const totalActions = summary.actions.reduce((sum, g) => sum + g.total, 0);
   if (totalActions === 0 && !hasFailures && !hasAnyStepFailure) {
-    return `${icon} ${wsPrefix}No Changes`;
+    return {
+      status,
+      ...(workspace !== undefined ? { workspace } : {}),
+      body: { kind: "no-changes" },
+    };
   }
 
   if (hasFailures || hasAnyStepFailure) {
-    return `${icon} ${wsPrefix}Plan Failed`;
+    return {
+      status,
+      ...(workspace !== undefined ? { workspace } : {}),
+      body: {
+        kind: "operation-failed",
+        operation: "plan",
+      },
+    };
   }
 
-  const parts = buildPlanCountParts(summary);
-  return `${icon} ${wsPrefix}Plan: ${parts.join(", ")}`;
+  const counts = buildPlanCounts(summary);
+  return {
+    status,
+    ...(workspace !== undefined ? { workspace } : {}),
+    body: {
+      kind: "summary",
+      operation: "plan",
+      counts,
+      failures: [],
+      failureTotal: 0,
+      hasStepFailure: false,
+    },
+  };
 }
 
-/** Returns a human-readable operation label. */
-function operationLabel(operation: string | undefined): string {
+/** Normalize an operation string to a TitleOperation, or undefined. */
+function normalizeOperation(
+  operation: string | undefined,
+): TitleOperation | undefined {
   switch (operation) {
     case "apply":
-      return "Apply";
     case "destroy":
-      return "Destroy";
     case "plan":
-      return "Plan";
+      return operation;
     default:
-      return "";
+      return undefined;
   }
 }
 
@@ -192,67 +271,22 @@ function hasAnyFailure(report: Report): boolean {
 }
 
 /**
- * When exactly one step failed, use its name in the title.
- * Otherwise return a generic "Failed".
+ * Build the failure body — step-failed (single step) or generic-failed.
  */
-function singleFailedStepLabel(report: Report): string {
+function buildFailedBody(report: Report): TitleBody {
   const failedSteps = report.steps.filter((s) => s.outcome === "failure");
   if (failedSteps.length === 1) {
     const name = failedSteps[0]?.id ?? "unknown";
-    return `\`${name}\` Failed`;
+    return { kind: "step-failed", stepId: name };
   }
-  return "Failed";
+  return { kind: "generic-failed" };
 }
 
-function formatCountParts(
-  counts: Map<string, number>,
-  prefix: string,
-): string[] {
-  const parts: string[] = [];
-  for (const [label, count] of counts) {
-    parts.push(`${String(count)} ${prefix}${label}`);
+/** Convert a Map<action, count> to TitleActionCount[]. */
+function mapToActionCounts(counts: Map<string, number>): TitleActionCount[] {
+  const result: TitleActionCount[] = [];
+  for (const [action, count] of counts) {
+    result.push({ action, count });
   }
-  return parts;
-}
-
-function planActionLabel(action: string): string {
-  switch (action) {
-    case "create":
-      return "add";
-    case "update":
-      return "change";
-    case "delete":
-      return "destroy";
-    case "replace":
-      return "replace";
-    case "import":
-      return "import";
-    case "move":
-      return "move";
-    case "forget":
-      return "forget";
-    default:
-      return action;
-  }
-}
-
-function applyActionLabel(action: string): string {
-  switch (action) {
-    case "create":
-      return "added";
-    case "update":
-      return "changed";
-    case "delete":
-      return "destroyed";
-    case "replace":
-      return "replaced";
-    case "import":
-      return "imported";
-    case "move":
-      return "moved";
-    case "forget":
-      return "forgotten";
-    default:
-      return action;
-  }
+  return result;
 }

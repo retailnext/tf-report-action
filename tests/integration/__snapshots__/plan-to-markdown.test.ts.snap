@@ -1,7 +1,7 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
 exports[`planToMarkdown integration > terraform/apply-error/0 > renders without error and matches snapshot [default] 1`] = `
-"## 
+"## ✅ Plan: 3 to add
 
 ## Plan Summary
 
@@ -38,7 +38,7 @@ null_resource.will_fail
 terraform_data.depends_on_fail
 \`\`\`
 
-_(all values known after apply)_
+_all values known after apply_
 
 
 
@@ -72,7 +72,7 @@ terraform_data.success
 `;
 
 exports[`planToMarkdown integration > terraform/apply-error/0 > renders without error and matches snapshot [diffFormat-simple] 1`] = `
-"## 
+"## ✅ Plan: 3 to add
 
 ## Plan Summary
 
@@ -109,7 +109,7 @@ null_resource.will_fail
 terraform_data.depends_on_fail
 \`\`\`
 
-_(all values known after apply)_
+_all values known after apply_
 
 
 
@@ -143,7 +143,7 @@ terraform_data.success
 `;
 
 exports[`planToMarkdown integration > terraform/apply-error/0 > renders without error and matches snapshot [showUnchangedAttributes] 1`] = `
-"## 
+"## ✅ Plan: 3 to add
 
 ## Plan Summary
 
@@ -220,7 +220,7 @@ terraform_data.success
 `;
 
 exports[`planToMarkdown integration > terraform/apply-error/1 > renders without error and matches snapshot [default] 1`] = `
-"## 
+"## ✅ Plan: 1 to change, 1 to replace
 
 ## Plan Summary
 
@@ -258,7 +258,7 @@ null_resource.will_fail
 terraform_data.depends_on_fail
 \`\`\`
 
-_(all values known after apply)_
+_all values known after apply_
 
 
 
@@ -274,7 +274,7 @@ _(all values known after apply)_
 `;
 
 exports[`planToMarkdown integration > terraform/apply-error/1 > renders without error and matches snapshot [diffFormat-simple] 1`] = `
-"## 
+"## ✅ Plan: 1 to change, 1 to replace
 
 ## Plan Summary
 
@@ -312,7 +312,7 @@ null_resource.will_fail
 terraform_data.depends_on_fail
 \`\`\`
 
-_(all values known after apply)_
+_all values known after apply_
 
 
 
@@ -328,7 +328,7 @@ _(all values known after apply)_
 `;
 
 exports[`planToMarkdown integration > terraform/apply-error/1 > renders without error and matches snapshot [showUnchangedAttributes] 1`] = `
-"## 
+"## ✅ Plan: 1 to change, 1 to replace
 
 ## Plan Summary
 
@@ -387,7 +387,7 @@ terraform_data.depends_on_fail
 `;
 
 exports[`planToMarkdown integration > terraform/deferred-data-source/0 > renders without error and matches snapshot [default] 1`] = `
-"## 
+"## ✅ Plan: 5 to add
 
 ## Plan Summary
 
@@ -465,7 +465,7 @@ terraform_data.independent
 terraform_data.worker_a
 \`\`\`
 
-_(all values known after apply)_
+_all values known after apply_
 
 
 
@@ -478,7 +478,7 @@ _(all values known after apply)_
 terraform_data.worker_b
 \`\`\`
 
-_(all values known after apply)_
+_all values known after apply_
 
 
 
@@ -491,7 +491,7 @@ _(all values known after apply)_
 terraform_data.worker_c
 \`\`\`
 
-_(all values known after apply)_
+_all values known after apply_
 
 
 
@@ -507,7 +507,7 @@ _(all values known after apply)_
 `;
 
 exports[`planToMarkdown integration > terraform/deferred-data-source/0 > renders without error and matches snapshot [diffFormat-simple] 1`] = `
-"## 
+"## ✅ Plan: 5 to add
 
 ## Plan Summary
 
@@ -585,7 +585,7 @@ terraform_data.independent
 terraform_data.worker_a
 \`\`\`
 
-_(all values known after apply)_
+_all values known after apply_
 
 
 
@@ -598,7 +598,7 @@ _(all values known after apply)_
 terraform_data.worker_b
 \`\`\`
 
-_(all values known after apply)_
+_all values known after apply_
 
 
 
@@ -611,7 +611,7 @@ _(all values known after apply)_
 terraform_data.worker_c
 \`\`\`
 
-_(all values known after apply)_
+_all values known after apply_
 
 
 
@@ -627,7 +627,7 @@ _(all values known after apply)_
 `;
 
 exports[`planToMarkdown integration > terraform/deferred-data-source/0 > renders without error and matches snapshot [showUnchangedAttributes] 1`] = `
-"## 
+"## ✅ Plan: 5 to add
 
 ## Plan Summary
 
@@ -765,7 +765,7 @@ terraform_data.worker_c
 `;
 
 exports[`planToMarkdown integration > terraform/deferred-data-source/1 > renders without error and matches snapshot [default] 1`] = `
-"## 
+"## ✅ Plan: 1 to add, 4 to change
 
 ## Plan Summary
 
@@ -829,7 +829,7 @@ terraform_data.independent
 terraform_data.worker_a
 \`\`\`
 
-_(all values known after apply)_
+_all values known after apply_
 
 
 
@@ -842,7 +842,7 @@ _(all values known after apply)_
 terraform_data.worker_b
 \`\`\`
 
-_(all values known after apply)_
+_all values known after apply_
 
 
 
@@ -855,7 +855,7 @@ _(all values known after apply)_
 terraform_data.worker_c
 \`\`\`
 
-_(all values known after apply)_
+_all values known after apply_
 
 
 
@@ -871,7 +871,7 @@ _(all values known after apply)_
 `;
 
 exports[`planToMarkdown integration > terraform/deferred-data-source/1 > renders without error and matches snapshot [diffFormat-simple] 1`] = `
-"## 
+"## ✅ Plan: 1 to add, 4 to change
 
 ## Plan Summary
 
@@ -935,7 +935,7 @@ terraform_data.independent
 terraform_data.worker_a
 \`\`\`
 
-_(all values known after apply)_
+_all values known after apply_
 
 
 
@@ -948,7 +948,7 @@ _(all values known after apply)_
 terraform_data.worker_b
 \`\`\`
 
-_(all values known after apply)_
+_all values known after apply_
 
 
 
@@ -961,7 +961,7 @@ _(all values known after apply)_
 terraform_data.worker_c
 \`\`\`
 
-_(all values known after apply)_
+_all values known after apply_
 
 
 
@@ -977,7 +977,7 @@ _(all values known after apply)_
 `;
 
 exports[`planToMarkdown integration > terraform/deferred-data-source/1 > renders without error and matches snapshot [showUnchangedAttributes] 1`] = `
-"## 
+"## ✅ Plan: 1 to add, 4 to change
 
 ## Plan Summary
 
@@ -1102,7 +1102,7 @@ terraform_data.worker_c
 `;
 
 exports[`planToMarkdown integration > terraform/deferred-data-source/2 > renders without error and matches snapshot [default] 1`] = `
-"## 
+"## ✅ Plan: 3 to change, 1 to replace
 
 ## Plan Summary
 
@@ -1162,7 +1162,7 @@ local_file.config
 terraform_data.worker_a
 \`\`\`
 
-_(all values known after apply)_
+_all values known after apply_
 
 
 
@@ -1175,7 +1175,7 @@ _(all values known after apply)_
 terraform_data.worker_b
 \`\`\`
 
-_(all values known after apply)_
+_all values known after apply_
 
 
 
@@ -1188,7 +1188,7 @@ _(all values known after apply)_
 terraform_data.worker_c
 \`\`\`
 
-_(all values known after apply)_
+_all values known after apply_
 
 
 
@@ -1204,7 +1204,7 @@ _(all values known after apply)_
 `;
 
 exports[`planToMarkdown integration > terraform/deferred-data-source/2 > renders without error and matches snapshot [diffFormat-simple] 1`] = `
-"## 
+"## ✅ Plan: 3 to change, 1 to replace
 
 ## Plan Summary
 
@@ -1264,7 +1264,7 @@ local_file.config
 terraform_data.worker_a
 \`\`\`
 
-_(all values known after apply)_
+_all values known after apply_
 
 
 
@@ -1277,7 +1277,7 @@ _(all values known after apply)_
 terraform_data.worker_b
 \`\`\`
 
-_(all values known after apply)_
+_all values known after apply_
 
 
 
@@ -1290,7 +1290,7 @@ _(all values known after apply)_
 terraform_data.worker_c
 \`\`\`
 
-_(all values known after apply)_
+_all values known after apply_
 
 
 
@@ -1306,7 +1306,7 @@ _(all values known after apply)_
 `;
 
 exports[`planToMarkdown integration > terraform/deferred-data-source/2 > renders without error and matches snapshot [showUnchangedAttributes] 1`] = `
-"## 
+"## ✅ Plan: 3 to change, 1 to replace
 
 ## Plan Summary
 
@@ -1428,7 +1428,7 @@ terraform_data.worker_c
 `;
 
 exports[`planToMarkdown integration > terraform/error-stages/0 > renders without error and matches snapshot [default] 1`] = `
-"## 
+"## ✅ Plan: 1 to add
 
 ## Plan Summary
 
@@ -1461,7 +1461,7 @@ null_resource.baseline
 `;
 
 exports[`planToMarkdown integration > terraform/error-stages/0 > renders without error and matches snapshot [diffFormat-simple] 1`] = `
-"## 
+"## ✅ Plan: 1 to add
 
 ## Plan Summary
 
@@ -1494,7 +1494,7 @@ null_resource.baseline
 `;
 
 exports[`planToMarkdown integration > terraform/error-stages/0 > renders without error and matches snapshot [showUnchangedAttributes] 1`] = `
-"## 
+"## ✅ Plan: 1 to add
 
 ## Plan Summary
 
@@ -1527,7 +1527,7 @@ null_resource.baseline
 `;
 
 exports[`planToMarkdown integration > terraform/invocation-variants/0 > renders without error and matches snapshot [default] 1`] = `
-"## 
+"## ✅ Plan: 1 to add
 
 ## Plan Summary
 
@@ -1560,7 +1560,7 @@ null_resource.example
 `;
 
 exports[`planToMarkdown integration > terraform/invocation-variants/0 > renders without error and matches snapshot [diffFormat-simple] 1`] = `
-"## 
+"## ✅ Plan: 1 to add
 
 ## Plan Summary
 
@@ -1593,7 +1593,7 @@ null_resource.example
 `;
 
 exports[`planToMarkdown integration > terraform/invocation-variants/0 > renders without error and matches snapshot [showUnchangedAttributes] 1`] = `
-"## 
+"## ✅ Plan: 1 to add
 
 ## Plan Summary
 
@@ -1626,7 +1626,7 @@ null_resource.example
 `;
 
 exports[`planToMarkdown integration > terraform/invocation-variants/1 > renders without error and matches snapshot [default] 1`] = `
-"## 
+"## ✅ No Changes
 
 ## Plan Summary
 
@@ -1636,7 +1636,7 @@ _No changes._
 `;
 
 exports[`planToMarkdown integration > terraform/invocation-variants/1 > renders without error and matches snapshot [diffFormat-simple] 1`] = `
-"## 
+"## ✅ No Changes
 
 ## Plan Summary
 
@@ -1646,7 +1646,7 @@ _No changes._
 `;
 
 exports[`planToMarkdown integration > terraform/invocation-variants/1 > renders without error and matches snapshot [showUnchangedAttributes] 1`] = `
-"## 
+"## ✅ No Changes
 
 ## Plan Summary
 
@@ -1656,7 +1656,7 @@ _No changes._
 `;
 
 exports[`planToMarkdown integration > terraform/local-files/0 > renders without error and matches snapshot [default] 1`] = `
-"## 
+"## ✅ Plan: 1 to add
 
 ## Plan Summary
 
@@ -1727,7 +1727,7 @@ Line 12: end of file
 `;
 
 exports[`planToMarkdown integration > terraform/local-files/0 > renders without error and matches snapshot [diffFormat-simple] 1`] = `
-"## 
+"## ✅ Plan: 1 to add
 
 ## Plan Summary
 
@@ -1798,7 +1798,7 @@ Line 12: end of file
 `;
 
 exports[`planToMarkdown integration > terraform/local-files/0 > renders without error and matches snapshot [showUnchangedAttributes] 1`] = `
-"## 
+"## ✅ Plan: 1 to add
 
 ## Plan Summary
 
@@ -1871,7 +1871,7 @@ Line 12: end of file
 `;
 
 exports[`planToMarkdown integration > terraform/local-files/1 > renders without error and matches snapshot [default] 1`] = `
-"## 
+"## ✅ Plan: 1 to replace
 
 ## Plan Summary
 
@@ -1938,7 +1938,7 @@ local_file.readme
 `;
 
 exports[`planToMarkdown integration > terraform/local-files/1 > renders without error and matches snapshot [diffFormat-simple] 1`] = `
-"## 
+"## ✅ Plan: 1 to replace
 
 ## Plan Summary
 
@@ -2005,7 +2005,7 @@ local_file.readme
 `;
 
 exports[`planToMarkdown integration > terraform/local-files/1 > renders without error and matches snapshot [showUnchangedAttributes] 1`] = `
-"## 
+"## ✅ Plan: 1 to replace
 
 ## Plan Summary
 
@@ -2077,7 +2077,7 @@ local_file.readme
 `;
 
 exports[`planToMarkdown integration > terraform/modules/0 > renders without error and matches snapshot [default] 1`] = `
-"## 
+"## ✅ Plan: 5 to add
 
 ## Plan Summary
 
@@ -2202,7 +2202,7 @@ module.parent["2"].module.child.null_resource.item[1]
 `;
 
 exports[`planToMarkdown integration > terraform/modules/0 > renders without error and matches snapshot [diffFormat-simple] 1`] = `
-"## 
+"## ✅ Plan: 5 to add
 
 ## Plan Summary
 
@@ -2327,7 +2327,7 @@ module.parent["2"].module.child.null_resource.item[1]
 `;
 
 exports[`planToMarkdown integration > terraform/modules/0 > renders without error and matches snapshot [showUnchangedAttributes] 1`] = `
-"## 
+"## ✅ Plan: 5 to add
 
 ## Plan Summary
 
@@ -2453,7 +2453,7 @@ module.parent["2"].module.child.null_resource.item[1]
 `;
 
 exports[`planToMarkdown integration > terraform/modules/1 > renders without error and matches snapshot [default] 1`] = `
-"## 
+"## ✅ Plan: 3 to add, 2 to replace, 2 to destroy
 
 ## Plan Summary
 
@@ -2606,7 +2606,7 @@ module.parent["3"].module.child.null_resource.item[2]
 `;
 
 exports[`planToMarkdown integration > terraform/modules/1 > renders without error and matches snapshot [diffFormat-simple] 1`] = `
-"## 
+"## ✅ Plan: 3 to add, 2 to replace, 2 to destroy
 
 ## Plan Summary
 
@@ -2759,7 +2759,7 @@ module.parent["3"].module.child.null_resource.item[2]
 `;
 
 exports[`planToMarkdown integration > terraform/modules/1 > renders without error and matches snapshot [showUnchangedAttributes] 1`] = `
-"## 
+"## ✅ Plan: 3 to add, 2 to replace, 2 to destroy
 
 ## Plan Summary
 
@@ -2923,7 +2923,7 @@ module.parent["3"].module.child.null_resource.item[2]
 `;
 
 exports[`planToMarkdown integration > terraform/null-lifecycle/0 > renders without error and matches snapshot [default] 1`] = `
-"## 
+"## ✅ No Changes
 
 ## Plan Summary
 
@@ -2933,7 +2933,7 @@ _No changes._
 `;
 
 exports[`planToMarkdown integration > terraform/null-lifecycle/0 > renders without error and matches snapshot [diffFormat-simple] 1`] = `
-"## 
+"## ✅ No Changes
 
 ## Plan Summary
 
@@ -2943,7 +2943,7 @@ _No changes._
 `;
 
 exports[`planToMarkdown integration > terraform/null-lifecycle/0 > renders without error and matches snapshot [showUnchangedAttributes] 1`] = `
-"## 
+"## ✅ No Changes
 
 ## Plan Summary
 
@@ -2953,7 +2953,7 @@ _No changes._
 `;
 
 exports[`planToMarkdown integration > terraform/null-lifecycle/1 > renders without error and matches snapshot [default] 1`] = `
-"## 
+"## ✅ Plan: 4 to add
 
 ## Plan Summary
 
@@ -3049,7 +3049,7 @@ terraform_data.meta
 `;
 
 exports[`planToMarkdown integration > terraform/null-lifecycle/1 > renders without error and matches snapshot [diffFormat-simple] 1`] = `
-"## 
+"## ✅ Plan: 4 to add
 
 ## Plan Summary
 
@@ -3145,7 +3145,7 @@ terraform_data.meta
 `;
 
 exports[`planToMarkdown integration > terraform/null-lifecycle/1 > renders without error and matches snapshot [showUnchangedAttributes] 1`] = `
-"## 
+"## ✅ Plan: 4 to add
 
 ## Plan Summary
 
@@ -3244,7 +3244,7 @@ terraform_data.meta
 `;
 
 exports[`planToMarkdown integration > terraform/null-lifecycle/2 > renders without error and matches snapshot [default] 1`] = `
-"## 
+"## ✅ Plan: 1 to change, 1 to replace, 1 to destroy
 
 ## Plan Summary
 
@@ -3314,7 +3314,7 @@ terraform_data.meta
 `;
 
 exports[`planToMarkdown integration > terraform/null-lifecycle/2 > renders without error and matches snapshot [diffFormat-simple] 1`] = `
-"## 
+"## ✅ Plan: 1 to change, 1 to replace, 1 to destroy
 
 ## Plan Summary
 
@@ -3384,7 +3384,7 @@ terraform_data.meta
 `;
 
 exports[`planToMarkdown integration > terraform/null-lifecycle/2 > renders without error and matches snapshot [showUnchangedAttributes] 1`] = `
-"## 
+"## ✅ Plan: 1 to change, 1 to replace, 1 to destroy
 
 ## Plan Summary
 
@@ -3457,7 +3457,7 @@ terraform_data.meta
 `;
 
 exports[`planToMarkdown integration > terraform/null-lifecycle/3 > renders without error and matches snapshot [default] 1`] = `
-"## 
+"## ✅ No Changes
 
 ## Plan Summary
 
@@ -3467,7 +3467,7 @@ _No changes._
 `;
 
 exports[`planToMarkdown integration > terraform/null-lifecycle/3 > renders without error and matches snapshot [diffFormat-simple] 1`] = `
-"## 
+"## ✅ No Changes
 
 ## Plan Summary
 
@@ -3477,7 +3477,7 @@ _No changes._
 `;
 
 exports[`planToMarkdown integration > terraform/null-lifecycle/3 > renders without error and matches snapshot [showUnchangedAttributes] 1`] = `
-"## 
+"## ✅ No Changes
 
 ## Plan Summary
 
@@ -3487,7 +3487,7 @@ _No changes._
 `;
 
 exports[`planToMarkdown integration > terraform/null-lifecycle/4 > renders without error and matches snapshot [default] 1`] = `
-"## 
+"## ✅ Plan: 1 to add
 
 ## Plan Summary
 
@@ -3560,7 +3560,7 @@ local_file.managed
 `;
 
 exports[`planToMarkdown integration > terraform/null-lifecycle/4 > renders without error and matches snapshot [diffFormat-simple] 1`] = `
-"## 
+"## ✅ Plan: 1 to add
 
 ## Plan Summary
 
@@ -3633,7 +3633,7 @@ local_file.managed
 `;
 
 exports[`planToMarkdown integration > terraform/null-lifecycle/4 > renders without error and matches snapshot [showUnchangedAttributes] 1`] = `
-"## 
+"## ✅ Plan: 1 to add
 
 ## Plan Summary
 
@@ -3710,7 +3710,7 @@ local_file.managed
 `;
 
 exports[`planToMarkdown integration > terraform/sensitive-values/0 > renders without error and matches snapshot [default] 1`] = `
-"## 
+"## ✅ Plan: 1 to add
 
 ## Plan Summary
 
@@ -3760,7 +3760,7 @@ local_sensitive_file.secret
 `;
 
 exports[`planToMarkdown integration > terraform/sensitive-values/0 > renders without error and matches snapshot [diffFormat-simple] 1`] = `
-"## 
+"## ✅ Plan: 1 to add
 
 ## Plan Summary
 
@@ -3810,7 +3810,7 @@ local_sensitive_file.secret
 `;
 
 exports[`planToMarkdown integration > terraform/sensitive-values/0 > renders without error and matches snapshot [showUnchangedAttributes] 1`] = `
-"## 
+"## ✅ Plan: 1 to add
 
 ## Plan Summary
 
@@ -3861,7 +3861,7 @@ local_sensitive_file.secret
 `;
 
 exports[`planToMarkdown integration > terraform/sensitive-values/1 > renders without error and matches snapshot [default] 1`] = `
-"## 
+"## ✅ Plan: 1 to replace
 
 ## Plan Summary
 
@@ -3907,7 +3907,7 @@ local_sensitive_file.secret
 `;
 
 exports[`planToMarkdown integration > terraform/sensitive-values/1 > renders without error and matches snapshot [diffFormat-simple] 1`] = `
-"## 
+"## ✅ Plan: 1 to replace
 
 ## Plan Summary
 
@@ -3953,7 +3953,7 @@ local_sensitive_file.secret
 `;
 
 exports[`planToMarkdown integration > terraform/sensitive-values/1 > renders without error and matches snapshot [showUnchangedAttributes] 1`] = `
-"## 
+"## ✅ Plan: 1 to replace
 
 ## Plan Summary
 
@@ -4003,7 +4003,7 @@ local_sensitive_file.secret
 `;
 
 exports[`planToMarkdown integration > terraform/state-operations/0 > renders without error and matches snapshot [default] 1`] = `
-"## 
+"## ✅ Plan: 4 to add
 
 ## Plan Summary
 
@@ -4095,7 +4095,7 @@ random_string.existing
 `;
 
 exports[`planToMarkdown integration > terraform/state-operations/0 > renders without error and matches snapshot [diffFormat-simple] 1`] = `
-"## 
+"## ✅ Plan: 4 to add
 
 ## Plan Summary
 
@@ -4187,7 +4187,7 @@ random_string.existing
 `;
 
 exports[`planToMarkdown integration > terraform/state-operations/0 > renders without error and matches snapshot [showUnchangedAttributes] 1`] = `
-"## 
+"## ✅ Plan: 4 to add
 
 ## Plan Summary
 
@@ -4281,7 +4281,7 @@ random_string.existing
 `;
 
 exports[`planToMarkdown integration > terraform/state-operations/1 > renders without error and matches snapshot [default] 1`] = `
-"## 
+"## ✅ Plan: 1 to move, 1 to import, 1 to forget
 
 ## Plan Summary
 
@@ -4348,7 +4348,7 @@ _No attribute changes._
 `;
 
 exports[`planToMarkdown integration > terraform/state-operations/1 > renders without error and matches snapshot [diffFormat-simple] 1`] = `
-"## 
+"## ✅ Plan: 1 to move, 1 to import, 1 to forget
 
 ## Plan Summary
 
@@ -4415,7 +4415,7 @@ _No attribute changes._
 `;
 
 exports[`planToMarkdown integration > terraform/state-operations/1 > renders without error and matches snapshot [showUnchangedAttributes] 1`] = `
-"## 
+"## ✅ Plan: 1 to move, 1 to import, 1 to forget
 
 ## Plan Summary
 
@@ -4500,7 +4500,7 @@ random_string.imported
 `;
 
 exports[`planToMarkdown integration > tofu/apply-error/0 > renders without error and matches snapshot [default] 1`] = `
-"## 
+"## ✅ Plan: 3 to add
 
 ## Plan Summary
 
@@ -4537,7 +4537,7 @@ null_resource.will_fail
 terraform_data.depends_on_fail
 \`\`\`
 
-_(all values known after apply)_
+_all values known after apply_
 
 
 
@@ -4571,7 +4571,7 @@ terraform_data.success
 `;
 
 exports[`planToMarkdown integration > tofu/apply-error/0 > renders without error and matches snapshot [diffFormat-simple] 1`] = `
-"## 
+"## ✅ Plan: 3 to add
 
 ## Plan Summary
 
@@ -4608,7 +4608,7 @@ null_resource.will_fail
 terraform_data.depends_on_fail
 \`\`\`
 
-_(all values known after apply)_
+_all values known after apply_
 
 
 
@@ -4642,7 +4642,7 @@ terraform_data.success
 `;
 
 exports[`planToMarkdown integration > tofu/apply-error/0 > renders without error and matches snapshot [showUnchangedAttributes] 1`] = `
-"## 
+"## ✅ Plan: 3 to add
 
 ## Plan Summary
 
@@ -4719,7 +4719,7 @@ terraform_data.success
 `;
 
 exports[`planToMarkdown integration > tofu/apply-error/1 > renders without error and matches snapshot [default] 1`] = `
-"## 
+"## ✅ Plan: 1 to change, 1 to replace
 
 ## Plan Summary
 
@@ -4757,7 +4757,7 @@ null_resource.will_fail
 terraform_data.depends_on_fail
 \`\`\`
 
-_(all values known after apply)_
+_all values known after apply_
 
 
 
@@ -4773,7 +4773,7 @@ _(all values known after apply)_
 `;
 
 exports[`planToMarkdown integration > tofu/apply-error/1 > renders without error and matches snapshot [diffFormat-simple] 1`] = `
-"## 
+"## ✅ Plan: 1 to change, 1 to replace
 
 ## Plan Summary
 
@@ -4811,7 +4811,7 @@ null_resource.will_fail
 terraform_data.depends_on_fail
 \`\`\`
 
-_(all values known after apply)_
+_all values known after apply_
 
 
 
@@ -4827,7 +4827,7 @@ _(all values known after apply)_
 `;
 
 exports[`planToMarkdown integration > tofu/apply-error/1 > renders without error and matches snapshot [showUnchangedAttributes] 1`] = `
-"## 
+"## ✅ Plan: 1 to change, 1 to replace
 
 ## Plan Summary
 
@@ -4886,7 +4886,7 @@ terraform_data.depends_on_fail
 `;
 
 exports[`planToMarkdown integration > tofu/deferred-data-source/0 > renders without error and matches snapshot [default] 1`] = `
-"## 
+"## ✅ Plan: 5 to add
 
 ## Plan Summary
 
@@ -4964,7 +4964,7 @@ terraform_data.independent
 terraform_data.worker_a
 \`\`\`
 
-_(all values known after apply)_
+_all values known after apply_
 
 
 
@@ -4977,7 +4977,7 @@ _(all values known after apply)_
 terraform_data.worker_b
 \`\`\`
 
-_(all values known after apply)_
+_all values known after apply_
 
 
 
@@ -4990,7 +4990,7 @@ _(all values known after apply)_
 terraform_data.worker_c
 \`\`\`
 
-_(all values known after apply)_
+_all values known after apply_
 
 
 
@@ -5006,7 +5006,7 @@ _(all values known after apply)_
 `;
 
 exports[`planToMarkdown integration > tofu/deferred-data-source/0 > renders without error and matches snapshot [diffFormat-simple] 1`] = `
-"## 
+"## ✅ Plan: 5 to add
 
 ## Plan Summary
 
@@ -5084,7 +5084,7 @@ terraform_data.independent
 terraform_data.worker_a
 \`\`\`
 
-_(all values known after apply)_
+_all values known after apply_
 
 
 
@@ -5097,7 +5097,7 @@ _(all values known after apply)_
 terraform_data.worker_b
 \`\`\`
 
-_(all values known after apply)_
+_all values known after apply_
 
 
 
@@ -5110,7 +5110,7 @@ _(all values known after apply)_
 terraform_data.worker_c
 \`\`\`
 
-_(all values known after apply)_
+_all values known after apply_
 
 
 
@@ -5126,7 +5126,7 @@ _(all values known after apply)_
 `;
 
 exports[`planToMarkdown integration > tofu/deferred-data-source/0 > renders without error and matches snapshot [showUnchangedAttributes] 1`] = `
-"## 
+"## ✅ Plan: 5 to add
 
 ## Plan Summary
 
@@ -5264,7 +5264,7 @@ terraform_data.worker_c
 `;
 
 exports[`planToMarkdown integration > tofu/deferred-data-source/1 > renders without error and matches snapshot [default] 1`] = `
-"## 
+"## ✅ Plan: 1 to add, 4 to change
 
 ## Plan Summary
 
@@ -5328,7 +5328,7 @@ terraform_data.independent
 terraform_data.worker_a
 \`\`\`
 
-_(all values known after apply)_
+_all values known after apply_
 
 
 
@@ -5341,7 +5341,7 @@ _(all values known after apply)_
 terraform_data.worker_b
 \`\`\`
 
-_(all values known after apply)_
+_all values known after apply_
 
 
 
@@ -5354,7 +5354,7 @@ _(all values known after apply)_
 terraform_data.worker_c
 \`\`\`
 
-_(all values known after apply)_
+_all values known after apply_
 
 
 
@@ -5370,7 +5370,7 @@ _(all values known after apply)_
 `;
 
 exports[`planToMarkdown integration > tofu/deferred-data-source/1 > renders without error and matches snapshot [diffFormat-simple] 1`] = `
-"## 
+"## ✅ Plan: 1 to add, 4 to change
 
 ## Plan Summary
 
@@ -5434,7 +5434,7 @@ terraform_data.independent
 terraform_data.worker_a
 \`\`\`
 
-_(all values known after apply)_
+_all values known after apply_
 
 
 
@@ -5447,7 +5447,7 @@ _(all values known after apply)_
 terraform_data.worker_b
 \`\`\`
 
-_(all values known after apply)_
+_all values known after apply_
 
 
 
@@ -5460,7 +5460,7 @@ _(all values known after apply)_
 terraform_data.worker_c
 \`\`\`
 
-_(all values known after apply)_
+_all values known after apply_
 
 
 
@@ -5476,7 +5476,7 @@ _(all values known after apply)_
 `;
 
 exports[`planToMarkdown integration > tofu/deferred-data-source/1 > renders without error and matches snapshot [showUnchangedAttributes] 1`] = `
-"## 
+"## ✅ Plan: 1 to add, 4 to change
 
 ## Plan Summary
 
@@ -5601,7 +5601,7 @@ terraform_data.worker_c
 `;
 
 exports[`planToMarkdown integration > tofu/deferred-data-source/2 > renders without error and matches snapshot [default] 1`] = `
-"## 
+"## ✅ Plan: 3 to change, 1 to replace
 
 ## Plan Summary
 
@@ -5661,7 +5661,7 @@ local_file.config
 terraform_data.worker_a
 \`\`\`
 
-_(all values known after apply)_
+_all values known after apply_
 
 
 
@@ -5674,7 +5674,7 @@ _(all values known after apply)_
 terraform_data.worker_b
 \`\`\`
 
-_(all values known after apply)_
+_all values known after apply_
 
 
 
@@ -5687,7 +5687,7 @@ _(all values known after apply)_
 terraform_data.worker_c
 \`\`\`
 
-_(all values known after apply)_
+_all values known after apply_
 
 
 
@@ -5703,7 +5703,7 @@ _(all values known after apply)_
 `;
 
 exports[`planToMarkdown integration > tofu/deferred-data-source/2 > renders without error and matches snapshot [diffFormat-simple] 1`] = `
-"## 
+"## ✅ Plan: 3 to change, 1 to replace
 
 ## Plan Summary
 
@@ -5763,7 +5763,7 @@ local_file.config
 terraform_data.worker_a
 \`\`\`
 
-_(all values known after apply)_
+_all values known after apply_
 
 
 
@@ -5776,7 +5776,7 @@ _(all values known after apply)_
 terraform_data.worker_b
 \`\`\`
 
-_(all values known after apply)_
+_all values known after apply_
 
 
 
@@ -5789,7 +5789,7 @@ _(all values known after apply)_
 terraform_data.worker_c
 \`\`\`
 
-_(all values known after apply)_
+_all values known after apply_
 
 
 
@@ -5805,7 +5805,7 @@ _(all values known after apply)_
 `;
 
 exports[`planToMarkdown integration > tofu/deferred-data-source/2 > renders without error and matches snapshot [showUnchangedAttributes] 1`] = `
-"## 
+"## ✅ Plan: 3 to change, 1 to replace
 
 ## Plan Summary
 
@@ -5927,7 +5927,7 @@ terraform_data.worker_c
 `;
 
 exports[`planToMarkdown integration > tofu/error-stages/0 > renders without error and matches snapshot [default] 1`] = `
-"## 
+"## ✅ Plan: 1 to add
 
 ## Plan Summary
 
@@ -5960,7 +5960,7 @@ null_resource.baseline
 `;
 
 exports[`planToMarkdown integration > tofu/error-stages/0 > renders without error and matches snapshot [diffFormat-simple] 1`] = `
-"## 
+"## ✅ Plan: 1 to add
 
 ## Plan Summary
 
@@ -5993,7 +5993,7 @@ null_resource.baseline
 `;
 
 exports[`planToMarkdown integration > tofu/error-stages/0 > renders without error and matches snapshot [showUnchangedAttributes] 1`] = `
-"## 
+"## ✅ Plan: 1 to add
 
 ## Plan Summary
 
@@ -6026,7 +6026,7 @@ null_resource.baseline
 `;
 
 exports[`planToMarkdown integration > tofu/invocation-variants/0 > renders without error and matches snapshot [default] 1`] = `
-"## 
+"## ✅ Plan: 1 to add
 
 ## Plan Summary
 
@@ -6059,7 +6059,7 @@ null_resource.example
 `;
 
 exports[`planToMarkdown integration > tofu/invocation-variants/0 > renders without error and matches snapshot [diffFormat-simple] 1`] = `
-"## 
+"## ✅ Plan: 1 to add
 
 ## Plan Summary
 
@@ -6092,7 +6092,7 @@ null_resource.example
 `;
 
 exports[`planToMarkdown integration > tofu/invocation-variants/0 > renders without error and matches snapshot [showUnchangedAttributes] 1`] = `
-"## 
+"## ✅ Plan: 1 to add
 
 ## Plan Summary
 
@@ -6125,7 +6125,7 @@ null_resource.example
 `;
 
 exports[`planToMarkdown integration > tofu/invocation-variants/1 > renders without error and matches snapshot [default] 1`] = `
-"## 
+"## ✅ No Changes
 
 ## Plan Summary
 
@@ -6135,7 +6135,7 @@ _No changes._
 `;
 
 exports[`planToMarkdown integration > tofu/invocation-variants/1 > renders without error and matches snapshot [diffFormat-simple] 1`] = `
-"## 
+"## ✅ No Changes
 
 ## Plan Summary
 
@@ -6145,7 +6145,7 @@ _No changes._
 `;
 
 exports[`planToMarkdown integration > tofu/invocation-variants/1 > renders without error and matches snapshot [showUnchangedAttributes] 1`] = `
-"## 
+"## ✅ No Changes
 
 ## Plan Summary
 
@@ -6155,7 +6155,7 @@ _No changes._
 `;
 
 exports[`planToMarkdown integration > tofu/local-files/0 > renders without error and matches snapshot [default] 1`] = `
-"## 
+"## ✅ Plan: 1 to add
 
 ## Plan Summary
 
@@ -6226,7 +6226,7 @@ Line 12: end of file
 `;
 
 exports[`planToMarkdown integration > tofu/local-files/0 > renders without error and matches snapshot [diffFormat-simple] 1`] = `
-"## 
+"## ✅ Plan: 1 to add
 
 ## Plan Summary
 
@@ -6297,7 +6297,7 @@ Line 12: end of file
 `;
 
 exports[`planToMarkdown integration > tofu/local-files/0 > renders without error and matches snapshot [showUnchangedAttributes] 1`] = `
-"## 
+"## ✅ Plan: 1 to add
 
 ## Plan Summary
 
@@ -6370,7 +6370,7 @@ Line 12: end of file
 `;
 
 exports[`planToMarkdown integration > tofu/local-files/1 > renders without error and matches snapshot [default] 1`] = `
-"## 
+"## ✅ Plan: 1 to replace
 
 ## Plan Summary
 
@@ -6437,7 +6437,7 @@ local_file.readme
 `;
 
 exports[`planToMarkdown integration > tofu/local-files/1 > renders without error and matches snapshot [diffFormat-simple] 1`] = `
-"## 
+"## ✅ Plan: 1 to replace
 
 ## Plan Summary
 
@@ -6504,7 +6504,7 @@ local_file.readme
 `;
 
 exports[`planToMarkdown integration > tofu/local-files/1 > renders without error and matches snapshot [showUnchangedAttributes] 1`] = `
-"## 
+"## ✅ Plan: 1 to replace
 
 ## Plan Summary
 
@@ -6576,7 +6576,7 @@ local_file.readme
 `;
 
 exports[`planToMarkdown integration > tofu/modules/0 > renders without error and matches snapshot [default] 1`] = `
-"## 
+"## ✅ Plan: 5 to add
 
 ## Plan Summary
 
@@ -6701,7 +6701,7 @@ module.parent["2"].module.child.null_resource.item[1]
 `;
 
 exports[`planToMarkdown integration > tofu/modules/0 > renders without error and matches snapshot [diffFormat-simple] 1`] = `
-"## 
+"## ✅ Plan: 5 to add
 
 ## Plan Summary
 
@@ -6826,7 +6826,7 @@ module.parent["2"].module.child.null_resource.item[1]
 `;
 
 exports[`planToMarkdown integration > tofu/modules/0 > renders without error and matches snapshot [showUnchangedAttributes] 1`] = `
-"## 
+"## ✅ Plan: 5 to add
 
 ## Plan Summary
 
@@ -6952,7 +6952,7 @@ module.parent["2"].module.child.null_resource.item[1]
 `;
 
 exports[`planToMarkdown integration > tofu/modules/1 > renders without error and matches snapshot [default] 1`] = `
-"## 
+"## ✅ Plan: 3 to add, 2 to replace, 2 to destroy
 
 ## Plan Summary
 
@@ -7105,7 +7105,7 @@ module.parent["3"].module.child.null_resource.item[2]
 `;
 
 exports[`planToMarkdown integration > tofu/modules/1 > renders without error and matches snapshot [diffFormat-simple] 1`] = `
-"## 
+"## ✅ Plan: 3 to add, 2 to replace, 2 to destroy
 
 ## Plan Summary
 
@@ -7258,7 +7258,7 @@ module.parent["3"].module.child.null_resource.item[2]
 `;
 
 exports[`planToMarkdown integration > tofu/modules/1 > renders without error and matches snapshot [showUnchangedAttributes] 1`] = `
-"## 
+"## ✅ Plan: 3 to add, 2 to replace, 2 to destroy
 
 ## Plan Summary
 
@@ -7422,7 +7422,7 @@ module.parent["3"].module.child.null_resource.item[2]
 `;
 
 exports[`planToMarkdown integration > tofu/null-lifecycle/0 > renders without error and matches snapshot [default] 1`] = `
-"## 
+"## ✅ No Changes
 
 ## Plan Summary
 
@@ -7432,7 +7432,7 @@ _No changes._
 `;
 
 exports[`planToMarkdown integration > tofu/null-lifecycle/0 > renders without error and matches snapshot [diffFormat-simple] 1`] = `
-"## 
+"## ✅ No Changes
 
 ## Plan Summary
 
@@ -7442,7 +7442,7 @@ _No changes._
 `;
 
 exports[`planToMarkdown integration > tofu/null-lifecycle/0 > renders without error and matches snapshot [showUnchangedAttributes] 1`] = `
-"## 
+"## ✅ No Changes
 
 ## Plan Summary
 
@@ -7452,7 +7452,7 @@ _No changes._
 `;
 
 exports[`planToMarkdown integration > tofu/null-lifecycle/1 > renders without error and matches snapshot [default] 1`] = `
-"## 
+"## ✅ Plan: 4 to add
 
 ## Plan Summary
 
@@ -7548,7 +7548,7 @@ terraform_data.meta
 `;
 
 exports[`planToMarkdown integration > tofu/null-lifecycle/1 > renders without error and matches snapshot [diffFormat-simple] 1`] = `
-"## 
+"## ✅ Plan: 4 to add
 
 ## Plan Summary
 
@@ -7644,7 +7644,7 @@ terraform_data.meta
 `;
 
 exports[`planToMarkdown integration > tofu/null-lifecycle/1 > renders without error and matches snapshot [showUnchangedAttributes] 1`] = `
-"## 
+"## ✅ Plan: 4 to add
 
 ## Plan Summary
 
@@ -7743,7 +7743,7 @@ terraform_data.meta
 `;
 
 exports[`planToMarkdown integration > tofu/null-lifecycle/2 > renders without error and matches snapshot [default] 1`] = `
-"## 
+"## ✅ Plan: 1 to change, 1 to replace, 1 to destroy
 
 ## Plan Summary
 
@@ -7813,7 +7813,7 @@ terraform_data.meta
 `;
 
 exports[`planToMarkdown integration > tofu/null-lifecycle/2 > renders without error and matches snapshot [diffFormat-simple] 1`] = `
-"## 
+"## ✅ Plan: 1 to change, 1 to replace, 1 to destroy
 
 ## Plan Summary
 
@@ -7883,7 +7883,7 @@ terraform_data.meta
 `;
 
 exports[`planToMarkdown integration > tofu/null-lifecycle/2 > renders without error and matches snapshot [showUnchangedAttributes] 1`] = `
-"## 
+"## ✅ Plan: 1 to change, 1 to replace, 1 to destroy
 
 ## Plan Summary
 
@@ -7956,7 +7956,7 @@ terraform_data.meta
 `;
 
 exports[`planToMarkdown integration > tofu/null-lifecycle/3 > renders without error and matches snapshot [default] 1`] = `
-"## 
+"## ✅ No Changes
 
 ## Plan Summary
 
@@ -7966,7 +7966,7 @@ _No changes._
 `;
 
 exports[`planToMarkdown integration > tofu/null-lifecycle/3 > renders without error and matches snapshot [diffFormat-simple] 1`] = `
-"## 
+"## ✅ No Changes
 
 ## Plan Summary
 
@@ -7976,7 +7976,7 @@ _No changes._
 `;
 
 exports[`planToMarkdown integration > tofu/null-lifecycle/3 > renders without error and matches snapshot [showUnchangedAttributes] 1`] = `
-"## 
+"## ✅ No Changes
 
 ## Plan Summary
 
@@ -7986,7 +7986,7 @@ _No changes._
 `;
 
 exports[`planToMarkdown integration > tofu/null-lifecycle/4 > renders without error and matches snapshot [default] 1`] = `
-"## 
+"## ✅ Plan: 1 to add
 
 ## Plan Summary
 
@@ -8059,7 +8059,7 @@ local_file.managed
 `;
 
 exports[`planToMarkdown integration > tofu/null-lifecycle/4 > renders without error and matches snapshot [diffFormat-simple] 1`] = `
-"## 
+"## ✅ Plan: 1 to add
 
 ## Plan Summary
 
@@ -8132,7 +8132,7 @@ local_file.managed
 `;
 
 exports[`planToMarkdown integration > tofu/null-lifecycle/4 > renders without error and matches snapshot [showUnchangedAttributes] 1`] = `
-"## 
+"## ✅ Plan: 1 to add
 
 ## Plan Summary
 
@@ -8209,7 +8209,7 @@ local_file.managed
 `;
 
 exports[`planToMarkdown integration > tofu/sensitive-values/0 > renders without error and matches snapshot [default] 1`] = `
-"## 
+"## ✅ Plan: 1 to add
 
 ## Plan Summary
 
@@ -8259,7 +8259,7 @@ local_sensitive_file.secret
 `;
 
 exports[`planToMarkdown integration > tofu/sensitive-values/0 > renders without error and matches snapshot [diffFormat-simple] 1`] = `
-"## 
+"## ✅ Plan: 1 to add
 
 ## Plan Summary
 
@@ -8309,7 +8309,7 @@ local_sensitive_file.secret
 `;
 
 exports[`planToMarkdown integration > tofu/sensitive-values/0 > renders without error and matches snapshot [showUnchangedAttributes] 1`] = `
-"## 
+"## ✅ Plan: 1 to add
 
 ## Plan Summary
 
@@ -8360,7 +8360,7 @@ local_sensitive_file.secret
 `;
 
 exports[`planToMarkdown integration > tofu/sensitive-values/1 > renders without error and matches snapshot [default] 1`] = `
-"## 
+"## ✅ Plan: 1 to replace
 
 ## Plan Summary
 
@@ -8406,7 +8406,7 @@ local_sensitive_file.secret
 `;
 
 exports[`planToMarkdown integration > tofu/sensitive-values/1 > renders without error and matches snapshot [diffFormat-simple] 1`] = `
-"## 
+"## ✅ Plan: 1 to replace
 
 ## Plan Summary
 
@@ -8452,7 +8452,7 @@ local_sensitive_file.secret
 `;
 
 exports[`planToMarkdown integration > tofu/sensitive-values/1 > renders without error and matches snapshot [showUnchangedAttributes] 1`] = `
-"## 
+"## ✅ Plan: 1 to replace
 
 ## Plan Summary
 
@@ -8502,7 +8502,7 @@ local_sensitive_file.secret
 `;
 
 exports[`planToMarkdown integration > tofu/state-operations/0 > renders without error and matches snapshot [default] 1`] = `
-"## 
+"## ✅ Plan: 4 to add
 
 ## Plan Summary
 
@@ -8594,7 +8594,7 @@ random_string.existing
 `;
 
 exports[`planToMarkdown integration > tofu/state-operations/0 > renders without error and matches snapshot [diffFormat-simple] 1`] = `
-"## 
+"## ✅ Plan: 4 to add
 
 ## Plan Summary
 
@@ -8686,7 +8686,7 @@ random_string.existing
 `;
 
 exports[`planToMarkdown integration > tofu/state-operations/0 > renders without error and matches snapshot [showUnchangedAttributes] 1`] = `
-"## 
+"## ✅ Plan: 4 to add
 
 ## Plan Summary
 
@@ -8780,7 +8780,7 @@ random_string.existing
 `;
 
 exports[`planToMarkdown integration > tofu/state-operations/1 > renders without error and matches snapshot [default] 1`] = `
-"## 
+"## ✅ Plan: 1 to move, 1 to import, 1 to forget
 
 ## Plan Summary
 
@@ -8847,7 +8847,7 @@ _No attribute changes._
 `;
 
 exports[`planToMarkdown integration > tofu/state-operations/1 > renders without error and matches snapshot [diffFormat-simple] 1`] = `
-"## 
+"## ✅ Plan: 1 to move, 1 to import, 1 to forget
 
 ## Plan Summary
 
@@ -8914,7 +8914,7 @@ _No attribute changes._
 `;
 
 exports[`planToMarkdown integration > tofu/state-operations/1 > renders without error and matches snapshot [showUnchangedAttributes] 1`] = `
-"## 
+"## ✅ Plan: 1 to move, 1 to import, 1 to forget
 
 ## Plan Summary
 

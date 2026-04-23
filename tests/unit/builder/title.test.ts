@@ -1,9 +1,9 @@
 import { describe, it, expect } from "vitest";
 import {
   buildTitle,
-  buildPlanCountParts,
-  buildApplyCountParts,
-  buildFailureCountParts,
+  buildPlanCounts,
+  buildApplyCounts,
+  buildFailureCounts,
 } from "../../../src/builder/title.js";
 import type { Report } from "../../../src/model/report.js";
 import type {
@@ -28,7 +28,7 @@ function makeActionGroup(action: string, total: number): SummaryActionGroup {
 
 function makeReport(overrides: Partial<Report> = {}): Report {
   return {
-    title: "",
+    title: { status: "success", body: { kind: "no-changes" } },
     issues: [],
     steps: [],
     warnings: [],
@@ -43,7 +43,16 @@ describe("buildTitle", () => {
       summary: makeSummary([makeActionGroup("create", 3)]),
       operation: "plan",
     });
-    expect(buildTitle(report)).toBe("✅ Plan: 3 to add");
+    const result = buildTitle(report);
+    expect(result.status).toBe("success");
+    expect(result.body).toEqual({
+      kind: "summary",
+      operation: "plan",
+      counts: [{ action: "create", count: 3 }],
+      failures: [],
+      failureTotal: 0,
+      hasStepFailure: false,
+    });
   });
 
   it("returns plan title with multiple action counts", () => {
@@ -55,9 +64,20 @@ describe("buildTitle", () => {
       ]),
       operation: "plan",
     });
-    expect(buildTitle(report)).toBe(
-      "✅ Plan: 2 to add, 1 to change, 3 to destroy",
-    );
+    const result = buildTitle(report);
+    expect(result.status).toBe("success");
+    expect(result.body).toEqual({
+      kind: "summary",
+      operation: "plan",
+      counts: [
+        { action: "create", count: 2 },
+        { action: "update", count: 1 },
+        { action: "delete", count: 3 },
+      ],
+      failures: [],
+      failureTotal: 0,
+      hasStepFailure: false,
+    });
   });
 
   it("returns 'No Changes' when no actions and no failures", () => {
@@ -65,7 +85,9 @@ describe("buildTitle", () => {
       summary: makeSummary(),
       operation: "plan",
     });
-    expect(buildTitle(report)).toBe("✅ No Changes");
+    const result = buildTitle(report);
+    expect(result.status).toBe("success");
+    expect(result.body).toEqual({ kind: "no-changes" });
   });
 
   it("returns 'Plan Failed' when summary has failures", () => {
@@ -73,7 +95,12 @@ describe("buildTitle", () => {
       summary: makeSummary([], [makeActionGroup("create", 1)]),
       operation: "plan",
     });
-    expect(buildTitle(report)).toBe("❌ Plan Failed");
+    const result = buildTitle(report);
+    expect(result.status).toBe("failure");
+    expect(result.body).toEqual({
+      kind: "operation-failed",
+      operation: "plan",
+    });
   });
 
   it("returns 'Plan Failed' when plan step has failure", () => {
@@ -82,7 +109,12 @@ describe("buildTitle", () => {
       operation: "plan",
       steps: [{ id: "plan", outcome: "failure" }],
     });
-    expect(buildTitle(report)).toBe("❌ Plan Failed");
+    const result = buildTitle(report);
+    expect(result.status).toBe("failure");
+    expect(result.body).toEqual({
+      kind: "operation-failed",
+      operation: "plan",
+    });
   });
 
   it("includes workspace prefix when workspace is provided", () => {
@@ -91,7 +123,17 @@ describe("buildTitle", () => {
       operation: "plan",
       workspace: "staging",
     });
-    expect(buildTitle(report)).toBe("✅ `staging` Plan: 1 to add");
+    const result = buildTitle(report);
+    expect(result.status).toBe("success");
+    expect(result.workspace).toBe("staging");
+    expect(result.body).toEqual({
+      kind: "summary",
+      operation: "plan",
+      counts: [{ action: "create", count: 1 }],
+      failures: [],
+      failureTotal: 0,
+      hasStepFailure: false,
+    });
   });
 
   it("includes workspace prefix in No Changes title", () => {
@@ -100,7 +142,10 @@ describe("buildTitle", () => {
       operation: "plan",
       workspace: "prod",
     });
-    expect(buildTitle(report)).toBe("✅ `prod` No Changes");
+    const result = buildTitle(report);
+    expect(result.status).toBe("success");
+    expect(result.workspace).toBe("prod");
+    expect(result.body).toEqual({ kind: "no-changes" });
   });
 
   it("returns apply title with successful counts", () => {
@@ -111,7 +156,19 @@ describe("buildTitle", () => {
       ]),
       operation: "apply",
     });
-    expect(buildTitle(report)).toBe("✅ Apply: 1 added, 2 changed");
+    const result = buildTitle(report);
+    expect(result.status).toBe("success");
+    expect(result.body).toEqual({
+      kind: "summary",
+      operation: "apply",
+      counts: [
+        { action: "create", count: 1 },
+        { action: "update", count: 2 },
+      ],
+      failures: [],
+      failureTotal: 0,
+      hasStepFailure: false,
+    });
   });
 
   it("returns 'Apply Complete' when apply has no actions", () => {
@@ -119,7 +176,16 @@ describe("buildTitle", () => {
       summary: makeSummary(),
       operation: "apply",
     });
-    expect(buildTitle(report)).toBe("✅ Apply Complete");
+    const result = buildTitle(report);
+    expect(result.status).toBe("success");
+    expect(result.body).toEqual({
+      kind: "summary",
+      operation: "apply",
+      counts: [],
+      failures: [],
+      failureTotal: 0,
+      hasStepFailure: false,
+    });
   });
 
   it("returns 'Apply Failed' with failure and success counts", () => {
@@ -130,7 +196,16 @@ describe("buildTitle", () => {
       ),
       operation: "apply",
     });
-    expect(buildTitle(report)).toBe("❌ Apply Failed: 2 failed, 1 added");
+    const result = buildTitle(report);
+    expect(result.status).toBe("failure");
+    expect(result.body).toEqual({
+      kind: "summary",
+      operation: "apply",
+      counts: [{ action: "create", count: 1 }],
+      failures: [{ action: "failed", count: 2 }],
+      failureTotal: 2,
+      hasStepFailure: false,
+    });
   });
 
   it("includes workspace prefix in apply titles", () => {
@@ -139,17 +214,32 @@ describe("buildTitle", () => {
       operation: "apply",
       workspace: "prod",
     });
-    expect(buildTitle(report)).toBe("✅ `prod` Apply: 1 destroyed");
+    const result = buildTitle(report);
+    expect(result.status).toBe("success");
+    expect(result.workspace).toBe("prod");
+    expect(result.body).toEqual({
+      kind: "summary",
+      operation: "apply",
+      counts: [{ action: "delete", count: 1 }],
+      failures: [],
+      failureTotal: 0,
+      hasStepFailure: false,
+    });
   });
 
   it("returns error title when error is set", () => {
     const report = makeReport({ error: "something broke" });
-    expect(buildTitle(report)).toBe("❌ Report Generation Failed");
+    const result = buildTitle(report);
+    expect(result.status).toBe("failure");
+    expect(result.body).toEqual({ kind: "error" });
   });
 
   it("returns error title with workspace", () => {
     const report = makeReport({ error: "something broke", workspace: "dev" });
-    expect(buildTitle(report)).toBe("❌ `dev` Report Generation Failed");
+    const result = buildTitle(report);
+    expect(result.status).toBe("failure");
+    expect(result.workspace).toBe("dev");
+    expect(result.body).toEqual({ kind: "error" });
   });
 
   it("returns 'All Steps Skipped' when all steps are skipped", () => {
@@ -159,7 +249,9 @@ describe("buildTitle", () => {
         { id: "plan", outcome: "skipped" },
       ],
     });
-    expect(buildTitle(report)).toBe("⚠️ All Steps Skipped");
+    const result = buildTitle(report);
+    expect(result.status).toBe("warning");
+    expect(result.body).toEqual({ kind: "all-skipped" });
   });
 
   it("returns 'Plan Skipped' when operationOutcome is skipped and operation is plan", () => {
@@ -167,7 +259,12 @@ describe("buildTitle", () => {
       operation: "plan",
       operationOutcome: "skipped",
     });
-    expect(buildTitle(report)).toBe("⚠️ Plan Skipped");
+    const result = buildTitle(report);
+    expect(result.status).toBe("warning");
+    expect(result.body).toEqual({
+      kind: "operation-skipped",
+      operation: "plan",
+    });
   });
 
   it("returns 'Apply Skipped' when operationOutcome is skipped and operation is apply", () => {
@@ -175,7 +272,12 @@ describe("buildTitle", () => {
       operation: "apply",
       operationOutcome: "skipped",
     });
-    expect(buildTitle(report)).toBe("⚠️ Apply Skipped");
+    const result = buildTitle(report);
+    expect(result.status).toBe("warning");
+    expect(result.body).toEqual({
+      kind: "operation-skipped",
+      operation: "apply",
+    });
   });
 
   it("returns 'Destroy Skipped' when operationOutcome is skipped and operation is destroy", () => {
@@ -183,7 +285,12 @@ describe("buildTitle", () => {
       operation: "destroy",
       operationOutcome: "skipped",
     });
-    expect(buildTitle(report)).toBe("⚠️ Destroy Skipped");
+    const result = buildTitle(report);
+    expect(result.status).toBe("warning");
+    expect(result.body).toEqual({
+      kind: "operation-skipped",
+      operation: "destroy",
+    });
   });
 
   it("includes workspace prefix in 'Plan Skipped' title", () => {
@@ -192,7 +299,13 @@ describe("buildTitle", () => {
       operationOutcome: "skipped",
       workspace: "tf",
     });
-    expect(buildTitle(report)).toBe("⚠️ `tf` Plan Skipped");
+    const result = buildTitle(report);
+    expect(result.status).toBe("warning");
+    expect(result.workspace).toBe("tf");
+    expect(result.body).toEqual({
+      kind: "operation-skipped",
+      operation: "plan",
+    });
   });
 
   it("does not skip title when operationOutcome is success", () => {
@@ -200,24 +313,32 @@ describe("buildTitle", () => {
       operation: "plan",
       operationOutcome: "success",
     });
-    expect(buildTitle(report)).toBe("✅ Plan Succeeded");
+    const result = buildTitle(report);
+    expect(result.status).toBe("success");
+    expect(result.body).toEqual({ kind: "succeeded", operation: "plan" });
   });
 
   it("returns 'Succeeded' when no data is available", () => {
     const report = makeReport();
-    expect(buildTitle(report)).toBe("✅ Succeeded");
+    const result = buildTitle(report);
+    expect(result.status).toBe("success");
+    expect(result.body).toEqual({ kind: "succeeded" });
   });
 
   it("returns 'Plan Succeeded' when operation is set but no summary", () => {
     const report = makeReport({ operation: "plan" });
-    expect(buildTitle(report)).toBe("✅ Plan Succeeded");
+    const result = buildTitle(report);
+    expect(result.status).toBe("success");
+    expect(result.body).toEqual({ kind: "succeeded", operation: "plan" });
   });
 
   it("returns 'Failed' when non-IaC step failed and no summary", () => {
     const report = makeReport({
       steps: [{ id: "custom-step", outcome: "failure" }],
     });
-    expect(buildTitle(report)).toBe("❌ `custom-step` Failed");
+    const result = buildTitle(report);
+    expect(result.status).toBe("failure");
+    expect(result.body).toEqual({ kind: "step-failed", stepId: "custom-step" });
   });
 
   it("returns 'Failed' when multiple non-IaC steps failed", () => {
@@ -227,7 +348,9 @@ describe("buildTitle", () => {
         { id: "step-b", outcome: "failure" },
       ],
     });
-    expect(buildTitle(report)).toBe("❌ Failed");
+    const result = buildTitle(report);
+    expect(result.status).toBe("failure");
+    expect(result.body).toEqual({ kind: "generic-failed" });
   });
 
   it("returns IaC failure title when plan step fails", () => {
@@ -235,7 +358,12 @@ describe("buildTitle", () => {
       steps: [{ id: "plan", outcome: "failure" }],
       operation: "plan",
     });
-    expect(buildTitle(report)).toBe("❌ Plan Failed");
+    const result = buildTitle(report);
+    expect(result.status).toBe("failure");
+    expect(result.body).toEqual({
+      kind: "operation-failed",
+      operation: "plan",
+    });
   });
 
   it("returns IaC failure title when apply step fails", () => {
@@ -243,29 +371,34 @@ describe("buildTitle", () => {
       steps: [{ id: "apply", outcome: "failure" }],
       operation: "apply",
     });
-    expect(buildTitle(report)).toBe("❌ Apply Failed");
+    const result = buildTitle(report);
+    expect(result.status).toBe("failure");
+    expect(result.body).toEqual({
+      kind: "operation-failed",
+      operation: "apply",
+    });
   });
 });
 
-describe("buildPlanCountParts", () => {
+describe("buildPlanCounts", () => {
   it("returns empty array for empty actions", () => {
     const summary = makeSummary();
-    expect(buildPlanCountParts(summary)).toEqual([]);
+    expect(buildPlanCounts(summary)).toEqual([]);
   });
 
-  it("maps create to 'add'", () => {
+  it("maps create action", () => {
     const summary = makeSummary([makeActionGroup("create", 3)]);
-    expect(buildPlanCountParts(summary)).toEqual(["3 to add"]);
+    expect(buildPlanCounts(summary)).toEqual([{ action: "create", count: 3 }]);
   });
 
-  it("maps update to 'change'", () => {
+  it("maps update action", () => {
     const summary = makeSummary([makeActionGroup("update", 1)]);
-    expect(buildPlanCountParts(summary)).toEqual(["1 to change"]);
+    expect(buildPlanCounts(summary)).toEqual([{ action: "update", count: 1 }]);
   });
 
-  it("maps delete to 'destroy'", () => {
+  it("maps delete action", () => {
     const summary = makeSummary([makeActionGroup("delete", 5)]);
-    expect(buildPlanCountParts(summary)).toEqual(["5 to destroy"]);
+    expect(buildPlanCounts(summary)).toEqual([{ action: "delete", count: 5 }]);
   });
 
   it("maps replace, import, move, and forget", () => {
@@ -275,11 +408,11 @@ describe("buildPlanCountParts", () => {
       makeActionGroup("move", 1),
       makeActionGroup("forget", 1),
     ]);
-    expect(buildPlanCountParts(summary)).toEqual([
-      "1 to replace",
-      "2 to import",
-      "1 to move",
-      "1 to forget",
+    expect(buildPlanCounts(summary)).toEqual([
+      { action: "replace", count: 1 },
+      { action: "import", count: 2 },
+      { action: "move", count: 1 },
+      { action: "forget", count: 1 },
     ]);
   });
 
@@ -289,29 +422,29 @@ describe("buildPlanCountParts", () => {
       makeActionGroup("create", 2),
       makeActionGroup("create", 3),
     ]);
-    expect(buildPlanCountParts(summary)).toEqual(["5 to add"]);
+    expect(buildPlanCounts(summary)).toEqual([{ action: "create", count: 5 }]);
   });
 });
 
-describe("buildApplyCountParts", () => {
+describe("buildApplyCounts", () => {
   it("returns empty array for empty actions", () => {
     const summary = makeSummary();
-    expect(buildApplyCountParts(summary)).toEqual([]);
+    expect(buildApplyCounts(summary)).toEqual([]);
   });
 
-  it("maps create to 'added'", () => {
+  it("maps create action", () => {
     const summary = makeSummary([makeActionGroup("create", 2)]);
-    expect(buildApplyCountParts(summary)).toEqual(["2 added"]);
+    expect(buildApplyCounts(summary)).toEqual([{ action: "create", count: 2 }]);
   });
 
-  it("maps update to 'changed'", () => {
+  it("maps update action", () => {
     const summary = makeSummary([makeActionGroup("update", 1)]);
-    expect(buildApplyCountParts(summary)).toEqual(["1 changed"]);
+    expect(buildApplyCounts(summary)).toEqual([{ action: "update", count: 1 }]);
   });
 
-  it("maps delete to 'destroyed'", () => {
+  it("maps delete action", () => {
     const summary = makeSummary([makeActionGroup("delete", 3)]);
-    expect(buildApplyCountParts(summary)).toEqual(["3 destroyed"]);
+    expect(buildApplyCounts(summary)).toEqual([{ action: "delete", count: 3 }]);
   });
 
   it("maps replace, import, move, and forget", () => {
@@ -321,19 +454,19 @@ describe("buildApplyCountParts", () => {
       makeActionGroup("move", 1),
       makeActionGroup("forget", 1),
     ]);
-    expect(buildApplyCountParts(summary)).toEqual([
-      "1 replaced",
-      "2 imported",
-      "1 moved",
-      "1 forgotten",
+    expect(buildApplyCounts(summary)).toEqual([
+      { action: "replace", count: 1 },
+      { action: "import", count: 2 },
+      { action: "move", count: 1 },
+      { action: "forget", count: 1 },
     ]);
   });
 });
 
-describe("buildFailureCountParts", () => {
+describe("buildFailureCounts", () => {
   it("returns empty array when no failures", () => {
     const summary = makeSummary([], []);
-    expect(buildFailureCountParts(summary)).toEqual([]);
+    expect(buildFailureCounts(summary)).toEqual([]);
   });
 
   it("returns total failed count", () => {
@@ -341,6 +474,8 @@ describe("buildFailureCountParts", () => {
       [],
       [makeActionGroup("create", 2), makeActionGroup("update", 1)],
     );
-    expect(buildFailureCountParts(summary)).toEqual(["3 failed"]);
+    expect(buildFailureCounts(summary)).toEqual([
+      { action: "failed", count: 3 },
+    ]);
   });
 });

@@ -7,14 +7,15 @@
  * level that the category element wraps.
  */
 
-import type { Renderable } from "../renderable/types.js";
+import type { Renderable, OutputFormat } from "../renderable/types.js";
 import type { ResourceChange } from "../model/resource.js";
 import type { DiffEntry } from "../diff/types.js";
 import type { ApplyContext } from "./apply-context.js";
 import type { ResourceRenderOptions } from "./resource.js";
-import { Heading, Sequence, Paragraph } from "../renderable/primitives.js";
+import { Sequence } from "../renderable/primitives.js";
 import { MODULE_ICON } from "../model/status-icons.js";
-import { moduleLabel } from "./address.js";
+import { htmlEscape } from "../renderable/html-escape.js";
+import { renderNote, noteSize } from "../renderable/helpers.js";
 import { buildResourceRenderable } from "./resource.js";
 
 /**
@@ -35,10 +36,8 @@ export function buildModuleGroupRenderable(
   level: number,
   applyContextFn?: (address: string) => ApplyContext,
 ): Renderable {
-  const label = moduleLabel(moduleAddress);
-  const parts: Renderable[] = [
-    new Heading(`${MODULE_ICON} Module: ${label}`, 3),
-  ];
+  const heading = new ModuleHeading(moduleAddress);
+  const parts: Renderable[] = [heading];
 
   for (const resource of resources) {
     const applyContext = applyContextFn?.(resource.address);
@@ -61,9 +60,75 @@ export function buildModuleGroupRenderable(
  * Used when the module group is degraded below its minimum detail level.
  */
 export function buildModuleGroupCompact(moduleAddress: string): Renderable {
-  const label = moduleLabel(moduleAddress);
-  return new Sequence([
-    new Heading(label, 3),
-    new Paragraph("_(details omitted)_"),
-  ]);
+  return new CompactModuleGroup(moduleAddress);
+}
+
+// ---------------------------------------------------------------------------
+// Internal Renderables
+// ---------------------------------------------------------------------------
+
+/**
+ * Module heading with code-styled address per format.
+ * Root modules render as "root" (no code styling).
+ */
+class ModuleHeading implements Renderable {
+  private readonly moduleAddress: string;
+
+  constructor(moduleAddress: string) {
+    this.moduleAddress = moduleAddress;
+  }
+
+  size(format: OutputFormat): number {
+    return this.render(format).length;
+  }
+
+  render(format: OutputFormat): string {
+    const label = this.renderLabel(format);
+    if (format === "markdown") {
+      return `### ${MODULE_ICON} Module: ${label}\n\n`;
+    }
+    return `<h3>${MODULE_ICON} Module: ${label}</h3>\n`;
+  }
+
+  private renderLabel(format: OutputFormat): string {
+    if (this.moduleAddress === "") return "root";
+    if (format === "markdown") {
+      return `\`${this.moduleAddress}\``;
+    }
+    return `<code>${htmlEscape(this.moduleAddress)}</code>`;
+  }
+}
+
+/**
+ * Compact module group — heading + "details omitted" note.
+ */
+class CompactModuleGroup implements Renderable {
+  private readonly moduleAddress: string;
+
+  constructor(moduleAddress: string) {
+    this.moduleAddress = moduleAddress;
+  }
+
+  size(format: OutputFormat): number {
+    return (
+      this.renderHeading(format).length + noteSize("details omitted", format)
+    );
+  }
+
+  render(format: OutputFormat): string {
+    return this.renderHeading(format) + renderNote("details omitted", format);
+  }
+
+  private renderHeading(format: OutputFormat): string {
+    const label =
+      this.moduleAddress === ""
+        ? "root"
+        : format === "markdown"
+          ? `\`${this.moduleAddress}\``
+          : `<code>${htmlEscape(this.moduleAddress)}</code>`;
+    if (format === "markdown") {
+      return `### ${label}\n\n`;
+    }
+    return `<h3>${label}</h3>\n`;
+  }
 }

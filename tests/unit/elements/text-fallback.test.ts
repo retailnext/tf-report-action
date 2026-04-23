@@ -31,7 +31,7 @@ describe("TextFallbackElement", () => {
     const el = new TextFallbackElement("plan", "Plan Output", "long content");
     const md = el.render("markdown", 0);
     expect(md).toContain("### Plan Output");
-    expect(md).toContain("_(omitted due to size)_");
+    expect(md).toContain("_omitted due to size_");
   });
 
   it("level 0 renders heading and omitted placeholder in HTML", () => {

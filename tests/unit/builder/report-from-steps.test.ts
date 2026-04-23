@@ -34,7 +34,11 @@ describe("buildReportFromSteps — operation skipped", () => {
       "show-plan": { outcome: "skipped" },
     });
     const report = buildReportFromSteps(json, { workspace: "tf", env: NO_ENV });
-    expect(report.title).toBe("⚠️ `tf` Plan Skipped");
+    expect(report.title).toEqual({
+      status: "warning",
+      workspace: "tf",
+      body: { kind: "operation-skipped", operation: "plan" },
+    });
   });
 
   it("reports Plan Skipped when init succeeds but plan step is skipped", () => {
@@ -45,7 +49,10 @@ describe("buildReportFromSteps — operation skipped", () => {
       "show-plan": { outcome: "skipped" },
     });
     const report = buildReportFromSteps(json, { env: NO_ENV });
-    expect(report.title).toBe("⚠️ Plan Skipped");
+    expect(report.title).toEqual({
+      status: "warning",
+      body: { kind: "operation-skipped", operation: "plan" },
+    });
   });
 
   it("reports Apply Skipped when only apply step is present and it is skipped", () => {
@@ -53,7 +60,10 @@ describe("buildReportFromSteps — operation skipped", () => {
       apply: { outcome: "skipped" },
     });
     const report = buildReportFromSteps(json, { env: NO_ENV });
-    expect(report.title).toBe("⚠️ Apply Skipped");
+    expect(report.title).toEqual({
+      status: "warning",
+      body: { kind: "operation-skipped", operation: "apply" },
+    });
   });
 
   it("reports Plan Skipped when plan and apply are both skipped", () => {
@@ -64,7 +74,10 @@ describe("buildReportFromSteps — operation skipped", () => {
       apply: { outcome: "skipped" },
     });
     const report = buildReportFromSteps(json, { env: NO_ENV });
-    expect(report.title).toBe("⚠️ Plan Skipped");
+    expect(report.title).toEqual({
+      status: "warning",
+      body: { kind: "operation-skipped", operation: "plan" },
+    });
   });
 
   it("does not report skipped when plan step succeeds (no stdout — falls back to Plan Succeeded)", () => {
@@ -76,7 +89,8 @@ describe("buildReportFromSteps — operation skipped", () => {
       "show-plan": { outcome: "success" },
     });
     const report = buildReportFromSteps(json, { env: NO_ENV });
-    expect(report.title).not.toContain("Skipped");
-    expect(report.title).toContain("Plan");
+    expect(report.title.body.kind).not.toBe("operation-skipped");
+    expect(report.title.body.kind).not.toBe("all-skipped");
+    expect(report.title.body).toHaveProperty("operation", "plan");
   });
 });

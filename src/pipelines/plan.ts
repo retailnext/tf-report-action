@@ -3,6 +3,7 @@ import type { RenderOptions } from "../model/render-options.js";
 import type { ComposedReport } from "../renderable/types.js";
 import { parsePlan } from "../parser/index.js";
 import { buildReport } from "../builder/index.js";
+import { buildTitle } from "../builder/title.js";
 import { buildReportElements } from "../elements/report-elements.js";
 import { composeReport } from "../elements/composed-report.js";
 
@@ -20,6 +21,7 @@ export function planReport(
 ): ComposedReport {
   const plan = parsePlan(json);
   const report = buildReport(plan, options);
+  report.title = buildTitle(report);
   const elements = buildReportElements(report, options);
   return composeReport(elements);
 }

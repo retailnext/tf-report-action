@@ -3,7 +3,6 @@ import {
   deriveModuleAddress,
   deriveInstanceName,
   groupByModule,
-  moduleLabel,
 } from "../../../src/elements/address.js";
 import type { ResourceChange } from "../../../src/model/resource.js";
 
@@ -140,19 +139,5 @@ describe("groupByModule", () => {
       "module.a",
       "module.z",
     ]);
-  });
-});
-
-// ---------------------------------------------------------------------------
-// moduleLabel
-// ---------------------------------------------------------------------------
-
-describe("moduleLabel", () => {
-  it('returns "root" for empty module address', () => {
-    expect(moduleLabel("")).toBe("root");
-  });
-
-  it("returns backtick-wrapped module address", () => {
-    expect(moduleLabel("module.vpc")).toBe("`module.vpc`");
   });
 });

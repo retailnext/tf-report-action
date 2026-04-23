@@ -9,6 +9,14 @@ export type {
   ResourceTypeCount,
 } from "./summary.js";
 export type { Report, RawStepStdout, Tool } from "./report.js";
+export type {
+  ReportTitle,
+  TitleStatus,
+  TitleBody,
+  TitleBodySummary,
+  TitleOperation,
+  TitleActionCount,
+} from "./report-title.js";
 export type { Diagnostic } from "./diagnostic.js";
 export type { ApplyStatus } from "./apply-status.js";
 export type { StepIssue } from "./step-issue.js";

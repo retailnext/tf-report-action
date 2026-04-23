@@ -4,6 +4,7 @@ import type { ComposedReport } from "../renderable/types.js";
 import { parsePlan } from "../parser/index.js";
 import { parseState } from "../parser/state.js";
 import { buildApplyReport } from "../builder/apply.js";
+import { buildTitle } from "../builder/title.js";
 import { enrichReportFromState } from "../builder/state-enrichment.js";
 import { buildReportElements } from "../elements/report-elements.js";
 import { composeReport } from "../elements/composed-report.js";
@@ -33,6 +34,7 @@ export function applyReport(
     const state = parseState(options.stateJson);
     enrichReportFromState(report, state);
   }
+  report.title = buildTitle(report);
   const elements = buildReportElements(report, options);
   return composeReport(elements);
 }

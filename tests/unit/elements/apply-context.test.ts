@@ -13,7 +13,7 @@ import {
 /** Create a minimal Report for testing. */
 function makeReport(overrides?: Partial<Report>): Report {
   return {
-    title: "Test",
+    title: { status: "success", body: { kind: "no-changes" } },
     issues: [],
     steps: [],
     warnings: [],

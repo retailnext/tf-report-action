@@ -74,8 +74,3 @@ export function groupByModule(
     })
     .map(([moduleAddress, grouped]) => ({ moduleAddress, resources: grouped }));
 }
-
-/** Formats a module address into its display label. */
-export function moduleLabel(moduleAddress: string): string {
-  return moduleAddress === "" ? "root" : `\`${moduleAddress}\``;
-}

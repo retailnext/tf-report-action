@@ -22,7 +22,6 @@ import type { DiffFormat } from "./diff-value.js";
 import {
   Details,
   CodeBlock,
-  Paragraph,
   Table,
   Sequence,
   RawText,
@@ -36,6 +35,7 @@ import {
   DIAGNOSTIC_WARNING,
 } from "../model/status-icons.js";
 import { htmlEscape } from "../renderable/html-escape.js";
+import { renderNote } from "../renderable/helpers.js";
 import { deriveInstanceName } from "./address.js";
 import {
   buildInlineDiff,
@@ -162,11 +162,11 @@ function buildAttributeRenderable(
   const useCharDiff = level >= 3;
 
   if (resource.allUnknownAfterApply) {
-    return new Paragraph("_(all values known after apply)_");
+    return new NoteRenderable("all values known after apply");
   }
 
   if (resource.attributes.length === 0 && resource.hasAttributeDetail) {
-    return new Paragraph("_No attribute changes._");
+    return new NoteRenderable("No attribute changes.");
   }
 
   if (resource.attributes.length === 0) {
@@ -238,9 +238,7 @@ function buildInlineDiagnostics(
   const parts: Renderable[] = [];
 
   for (const diag of [...errors, ...warnings]) {
-    const prefix =
-      diag.severity === "error" ? DIAGNOSTIC_ERROR : DIAGNOSTIC_WARNING;
-    parts.push(new DiagLine(`${prefix} **${htmlEscape(diag.summary)}**`));
+    parts.push(new ResourceDiagnosticLine(diag.severity, diag.summary));
     if (diag.detail) {
       parts.push(new CodeBlock(diag.detail));
     }
@@ -272,22 +270,47 @@ class MetadataParagraph implements Renderable {
   }
 }
 
-/** Diagnostic line (paragraph with markdown formatting). */
-class DiagLine implements Renderable {
-  private readonly mdStr: string;
-  private readonly htStr: string;
+/**
+ * Resource diagnostic line — holds severity and summary text as
+ * semantic data; renders bold summary with icon per format.
+ */
+class ResourceDiagnosticLine implements Renderable {
+  private readonly severity: "error" | "warning";
+  private readonly summary: string;
 
-  constructor(text: string) {
-    this.mdStr = `${text}\n\n`;
-    this.htStr = `<p>${text}</p>\n`;
+  constructor(severity: "error" | "warning", summary: string) {
+    this.severity = severity;
+    this.summary = summary;
   }
 
   size(format: OutputFormat): number {
-    return format === "markdown" ? this.mdStr.length : this.htStr.length;
+    return this.render(format).length;
   }
 
   render(format: OutputFormat): string {
-    return format === "markdown" ? this.mdStr : this.htStr;
+    const icon =
+      this.severity === "error" ? DIAGNOSTIC_ERROR : DIAGNOSTIC_WARNING;
+    if (format === "markdown") {
+      return `${icon} **${this.summary}**\n\n`;
+    }
+    return `<p>${icon} <strong>${htmlEscape(this.summary)}</strong></p>\n`;
+  }
+}
+
+/** Contextual note — italic in markdown, `<em>` in HTML. */
+class NoteRenderable implements Renderable {
+  private readonly text: string;
+
+  constructor(text: string) {
+    this.text = text;
+  }
+
+  size(format: OutputFormat): number {
+    return renderNote(this.text, format).length;
+  }
+
+  render(format: OutputFormat): string {
+    return renderNote(this.text, format);
   }
 }
 

@@ -17,7 +17,7 @@ function makeReport(
   outputs?: OutputChange[],
 ): Report {
   return {
-    title: "test",
+    title: { status: "success", body: { kind: "no-changes" } },
     issues: [],
     steps: [],
     warnings: [],

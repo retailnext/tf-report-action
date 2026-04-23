@@ -333,7 +333,17 @@ describe("ComposedReport", () => {
     it("composes a structured report from buildReportElements", () => {
       const elements = buildReportElements(
         {
-          title: "Plan: 1 to create",
+          title: {
+            status: "success",
+            body: {
+              kind: "summary",
+              operation: "plan",
+              counts: [{ action: "create", count: 1 }],
+              failures: [],
+              failureTotal: 0,
+              hasStepFailure: false,
+            },
+          },
           issues: [],
           steps: [],
           warnings: [],
