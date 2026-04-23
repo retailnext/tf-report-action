@@ -281,8 +281,8 @@ if (gallery) {
     `Found ${allStepsFiles.length} fixture steps files. Rendering...\n`,
   );
 
-  // Render each fixture and collect { path, markdown }
-  const entries: Array<{ path: string; markdown: string }> = [];
+  // Render each fixture and collect { path, markdown, html }
+  const entries: Array<{ path: string; markdown: string; html: string }> = [];
   for (const absPath of allStepsFiles) {
     const relPath = relative(repoRoot, absPath);
     const stepsDir = dirname(absPath);
@@ -290,10 +290,8 @@ if (gallery) {
     try {
       json = readFileSync(absPath, "utf-8");
     } catch {
-      entries.push({
-        path: relPath,
-        markdown: `> ⚠️ Failed to read ${relPath}`,
-      });
+      const fallback = `> ⚠️ Failed to read ${relPath}`;
+      entries.push({ path: relPath, markdown: fallback, html: fallback });
       continue;
     }
 
@@ -306,13 +304,13 @@ if (gallery) {
     };
 
     try {
-      const md = reportFromSteps(json, opts).report.render("markdown").output;
-      entries.push({ path: relPath, markdown: md });
+      const report = reportFromSteps(json, opts).report;
+      const md = report.render("markdown").output;
+      const htmlOut = report.render("html").output;
+      entries.push({ path: relPath, markdown: md, html: htmlOut });
     } catch {
-      entries.push({
-        path: relPath,
-        markdown: `> ⚠️ reportFromSteps threw for ${relPath}`,
-      });
+      const fallback = `> ⚠️ reportFromSteps threw for ${relPath}`;
+      entries.push({ path: relPath, markdown: fallback, html: fallback });
     }
   }
 
@@ -324,6 +322,7 @@ if (gallery) {
     entries.map((e) => ({
       path: e.path,
       markdown: e.markdown,
+      html: e.html,
     })),
   );
 
@@ -444,9 +443,37 @@ function buildGalleryHtml(entriesJson: string): string {
     }
     #btn-copy:hover { background: #eaeef2; }
     #btn-copy.copied { background: #dafbe1; border-color: #116329; color: #116329; }
+
+    /* View mode toggle (segmented control) */
+    .view-toggle {
+      display: inline-flex; border: 1px solid #d0d7de; border-radius: 6px;
+      overflow: hidden; flex-shrink: 0;
+    }
+    .view-toggle button {
+      padding: 4px 10px; border: none; border-right: 1px solid #d0d7de;
+      background: #fff; cursor: pointer; font-size: 12px; border-radius: 0;
+      color: #57606a;
+    }
+    .view-toggle button:last-child { border-right: none; }
+    .view-toggle button:hover { background: #f3f4f6; }
+    .view-toggle button.active { background: #0969da; color: #fff; }
+
+    /* Content area: single view (default) and split view */
     #content-area {
       flex: 1; overflow-y: auto; padding: 32px;
       max-width: 1012px;
+    }
+    #content-area.split-mode {
+      display: flex; gap: 24px; max-width: none;
+    }
+    #content-area.split-mode .split-pane {
+      flex: 1; min-width: 0; overflow-y: auto;
+    }
+    .split-pane-label {
+      font-size: 11px; font-weight: 600; color: #57606a;
+      text-transform: uppercase; letter-spacing: 0.5px;
+      margin-bottom: 8px; padding-bottom: 4px;
+      border-bottom: 1px solid #d0d7de;
     }
 
     /* GitHub-flavored markdown styles (shared with artifact page) */
@@ -466,6 +493,11 @@ function buildGalleryHtml(entriesJson: string): string {
     <div id="nav-bar">
       <button id="btn-prev" title="Previous (←)">← Prev</button>
       <button id="btn-next" title="Next (→)">Next →</button>
+      <span class="view-toggle">
+        <button id="btn-view-md" class="active" title="Markdown view">Markdown</button>
+        <button id="btn-view-html" title="HTML view">HTML</button>
+        <button id="btn-view-split" title="Side-by-side">Split</button>
+      </span>
       <button id="btn-copy" title="Copy markdown to clipboard">📋 Copy Markdown</button>
       <span id="fixture-path"></span>
       <span id="position-label"></span>
@@ -508,6 +540,12 @@ function buildGalleryHtml(entriesJson: string): string {
     var btnPrev = document.getElementById('btn-prev');
     var btnNext = document.getElementById('btn-next');
     var btnCopy = document.getElementById('btn-copy');
+    var btnViewMd = document.getElementById('btn-view-md');
+    var btnViewHtml = document.getElementById('btn-view-html');
+    var btnViewSplit = document.getElementById('btn-view-split');
+
+    // View mode: "markdown" | "html" | "split"
+    var viewMode = 'markdown';
 
     // Build the visible (filtered) index list
     var visibleIndices = [];
@@ -545,6 +583,22 @@ function buildGalleryHtml(entriesJson: string): string {
       }
     }
 
+    function renderHtmlContent(html) {
+      var container = document.createElement('div');
+      container.className = 'markdown-body';
+      container.innerHTML = html;
+      addCopyButtons(container);
+      return container;
+    }
+
+    function renderMarkdownContent(markdown) {
+      var container = document.createElement('div');
+      container.className = 'markdown-body';
+      container.innerHTML = DOMPurify.sanitize(marked.parse(markdown));
+      addCopyButtons(container);
+      return container;
+    }
+
     function renderCurrent() {
       // Clear active state
       for (var i = 0; i < listItems.length; i++) {
@@ -555,6 +609,7 @@ function buildGalleryHtml(entriesJson: string): string {
         fixturePath.textContent = '(no matches)';
         positionLabel.textContent = '';
         contentArea.innerHTML = '<p style="color:#57606a;padding:20px;">No fixtures match the filter.</p>';
+        contentArea.classList.remove('split-mode');
         btnPrev.disabled = true;
         btnNext.disabled = true;
         return;
@@ -568,14 +623,62 @@ function buildGalleryHtml(entriesJson: string): string {
       fixturePath.textContent = entry.path;
       positionLabel.textContent = (currentVisiblePos + 1) + ' / ' + visibleIndices.length;
 
-      var html = DOMPurify.sanitize(marked.parse(entry.markdown));
-      contentArea.innerHTML = html;
-      addCopyButtons(contentArea);
-      contentArea.scrollTop = 0;
+      contentArea.innerHTML = '';
 
+      if (viewMode === 'split') {
+        contentArea.classList.add('split-mode');
+        // Left pane: Markdown
+        var leftPane = document.createElement('div');
+        leftPane.className = 'split-pane';
+        var leftLabel = document.createElement('div');
+        leftLabel.className = 'split-pane-label';
+        leftLabel.textContent = 'Markdown (via marked.js)';
+        leftPane.appendChild(leftLabel);
+        leftPane.appendChild(renderMarkdownContent(entry.markdown));
+        // Right pane: HTML
+        var rightPane = document.createElement('div');
+        rightPane.className = 'split-pane';
+        var rightLabel = document.createElement('div');
+        rightLabel.className = 'split-pane-label';
+        rightLabel.textContent = 'Native HTML';
+        rightPane.appendChild(rightLabel);
+        rightPane.appendChild(renderHtmlContent(entry.html));
+
+        contentArea.appendChild(leftPane);
+        contentArea.appendChild(rightPane);
+      } else {
+        contentArea.classList.remove('split-mode');
+        if (viewMode === 'html') {
+          contentArea.appendChild(renderHtmlContent(entry.html));
+        } else {
+          contentArea.appendChild(renderMarkdownContent(entry.markdown));
+        }
+      }
+
+      contentArea.scrollTop = 0;
       btnPrev.disabled = currentVisiblePos === 0;
       btnNext.disabled = currentVisiblePos === visibleIndices.length - 1;
     }
+
+    function setViewMode(mode) {
+      viewMode = mode;
+      btnViewMd.classList.toggle('active', mode === 'markdown');
+      btnViewHtml.classList.toggle('active', mode === 'html');
+      btnViewSplit.classList.toggle('active', mode === 'split');
+      // Update copy button label
+      if (mode === 'html') {
+        btnCopy.textContent = '📋 Copy HTML';
+        btnCopy.title = 'Copy HTML to clipboard';
+      } else {
+        btnCopy.textContent = '📋 Copy Markdown';
+        btnCopy.title = 'Copy markdown to clipboard';
+      }
+      renderCurrent();
+    }
+
+    btnViewMd.addEventListener('click', function() { setViewMode('markdown'); });
+    btnViewHtml.addEventListener('click', function() { setViewMode('html'); });
+    btnViewSplit.addEventListener('click', function() { setViewMode('split'); });
 
     function selectByGlobalIndex(globalIdx) {
       var pos = visibleIndices.indexOf(globalIdx);
@@ -604,11 +707,13 @@ function buildGalleryHtml(entriesJson: string): string {
     btnCopy.addEventListener('click', function() {
       if (visibleIndices.length === 0) return;
       var entry = entries[visibleIndices[currentVisiblePos]];
-      navigator.clipboard.writeText(entry.markdown).then(function() {
+      var text = (viewMode === 'html') ? entry.html : entry.markdown;
+      navigator.clipboard.writeText(text).then(function() {
+        var label = (viewMode === 'html') ? '📋 Copy HTML' : '📋 Copy Markdown';
         btnCopy.textContent = '✅ Copied!';
         btnCopy.classList.add('copied');
         setTimeout(function() {
-          btnCopy.textContent = '📋 Copy Markdown';
+          btnCopy.textContent = label;
           btnCopy.classList.remove('copied');
         }, 1500);
       });
@@ -645,6 +750,12 @@ function buildGalleryHtml(entriesJson: string): string {
         e.preventDefault();
         filterInput.focus();
         filterInput.select();
+      } else if (e.key === '1') {
+        setViewMode('markdown');
+      } else if (e.key === '2') {
+        setViewMode('html');
+      } else if (e.key === '3') {
+        setViewMode('split');
       }
     });
 
