@@ -14,6 +14,10 @@ import {
   STATUS_FAILURE,
 } from "../model/status-icons.js";
 import { htmlEscape } from "../renderable/html-escape.js";
+import {
+  markdownEscape,
+  markdownEscapeBlock,
+} from "../renderable/markdown-escape.js";
 
 // ---------------------------------------------------------------------------
 // JSON Lines types and helpers
@@ -295,11 +299,11 @@ function formatValidateDiagMarkdown(diag: Record<string, unknown>): string {
     typeof diag["summary"] === "string" ? diag["summary"] : "(unknown)";
   const detail = typeof diag["detail"] === "string" ? diag["detail"] : "";
 
-  let output = `${icon} **${htmlEscape(summary)}**\n`;
+  let output = `${icon} **${markdownEscape(summary)}**\n`;
   if (detail) {
-    const detailLines = htmlEscape(detail)
+    const detailLines = detail
       .split("\n")
-      .map((l) => `> ${l}`)
+      .map((l) => `> ${markdownEscapeBlock(l)}`)
       .join("\n");
     output += `${detailLines}\n\n`;
   }
@@ -312,7 +316,7 @@ function formatValidateDiagMarkdown(diag: Record<string, unknown>): string {
         : "";
     const ctx =
       typeof snippet["context"] === "string"
-        ? ` in ${htmlEscape(snippet["context"])}`
+        ? ` in ${markdownEscape(snippet["context"])}`
         : "";
     output += `> \`${snippet["code"]}\`${ctx}${lineInfo}\n`;
   }

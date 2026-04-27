@@ -1,5 +1,8 @@
 import { describe, expect, it } from "vitest";
-import { markdownEscape } from "../../../src/renderable/markdown-escape.js";
+import {
+  markdownEscape,
+  markdownEscapeBlock,
+} from "../../../src/renderable/markdown-escape.js";
 
 describe("markdownEscape", () => {
   it("returns plain text unchanged", () => {
@@ -73,5 +76,46 @@ describe("markdownEscape", () => {
 
   it("returns empty string for empty input", () => {
     expect(markdownEscape("")).toBe("");
+  });
+});
+
+describe("markdownEscapeBlock", () => {
+  it("returns plain text unchanged", () => {
+    expect(markdownEscapeBlock("hello world")).toBe("hello world");
+  });
+
+  it("escapes unordered list triggers at line start", () => {
+    expect(markdownEscapeBlock("- list item")).toBe("\\- list item");
+    expect(markdownEscapeBlock("+ other item")).toBe("\\+ other item");
+  });
+
+  it("does not escape dash/plus without trailing space", () => {
+    expect(markdownEscapeBlock("-compact")).toBe("-compact");
+    expect(markdownEscapeBlock("+compact")).toBe("+compact");
+  });
+
+  it("escapes ordered list triggers at line start", () => {
+    expect(markdownEscapeBlock("1. first")).toBe("1\\. first");
+    expect(markdownEscapeBlock("99) item")).toBe("99\\) item");
+  });
+
+  it("escapes ATX heading triggers at line start", () => {
+    expect(markdownEscapeBlock("# heading")).toBe("\\# heading");
+    expect(markdownEscapeBlock("### deep")).toBe("\\### deep");
+  });
+
+  it("does not escape blockquote trigger (already entity-encoded by inline escaping)", () => {
+    // `>` is entity-encoded to `&gt;` by markdownEscape, which prevents
+    // block-level blockquote parsing without further escaping.
+    expect(markdownEscapeBlock("> nested")).toBe("&gt; nested");
+  });
+
+  it("still applies inline escaping", () => {
+    expect(markdownEscapeBlock("- **bold**")).toBe("\\- \\*\\*bold\\*\\*");
+  });
+
+  it("does not escape mid-line triggers", () => {
+    expect(markdownEscapeBlock("text - item")).toBe("text - item");
+    expect(markdownEscapeBlock("text > quote")).toBe("text &gt; quote");
   });
 });

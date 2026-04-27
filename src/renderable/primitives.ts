@@ -13,7 +13,7 @@
 
 import type { OutputFormat, Renderable } from "./types.js";
 import { htmlEscape } from "./html-escape.js";
-import { markdownEscape } from "./markdown-escape.js";
+import { markdownEscape, markdownEscapeBlock } from "./markdown-escape.js";
 
 // ---------------------------------------------------------------------------
 // Empty
@@ -132,7 +132,9 @@ export class Blockquote implements Renderable {
   render(format: OutputFormat): string {
     if (format === "markdown") {
       const lines = this.text.split("\n");
-      return lines.map((l) => `> ${markdownEscape(l)}`).join("\n") + "\n\n";
+      return (
+        lines.map((l) => `> ${markdownEscapeBlock(l)}`).join("\n") + "\n\n"
+      );
     }
     return `<blockquote><p>${htmlEscape(this.text).replace(/\n/g, "<br>")}</p></blockquote>\n`;
   }

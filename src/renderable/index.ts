@@ -10,7 +10,7 @@
  */
 
 export { htmlEscape } from "./html-escape.js";
-export { markdownEscape } from "./markdown-escape.js";
+export { markdownEscape, markdownEscapeBlock } from "./markdown-escape.js";
 export {
   mdCodeSpan,
   renderNote,

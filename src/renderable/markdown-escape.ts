@@ -43,6 +43,9 @@ const ESCAPE_MAP: ReadonlyMap<string, string> = new Map([
  * Escapes both markdown formatting characters (backslash-prefixed) and
  * HTML characters (entity-encoded) to prevent markdown injection and
  * inline HTML rendering.
+ *
+ * This handles inline contexts only. For block contexts (e.g. blockquote
+ * lines), call {@link markdownEscapeBlock} instead.
  */
 export function markdownEscape(text: string): string {
   let result = "";
@@ -51,4 +54,25 @@ export function markdownEscape(text: string): string {
     result += replacement ?? ch;
   }
   return result;
+}
+
+/**
+ * Escape text for a markdown block context (e.g. inside a blockquote line).
+ *
+ * Applies inline escaping first, then escapes any block-level triggers
+ * that would be parsed at the start of the line. Only patterns that survive
+ * inline escaping need handling here — `>` is already entity-encoded to
+ * `&gt;` by inline escaping and `* ` becomes `\* ` which doesn't trigger
+ * a list.
+ */
+export function markdownEscapeBlock(text: string): string {
+  let escaped = markdownEscape(text);
+  // Unordered list: `- ` / `+ ` → `\- ` / `\+ `
+  escaped = escaped.replace(/^([-+])(?=[ \t])/, "\\$1");
+  // Ordered list: `1. ` / `1) ` → `1\. ` / `1\) ` (digits aren't punctuation
+  // so we escape the delimiter, not the digit)
+  escaped = escaped.replace(/^(\d{1,9})([.)])(?=[ \t])/, "$1\\$2");
+  // ATX heading: `# ` → `\# `
+  escaped = escaped.replace(/^(#{1,6})(?=[ \t])/, "\\$1");
+  return escaped;
 }

@@ -10,7 +10,10 @@ import type { UIDiagnosticSnippet } from "../model/index.js";
 import { Blockquote } from "../renderable/primitives.js";
 import { DIAGNOSTIC_ERROR, DIAGNOSTIC_WARNING } from "../model/status-icons.js";
 import { htmlEscape } from "../renderable/html-escape.js";
-import { markdownEscape } from "../renderable/markdown-escape.js";
+import {
+  markdownEscape,
+  markdownEscapeBlock,
+} from "../renderable/markdown-escape.js";
 import { mdCodeSpan } from "../renderable/helpers.js";
 
 /**
@@ -181,7 +184,7 @@ function renderSnippetValue(
   format: OutputFormat,
 ): string {
   if (format === "markdown") {
-    return `> ${markdownEscape(traversal)} = ${markdownEscape(statement)}\n\n`;
+    return `> ${markdownEscapeBlock(traversal)} = ${markdownEscape(statement)}\n\n`;
   }
   return `<blockquote><p>${htmlEscape(traversal)} = ${htmlEscape(statement)}</p></blockquote>\n`;
 }

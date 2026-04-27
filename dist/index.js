@@ -2334,6 +2334,13 @@ function markdownEscape(text) {
   }
   return result;
 }
+function markdownEscapeBlock(text) {
+  let escaped = markdownEscape(text);
+  escaped = escaped.replace(/^([-+])(?=[ \t])/, "\\$1");
+  escaped = escaped.replace(/^(\d{1,9})([.)])(?=[ \t])/, "$1\\$2");
+  escaped = escaped.replace(/^(#{1,6})(?=[ \t])/, "\\$1");
+  return escaped;
+}
 
 // src/renderable/primitives.ts
 var Empty = class {
@@ -2401,7 +2408,7 @@ var Blockquote = class {
   render(format) {
     if (format === "markdown") {
       const lines = this.text.split("\n");
-      return lines.map((l) => `> ${markdownEscape(l)}`).join("\n") + "\n\n";
+      return lines.map((l) => `> ${markdownEscapeBlock(l)}`).join("\n") + "\n\n";
     }
     return `<blockquote><p>${htmlEscape(this.text).replace(/\n/g, "<br>")}</p></blockquote>
 `;
@@ -3078,7 +3085,7 @@ function renderSnippetLine(code, context, filename, startLine, format) {
 }
 function renderSnippetValue(traversal, statement, format) {
   if (format === "markdown") {
-    return `> ${markdownEscape(traversal)} = ${markdownEscape(statement)}
+    return `> ${markdownEscapeBlock(traversal)} = ${markdownEscape(statement)}
 
 `;
   }
@@ -3275,10 +3282,10 @@ function formatValidateDiagMarkdown(diag) {
   const icon = severity === "warning" ? DIAGNOSTIC_WARNING : DIAGNOSTIC_ERROR;
   const summary = typeof diag["summary"] === "string" ? diag["summary"] : "(unknown)";
   const detail = typeof diag["detail"] === "string" ? diag["detail"] : "";
-  let output = `${icon} **${htmlEscape(summary)}**
+  let output = `${icon} **${markdownEscape(summary)}**
 `;
   if (detail) {
-    const detailLines = htmlEscape(detail).split("\n").map((l) => `> ${l}`).join("\n");
+    const detailLines = detail.split("\n").map((l) => `> ${markdownEscapeBlock(l)}`).join("\n");
     output += `${detailLines}
 
 `;
@@ -3286,7 +3293,7 @@ function formatValidateDiagMarkdown(diag) {
   const snippet = diag["snippet"];
   if (snippet && typeof snippet["code"] === "string") {
     const lineInfo = typeof snippet["start_line"] === "number" ? ` (line ${String(snippet["start_line"])})` : "";
-    const ctx = typeof snippet["context"] === "string" ? ` in ${htmlEscape(snippet["context"])}` : "";
+    const ctx = typeof snippet["context"] === "string" ? ` in ${markdownEscape(snippet["context"])}` : "";
     output += `> \`${snippet["code"]}\`${ctx}${lineInfo}
 `;
   }
@@ -3544,7 +3551,7 @@ function renderExitCode(exitCode, format) {
 }
 function renderWarningBlockquote(text, format) {
   if (format === "markdown") {
-    return `> ${markdownEscape(text)}
+    return `> ${markdownEscapeBlock(text)}
 
 `;
   }

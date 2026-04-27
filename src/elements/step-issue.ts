@@ -13,7 +13,10 @@ import type { StepIssue } from "../model/step-issue.js";
 import { Blockquote, Details } from "../renderable/primitives.js";
 import { detailsSummary, mdCodeSpan } from "../renderable/helpers.js";
 import { htmlEscape } from "../renderable/html-escape.js";
-import { markdownEscape } from "../renderable/markdown-escape.js";
+import {
+  markdownEscape,
+  markdownEscapeBlock,
+} from "../renderable/markdown-escape.js";
 import { STATUS_FAILURE, DIAGNOSTIC_WARNING } from "../model/status-icons.js";
 import { buildRawOutputRenderable } from "./raw-output.js";
 
@@ -139,7 +142,7 @@ function renderExitCode(exitCode: string, format: OutputFormat): string {
 /** Renders a warning blockquote. */
 function renderWarningBlockquote(text: string, format: OutputFormat): string {
   if (format === "markdown") {
-    return `> ${markdownEscape(text)}\n\n`;
+    return `> ${markdownEscapeBlock(text)}\n\n`;
   }
   return `<blockquote><p>${htmlEscape(text)}</p></blockquote>\n`;
 }

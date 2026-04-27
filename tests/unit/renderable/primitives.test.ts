@@ -144,6 +144,11 @@ describe("Blockquote", () => {
     );
   });
 
+  it("escapes block-level triggers in markdown blockquote content", () => {
+    const bq = new Blockquote("- list item\n> nested");
+    expect(bq.render("markdown")).toBe("> \\- list item\n> &gt; nested\n\n");
+  });
+
   it("satisfies size invariant", () => {
     assertSizeInvariant(new Blockquote("test"), "Blockquote");
     assertSizeInvariant(new Blockquote("a\nb\nc"), "Blockquote multiline");
