@@ -117,7 +117,7 @@ describe("DiagnosticsElement", () => {
     ];
     const el = new DiagnosticsElement("diag", diags);
     const md = el.render("markdown", 0);
-    expect(md).toContain("`aws_instance.web`");
+    expect(md).toContain("`aws\\_instance.web`");
   });
 
   it("satisfies the size invariant for errors only", () => {

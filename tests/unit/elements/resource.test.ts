@@ -45,7 +45,7 @@ describe("buildResourceRenderable - level 0 (listing)", () => {
       0,
     );
     const md = r.render("markdown");
-    expect(md).toContain("aws_instance.web");
+    expect(md).toContain("aws\\_instance.web");
     // Contains an emoji/symbol for create action
     expect(md.length).toBeGreaterThan("aws_instance.web".length);
     assertSizeInvariant(r, "listing");
@@ -119,7 +119,7 @@ describe("buildResourceRenderable - level 1 (compact)", () => {
       1,
     );
     const md = r.render("markdown");
-    expect(md).toContain("aws_instance.old");
+    expect(md).toContain("aws\\_instance.old");
     assertSizeInvariant(r, "compact-moved");
   });
 });

@@ -7,17 +7,13 @@
  * objects that can render to both markdown and HTML.
  */
 
-import type { Renderable } from "../renderable/types.js";
+import type { Renderable, OutputFormat } from "../renderable/types.js";
 import type { DiffEntry } from "../diff/types.js";
-import {
-  Details,
-  CodeBlock,
-  HtmlText,
-  EMPTY,
-} from "../renderable/primitives.js";
+import { Details, CodeBlock, EMPTY } from "../renderable/primitives.js";
 import { buildLineDiff } from "../diff/line-diff.js";
 import { buildCharDiff } from "../diff/char-diff.js";
 import { htmlEscape } from "../renderable/html-escape.js";
+import { detailsSummary, htmlCodeCell } from "../renderable/helpers.js";
 
 /** Number of unchanged lines to show around each changed hunk in context diffs. */
 const CONTEXT_LINES = 3;
@@ -32,7 +28,7 @@ export type DiffFormat = "inline" | "simple";
 /**
  * Formats a before/after pair as an inline diff suitable for a table cell.
  *
- * Returns an HtmlText renderable (identical in both formats since table cells
+ * Returns a Renderable (identical in both formats since table cells
  * contain HTML in both markdown and HTML contexts).
  *
  * - Both null/empty: returns EMPTY
@@ -51,70 +47,16 @@ export function buildInlineDiff(
   if (b === "" && a === "") return EMPTY;
 
   if (b === a) {
-    return new HtmlText(inlineCodeCell(b));
+    return htmlCodeCell(b);
   }
 
   if (format === "simple") {
-    const parts: string[] = [];
-    if (b !== "") parts.push(`- ${escapeCell(htmlEscape(b))}`);
-    if (a !== "") parts.push(`+ ${escapeCell(htmlEscape(a))}`);
-    return new HtmlText(parts.join("<br>"));
+    return simpleDiffCell(b, a);
   }
 
   // Inline format — character-level diff per line
-  const beforeLines = b.split("\n");
-  const afterLines = a.split("\n");
-  const maxLen = Math.max(beforeLines.length, afterLines.length);
-  const resultLines: string[] = [];
-
-  for (let i = 0; i < maxLen; i++) {
-    const bl = beforeLines[i] ?? "";
-    const al = afterLines[i] ?? "";
-
-    if (bl === al) {
-      resultLines.push(escapeHtmlCell(bl));
-      continue;
-    }
-
-    const charDiff = buildCharDiff(bl, al);
-    let line = "";
-    let delBuf = "";
-    let insBuf = "";
-
-    function flushBuffers(): void {
-      if (delBuf) {
-        line += `<del style="background:#fdd">${escapeHtmlCell(delBuf)}</del>`;
-        delBuf = "";
-      }
-      if (insBuf) {
-        line += `<ins style="background:#dfd">${escapeHtmlCell(insBuf)}</ins>`;
-        insBuf = "";
-      }
-    }
-
-    for (const entry of charDiff) {
-      if (entry.kind === "removed") {
-        if (insBuf) {
-          flushBuffers();
-        }
-        delBuf += entry.value;
-      } else if (entry.kind === "added") {
-        insBuf += entry.value;
-      } else {
-        flushBuffers();
-        line += escapeHtmlCell(entry.value);
-      }
-    }
-    flushBuffers();
-    resultLines.push(line);
-  }
-
-  return new HtmlText(`<code>${resultLines.join("<br>")}</code>`);
+  return new InlineCharDiffCell(b, a);
 }
-
-// ---------------------------------------------------------------------------
-// Large value diffs (full and context)
-// ---------------------------------------------------------------------------
 
 /**
  * Builds a collapsible details block for a large attribute value showing
@@ -263,8 +205,8 @@ function buildDetailsBlock(
     ? ` (large value; +${String(addedLines)}, -${String(removedLines)})`
     : " (large value)";
 
-  const summaryHtml = `${htmlEscape(name)}${suffix}`;
-  return new Details(new HtmlText(summaryHtml), content);
+  const summary = detailsSummary(name + suffix);
+  return new Details(summary, content);
 }
 
 /** Try JSON pretty-print, fall back to original value. */
@@ -281,17 +223,107 @@ function prettyPrint(value: string): string {
   return value;
 }
 
-/** Escape pipe characters for HTML table cell context. */
-function escapeCell(value: string): string {
-  return value.replace(/\\/g, "\\\\").replace(/\|/g, "\\|");
-}
+// ---------------------------------------------------------------------------
+// Semantic diff cell renderables
+// ---------------------------------------------------------------------------
 
 /** Escape HTML + pipe for table cell context. */
 function escapeHtmlCell(value: string): string {
   return htmlEscape(value).replace(/\|/g, "&#124;");
 }
 
-/** Wrap value in `<code>` with HTML + pipe escaping. */
-function inlineCodeCell(value: string): string {
-  return `<code>${htmlEscape(value).replace(/\|/g, "&#124;")}</code>`;
+/**
+ * Simple diff cell — renders `- before<br>+ after` with proper escaping.
+ * Stores raw before/after; escapes at render time.
+ */
+function simpleDiffCell(before: string, after: string): Renderable {
+  return {
+    size(format: OutputFormat): number {
+      return this.render(format).length;
+    },
+    render(format: OutputFormat): string {
+      const parts: string[] = [];
+      if (before !== "") parts.push(`- ${escapeHtmlCell(before)}`);
+      if (after !== "") parts.push(`+ ${escapeHtmlCell(after)}`);
+      const html = parts.join("<br>");
+      if (format === "markdown") {
+        return html.replace(/\|/g, "&#124;");
+      }
+      return html;
+    },
+  };
+}
+
+/**
+ * Inline character-level diff cell — renders `<code>` block with
+ * `<del>`/`<ins>` annotations for changed characters.
+ * Stores raw before/after; computes diff at render time.
+ */
+class InlineCharDiffCell implements Renderable {
+  private readonly before: string;
+  private readonly after: string;
+
+  constructor(before: string, after: string) {
+    this.before = before;
+    this.after = after;
+  }
+
+  size(format: OutputFormat): number {
+    return this.render(format).length;
+  }
+
+  render(format: OutputFormat): string {
+    const beforeLines = this.before.split("\n");
+    const afterLines = this.after.split("\n");
+    const maxLen = Math.max(beforeLines.length, afterLines.length);
+    const resultLines: string[] = [];
+
+    for (let i = 0; i < maxLen; i++) {
+      const bl = beforeLines[i] ?? "";
+      const al = afterLines[i] ?? "";
+
+      if (bl === al) {
+        resultLines.push(escapeHtmlCell(bl));
+        continue;
+      }
+
+      const charDiff = buildCharDiff(bl, al);
+      let line = "";
+      let delBuf = "";
+      let insBuf = "";
+
+      const flushBuffers = (): void => {
+        if (delBuf) {
+          line += `<del style="background:#fdd">${escapeHtmlCell(delBuf)}</del>`;
+          delBuf = "";
+        }
+        if (insBuf) {
+          line += `<ins style="background:#dfd">${escapeHtmlCell(insBuf)}</ins>`;
+          insBuf = "";
+        }
+      };
+
+      for (const entry of charDiff) {
+        if (entry.kind === "removed") {
+          if (insBuf) {
+            flushBuffers();
+          }
+          delBuf += entry.value;
+        } else if (entry.kind === "added") {
+          insBuf += entry.value;
+        } else {
+          flushBuffers();
+          line += escapeHtmlCell(entry.value);
+        }
+      }
+      flushBuffers();
+      resultLines.push(line);
+    }
+
+    const html = `<code>${resultLines.join("<br>")}</code>`;
+    if (format === "markdown") {
+      return html.replace(/\|/g, "&#124;");
+    }
+    return html;
+  }
 }

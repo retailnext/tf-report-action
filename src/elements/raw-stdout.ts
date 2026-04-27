@@ -3,10 +3,10 @@
  * details section (used when structured + raw content coexist in a report).
  */
 
-import type { Renderable, OutputFormat } from "../renderable/types.js";
+import type { OutputFormat } from "../renderable/types.js";
 import type { ReportElement } from "../renderable/types.js";
-import { Details, HtmlText } from "../renderable/primitives.js";
-import { htmlEscape } from "../renderable/html-escape.js";
+import { Details } from "../renderable/primitives.js";
+import { detailsSummary } from "../renderable/helpers.js";
 import { buildRawOutputRenderable } from "./raw-output.js";
 
 /**
@@ -17,22 +17,24 @@ export class RawStdoutElement implements ReportElement {
   readonly fixed = true;
   readonly levels = 1;
 
-  private readonly renderable: Renderable;
+  private readonly label: string;
+  private readonly content: string;
 
   constructor(stepId: string, label: string, content: string) {
     this.id = `raw-${stepId}`;
-    const escapedLabel = htmlEscape(label);
-    const formatted = buildRawOutputRenderable(content);
-    this.renderable = new Details(new HtmlText(escapedLabel), formatted);
+    this.label = label;
+    this.content = content;
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   size(format: OutputFormat, _level: number): number {
-    return this.renderable.size(format);
+    return this.render(format, 0).length;
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   render(format: OutputFormat, _level: number): string {
-    return this.renderable.render(format);
+    const summary = detailsSummary(this.label);
+    const formatted = buildRawOutputRenderable(this.content);
+    return new Details(summary, formatted).render(format);
   }
 }

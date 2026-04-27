@@ -7,13 +7,11 @@ import {
   EMPTY,
   Empty,
   Heading,
-  HtmlText,
   InlineDiff,
-  Paragraph,
-  RawText,
   Sequence,
   Table,
 } from "../../../src/renderable/primitives.js";
+import { textCell, detailsSummary } from "../../../src/renderable/helpers.js";
 
 /**
  * Verify the core size invariant: size(format) === render(format).length
@@ -49,50 +47,6 @@ describe("Empty", () => {
 });
 
 // ---------------------------------------------------------------------------
-// RawText
-// ---------------------------------------------------------------------------
-
-describe("RawText", () => {
-  it("renders text verbatim in markdown", () => {
-    const r = new RawText("hello <world>");
-    expect(r.render("markdown")).toBe("hello <world>");
-  });
-
-  it("HTML-escapes in html format", () => {
-    const r = new RawText("hello <world>");
-    expect(r.render("html")).toBe("hello &lt;world&gt;");
-  });
-
-  it("satisfies size invariant", () => {
-    assertSizeInvariant(new RawText("a & b < c"), "RawText");
-  });
-
-  it("handles empty string", () => {
-    const r = new RawText("");
-    expect(r.size("markdown")).toBe(0);
-    expect(r.size("html")).toBe(0);
-    assertSizeInvariant(r, "RawText empty");
-  });
-});
-
-// ---------------------------------------------------------------------------
-// HtmlText
-// ---------------------------------------------------------------------------
-
-describe("HtmlText", () => {
-  it("renders same content in both formats", () => {
-    const h = new HtmlText("<del>old</del><ins>new</ins>");
-    const expected = "<del>old</del><ins>new</ins>";
-    expect(h.render("markdown")).toBe(expected);
-    expect(h.render("html")).toBe(expected);
-  });
-
-  it("satisfies size invariant", () => {
-    assertSizeInvariant(new HtmlText("<b>bold</b>"), "HtmlText");
-  });
-});
-
-// ---------------------------------------------------------------------------
 // Heading
 // ---------------------------------------------------------------------------
 
@@ -118,34 +72,14 @@ describe("Heading", () => {
     expect(h.render("html")).toBe("<h2>A &amp; B &lt;C&gt;</h2>\n");
   });
 
+  it("escapes markdown and HTML chars in heading text for markdown format", () => {
+    const h = new Heading("A & B <C>");
+    expect(h.render("markdown")).toBe("## A &amp; B &lt;C&gt;\n\n");
+  });
+
   it("satisfies size invariant", () => {
     assertSizeInvariant(new Heading("Test"), "Heading");
     assertSizeInvariant(new Heading("A & B", 4), "Heading h4");
-  });
-});
-
-// ---------------------------------------------------------------------------
-// Paragraph
-// ---------------------------------------------------------------------------
-
-describe("Paragraph", () => {
-  it("renders markdown paragraph", () => {
-    const p = new Paragraph("Hello world");
-    expect(p.render("markdown")).toBe("Hello world\n\n");
-  });
-
-  it("renders HTML paragraph", () => {
-    const p = new Paragraph("Hello world");
-    expect(p.render("html")).toBe("<p>Hello world</p>\n");
-  });
-
-  it("escapes HTML in content", () => {
-    const p = new Paragraph("x < y & z");
-    expect(p.render("html")).toBe("<p>x &lt; y &amp; z</p>\n");
-  });
-
-  it("satisfies size invariant", () => {
-    assertSizeInvariant(new Paragraph("test"), "Paragraph");
   });
 });
 
@@ -200,13 +134,15 @@ describe("Blockquote", () => {
 
   it("renders HTML blockquote", () => {
     const bq = new Blockquote("note");
-    expect(bq.render("html")).toBe("<blockquote><p>note</p></blockquote>\n");
+    expect(bq.render("html")).toBe(
+      "<blockquote><pre><samp>note</samp></pre></blockquote>\n",
+    );
   });
 
   it("escapes HTML in blockquote content", () => {
     const bq = new Blockquote("a < b");
     expect(bq.render("html")).toBe(
-      "<blockquote><p>a &lt; b</p></blockquote>\n",
+      "<blockquote><pre><samp>a &lt; b</samp></pre></blockquote>\n",
     );
   });
 
@@ -223,8 +159,8 @@ describe("Blockquote", () => {
 describe("Table", () => {
   it("renders markdown table", () => {
     const t = new Table(
-      [new RawText("Name"), new RawText("Value")],
-      [{ cells: [new RawText("a"), new RawText("1")] }],
+      [textCell("Name"), textCell("Value")],
+      [{ cells: [textCell("a"), textCell("1")] }],
     );
     const md = t.render("markdown");
     expect(md).toContain("| Name | Value |");
@@ -234,8 +170,8 @@ describe("Table", () => {
 
   it("renders HTML table", () => {
     const t = new Table(
-      [new RawText("Name"), new RawText("Value")],
-      [{ cells: [new RawText("a"), new RawText("1")] }],
+      [textCell("Name"), textCell("Value")],
+      [{ cells: [textCell("a"), textCell("1")] }],
     );
     const html = t.render("html");
     expect(html).toContain("<table>");
@@ -247,26 +183,23 @@ describe("Table", () => {
   });
 
   it("renders empty body", () => {
-    const t = new Table([new RawText("H")], []);
+    const t = new Table([textCell("H")], []);
     assertSizeInvariant(t, "Table empty body");
   });
 
   it("satisfies size invariant with multiple rows", () => {
     const t = new Table(
-      [new RawText("A"), new RawText("B"), new RawText("C")],
+      [textCell("A"), textCell("B"), textCell("C")],
       [
-        { cells: [new RawText("1"), new RawText("2"), new RawText("3")] },
-        { cells: [new RawText("x"), new RawText("y"), new RawText("z")] },
+        { cells: [textCell("1"), textCell("2"), textCell("3")] },
+        { cells: [textCell("x"), textCell("y"), textCell("z")] },
       ],
     );
     assertSizeInvariant(t, "Table 3x2");
   });
 
   it("handles cells with HTML entities", () => {
-    const t = new Table(
-      [new RawText("Key")],
-      [{ cells: [new RawText("a<b")] }],
-    );
+    const t = new Table([textCell("Key")], [{ cells: [textCell("a<b")] }]);
     assertSizeInvariant(t, "Table with entities");
     expect(t.render("html")).toContain("<td>a&lt;b</td>");
   });
@@ -278,7 +211,7 @@ describe("Table", () => {
 
 describe("Details", () => {
   it("renders markdown details", () => {
-    const d = new Details(new RawText("Summary"), new RawText("Content"));
+    const d = new Details(textCell("Summary"), textCell("Content"));
     const md = d.render("markdown");
     expect(md).toContain("<details>");
     expect(md).toContain("<summary>Summary</summary>");
@@ -287,7 +220,7 @@ describe("Details", () => {
   });
 
   it("renders HTML details", () => {
-    const d = new Details(new RawText("Summary"), new RawText("Content"));
+    const d = new Details(textCell("Summary"), textCell("Content"));
     const html = d.render("html");
     expect(html).toContain("<details>");
     expect(html).toContain("<summary>Summary</summary>");
@@ -296,40 +229,37 @@ describe("Details", () => {
   });
 
   it("supports open attribute", () => {
-    const d = new Details(new RawText("S"), new RawText("C"), true);
+    const d = new Details(textCell("S"), textCell("C"), true);
     expect(d.render("markdown")).toContain("<details open>");
     expect(d.render("html")).toContain("<details open>");
   });
 
-  it("escapes HTML in RawText summary", () => {
-    const d = new Details(new RawText("A & B <C>"), EMPTY);
+  it("escapes HTML in textCell summary", () => {
+    const d = new Details(textCell("A & B <C>"), EMPTY);
     expect(d.render("markdown")).toContain(
       "<summary>A &amp; B &lt;C&gt;</summary>",
     );
   });
 
-  it("passes through HtmlText summary unchanged", () => {
-    const d = new Details(new HtmlText("<strong>Type</strong> name"), EMPTY);
+  it("passes through detailsSummary escaped", () => {
+    const d = new Details(detailsSummary("Type & name"), EMPTY);
     expect(d.render("markdown")).toContain(
-      "<summary><strong>Type</strong> name</summary>",
+      "<summary>Type &amp; name</summary>",
     );
   });
 
   it("satisfies size invariant", () => {
     assertSizeInvariant(
-      new Details(new RawText("Summary"), new RawText("body text")),
+      new Details(textCell("Summary"), textCell("body text")),
       "Details",
     );
     assertSizeInvariant(
-      new Details(new RawText("Open"), new CodeBlock("code", "js"), true),
+      new Details(textCell("Open"), new CodeBlock("code", "js"), true),
       "Details open",
     );
     assertSizeInvariant(
-      new Details(
-        new HtmlText("<strong>Bold</strong>"),
-        new RawText("content"),
-      ),
-      "Details with HtmlText summary",
+      new Details(detailsSummary("Bold"), textCell("content")),
+      "Details with detailsSummary",
     );
   });
 });
@@ -374,13 +304,13 @@ describe("InlineDiff", () => {
 
 describe("Sequence", () => {
   it("concatenates children renders", () => {
-    const seq = new Sequence([new RawText("hello"), new RawText(" world")]);
+    const seq = new Sequence([textCell("hello"), textCell(" world")]);
     expect(seq.render("markdown")).toBe("hello world");
   });
 
   it("uses separator between children", () => {
     const seq = new Sequence(
-      [new RawText("a"), new RawText("b"), new RawText("c")],
+      [textCell("a"), textCell("b"), textCell("c")],
       ", ",
     );
     expect(seq.render("markdown")).toBe("a, b, c");
@@ -393,33 +323,30 @@ describe("Sequence", () => {
   });
 
   it("renders single child without separator", () => {
-    const seq = new Sequence([new RawText("only")], ", ");
+    const seq = new Sequence([textCell("only")], ", ");
     expect(seq.render("markdown")).toBe("only");
   });
 
   it("computes size as sum of children + separators", () => {
-    const seq = new Sequence([new RawText("a"), new RawText("b")], " | ");
+    const seq = new Sequence([textCell("a"), textCell("b")], " | ");
     // "a" + " | " + "b" = 1 + 3 + 1 = 5
     expect(seq.size("markdown")).toBe(5);
   });
 
   it("satisfies size invariant", () => {
     assertSizeInvariant(
-      new Sequence([new RawText("hello"), new Paragraph("world")]),
+      new Sequence([textCell("hello"), textCell("world")]),
       "Sequence",
     );
     assertSizeInvariant(
-      new Sequence(
-        [new RawText("a"), new RawText("b<c>"), new RawText("d")],
-        "\n",
-      ),
+      new Sequence([textCell("a"), textCell("b<c>"), textCell("d")], "\n"),
       "Sequence with sep",
     );
   });
 
   it("handles nested sequences", () => {
-    const inner = new Sequence([new RawText("a"), new RawText("b")]);
-    const outer = new Sequence([inner, new RawText("c")], " ");
+    const inner = new Sequence([textCell("a"), textCell("b")]);
+    const outer = new Sequence([inner, textCell("c")], " ");
     assertSizeInvariant(outer, "nested Sequence");
     expect(outer.render("markdown")).toBe("ab c");
   });
@@ -433,21 +360,18 @@ describe("composite tree", () => {
   it("satisfies size invariant for a complex tree", () => {
     const tree = new Sequence([
       new Heading("Report", 2),
-      new Paragraph("Summary of changes"),
+      textCell("Summary of changes\n\n"),
       new Details(
-        new RawText("Resource changes"),
+        textCell("Resource changes"),
         new Sequence([
           new Table(
-            [new RawText("Name"), new RawText("Action")],
+            [textCell("Name"), textCell("Action")],
             [
               {
-                cells: [new RawText("aws_instance.web"), new RawText("create")],
+                cells: [textCell("aws_instance.web"), textCell("create")],
               },
               {
-                cells: [
-                  new RawText("aws_s3_bucket.data"),
-                  new RawText("update"),
-                ],
+                cells: [textCell("aws_s3_bucket.data"), textCell("update")],
               },
             ],
           ),
@@ -466,15 +390,15 @@ describe("composite tree", () => {
     const md = tree.render("markdown");
     expect(md).toContain("## Report");
     expect(md).toContain("Summary of changes");
-    expect(md).toContain("aws_instance.web");
+    expect(md).toContain("aws\\_instance.web");
     expect(md).toContain("```hcl");
     expect(md).toContain("> Warning:");
 
     const html = tree.render("html");
     expect(html).toContain("<h2>Report</h2>");
-    expect(html).toContain("<p>Summary of changes</p>");
+    expect(html).toContain("Summary of changes");
     expect(html).toContain("<table>");
     expect(html).toContain("<pre><code");
-    expect(html).toContain("<blockquote>");
+    expect(html).toContain("<pre><samp>");
   });
 });

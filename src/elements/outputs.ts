@@ -14,15 +14,13 @@
 import type { Renderable } from "../renderable/types.js";
 import type { OutputChange } from "../model/output.js";
 import type { DiffEntry } from "../diff/types.js";
-import {
-  Table,
-  Sequence,
-  RawText,
-  HtmlText,
-  EMPTY,
-} from "../renderable/primitives.js";
+import { Table, Sequence, EMPTY } from "../renderable/primitives.js";
 import { ACTION_SYMBOLS } from "../model/plan-action.js";
-import { htmlEscape } from "../renderable/html-escape.js";
+import {
+  textCell,
+  htmlCodeCell,
+  htmlCodeCellMultiline,
+} from "../renderable/helpers.js";
 import {
   buildInlineDiff,
   buildLargeValueDiff,
@@ -70,10 +68,10 @@ export function buildOutputsRenderable(
   // Small outputs in a table
   if (smallOutputs.length > 0) {
     const headers = [
-      new RawText("Output"),
-      new RawText("Action"),
-      new RawText("Before"),
-      new RawText("After"),
+      textCell("Output"),
+      textCell("Action"),
+      textCell("Before"),
+      textCell("After"),
     ];
     const rows: { cells: Renderable[] }[] = [];
 
@@ -83,28 +81,21 @@ export function buildOutputsRenderable(
         output.isSensitive || output.isKnownAfterApply || !useDiff;
 
       const before = output.isSensitive
-        ? new HtmlText(inlineCode("(sensitive)"))
+        ? htmlCodeCell("(sensitive)")
         : output.before !== null
           ? skipDiff
-            ? new HtmlText(inlineCodeCell(output.before))
-            : new HtmlText(
-                `<code>${escapeHtmlCell(output.before).replace(/\n/g, "<br>")}</code>`,
-              )
+            ? htmlCodeCell(output.before)
+            : htmlCodeCellMultiline(output.before)
           : EMPTY;
 
       const after = output.isSensitive
-        ? new HtmlText(inlineCode("(sensitive)"))
+        ? htmlCodeCell("(sensitive)")
         : skipDiff
-          ? new HtmlText(inlineCodeCell(output.after ?? ""))
+          ? htmlCodeCell(output.after ?? "")
           : buildInlineDiff(output.before, output.after, diffFormat);
 
       rows.push({
-        cells: [
-          new HtmlText(escapeCell(output.name)),
-          new RawText(symbol),
-          before,
-          after,
-        ],
+        cells: [textCell(output.name), textCell(symbol), before, after],
       });
     }
 
@@ -131,28 +122,4 @@ export function buildOutputsRenderable(
 
   if (parts.length === 0) return EMPTY;
   return new Sequence(parts);
-}
-
-// ---------------------------------------------------------------------------
-// Escape helpers
-// ---------------------------------------------------------------------------
-
-/** Escape pipe characters for markdown table cells. */
-function escapeCell(value: string): string {
-  return value.replace(/\\/g, "\\\\").replace(/\|/g, "\\|");
-}
-
-/** Escape HTML + pipe for table cell context. */
-function escapeHtmlCell(value: string): string {
-  return htmlEscape(value).replace(/\|/g, "&#124;");
-}
-
-/** Wrap value in `<code>` with HTML escaping. */
-function inlineCode(value: string): string {
-  return `<code>${htmlEscape(value)}</code>`;
-}
-
-/** Wrap value in `<code>` with HTML + pipe escaping. */
-function inlineCodeCell(value: string): string {
-  return `<code>${htmlEscape(value).replace(/\|/g, "&#124;")}</code>`;
 }

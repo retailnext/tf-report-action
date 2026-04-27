@@ -64,7 +64,7 @@ describe("buildOutputsRenderable - basic rendering", () => {
     const outputs = [makeOutput({ name: "vpc_id", after: "vpc-12345" })];
     const r = buildOutputsRenderable(outputs, {}, new Map(), 2);
     const md = r.render("markdown");
-    expect(md).toContain("vpc_id");
+    expect(md).toContain("vpc\\_id");
     assertSizeInvariant(r, "basic");
   });
 
@@ -94,7 +94,7 @@ describe("buildOutputsRenderable - basic rendering", () => {
     ];
     const r = buildOutputsRenderable(outputs, {}, new Map(), 2);
     const md = r.render("markdown");
-    expect(md).toContain("future_ip");
+    expect(md).toContain("future\\_ip");
     assertSizeInvariant(r, "known-after");
   });
 });

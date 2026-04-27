@@ -180,6 +180,6 @@ describe("OutputCategoryElement", () => {
       new Map(),
     );
     const md = el.render("markdown", 2);
-    expect(md).toContain("vpc_id");
+    expect(md).toContain("vpc\\_id");
   });
 });

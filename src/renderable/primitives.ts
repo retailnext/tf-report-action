@@ -3,7 +3,8 @@
  *
  * Each class implements {@link Renderable} and knows how to render itself
  * to both markdown and HTML. Classes are immutable: content is fixed at
- * construction time, and sizes for both formats are eagerly cached.
+ * construction time. All formatting and escaping happens in `render()` —
+ * constructors store only raw semantic data.
  *
  * Composites (Sequence, Table, Details) delegate to their children's
  * `size()` and `render()` methods — the same recursive pattern used in
@@ -11,7 +12,8 @@
  */
 
 import type { OutputFormat, Renderable } from "./types.js";
-import { htmlEscape, htmlEscapeSize } from "./html-escape.js";
+import { htmlEscape } from "./html-escape.js";
+import { markdownEscape } from "./markdown-escape.js";
 
 // ---------------------------------------------------------------------------
 // Empty
@@ -33,63 +35,6 @@ export class Empty implements Renderable {
 export const EMPTY: Renderable = new Empty();
 
 // ---------------------------------------------------------------------------
-// RawText
-// ---------------------------------------------------------------------------
-
-/**
- * Verbatim text in markdown, HTML-escaped in HTML format.
- *
- * Use for text that should appear as-is in markdown but needs entity
- * escaping in HTML (e.g. user-provided labels, attribute names).
- */
-export class RawText implements Renderable {
-  private readonly text: string;
-  private readonly mdSize: number;
-  private readonly htSize: number;
-
-  constructor(text: string) {
-    this.text = text;
-    this.mdSize = text.length;
-    this.htSize = htmlEscapeSize(text);
-  }
-
-  size(format: OutputFormat): number {
-    return format === "markdown" ? this.mdSize : this.htSize;
-  }
-
-  render(format: OutputFormat): string {
-    return format === "markdown" ? this.text : htmlEscape(this.text);
-  }
-}
-
-// ---------------------------------------------------------------------------
-// HtmlText
-// ---------------------------------------------------------------------------
-
-/**
- * Text that is already safe HTML and should pass through verbatim in both
- * formats. Use for content containing intentional HTML markup (e.g. inline
- * diff tags `<del>/<ins>`) that is valid in both GitHub markdown and HTML.
- */
-export class HtmlText implements Renderable {
-  private readonly html: string;
-
-  constructor(html: string) {
-    this.html = html;
-  }
-
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  size(format: OutputFormat): number {
-    return this.html.length;
-  }
-
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  render(format: OutputFormat): string {
-    return this.html;
-  }
-}
-
-// ---------------------------------------------------------------------------
 // Heading
 // ---------------------------------------------------------------------------
 
@@ -98,50 +43,28 @@ export class HtmlText implements Renderable {
  *
  * - Markdown: `## text\n\n`
  * - HTML: `<hN>text</hN>\n`
+ *
+ * Text is escaped at render time — `markdownEscape` for markdown,
+ * `htmlEscape` for HTML.
  */
 export class Heading implements Renderable {
-  private readonly mdStr: string;
-  private readonly htStr: string;
+  private readonly text: string;
+  private readonly level: 1 | 2 | 3 | 4 | 5 | 6;
 
   constructor(text: string, level: 1 | 2 | 3 | 4 | 5 | 6 = 2) {
-    this.mdStr = `${"#".repeat(level)} ${text}\n\n`;
-    this.htStr = `<h${String(level)}>${htmlEscape(text)}</h${String(level)}>\n`;
+    this.text = text;
+    this.level = level;
   }
 
   size(format: OutputFormat): number {
-    return format === "markdown" ? this.mdStr.length : this.htStr.length;
+    return this.render(format).length;
   }
 
   render(format: OutputFormat): string {
-    return format === "markdown" ? this.mdStr : this.htStr;
-  }
-}
-
-// ---------------------------------------------------------------------------
-// Paragraph
-// ---------------------------------------------------------------------------
-
-/**
- * A paragraph of text.
- *
- * - Markdown: `text\n\n`
- * - HTML: `<p>text</p>\n`
- */
-export class Paragraph implements Renderable {
-  private readonly mdStr: string;
-  private readonly htStr: string;
-
-  constructor(text: string) {
-    this.mdStr = `${text}\n\n`;
-    this.htStr = `<p>${htmlEscape(text)}</p>\n`;
-  }
-
-  size(format: OutputFormat): number {
-    return format === "markdown" ? this.mdStr.length : this.htStr.length;
-  }
-
-  render(format: OutputFormat): string {
-    return format === "markdown" ? this.mdStr : this.htStr;
+    if (format === "markdown") {
+      return `${"#".repeat(this.level)} ${markdownEscape(this.text)}\n\n`;
+    }
+    return `<h${String(this.level)}>${htmlEscape(this.text)}</h${String(this.level)}>\n`;
   }
 }
 
@@ -154,24 +77,33 @@ export class Paragraph implements Renderable {
  *
  * - Markdown: `` ```lang\ncontent\n``` \n\n``
  * - HTML: `<pre><code class="language-lang">escaped</code></pre>\n`
+ *
+ * Code block content is NOT markdown-escaped (it's inside a fenced block
+ * which GitHub treats as literal), but IS html-escaped for HTML output.
+ * The language tag is html-escaped in HTML output.
  */
 export class CodeBlock implements Renderable {
-  private readonly mdStr: string;
-  private readonly htStr: string;
+  private readonly content: string;
+  private readonly language: string;
 
   constructor(content: string, language = "") {
-    this.mdStr = `\`\`\`${language}\n${content}\n\`\`\`\n\n`;
-    const langAttr =
-      language.length > 0 ? ` class="language-${htmlEscape(language)}"` : "";
-    this.htStr = `<pre><code${langAttr}>${htmlEscape(content)}</code></pre>\n`;
+    this.content = content;
+    this.language = language;
   }
 
   size(format: OutputFormat): number {
-    return format === "markdown" ? this.mdStr.length : this.htStr.length;
+    return this.render(format).length;
   }
 
   render(format: OutputFormat): string {
-    return format === "markdown" ? this.mdStr : this.htStr;
+    if (format === "markdown") {
+      return `\`\`\`${this.language}\n${this.content}\n\`\`\`\n\n`;
+    }
+    const langAttr =
+      this.language.length > 0
+        ? ` class="language-${htmlEscape(this.language)}"`
+        : "";
+    return `<pre><code${langAttr}>${htmlEscape(this.content)}</code></pre>\n`;
   }
 }
 
@@ -183,24 +115,29 @@ export class CodeBlock implements Renderable {
  * A blockquote.
  *
  * - Markdown: `> line1\n> line2\n\n`
- * - HTML: `<blockquote><p>escaped</p></blockquote>\n`
+ * - HTML: `<blockquote><pre><samp>escaped</samp></pre></blockquote>\n`
+ *
+ * HTML uses `<pre><samp>` to preserve whitespace and newlines — `<samp>`
+ * indicates sample output from a program, which is the typical content
+ * of blockquotes in this tool (diagnostic messages, warnings, etc.).
  */
 export class Blockquote implements Renderable {
-  private readonly mdStr: string;
-  private readonly htStr: string;
+  private readonly text: string;
 
   constructor(text: string) {
-    const lines = text.split("\n");
-    this.mdStr = lines.map((l) => `> ${l}`).join("\n") + "\n\n";
-    this.htStr = `<blockquote><p>${htmlEscape(text)}</p></blockquote>\n`;
+    this.text = text;
   }
 
   size(format: OutputFormat): number {
-    return format === "markdown" ? this.mdStr.length : this.htStr.length;
+    return this.render(format).length;
   }
 
   render(format: OutputFormat): string {
-    return format === "markdown" ? this.mdStr : this.htStr;
+    if (format === "markdown") {
+      const lines = this.text.split("\n");
+      return lines.map((l) => `> ${markdownEscape(l)}`).join("\n") + "\n\n";
+    }
+    return `<blockquote><pre><samp>${htmlEscape(this.text)}</samp></pre></blockquote>\n`;
   }
 }
 
@@ -412,27 +349,28 @@ export class Details implements Renderable {
  * Inline diff markup using `<del>` and `<ins>` tags.
  *
  * Both formats produce identical HTML since GitHub markdown renders these
- * tags natively.
+ * tags natively. Values are html-escaped at render time.
  */
 export class InlineDiff implements Renderable {
-  private readonly html: string;
+  private readonly deleted: string;
+  private readonly inserted: string;
 
   constructor(deleted: string, inserted: string) {
-    const delPart =
-      deleted.length > 0 ? `<del>${htmlEscape(deleted)}</del>` : "";
-    const insPart =
-      inserted.length > 0 ? `<ins>${htmlEscape(inserted)}</ins>` : "";
-    this.html = delPart + insPart;
+    this.deleted = deleted;
+    this.inserted = inserted;
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   size(format: OutputFormat): number {
-    return this.html.length;
+    return this.render(format).length;
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   render(format: OutputFormat): string {
-    return this.html;
+    const delPart =
+      this.deleted.length > 0 ? `<del>${htmlEscape(this.deleted)}</del>` : "";
+    const insPart =
+      this.inserted.length > 0 ? `<ins>${htmlEscape(this.inserted)}</ins>` : "";
+    return delPart + insPart;
   }
 }
 

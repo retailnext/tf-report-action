@@ -15,7 +15,8 @@ import type { ResourceRenderOptions } from "./resource.js";
 import { Sequence } from "../renderable/primitives.js";
 import { MODULE_ICON } from "../model/status-icons.js";
 import { htmlEscape } from "../renderable/html-escape.js";
-import { renderNote, noteSize } from "../renderable/helpers.js";
+import { markdownEscape } from "../renderable/markdown-escape.js";
+import { renderNote } from "../renderable/helpers.js";
 import { buildResourceRenderable } from "./resource.js";
 
 /**
@@ -93,7 +94,7 @@ class ModuleHeading implements Renderable {
   private renderLabel(format: OutputFormat): string {
     if (this.moduleAddress === "") return "root";
     if (format === "markdown") {
-      return `\`${this.moduleAddress}\``;
+      return `\`${markdownEscape(this.moduleAddress)}\``;
     }
     return `<code>${htmlEscape(this.moduleAddress)}</code>`;
   }
@@ -111,7 +112,8 @@ class CompactModuleGroup implements Renderable {
 
   size(format: OutputFormat): number {
     return (
-      this.renderHeading(format).length + noteSize("details omitted", format)
+      this.renderHeading(format).length +
+      renderNote("details omitted", format).length
     );
   }
 
@@ -124,7 +126,7 @@ class CompactModuleGroup implements Renderable {
       this.moduleAddress === ""
         ? "root"
         : format === "markdown"
-          ? `\`${this.moduleAddress}\``
+          ? `\`${markdownEscape(this.moduleAddress)}\``
           : `<code>${htmlEscape(this.moduleAddress)}</code>`;
     if (format === "markdown") {
       return `### ${label}\n\n`;

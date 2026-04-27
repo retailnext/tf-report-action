@@ -5,14 +5,10 @@
 
 import type { OutputFormat } from "../renderable/types.js";
 import type { ReportElement } from "../renderable/types.js";
-import type { Renderable } from "../renderable/types.js";
 import type { StepOutcome } from "../model/step-outcome.js";
-import {
-  Heading,
-  Paragraph,
-  Sequence,
-  EMPTY,
-} from "../renderable/primitives.js";
+import { Heading, EMPTY } from "../renderable/primitives.js";
+import { htmlEscape } from "../renderable/html-escape.js";
+import { markdownEscape } from "../renderable/markdown-escape.js";
 import { buildStepTable } from "./step-table.js";
 
 /**
@@ -23,20 +19,23 @@ export class ErrorMessageElement implements ReportElement {
   readonly fixed = true;
   readonly levels = 1;
 
-  private readonly renderable: Renderable;
+  private readonly message: string;
 
   constructor(message: string) {
-    this.renderable = new Paragraph(message);
+    this.message = message;
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   size(format: OutputFormat, _level: number): number {
-    return this.renderable.size(format);
+    return this.render(format, 0).length;
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   render(format: OutputFormat, _level: number): string {
-    return this.renderable.render(format);
+    if (format === "markdown") {
+      return `${markdownEscape(this.message)}\n\n`;
+    }
+    return `<p>${htmlEscape(this.message)}</p>\n`;
   }
 }
 
@@ -48,24 +47,21 @@ export class ErrorStepTableElement implements ReportElement {
   readonly fixed = true;
   readonly levels = 1;
 
-  private readonly renderable: Renderable;
+  private readonly steps: readonly StepOutcome[];
 
   constructor(steps: readonly StepOutcome[]) {
-    const table = buildStepTable(steps);
-    if (table === EMPTY) {
-      this.renderable = EMPTY;
-    } else {
-      this.renderable = new Sequence([new Heading("Steps", 3), table]);
-    }
+    this.steps = steps;
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   size(format: OutputFormat, _level: number): number {
-    return this.renderable.size(format);
+    return this.render(format, 0).length;
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   render(format: OutputFormat, _level: number): string {
-    return this.renderable.render(format);
+    const table = buildStepTable(this.steps);
+    if (table === EMPTY) return "";
+    return new Heading("Steps", 3).render(format) + table.render(format);
   }
 }

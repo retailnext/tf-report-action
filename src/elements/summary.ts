@@ -7,8 +7,9 @@ import type { Renderable, OutputFormat } from "../renderable/types.js";
 import type { ReportElement } from "../renderable/types.js";
 import type { Summary, SummaryActionGroup } from "../model/summary.js";
 import type { PlanAction } from "../model/plan-action.js";
-import { Table, RawText, Heading, Sequence } from "../renderable/primitives.js";
-import { renderNote, noteSize } from "../renderable/helpers.js";
+import { Table, Heading } from "../renderable/primitives.js";
+import { renderNote } from "../renderable/helpers.js";
+import { textCell, boldSpan } from "../renderable/helpers.js";
 import { ACTION_SYMBOLS } from "../model/plan-action.js";
 import { STATUS_FAILURE } from "../model/status-icons.js";
 
@@ -54,49 +55,49 @@ export class SummaryElement implements ReportElement {
   readonly fixed = true;
   readonly levels = 1;
 
-  private readonly renderable: Renderable;
+  private readonly heading: string;
+  private readonly summary: Summary | undefined;
+  private readonly isApply: boolean;
 
   constructor(heading: string, summary: Summary | undefined, isApply: boolean) {
-    this.renderable = buildSummaryRenderable(heading, summary, isApply);
+    this.heading = heading;
+    this.summary = summary;
+    this.isApply = isApply;
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   size(format: OutputFormat, _level: number): number {
-    return this.renderable.size(format);
+    return this.render(format, 0).length;
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   render(format: OutputFormat, _level: number): string {
-    return this.renderable.render(format);
+    return renderSummary(this.heading, this.summary, this.isApply, format);
   }
 }
 
-/** Builds the summary as a Renderable tree. */
-function buildSummaryRenderable(
+/** Renders the summary as heading + table. */
+function renderSummary(
   headingText: string,
   summary: Summary | undefined,
   isApply: boolean,
-): Renderable {
-  const parts: Renderable[] = [new Heading(headingText, 2)];
+  format: OutputFormat,
+): string {
+  let result = new Heading(headingText, 2).render(format);
 
   if (!summary) {
-    return new Sequence(parts);
+    return result;
   }
 
   const labels = isApply ? APPLY_LABELS : PLAN_LABELS;
   const hasContent = summary.actions.length > 0 || summary.failures.length > 0;
 
   if (!hasContent) {
-    parts.push(new NoteRenderable("No changes."));
-    return new Sequence(parts);
+    result += renderNote("No changes.", format);
+    return result;
   }
 
-  // Build table rows
-  const headers = [
-    new RawText("Action"),
-    new RawText("Resource"),
-    new RawText("Count"),
-  ];
+  const headers = [textCell("Action"), textCell("Resource"), textCell("Count")];
   const rows: { cells: Renderable[] }[] = [];
 
   for (const group of summary.actions) {
@@ -107,8 +108,8 @@ function buildSummaryRenderable(
     addGroupRows(group, FAILURE_LABELS, STATUS_FAILURE, rows);
   }
 
-  parts.push(new Table(headers, rows));
-  return new Sequence(parts);
+  result += new Table(headers, rows).render(format);
+  return result;
 }
 
 /** Adds rows for a single action group to the table. */
@@ -123,58 +124,18 @@ function addGroupRows(
   for (let i = 0; i < group.resourceTypes.length; i++) {
     const rt = group.resourceTypes[i];
     if (!rt) continue;
-    const actionCell = i === 0 ? `${symbol} ${label}` : "";
+    const actionText = i === 0 ? `${symbol} ${label}` : "";
     rows.push({
       cells: [
-        new RawText(actionCell),
-        new RawText(rt.type),
-        new RawText(String(rt.count)),
+        textCell(actionText),
+        textCell(rt.type),
+        textCell(String(rt.count)),
       ],
     });
   }
 
   // Bold subtotal row
   rows.push({
-    cells: [
-      new RawText(""),
-      new BoldText(label),
-      new BoldText(String(group.total)),
-    ],
+    cells: [textCell(""), boldSpan(label), boldSpan(String(group.total))],
   });
-}
-
-/** Bold text renderable — `**text**` in markdown, `<strong>text</strong>` in HTML. */
-class BoldText implements Renderable {
-  private readonly mdStr: string;
-  private readonly htStr: string;
-
-  constructor(text: string) {
-    this.mdStr = `**${text}**`;
-    this.htStr = `<strong>${text}</strong>`;
-  }
-
-  size(format: OutputFormat): number {
-    return format === "markdown" ? this.mdStr.length : this.htStr.length;
-  }
-
-  render(format: OutputFormat): string {
-    return format === "markdown" ? this.mdStr : this.htStr;
-  }
-}
-
-/** Contextual note — italic in markdown, `<em>` in HTML. */
-class NoteRenderable implements Renderable {
-  private readonly text: string;
-
-  constructor(text: string) {
-    this.text = text;
-  }
-
-  size(format: OutputFormat): number {
-    return noteSize(this.text, format);
-  }
-
-  render(format: OutputFormat): string {
-    return renderNote(this.text, format);
-  }
 }

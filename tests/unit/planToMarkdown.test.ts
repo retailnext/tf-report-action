@@ -104,7 +104,7 @@ describe("planToMarkdown", () => {
     it("renders 3-column summary table for non-empty plan", () => {
       const result = planToMarkdown(CREATE_PLAN);
       expect(result).toContain("| Action | Resource | Count |");
-      expect(result).toContain("| ➕ Add | null_resource | 1 |");
+      expect(result).toContain("| ➕ Add | null\\_resource | 1 |");
       expect(result).toContain("|  | **Add** | **1** |");
     });
   });
@@ -117,7 +117,7 @@ describe("planToMarkdown", () => {
 
     it("shows resource type and name", () => {
       const result = planToMarkdown(CREATE_PLAN);
-      expect(result).toContain("null_resource");
+      expect(result).toContain("null\\_resource");
       expect(result).toContain("example");
     });
 

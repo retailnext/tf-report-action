@@ -7,17 +7,13 @@
  * - Level 1 (full): heading + exit code + diagnostic + stdout/stderr
  */
 
-import type { Renderable, OutputFormat } from "../renderable/types.js";
+import type { OutputFormat } from "../renderable/types.js";
 import type { ReportElement } from "../renderable/types.js";
 import type { StepIssue } from "../model/step-issue.js";
-import {
-  Paragraph,
-  Blockquote,
-  Details,
-  Sequence,
-  RawText,
-} from "../renderable/primitives.js";
+import { Blockquote, Details } from "../renderable/primitives.js";
+import { detailsSummary } from "../renderable/helpers.js";
 import { htmlEscape } from "../renderable/html-escape.js";
+import { markdownEscape } from "../renderable/markdown-escape.js";
 import { STATUS_FAILURE, DIAGNOSTIC_WARNING } from "../model/status-icons.js";
 import { buildRawOutputRenderable } from "./raw-output.js";
 
@@ -63,7 +59,7 @@ function renderIssueHeading(issue: StepIssue, format: OutputFormat): string {
   const stepId = issue.id;
 
   if (format === "markdown") {
-    return `### ${icon} \`${stepId}\`${suffix}\n\n`;
+    return `### ${icon} \`${markdownEscape(stepId)}\`${markdownEscape(suffix)}\n\n`;
   }
   return `<h3>${icon} <code>${htmlEscape(stepId)}</code>${htmlEscape(suffix)}</h3>\n`;
 }
@@ -86,36 +82,37 @@ function issueHeadingSuffix(issue: StepIssue): string {
 
 /** Render the full issue with heading + details. */
 function renderFullIssue(issue: StepIssue, format: OutputFormat): string {
-  const heading = renderIssueHeading(issue, format);
-  const parts: Renderable[] = [];
+  let result = renderIssueHeading(issue, format);
 
   if (issue.exitCode !== undefined) {
-    parts.push(new ExitCodeParagraph(issue.exitCode));
+    result += renderExitCode(issue.exitCode, format);
   }
 
   if (issue.diagnostic !== undefined) {
-    parts.push(new Blockquote(issue.diagnostic));
+    result += new Blockquote(issue.diagnostic).render(format);
   }
 
   if (issue.stdout !== undefined) {
     const formatted = buildRawOutputRenderable(issue.stdout);
-    parts.push(new Details(new RawText("stdout"), formatted, true));
+    result += new Details(detailsSummary("stdout"), formatted, true).render(
+      format,
+    );
   } else if (issue.stdoutError !== undefined) {
-    parts.push(
-      new WarningBlockquote(
-        `${DIAGNOSTIC_WARNING} stdout not available: ${issue.stdoutError}`,
-      ),
+    result += renderWarningBlockquote(
+      `${DIAGNOSTIC_WARNING} stdout not available: ${issue.stdoutError}`,
+      format,
     );
   }
 
   if (issue.stderr !== undefined) {
     const formatted = buildRawOutputRenderable(issue.stderr);
-    parts.push(new Details(new RawText("stderr"), formatted, true));
+    result += new Details(detailsSummary("stderr"), formatted, true).render(
+      format,
+    );
   } else if (issue.stderrError !== undefined) {
-    parts.push(
-      new WarningBlockquote(
-        `${DIAGNOSTIC_WARNING} stderr not available: ${issue.stderrError}`,
-      ),
+    result += renderWarningBlockquote(
+      `${DIAGNOSTIC_WARNING} stderr not available: ${issue.stderrError}`,
+      format,
     );
   }
 
@@ -125,47 +122,32 @@ function renderFullIssue(issue: StepIssue, format: OutputFormat): string {
     issue.stdoutError === undefined &&
     issue.stderrError === undefined
   ) {
-    parts.push(new Paragraph("No output captured."));
+    result += renderNoOutputNotice(format);
   }
 
-  const body = new Sequence(parts);
-  return heading + body.render(format);
+  return result;
 }
 
-/** Exit code paragraph. */
-class ExitCodeParagraph implements Renderable {
-  private readonly mdStr: string;
-  private readonly htStr: string;
-
-  constructor(exitCode: string) {
-    this.mdStr = `Exit code: \`${exitCode}\`\n\n`;
-    this.htStr = `<p>Exit code: <code>${htmlEscape(exitCode)}</code></p>\n`;
+/** Renders an exit code paragraph. */
+function renderExitCode(exitCode: string, format: OutputFormat): string {
+  if (format === "markdown") {
+    return `Exit code: \`${markdownEscape(exitCode)}\`\n\n`;
   }
-
-  size(format: OutputFormat): number {
-    return format === "markdown" ? this.mdStr.length : this.htStr.length;
-  }
-
-  render(format: OutputFormat): string {
-    return format === "markdown" ? this.mdStr : this.htStr;
-  }
+  return `<p>Exit code: <code>${htmlEscape(exitCode)}</code></p>\n`;
 }
 
-/** Warning blockquote. */
-class WarningBlockquote implements Renderable {
-  private readonly mdStr: string;
-  private readonly htStr: string;
-
-  constructor(text: string) {
-    this.mdStr = `> ${text}\n\n`;
-    this.htStr = `<blockquote><p>${htmlEscape(text)}</p></blockquote>\n`;
+/** Renders a warning blockquote. */
+function renderWarningBlockquote(text: string, format: OutputFormat): string {
+  if (format === "markdown") {
+    return `> ${markdownEscape(text)}\n\n`;
   }
+  return `<blockquote><pre><samp>${htmlEscape(text)}</samp></pre></blockquote>\n`;
+}
 
-  size(format: OutputFormat): number {
-    return format === "markdown" ? this.mdStr.length : this.htStr.length;
+/** Renders a "no output captured" notice. */
+function renderNoOutputNotice(format: OutputFormat): string {
+  if (format === "markdown") {
+    return "No output captured.\n\n";
   }
-
-  render(format: OutputFormat): string {
-    return format === "markdown" ? this.mdStr : this.htStr;
-  }
+  return "<p>No output captured.</p>\n";
 }

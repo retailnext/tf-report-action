@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { buildReportElements } from "../../../src/elements/report-elements.js";
 import type { Report } from "../../../src/model/report.js";
 import type { ResourceChange } from "../../../src/model/resource.js";
-import { RawText } from "../../../src/renderable/primitives.js";
+import { textCell } from "../../../src/renderable/helpers.js";
 
 /** Minimal resource change with all required fields. */
 function makeResource(overrides?: Partial<ResourceChange>): ResourceChange {
@@ -48,7 +48,7 @@ describe("buildReportElements", () => {
   it("includes warnings in order", () => {
     const elements = buildReportElements(
       emptyReport({
-        warnings: [new RawText("warning A"), new RawText("warning B")],
+        warnings: [textCell("warning A"), textCell("warning B")],
       }),
     );
     const ids = elements.map((e) => e.id);
@@ -190,7 +190,7 @@ describe("buildReportElements", () => {
     const elements = buildReportElements(
       emptyReport({
         workspace: "prod",
-        warnings: [new RawText("watch out")],
+        warnings: [textCell("watch out")],
         summary: { actions: [], failures: [] },
         resources: [makeResource({ address: "null_resource.a" })],
         issues: [

@@ -18,24 +18,6 @@ function expectedCommand(tool, role) {
 }
 
 // src/renderable/html-escape.ts
-var ENTITY_MAP = /* @__PURE__ */ new Map([
-  ["&", 5],
-  // &amp;
-  ["<", 4],
-  // &lt;
-  [">", 4],
-  // &gt;
-  ['"', 6]
-  // &quot;
-]);
-function htmlEscapeSize(text) {
-  let size = 0;
-  for (const ch of text) {
-    const entityLen = ENTITY_MAP.get(ch);
-    size += entityLen ?? ch.length;
-  }
-  return size;
-}
 function htmlEscape(text) {
   return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 }
@@ -2320,6 +2302,39 @@ function hasUnresolvedKnownAfterApply(report) {
   return false;
 }
 
+// src/renderable/markdown-escape.ts
+var ESCAPE_MAP = /* @__PURE__ */ new Map([
+  // HTML entities (security-critical — GitHub renders inline HTML)
+  ["&", "&amp;"],
+  ["<", "&lt;"],
+  [">", "&gt;"],
+  // Markdown inline syntax characters (GFM spec sections 6.1–6.6)
+  ["\\", "\\\\"],
+  // backslash escape initiator
+  ["`", "\\`"],
+  // code span delimiter
+  ["*", "\\*"],
+  // emphasis / strong emphasis
+  ["_", "\\_"],
+  // emphasis / strong emphasis
+  ["~", "\\~"],
+  // strikethrough (GFM extension)
+  ["[", "\\["],
+  // link / image text start
+  ["]", "\\]"],
+  // link / image text end
+  ["|", "\\|"]
+  // GFM table cell delimiter
+]);
+function markdownEscape(text) {
+  let result = "";
+  for (const ch of text) {
+    const replacement = ESCAPE_MAP.get(ch);
+    result += replacement ?? ch;
+  }
+  return result;
+}
+
 // src/renderable/primitives.ts
 var Empty = class {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -2332,104 +2347,64 @@ var Empty = class {
   }
 };
 var EMPTY = new Empty();
-var RawText = class {
-  text;
-  mdSize;
-  htSize;
-  constructor(text) {
-    this.text = text;
-    this.mdSize = text.length;
-    this.htSize = htmlEscapeSize(text);
-  }
-  size(format) {
-    return format === "markdown" ? this.mdSize : this.htSize;
-  }
-  render(format) {
-    return format === "markdown" ? this.text : htmlEscape(this.text);
-  }
-};
-var HtmlText = class {
-  html;
-  constructor(html) {
-    this.html = html;
-  }
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  size(format) {
-    return this.html.length;
-  }
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  render(format) {
-    return this.html;
-  }
-};
 var Heading = class {
-  mdStr;
-  htStr;
+  text;
+  level;
   constructor(text, level = 2) {
-    this.mdStr = `${"#".repeat(level)} ${text}
-
-`;
-    this.htStr = `<h${String(level)}>${htmlEscape(text)}</h${String(level)}>
-`;
+    this.text = text;
+    this.level = level;
   }
   size(format) {
-    return format === "markdown" ? this.mdStr.length : this.htStr.length;
+    return this.render(format).length;
   }
   render(format) {
-    return format === "markdown" ? this.mdStr : this.htStr;
-  }
-};
-var Paragraph = class {
-  mdStr;
-  htStr;
-  constructor(text) {
-    this.mdStr = `${text}
+    if (format === "markdown") {
+      return `${"#".repeat(this.level)} ${markdownEscape(this.text)}
 
 `;
-    this.htStr = `<p>${htmlEscape(text)}</p>
+    }
+    return `<h${String(this.level)}>${htmlEscape(this.text)}</h${String(this.level)}>
 `;
-  }
-  size(format) {
-    return format === "markdown" ? this.mdStr.length : this.htStr.length;
-  }
-  render(format) {
-    return format === "markdown" ? this.mdStr : this.htStr;
   }
 };
 var CodeBlock = class {
-  mdStr;
-  htStr;
+  content;
+  language;
   constructor(content, language = "") {
-    this.mdStr = `\`\`\`${language}
-${content}
+    this.content = content;
+    this.language = language;
+  }
+  size(format) {
+    return this.render(format).length;
+  }
+  render(format) {
+    if (format === "markdown") {
+      return `\`\`\`${this.language}
+${this.content}
 \`\`\`
 
 `;
-    const langAttr = language.length > 0 ? ` class="language-${htmlEscape(language)}"` : "";
-    this.htStr = `<pre><code${langAttr}>${htmlEscape(content)}</code></pre>
+    }
+    const langAttr = this.language.length > 0 ? ` class="language-${htmlEscape(this.language)}"` : "";
+    return `<pre><code${langAttr}>${htmlEscape(this.content)}</code></pre>
 `;
-  }
-  size(format) {
-    return format === "markdown" ? this.mdStr.length : this.htStr.length;
-  }
-  render(format) {
-    return format === "markdown" ? this.mdStr : this.htStr;
   }
 };
 var Blockquote = class {
-  mdStr;
-  htStr;
+  text;
   constructor(text) {
-    const lines = text.split("\n");
-    this.mdStr = lines.map((l) => `> ${l}`).join("\n") + "\n\n";
-    this.htStr = `<blockquote><p>${htmlEscape(text)}</p></blockquote>
-`;
+    this.text = text;
   }
   size(format) {
-    return format === "markdown" ? this.mdStr.length : this.htStr.length;
+    return this.render(format).length;
   }
   render(format) {
-    return format === "markdown" ? this.mdStr : this.htStr;
+    if (format === "markdown") {
+      const lines = this.text.split("\n");
+      return lines.map((l) => `> ${markdownEscape(l)}`).join("\n") + "\n\n";
+    }
+    return `<blockquote><pre><samp>${htmlEscape(this.text)}</samp></pre></blockquote>
+`;
   }
 };
 var Table = class {
@@ -2772,20 +2747,19 @@ var MarkerElement = class {
   id = "marker";
   fixed = true;
   levels = 1;
-  renderable;
+  workspace;
   constructor(workspace) {
-    const escaped = escapeMarkerWorkspace(workspace);
-    const comment = `<!-- tf-report-action:"${escaped}" -->
+    this.workspace = workspace;
+  }
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  size(_format, _level) {
+    return this.render("markdown", 0).length;
+  }
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  render(_format, _level) {
+    const escaped = escapeMarkerWorkspace(this.workspace);
+    return `<!-- tf-report-action:"${escaped}" -->
 `;
-    this.renderable = new HtmlText(comment);
-  }
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  size(format, _level) {
-    return this.renderable.size(format);
-  }
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  render(format, _level) {
-    return this.renderable.render(format);
   }
 };
 var WarningElement = class {
@@ -2848,13 +2822,40 @@ function escapeMarkerWorkspace(workspace) {
 
 // src/renderable/helpers.ts
 function renderNote(text, format) {
-  return format === "markdown" ? `_${text}_
+  return format === "markdown" ? `_${markdownEscape(text)}_
 
 ` : `<p><em>${htmlEscape(text)}</em></p>
 `;
 }
-function noteSize(text, format) {
-  return renderNote(text, format).length;
+function textCell(text) {
+  const renderFn = (format) => format === "markdown" ? markdownEscape(text) : htmlEscape(text);
+  return { size: (f) => renderFn(f).length, render: renderFn };
+}
+function codeSpan(text) {
+  const renderFn = (format) => format === "markdown" ? `\`${markdownEscape(text)}\`` : `<code>${htmlEscape(text)}</code>`;
+  return { size: (f) => renderFn(f).length, render: renderFn };
+}
+function boldSpan(text) {
+  const renderFn = (format) => format === "markdown" ? `**${markdownEscape(text)}**` : `<strong>${htmlEscape(text)}</strong>`;
+  return { size: (f) => renderFn(f).length, render: renderFn };
+}
+function htmlCodeCell(value) {
+  const renderFn = (format) => {
+    const escaped = htmlEscape(value);
+    return format === "markdown" ? `<code>${escaped.replace(/\|/g, "&#124;")}</code>` : `<code>${escaped}</code>`;
+  };
+  return { size: (f) => renderFn(f).length, render: renderFn };
+}
+function htmlCodeCellMultiline(value) {
+  const renderFn = (format) => {
+    const escaped = htmlEscape(value).replace(/\n/g, "<br>");
+    return format === "markdown" ? `<code>${escaped.replace(/\|/g, "&#124;")}</code>` : `<code>${escaped}</code>`;
+  };
+  return { size: (f) => renderFn(f).length, render: renderFn };
+}
+function detailsSummary(text) {
+  const html = htmlEscape(text);
+  return { size: () => html.length, render: () => html };
 }
 
 // src/model/plan-action.ts
@@ -2904,35 +2905,35 @@ var SummaryElement = class {
   id = "summary";
   fixed = true;
   levels = 1;
-  renderable;
+  heading;
+  summary;
+  isApply;
   constructor(heading, summary, isApply) {
-    this.renderable = buildSummaryRenderable(heading, summary, isApply);
+    this.heading = heading;
+    this.summary = summary;
+    this.isApply = isApply;
   }
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   size(format, _level) {
-    return this.renderable.size(format);
+    return this.render(format, 0).length;
   }
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   render(format, _level) {
-    return this.renderable.render(format);
+    return renderSummary(this.heading, this.summary, this.isApply, format);
   }
 };
-function buildSummaryRenderable(headingText, summary, isApply) {
-  const parts = [new Heading(headingText, 2)];
+function renderSummary(headingText, summary, isApply, format) {
+  let result = new Heading(headingText, 2).render(format);
   if (!summary) {
-    return new Sequence(parts);
+    return result;
   }
   const labels = isApply ? APPLY_LABELS : PLAN_LABELS;
   const hasContent = summary.actions.length > 0 || summary.failures.length > 0;
   if (!hasContent) {
-    parts.push(new NoteRenderable("No changes."));
-    return new Sequence(parts);
+    result += renderNote("No changes.", format);
+    return result;
   }
-  const headers = [
-    new RawText("Action"),
-    new RawText("Resource"),
-    new RawText("Count")
-  ];
+  const headers = [textCell("Action"), textCell("Resource"), textCell("Count")];
   const rows = [];
   for (const group of summary.actions) {
     addGroupRows(group, labels, ACTION_SYMBOLS[group.action], rows);
@@ -2940,225 +2941,139 @@ function buildSummaryRenderable(headingText, summary, isApply) {
   for (const group of summary.failures) {
     addGroupRows(group, FAILURE_LABELS, STATUS_FAILURE, rows);
   }
-  parts.push(new Table(headers, rows));
-  return new Sequence(parts);
+  result += new Table(headers, rows).render(format);
+  return result;
 }
 function addGroupRows(group, labels, symbol, rows) {
   const label = labels[group.action] ?? group.action;
   for (let i = 0; i < group.resourceTypes.length; i++) {
     const rt = group.resourceTypes[i];
     if (!rt) continue;
-    const actionCell = i === 0 ? `${symbol} ${label}` : "";
+    const actionText = i === 0 ? `${symbol} ${label}` : "";
     rows.push({
       cells: [
-        new RawText(actionCell),
-        new RawText(rt.type),
-        new RawText(String(rt.count))
+        textCell(actionText),
+        textCell(rt.type),
+        textCell(String(rt.count))
       ]
     });
   }
   rows.push({
-    cells: [
-      new RawText(""),
-      new BoldText(label),
-      new BoldText(String(group.total))
-    ]
+    cells: [textCell(""), boldSpan(label), boldSpan(String(group.total))]
   });
 }
-var BoldText = class {
-  mdStr;
-  htStr;
-  constructor(text) {
-    this.mdStr = `**${text}**`;
-    this.htStr = `<strong>${text}</strong>`;
-  }
-  size(format) {
-    return format === "markdown" ? this.mdStr.length : this.htStr.length;
-  }
-  render(format) {
-    return format === "markdown" ? this.mdStr : this.htStr;
-  }
-};
-var NoteRenderable = class {
-  text;
-  constructor(text) {
-    this.text = text;
-  }
-  size(format) {
-    return noteSize(this.text, format);
-  }
-  render(format) {
-    return renderNote(this.text, format);
-  }
-};
 
 // src/elements/diagnostics.ts
 var DiagnosticsElement = class {
   id;
   fixed = true;
   levels = 1;
-  renderable;
+  diagnostics;
+  headingLevel;
   constructor(id, diagnostics, headingLevel = 3) {
     this.id = id;
-    this.renderable = buildDiagnosticsRenderable(diagnostics, headingLevel);
+    this.diagnostics = diagnostics;
+    this.headingLevel = headingLevel;
   }
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   size(format, _level) {
-    return this.renderable.size(format);
+    return this.render(format, 0).length;
   }
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   render(format, _level) {
-    return this.renderable.render(format);
+    return renderDiagnostics(this.diagnostics, this.headingLevel, format);
   }
 };
-function buildDiagnosticsRenderable(diagnostics, headingLevel) {
+function renderDiagnostics(diagnostics, headingLevel, format) {
   const errors = diagnostics.filter((d) => d.severity === "error");
   const warnings = diagnostics.filter((d) => d.severity === "warning");
-  const parts = [];
+  let result = "";
   if (errors.length > 0) {
-    parts.push(new PlainHeading("Errors", headingLevel));
+    result += renderPlainHeading("Errors", headingLevel, format);
     for (const diag of errors) {
-      parts.push(buildDiagnosticRenderable(diag));
+      result += renderDiagnostic(diag, format);
     }
   }
   if (warnings.length > 0) {
-    parts.push(new PlainHeading("Warnings", headingLevel));
+    result += renderPlainHeading("Warnings", headingLevel, format);
     for (const diag of warnings) {
-      parts.push(buildDiagnosticRenderable(diag));
+      result += renderDiagnostic(diag, format);
     }
   }
-  if (parts.length === 0) return EMPTY;
-  return new Sequence(parts);
+  return result;
 }
-function buildDiagnosticRenderable(diag) {
-  const parts = [];
-  parts.push(
-    new DiagnosticSummaryLine(diag.severity, diag.summary, diag.address)
+function renderDiagnostic(diag, format) {
+  let result = renderDiagnosticSummaryLine(
+    diag.severity,
+    diag.summary,
+    diag.address,
+    format
   );
   if (diag.detail) {
-    parts.push(new Blockquote(diag.detail));
+    result += new Blockquote(diag.detail).render(format);
   }
   if (diag.snippet !== void 0) {
-    parts.push(buildSnippetRenderable(diag.snippet, diag.range?.filename));
+    result += renderSnippet(diag.snippet, diag.range?.filename, format);
   }
   if (diag.detail || diag.snippet !== void 0) {
-    parts.push(new BlankLine());
+    if (format === "markdown") result += "\n";
   }
-  return new Sequence(parts);
+  return result;
 }
-function buildSnippetRenderable(snippet, filename) {
-  const parts = [];
-  parts.push(
-    new DiagnosticSnippetLine(
-      snippet.code,
-      snippet.context,
-      filename,
-      snippet.start_line
-    )
+function renderSnippet(snippet, filename, format) {
+  let result = renderSnippetLine(
+    snippet.code,
+    snippet.context,
+    filename,
+    snippet.start_line,
+    format
   );
-  if (snippet.values.length > 0) {
-    for (const val of snippet.values) {
-      parts.push(new DiagnosticSnippetValue(val.traversal, val.statement));
-    }
+  for (const val of snippet.values) {
+    result += renderSnippetValue(val.traversal, val.statement, format);
   }
-  return new Sequence(parts);
+  return result;
 }
-var PlainHeading = class {
-  mdStr;
-  htStr;
-  constructor(text, level) {
-    this.mdStr = `${"#".repeat(level)} ${text}
+function renderPlainHeading(text, level, format) {
+  if (format === "markdown") {
+    return `${"#".repeat(level)} ${markdownEscape(text)}
 
 `;
-    this.htStr = `<h${String(level)}>${htmlEscape(text)}</h${String(level)}>
+  }
+  return `<h${String(level)}>${htmlEscape(text)}</h${String(level)}>
 `;
-  }
-  size(format) {
-    return format === "markdown" ? this.mdStr.length : this.htStr.length;
-  }
-  render(format) {
-    return format === "markdown" ? this.mdStr : this.htStr;
-  }
-};
-var DiagnosticSummaryLine = class {
-  severity;
-  summary;
-  address;
-  constructor(severity, summary, address) {
-    this.severity = severity;
-    this.summary = summary;
-    this.address = address;
-  }
-  size(format) {
-    return this.render(format).length;
-  }
-  render(format) {
-    const icon = this.severity === "error" ? DIAGNOSTIC_ERROR : DIAGNOSTIC_WARNING;
-    if (format === "markdown") {
-      const addr2 = this.address !== void 0 ? ` \u2014 \`${this.address}\`` : "";
-      return `${icon} **${this.summary}**${addr2}
+}
+function renderDiagnosticSummaryLine(severity, summary, address, format) {
+  const icon = severity === "error" ? DIAGNOSTIC_ERROR : DIAGNOSTIC_WARNING;
+  if (format === "markdown") {
+    const addr2 = address !== void 0 ? ` \u2014 \`${markdownEscape(address)}\`` : "";
+    return `${icon} **${markdownEscape(summary)}**${addr2}
 
 `;
-    }
-    const addr = this.address !== void 0 ? ` \u2014 <code>${htmlEscape(this.address)}</code>` : "";
-    return `<p>${icon} <strong>${htmlEscape(this.summary)}</strong>${addr}</p>
+  }
+  const addr = address !== void 0 ? ` \u2014 <code>${htmlEscape(address)}</code>` : "";
+  return `<p>${icon} <strong>${htmlEscape(summary)}</strong>${addr}</p>
 `;
-  }
-};
-var DiagnosticSnippetLine = class {
-  code;
-  context;
-  filename;
-  startLine;
-  constructor(code, context, filename, startLine) {
-    this.code = code;
-    this.context = context;
-    this.filename = filename;
-    this.startLine = startLine;
-  }
-  size(format) {
-    return this.render(format).length;
-  }
-  render(format) {
-    if (format === "markdown") {
-      const loc2 = this.filename !== void 0 ? `\`${this.code}\` in ${this.context} (\`${this.filename}\`:${String(this.startLine)})` : `\`${this.code}\` in ${this.context}`;
-      return `> ${loc2}
+}
+function renderSnippetLine(code, context, filename, startLine, format) {
+  if (format === "markdown") {
+    const loc2 = filename !== void 0 ? `\`${markdownEscape(code)}\` in ${markdownEscape(context)} (\`${markdownEscape(filename)}\`:${String(startLine)})` : `\`${markdownEscape(code)}\` in ${markdownEscape(context)}`;
+    return `> ${loc2}
 
 `;
-    }
-    const loc = this.filename !== void 0 ? `<code>${htmlEscape(this.code)}</code> in ${htmlEscape(this.context)} (<code>${htmlEscape(this.filename)}</code>:${String(this.startLine)})` : `<code>${htmlEscape(this.code)}</code> in ${htmlEscape(this.context)}`;
-    return `<blockquote><p>${loc}</p></blockquote>
+  }
+  const loc = filename !== void 0 ? `<code>${htmlEscape(code)}</code> in ${htmlEscape(context)} (<code>${htmlEscape(filename)}</code>:${String(startLine)})` : `<code>${htmlEscape(code)}</code> in ${htmlEscape(context)}`;
+  return `<blockquote><p>${loc}</p></blockquote>
 `;
-  }
-};
-var DiagnosticSnippetValue = class {
-  traversal;
-  statement;
-  constructor(traversal, statement) {
-    this.traversal = traversal;
-    this.statement = statement;
-  }
-  size(format) {
-    return this.render(format).length;
-  }
-  render(format) {
-    if (format === "markdown") {
-      return `> ${this.traversal} = ${this.statement}
+}
+function renderSnippetValue(traversal, statement, format) {
+  if (format === "markdown") {
+    return `> ${markdownEscape(traversal)} = ${markdownEscape(statement)}
 
 `;
-    }
-    return `<blockquote><p>${htmlEscape(this.traversal)} = ${htmlEscape(this.statement)}</p></blockquote>
+  }
+  return `<blockquote><p>${htmlEscape(traversal)} = ${htmlEscape(statement)}</p></blockquote>
 `;
-  }
-};
-var BlankLine = class {
-  size(format) {
-    return format === "markdown" ? 1 : 0;
-  }
-  render(format) {
-    return format === "markdown" ? "\n" : "";
-  }
-};
+}
 
 // src/elements/raw-output.ts
 var ENVELOPE_KEYS = /* @__PURE__ */ new Set([
@@ -3257,36 +3172,42 @@ function tryBuildJsonLinesRenderable(content) {
   return new JsonLinesRenderable(messages);
 }
 var FourTickCodeBlock = class {
-  mdStr;
-  htStr;
+  content;
   constructor(content) {
-    this.mdStr = `\`\`\`\`
-${content}
+    this.content = content;
+  }
+  size(format) {
+    return this.render(format).length;
+  }
+  render(format) {
+    if (format === "markdown") {
+      return `\`\`\`\`
+${this.content}
 \`\`\`\`
 
 `;
-    this.htStr = `<pre><code>${htmlEscape(content)}</code></pre>
+    }
+    return `<pre><code>${htmlEscape(this.content)}</code></pre>
 `;
-  }
-  size(format) {
-    return format === "markdown" ? this.mdStr.length : this.htStr.length;
-  }
-  render(format) {
-    return format === "markdown" ? this.mdStr : this.htStr;
   }
 };
 var ValidateRenderable = class {
-  mdStr;
-  htStr;
+  valid;
+  diagnostics;
+  raw;
   constructor(valid, diagnostics, raw) {
-    this.mdStr = buildValidateMarkdown(valid, diagnostics, raw);
-    this.htStr = buildValidateHtml(valid, diagnostics, raw);
+    this.valid = valid;
+    this.diagnostics = diagnostics;
+    this.raw = raw;
   }
   size(format) {
-    return format === "markdown" ? this.mdStr.length : this.htStr.length;
+    return this.render(format).length;
   }
   render(format) {
-    return format === "markdown" ? this.mdStr : this.htStr;
+    if (format === "markdown") {
+      return buildValidateMarkdown(this.valid, this.diagnostics, this.raw);
+    }
+    return buildValidateHtml(this.valid, this.diagnostics, this.raw);
   }
 };
 function buildValidateMarkdown(valid, diagnostics, raw) {
@@ -3381,17 +3302,18 @@ function formatValidateDiagHtml(diag) {
   return output;
 }
 var JsonLinesRenderable = class {
-  mdStr;
-  htStr;
+  messages;
   constructor(messages) {
-    this.mdStr = buildJsonLinesMarkdown(messages);
-    this.htStr = buildJsonLinesHtml(messages);
+    this.messages = messages;
   }
   size(format) {
-    return format === "markdown" ? this.mdStr.length : this.htStr.length;
+    return this.render(format).length;
   }
   render(format) {
-    return format === "markdown" ? this.mdStr : this.htStr;
+    if (format === "markdown") {
+      return buildJsonLinesMarkdown(this.messages);
+    }
+    return buildJsonLinesHtml(this.messages);
   }
 };
 function buildJsonLinesMarkdown(messages) {
@@ -3547,7 +3469,7 @@ function renderIssueHeading(issue, format) {
   const suffix = issueHeadingSuffix(issue);
   const stepId = issue.id;
   if (format === "markdown") {
-    return `### ${icon} \`${stepId}\`${suffix}
+    return `### ${icon} \`${markdownEscape(stepId)}\`${markdownEscape(suffix)}
 
 `;
   }
@@ -3565,74 +3487,64 @@ function issueHeadingSuffix(issue) {
   }
 }
 function renderFullIssue(issue, format) {
-  const heading = renderIssueHeading(issue, format);
-  const parts = [];
+  let result = renderIssueHeading(issue, format);
   if (issue.exitCode !== void 0) {
-    parts.push(new ExitCodeParagraph(issue.exitCode));
+    result += renderExitCode(issue.exitCode, format);
   }
   if (issue.diagnostic !== void 0) {
-    parts.push(new Blockquote(issue.diagnostic));
+    result += new Blockquote(issue.diagnostic).render(format);
   }
   if (issue.stdout !== void 0) {
     const formatted = buildRawOutputRenderable(issue.stdout);
-    parts.push(new Details(new RawText("stdout"), formatted, true));
+    result += new Details(detailsSummary("stdout"), formatted, true).render(
+      format
+    );
   } else if (issue.stdoutError !== void 0) {
-    parts.push(
-      new WarningBlockquote(
-        `${DIAGNOSTIC_WARNING} stdout not available: ${issue.stdoutError}`
-      )
+    result += renderWarningBlockquote(
+      `${DIAGNOSTIC_WARNING} stdout not available: ${issue.stdoutError}`,
+      format
     );
   }
   if (issue.stderr !== void 0) {
     const formatted = buildRawOutputRenderable(issue.stderr);
-    parts.push(new Details(new RawText("stderr"), formatted, true));
+    result += new Details(detailsSummary("stderr"), formatted, true).render(
+      format
+    );
   } else if (issue.stderrError !== void 0) {
-    parts.push(
-      new WarningBlockquote(
-        `${DIAGNOSTIC_WARNING} stderr not available: ${issue.stderrError}`
-      )
+    result += renderWarningBlockquote(
+      `${DIAGNOSTIC_WARNING} stderr not available: ${issue.stderrError}`,
+      format
     );
   }
   if (issue.stdout === void 0 && issue.stderr === void 0 && issue.stdoutError === void 0 && issue.stderrError === void 0) {
-    parts.push(new Paragraph("No output captured."));
+    result += renderNoOutputNotice(format);
   }
-  const body = new Sequence(parts);
-  return heading + body.render(format);
+  return result;
 }
-var ExitCodeParagraph = class {
-  mdStr;
-  htStr;
-  constructor(exitCode) {
-    this.mdStr = `Exit code: \`${exitCode}\`
+function renderExitCode(exitCode, format) {
+  if (format === "markdown") {
+    return `Exit code: \`${markdownEscape(exitCode)}\`
 
 `;
-    this.htStr = `<p>Exit code: <code>${htmlEscape(exitCode)}</code></p>
+  }
+  return `<p>Exit code: <code>${htmlEscape(exitCode)}</code></p>
 `;
-  }
-  size(format) {
-    return format === "markdown" ? this.mdStr.length : this.htStr.length;
-  }
-  render(format) {
-    return format === "markdown" ? this.mdStr : this.htStr;
-  }
-};
-var WarningBlockquote = class {
-  mdStr;
-  htStr;
-  constructor(text) {
-    this.mdStr = `> ${text}
+}
+function renderWarningBlockquote(text, format) {
+  if (format === "markdown") {
+    return `> ${markdownEscape(text)}
 
 `;
-    this.htStr = `<blockquote><p>${htmlEscape(text)}</p></blockquote>
+  }
+  return `<blockquote><pre><samp>${htmlEscape(text)}</samp></pre></blockquote>
 `;
+}
+function renderNoOutputNotice(format) {
+  if (format === "markdown") {
+    return "No output captured.\n\n";
   }
-  size(format) {
-    return format === "markdown" ? this.mdStr.length : this.htStr.length;
-  }
-  render(format) {
-    return format === "markdown" ? this.mdStr : this.htStr;
-  }
-};
+  return "<p>No output captured.</p>\n";
+}
 
 // src/elements/text-fallback.ts
 var TextFallbackElement = class {
@@ -3649,7 +3561,7 @@ var TextFallbackElement = class {
   }
   size(format, level) {
     if (level === 0) {
-      return this.heading.size(format) + noteSize(this.noteText, format);
+      return this.heading.size(format) + renderNote(this.noteText, format).length;
     }
     return this.full.size(format);
   }
@@ -3665,40 +3577,39 @@ var TextFallbackElement = class {
 function buildStepTable(steps, excludeIds) {
   const filtered = excludeIds ? steps.filter((s) => !excludeIds.has(s.id)) : steps;
   if (filtered.length === 0) return EMPTY;
-  const hasExitCodes = filtered.some((s) => s.exitCode !== void 0);
-  if (hasExitCodes) {
-    const headers2 = [
-      new RawText("Step"),
-      new RawText("Outcome"),
-      new RawText("Exit Code")
-    ];
-    const rows2 = filtered.map((step) => ({
-      cells: [
-        new InlineCode(step.id),
-        new RawText(step.outcome),
-        step.exitCode !== void 0 ? new InlineCode(step.exitCode) : EMPTY
-      ]
-    }));
-    return new Table(headers2, rows2);
-  }
-  const headers = [new RawText("Step"), new RawText("Outcome")];
-  const rows = filtered.map((step) => ({
-    cells: [new InlineCode(step.id), new RawText(step.outcome)]
-  }));
-  return new Table(headers, rows);
+  return new StepOutcomes(filtered);
 }
-var InlineCode = class {
-  mdStr;
-  htStr;
-  constructor(text) {
-    this.mdStr = `\`${text}\``;
-    this.htStr = `<code>${htmlEscape(text)}</code>`;
+var StepOutcomes = class {
+  steps;
+  hasExitCodes;
+  constructor(steps) {
+    this.steps = steps;
+    this.hasExitCodes = steps.some((s) => s.exitCode !== void 0);
   }
   size(format) {
-    return format === "markdown" ? this.mdStr.length : this.htStr.length;
+    return this.render(format).length;
   }
   render(format) {
-    return format === "markdown" ? this.mdStr : this.htStr;
+    if (this.hasExitCodes) {
+      const headers2 = [
+        textCell("Step"),
+        textCell("Outcome"),
+        textCell("Exit Code")
+      ];
+      const rows2 = this.steps.map((step) => ({
+        cells: [
+          codeSpan(step.id),
+          textCell(step.outcome),
+          step.exitCode !== void 0 ? codeSpan(step.exitCode) : EMPTY
+        ]
+      }));
+      return new Table(headers2, rows2).render(format);
+    }
+    const headers = [textCell("Step"), textCell("Outcome")];
+    const rows = this.steps.map((step) => ({
+      cells: [codeSpan(step.id), textCell(step.outcome)]
+    }));
+    return new Table(headers, rows).render(format);
   }
 };
 
@@ -3707,22 +3618,19 @@ var WorkflowElement = class {
   id = "step-table";
   fixed = true;
   levels = 1;
-  renderable;
+  steps;
   constructor(steps) {
-    const table = buildStepTable(steps);
-    if (table === EMPTY) {
-      this.renderable = EMPTY;
-    } else {
-      this.renderable = new Sequence([new Heading("Steps", 3), table]);
-    }
+    this.steps = steps;
   }
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   size(format, _level) {
-    return this.renderable.size(format);
+    return this.render(format, 0).length;
   }
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   render(format, _level) {
-    return this.renderable.render(format);
+    const table = buildStepTable(this.steps);
+    if (table === EMPTY) return "";
+    return new Heading("Steps", 3).render(format) + table.render(format);
   }
 };
 
@@ -3731,39 +3639,42 @@ var ErrorMessageElement = class {
   id = "message";
   fixed = true;
   levels = 1;
-  renderable;
+  message;
   constructor(message) {
-    this.renderable = new Paragraph(message);
+    this.message = message;
   }
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   size(format, _level) {
-    return this.renderable.size(format);
+    return this.render(format, 0).length;
   }
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   render(format, _level) {
-    return this.renderable.render(format);
+    if (format === "markdown") {
+      return `${markdownEscape(this.message)}
+
+`;
+    }
+    return `<p>${htmlEscape(this.message)}</p>
+`;
   }
 };
 var ErrorStepTableElement = class {
   id = "step-statuses";
   fixed = true;
   levels = 1;
-  renderable;
+  steps;
   constructor(steps) {
-    const table = buildStepTable(steps);
-    if (table === EMPTY) {
-      this.renderable = EMPTY;
-    } else {
-      this.renderable = new Sequence([new Heading("Steps", 3), table]);
-    }
+    this.steps = steps;
   }
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   size(format, _level) {
-    return this.renderable.size(format);
+    return this.render(format, 0).length;
   }
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   render(format, _level) {
-    return this.renderable.render(format);
+    const table = buildStepTable(this.steps);
+    if (table === EMPTY) return "";
+    return new Heading("Steps", 3).render(format) + table.render(format);
   }
 };
 
@@ -3772,20 +3683,22 @@ var RawStdoutElement = class {
   id;
   fixed = true;
   levels = 1;
-  renderable;
+  label;
+  content;
   constructor(stepId, label, content) {
     this.id = `raw-${stepId}`;
-    const escapedLabel = htmlEscape(label);
-    const formatted = buildRawOutputRenderable(content);
-    this.renderable = new Details(new HtmlText(escapedLabel), formatted);
+    this.label = label;
+    this.content = content;
   }
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   size(format, _level) {
-    return this.renderable.size(format);
+    return this.render(format, 0).length;
   }
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   render(format, _level) {
-    return this.renderable.render(format);
+    const summary = detailsSummary(this.label);
+    const formatted = buildRawOutputRenderable(this.content);
+    return new Details(summary, formatted).render(format);
   }
 };
 
@@ -3934,57 +3847,12 @@ function buildInlineDiff(before, after, format) {
   const a = after ?? "";
   if (b === "" && a === "") return EMPTY;
   if (b === a) {
-    return new HtmlText(inlineCodeCell(b));
+    return htmlCodeCell(b);
   }
   if (format === "simple") {
-    const parts = [];
-    if (b !== "") parts.push(`- ${escapeCell(htmlEscape(b))}`);
-    if (a !== "") parts.push(`+ ${escapeCell(htmlEscape(a))}`);
-    return new HtmlText(parts.join("<br>"));
+    return simpleDiffCell(b, a);
   }
-  const beforeLines = b.split("\n");
-  const afterLines = a.split("\n");
-  const maxLen = Math.max(beforeLines.length, afterLines.length);
-  const resultLines = [];
-  for (let i = 0; i < maxLen; i++) {
-    let flushBuffers2 = function() {
-      if (delBuf) {
-        line += `<del style="background:#fdd">${escapeHtmlCell(delBuf)}</del>`;
-        delBuf = "";
-      }
-      if (insBuf) {
-        line += `<ins style="background:#dfd">${escapeHtmlCell(insBuf)}</ins>`;
-        insBuf = "";
-      }
-    };
-    var flushBuffers = flushBuffers2;
-    const bl = beforeLines[i] ?? "";
-    const al = afterLines[i] ?? "";
-    if (bl === al) {
-      resultLines.push(escapeHtmlCell(bl));
-      continue;
-    }
-    const charDiff = buildCharDiff(bl, al);
-    let line = "";
-    let delBuf = "";
-    let insBuf = "";
-    for (const entry of charDiff) {
-      if (entry.kind === "removed") {
-        if (insBuf) {
-          flushBuffers2();
-        }
-        delBuf += entry.value;
-      } else if (entry.kind === "added") {
-        insBuf += entry.value;
-      } else {
-        flushBuffers2();
-        line += escapeHtmlCell(entry.value);
-      }
-    }
-    flushBuffers2();
-    resultLines.push(line);
-  }
-  return new HtmlText(`<code>${resultLines.join("<br>")}</code>`);
+  return new InlineCharDiffCell(b, a);
 }
 function buildLargeValueDiff(name, before, after, cache) {
   const bVal = before ? prettyPrint(before) : null;
@@ -4067,8 +3935,8 @@ function renderContextHunks(name, diff) {
 function buildDetailsBlock(name, content, addedLines, removedLines) {
   const hasDiff = addedLines > 0 || removedLines > 0;
   const suffix = hasDiff ? ` (large value; +${String(addedLines)}, -${String(removedLines)})` : " (large value)";
-  const summaryHtml = `${htmlEscape(name)}${suffix}`;
-  return new Details(new HtmlText(summaryHtml), content);
+  const summary = detailsSummary(name + suffix);
+  return new Details(summary, content);
 }
 function prettyPrint(value) {
   const trimmed = value.trim();
@@ -4081,15 +3949,85 @@ function prettyPrint(value) {
   }
   return value;
 }
-function escapeCell(value) {
-  return value.replace(/\\/g, "\\\\").replace(/\|/g, "\\|");
-}
 function escapeHtmlCell(value) {
   return htmlEscape(value).replace(/\|/g, "&#124;");
 }
-function inlineCodeCell(value) {
-  return `<code>${htmlEscape(value).replace(/\|/g, "&#124;")}</code>`;
+function simpleDiffCell(before, after) {
+  return {
+    size(format) {
+      return this.render(format).length;
+    },
+    render(format) {
+      const parts = [];
+      if (before !== "") parts.push(`- ${escapeHtmlCell(before)}`);
+      if (after !== "") parts.push(`+ ${escapeHtmlCell(after)}`);
+      const html = parts.join("<br>");
+      if (format === "markdown") {
+        return html.replace(/\|/g, "&#124;");
+      }
+      return html;
+    }
+  };
 }
+var InlineCharDiffCell = class {
+  before;
+  after;
+  constructor(before, after) {
+    this.before = before;
+    this.after = after;
+  }
+  size(format) {
+    return this.render(format).length;
+  }
+  render(format) {
+    const beforeLines = this.before.split("\n");
+    const afterLines = this.after.split("\n");
+    const maxLen = Math.max(beforeLines.length, afterLines.length);
+    const resultLines = [];
+    for (let i = 0; i < maxLen; i++) {
+      const bl = beforeLines[i] ?? "";
+      const al = afterLines[i] ?? "";
+      if (bl === al) {
+        resultLines.push(escapeHtmlCell(bl));
+        continue;
+      }
+      const charDiff = buildCharDiff(bl, al);
+      let line = "";
+      let delBuf = "";
+      let insBuf = "";
+      const flushBuffers = () => {
+        if (delBuf) {
+          line += `<del style="background:#fdd">${escapeHtmlCell(delBuf)}</del>`;
+          delBuf = "";
+        }
+        if (insBuf) {
+          line += `<ins style="background:#dfd">${escapeHtmlCell(insBuf)}</ins>`;
+          insBuf = "";
+        }
+      };
+      for (const entry of charDiff) {
+        if (entry.kind === "removed") {
+          if (insBuf) {
+            flushBuffers();
+          }
+          delBuf += entry.value;
+        } else if (entry.kind === "added") {
+          insBuf += entry.value;
+        } else {
+          flushBuffers();
+          line += escapeHtmlCell(entry.value);
+        }
+      }
+      flushBuffers();
+      resultLines.push(line);
+    }
+    const html = `<code>${resultLines.join("<br>")}</code>`;
+    if (format === "markdown") {
+      return html.replace(/\|/g, "&#124;");
+    }
+    return html;
+  }
+};
 
 // src/elements/resource.ts
 function buildResourceRenderable(resource, options, diffCache, level, applyContext) {
@@ -4105,23 +4043,22 @@ function buildResourceRenderable(resource, options, diffCache, level, applyConte
   );
 }
 function buildListingLine(resource) {
-  const symbol = ACTION_SYMBOLS[resource.action];
-  return new RawText(`${symbol} ${resource.address}`);
+  return new ResourceListingLine(resource.action, resource.address);
 }
 function buildDetailsRenderable(resource, options, diffCache, level, applyContext) {
   const symbol = ACTION_SYMBOLS[resource.action];
+  const instanceName = deriveInstanceName(resource.address, resource.type);
   const changedAttrs = resource.attributes.filter(
     (a) => !a.isSensitive && !a.isKnownAfterApply && a.before !== a.after
   ).map((a) => a.name);
-  let summaryHtml = `${symbol} <strong>${htmlEscape(resource.type)}</strong> ${htmlEscape(deriveInstanceName(resource.address, resource.type))}`;
-  if (resource.action === "update" && changedAttrs.length > 0) {
-    const hint = changedAttrs.slice(0, 5).join(", ");
-    summaryHtml += ` \u2014 changed: ${htmlEscape(hint)}`;
-  }
-  if (applyContext?.failed) {
-    summaryHtml += ` ${STATUS_FAILURE}`;
-  }
   const shouldOpen = applyContext !== void 0 && (applyContext.failed || applyContext.diagnostics.length > 0);
+  const summary = new ResourceDetailSummary(
+    symbol,
+    resource.type,
+    instanceName,
+    resource.action === "update" ? changedAttrs : [],
+    applyContext?.failed ?? false
+  );
   const parts = [];
   parts.push(new CodeBlock(resource.address));
   if (resource.importId !== null) {
@@ -4145,16 +4082,16 @@ function buildDetailsRenderable(resource, options, diffCache, level, applyContex
     parts.push(buildInlineDiagnostics(applyContext.diagnostics));
   }
   const content = new Sequence(parts);
-  return new Details(new HtmlText(summaryHtml), content, shouldOpen);
+  return new Details(summary, content, shouldOpen);
 }
 function buildAttributeRenderable(resource, options, diffCache, level) {
   const diffFormat = options.diffFormat ?? "inline";
   const useCharDiff = level >= 3;
   if (resource.allUnknownAfterApply) {
-    return new NoteRenderable2("all values known after apply");
+    return new NoteRenderable("all values known after apply");
   }
   if (resource.attributes.length === 0 && resource.hasAttributeDetail) {
-    return new NoteRenderable2("No attribute changes.");
+    return new NoteRenderable("No attribute changes.");
   }
   if (resource.attributes.length === 0) {
     return EMPTY;
@@ -4164,23 +4101,17 @@ function buildAttributeRenderable(resource, options, diffCache, level) {
   const largeAttrs = resource.attributes.filter((a) => a.isLarge);
   if (smallAttrs.length > 0) {
     const headers = [
-      new RawText("Attribute"),
-      new RawText("Before"),
-      new RawText("After")
+      textCell("Attribute"),
+      textCell("Before"),
+      textCell("After")
     ];
     const rows = [];
     for (const attr of smallAttrs) {
       const skipDiff = attr.isSensitive || attr.isKnownAfterApply;
-      const beforeCell = skipDiff ? new HtmlText(inlineCodeCell2(attr.before ?? "")) : new HtmlText(
-        `<code>${escapeHtmlCell2(attr.before ?? "").replace(/\n/g, "<br>")}</code>`
-      );
-      const afterCell = skipDiff || !useCharDiff ? new HtmlText(inlineCodeCell2(attr.after ?? "")) : buildInlineDiff(attr.before, attr.after, diffFormat);
+      const beforeCell = skipDiff ? htmlCodeCell(attr.before ?? "") : htmlCodeCellMultiline(attr.before ?? "");
+      const afterCell = skipDiff || !useCharDiff ? htmlCodeCell(attr.after ?? "") : buildInlineDiff(attr.before, attr.after, diffFormat);
       rows.push({
-        cells: [
-          new HtmlText(escapeCell2(htmlEscape(attr.name))),
-          beforeCell,
-          afterCell
-        ]
+        cells: [textCell(attr.name), beforeCell, afterCell]
       });
     }
     parts.push(new Table(headers, rows));
@@ -4211,21 +4142,71 @@ function buildInlineDiagnostics(diagnostics) {
   }
   return new Sequence(parts);
 }
-var MetadataParagraph = class {
-  mdStr;
-  htStr;
-  constructor(label, value) {
-    this.mdStr = `**${label}:** \`${value}\`
-
-`;
-    this.htStr = `<p><strong>${label}:</strong> <code>${htmlEscape(value)}</code></p>
-`;
+var ResourceListingLine = class {
+  action;
+  address;
+  constructor(action, address) {
+    this.action = action;
+    this.address = address;
   }
   size(format) {
-    return format === "markdown" ? this.mdStr.length : this.htStr.length;
+    return this.render(format).length;
   }
   render(format) {
-    return format === "markdown" ? this.mdStr : this.htStr;
+    const symbol = ACTION_SYMBOLS[this.action];
+    if (format === "markdown") {
+      return `${symbol} ${markdownEscape(this.address)}`;
+    }
+    return `${symbol} ${htmlEscape(this.address)}`;
+  }
+};
+var ResourceDetailSummary = class {
+  symbol;
+  type;
+  instanceName;
+  changedAttrs;
+  failed;
+  constructor(symbol, type, instanceName, changedAttrs, failed) {
+    this.symbol = symbol;
+    this.type = type;
+    this.instanceName = instanceName;
+    this.changedAttrs = changedAttrs;
+    this.failed = failed;
+  }
+  size(format) {
+    return this.render(format).length;
+  }
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  render(_format) {
+    let html = `${this.symbol} <strong>${htmlEscape(this.type)}</strong> ${htmlEscape(this.instanceName)}`;
+    if (this.changedAttrs.length > 0) {
+      const hint = this.changedAttrs.slice(0, 5).join(", ");
+      html += ` \u2014 changed: ${htmlEscape(hint)}`;
+    }
+    if (this.failed) {
+      html += ` ${STATUS_FAILURE}`;
+    }
+    return html;
+  }
+};
+var MetadataParagraph = class {
+  label;
+  value;
+  constructor(label, value) {
+    this.label = label;
+    this.value = value;
+  }
+  size(format) {
+    return this.render(format).length;
+  }
+  render(format) {
+    if (format === "markdown") {
+      return `**${markdownEscape(this.label)}:** \`${markdownEscape(this.value)}\`
+
+`;
+    }
+    return `<p><strong>${htmlEscape(this.label)}:</strong> <code>${htmlEscape(this.value)}</code></p>
+`;
   }
 };
 var ResourceDiagnosticLine = class {
@@ -4241,7 +4222,7 @@ var ResourceDiagnosticLine = class {
   render(format) {
     const icon = this.severity === "error" ? DIAGNOSTIC_ERROR : DIAGNOSTIC_WARNING;
     if (format === "markdown") {
-      return `${icon} **${this.summary}**
+      return `${icon} **${markdownEscape(this.summary)}**
 
 `;
     }
@@ -4249,7 +4230,7 @@ var ResourceDiagnosticLine = class {
 `;
   }
 };
-var NoteRenderable2 = class {
+var NoteRenderable = class {
   text;
   constructor(text) {
     this.text = text;
@@ -4261,15 +4242,6 @@ var NoteRenderable2 = class {
     return renderNote(this.text, format);
   }
 };
-function escapeCell2(value) {
-  return value.replace(/\\/g, "\\\\").replace(/\|/g, "\\|");
-}
-function escapeHtmlCell2(value) {
-  return htmlEscape(value).replace(/\|/g, "&#124;");
-}
-function inlineCodeCell2(value) {
-  return `<code>${htmlEscape(value).replace(/\|/g, "&#124;")}</code>`;
-}
 
 // src/elements/module-group.ts
 function buildModuleGroupRenderable(moduleAddress, resources, options, diffCache, level, applyContextFn) {
@@ -4310,7 +4282,7 @@ var ModuleHeading = class {
   renderLabel(format) {
     if (this.moduleAddress === "") return "root";
     if (format === "markdown") {
-      return `\`${this.moduleAddress}\``;
+      return `\`${markdownEscape(this.moduleAddress)}\``;
     }
     return `<code>${htmlEscape(this.moduleAddress)}</code>`;
   }
@@ -4330,26 +4302,19 @@ function buildOutputsRenderable(outputs, options, diffCache, level) {
   const parts = [];
   if (smallOutputs.length > 0) {
     const headers = [
-      new RawText("Output"),
-      new RawText("Action"),
-      new RawText("Before"),
-      new RawText("After")
+      textCell("Output"),
+      textCell("Action"),
+      textCell("Before"),
+      textCell("After")
     ];
     const rows = [];
     for (const output of smallOutputs) {
       const symbol = ACTION_SYMBOLS[output.action];
       const skipDiff = output.isSensitive || output.isKnownAfterApply || !useDiff;
-      const before = output.isSensitive ? new HtmlText(inlineCode("(sensitive)")) : output.before !== null ? skipDiff ? new HtmlText(inlineCodeCell3(output.before)) : new HtmlText(
-        `<code>${escapeHtmlCell3(output.before).replace(/\n/g, "<br>")}</code>`
-      ) : EMPTY;
-      const after = output.isSensitive ? new HtmlText(inlineCode("(sensitive)")) : skipDiff ? new HtmlText(inlineCodeCell3(output.after ?? "")) : buildInlineDiff(output.before, output.after, diffFormat);
+      const before = output.isSensitive ? htmlCodeCell("(sensitive)") : output.before !== null ? skipDiff ? htmlCodeCell(output.before) : htmlCodeCellMultiline(output.before) : EMPTY;
+      const after = output.isSensitive ? htmlCodeCell("(sensitive)") : skipDiff ? htmlCodeCell(output.after ?? "") : buildInlineDiff(output.before, output.after, diffFormat);
       rows.push({
-        cells: [
-          new HtmlText(escapeCell3(output.name)),
-          new RawText(symbol),
-          before,
-          after
-        ]
+        cells: [textCell(output.name), textCell(symbol), before, after]
       });
     }
     parts.push(new Table(headers, rows));
@@ -4369,18 +4334,6 @@ function buildOutputsRenderable(outputs, options, diffCache, level) {
   }
   if (parts.length === 0) return EMPTY;
   return new Sequence(parts);
-}
-function escapeCell3(value) {
-  return value.replace(/\\/g, "\\\\").replace(/\|/g, "\\|");
-}
-function escapeHtmlCell3(value) {
-  return htmlEscape(value).replace(/\|/g, "&#124;");
-}
-function inlineCode(value) {
-  return `<code>${htmlEscape(value)}</code>`;
-}
-function inlineCodeCell3(value) {
-  return `<code>${htmlEscape(value).replace(/\|/g, "&#124;")}</code>`;
 }
 
 // src/elements/categories.ts
@@ -4790,16 +4743,7 @@ function reportFromSteps(stepsJson, options) {
     };
   } catch (err) {
     const message = err instanceof Error ? err.message : "Unknown error";
-    const errorRenderable = new RawText(
-      `## ${STATUS_FAILURE} Report Generation Failed
-
-An unexpected error occurred while generating the report:
-
-\`\`\`
-${message}
-\`\`\`
-`
-    );
+    const errorRenderable = new PipelineErrorRenderable(message);
     const errorReport = {
       render: (format) => ({
         output: errorRenderable.render(format),
@@ -4813,6 +4757,24 @@ ${message}
     };
   }
 }
+var PipelineErrorRenderable = class {
+  message;
+  constructor(message) {
+    this.message = message;
+  }
+  size(format) {
+    return this.render(format).length;
+  }
+  render(format) {
+    const heading = new Heading(
+      `${STATUS_FAILURE} Report Generation Failed`,
+      2
+    );
+    const preamble = format === "markdown" ? "An unexpected error occurred while generating the report:\n\n" : "<p>An unexpected error occurred while generating the report:</p>\n";
+    const code = new CodeBlock(this.message);
+    return heading.render(format) + preamble + code.render(format);
+  }
+};
 
 // src/github/client.ts
 var DEFAULT_BASE_URL = "https://api.github.com";

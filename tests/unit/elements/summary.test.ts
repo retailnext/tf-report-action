@@ -65,7 +65,7 @@ describe("SummaryElement", () => {
     const el = new SummaryElement("Plan", summary, false);
     const md = el.render("markdown", 0);
     expect(md).toContain("Add");
-    expect(md).toContain("aws_instance");
+    expect(md).toContain("aws\\_instance");
     expect(md).toContain("2");
   });
 
@@ -83,7 +83,7 @@ describe("SummaryElement", () => {
     const el = new SummaryElement("Apply", summary, true);
     const md = el.render("markdown", 0);
     expect(md).toContain("Added");
-    expect(md).toContain("aws_instance");
+    expect(md).toContain("aws\\_instance");
   });
 
   it("renders multiple action groups", () => {
@@ -106,8 +106,8 @@ describe("SummaryElement", () => {
     const md = el.render("markdown", 0);
     expect(md).toContain("Add");
     expect(md).toContain("Destroy");
-    expect(md).toContain("aws_instance");
-    expect(md).toContain("aws_s3_bucket");
+    expect(md).toContain("aws\\_instance");
+    expect(md).toContain("aws\\_s3\\_bucket");
   });
 
   it("renders failure labels for apply failures", () => {

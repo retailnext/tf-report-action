@@ -1,11 +1,15 @@
 import type { ReportOptions } from "../builder/report-from-steps.js";
 export type { ReportOptions };
-import type { ComposedReport } from "../renderable/types.js";
+import type {
+  ComposedReport,
+  OutputFormat,
+  Renderable,
+} from "../renderable/types.js";
 import { buildReportFromSteps } from "../builder/report-from-steps.js";
 import { buildReportElements } from "../elements/report-elements.js";
 import { composeReport } from "../elements/composed-report.js";
 import { STATUS_FAILURE } from "../model/status-icons.js";
-import { RawText } from "../renderable/primitives.js";
+import { Heading, CodeBlock } from "../renderable/primitives.js";
 
 /**
  * Result of generating a report from a GitHub Actions steps context.
@@ -63,9 +67,7 @@ export function reportFromSteps(
     };
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : "Unknown error";
-    const errorRenderable = new RawText(
-      `## ${STATUS_FAILURE} Report Generation Failed\n\nAn unexpected error occurred while generating the report:\n\n\`\`\`\n${message}\n\`\`\`\n`,
-    );
+    const errorRenderable = new PipelineErrorRenderable(message);
     const errorReport: ComposedReport = {
       render: (format) => ({
         output: errorRenderable.render(format),
@@ -77,5 +79,34 @@ export function reportFromSteps(
       report: errorReport,
       hasUnresolvedFailures: false,
     };
+  }
+}
+
+/**
+ * Pipeline error renderable — renders a failure heading with the error
+ * message in a code block. All escaping happens at render time.
+ */
+class PipelineErrorRenderable implements Renderable {
+  private readonly message: string;
+
+  constructor(message: string) {
+    this.message = message;
+  }
+
+  size(format: OutputFormat): number {
+    return this.render(format).length;
+  }
+
+  render(format: OutputFormat): string {
+    const heading = new Heading(
+      `${STATUS_FAILURE} Report Generation Failed`,
+      2,
+    );
+    const preamble =
+      format === "markdown"
+        ? "An unexpected error occurred while generating the report:\n\n"
+        : "<p>An unexpected error occurred while generating the report:</p>\n";
+    const code = new CodeBlock(this.message);
+    return heading.render(format) + preamble + code.render(format);
   }
 }

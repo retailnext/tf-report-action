@@ -10,7 +10,7 @@
 import type { Renderable, OutputFormat } from "../renderable/types.js";
 import type { ReportElement } from "../renderable/types.js";
 import { Heading, Sequence } from "../renderable/primitives.js";
-import { renderNote, noteSize } from "../renderable/helpers.js";
+import { renderNote } from "../renderable/helpers.js";
 import { buildRawOutputRenderable } from "./raw-output.js";
 
 /**
@@ -34,7 +34,9 @@ export class TextFallbackElement implements ReportElement {
 
   size(format: OutputFormat, level: number): number {
     if (level === 0) {
-      return this.heading.size(format) + noteSize(this.noteText, format);
+      return (
+        this.heading.size(format) + renderNote(this.noteText, format).length
+      );
     }
     return this.full.size(format);
   }

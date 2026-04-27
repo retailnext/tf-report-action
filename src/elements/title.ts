@@ -6,8 +6,9 @@
 import type { Renderable, OutputFormat } from "../renderable/types.js";
 import type { ReportElement } from "../renderable/types.js";
 import type { ReportTitle, TitleActionCount } from "../model/report-title.js";
-import { Heading, HtmlText } from "../renderable/primitives.js";
+import { Heading } from "../renderable/primitives.js";
 import { htmlEscape } from "../renderable/html-escape.js";
+import { markdownEscape } from "../renderable/markdown-escape.js";
 import {
   STATUS_SUCCESS,
   STATUS_FAILURE,
@@ -230,22 +231,21 @@ export class MarkerElement implements ReportElement {
   readonly fixed = true;
   readonly levels = 1;
 
-  private readonly renderable: Renderable;
+  private readonly workspace: string;
 
   constructor(workspace: string) {
-    const escaped = escapeMarkerWorkspace(workspace);
-    const comment = `<!-- tf-report-action:"${escaped}" -->\n`;
-    this.renderable = new HtmlText(comment);
+    this.workspace = workspace;
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  size(format: OutputFormat, _level: number): number {
-    return this.renderable.size(format);
+  size(_format: OutputFormat, _level: number): number {
+    return this.render("markdown", 0).length;
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  render(format: OutputFormat, _level: number): string {
-    return this.renderable.render(format);
+  render(_format: OutputFormat, _level: number): string {
+    const escaped = escapeMarkerWorkspace(this.workspace);
+    return `<!-- tf-report-action:"${escaped}" -->\n`;
   }
 }
 
@@ -362,20 +362,21 @@ class WarningBlockquoteChrome implements Renderable {
 
 /** Renders a logs link. */
 class LogsUrlRenderable implements Renderable {
-  private readonly mdStr: string;
-  private readonly htStr: string;
+  private readonly url: string;
 
   constructor(url: string) {
-    this.mdStr = `[View full logs](${url})\n\n`;
-    this.htStr = `<p><a href="${htmlEscape(url)}">View full logs</a></p>\n`;
+    this.url = url;
   }
 
   size(format: OutputFormat): number {
-    return format === "markdown" ? this.mdStr.length : this.htStr.length;
+    return this.render(format).length;
   }
 
   render(format: OutputFormat): string {
-    return format === "markdown" ? this.mdStr : this.htStr;
+    if (format === "markdown") {
+      return `[View full logs](${markdownEscape(this.url)})\n\n`;
+    }
+    return `<p><a href="${htmlEscape(this.url)}">View full logs</a></p>\n`;
   }
 }
 

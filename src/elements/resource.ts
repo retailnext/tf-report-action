@@ -19,13 +19,12 @@ import type { Diagnostic } from "../model/diagnostic.js";
 import type { DiffEntry } from "../diff/types.js";
 import type { ApplyContext } from "./apply-context.js";
 import type { DiffFormat } from "./diff-value.js";
+import type { PlanAction } from "../model/plan-action.js";
 import {
   Details,
   CodeBlock,
   Table,
   Sequence,
-  RawText,
-  HtmlText,
   EMPTY,
 } from "../renderable/primitives.js";
 import { ACTION_SYMBOLS } from "../model/plan-action.js";
@@ -35,7 +34,13 @@ import {
   DIAGNOSTIC_WARNING,
 } from "../model/status-icons.js";
 import { htmlEscape } from "../renderable/html-escape.js";
+import { markdownEscape } from "../renderable/markdown-escape.js";
 import { renderNote } from "../renderable/helpers.js";
+import {
+  textCell,
+  htmlCodeCell,
+  htmlCodeCellMultiline,
+} from "../renderable/helpers.js";
 import { deriveInstanceName } from "./address.js";
 import {
   buildInlineDiff,
@@ -79,8 +84,7 @@ export function buildResourceRenderable(
 
 /** Level 0: a single line for the flat listing. */
 function buildListingLine(resource: ResourceChange): Renderable {
-  const symbol = ACTION_SYMBOLS[resource.action];
-  return new RawText(`${symbol} ${resource.address}`);
+  return new ResourceListingLine(resource.action, resource.address);
 }
 
 /** Levels 1–4: collapsible details block. */
@@ -92,28 +96,27 @@ function buildDetailsRenderable(
   applyContext?: ApplyContext,
 ): Renderable {
   const symbol = ACTION_SYMBOLS[resource.action];
+  const instanceName = deriveInstanceName(resource.address, resource.type);
 
-  // Build summary text
+  // Build changed attributes hint for summary
   const changedAttrs = resource.attributes
     .filter(
       (a) => !a.isSensitive && !a.isKnownAfterApply && a.before !== a.after,
     )
     .map((a) => a.name);
 
-  let summaryHtml = `${symbol} <strong>${htmlEscape(resource.type)}</strong> ${htmlEscape(deriveInstanceName(resource.address, resource.type))}`;
-
-  if (resource.action === "update" && changedAttrs.length > 0) {
-    const hint = changedAttrs.slice(0, 5).join(", ");
-    summaryHtml += ` — changed: ${htmlEscape(hint)}`;
-  }
-
-  if (applyContext?.failed) {
-    summaryHtml += ` ${STATUS_FAILURE}`;
-  }
-
   const shouldOpen =
     applyContext !== undefined &&
     (applyContext.failed || applyContext.diagnostics.length > 0);
+
+  // Build the summary Renderable for the Details block
+  const summary = new ResourceDetailSummary(
+    symbol,
+    resource.type,
+    instanceName,
+    resource.action === "update" ? changedAttrs : [],
+    applyContext?.failed ?? false,
+  );
 
   // Build content parts
   const parts: Renderable[] = [];
@@ -148,7 +151,7 @@ function buildDetailsRenderable(
   }
 
   const content = new Sequence(parts);
-  return new Details(new HtmlText(summaryHtml), content, shouldOpen);
+  return new Details(summary, content, shouldOpen);
 }
 
 /** Builds attribute table and large value blocks. */
@@ -180,29 +183,23 @@ function buildAttributeRenderable(
   // Small attributes table
   if (smallAttrs.length > 0) {
     const headers = [
-      new RawText("Attribute"),
-      new RawText("Before"),
-      new RawText("After"),
+      textCell("Attribute"),
+      textCell("Before"),
+      textCell("After"),
     ];
     const rows: { cells: Renderable[] }[] = [];
 
     for (const attr of smallAttrs) {
       const skipDiff = attr.isSensitive || attr.isKnownAfterApply;
       const beforeCell = skipDiff
-        ? new HtmlText(inlineCodeCell(attr.before ?? ""))
-        : new HtmlText(
-            `<code>${escapeHtmlCell(attr.before ?? "").replace(/\n/g, "<br>")}</code>`,
-          );
+        ? htmlCodeCell(attr.before ?? "")
+        : htmlCodeCellMultiline(attr.before ?? "");
       const afterCell =
         skipDiff || !useCharDiff
-          ? new HtmlText(inlineCodeCell(attr.after ?? ""))
+          ? htmlCodeCell(attr.after ?? "")
           : buildInlineDiff(attr.before, attr.after, diffFormat);
       rows.push({
-        cells: [
-          new HtmlText(escapeCell(htmlEscape(attr.name))),
-          beforeCell,
-          afterCell,
-        ],
+        cells: [textCell(attr.name), beforeCell, afterCell],
       });
     }
 
@@ -251,22 +248,98 @@ function buildInlineDiagnostics(
 // Internal helper renderables
 // ---------------------------------------------------------------------------
 
-/** Bold-label + inline code paragraph. */
-class MetadataParagraph implements Renderable {
-  private readonly mdStr: string;
-  private readonly htStr: string;
+/**
+ * Resource listing line — renders `symbol address` for flat listings.
+ * Stores action and address as semantic data; escapes at render time.
+ */
+class ResourceListingLine implements Renderable {
+  private readonly action: PlanAction;
+  private readonly address: string;
 
-  constructor(label: string, value: string) {
-    this.mdStr = `**${label}:** \`${value}\`\n\n`;
-    this.htStr = `<p><strong>${label}:</strong> <code>${htmlEscape(value)}</code></p>\n`;
+  constructor(action: PlanAction, address: string) {
+    this.action = action;
+    this.address = address;
   }
 
   size(format: OutputFormat): number {
-    return format === "markdown" ? this.mdStr.length : this.htStr.length;
+    return this.render(format).length;
   }
 
   render(format: OutputFormat): string {
-    return format === "markdown" ? this.mdStr : this.htStr;
+    const symbol = ACTION_SYMBOLS[this.action];
+    if (format === "markdown") {
+      return `${symbol} ${markdownEscape(this.address)}`;
+    }
+    return `${symbol} ${htmlEscape(this.address)}`;
+  }
+}
+
+/**
+ * Resource detail summary — renders the `<summary>` content for a
+ * resource's collapsible details block. Always produces HTML since
+ * `<summary>` is an HTML context in both formats.
+ */
+class ResourceDetailSummary implements Renderable {
+  private readonly symbol: string;
+  private readonly type: string;
+  private readonly instanceName: string;
+  private readonly changedAttrs: readonly string[];
+  private readonly failed: boolean;
+
+  constructor(
+    symbol: string,
+    type: string,
+    instanceName: string,
+    changedAttrs: readonly string[],
+    failed: boolean,
+  ) {
+    this.symbol = symbol;
+    this.type = type;
+    this.instanceName = instanceName;
+    this.changedAttrs = changedAttrs;
+    this.failed = failed;
+  }
+
+  size(format: OutputFormat): number {
+    return this.render(format).length;
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  render(_format: OutputFormat): string {
+    let html = `${this.symbol} <strong>${htmlEscape(this.type)}</strong> ${htmlEscape(this.instanceName)}`;
+
+    if (this.changedAttrs.length > 0) {
+      const hint = this.changedAttrs.slice(0, 5).join(", ");
+      html += ` — changed: ${htmlEscape(hint)}`;
+    }
+
+    if (this.failed) {
+      html += ` ${STATUS_FAILURE}`;
+    }
+
+    return html;
+  }
+}
+
+/** Bold-label + inline code paragraph. */
+class MetadataParagraph implements Renderable {
+  private readonly label: string;
+  private readonly value: string;
+
+  constructor(label: string, value: string) {
+    this.label = label;
+    this.value = value;
+  }
+
+  size(format: OutputFormat): number {
+    return this.render(format).length;
+  }
+
+  render(format: OutputFormat): string {
+    if (format === "markdown") {
+      return `**${markdownEscape(this.label)}:** \`${markdownEscape(this.value)}\`\n\n`;
+    }
+    return `<p><strong>${htmlEscape(this.label)}:</strong> <code>${htmlEscape(this.value)}</code></p>\n`;
   }
 }
 
@@ -291,7 +364,7 @@ class ResourceDiagnosticLine implements Renderable {
     const icon =
       this.severity === "error" ? DIAGNOSTIC_ERROR : DIAGNOSTIC_WARNING;
     if (format === "markdown") {
-      return `${icon} **${this.summary}**\n\n`;
+      return `${icon} **${markdownEscape(this.summary)}**\n\n`;
     }
     return `<p>${icon} <strong>${htmlEscape(this.summary)}</strong></p>\n`;
   }
@@ -312,23 +385,4 @@ class NoteRenderable implements Renderable {
   render(format: OutputFormat): string {
     return renderNote(this.text, format);
   }
-}
-
-// ---------------------------------------------------------------------------
-// Escape helpers (local copies to avoid importing from renderer/writer)
-// ---------------------------------------------------------------------------
-
-/** Escape pipe characters for markdown table cells. */
-function escapeCell(value: string): string {
-  return value.replace(/\\/g, "\\\\").replace(/\|/g, "\\|");
-}
-
-/** Escape HTML + pipe for table cell context. */
-function escapeHtmlCell(value: string): string {
-  return htmlEscape(value).replace(/\|/g, "&#124;");
-}
-
-/** Wrap value in `<code>` with HTML + pipe escaping. */
-function inlineCodeCell(value: string): string {
-  return `<code>${htmlEscape(value).replace(/\|/g, "&#124;")}</code>`;
 }

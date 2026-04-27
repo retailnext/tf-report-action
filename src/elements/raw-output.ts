@@ -197,43 +197,49 @@ function tryBuildJsonLinesRenderable(content: string): Renderable | undefined {
 
 /** A code block with 4-backtick fences. */
 class FourTickCodeBlock implements Renderable {
-  private readonly mdStr: string;
-  private readonly htStr: string;
+  private readonly content: string;
 
   constructor(content: string) {
-    this.mdStr = `\`\`\`\`\n${content}\n\`\`\`\`\n\n`;
-    this.htStr = `<pre><code>${htmlEscape(content)}</code></pre>\n`;
+    this.content = content;
   }
 
   size(format: OutputFormat): number {
-    return format === "markdown" ? this.mdStr.length : this.htStr.length;
+    return this.render(format).length;
   }
 
   render(format: OutputFormat): string {
-    return format === "markdown" ? this.mdStr : this.htStr;
+    if (format === "markdown") {
+      return `\`\`\`\`\n${this.content}\n\`\`\`\`\n\n`;
+    }
+    return `<pre><code>${htmlEscape(this.content)}</code></pre>\n`;
   }
 }
 
 /** Validation result renderable. */
 class ValidateRenderable implements Renderable {
-  private readonly mdStr: string;
-  private readonly htStr: string;
+  private readonly valid: boolean;
+  private readonly diagnostics: Record<string, unknown>[];
+  private readonly raw: string;
 
   constructor(
     valid: boolean,
     diagnostics: Record<string, unknown>[],
     raw: string,
   ) {
-    this.mdStr = buildValidateMarkdown(valid, diagnostics, raw);
-    this.htStr = buildValidateHtml(valid, diagnostics, raw);
+    this.valid = valid;
+    this.diagnostics = diagnostics;
+    this.raw = raw;
   }
 
   size(format: OutputFormat): number {
-    return format === "markdown" ? this.mdStr.length : this.htStr.length;
+    return this.render(format).length;
   }
 
   render(format: OutputFormat): string {
-    return format === "markdown" ? this.mdStr : this.htStr;
+    if (format === "markdown") {
+      return buildValidateMarkdown(this.valid, this.diagnostics, this.raw);
+    }
+    return buildValidateHtml(this.valid, this.diagnostics, this.raw);
   }
 }
 
@@ -344,20 +350,21 @@ function formatValidateDiagHtml(diag: Record<string, unknown>): string {
 
 /** JSON Lines renderable — formats messages with icons and expandable fields. */
 class JsonLinesRenderable implements Renderable {
-  private readonly mdStr: string;
-  private readonly htStr: string;
+  private readonly messages: JsonLinesMsg[];
 
   constructor(messages: JsonLinesMsg[]) {
-    this.mdStr = buildJsonLinesMarkdown(messages);
-    this.htStr = buildJsonLinesHtml(messages);
+    this.messages = messages;
   }
 
   size(format: OutputFormat): number {
-    return format === "markdown" ? this.mdStr.length : this.htStr.length;
+    return this.render(format).length;
   }
 
   render(format: OutputFormat): string {
-    return format === "markdown" ? this.mdStr : this.htStr;
+    if (format === "markdown") {
+      return buildJsonLinesMarkdown(this.messages);
+    }
+    return buildJsonLinesHtml(this.messages);
   }
 }
 

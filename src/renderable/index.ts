@@ -9,7 +9,17 @@
  * **Layer 1** — no project dependencies beyond `model/`.
  */
 
-export { htmlEscape, htmlEscapeSize } from "./html-escape.js";
+export { htmlEscape } from "./html-escape.js";
+export { markdownEscape } from "./markdown-escape.js";
+export {
+  renderNote,
+  textCell,
+  codeSpan,
+  boldSpan,
+  htmlCodeCell,
+  htmlCodeCellMultiline,
+  detailsSummary,
+} from "./helpers.js";
 export {
   Blockquote,
   CodeBlock,
@@ -17,10 +27,7 @@ export {
   EMPTY,
   Empty,
   Heading,
-  HtmlText,
   InlineDiff,
-  Paragraph,
-  RawText,
   Sequence,
   Table,
 } from "./primitives.js";

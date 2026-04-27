@@ -7,8 +7,8 @@
 
 import type { Renderable, OutputFormat } from "../renderable/types.js";
 import type { StepOutcome } from "../model/step-outcome.js";
-import { Table, RawText, EMPTY } from "../renderable/primitives.js";
-import { htmlEscape } from "../renderable/html-escape.js";
+import { Table, EMPTY } from "../renderable/primitives.js";
+import { textCell, codeSpan } from "../renderable/helpers.js";
 
 /**
  * Builds a step status table as a Renderable.
@@ -26,49 +26,47 @@ export function buildStepTable(
 
   if (filtered.length === 0) return EMPTY;
 
-  const hasExitCodes = filtered.some((s) => s.exitCode !== undefined);
-
-  if (hasExitCodes) {
-    const headers = [
-      new RawText("Step"),
-      new RawText("Outcome"),
-      new RawText("Exit Code"),
-    ];
-    const rows = filtered.map((step) => ({
-      cells: [
-        new InlineCode(step.id),
-        new RawText(step.outcome),
-        step.exitCode !== undefined ? new InlineCode(step.exitCode) : EMPTY,
-      ],
-    }));
-    return new Table(headers, rows);
-  }
-
-  const headers = [new RawText("Step"), new RawText("Outcome")];
-  const rows = filtered.map((step) => ({
-    cells: [new InlineCode(step.id), new RawText(step.outcome)],
-  }));
-  return new Table(headers, rows);
+  return new StepOutcomes(filtered);
 }
 
 /**
- * Inline code renderable — wraps text in backticks (markdown) or
- * `<code>` tags (HTML). Used for step IDs and exit codes in tables.
+ * Step outcomes — semantic Renderable holding step status data.
+ * Renders as a table with step IDs, outcomes, and optional exit codes.
  */
-class InlineCode implements Renderable {
-  private readonly mdStr: string;
-  private readonly htStr: string;
+class StepOutcomes implements Renderable {
+  private readonly steps: readonly StepOutcome[];
+  private readonly hasExitCodes: boolean;
 
-  constructor(text: string) {
-    this.mdStr = `\`${text}\``;
-    this.htStr = `<code>${htmlEscape(text)}</code>`;
+  constructor(steps: readonly StepOutcome[]) {
+    this.steps = steps;
+    this.hasExitCodes = steps.some((s) => s.exitCode !== undefined);
   }
 
   size(format: OutputFormat): number {
-    return format === "markdown" ? this.mdStr.length : this.htStr.length;
+    return this.render(format).length;
   }
 
   render(format: OutputFormat): string {
-    return format === "markdown" ? this.mdStr : this.htStr;
+    if (this.hasExitCodes) {
+      const headers = [
+        textCell("Step"),
+        textCell("Outcome"),
+        textCell("Exit Code"),
+      ];
+      const rows = this.steps.map((step) => ({
+        cells: [
+          codeSpan(step.id),
+          textCell(step.outcome),
+          step.exitCode !== undefined ? codeSpan(step.exitCode) : EMPTY,
+        ],
+      }));
+      return new Table(headers, rows).render(format);
+    }
+
+    const headers = [textCell("Step"), textCell("Outcome")];
+    const rows = this.steps.map((step) => ({
+      cells: [codeSpan(step.id), textCell(step.outcome)],
+    }));
+    return new Table(headers, rows).render(format);
   }
 }
