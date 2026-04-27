@@ -119,7 +119,7 @@ describe("buildResourceRenderable - level 1 (compact)", () => {
       1,
     );
     const md = r.render("markdown");
-    expect(md).toContain("aws\\_instance.old");
+    expect(md).toContain("aws_instance.old");
     assertSizeInvariant(r, "compact-moved");
   });
 });

@@ -2403,7 +2403,7 @@ var Blockquote = class {
       const lines = this.text.split("\n");
       return lines.map((l) => `> ${markdownEscape(l)}`).join("\n") + "\n\n";
     }
-    return `<blockquote><pre><samp>${htmlEscape(this.text)}</samp></pre></blockquote>
+    return `<blockquote><p>${htmlEscape(this.text).replace(/\n/g, "<br>")}</p></blockquote>
 `;
   }
 };
@@ -2821,6 +2821,17 @@ function escapeMarkerWorkspace(workspace) {
 }
 
 // src/renderable/helpers.ts
+function mdCodeSpan(text) {
+  let maxRun = 0;
+  let currentRun = 0;
+  for (const ch of text) {
+    currentRun = ch === "`" ? currentRun + 1 : 0;
+    if (currentRun > maxRun) maxRun = currentRun;
+  }
+  const fence = "`".repeat(maxRun + 1);
+  const needsPadding = text.startsWith("`") || text.endsWith("`");
+  return needsPadding ? `${fence} ${text} ${fence}` : `${fence}${text}${fence}`;
+}
 function renderNote(text, format) {
   return format === "markdown" ? `_${markdownEscape(text)}_
 
@@ -2832,7 +2843,7 @@ function textCell(text) {
   return { size: (f) => renderFn(f).length, render: renderFn };
 }
 function codeSpan(text) {
-  const renderFn = (format) => format === "markdown" ? `\`${markdownEscape(text)}\`` : `<code>${htmlEscape(text)}</code>`;
+  const renderFn = (format) => format === "markdown" ? mdCodeSpan(text) : `<code>${htmlEscape(text)}</code>`;
   return { size: (f) => renderFn(f).length, render: renderFn };
 }
 function boldSpan(text) {
@@ -3045,7 +3056,7 @@ function renderPlainHeading(text, level, format) {
 function renderDiagnosticSummaryLine(severity, summary, address, format) {
   const icon = severity === "error" ? DIAGNOSTIC_ERROR : DIAGNOSTIC_WARNING;
   if (format === "markdown") {
-    const addr2 = address !== void 0 ? ` \u2014 \`${markdownEscape(address)}\`` : "";
+    const addr2 = address !== void 0 ? ` \u2014 ${mdCodeSpan(address)}` : "";
     return `${icon} **${markdownEscape(summary)}**${addr2}
 
 `;
@@ -3056,7 +3067,7 @@ function renderDiagnosticSummaryLine(severity, summary, address, format) {
 }
 function renderSnippetLine(code, context, filename, startLine, format) {
   if (format === "markdown") {
-    const loc2 = filename !== void 0 ? `\`${markdownEscape(code)}\` in ${markdownEscape(context)} (\`${markdownEscape(filename)}\`:${String(startLine)})` : `\`${markdownEscape(code)}\` in ${markdownEscape(context)}`;
+    const loc2 = filename !== void 0 ? `${mdCodeSpan(code)} in ${markdownEscape(context)} (${mdCodeSpan(filename)}:${String(startLine)})` : `${mdCodeSpan(code)} in ${markdownEscape(context)}`;
     return `> ${loc2}
 
 `;
@@ -3470,7 +3481,7 @@ function renderIssueHeading(issue, format) {
   const suffix = issueHeadingSuffix(issue);
   const stepId = issue.id;
   if (format === "markdown") {
-    return `### ${icon} \`${markdownEscape(stepId)}\`${markdownEscape(suffix)}
+    return `### ${icon} ${mdCodeSpan(stepId)}${markdownEscape(suffix)}
 
 `;
   }
@@ -3524,7 +3535,7 @@ function renderFullIssue(issue, format) {
 }
 function renderExitCode(exitCode, format) {
   if (format === "markdown") {
-    return `Exit code: \`${markdownEscape(exitCode)}\`
+    return `Exit code: ${mdCodeSpan(exitCode)}
 
 `;
   }
@@ -3537,7 +3548,7 @@ function renderWarningBlockquote(text, format) {
 
 `;
   }
-  return `<blockquote><pre><samp>${htmlEscape(text)}</samp></pre></blockquote>
+  return `<blockquote><p>${htmlEscape(text)}</p></blockquote>
 `;
 }
 function renderNoOutputNotice(format) {
@@ -4202,7 +4213,7 @@ var MetadataParagraph = class {
   }
   render(format) {
     if (format === "markdown") {
-      return `**${markdownEscape(this.label)}:** \`${markdownEscape(this.value)}\`
+      return `**${markdownEscape(this.label)}:** ${mdCodeSpan(this.value)}
 
 `;
     }
@@ -4283,7 +4294,7 @@ var ModuleHeading = class {
   renderLabel(format) {
     if (this.moduleAddress === "") return "root";
     if (format === "markdown") {
-      return `\`${markdownEscape(this.moduleAddress)}\``;
+      return mdCodeSpan(this.moduleAddress);
     }
     return `<code>${htmlEscape(this.moduleAddress)}</code>`;
   }

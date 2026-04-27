@@ -1006,7 +1006,7 @@ module.naming.random_string.suffix
 
 </details>
 
-### 📦 Module: \`module.parent\\["1"\\].module.child\`
+### 📦 Module: \`module.parent["1"].module.child\`
 
 <details>
 <summary>➕ <strong>null_resource</strong> item[0]</summary>
@@ -1019,7 +1019,7 @@ module.parent["1"].module.child.null_resource.item[0]
 
 </details>
 
-### 📦 Module: \`module.parent\\["2"\\].module.child\`
+### 📦 Module: \`module.parent["2"].module.child\`
 
 <details>
 <summary>➕ <strong>null_resource</strong> item[0]</summary>
@@ -1091,7 +1091,7 @@ module.naming.random_string.suffix
 
 </details>
 
-### 📦 Module: \`module.parent\\["2"\\].module.child\`
+### 📦 Module: \`module.parent["2"].module.child\`
 
 <details>
 <summary>🗑️ <strong>null_resource</strong> item[1]</summary>
@@ -1115,7 +1115,7 @@ module.parent["2"].module.child.null_resource.item[0]
 
 </details>
 
-### 📦 Module: \`module.parent\\["3"\\].module.child\`
+### 📦 Module: \`module.parent["3"].module.child\`
 
 <details>
 <summary>➕ <strong>null_resource</strong> item[1]</summary>
@@ -1189,7 +1189,7 @@ exports[`reportFromSteps integration — apply-no-show fixtures > terraform/null
 
 > The condition could not be evaluated at this time, a result will be known when this plan is applied.
 
-> \`    condition     = null\\_resource.alpha.id != ""\` in check "readiness" (\`main.tf\`:50)
+> \`    condition     = null_resource.alpha.id != ""\` in check "readiness" (\`main.tf\`:50)
 
 > null\\_resource.alpha.id = is a string
 
@@ -1267,7 +1267,7 @@ exports[`reportFromSteps integration — apply-no-show fixtures > terraform/null
 
 > The condition could not be evaluated at this time, a result will be known when this plan is applied.
 
-> \`    condition     = null\\_resource.alpha.id != ""\` in check "readiness" (\`main.tf\`:39)
+> \`    condition     = null_resource.alpha.id != ""\` in check "readiness" (\`main.tf\`:39)
 
 > null\\_resource.alpha.id = is a string
 
@@ -2569,7 +2569,7 @@ module.naming.random_string.suffix
 
 </details>
 
-### 📦 Module: \`module.parent\\["1"\\].module.child\`
+### 📦 Module: \`module.parent["1"].module.child\`
 
 <details>
 <summary>➕ <strong>null_resource</strong> item[0]</summary>
@@ -2582,7 +2582,7 @@ module.parent["1"].module.child.null_resource.item[0]
 
 </details>
 
-### 📦 Module: \`module.parent\\["2"\\].module.child\`
+### 📦 Module: \`module.parent["2"].module.child\`
 
 <details>
 <summary>➕ <strong>null_resource</strong> item[1]</summary>
@@ -2654,7 +2654,7 @@ module.naming.random_string.suffix
 
 </details>
 
-### 📦 Module: \`module.parent\\["2"\\].module.child\`
+### 📦 Module: \`module.parent["2"].module.child\`
 
 <details>
 <summary>🗑️ <strong>null_resource</strong> item[0]</summary>
@@ -2678,7 +2678,7 @@ module.parent["2"].module.child.null_resource.item[1]
 
 </details>
 
-### 📦 Module: \`module.parent\\["3"\\].module.child\`
+### 📦 Module: \`module.parent["3"].module.child\`
 
 <details>
 <summary>➕ <strong>null_resource</strong> item[2]</summary>
@@ -2752,7 +2752,7 @@ exports[`reportFromSteps integration — apply-no-show fixtures > tofu/null-life
 
 > The condition could not be evaluated at this time, a result will be known when this plan is applied.
 
-> \`    condition     = null\\_resource.alpha.id != ""\` in check "readiness" (\`main.tf\`:50)
+> \`    condition     = null_resource.alpha.id != ""\` in check "readiness" (\`main.tf\`:50)
 
 > null\\_resource.alpha.id = is a string
 
@@ -2830,7 +2830,7 @@ exports[`reportFromSteps integration — apply-no-show fixtures > tofu/null-life
 
 > The condition could not be evaluated at this time, a result will be known when this plan is applied.
 
-> \`    condition     = null\\_resource.alpha.id != ""\` in check "readiness" (\`main.tf\`:39)
+> \`    condition     = null_resource.alpha.id != ""\` in check "readiness" (\`main.tf\`:39)
 
 > null\\_resource.alpha.id = is a string
 
@@ -3985,7 +3985,7 @@ module.naming.random_string.suffix
 
 </details>
 
-### 📦 Module: \`module.parent\\["1"\\].module.child\`
+### 📦 Module: \`module.parent["1"].module.child\`
 
 <details>
 <summary>➕ <strong>null_resource</strong> item[0]</summary>
@@ -3998,7 +3998,7 @@ module.parent["1"].module.child.null_resource.item[0]
 
 </details>
 
-### 📦 Module: \`module.parent\\["2"\\].module.child\`
+### 📦 Module: \`module.parent["2"].module.child\`
 
 <details>
 <summary>➕ <strong>null_resource</strong> item[0]</summary>
@@ -4070,7 +4070,7 @@ module.naming.random_string.suffix
 
 </details>
 
-### 📦 Module: \`module.parent\\["2"\\].module.child\`
+### 📦 Module: \`module.parent["2"].module.child\`
 
 <details>
 <summary>🗑️ <strong>null_resource</strong> item[1]</summary>
@@ -4094,7 +4094,7 @@ module.parent["2"].module.child.null_resource.item[0]
 
 </details>
 
-### 📦 Module: \`module.parent\\["3"\\].module.child\`
+### 📦 Module: \`module.parent["3"].module.child\`
 
 <details>
 <summary>➕ <strong>null_resource</strong> item[1]</summary>
@@ -5327,7 +5327,7 @@ module.naming.random_string.suffix
 
 </details>
 
-### 📦 Module: \`module.parent\\["1"\\].module.child\`
+### 📦 Module: \`module.parent["1"].module.child\`
 
 <details>
 <summary>➕ <strong>null_resource</strong> item[0]</summary>
@@ -5340,7 +5340,7 @@ module.parent["1"].module.child.null_resource.item[0]
 
 </details>
 
-### 📦 Module: \`module.parent\\["2"\\].module.child\`
+### 📦 Module: \`module.parent["2"].module.child\`
 
 <details>
 <summary>➕ <strong>null_resource</strong> item[1]</summary>
@@ -5412,7 +5412,7 @@ module.naming.random_string.suffix
 
 </details>
 
-### 📦 Module: \`module.parent\\["2"\\].module.child\`
+### 📦 Module: \`module.parent["2"].module.child\`
 
 <details>
 <summary>🗑️ <strong>null_resource</strong> item[0]</summary>
@@ -5436,7 +5436,7 @@ module.parent["2"].module.child.null_resource.item[1]
 
 </details>
 
-### 📦 Module: \`module.parent\\["3"\\].module.child\`
+### 📦 Module: \`module.parent["3"].module.child\`
 
 <details>
 <summary>➕ <strong>null_resource</strong> item[2]</summary>
@@ -8526,7 +8526,7 @@ module.naming.random_string.suffix
 
 </details>
 
-### 📦 Module: \`module.parent\\["1"\\].module.child\`
+### 📦 Module: \`module.parent["1"].module.child\`
 
 <details>
 <summary>➕ <strong>null_resource</strong> item[0]</summary>
@@ -8545,7 +8545,7 @@ module.parent["1"].module.child.null_resource.item[0]
 
 </details>
 
-### 📦 Module: \`module.parent\\["2"\\].module.child\`
+### 📦 Module: \`module.parent["2"].module.child\`
 
 <details>
 <summary>➕ <strong>null_resource</strong> item[0]</summary>
@@ -8651,7 +8651,7 @@ module.naming.random_string.suffix
 
 </details>
 
-### 📦 Module: \`module.parent\\["1"\\].module.child\`
+### 📦 Module: \`module.parent["1"].module.child\`
 
 <details>
 <summary>➕ <strong>null_resource</strong> item[0]</summary>
@@ -8670,7 +8670,7 @@ module.parent["1"].module.child.null_resource.item[0]
 
 </details>
 
-### 📦 Module: \`module.parent\\["2"\\].module.child\`
+### 📦 Module: \`module.parent["2"].module.child\`
 
 <details>
 <summary>➕ <strong>null_resource</strong> item[0]</summary>
@@ -8771,7 +8771,7 @@ module.naming.random_string.suffix
 
 </details>
 
-### 📦 Module: \`module.parent\\["2"\\].module.child\`
+### 📦 Module: \`module.parent["2"].module.child\`
 
 <details>
 <summary>🗑️ <strong>null_resource</strong> item[0]</summary>
@@ -8807,7 +8807,7 @@ module.parent["2"].module.child.null_resource.item[1]
 
 </details>
 
-### 📦 Module: \`module.parent\\["3"\\].module.child\`
+### 📦 Module: \`module.parent["3"].module.child\`
 
 <details>
 <summary>➕ <strong>null_resource</strong> item[0]</summary>
@@ -8924,7 +8924,7 @@ module.naming.random_string.suffix
 
 </details>
 
-### 📦 Module: \`module.parent\\["2"\\].module.child\`
+### 📦 Module: \`module.parent["2"].module.child\`
 
 <details>
 <summary>🗑️ <strong>null_resource</strong> item[0]</summary>
@@ -8960,7 +8960,7 @@ module.parent["2"].module.child.null_resource.item[1]
 
 </details>
 
-### 📦 Module: \`module.parent\\["3"\\].module.child\`
+### 📦 Module: \`module.parent["3"].module.child\`
 
 <details>
 <summary>➕ <strong>null_resource</strong> item[0]</summary>
@@ -9063,7 +9063,7 @@ exports[`reportFromSteps integration — generated fixtures > terraform/null-lif
 
 > The condition could not be evaluated at this time, a result will be known when this plan is applied.
 
-> \`    condition     = null\\_resource.alpha.id != ""\` in check "readiness" (\`main.tf\`:50)
+> \`    condition     = null_resource.alpha.id != ""\` in check "readiness" (\`main.tf\`:50)
 
 > null\\_resource.alpha.id = is a string
 
@@ -9183,7 +9183,7 @@ exports[`reportFromSteps integration — generated fixtures > terraform/null-lif
 
 > The condition could not be evaluated at this time, a result will be known when this plan is applied.
 
-> \`    condition     = null\\_resource.alpha.id != ""\` in check "readiness" (\`main.tf\`:50)
+> \`    condition     = null_resource.alpha.id != ""\` in check "readiness" (\`main.tf\`:50)
 
 > null\\_resource.alpha.id = is a string
 
@@ -9306,7 +9306,7 @@ exports[`reportFromSteps integration — generated fixtures > terraform/null-lif
 
 > The condition could not be evaluated at this time, a result will be known when this plan is applied.
 
-> \`    condition     = null\\_resource.alpha.id != ""\` in check "readiness" (\`main.tf\`:39)
+> \`    condition     = null_resource.alpha.id != ""\` in check "readiness" (\`main.tf\`:39)
 
 > null\\_resource.alpha.id = is a string
 
@@ -9401,7 +9401,7 @@ exports[`reportFromSteps integration — generated fixtures > terraform/null-lif
 
 > The condition could not be evaluated at this time, a result will be known when this plan is applied.
 
-> \`    condition     = null\\_resource.alpha.id != ""\` in check "readiness" (\`main.tf\`:39)
+> \`    condition     = null_resource.alpha.id != ""\` in check "readiness" (\`main.tf\`:39)
 
 > null\\_resource.alpha.id = is a string
 
@@ -10075,7 +10075,7 @@ null_resource.ephemeral
 null_resource.renamed
 \`\`\`
 
-**Moved from:** \`null\\_resource.original\`
+**Moved from:** \`null_resource.original\`
 
 _No attribute changes._
 
@@ -10152,7 +10152,7 @@ null_resource.ephemeral
 null_resource.renamed
 \`\`\`
 
-**Moved from:** \`null\\_resource.original\`
+**Moved from:** \`null_resource.original\`
 
 _No attribute changes._
 
@@ -12895,7 +12895,7 @@ module.naming.random_string.suffix
 
 </details>
 
-### 📦 Module: \`module.parent\\["1"\\].module.child\`
+### 📦 Module: \`module.parent["1"].module.child\`
 
 <details>
 <summary>➕ <strong>null_resource</strong> item[0]</summary>
@@ -12914,7 +12914,7 @@ module.parent["1"].module.child.null_resource.item[0]
 
 </details>
 
-### 📦 Module: \`module.parent\\["2"\\].module.child\`
+### 📦 Module: \`module.parent["2"].module.child\`
 
 <details>
 <summary>➕ <strong>null_resource</strong> item[0]</summary>
@@ -13020,7 +13020,7 @@ module.naming.random_string.suffix
 
 </details>
 
-### 📦 Module: \`module.parent\\["1"\\].module.child\`
+### 📦 Module: \`module.parent["1"].module.child\`
 
 <details>
 <summary>➕ <strong>null_resource</strong> item[0]</summary>
@@ -13039,7 +13039,7 @@ module.parent["1"].module.child.null_resource.item[0]
 
 </details>
 
-### 📦 Module: \`module.parent\\["2"\\].module.child\`
+### 📦 Module: \`module.parent["2"].module.child\`
 
 <details>
 <summary>➕ <strong>null_resource</strong> item[0]</summary>
@@ -13140,7 +13140,7 @@ module.naming.random_string.suffix
 
 </details>
 
-### 📦 Module: \`module.parent\\["2"\\].module.child\`
+### 📦 Module: \`module.parent["2"].module.child\`
 
 <details>
 <summary>🗑️ <strong>null_resource</strong> item[0]</summary>
@@ -13176,7 +13176,7 @@ module.parent["2"].module.child.null_resource.item[1]
 
 </details>
 
-### 📦 Module: \`module.parent\\["3"\\].module.child\`
+### 📦 Module: \`module.parent["3"].module.child\`
 
 <details>
 <summary>➕ <strong>null_resource</strong> item[0]</summary>
@@ -13293,7 +13293,7 @@ module.naming.random_string.suffix
 
 </details>
 
-### 📦 Module: \`module.parent\\["2"\\].module.child\`
+### 📦 Module: \`module.parent["2"].module.child\`
 
 <details>
 <summary>🗑️ <strong>null_resource</strong> item[0]</summary>
@@ -13329,7 +13329,7 @@ module.parent["2"].module.child.null_resource.item[1]
 
 </details>
 
-### 📦 Module: \`module.parent\\["3"\\].module.child\`
+### 📦 Module: \`module.parent["3"].module.child\`
 
 <details>
 <summary>➕ <strong>null_resource</strong> item[0]</summary>
@@ -13432,7 +13432,7 @@ exports[`reportFromSteps integration — generated fixtures > tofu/null-lifecycl
 
 > The condition could not be evaluated at this time, a result will be known when this plan is applied.
 
-> \`    condition     = null\\_resource.alpha.id != ""\` in check "readiness" (\`main.tf\`:50)
+> \`    condition     = null_resource.alpha.id != ""\` in check "readiness" (\`main.tf\`:50)
 
 > null\\_resource.alpha.id = is a string
 
@@ -13552,7 +13552,7 @@ exports[`reportFromSteps integration — generated fixtures > tofu/null-lifecycl
 
 > The condition could not be evaluated at this time, a result will be known when this plan is applied.
 
-> \`    condition     = null\\_resource.alpha.id != ""\` in check "readiness" (\`main.tf\`:50)
+> \`    condition     = null_resource.alpha.id != ""\` in check "readiness" (\`main.tf\`:50)
 
 > null\\_resource.alpha.id = is a string
 
@@ -13675,7 +13675,7 @@ exports[`reportFromSteps integration — generated fixtures > tofu/null-lifecycl
 
 > The condition could not be evaluated at this time, a result will be known when this plan is applied.
 
-> \`    condition     = null\\_resource.alpha.id != ""\` in check "readiness" (\`main.tf\`:39)
+> \`    condition     = null_resource.alpha.id != ""\` in check "readiness" (\`main.tf\`:39)
 
 > null\\_resource.alpha.id = is a string
 
@@ -13770,7 +13770,7 @@ exports[`reportFromSteps integration — generated fixtures > tofu/null-lifecycl
 
 > The condition could not be evaluated at this time, a result will be known when this plan is applied.
 
-> \`    condition     = null\\_resource.alpha.id != ""\` in check "readiness" (\`main.tf\`:39)
+> \`    condition     = null_resource.alpha.id != ""\` in check "readiness" (\`main.tf\`:39)
 
 > null\\_resource.alpha.id = is a string
 
@@ -14443,7 +14443,7 @@ null_resource.ephemeral
 null_resource.renamed
 \`\`\`
 
-**Moved from:** \`null\\_resource.original\`
+**Moved from:** \`null_resource.original\`
 
 _No attribute changes._
 
@@ -14519,7 +14519,7 @@ null_resource.ephemeral
 null_resource.renamed
 \`\`\`
 
-**Moved from:** \`null\\_resource.original\`
+**Moved from:** \`null_resource.original\`
 
 _No attribute changes._
 
@@ -15455,7 +15455,7 @@ module.naming.random_string.suffix
 
 </details>
 
-### 📦 Module: \`module.parent\\["1"\\].module.child\`
+### 📦 Module: \`module.parent["1"].module.child\`
 
 <details>
 <summary>➕ <strong>null_resource</strong> item[0]</summary>
@@ -15468,7 +15468,7 @@ module.parent["1"].module.child.null_resource.item[0]
 
 </details>
 
-### 📦 Module: \`module.parent\\["2"\\].module.child\`
+### 📦 Module: \`module.parent["2"].module.child\`
 
 <details>
 <summary>➕ <strong>null_resource</strong> item[0]</summary>
@@ -15540,7 +15540,7 @@ module.naming.random_string.suffix
 
 </details>
 
-### 📦 Module: \`module.parent\\["2"\\].module.child\`
+### 📦 Module: \`module.parent["2"].module.child\`
 
 <details>
 <summary>🗑️ <strong>null_resource</strong> item[1]</summary>
@@ -15564,7 +15564,7 @@ module.parent["2"].module.child.null_resource.item[0]
 
 </details>
 
-### 📦 Module: \`module.parent\\["3"\\].module.child\`
+### 📦 Module: \`module.parent["3"].module.child\`
 
 <details>
 <summary>➕ <strong>null_resource</strong> item[1]</summary>
@@ -15636,7 +15636,7 @@ exports[`reportFromSteps integration — no-show fixtures (Tier 3) > terraform/n
 
 > The condition could not be evaluated at this time, a result will be known when this plan is applied.
 
-> \`    condition     = null\\_resource.alpha.id != ""\` in check "readiness" (\`main.tf\`:50)
+> \`    condition     = null_resource.alpha.id != ""\` in check "readiness" (\`main.tf\`:50)
 
 > null\\_resource.alpha.id = is a string
 
@@ -15714,7 +15714,7 @@ exports[`reportFromSteps integration — no-show fixtures (Tier 3) > terraform/n
 
 > The condition could not be evaluated at this time, a result will be known when this plan is applied.
 
-> \`    condition     = null\\_resource.alpha.id != ""\` in check "readiness" (\`main.tf\`:39)
+> \`    condition     = null_resource.alpha.id != ""\` in check "readiness" (\`main.tf\`:39)
 
 > null\\_resource.alpha.id = is a string
 
@@ -16739,7 +16739,7 @@ module.naming.random_string.suffix
 
 </details>
 
-### 📦 Module: \`module.parent\\["1"\\].module.child\`
+### 📦 Module: \`module.parent["1"].module.child\`
 
 <details>
 <summary>➕ <strong>null_resource</strong> item[0]</summary>
@@ -16752,7 +16752,7 @@ module.parent["1"].module.child.null_resource.item[0]
 
 </details>
 
-### 📦 Module: \`module.parent\\["2"\\].module.child\`
+### 📦 Module: \`module.parent["2"].module.child\`
 
 <details>
 <summary>➕ <strong>null_resource</strong> item[1]</summary>
@@ -16824,7 +16824,7 @@ module.naming.random_string.suffix
 
 </details>
 
-### 📦 Module: \`module.parent\\["2"\\].module.child\`
+### 📦 Module: \`module.parent["2"].module.child\`
 
 <details>
 <summary>🗑️ <strong>null_resource</strong> item[0]</summary>
@@ -16848,7 +16848,7 @@ module.parent["2"].module.child.null_resource.item[1]
 
 </details>
 
-### 📦 Module: \`module.parent\\["3"\\].module.child\`
+### 📦 Module: \`module.parent["3"].module.child\`
 
 <details>
 <summary>➕ <strong>null_resource</strong> item[2]</summary>
@@ -16920,7 +16920,7 @@ exports[`reportFromSteps integration — no-show fixtures (Tier 3) > tofu/null-l
 
 > The condition could not be evaluated at this time, a result will be known when this plan is applied.
 
-> \`    condition     = null\\_resource.alpha.id != ""\` in check "readiness" (\`main.tf\`:50)
+> \`    condition     = null_resource.alpha.id != ""\` in check "readiness" (\`main.tf\`:50)
 
 > null\\_resource.alpha.id = is a string
 
@@ -16998,7 +16998,7 @@ exports[`reportFromSteps integration — no-show fixtures (Tier 3) > tofu/null-l
 
 > The condition could not be evaluated at this time, a result will be known when this plan is applied.
 
-> \`    condition     = null\\_resource.alpha.id != ""\` in check "readiness" (\`main.tf\`:39)
+> \`    condition     = null_resource.alpha.id != ""\` in check "readiness" (\`main.tf\`:39)
 
 > null\\_resource.alpha.id = is a string
 
@@ -18263,7 +18263,7 @@ module.naming.random_string.suffix
 
 </details>
 
-### 📦 Module: \`module.parent\\["1"\\].module.child\`
+### 📦 Module: \`module.parent["1"].module.child\`
 
 <details>
 <summary>➕ <strong>null_resource</strong> item[0]</summary>
@@ -18282,7 +18282,7 @@ module.parent["1"].module.child.null_resource.item[0]
 
 </details>
 
-### 📦 Module: \`module.parent\\["2"\\].module.child\`
+### 📦 Module: \`module.parent["2"].module.child\`
 
 <details>
 <summary>➕ <strong>null_resource</strong> item[0]</summary>
@@ -18382,7 +18382,7 @@ module.naming.random_string.suffix
 
 </details>
 
-### 📦 Module: \`module.parent\\["2"\\].module.child\`
+### 📦 Module: \`module.parent["2"].module.child\`
 
 <details>
 <summary>🗑️ <strong>null_resource</strong> item[0]</summary>
@@ -18418,7 +18418,7 @@ module.parent["2"].module.child.null_resource.item[1]
 
 </details>
 
-### 📦 Module: \`module.parent\\["3"\\].module.child\`
+### 📦 Module: \`module.parent["3"].module.child\`
 
 <details>
 <summary>➕ <strong>null_resource</strong> item[0]</summary>
@@ -18509,7 +18509,7 @@ exports[`reportFromSteps integration — plan-only fixtures > terraform/null-lif
 
 > The condition could not be evaluated at this time, a result will be known when this plan is applied.
 
-> \`    condition     = null\\_resource.alpha.id != ""\` in check "readiness" (\`main.tf\`:50)
+> \`    condition     = null_resource.alpha.id != ""\` in check "readiness" (\`main.tf\`:50)
 
 > null\\_resource.alpha.id = is a string
 
@@ -18618,7 +18618,7 @@ exports[`reportFromSteps integration — plan-only fixtures > terraform/null-lif
 
 > The condition could not be evaluated at this time, a result will be known when this plan is applied.
 
-> \`    condition     = null\\_resource.alpha.id != ""\` in check "readiness" (\`main.tf\`:39)
+> \`    condition     = null_resource.alpha.id != ""\` in check "readiness" (\`main.tf\`:39)
 
 > null\\_resource.alpha.id = is a string
 
@@ -19001,7 +19001,7 @@ null_resource.ephemeral
 null_resource.renamed
 \`\`\`
 
-**Moved from:** \`null\\_resource.original\`
+**Moved from:** \`null_resource.original\`
 
 _No attribute changes._
 
@@ -19999,7 +19999,7 @@ module.naming.random_string.suffix
 
 </details>
 
-### 📦 Module: \`module.parent\\["1"\\].module.child\`
+### 📦 Module: \`module.parent["1"].module.child\`
 
 <details>
 <summary>➕ <strong>null_resource</strong> item[0]</summary>
@@ -20018,7 +20018,7 @@ module.parent["1"].module.child.null_resource.item[0]
 
 </details>
 
-### 📦 Module: \`module.parent\\["2"\\].module.child\`
+### 📦 Module: \`module.parent["2"].module.child\`
 
 <details>
 <summary>➕ <strong>null_resource</strong> item[0]</summary>
@@ -20118,7 +20118,7 @@ module.naming.random_string.suffix
 
 </details>
 
-### 📦 Module: \`module.parent\\["2"\\].module.child\`
+### 📦 Module: \`module.parent["2"].module.child\`
 
 <details>
 <summary>🗑️ <strong>null_resource</strong> item[0]</summary>
@@ -20154,7 +20154,7 @@ module.parent["2"].module.child.null_resource.item[1]
 
 </details>
 
-### 📦 Module: \`module.parent\\["3"\\].module.child\`
+### 📦 Module: \`module.parent["3"].module.child\`
 
 <details>
 <summary>➕ <strong>null_resource</strong> item[0]</summary>
@@ -20245,7 +20245,7 @@ exports[`reportFromSteps integration — plan-only fixtures > tofu/null-lifecycl
 
 > The condition could not be evaluated at this time, a result will be known when this plan is applied.
 
-> \`    condition     = null\\_resource.alpha.id != ""\` in check "readiness" (\`main.tf\`:50)
+> \`    condition     = null_resource.alpha.id != ""\` in check "readiness" (\`main.tf\`:50)
 
 > null\\_resource.alpha.id = is a string
 
@@ -20354,7 +20354,7 @@ exports[`reportFromSteps integration — plan-only fixtures > tofu/null-lifecycl
 
 > The condition could not be evaluated at this time, a result will be known when this plan is applied.
 
-> \`    condition     = null\\_resource.alpha.id != ""\` in check "readiness" (\`main.tf\`:39)
+> \`    condition     = null_resource.alpha.id != ""\` in check "readiness" (\`main.tf\`:39)
 
 > null\\_resource.alpha.id = is a string
 
@@ -20736,7 +20736,7 @@ null_resource.ephemeral
 null_resource.renamed
 \`\`\`
 
-**Moved from:** \`null\\_resource.original\`
+**Moved from:** \`null_resource.original\`
 
 _No attribute changes._
 
@@ -21938,7 +21938,7 @@ module.naming.random_string.suffix
 
 </details>
 
-### 📦 Module: \`module.parent\\["1"\\].module.child\`
+### 📦 Module: \`module.parent["1"].module.child\`
 
 <details>
 <summary>➕ <strong>null_resource</strong> item[0]</summary>
@@ -21957,7 +21957,7 @@ module.parent["1"].module.child.null_resource.item[0]
 
 </details>
 
-### 📦 Module: \`module.parent\\["2"\\].module.child\`
+### 📦 Module: \`module.parent["2"].module.child\`
 
 <details>
 <summary>➕ <strong>null_resource</strong> item[0]</summary>
@@ -22059,7 +22059,7 @@ module.naming.random_string.suffix
 
 </details>
 
-### 📦 Module: \`module.parent\\["2"\\].module.child\`
+### 📦 Module: \`module.parent["2"].module.child\`
 
 <details>
 <summary>🗑️ <strong>null_resource</strong> item[0]</summary>
@@ -22095,7 +22095,7 @@ module.parent["2"].module.child.null_resource.item[1]
 
 </details>
 
-### 📦 Module: \`module.parent\\["3"\\].module.child\`
+### 📦 Module: \`module.parent["3"].module.child\`
 
 <details>
 <summary>➕ <strong>null_resource</strong> item[0]</summary>
@@ -22188,7 +22188,7 @@ exports[`reportFromSteps — state enrichment > no-state snapshot: terraform/nul
 
 > The condition could not be evaluated at this time, a result will be known when this plan is applied.
 
-> \`    condition     = null\\_resource.alpha.id != ""\` in check "readiness" (\`main.tf\`:50)
+> \`    condition     = null_resource.alpha.id != ""\` in check "readiness" (\`main.tf\`:50)
 
 > null\\_resource.alpha.id = is a string
 
@@ -22299,7 +22299,7 @@ exports[`reportFromSteps — state enrichment > no-state snapshot: terraform/nul
 
 > The condition could not be evaluated at this time, a result will be known when this plan is applied.
 
-> \`    condition     = null\\_resource.alpha.id != ""\` in check "readiness" (\`main.tf\`:39)
+> \`    condition     = null_resource.alpha.id != ""\` in check "readiness" (\`main.tf\`:39)
 
 > null\\_resource.alpha.id = is a string
 
@@ -22690,7 +22690,7 @@ null_resource.ephemeral
 null_resource.renamed
 \`\`\`
 
-**Moved from:** \`null\\_resource.original\`
+**Moved from:** \`null_resource.original\`
 
 _No attribute changes._
 
@@ -23892,7 +23892,7 @@ module.naming.random_string.suffix
 
 </details>
 
-### 📦 Module: \`module.parent\\["1"\\].module.child\`
+### 📦 Module: \`module.parent["1"].module.child\`
 
 <details>
 <summary>➕ <strong>null_resource</strong> item[0]</summary>
@@ -23911,7 +23911,7 @@ module.parent["1"].module.child.null_resource.item[0]
 
 </details>
 
-### 📦 Module: \`module.parent\\["2"\\].module.child\`
+### 📦 Module: \`module.parent["2"].module.child\`
 
 <details>
 <summary>➕ <strong>null_resource</strong> item[0]</summary>
@@ -24013,7 +24013,7 @@ module.naming.random_string.suffix
 
 </details>
 
-### 📦 Module: \`module.parent\\["2"\\].module.child\`
+### 📦 Module: \`module.parent["2"].module.child\`
 
 <details>
 <summary>🗑️ <strong>null_resource</strong> item[0]</summary>
@@ -24049,7 +24049,7 @@ module.parent["2"].module.child.null_resource.item[1]
 
 </details>
 
-### 📦 Module: \`module.parent\\["3"\\].module.child\`
+### 📦 Module: \`module.parent["3"].module.child\`
 
 <details>
 <summary>➕ <strong>null_resource</strong> item[0]</summary>
@@ -24142,7 +24142,7 @@ exports[`reportFromSteps — state enrichment > no-state snapshot: tofu/null-lif
 
 > The condition could not be evaluated at this time, a result will be known when this plan is applied.
 
-> \`    condition     = null\\_resource.alpha.id != ""\` in check "readiness" (\`main.tf\`:50)
+> \`    condition     = null_resource.alpha.id != ""\` in check "readiness" (\`main.tf\`:50)
 
 > null\\_resource.alpha.id = is a string
 
@@ -24253,7 +24253,7 @@ exports[`reportFromSteps — state enrichment > no-state snapshot: tofu/null-lif
 
 > The condition could not be evaluated at this time, a result will be known when this plan is applied.
 
-> \`    condition     = null\\_resource.alpha.id != ""\` in check "readiness" (\`main.tf\`:39)
+> \`    condition     = null_resource.alpha.id != ""\` in check "readiness" (\`main.tf\`:39)
 
 > null\\_resource.alpha.id = is a string
 
@@ -24643,7 +24643,7 @@ null_resource.ephemeral
 null_resource.renamed
 \`\`\`
 
-**Moved from:** \`null\\_resource.original\`
+**Moved from:** \`null_resource.original\`
 
 _No attribute changes._
 

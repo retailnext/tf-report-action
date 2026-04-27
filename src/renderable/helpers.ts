@@ -12,6 +12,30 @@ import { htmlEscape } from "./html-escape.js";
 import { markdownEscape } from "./markdown-escape.js";
 
 /**
+ * Wraps text in a markdown code span with appropriate backtick fencing.
+ *
+ * Content inside code spans is literal — no backslash escaping applies.
+ * If the text contains backticks, a longer fence is chosen. A leading/trailing
+ * space is added when the content starts or ends with a backtick to prevent
+ * the CommonMark parser from treating it as part of the delimiter.
+ */
+export function mdCodeSpan(text: string): string {
+  // Find the longest run of consecutive backticks to determine fence length
+  let maxRun = 0;
+  let currentRun = 0;
+  for (const ch of text) {
+    currentRun = ch === "`" ? currentRun + 1 : 0;
+    if (currentRun > maxRun) maxRun = currentRun;
+  }
+  const fence = "`".repeat(maxRun + 1);
+
+  // CommonMark 6.1: if content begins or ends with a backtick, add space
+  // padding to prevent ambiguity with the delimiter.
+  const needsPadding = text.startsWith("`") || text.endsWith("`");
+  return needsPadding ? `${fence} ${text} ${fence}` : `${fence}${text}${fence}`;
+}
+
+/**
  * Renders a contextual note — italic in markdown, `<em>` in HTML.
  *
  * Used by owning Renderables for their "no data" / "omitted" states.
@@ -40,7 +64,7 @@ export function textCell(text: string): Renderable {
 export function codeSpan(text: string): Renderable {
   const renderFn = (format: OutputFormat): string =>
     format === "markdown"
-      ? `\`${markdownEscape(text)}\``
+      ? mdCodeSpan(text)
       : `<code>${htmlEscape(text)}</code>`;
   return { size: (f: OutputFormat) => renderFn(f).length, render: renderFn };
 }

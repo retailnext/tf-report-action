@@ -12,6 +12,7 @@
 export { htmlEscape } from "./html-escape.js";
 export { markdownEscape } from "./markdown-escape.js";
 export {
+  mdCodeSpan,
   renderNote,
   textCell,
   codeSpan,

@@ -35,6 +35,7 @@ import {
 } from "../model/status-icons.js";
 import { htmlEscape } from "../renderable/html-escape.js";
 import { markdownEscape } from "../renderable/markdown-escape.js";
+import { mdCodeSpan } from "../renderable/helpers.js";
 import { renderNote } from "../renderable/helpers.js";
 import {
   textCell,
@@ -337,7 +338,7 @@ class MetadataParagraph implements Renderable {
 
   render(format: OutputFormat): string {
     if (format === "markdown") {
-      return `**${markdownEscape(this.label)}:** \`${markdownEscape(this.value)}\`\n\n`;
+      return `**${markdownEscape(this.label)}:** ${mdCodeSpan(this.value)}\n\n`;
     }
     return `<p><strong>${htmlEscape(this.label)}:</strong> <code>${htmlEscape(this.value)}</code></p>\n`;
   }

@@ -112,14 +112,11 @@ export class CodeBlock implements Renderable {
 // ---------------------------------------------------------------------------
 
 /**
- * A blockquote.
+ * A blockquote wrapping multi-line text.
  *
- * - Markdown: `> line1\n> line2\n\n`
- * - HTML: `<blockquote><pre><samp>escaped</samp></pre></blockquote>\n`
- *
- * HTML uses `<pre><samp>` to preserve whitespace and newlines — `<samp>`
- * indicates sample output from a program, which is the typical content
- * of blockquotes in this tool (diagnostic messages, warnings, etc.).
+ * Both formats render the text as a regular (non-code) blockquote:
+ * - Markdown: `> escaped line` per line (standard GFM blockquote)
+ * - HTML: `<blockquote><p>escaped</p></blockquote>\n` with `<br>` for newlines
  */
 export class Blockquote implements Renderable {
   private readonly text: string;
@@ -137,7 +134,7 @@ export class Blockquote implements Renderable {
       const lines = this.text.split("\n");
       return lines.map((l) => `> ${markdownEscape(l)}`).join("\n") + "\n\n";
     }
-    return `<blockquote><pre><samp>${htmlEscape(this.text)}</samp></pre></blockquote>\n`;
+    return `<blockquote><p>${htmlEscape(this.text).replace(/\n/g, "<br>")}</p></blockquote>\n`;
   }
 }
 

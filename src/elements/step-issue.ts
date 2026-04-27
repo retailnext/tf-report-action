@@ -11,7 +11,7 @@ import type { OutputFormat } from "../renderable/types.js";
 import type { ReportElement } from "../renderable/types.js";
 import type { StepIssue } from "../model/step-issue.js";
 import { Blockquote, Details } from "../renderable/primitives.js";
-import { detailsSummary } from "../renderable/helpers.js";
+import { detailsSummary, mdCodeSpan } from "../renderable/helpers.js";
 import { htmlEscape } from "../renderable/html-escape.js";
 import { markdownEscape } from "../renderable/markdown-escape.js";
 import { STATUS_FAILURE, DIAGNOSTIC_WARNING } from "../model/status-icons.js";
@@ -59,7 +59,7 @@ function renderIssueHeading(issue: StepIssue, format: OutputFormat): string {
   const stepId = issue.id;
 
   if (format === "markdown") {
-    return `### ${icon} \`${markdownEscape(stepId)}\`${markdownEscape(suffix)}\n\n`;
+    return `### ${icon} ${mdCodeSpan(stepId)}${markdownEscape(suffix)}\n\n`;
   }
   return `<h3>${icon} <code>${htmlEscape(stepId)}</code>${htmlEscape(suffix)}</h3>\n`;
 }
@@ -131,7 +131,7 @@ function renderFullIssue(issue: StepIssue, format: OutputFormat): string {
 /** Renders an exit code paragraph. */
 function renderExitCode(exitCode: string, format: OutputFormat): string {
   if (format === "markdown") {
-    return `Exit code: \`${markdownEscape(exitCode)}\`\n\n`;
+    return `Exit code: ${mdCodeSpan(exitCode)}\n\n`;
   }
   return `<p>Exit code: <code>${htmlEscape(exitCode)}</code></p>\n`;
 }
@@ -141,7 +141,7 @@ function renderWarningBlockquote(text: string, format: OutputFormat): string {
   if (format === "markdown") {
     return `> ${markdownEscape(text)}\n\n`;
   }
-  return `<blockquote><pre><samp>${htmlEscape(text)}</samp></pre></blockquote>\n`;
+  return `<blockquote><p>${htmlEscape(text)}</p></blockquote>\n`;
 }
 
 /** Renders a "no output captured" notice. */

@@ -134,15 +134,13 @@ describe("Blockquote", () => {
 
   it("renders HTML blockquote", () => {
     const bq = new Blockquote("note");
-    expect(bq.render("html")).toBe(
-      "<blockquote><pre><samp>note</samp></pre></blockquote>\n",
-    );
+    expect(bq.render("html")).toBe("<blockquote><p>note</p></blockquote>\n");
   });
 
   it("escapes HTML in blockquote content", () => {
     const bq = new Blockquote("a < b");
     expect(bq.render("html")).toBe(
-      "<blockquote><pre><samp>a &lt; b</samp></pre></blockquote>\n",
+      "<blockquote><p>a &lt; b</p></blockquote>\n",
     );
   });
 
@@ -399,6 +397,6 @@ describe("composite tree", () => {
     expect(html).toContain("Summary of changes");
     expect(html).toContain("<table>");
     expect(html).toContain("<pre><code");
-    expect(html).toContain("<pre><samp>");
+    expect(html).toContain("<blockquote><p>");
   });
 });

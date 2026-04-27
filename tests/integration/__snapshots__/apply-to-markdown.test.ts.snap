@@ -610,7 +610,7 @@ module.naming.random_string.suffix
 
 </details>
 
-### 📦 Module: \`module.parent\\["1"\\].module.child\`
+### 📦 Module: \`module.parent["1"].module.child\`
 
 <details>
 <summary>➕ <strong>null_resource</strong> item[0]</summary>
@@ -629,7 +629,7 @@ module.parent["1"].module.child.null_resource.item[0]
 
 </details>
 
-### 📦 Module: \`module.parent\\["2"\\].module.child\`
+### 📦 Module: \`module.parent["2"].module.child\`
 
 <details>
 <summary>➕ <strong>null_resource</strong> item[0]</summary>
@@ -729,7 +729,7 @@ module.naming.random_string.suffix
 
 </details>
 
-### 📦 Module: \`module.parent\\["2"\\].module.child\`
+### 📦 Module: \`module.parent["2"].module.child\`
 
 <details>
 <summary>🗑️ <strong>null_resource</strong> item[0]</summary>
@@ -765,7 +765,7 @@ module.parent["2"].module.child.null_resource.item[1]
 
 </details>
 
-### 📦 Module: \`module.parent\\["3"\\].module.child\`
+### 📦 Module: \`module.parent["3"].module.child\`
 
 <details>
 <summary>➕ <strong>null_resource</strong> item[0]</summary>
@@ -1316,7 +1316,7 @@ null_resource.ephemeral
 null_resource.renamed
 \`\`\`
 
-**Moved from:** \`null\\_resource.original\`
+**Moved from:** \`null_resource.original\`
 
 _No attribute changes._
 
@@ -1952,7 +1952,7 @@ module.naming.random_string.suffix
 
 </details>
 
-### 📦 Module: \`module.parent\\["1"\\].module.child\`
+### 📦 Module: \`module.parent["1"].module.child\`
 
 <details>
 <summary>➕ <strong>null_resource</strong> item[0]</summary>
@@ -1971,7 +1971,7 @@ module.parent["1"].module.child.null_resource.item[0]
 
 </details>
 
-### 📦 Module: \`module.parent\\["2"\\].module.child\`
+### 📦 Module: \`module.parent["2"].module.child\`
 
 <details>
 <summary>➕ <strong>null_resource</strong> item[0]</summary>
@@ -2071,7 +2071,7 @@ module.naming.random_string.suffix
 
 </details>
 
-### 📦 Module: \`module.parent\\["2"\\].module.child\`
+### 📦 Module: \`module.parent["2"].module.child\`
 
 <details>
 <summary>🗑️ <strong>null_resource</strong> item[0]</summary>
@@ -2107,7 +2107,7 @@ module.parent["2"].module.child.null_resource.item[1]
 
 </details>
 
-### 📦 Module: \`module.parent\\["3"\\].module.child\`
+### 📦 Module: \`module.parent["3"].module.child\`
 
 <details>
 <summary>➕ <strong>null_resource</strong> item[0]</summary>
@@ -2658,7 +2658,7 @@ null_resource.ephemeral
 null_resource.renamed
 \`\`\`
 
-**Moved from:** \`null\\_resource.original\`
+**Moved from:** \`null_resource.original\`
 
 _No attribute changes._
 
@@ -3516,7 +3516,7 @@ module.naming.random_string.suffix
 
 </details>
 
-### 📦 Module: \`module.parent\\["1"\\].module.child\`
+### 📦 Module: \`module.parent["1"].module.child\`
 
 <details>
 <summary>➕ <strong>null_resource</strong> item[0]</summary>
@@ -3535,7 +3535,7 @@ module.parent["1"].module.child.null_resource.item[0]
 
 </details>
 
-### 📦 Module: \`module.parent\\["2"\\].module.child\`
+### 📦 Module: \`module.parent["2"].module.child\`
 
 <details>
 <summary>➕ <strong>null_resource</strong> item[0]</summary>
@@ -3635,7 +3635,7 @@ module.naming.random_string.suffix
 
 </details>
 
-### 📦 Module: \`module.parent\\["2"\\].module.child\`
+### 📦 Module: \`module.parent["2"].module.child\`
 
 <details>
 <summary>🗑️ <strong>null_resource</strong> item[0]</summary>
@@ -3671,7 +3671,7 @@ module.parent["2"].module.child.null_resource.item[1]
 
 </details>
 
-### 📦 Module: \`module.parent\\["3"\\].module.child\`
+### 📦 Module: \`module.parent["3"].module.child\`
 
 <details>
 <summary>➕ <strong>null_resource</strong> item[0]</summary>
@@ -4249,7 +4249,7 @@ null_resource.ephemeral
 null_resource.renamed
 \`\`\`
 
-**Moved from:** \`null\\_resource.original\`
+**Moved from:** \`null_resource.original\`
 
 _No attribute changes._
 
@@ -5107,7 +5107,7 @@ module.naming.random_string.suffix
 
 </details>
 
-### 📦 Module: \`module.parent\\["1"\\].module.child\`
+### 📦 Module: \`module.parent["1"].module.child\`
 
 <details>
 <summary>➕ <strong>null_resource</strong> item[0]</summary>
@@ -5126,7 +5126,7 @@ module.parent["1"].module.child.null_resource.item[0]
 
 </details>
 
-### 📦 Module: \`module.parent\\["2"\\].module.child\`
+### 📦 Module: \`module.parent["2"].module.child\`
 
 <details>
 <summary>➕ <strong>null_resource</strong> item[0]</summary>
@@ -5226,7 +5226,7 @@ module.naming.random_string.suffix
 
 </details>
 
-### 📦 Module: \`module.parent\\["2"\\].module.child\`
+### 📦 Module: \`module.parent["2"].module.child\`
 
 <details>
 <summary>🗑️ <strong>null_resource</strong> item[0]</summary>
@@ -5262,7 +5262,7 @@ module.parent["2"].module.child.null_resource.item[1]
 
 </details>
 
-### 📦 Module: \`module.parent\\["3"\\].module.child\`
+### 📦 Module: \`module.parent["3"].module.child\`
 
 <details>
 <summary>➕ <strong>null_resource</strong> item[0]</summary>
@@ -5840,7 +5840,7 @@ null_resource.ephemeral
 null_resource.renamed
 \`\`\`
 
-**Moved from:** \`null\\_resource.original\`
+**Moved from:** \`null_resource.original\`
 
 _No attribute changes._
 

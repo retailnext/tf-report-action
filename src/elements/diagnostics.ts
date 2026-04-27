@@ -11,6 +11,7 @@ import { Blockquote } from "../renderable/primitives.js";
 import { DIAGNOSTIC_ERROR, DIAGNOSTIC_WARNING } from "../model/status-icons.js";
 import { htmlEscape } from "../renderable/html-escape.js";
 import { markdownEscape } from "../renderable/markdown-escape.js";
+import { mdCodeSpan } from "../renderable/helpers.js";
 
 /**
  * A diagnostics section with error/warning sub-headings.
@@ -143,8 +144,7 @@ function renderDiagnosticSummaryLine(
 ): string {
   const icon = severity === "error" ? DIAGNOSTIC_ERROR : DIAGNOSTIC_WARNING;
   if (format === "markdown") {
-    const addr =
-      address !== undefined ? ` — \`${markdownEscape(address)}\`` : "";
+    const addr = address !== undefined ? ` — ${mdCodeSpan(address)}` : "";
     return `${icon} **${markdownEscape(summary)}**${addr}\n\n`;
   }
   const addr =
@@ -163,8 +163,8 @@ function renderSnippetLine(
   if (format === "markdown") {
     const loc =
       filename !== undefined
-        ? `\`${markdownEscape(code)}\` in ${markdownEscape(context)} (\`${markdownEscape(filename)}\`:${String(startLine)})`
-        : `\`${markdownEscape(code)}\` in ${markdownEscape(context)}`;
+        ? `${mdCodeSpan(code)} in ${markdownEscape(context)} (${mdCodeSpan(filename)}:${String(startLine)})`
+        : `${mdCodeSpan(code)} in ${markdownEscape(context)}`;
     return `> ${loc}\n\n`;
   }
   const loc =
