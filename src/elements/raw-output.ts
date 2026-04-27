@@ -201,7 +201,7 @@ class FourTickCodeBlock implements Renderable {
   private readonly htStr: string;
 
   constructor(content: string) {
-    this.mdStr = `\`\`\`\`\n${content}\n\`\`\`\``;
+    this.mdStr = `\`\`\`\`\n${content}\n\`\`\`\`\n\n`;
     this.htStr = `<pre><code>${htmlEscape(content)}</code></pre>\n`;
   }
 
@@ -255,7 +255,7 @@ function buildValidateMarkdown(
     }
   }
 
-  output += `<details>\n<summary>Show raw JSON</summary>\n\n\`\`\`json\n${raw}\n\`\`\`\n\n</details>`;
+  output += `<details>\n<summary>Show raw JSON</summary>\n\n\`\`\`json\n${raw}\n\`\`\`\n\n</details>\n\n`;
   return output;
 }
 
@@ -403,7 +403,7 @@ function buildJsonLinesMarkdown(messages: JsonLinesMsg[]): string {
     );
   }
 
-  return parts.join("\n\n") + "\n";
+  return parts.join("\n\n") + "\n\n";
 }
 
 function formatJsonLinesMsgMarkdown(msg: JsonLinesMsg): string {

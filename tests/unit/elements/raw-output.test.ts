@@ -147,8 +147,56 @@ describe("buildRawOutputRenderable - JSON Lines", () => {
 });
 
 // ---------------------------------------------------------------------------
-// Validate output detection
+// Trailing newline invariant — markdown output must end with \n\n
 // ---------------------------------------------------------------------------
+
+describe("buildRawOutputRenderable - trailing newline invariant", () => {
+  it("plain text code block ends with blank line", () => {
+    const r = buildRawOutputRenderable("hello world\nnext line");
+    expect(r.render("markdown")).toMatch(/\n\n$/);
+  });
+
+  it("JSON Lines output ends with blank line", () => {
+    const jsonl = [
+      '{"@level":"info","@message":"Initializing..."}',
+      '{"@level":"info","@message":"Plan complete"}',
+    ].join("\n");
+    const r = buildRawOutputRenderable(jsonl);
+    expect(r.render("markdown")).toMatch(/\n\n$/);
+  });
+
+  it("JSON Lines with debug/trace messages ends with blank line", () => {
+    const jsonl = [
+      '{"@level":"info","@message":"visible"}',
+      '{"@level":"debug","@message":"hidden"}',
+    ].join("\n");
+    const r = buildRawOutputRenderable(jsonl);
+    expect(r.render("markdown")).toMatch(/\n\n$/);
+  });
+
+  it("validate output ends with blank line", () => {
+    const validate = JSON.stringify({
+      valid: true,
+      diagnostics: [],
+    });
+    const r = buildRawOutputRenderable(validate);
+    expect(r.render("markdown")).toMatch(/\n\n$/);
+  });
+
+  it("validate output with diagnostics ends with blank line", () => {
+    const validate = JSON.stringify({
+      valid: false,
+      diagnostics: [{ severity: "error", summary: "Bad" }],
+    });
+    const r = buildRawOutputRenderable(validate);
+    expect(r.render("markdown")).toMatch(/\n\n$/);
+  });
+
+  it("empty content ends with blank line", () => {
+    const r = buildRawOutputRenderable("");
+    expect(r.render("markdown")).toMatch(/\n\n$/);
+  });
+});
 
 describe("buildRawOutputRenderable - validate", () => {
   it("formats valid configuration result", () => {

@@ -302,6 +302,7 @@ Exit code: \`1\`
 </details>
 
 
+
 </details>
 
 ## Apply Summary
@@ -694,6 +695,8 @@ Exit code: \`1\`
 
 </details>
 
+
+
 </details>
 
 ### Steps
@@ -810,6 +813,7 @@ Exit code: \`1\`
 </details>
 
 
+
 </details>
 
 ### Steps
@@ -857,7 +861,9 @@ Saved the plan to: tfplan
 To perform exactly these actions, run the following command to apply:
     terraform apply "tfplan"
 
-\`\`\`\`### Apply Output
+\`\`\`\`
+
+### Apply Output
 
 \`\`\`\`
 [0m[1mnull_resource.example: Creating...[0m[0m
@@ -865,7 +871,9 @@ To perform exactly these actions, run the following command to apply:
 [0m[1m[32m
 Apply complete! Resources: 1 added, 0 changed, 0 destroyed.[0m
 
-\`\`\`\`"
+\`\`\`\`
+
+"
 `;
 
 exports[`reportFromSteps integration — apply-no-show fixtures > terraform/invocation-variants/1/apply-no-show > renders without error and matches snapshot 1`] = `
@@ -883,13 +891,17 @@ No changes. Your infrastructure matches the configuration.
 Terraform has compared your real infrastructure against your configuration
 and found no differences, so no changes are needed.
 
-\`\`\`\`### Apply Output
+\`\`\`\`
+
+### Apply Output
 
 \`\`\`\`
 [0m[1m[32m
 Apply complete! Resources: 0 added, 0 changed, 0 destroyed.[0m
 
-\`\`\`\`"
+\`\`\`\`
+
+"
 `;
 
 exports[`reportFromSteps integration — apply-no-show fixtures > terraform/local-files/0/apply-no-show > renders without error and matches snapshot 1`] = `
@@ -1852,6 +1864,7 @@ Exit code: \`1\`
 </details>
 
 
+
 </details>
 
 ## Apply Summary
@@ -2244,6 +2257,8 @@ Exit code: \`1\`
 
 </details>
 
+
+
 </details>
 
 ### Steps
@@ -2360,6 +2375,7 @@ Exit code: \`1\`
 </details>
 
 
+
 </details>
 
 ### Steps
@@ -2407,7 +2423,9 @@ Saved the plan to: tfplan
 To perform exactly these actions, run the following command to apply:
     tofu apply "tfplan"
 
-\`\`\`\`### Apply Output
+\`\`\`\`
+
+### Apply Output
 
 \`\`\`\`
 [0m[1mnull_resource.example: Creating...[0m[0m
@@ -2415,7 +2433,9 @@ To perform exactly these actions, run the following command to apply:
 [0m[1m[32m
 Apply complete! Resources: 1 added, 0 changed, 0 destroyed.
 [0m
-\`\`\`\`"
+\`\`\`\`
+
+"
 `;
 
 exports[`reportFromSteps integration — apply-no-show fixtures > tofu/invocation-variants/1/apply-no-show > renders without error and matches snapshot 1`] = `
@@ -2433,13 +2453,17 @@ No changes. Your infrastructure matches the configuration.
 OpenTofu has compared your real infrastructure against your configuration and
 found no differences, so no changes are needed.
 
-\`\`\`\`### Apply Output
+\`\`\`\`
+
+### Apply Output
 
 \`\`\`\`
 [0m[1m[32m
 Apply complete! Resources: 0 added, 0 changed, 0 destroyed.
 [0m
-\`\`\`\`"
+\`\`\`\`
+
+"
 `;
 
 exports[`reportFromSteps integration — apply-no-show fixtures > tofu/local-files/0/apply-no-show > renders without error and matches snapshot 1`] = `
@@ -3401,6 +3425,7 @@ Exit code: \`1\`
 </details>
 
 
+
 </details>
 
 ## Apply Summary
@@ -3791,6 +3816,8 @@ Exit code: \`1\`
 
 </details>
 
+
+
 </details>
 
 ### Steps
@@ -3833,7 +3860,9 @@ exports[`reportFromSteps integration — apply-only fixtures > terraform/invocat
 [0m[1m[32m
 Apply complete! Resources: 1 added, 0 changed, 0 destroyed.[0m
 
-\`\`\`\`"
+\`\`\`\`
+
+"
 `;
 
 exports[`reportFromSteps integration — apply-only fixtures > terraform/invocation-variants/1/apply-only > renders without error and matches snapshot 1`] = `
@@ -3847,7 +3876,9 @@ exports[`reportFromSteps integration — apply-only fixtures > terraform/invocat
 [0m[1m[32m
 Apply complete! Resources: 0 added, 0 changed, 0 destroyed.[0m
 
-\`\`\`\`"
+\`\`\`\`
+
+"
 `;
 
 exports[`reportFromSteps integration — apply-only fixtures > terraform/local-files/0/apply-only > renders without error and matches snapshot 1`] = `
@@ -4735,6 +4766,7 @@ Exit code: \`1\`
 </details>
 
 
+
 </details>
 
 ## Apply Summary
@@ -5125,6 +5157,8 @@ Exit code: \`1\`
 
 </details>
 
+
+
 </details>
 
 ### Steps
@@ -5167,7 +5201,9 @@ exports[`reportFromSteps integration — apply-only fixtures > tofu/invocation-v
 [0m[1m[32m
 Apply complete! Resources: 1 added, 0 changed, 0 destroyed.
 [0m
-\`\`\`\`"
+\`\`\`\`
+
+"
 `;
 
 exports[`reportFromSteps integration — apply-only fixtures > tofu/invocation-variants/1/apply-only > renders without error and matches snapshot 1`] = `
@@ -5181,7 +5217,9 @@ exports[`reportFromSteps integration — apply-only fixtures > tofu/invocation-v
 [0m[1m[32m
 Apply complete! Resources: 0 added, 0 changed, 0 destroyed.
 [0m
-\`\`\`\`"
+\`\`\`\`
+
+"
 `;
 
 exports[`reportFromSteps integration — apply-only fixtures > tofu/local-files/0/apply-only > renders without error and matches snapshot 1`] = `
@@ -6244,6 +6282,7 @@ Exit code: \`1\`
 </details>
 
 
+
 </details>
 
 ## Apply Summary
@@ -6539,6 +6578,7 @@ Exit code: \`1\`
 \`diagnostic.summary=local-exec provisioner error\`
 
 </details>
+
 
 
 </details>
@@ -7607,6 +7647,8 @@ Exit code: \`1\`
 
 </details>
 
+
+
 </details>
 
 ### Steps
@@ -7683,6 +7725,8 @@ Exit code: \`1\`
 \`\`\`
 
 </details>
+
+
 
 </details>
 
@@ -7802,6 +7846,7 @@ Exit code: \`1\`
 </details>
 
 
+
 </details>
 
 ### Steps
@@ -7919,6 +7964,7 @@ Exit code: \`1\`
 </details>
 
 
+
 </details>
 
 ### Steps
@@ -7973,6 +8019,8 @@ To perform exactly these actions, run the following command to apply:
 
 \`\`\`\`
 
+
+
 </details>
 
 <details>
@@ -7985,6 +8033,8 @@ To perform exactly these actions, run the following command to apply:
 Apply complete! Resources: 1 added, 0 changed, 0 destroyed.[0m
 
 \`\`\`\`
+
+
 
 </details>
 
@@ -8028,6 +8078,8 @@ To perform exactly these actions, run the following command to apply:
 
 \`\`\`\`
 
+
+
 </details>
 
 <details>
@@ -8040,6 +8092,8 @@ To perform exactly these actions, run the following command to apply:
 Apply complete! Resources: 1 added, 0 changed, 0 destroyed.[0m
 
 \`\`\`\`
+
+
 
 </details>
 
@@ -8067,6 +8121,8 @@ and found no differences, so no changes are needed.
 
 \`\`\`\`
 
+
+
 </details>
 
 <details>
@@ -8077,6 +8133,8 @@ and found no differences, so no changes are needed.
 Apply complete! Resources: 0 added, 0 changed, 0 destroyed.[0m
 
 \`\`\`\`
+
+
 
 </details>
 
@@ -8103,6 +8161,8 @@ and found no differences, so no changes are needed.
 
 \`\`\`\`
 
+
+
 </details>
 
 <details>
@@ -8113,6 +8173,8 @@ and found no differences, so no changes are needed.
 Apply complete! Resources: 0 added, 0 changed, 0 destroyed.[0m
 
 \`\`\`\`
+
+
 
 </details>
 
@@ -10587,6 +10649,7 @@ Exit code: \`1\`
 </details>
 
 
+
 </details>
 
 ## Apply Summary
@@ -10882,6 +10945,7 @@ Exit code: \`1\`
 \`diagnostic.summary=local-exec provisioner error\`
 
 </details>
+
 
 
 </details>
@@ -11950,6 +12014,8 @@ Exit code: \`1\`
 
 </details>
 
+
+
 </details>
 
 ### Steps
@@ -12026,6 +12092,8 @@ Exit code: \`1\`
 \`\`\`
 
 </details>
+
+
 
 </details>
 
@@ -12145,6 +12213,7 @@ Exit code: \`1\`
 </details>
 
 
+
 </details>
 
 ### Steps
@@ -12262,6 +12331,7 @@ Exit code: \`1\`
 </details>
 
 
+
 </details>
 
 ### Steps
@@ -12316,6 +12386,8 @@ To perform exactly these actions, run the following command to apply:
 
 \`\`\`\`
 
+
+
 </details>
 
 <details>
@@ -12328,6 +12400,8 @@ To perform exactly these actions, run the following command to apply:
 Apply complete! Resources: 1 added, 0 changed, 0 destroyed.
 [0m
 \`\`\`\`
+
+
 
 </details>
 
@@ -12371,6 +12445,8 @@ To perform exactly these actions, run the following command to apply:
 
 \`\`\`\`
 
+
+
 </details>
 
 <details>
@@ -12383,6 +12459,8 @@ To perform exactly these actions, run the following command to apply:
 Apply complete! Resources: 1 added, 0 changed, 0 destroyed.
 [0m
 \`\`\`\`
+
+
 
 </details>
 
@@ -12410,6 +12488,8 @@ found no differences, so no changes are needed.
 
 \`\`\`\`
 
+
+
 </details>
 
 <details>
@@ -12420,6 +12500,8 @@ found no differences, so no changes are needed.
 Apply complete! Resources: 0 added, 0 changed, 0 destroyed.
 [0m
 \`\`\`\`
+
+
 
 </details>
 
@@ -12446,6 +12528,8 @@ found no differences, so no changes are needed.
 
 \`\`\`\`
 
+
+
 </details>
 
 <details>
@@ -12456,6 +12540,8 @@ found no differences, so no changes are needed.
 Apply complete! Resources: 0 added, 0 changed, 0 destroyed.
 [0m
 \`\`\`\`
+
+
 
 </details>
 
@@ -14529,6 +14615,8 @@ this is not valid JSON for a plan
 
 \`\`\`\`
 
+
+
 </details>
 
 ### Steps
@@ -14578,6 +14666,8 @@ Exit code: \`0\`
 warning: deprecated API usage in build step
 
 \`\`\`\`
+
+
 
 </details>
 
@@ -15068,6 +15158,8 @@ Exit code: \`1\`
 
 </details>
 
+
+
 </details>
 
 ### Steps
@@ -15182,6 +15274,7 @@ Exit code: \`1\`
 </details>
 
 
+
 </details>
 
 ### Steps
@@ -15227,7 +15320,9 @@ Saved the plan to: tfplan
 To perform exactly these actions, run the following command to apply:
     terraform apply "tfplan"
 
-\`\`\`\`"
+\`\`\`\`
+
+"
 `;
 
 exports[`reportFromSteps integration — no-show fixtures (Tier 3) > terraform/invocation-variants/1/no-show > renders without error and matches snapshot 1`] = `
@@ -15245,7 +15340,9 @@ No changes. Your infrastructure matches the configuration.
 Terraform has compared your real infrastructure against your configuration
 and found no differences, so no changes are needed.
 
-\`\`\`\`"
+\`\`\`\`
+
+"
 `;
 
 exports[`reportFromSteps integration — no-show fixtures (Tier 3) > terraform/local-files/0/no-show > renders without error and matches snapshot 1`] = `
@@ -16344,6 +16441,8 @@ Exit code: \`1\`
 
 </details>
 
+
+
 </details>
 
 ### Steps
@@ -16458,6 +16557,7 @@ Exit code: \`1\`
 </details>
 
 
+
 </details>
 
 ### Steps
@@ -16503,7 +16603,9 @@ Saved the plan to: tfplan
 To perform exactly these actions, run the following command to apply:
     tofu apply "tfplan"
 
-\`\`\`\`"
+\`\`\`\`
+
+"
 `;
 
 exports[`reportFromSteps integration — no-show fixtures (Tier 3) > tofu/invocation-variants/1/no-show > renders without error and matches snapshot 1`] = `
@@ -16521,7 +16623,9 @@ No changes. Your infrastructure matches the configuration.
 OpenTofu has compared your real infrastructure against your configuration and
 found no differences, so no changes are needed.
 
-\`\`\`\`"
+\`\`\`\`
+
+"
 `;
 
 exports[`reportFromSteps integration — no-show fixtures (Tier 3) > tofu/local-files/0/no-show > renders without error and matches snapshot 1`] = `
@@ -17724,6 +17828,8 @@ Exit code: \`1\`
 
 </details>
 
+
+
 </details>
 
 ### Steps
@@ -17839,6 +17945,7 @@ Exit code: \`1\`
 </details>
 
 
+
 </details>
 
 ### Steps
@@ -17913,6 +18020,8 @@ To perform exactly these actions, run the following command to apply:
 
 \`\`\`\`
 
+
+
 </details>
 
 "
@@ -17937,6 +18046,8 @@ Terraform has compared your real infrastructure against your configuration
 and found no differences, so no changes are needed.
 
 \`\`\`\`
+
+
 
 </details>
 
@@ -19452,6 +19563,8 @@ Exit code: \`1\`
 
 </details>
 
+
+
 </details>
 
 ### Steps
@@ -19567,6 +19680,7 @@ Exit code: \`1\`
 </details>
 
 
+
 </details>
 
 ### Steps
@@ -19641,6 +19755,8 @@ To perform exactly these actions, run the following command to apply:
 
 \`\`\`\`
 
+
+
 </details>
 
 "
@@ -19665,6 +19781,8 @@ OpenTofu has compared your real infrastructure against your configuration and
 found no differences, so no changes are needed.
 
 \`\`\`\`
+
+
 
 </details>
 
@@ -20954,6 +21072,7 @@ Exit code: \`1\`
 </details>
 
 
+
 </details>
 
 ## Apply Summary
@@ -21369,6 +21488,8 @@ Exit code: \`1\`
 
 </details>
 
+
+
 </details>
 
 ### Steps
@@ -21485,6 +21606,7 @@ Exit code: \`1\`
 </details>
 
 
+
 </details>
 
 ### Steps
@@ -21537,6 +21659,8 @@ To perform exactly these actions, run the following command to apply:
 
 \`\`\`\`
 
+
+
 </details>
 
 <details>
@@ -21549,6 +21673,8 @@ To perform exactly these actions, run the following command to apply:
 Apply complete! Resources: 1 added, 0 changed, 0 destroyed.[0m
 
 \`\`\`\`
+
+
 
 </details>
 
@@ -21575,6 +21701,8 @@ and found no differences, so no changes are needed.
 
 \`\`\`\`
 
+
+
 </details>
 
 <details>
@@ -21585,6 +21713,8 @@ and found no differences, so no changes are needed.
 Apply complete! Resources: 0 added, 0 changed, 0 destroyed.[0m
 
 \`\`\`\`
+
+
 
 </details>
 
@@ -22895,6 +23025,7 @@ Exit code: \`1\`
 </details>
 
 
+
 </details>
 
 ## Apply Summary
@@ -23310,6 +23441,8 @@ Exit code: \`1\`
 
 </details>
 
+
+
 </details>
 
 ### Steps
@@ -23426,6 +23559,7 @@ Exit code: \`1\`
 </details>
 
 
+
 </details>
 
 ### Steps
@@ -23478,6 +23612,8 @@ To perform exactly these actions, run the following command to apply:
 
 \`\`\`\`
 
+
+
 </details>
 
 <details>
@@ -23490,6 +23626,8 @@ To perform exactly these actions, run the following command to apply:
 Apply complete! Resources: 1 added, 0 changed, 0 destroyed.
 [0m
 \`\`\`\`
+
+
 
 </details>
 
@@ -23516,6 +23654,8 @@ found no differences, so no changes are needed.
 
 \`\`\`\`
 
+
+
 </details>
 
 <details>
@@ -23526,6 +23666,8 @@ found no differences, so no changes are needed.
 Apply complete! Resources: 0 added, 0 changed, 0 destroyed.
 [0m
 \`\`\`\`
+
+
 
 </details>
 

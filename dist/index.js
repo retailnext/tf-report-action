@@ -3262,7 +3262,9 @@ var FourTickCodeBlock = class {
   constructor(content) {
     this.mdStr = `\`\`\`\`
 ${content}
-\`\`\`\``;
+\`\`\`\`
+
+`;
     this.htStr = `<pre><code>${htmlEscape(content)}</code></pre>
 `;
   }
@@ -3310,7 +3312,9 @@ function buildValidateMarkdown(valid, diagnostics, raw) {
 ${raw}
 \`\`\`
 
-</details>`;
+</details>
+
+`;
   return output;
 }
 function buildValidateHtml(valid, diagnostics, raw) {
@@ -3428,7 +3432,7 @@ ${inner}
 </details>`
     );
   }
-  return parts.join("\n\n") + "\n";
+  return parts.join("\n\n") + "\n\n";
 }
 function formatJsonLinesMsgMarkdown(msg) {
   const level = typeof msg["@level"] === "string" ? msg["@level"] : "info";

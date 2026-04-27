@@ -84,3 +84,37 @@ describe("TextFallbackElement", () => {
     assertElementSizeInvariant(el, "empty-content");
   });
 });
+
+// ---------------------------------------------------------------------------
+// Trailing newline invariant — composed elements must end with \n\n
+// ---------------------------------------------------------------------------
+
+describe("TextFallbackElement - trailing newline invariant", () => {
+  it("plain text at full level ends with blank line in markdown", () => {
+    const el = new TextFallbackElement("plan", "Plan Output", "some content");
+    expect(el.render("markdown", 1)).toMatch(/\n\n$/);
+  });
+
+  it("JSON Lines at full level ends with blank line in markdown", () => {
+    const jsonl = [
+      '{"@level":"info","@message":"Creating..."}',
+      '{"@level":"info","@message":"Done"}',
+    ].join("\n");
+    const el = new TextFallbackElement("apply", "Apply Output", jsonl);
+    expect(el.render("markdown", 1)).toMatch(/\n\n$/);
+  });
+
+  it("validate output at full level ends with blank line in markdown", () => {
+    const validate = JSON.stringify({
+      valid: true,
+      diagnostics: [],
+    });
+    const el = new TextFallbackElement("validate", "Validate Output", validate);
+    expect(el.render("markdown", 1)).toMatch(/\n\n$/);
+  });
+
+  it("compact level ends with blank line in markdown", () => {
+    const el = new TextFallbackElement("plan", "Plan Output", "content");
+    expect(el.render("markdown", 0)).toMatch(/\n\n$/);
+  });
+});
