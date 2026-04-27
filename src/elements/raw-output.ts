@@ -301,7 +301,7 @@ function formatValidateDiagMarkdown(diag: Record<string, unknown>): string {
       .split("\n")
       .map((l) => `> ${l}`)
       .join("\n");
-    output += `${detailLines}\n`;
+    output += `${detailLines}\n\n`;
   }
 
   const snippet = diag["snippet"] as Record<string, unknown> | undefined;

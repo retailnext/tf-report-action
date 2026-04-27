@@ -3269,6 +3269,7 @@ function formatValidateDiagMarkdown(diag) {
   if (detail) {
     const detailLines = htmlEscape(detail).split("\n").map((l) => `> ${l}`).join("\n");
     output += `${detailLines}
+
 `;
   }
   const snippet = diag["snippet"];

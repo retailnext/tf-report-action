@@ -650,6 +650,7 @@ Exit code: \`1\`
 
 🚨 **Reference to undeclared input variable**
 > An input variable with the name &quot;nonexistent_variable&quot; has not been declared. This variable can be declared with a variable &quot;nonexistent_variable&quot; {} block.
+
 > \`    value = var.nonexistent_variable\` in resource &quot;null_resource&quot; &quot;baseline&quot; (line 16)
 
 <details>
@@ -2212,6 +2213,7 @@ Exit code: \`1\`
 
 🚨 **Reference to undeclared input variable**
 > An input variable with the name &quot;nonexistent_variable&quot; has not been declared. This variable can be declared with a variable &quot;nonexistent_variable&quot; {} block.
+
 > \`    value = var.nonexistent_variable\` in resource &quot;null_resource&quot; &quot;baseline&quot; (line 16)
 
 <details>
@@ -3771,6 +3773,7 @@ Exit code: \`1\`
 
 🚨 **Reference to undeclared input variable**
 > An input variable with the name &quot;nonexistent_variable&quot; has not been declared. This variable can be declared with a variable &quot;nonexistent_variable&quot; {} block.
+
 > \`    value = var.nonexistent_variable\` in resource &quot;null_resource&quot; &quot;baseline&quot; (line 16)
 
 <details>
@@ -5112,6 +5115,7 @@ Exit code: \`1\`
 
 🚨 **Reference to undeclared input variable**
 > An input variable with the name &quot;nonexistent_variable&quot; has not been declared. This variable can be declared with a variable &quot;nonexistent_variable&quot; {} block.
+
 > \`    value = var.nonexistent_variable\` in resource &quot;null_resource&quot; &quot;baseline&quot; (line 16)
 
 <details>
@@ -7602,6 +7606,7 @@ Exit code: \`1\`
 
 🚨 **Reference to undeclared input variable**
 > An input variable with the name &quot;nonexistent_variable&quot; has not been declared. This variable can be declared with a variable &quot;nonexistent_variable&quot; {} block.
+
 > \`    value = var.nonexistent_variable\` in resource &quot;null_resource&quot; &quot;baseline&quot; (line 16)
 
 <details>
@@ -7681,6 +7686,7 @@ Exit code: \`1\`
 
 🚨 **Reference to undeclared input variable**
 > An input variable with the name &quot;nonexistent_variable&quot; has not been declared. This variable can be declared with a variable &quot;nonexistent_variable&quot; {} block.
+
 > \`    value = var.nonexistent_variable\` in resource &quot;null_resource&quot; &quot;baseline&quot; (line 16)
 
 <details>
@@ -11969,6 +11975,7 @@ Exit code: \`1\`
 
 🚨 **Reference to undeclared input variable**
 > An input variable with the name &quot;nonexistent_variable&quot; has not been declared. This variable can be declared with a variable &quot;nonexistent_variable&quot; {} block.
+
 > \`    value = var.nonexistent_variable\` in resource &quot;null_resource&quot; &quot;baseline&quot; (line 16)
 
 <details>
@@ -12048,6 +12055,7 @@ Exit code: \`1\`
 
 🚨 **Reference to undeclared input variable**
 > An input variable with the name &quot;nonexistent_variable&quot; has not been declared. This variable can be declared with a variable &quot;nonexistent_variable&quot; {} block.
+
 > \`    value = var.nonexistent_variable\` in resource &quot;null_resource&quot; &quot;baseline&quot; (line 16)
 
 <details>
@@ -15113,6 +15121,7 @@ Exit code: \`1\`
 
 🚨 **Reference to undeclared input variable**
 > An input variable with the name &quot;nonexistent_variable&quot; has not been declared. This variable can be declared with a variable &quot;nonexistent_variable&quot; {} block.
+
 > \`    value = var.nonexistent_variable\` in resource &quot;null_resource&quot; &quot;baseline&quot; (line 16)
 
 <details>
@@ -16396,6 +16405,7 @@ Exit code: \`1\`
 
 🚨 **Reference to undeclared input variable**
 > An input variable with the name &quot;nonexistent_variable&quot; has not been declared. This variable can be declared with a variable &quot;nonexistent_variable&quot; {} block.
+
 > \`    value = var.nonexistent_variable\` in resource &quot;null_resource&quot; &quot;baseline&quot; (line 16)
 
 <details>
@@ -17783,6 +17793,7 @@ Exit code: \`1\`
 
 🚨 **Reference to undeclared input variable**
 > An input variable with the name &quot;nonexistent_variable&quot; has not been declared. This variable can be declared with a variable &quot;nonexistent_variable&quot; {} block.
+
 > \`    value = var.nonexistent_variable\` in resource &quot;null_resource&quot; &quot;baseline&quot; (line 16)
 
 <details>
@@ -19518,6 +19529,7 @@ Exit code: \`1\`
 
 🚨 **Reference to undeclared input variable**
 > An input variable with the name &quot;nonexistent_variable&quot; has not been declared. This variable can be declared with a variable &quot;nonexistent_variable&quot; {} block.
+
 > \`    value = var.nonexistent_variable\` in resource &quot;null_resource&quot; &quot;baseline&quot; (line 16)
 
 <details>
@@ -21443,6 +21455,7 @@ Exit code: \`1\`
 
 🚨 **Reference to undeclared input variable**
 > An input variable with the name &quot;nonexistent_variable&quot; has not been declared. This variable can be declared with a variable &quot;nonexistent_variable&quot; {} block.
+
 > \`    value = var.nonexistent_variable\` in resource &quot;null_resource&quot; &quot;baseline&quot; (line 16)
 
 <details>
@@ -23396,6 +23409,7 @@ Exit code: \`1\`
 
 🚨 **Reference to undeclared input variable**
 > An input variable with the name &quot;nonexistent_variable&quot; has not been declared. This variable can be declared with a variable &quot;nonexistent_variable&quot; {} block.
+
 > \`    value = var.nonexistent_variable\` in resource &quot;null_resource&quot; &quot;baseline&quot; (line 16)
 
 <details>
