@@ -8,6 +8,7 @@
 import type { Renderable, OutputFormat } from "../renderable/types.js";
 import type { StepOutcome } from "../model/step-outcome.js";
 import { Table, RawText, EMPTY } from "../renderable/primitives.js";
+import { htmlEscape } from "../renderable/html-escape.js";
 
 /**
  * Builds a step status table as a Renderable.
@@ -60,7 +61,7 @@ class InlineCode implements Renderable {
 
   constructor(text: string) {
     this.mdStr = `\`${text}\``;
-    this.htStr = `<code>${text}</code>`;
+    this.htStr = `<code>${htmlEscape(text)}</code>`;
   }
 
   size(format: OutputFormat): number {

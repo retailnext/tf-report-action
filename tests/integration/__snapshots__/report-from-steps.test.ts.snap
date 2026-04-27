@@ -20635,7 +20635,7 @@ _No attribute changes._
 exports[`reportFromSteps — state enrichment > no-state snapshot: terraform/apply-error/0/no-state 1`] = `
 "## ✅ Apply: 3 added
 
-> ⚠️ **Warning:** Some attribute values could not be resolved because \`terraform state pull\` output was not available. Add a \`state\` step after apply to see the actual values.
+> ⚠️ **Warning:** Some attribute values could not be resolved because \`terraform state pull\` output was not available. Add a state step after apply to see the actual values.
 
 ## Apply Summary
 
@@ -20708,7 +20708,7 @@ terraform_data.success
 exports[`reportFromSteps — state enrichment > no-state snapshot: terraform/apply-error/1/no-state 1`] = `
 "## ❌ Apply Failed
 
-> ⚠️ **Warning:** Some attribute values could not be resolved because \`terraform state pull\` output was not available. Add a \`state\` step after apply to see the actual values.
+> ⚠️ **Warning:** Some attribute values could not be resolved because \`terraform state pull\` output was not available. Add a state step after apply to see the actual values.
 
 ### ❌ \`apply\` failed
 
@@ -21007,7 +21007,7 @@ Error running command 'exit 1': exit status 1. Output:
 exports[`reportFromSteps — state enrichment > no-state snapshot: terraform/deferred-data-source/0/no-state 1`] = `
 "## ✅ Apply: 5 added
 
-> ⚠️ **Warning:** Some attribute values could not be resolved because \`terraform state pull\` output was not available. Add a \`state\` step after apply to see the actual values.
+> ⚠️ **Warning:** Some attribute values could not be resolved because \`terraform state pull\` output was not available. Add a state step after apply to see the actual values.
 
 ## Apply Summary
 
@@ -21129,7 +21129,7 @@ _all values known after apply_
 exports[`reportFromSteps — state enrichment > no-state snapshot: terraform/deferred-data-source/1/no-state 1`] = `
 "## ✅ Apply: 1 added, 1 changed
 
-> ⚠️ **Warning:** Some attribute values could not be resolved because \`terraform state pull\` output was not available. Add a \`state\` step after apply to see the actual values.
+> ⚠️ **Warning:** Some attribute values could not be resolved because \`terraform state pull\` output was not available. Add a state step after apply to see the actual values.
 
 ## Apply Summary
 
@@ -21198,7 +21198,7 @@ terraform_data.independent
 exports[`reportFromSteps — state enrichment > no-state snapshot: terraform/deferred-data-source/2/no-state 1`] = `
 "## ✅ Apply: 1 changed, 1 replaced
 
-> ⚠️ **Warning:** Some attribute values could not be resolved because \`terraform state pull\` output was not available. Add a \`state\` step after apply to see the actual values.
+> ⚠️ **Warning:** Some attribute values could not be resolved because \`terraform state pull\` output was not available. Add a state step after apply to see the actual values.
 
 ## Apply Summary
 
@@ -21276,7 +21276,7 @@ _all values known after apply_
 exports[`reportFromSteps — state enrichment > no-state snapshot: terraform/error-stages/0/no-state 1`] = `
 "## ✅ Apply: 1 added
 
-> ⚠️ **Warning:** Some attribute values could not be resolved because \`terraform state pull\` output was not available. Add a \`state\` step after apply to see the actual values.
+> ⚠️ **Warning:** Some attribute values could not be resolved because \`terraform state pull\` output was not available. Add a state step after apply to see the actual values.
 
 ## Apply Summary
 
@@ -21594,7 +21594,7 @@ Apply complete! Resources: 0 added, 0 changed, 0 destroyed.[0m
 exports[`reportFromSteps — state enrichment > no-state snapshot: terraform/local-files/0/no-state 1`] = `
 "## ✅ Apply: 1 added
 
-> ⚠️ **Warning:** Some attribute values could not be resolved because \`terraform state pull\` output was not available. Add a \`state\` step after apply to see the actual values.
+> ⚠️ **Warning:** Some attribute values could not be resolved because \`terraform state pull\` output was not available. Add a state step after apply to see the actual values.
 
 ## Apply Summary
 
@@ -21667,7 +21667,7 @@ Line 12: end of file
 exports[`reportFromSteps — state enrichment > no-state snapshot: terraform/local-files/1/no-state 1`] = `
 "## ✅ Apply: 1 replaced
 
-> ⚠️ **Warning:** Some attribute values could not be resolved because \`terraform state pull\` output was not available. Add a \`state\` step after apply to see the actual values.
+> ⚠️ **Warning:** Some attribute values could not be resolved because \`terraform state pull\` output was not available. Add a state step after apply to see the actual values.
 
 ## Apply Summary
 
@@ -21736,7 +21736,7 @@ local_file.readme
 exports[`reportFromSteps — state enrichment > no-state snapshot: terraform/modules/0/no-state 1`] = `
 "## ✅ Apply: 5 added
 
-> ⚠️ **Warning:** Some attribute values could not be resolved because \`terraform state pull\` output was not available. Add a \`state\` step after apply to see the actual values.
+> ⚠️ **Warning:** Some attribute values could not be resolved because \`terraform state pull\` output was not available. Add a state step after apply to see the actual values.
 
 ## Apply Summary
 
@@ -21863,7 +21863,7 @@ module.parent["2"].module.child.null_resource.item[1]
 exports[`reportFromSteps — state enrichment > no-state snapshot: terraform/modules/1/no-state 1`] = `
 "## ✅ Apply: 3 added, 2 replaced, 2 destroyed
 
-> ⚠️ **Warning:** Some attribute values could not be resolved because \`terraform state pull\` output was not available. Add a \`state\` step after apply to see the actual values.
+> ⚠️ **Warning:** Some attribute values could not be resolved because \`terraform state pull\` output was not available. Add a state step after apply to see the actual values.
 
 ## Apply Summary
 
@@ -22028,7 +22028,7 @@ _No changes._
 exports[`reportFromSteps — state enrichment > no-state snapshot: terraform/null-lifecycle/1/no-state 1`] = `
 "## ✅ Apply: 4 added
 
-> ⚠️ **Warning:** Some attribute values could not be resolved because \`terraform state pull\` output was not available. Add a \`state\` step after apply to see the actual values.
+> ⚠️ **Warning:** Some attribute values could not be resolved because \`terraform state pull\` output was not available. Add a state step after apply to see the actual values.
 
 ## Apply Summary
 
@@ -22137,7 +22137,7 @@ terraform_data.meta
 exports[`reportFromSteps — state enrichment > no-state snapshot: terraform/null-lifecycle/2/no-state 1`] = `
 "## ✅ Apply: 1 changed, 1 replaced, 1 destroyed
 
-> ⚠️ **Warning:** Some attribute values could not be resolved because \`terraform state pull\` output was not available. Add a \`state\` step after apply to see the actual values.
+> ⚠️ **Warning:** Some attribute values could not be resolved because \`terraform state pull\` output was not available. Add a state step after apply to see the actual values.
 
 ## Apply Summary
 
@@ -22230,7 +22230,7 @@ _No changes._
 exports[`reportFromSteps — state enrichment > no-state snapshot: terraform/null-lifecycle/4/no-state 1`] = `
 "## ✅ Apply: 1 added
 
-> ⚠️ **Warning:** Some attribute values could not be resolved because \`terraform state pull\` output was not available. Add a \`state\` step after apply to see the actual values.
+> ⚠️ **Warning:** Some attribute values could not be resolved because \`terraform state pull\` output was not available. Add a state step after apply to see the actual values.
 
 ## Apply Summary
 
@@ -22305,7 +22305,7 @@ local_file.managed
 exports[`reportFromSteps — state enrichment > no-state snapshot: terraform/sensitive-values/0/no-state 1`] = `
 "## ✅ Apply: 1 added
 
-> ⚠️ **Warning:** Some attribute values could not be resolved because \`terraform state pull\` output was not available. Add a \`state\` step after apply to see the actual values.
+> ⚠️ **Warning:** Some attribute values could not be resolved because \`terraform state pull\` output was not available. Add a state step after apply to see the actual values.
 
 ## Apply Summary
 
@@ -22357,7 +22357,7 @@ local_sensitive_file.secret
 exports[`reportFromSteps — state enrichment > no-state snapshot: terraform/sensitive-values/1/no-state 1`] = `
 "## ✅ Apply: 1 replaced
 
-> ⚠️ **Warning:** Some attribute values could not be resolved because \`terraform state pull\` output was not available. Add a \`state\` step after apply to see the actual values.
+> ⚠️ **Warning:** Some attribute values could not be resolved because \`terraform state pull\` output was not available. Add a state step after apply to see the actual values.
 
 ## Apply Summary
 
@@ -22405,7 +22405,7 @@ local_sensitive_file.secret
 exports[`reportFromSteps — state enrichment > no-state snapshot: terraform/state-operations/0/no-state 1`] = `
 "## ✅ Apply: 4 added
 
-> ⚠️ **Warning:** Some attribute values could not be resolved because \`terraform state pull\` output was not available. Add a \`state\` step after apply to see the actual values.
+> ⚠️ **Warning:** Some attribute values could not be resolved because \`terraform state pull\` output was not available. Add a state step after apply to see the actual values.
 
 ## Apply Summary
 
@@ -22576,7 +22576,7 @@ _No attribute changes._
 exports[`reportFromSteps — state enrichment > no-state snapshot: tofu/apply-error/0/no-state 1`] = `
 "## ✅ Apply: 3 added
 
-> ⚠️ **Warning:** Some attribute values could not be resolved because \`tofu state pull\` output was not available. Add a \`state\` step after apply to see the actual values.
+> ⚠️ **Warning:** Some attribute values could not be resolved because \`tofu state pull\` output was not available. Add a state step after apply to see the actual values.
 
 ## Apply Summary
 
@@ -22649,7 +22649,7 @@ terraform_data.success
 exports[`reportFromSteps — state enrichment > no-state snapshot: tofu/apply-error/1/no-state 1`] = `
 "## ❌ Apply Failed
 
-> ⚠️ **Warning:** Some attribute values could not be resolved because \`tofu state pull\` output was not available. Add a \`state\` step after apply to see the actual values.
+> ⚠️ **Warning:** Some attribute values could not be resolved because \`tofu state pull\` output was not available. Add a state step after apply to see the actual values.
 
 ### ❌ \`apply\` failed
 
@@ -22948,7 +22948,7 @@ Error running command 'exit 1': exit status 1. Output:
 exports[`reportFromSteps — state enrichment > no-state snapshot: tofu/deferred-data-source/0/no-state 1`] = `
 "## ✅ Apply: 5 added
 
-> ⚠️ **Warning:** Some attribute values could not be resolved because \`tofu state pull\` output was not available. Add a \`state\` step after apply to see the actual values.
+> ⚠️ **Warning:** Some attribute values could not be resolved because \`tofu state pull\` output was not available. Add a state step after apply to see the actual values.
 
 ## Apply Summary
 
@@ -23070,7 +23070,7 @@ _all values known after apply_
 exports[`reportFromSteps — state enrichment > no-state snapshot: tofu/deferred-data-source/1/no-state 1`] = `
 "## ✅ Apply: 1 added, 1 changed
 
-> ⚠️ **Warning:** Some attribute values could not be resolved because \`tofu state pull\` output was not available. Add a \`state\` step after apply to see the actual values.
+> ⚠️ **Warning:** Some attribute values could not be resolved because \`tofu state pull\` output was not available. Add a state step after apply to see the actual values.
 
 ## Apply Summary
 
@@ -23139,7 +23139,7 @@ terraform_data.independent
 exports[`reportFromSteps — state enrichment > no-state snapshot: tofu/deferred-data-source/2/no-state 1`] = `
 "## ✅ Apply: 1 changed, 1 replaced
 
-> ⚠️ **Warning:** Some attribute values could not be resolved because \`tofu state pull\` output was not available. Add a \`state\` step after apply to see the actual values.
+> ⚠️ **Warning:** Some attribute values could not be resolved because \`tofu state pull\` output was not available. Add a state step after apply to see the actual values.
 
 ## Apply Summary
 
@@ -23217,7 +23217,7 @@ _all values known after apply_
 exports[`reportFromSteps — state enrichment > no-state snapshot: tofu/error-stages/0/no-state 1`] = `
 "## ✅ Apply: 1 added
 
-> ⚠️ **Warning:** Some attribute values could not be resolved because \`tofu state pull\` output was not available. Add a \`state\` step after apply to see the actual values.
+> ⚠️ **Warning:** Some attribute values could not be resolved because \`tofu state pull\` output was not available. Add a state step after apply to see the actual values.
 
 ## Apply Summary
 
@@ -23535,7 +23535,7 @@ Apply complete! Resources: 0 added, 0 changed, 0 destroyed.
 exports[`reportFromSteps — state enrichment > no-state snapshot: tofu/local-files/0/no-state 1`] = `
 "## ✅ Apply: 1 added
 
-> ⚠️ **Warning:** Some attribute values could not be resolved because \`tofu state pull\` output was not available. Add a \`state\` step after apply to see the actual values.
+> ⚠️ **Warning:** Some attribute values could not be resolved because \`tofu state pull\` output was not available. Add a state step after apply to see the actual values.
 
 ## Apply Summary
 
@@ -23608,7 +23608,7 @@ Line 12: end of file
 exports[`reportFromSteps — state enrichment > no-state snapshot: tofu/local-files/1/no-state 1`] = `
 "## ✅ Apply: 1 replaced
 
-> ⚠️ **Warning:** Some attribute values could not be resolved because \`tofu state pull\` output was not available. Add a \`state\` step after apply to see the actual values.
+> ⚠️ **Warning:** Some attribute values could not be resolved because \`tofu state pull\` output was not available. Add a state step after apply to see the actual values.
 
 ## Apply Summary
 
@@ -23677,7 +23677,7 @@ local_file.readme
 exports[`reportFromSteps — state enrichment > no-state snapshot: tofu/modules/0/no-state 1`] = `
 "## ✅ Apply: 5 added
 
-> ⚠️ **Warning:** Some attribute values could not be resolved because \`tofu state pull\` output was not available. Add a \`state\` step after apply to see the actual values.
+> ⚠️ **Warning:** Some attribute values could not be resolved because \`tofu state pull\` output was not available. Add a state step after apply to see the actual values.
 
 ## Apply Summary
 
@@ -23804,7 +23804,7 @@ module.parent["2"].module.child.null_resource.item[1]
 exports[`reportFromSteps — state enrichment > no-state snapshot: tofu/modules/1/no-state 1`] = `
 "## ✅ Apply: 3 added, 2 replaced, 2 destroyed
 
-> ⚠️ **Warning:** Some attribute values could not be resolved because \`tofu state pull\` output was not available. Add a \`state\` step after apply to see the actual values.
+> ⚠️ **Warning:** Some attribute values could not be resolved because \`tofu state pull\` output was not available. Add a state step after apply to see the actual values.
 
 ## Apply Summary
 
@@ -23969,7 +23969,7 @@ _No changes._
 exports[`reportFromSteps — state enrichment > no-state snapshot: tofu/null-lifecycle/1/no-state 1`] = `
 "## ✅ Apply: 4 added
 
-> ⚠️ **Warning:** Some attribute values could not be resolved because \`tofu state pull\` output was not available. Add a \`state\` step after apply to see the actual values.
+> ⚠️ **Warning:** Some attribute values could not be resolved because \`tofu state pull\` output was not available. Add a state step after apply to see the actual values.
 
 ## Apply Summary
 
@@ -24078,7 +24078,7 @@ terraform_data.meta
 exports[`reportFromSteps — state enrichment > no-state snapshot: tofu/null-lifecycle/2/no-state 1`] = `
 "## ✅ Apply: 1 changed, 1 replaced, 1 destroyed
 
-> ⚠️ **Warning:** Some attribute values could not be resolved because \`tofu state pull\` output was not available. Add a \`state\` step after apply to see the actual values.
+> ⚠️ **Warning:** Some attribute values could not be resolved because \`tofu state pull\` output was not available. Add a state step after apply to see the actual values.
 
 ## Apply Summary
 
@@ -24171,7 +24171,7 @@ _No changes._
 exports[`reportFromSteps — state enrichment > no-state snapshot: tofu/null-lifecycle/4/no-state 1`] = `
 "## ✅ Apply: 1 added
 
-> ⚠️ **Warning:** Some attribute values could not be resolved because \`tofu state pull\` output was not available. Add a \`state\` step after apply to see the actual values.
+> ⚠️ **Warning:** Some attribute values could not be resolved because \`tofu state pull\` output was not available. Add a state step after apply to see the actual values.
 
 ## Apply Summary
 
@@ -24246,7 +24246,7 @@ local_file.managed
 exports[`reportFromSteps — state enrichment > no-state snapshot: tofu/sensitive-values/0/no-state 1`] = `
 "## ✅ Apply: 1 added
 
-> ⚠️ **Warning:** Some attribute values could not be resolved because \`tofu state pull\` output was not available. Add a \`state\` step after apply to see the actual values.
+> ⚠️ **Warning:** Some attribute values could not be resolved because \`tofu state pull\` output was not available. Add a state step after apply to see the actual values.
 
 ## Apply Summary
 
@@ -24298,7 +24298,7 @@ local_sensitive_file.secret
 exports[`reportFromSteps — state enrichment > no-state snapshot: tofu/sensitive-values/1/no-state 1`] = `
 "## ✅ Apply: 1 replaced
 
-> ⚠️ **Warning:** Some attribute values could not be resolved because \`tofu state pull\` output was not available. Add a \`state\` step after apply to see the actual values.
+> ⚠️ **Warning:** Some attribute values could not be resolved because \`tofu state pull\` output was not available. Add a state step after apply to see the actual values.
 
 ## Apply Summary
 
@@ -24346,7 +24346,7 @@ local_sensitive_file.secret
 exports[`reportFromSteps — state enrichment > no-state snapshot: tofu/state-operations/0/no-state 1`] = `
 "## ✅ Apply: 4 added
 
-> ⚠️ **Warning:** Some attribute values could not be resolved because \`tofu state pull\` output was not available. Add a \`state\` step after apply to see the actual values.
+> ⚠️ **Warning:** Some attribute values could not be resolved because \`tofu state pull\` output was not available. Add a state step after apply to see the actual values.
 
 ## Apply Summary
 

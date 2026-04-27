@@ -6,6 +6,7 @@ import type { ApplyStatus } from "./apply-status.js";
 import type { StepIssue } from "./step-issue.js";
 import type { StepOutcome } from "./step-outcome.js";
 import type { ReportTitle } from "./report-title.js";
+import type { Renderable } from "../renderable/types.js";
 
 // ---------------------------------------------------------------------------
 // Tool identification
@@ -75,7 +76,7 @@ export interface Report {
   steps: StepOutcome[];
 
   /** Warnings about missing data, scanner quality, parse failures. */
-  warnings: string[];
+  warnings: Renderable[];
 
   /**
    * Raw stdout from steps whose output could not be parsed structurally.

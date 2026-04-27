@@ -139,7 +139,7 @@ class ExitCodeParagraph implements Renderable {
 
   constructor(exitCode: string) {
     this.mdStr = `Exit code: \`${exitCode}\`\n\n`;
-    this.htStr = `<p>Exit code: <code>${exitCode}</code></p>\n`;
+    this.htStr = `<p>Exit code: <code>${htmlEscape(exitCode)}</code></p>\n`;
   }
 
   size(format: OutputFormat): number {
@@ -158,7 +158,7 @@ class WarningBlockquote implements Renderable {
 
   constructor(text: string) {
     this.mdStr = `> ${text}\n\n`;
-    this.htStr = `<blockquote><p>${text}</p></blockquote>\n`;
+    this.htStr = `<blockquote><p>${htmlEscape(text)}</p></blockquote>\n`;
   }
 
   size(format: OutputFormat): number {

@@ -260,11 +260,9 @@ export class WarningElement implements ReportElement {
   readonly id: string;
   private readonly renderable: Renderable;
 
-  constructor(warning: string, index: number) {
+  constructor(warning: Renderable, index: number) {
     this.id = `warning-${String(index)}`;
-    // The warning text may contain markdown/HTML — render as-is in
-    // markdown, but escape for HTML format. Use format-aware rendering.
-    this.renderable = new WarningRenderable(warning);
+    this.renderable = new WarningBlockquoteChrome(warning);
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -335,25 +333,30 @@ export class LogsUrlElement implements ReportElement {
 // ---------------------------------------------------------------------------
 
 /**
- * Warning renderable that produces `> ⚠️ **Warning:** text\n\n` in
- * markdown and `<blockquote><p>⚠️ <strong>Warning:</strong> text</p></blockquote>\n`
- * in HTML.
+ * Adds blockquote chrome around a warning body Renderable.
+ *
+ * Produces `> ⚠️ **Warning:** {body}\n\n` in markdown and
+ * `<blockquote><p>⚠️ <strong>Warning:</strong> {body}</p></blockquote>\n` in HTML.
+ *
+ * The body is a Renderable that produces its own format-appropriate text.
  */
-class WarningRenderable implements Renderable {
-  private readonly mdStr: string;
-  private readonly htStr: string;
+class WarningBlockquoteChrome implements Renderable {
+  private readonly body: Renderable;
 
-  constructor(warning: string) {
-    this.mdStr = `> ${DIAGNOSTIC_WARNING} **Warning:** ${warning}\n\n`;
-    this.htStr = `<blockquote><p>${DIAGNOSTIC_WARNING} <strong>Warning:</strong> ${htmlEscape(warning)}</p></blockquote>\n`;
+  constructor(body: Renderable) {
+    this.body = body;
   }
 
   size(format: OutputFormat): number {
-    return format === "markdown" ? this.mdStr.length : this.htStr.length;
+    return this.render(format).length;
   }
 
   render(format: OutputFormat): string {
-    return format === "markdown" ? this.mdStr : this.htStr;
+    const text = this.body.render(format);
+    if (format === "markdown") {
+      return `> ${DIAGNOSTIC_WARNING} **Warning:** ${text}\n\n`;
+    }
+    return `<blockquote><p>${DIAGNOSTIC_WARNING} <strong>Warning:</strong> ${text}</p></blockquote>\n`;
   }
 }
 

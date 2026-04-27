@@ -23,7 +23,11 @@ import type { RenderOptions } from "../model/render-options.js";
 import type { Env } from "../env/index.js";
 import type { ReaderOptions } from "../steps/types.js";
 import type { Report, Tool } from "../model/report.js";
-import { expectedCommand } from "../model/step-commands.js";
+import {
+  NoShowPlanWarning,
+  RawTextFallbackWarning,
+  NoStateWarning,
+} from "./warnings.js";
 import { parseSteps } from "../steps/parse.js";
 import {
   DEFAULT_INIT_STEP,
@@ -243,14 +247,10 @@ export function buildReportFromSteps(
     (report.resources !== undefined || report.summary !== undefined)
   ) {
     // JSONL-enriched report — has structure but no attribute detail
-    report.warnings.push(
-      `This report was generated without \`${expectedCommand(tool, "show-plan")}\` output. Resource attribute details are not available.`,
-    );
+    report.warnings.push(new NoShowPlanWarning(tool));
   } else if (!showPlanParsed && report.rawStdout.length > 0) {
     // Raw text fallback — no structured data at all
-    report.warnings.push(
-      `Report limited because \`${expectedCommand(tool, "show-plan")}\` output was not available. Showing raw command output.`,
-    );
+    report.warnings.push(new RawTextFallbackWarning(tool));
   }
 
   // Missing state warning — only for structured apply reports with unresolved values
@@ -260,9 +260,7 @@ export function buildReportFromSteps(
     !report.stateEnriched &&
     hasUnresolvedKnownAfterApply(report)
   ) {
-    report.warnings.push(
-      `Some attribute values could not be resolved because \`${expectedCommand(tool, "state")}\` output was not available. Add a \`state\` step after apply to see the actual values.`,
-    );
+    report.warnings.push(new NoStateWarning(tool));
   }
 
   // Store detected tool

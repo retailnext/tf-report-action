@@ -17,6 +17,163 @@ function expectedCommand(tool, role) {
   }
 }
 
+// src/renderable/html-escape.ts
+var ENTITY_MAP = /* @__PURE__ */ new Map([
+  ["&", 5],
+  // &amp;
+  ["<", 4],
+  // &lt;
+  [">", 4],
+  // &gt;
+  ['"', 6]
+  // &quot;
+]);
+function htmlEscapeSize(text) {
+  let size = 0;
+  for (const ch of text) {
+    const entityLen = ENTITY_MAP.get(ch);
+    size += entityLen ?? ch.length;
+  }
+  return size;
+}
+function htmlEscape(text) {
+  return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+}
+
+// src/builder/warnings.ts
+function renderCommand(tool, role, format) {
+  const cmd = expectedCommand(tool, role);
+  return format === "markdown" ? `\`${cmd}\`` : `<code>${htmlEscape(cmd)}</code>`;
+}
+var NoShowPlanWarning = class {
+  tool;
+  constructor(tool) {
+    this.tool = tool;
+  }
+  size(format) {
+    return this.render(format).length;
+  }
+  render(format) {
+    const cmd = renderCommand(this.tool, "show-plan", format);
+    return `This report was generated without ${cmd} output. Resource attribute details are not available.`;
+  }
+};
+var RawTextFallbackWarning = class {
+  tool;
+  constructor(tool) {
+    this.tool = tool;
+  }
+  size(format) {
+    return this.render(format).length;
+  }
+  render(format) {
+    const cmd = renderCommand(this.tool, "show-plan", format);
+    return `Report limited because ${cmd} output was not available. Showing raw command output.`;
+  }
+};
+var NoStateWarning = class {
+  tool;
+  constructor(tool) {
+    this.tool = tool;
+  }
+  size(format) {
+    return this.render(format).length;
+  }
+  render(format) {
+    const cmd = renderCommand(this.tool, "state", format);
+    return `Some attribute values could not be resolved because ${cmd} output was not available. Add a state step after apply to see the actual values.`;
+  }
+};
+var StepOutputParseWarning = class {
+  stepId;
+  constructor(stepId) {
+    this.stepId = stepId;
+  }
+  size(format) {
+    return this.render(format).length;
+  }
+  render(format) {
+    const id = format === "markdown" ? `\`${this.stepId}\`` : `<code>${htmlEscape(this.stepId)}</code>`;
+    return `Output from step ${id} could not be parsed; using plan data only.`;
+  }
+};
+var StepReadErrorWarning = class {
+  role;
+  error;
+  constructor(role, error) {
+    this.role = role;
+    this.error = error;
+  }
+  size(format) {
+    return this.render(format).length;
+  }
+  render(format) {
+    const escaped = format === "markdown" ? this.error : htmlEscape(this.error);
+    return `${this.role} stdout: ${escaped}`;
+  }
+};
+var StepOutputMissingWarning = class {
+  role;
+  constructor(role) {
+    this.role = role;
+  }
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  size(_format) {
+    return this.render("markdown").length;
+  }
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  render(_format) {
+    return `${this.role}: stdout_file output missing in steps`;
+  }
+};
+var StepScanFailureWarning = class {
+  role;
+  constructor(role) {
+    this.role = role;
+  }
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  size(_format) {
+    return this.render("markdown").length;
+  }
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  render(_format) {
+    const label = this.role.charAt(0).toUpperCase() + this.role.slice(1);
+    return `${label} JSONL file could not be scanned`;
+  }
+};
+var UnparseableLinesWarning = class {
+  count;
+  role;
+  constructor(count, role) {
+    this.count = count;
+    this.role = role;
+  }
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  size(_format) {
+    return this.render("markdown").length;
+  }
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  render(_format) {
+    return `${String(this.count)} line(s) in ${this.role} output could not be parsed as JSON`;
+  }
+};
+var UnknownMessageTypesWarning = class {
+  count;
+  role;
+  constructor(count, role) {
+    this.count = count;
+    this.role = role;
+  }
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  size(_format) {
+    return this.render("markdown").length;
+  }
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  render(_format) {
+    return `${String(this.count)} line(s) in ${this.role} output had unrecognized message types`;
+  }
+};
+
 // src/steps/parse.ts
 function parseSteps(json) {
   let parsed;
@@ -687,15 +844,15 @@ function filterStepIssueStdout(report, stepId, diagnostics) {
   const filtered = filterJsonlByAddresses(issue.stdout, addresses);
   report.issues[idx] = { ...issue, stdout: filtered };
 }
-function addScannerWarnings(report, scan, stepLabel) {
+function addScannerWarnings(report, scan, role) {
   if (scan.unparseableLines > 0) {
     report.warnings.push(
-      `${String(scan.unparseableLines)} line(s) in ${stepLabel} output could not be parsed as JSON`
+      new UnparseableLinesWarning(scan.unparseableLines, role)
     );
   }
   if (scan.unknownTypeLines > 0) {
     report.warnings.push(
-      `${String(scan.unknownTypeLines)} line(s) in ${stepLabel} output had unrecognized message types`
+      new UnknownMessageTypesWarning(scan.unknownTypeLines, role)
     );
   }
 }
@@ -1629,9 +1786,9 @@ function tryProcessShowPlan(showPlanStep, showPlanStepId, applyStep, applyStepId
   const read = readStepStdout(showPlanStep, readerOpts);
   if (read.content === void 0) {
     if (read.error) {
-      report.warnings.push(`show-plan stdout: ${read.error}`);
+      report.warnings.push(new StepReadErrorWarning("show-plan", read.error));
     } else if (read.noFile) {
-      report.warnings.push("show-plan: stdout_file output missing in steps");
+      report.warnings.push(new StepOutputMissingWarning("show-plan"));
     }
     return false;
   }
@@ -1661,9 +1818,7 @@ function tryProcessShowPlan(showPlanStep, showPlanStepId, applyStep, applyStepId
         const applyScan = scanString(applyRead.content);
         enrichedReport = buildApplyReport(plan, applyScan, options);
       } catch {
-        report.warnings.push(
-          `Apply output from step \`${applyStepId}\` could not be parsed; using plan data only.`
-        );
+        report.warnings.push(new StepOutputParseWarning(applyStepId));
         enrichedReport = buildReport(plan, options);
       }
     } else {
@@ -1747,9 +1902,9 @@ function processPlanStep(step, stepId, report, readerOpts, showPlanParsed) {
         content: read.content
       });
     } else if (read.error) {
-      report.warnings.push(`plan stdout: ${read.error}`);
+      report.warnings.push(new StepReadErrorWarning("plan", read.error));
     } else if (read.noFile) {
-      report.warnings.push("plan: stdout_file output missing in steps");
+      report.warnings.push(new StepOutputMissingWarning("plan"));
     }
   }
 }
@@ -1758,7 +1913,7 @@ function enrichFromPlanJsonl(filePath, report, readerOpts, showPlanParsed) {
   try {
     scan = scanFile(filePath, readerOpts.maxFileSize);
   } catch {
-    report.warnings.push("Plan JSONL file could not be scanned");
+    report.warnings.push(new StepScanFailureWarning("plan"));
     return;
   }
   if (scan.tool !== void 0) report.tool = scan.tool;
@@ -1821,9 +1976,9 @@ function processApplyStep(step, stepId, report, readerOpts, showPlanParsed) {
         content: read.content
       });
     } else if (read.error) {
-      report.warnings.push(`apply stdout: ${read.error}`);
+      report.warnings.push(new StepReadErrorWarning("apply", read.error));
     } else if (read.noFile) {
-      report.warnings.push("apply: stdout_file output missing in steps");
+      report.warnings.push(new StepOutputMissingWarning("apply"));
     }
   }
   report.operation = "apply";
@@ -1833,7 +1988,7 @@ function enrichFromApplyJsonl(filePath, report, readerOpts, showPlanParsed) {
   try {
     scan = scanFile(filePath, readerOpts.maxFileSize);
   } catch {
-    report.warnings.push("Apply JSONL file could not be scanned");
+    report.warnings.push(new StepScanFailureWarning("apply"));
     return;
   }
   if (scan.tool !== void 0) report.tool = scan.tool;
@@ -2101,18 +2256,12 @@ function buildReportFromSteps(stepsJson, options) {
     }
   }
   if (!showPlanParsed && (report.resources !== void 0 || report.summary !== void 0)) {
-    report.warnings.push(
-      `This report was generated without \`${expectedCommand(tool, "show-plan")}\` output. Resource attribute details are not available.`
-    );
+    report.warnings.push(new NoShowPlanWarning(tool));
   } else if (!showPlanParsed && report.rawStdout.length > 0) {
-    report.warnings.push(
-      `Report limited because \`${expectedCommand(tool, "show-plan")}\` output was not available. Showing raw command output.`
-    );
+    report.warnings.push(new RawTextFallbackWarning(tool));
   }
   if (showPlanParsed && report.operation === "apply" && !report.stateEnriched && hasUnresolvedKnownAfterApply(report)) {
-    report.warnings.push(
-      `Some attribute values could not be resolved because \`${expectedCommand(tool, "state")}\` output was not available. Add a \`state\` step after apply to see the actual values.`
-    );
+    report.warnings.push(new NoStateWarning(tool));
   }
   if (tool !== void 0) report.tool = tool;
   if (report.operation === void 0) {
@@ -2169,29 +2318,6 @@ function hasUnresolvedKnownAfterApply(report) {
     if (output.isKnownAfterApply) return true;
   }
   return false;
-}
-
-// src/renderable/html-escape.ts
-var ENTITY_MAP = /* @__PURE__ */ new Map([
-  ["&", 5],
-  // &amp;
-  ["<", 4],
-  // &lt;
-  [">", 4],
-  // &gt;
-  ['"', 6]
-  // &quot;
-]);
-function htmlEscapeSize(text) {
-  let size = 0;
-  for (const ch of text) {
-    const entityLen = ENTITY_MAP.get(ch);
-    size += entityLen ?? ch.length;
-  }
-  return size;
-}
-function htmlEscape(text) {
-  return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 }
 
 // src/renderable/primitives.ts
@@ -2669,7 +2795,7 @@ var WarningElement = class {
   renderable;
   constructor(warning, index) {
     this.id = `warning-${String(index)}`;
-    this.renderable = new WarningRenderable(warning);
+    this.renderable = new WarningBlockquoteChrome(warning);
   }
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   size(format, _level) {
@@ -2697,21 +2823,23 @@ var UserTitleElement = class {
     return this.renderable.render(format);
   }
 };
-var WarningRenderable = class {
-  mdStr;
-  htStr;
-  constructor(warning) {
-    this.mdStr = `> ${DIAGNOSTIC_WARNING} **Warning:** ${warning}
-
-`;
-    this.htStr = `<blockquote><p>${DIAGNOSTIC_WARNING} <strong>Warning:</strong> ${htmlEscape(warning)}</p></blockquote>
-`;
+var WarningBlockquoteChrome = class {
+  body;
+  constructor(body) {
+    this.body = body;
   }
   size(format) {
-    return format === "markdown" ? this.mdStr.length : this.htStr.length;
+    return this.render(format).length;
   }
   render(format) {
-    return format === "markdown" ? this.mdStr : this.htStr;
+    const text = this.body.render(format);
+    if (format === "markdown") {
+      return `> ${DIAGNOSTIC_WARNING} **Warning:** ${text}
+
+`;
+    }
+    return `<blockquote><p>${DIAGNOSTIC_WARNING} <strong>Warning:</strong> ${text}</p></blockquote>
+`;
   }
 };
 function escapeMarkerWorkspace(workspace) {
@@ -3474,7 +3602,7 @@ var ExitCodeParagraph = class {
     this.mdStr = `Exit code: \`${exitCode}\`
 
 `;
-    this.htStr = `<p>Exit code: <code>${exitCode}</code></p>
+    this.htStr = `<p>Exit code: <code>${htmlEscape(exitCode)}</code></p>
 `;
   }
   size(format) {
@@ -3491,7 +3619,7 @@ var WarningBlockquote = class {
     this.mdStr = `> ${text}
 
 `;
-    this.htStr = `<blockquote><p>${text}</p></blockquote>
+    this.htStr = `<blockquote><p>${htmlEscape(text)}</p></blockquote>
 `;
   }
   size(format) {
@@ -3560,7 +3688,7 @@ var InlineCode = class {
   htStr;
   constructor(text) {
     this.mdStr = `\`${text}\``;
-    this.htStr = `<code>${text}</code>`;
+    this.htStr = `<code>${htmlEscape(text)}</code>`;
   }
   size(format) {
     return format === "markdown" ? this.mdStr.length : this.htStr.length;

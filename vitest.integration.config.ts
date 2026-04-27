@@ -131,6 +131,10 @@ export default defineConfig({
         // RawStdoutElement is a small wrapper; its size-limited truncation
         // path is not exercised by standard fixtures. Covered by unit tests.
         "src/elements/raw-stdout.ts",
+        // Warning classes have 9 variants for different builder conditions.
+        // Integration fixtures only exercise a subset (e.g. NoStateWarning).
+        // All variants are 100% covered by unit tests.
+        "src/builder/warnings.ts",
       ],
       thresholds: {
         lines: 90,

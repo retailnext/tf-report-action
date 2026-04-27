@@ -22,6 +22,11 @@ import { buildStepIssue } from "./step-issues.js";
 import { buildSummaryFromScan } from "./summary.js";
 import { buildResourcesFromScan } from "./resources.js";
 import {
+  StepReadErrorWarning,
+  StepOutputMissingWarning,
+  StepScanFailureWarning,
+} from "./warnings.js";
+import {
   addScannerWarnings,
   filterStepIssueStdout,
 } from "./process-helpers.js";
@@ -81,9 +86,9 @@ export function processPlanStep(
         content: read.content,
       });
     } else if (read.error) {
-      report.warnings.push(`plan stdout: ${read.error}`);
+      report.warnings.push(new StepReadErrorWarning("plan", read.error));
     } else if (read.noFile) {
-      report.warnings.push("plan: stdout_file output missing in steps");
+      report.warnings.push(new StepOutputMissingWarning("plan"));
     }
   }
 }
@@ -101,7 +106,7 @@ function enrichFromPlanJsonl(
   try {
     scan = scanFile(filePath, readerOpts.maxFileSize);
   } catch {
-    report.warnings.push("Plan JSONL file could not be scanned");
+    report.warnings.push(new StepScanFailureWarning("plan"));
     return;
   }
 

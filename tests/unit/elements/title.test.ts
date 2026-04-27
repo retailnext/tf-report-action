@@ -1,5 +1,9 @@
 import { describe, expect, it } from "vitest";
-import type { ReportElement } from "../../../src/renderable/types.js";
+import type {
+  ReportElement,
+  Renderable,
+  OutputFormat,
+} from "../../../src/renderable/types.js";
 import type { ReportTitle } from "../../../src/model/report-title.js";
 import {
   TitleElement,
@@ -8,6 +12,21 @@ import {
   UserTitleElement,
   LogsUrlElement,
 } from "../../../src/elements/title.js";
+
+/** Simple Renderable that returns the same text in both formats. */
+class PlainWarning implements Renderable {
+  constructor(private readonly text: string) {}
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  size(_format: OutputFormat): number {
+    return this.text.length;
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  render(_format: OutputFormat): string {
+    return this.text;
+  }
+}
 
 /**
  * Verify the size invariant for a ReportElement at all levels and both
@@ -121,19 +140,19 @@ describe("MarkerElement", () => {
 
 describe("WarningElement", () => {
   it("has correct metadata", () => {
-    const el = new WarningElement("Something is wrong", 0);
+    const el = new WarningElement(new PlainWarning("Something is wrong"), 0);
     expect(el.id).toBe("warning-0");
     expect(el.fixed).toBe(true);
     expect(el.levels).toBe(1);
   });
 
   it("generates sequential warning IDs", () => {
-    expect(new WarningElement("w1", 0).id).toBe("warning-0");
-    expect(new WarningElement("w2", 3).id).toBe("warning-3");
+    expect(new WarningElement(new PlainWarning("w1"), 0).id).toBe("warning-0");
+    expect(new WarningElement(new PlainWarning("w2"), 3).id).toBe("warning-3");
   });
 
   it("renders warning blockquote in markdown", () => {
-    const el = new WarningElement("State mismatch", 0);
+    const el = new WarningElement(new PlainWarning("State mismatch"), 0);
     const md = el.render("markdown", 0);
     expect(md).toContain("**Warning:**");
     expect(md).toContain("State mismatch");
@@ -141,22 +160,28 @@ describe("WarningElement", () => {
   });
 
   it("renders warning blockquote in HTML", () => {
-    const el = new WarningElement("State mismatch", 0);
+    const el = new WarningElement(new PlainWarning("State mismatch"), 0);
     const html = el.render("html", 0);
     expect(html).toContain("<blockquote>");
     expect(html).toContain("<strong>Warning:</strong>");
     expect(html).toContain("State mismatch");
   });
 
-  it("escapes HTML entities in HTML format", () => {
-    const el = new WarningElement("Use <caution>", 0);
+  it("delegates to body renderable for format-specific escaping", () => {
+    const el = new WarningElement(new PlainWarning("Use <caution>"), 0);
+    // The body is a PlainWarning which renders identically in both formats;
+    // WarningBlockquoteChrome does NOT double-escape the body.
     const html = el.render("html", 0);
-    expect(html).toContain("&lt;caution&gt;");
+    expect(html).toContain("Use <caution>");
   });
 
   it("satisfies the size invariant", () => {
-    assertElementSizeInvariant(new WarningElement("test warning", 0));
-    assertElementSizeInvariant(new WarningElement("warn <html>", 1));
+    assertElementSizeInvariant(
+      new WarningElement(new PlainWarning("test warning"), 0),
+    );
+    assertElementSizeInvariant(
+      new WarningElement(new PlainWarning("warn <html>"), 1),
+    );
   });
 });
 
