@@ -27,3 +27,4 @@ export { expectedCommand } from "./step-commands.js";
 export type { JsonValue } from "../tfjson/common.js";
 export type { UIDiagnosticSnippet } from "../tfjson/machine-readable-ui.js";
 export type { RenderOptions, DiffFormat } from "./render-options.js";
+export type { OutputFormat, Renderable } from "./renderable.js";

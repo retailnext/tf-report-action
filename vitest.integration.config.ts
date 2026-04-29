@@ -106,11 +106,6 @@ export default defineConfig({
         // Barrel re-exports — no executable logic.
         "src/renderable/index.ts",
         "src/elements/index.ts",
-        // Renderable primitives have many format-specific branches (markdown vs
-        // HTML headings, tables, code blocks, blockquotes). Integration tests
-        // only exercise the markdown path for snapshots. HTML paths and edge
-        // cases (empty tables, zero-row, Blockquote) are covered by unit tests.
-        "src/renderable/primitives.ts",
         // ErrorElement is only produced on pipeline/parse failures —
         // integration tests supply valid fixture data. Covered by unit tests.
         "src/elements/error.ts",

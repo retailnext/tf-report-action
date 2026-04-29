@@ -89,6 +89,22 @@ describe("reportFromSteps integration — generated fixtures", () => {
   }
 });
 
+// ---------- HTML rendering (exercises HTML branches in renderable primitives) ----------
+
+describe("reportFromSteps integration — HTML rendering", () => {
+  for (const { label, stepsJson, fixtureDir } of generatedFixtures) {
+    it(`${label}: renders to HTML without error`, () => {
+      const resolved = resolveStepFilePaths(stepsJson, fixtureDir);
+      const options: ReportOptions = {
+        allowedDirs: [fixtureDir],
+        env: NO_GITHUB_ENV,
+      };
+      const result = reportFromSteps(resolved, options).report.render("html");
+      expect(result.output.length).toBeGreaterThan(0);
+    });
+  }
+});
+
 // ---------- Custom step IDs (verify step ID overrides work end-to-end) ----------
 
 /**

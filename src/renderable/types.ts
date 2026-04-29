@@ -7,40 +7,9 @@
  * markdown and HTML on demand.
  */
 
-// ---------------------------------------------------------------------------
-// Output format
-// ---------------------------------------------------------------------------
-
-/** Supported output formats for rendering. */
-export type OutputFormat = "markdown" | "html";
-
-// ---------------------------------------------------------------------------
-// Renderable (the fundamental contract)
-// ---------------------------------------------------------------------------
-
-/**
- * A content node that can render itself to markdown or HTML.
- *
- * Implementations are immutable — content is fixed at construction time.
- * Sizes for both formats may be computed eagerly and cached so that
- * repeated `size()` calls return in O(1) without allocation.
- */
-export interface Renderable {
-  /**
-   * Exact character count of the rendered output in the given format.
-   *
-   * **Invariant**: `size(f) === render(f).length` for all formats `f`.
-   *
-   * Must NOT build or allocate the full output string. For leaf nodes this
-   * is an O(n) scan at construction time (e.g. counting HTML entities).
-   * For composites it is the sum of children's sizes plus structural
-   * overhead — cached at construction.
-   */
-  size(format: OutputFormat): number;
-
-  /** Render to the given format. */
-  render(format: OutputFormat): string;
-}
+// Re-export the fundamental contract from model/ (Layer 0) where it is defined.
+export type { OutputFormat, Renderable } from "../model/renderable.js";
+import type { OutputFormat } from "../model/renderable.js";
 
 // ---------------------------------------------------------------------------
 // ReportElement (replaces Section)
