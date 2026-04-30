@@ -1,6 +1,14 @@
 import { describe, it, expect } from "vitest";
 import { buildApplyReport } from "../../../src/builder/apply.js";
-import type { Plan } from "../../../src/tfjson/plan.js";
+import type {
+  Plan,
+  Change,
+  Importing,
+  ChangeActions,
+  AttributeValues,
+  AttributeShadow,
+  JsonValue,
+} from "../../../src/tfjson/index.js";
 import type { UIOutputsMessage } from "../../../src/tfjson/machine-readable-ui.js";
 import type { ScanResult } from "../../../src/jsonl-scanner/types.js";
 import { VALUE_NOT_IN_PLAN } from "../../../src/model/sentinels.js";
@@ -22,43 +30,51 @@ function makePlan(overrides: Partial<Plan> = {}): Plan {
 /** Creates a minimal resource change for the plan. */
 function resourceChange(
   address: string,
-  actions: string[],
-  overrides: Record<string, unknown> = {},
+  actions: ChangeActions,
+  overrides: {
+    before?: AttributeValues | null;
+    after?: AttributeValues | null;
+    after_unknown?: AttributeShadow;
+    importing?: Importing;
+    previous_address?: string;
+  } = {},
 ) {
-  // previous_address is a top-level ResourceChange field, not inside change
-  const { previous_address, ...changeOverrides } = overrides;
+  const { previous_address, importing, ...changeFields } = overrides;
+  const change: Change = {
+    actions,
+    before: changeFields.before ?? null,
+    after: changeFields.after ?? null,
+    after_unknown: changeFields.after_unknown ?? {},
+    before_sensitive: {},
+    after_sensitive: {},
+    ...(importing !== undefined ? { importing } : {}),
+  };
   return {
     address,
     mode: "managed",
-    type: address.split(".")[0],
+    type: address.split(".")[0]!,
     name: address.split(".").slice(1).join("."),
     provider_name: "registry.terraform.io/hashicorp/null",
     ...(previous_address !== undefined ? { previous_address } : {}),
-    change: {
-      actions,
-      before: null,
-      after: null,
-      after_unknown: {},
-      before_sensitive: {},
-      after_sensitive: {},
-      ...changeOverrides,
-    },
+    change,
   };
 }
 
 /** Creates a plan output change. */
 function outputChange(
   name: string,
-  actions: string[],
-  before: unknown,
-  after: unknown,
+  actions: ChangeActions,
+  before: JsonValue,
+  after: JsonValue,
   { afterUnknown = false, sensitive = false } = {},
-) {
+): Record<string, Change> {
   return {
     [name]: {
       actions,
-      before,
-      after,
+      // Output changes store raw JSON values in before/after, but the shared
+      // Change type uses AttributeValues for resource attribute maps.
+      before: before as AttributeValues | null,
+      after: after as AttributeValues | null,
       after_unknown: afterUnknown,
       before_sensitive: sensitive,
       after_sensitive: sensitive,
@@ -273,14 +289,14 @@ describe("buildApplyReport", () => {
       const report = buildApplyReport(plan, scanResult);
 
       // Only the applied resource should be counted
-      const updateGroup = report.summary.actions.find(
+      const updateGroup = report.summary!.actions.find(
         (g) => g.action === "update",
       );
       expect(updateGroup?.total).toBe(1);
       expect(
-        report.summary.actions.find((g) => g.action === "create"),
+        report.summary!.actions.find((g) => g.action === "create"),
       ).toBeUndefined();
-      expect(report.summary.failures).toEqual([]);
+      expect(report.summary!.failures).toEqual([]);
     });
 
     it("summary is zero for all-phantom apply", () => {
@@ -342,7 +358,7 @@ describe("buildApplyReport", () => {
       // but outputs are independent of resource filtering
       const report = buildApplyReport(plan, makeScanResult());
 
-      const output = report.outputs.find((o) => o.name === "test_out");
+      const output = report.outputs!.find((o) => o.name === "test_out");
       expect(output?.after).toBe(VALUE_NOT_IN_PLAN);
     });
 
@@ -555,7 +571,7 @@ describe("buildApplyReport", () => {
       });
 
       const report = buildApplyReport(plan, scanResult);
-      const output = report.outputs.find((o) => o.name === "result");
+      const output = report.outputs!.find((o) => o.name === "result");
       expect(output?.after).toBe("resolved_value");
     });
 
@@ -573,7 +589,7 @@ describe("buildApplyReport", () => {
       });
 
       const report = buildApplyReport(plan, scanResult);
-      const output = report.outputs.find((o) => o.name === "data");
+      const output = report.outputs!.find((o) => o.name === "data");
       expect(output?.after).toBe('{\n  "key": "val"\n}');
     });
 
@@ -592,7 +608,7 @@ describe("buildApplyReport", () => {
       });
 
       const report = buildApplyReport(plan, scanResult);
-      const output = report.outputs.find((o) => o.name === "secret");
+      const output = report.outputs!.find((o) => o.name === "secret");
       // Must not contain the sensitive value
       expect(output?.after).not.toBe("leaked_secret");
       expect(output?.isSensitive).toBe(true);
@@ -613,7 +629,7 @@ describe("buildApplyReport", () => {
       });
 
       const report = buildApplyReport(plan, scanResult);
-      const output = report.outputs.find((o) => o.name === "sneaky");
+      const output = report.outputs!.find((o) => o.name === "sneaky");
       expect(output?.after).not.toBe("secret_value");
     });
 
@@ -634,7 +650,7 @@ describe("buildApplyReport", () => {
       });
 
       const report = buildApplyReport(plan, scanResult);
-      const output = report.outputs.find((o) => o.name === "known");
+      const output = report.outputs!.find((o) => o.name === "known");
       // after_val was already a concrete value, not a sentinel — should not be replaced
       expect(output?.after).toBe("after_val");
     });
@@ -647,7 +663,7 @@ describe("buildApplyReport", () => {
       });
 
       const report = buildApplyReport(plan, makeScanResult());
-      const output = report.outputs.find((o) => o.name === "test");
+      const output = report.outputs!.find((o) => o.name === "test");
       // With no outputs message, sentinel was already replaced by replaceKnownAfterApply
       expect(output?.after).toBe(VALUE_NOT_IN_PLAN);
     });
@@ -968,7 +984,7 @@ describe("buildApplyReport", () => {
         });
 
         const report = buildApplyReport(plan, scanResult);
-        const forgetGroup = report.summary.actions.find(
+        const forgetGroup = report.summary!.actions.find(
           (g) => g.action === "forget",
         );
         expect(forgetGroup).toBeDefined();
@@ -1063,7 +1079,7 @@ describe("buildApplyReport", () => {
         });
 
         const report = buildApplyReport(plan, makeScanResult());
-        const moveGroup = report.summary.actions.find(
+        const moveGroup = report.summary!.actions.find(
           (g) => g.action === "move",
         );
         expect(moveGroup).toBeDefined();
@@ -1138,7 +1154,7 @@ describe("buildApplyReport", () => {
         });
 
         const report = buildApplyReport(plan, makeScanResult());
-        const importGroup = report.summary.actions.find(
+        const importGroup = report.summary!.actions.find(
           (g) => g.action === "import",
         );
         expect(importGroup).toBeDefined();

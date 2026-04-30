@@ -10,6 +10,11 @@ import type { Diagnostic } from "../model/diagnostic.js";
 import type { UIDiagnostic } from "../tfjson/machine-readable-ui.js";
 import type { ScanResult } from "../jsonl-scanner/types.js";
 import type { Report } from "../model/report.js";
+import type { StepRole } from "../model/step-commands.js";
+import {
+  UnparseableLinesWarning,
+  UnknownMessageTypesWarning,
+} from "./warnings.js";
 
 /**
  * Convert a UIDiagnostic from validate/JSONL wire format to the model Diagnostic.
@@ -185,16 +190,16 @@ export function filterStepIssueStdout(
 export function addScannerWarnings(
   report: Report,
   scan: ScanResult,
-  stepLabel: string,
+  role: StepRole,
 ): void {
   if (scan.unparseableLines > 0) {
     report.warnings.push(
-      `${String(scan.unparseableLines)} line(s) in ${stepLabel} output could not be parsed as JSON`,
+      new UnparseableLinesWarning(scan.unparseableLines, role),
     );
   }
   if (scan.unknownTypeLines > 0) {
     report.warnings.push(
-      `${String(scan.unknownTypeLines)} line(s) in ${stepLabel} output had unrecognized message types`,
+      new UnknownMessageTypesWarning(scan.unknownTypeLines, role),
     );
   }
 }

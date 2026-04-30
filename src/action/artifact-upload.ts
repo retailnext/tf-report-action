@@ -27,21 +27,10 @@ export interface TryUploadDeps {
 
 /** Parameters for `tryUploadFullReport`. */
 export interface TryUploadParams {
-  /** Full un-truncated markdown (from `ReportFromStepsResult.fullMarkdown`). */
-  readonly fullMarkdown: string;
-  /**
-   * Render markdown to HTML via the GitHub `/markdown` API.
-   * Accepts the same parameters as `GitHubClient.renderMarkdown`.
-   */
-  readonly renderMarkdown: (params: {
-    text: string;
-    mode: "gfm";
-    context: string;
-  }) => Promise<string>;
+  /** Pre-rendered HTML content from `ComposedReport.render("html").output`. */
+  readonly htmlContent: string;
   /** Injected environment variables. */
   readonly env: Env;
-  /** Repository context string, e.g. "owner/repo". */
-  readonly repoContext: string;
   /** Artifact display name and filename, e.g. "cluster-plan-report.html". */
   readonly artifactName: string;
   /** Logger for warnings on failure. */
@@ -52,6 +41,10 @@ export interface TryUploadParams {
 
 /**
  * Attempt to upload the full un-truncated report as an HTML artifact.
+ *
+ * Receives pre-rendered HTML from `ComposedReport.render("html")` and wraps
+ * it in a standalone HTML page with embedded CSS. No GitHub `/markdown` API
+ * call is needed.
  *
  * Returns the artifact view URL on success, or `undefined` if upload is
  * not possible (GHES, missing env vars) or fails (network error, API error).
@@ -74,21 +67,16 @@ export async function tryUploadFullReport(
       return undefined;
     }
 
-    const htmlFragment = await params.renderMarkdown({
-      text: params.fullMarkdown,
-      mode: "gfm",
-      context: params.repoContext,
-    });
-
     const dotIndex = params.artifactName.lastIndexOf(".");
     const pageTitle =
       dotIndex > 0
         ? params.artifactName.slice(0, dotIndex)
         : params.artifactName;
-    const htmlPage = buildHtmlPage(htmlFragment, pageTitle);
+    const htmlPage = buildHtmlPage(params.htmlContent, pageTitle);
 
     const filename = params.artifactName;
     const serverUrl = params.env["GITHUB_SERVER_URL"];
+    const repoContext = params.env["GITHUB_REPOSITORY"] ?? "";
     const uploader = createArtifactUploader({
       runtimeToken,
       resultsUrl,
@@ -110,7 +98,7 @@ export async function tryUploadFullReport(
 
     const artifactServerUrl =
       params.env["GITHUB_SERVER_URL"] ?? "https://github.com";
-    return `${artifactServerUrl}/${params.repoContext}/actions/runs/${runId}/artifacts/${String(result.id)}`;
+    return `${artifactServerUrl}/${repoContext}/actions/runs/${runId}/artifacts/${String(result.id)}`;
   } catch (error: unknown) {
     const msg = error instanceof Error ? error.message : String(error);
     const log = params.logger;

@@ -66,13 +66,14 @@ Follow these boundaries strictly — do not add cross-cutting logic.
 
 ### Layer 1 — Pure algorithms (depend only on Layer 0)
 
-| Module               | Responsibility                                                                                |
-| -------------------- | --------------------------------------------------------------------------------------------- |
-| `src/diff/`          | Pure LCS, line-diff, char-diff, and context-diff algorithms with diff formatting. No I/O.     |
-| `src/flattener/`     | Flatten nested `JsonValue` → `Map<string, string \| null>` with dotted-path keys.             |
-| `src/sensitivity/`   | Detect whether a flattened attribute path is sensitive. Pure predicate.                       |
-| `src/raw-formatter/` | Format raw command output (JSON Lines, validate results, plain text) into Markdown fragments. |
-| `src/jsonl-scanner/` | Scan and classify JSON Lines output from Terraform/OpenTofu commands into structured results. |
+| Module               | Responsibility                                                                                                                                                                                                       |
+| -------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `src/diff/`          | Pure LCS, line-diff, char-diff, and context-diff algorithms with diff formatting. No I/O.                                                                                                                            |
+| `src/flattener/`     | Flatten nested `JsonValue` → `Map<string, string \| null>` with dotted-path keys.                                                                                                                                    |
+| `src/sensitivity/`   | Detect whether a flattened attribute path is sensitive. Pure predicate.                                                                                                                                              |
+| `src/raw-formatter/` | Format raw command output (JSON Lines, validate results, plain text) into Markdown fragments.                                                                                                                        |
+| `src/jsonl-scanner/` | Scan and classify JSON Lines output from Terraform/OpenTofu commands into structured results.                                                                                                                        |
+| `src/renderable/`    | Core `Renderable` interface, `OutputFormat` type, `ReportElement`/`ComposedReport` interfaces, primitive renderable classes (Heading, Table, CodeBlock, etc.), and HTML escaping with size estimation. Pure, no I/O. |
 
 ### Layer 2 — I/O and parsing (depend on Layers 0–1)
 
@@ -113,6 +114,7 @@ each other**.
 | Module          | Responsibility                                                                                                                                                                                                                                                                                                                              |
 | --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `src/renderer/` | Render any `Report` variant to Markdown. Groups resources by module address (derived from address + type) for display — module grouping is a renderer concern. StructuredReport → full Markdown string, TextFallbackReport/WorkflowReport/ErrorReport → Section arrays. Title, step issue, step table, and variant-specific body renderers. |
+| `src/elements/` | Domain-specific `ReportElement` classes that compose primitive `Renderable` objects (from `renderable/`) into dual-format report sections. Each class holds pre-built renderable trees at multiple detail levels and renders to both Markdown and HTML on demand. Replaces `renderer/` during migration (both coexist temporarily).         |
 
 ### Layer 4b — Composition (depends on Layers 0–4a)
 
@@ -141,6 +143,7 @@ each other**.
 | `flattener/`     | _(nothing)_                                                                            |
 | `sensitivity/`   | _(nothing)_                                                                            |
 | `raw-formatter/` | _(nothing)_                                                                            |
+| `renderable/`    | _(nothing)_                                                                            |
 | `jsonl-scanner/` | `tfjson/`                                                                              |
 | `env/`           | _(nothing)_                                                                            |
 | `http/`          | `env/`                                                                                 |
@@ -151,6 +154,7 @@ each other**.
 | `inputs/`        | `env/`                                                                                 |
 | `builder/`       | `tfjson/`, `flattener/`, `sensitivity/`, `steps/`, `env/`, `parser/`, `jsonl-scanner/` |
 | `renderer/`      | `diff/`, `raw-formatter/`                                                              |
+| `elements/`      | `renderable/`, `diff/`, `flattener/`, `sensitivity/`                                   |
 | `compose/`       | `renderer/`, `diff/`                                                                   |
 | `comment/`       | `env/`, `compose/`                                                                     |
 | `pipelines/`     | `parser/`, `builder/`, `renderer/`, `compose/`, `steps/`, `env/`                       |
@@ -546,8 +550,10 @@ referenced by exec-action step outputs:
   (no subdirectory traversal). Default: `RUNNER_TEMP` or the OS temp directory.
 - **Regular files only** — rejects symlinks-to-non-regular-files, devices, FIFOs,
   sockets, and directories.
-- **Two read strategies**: parse reads (full file, bounded by `maxFileSize` = 256 MiB)
-  and display reads (first `maxDisplayRead` = 64 KiB bytes only).
+- **Read strategies**: parse reads load the full file, bounded by `maxFileSize`
+  (256 MiB). Peek reads load only the first 8 KiB for format detection (e.g.
+  JSONL). There is no separate display-truncation path — all content reaches
+  the rendering layer intact, and budget/composition decides what fits.
 - **Error messages** must never contain file paths (may reveal runner directory structure).
 
 ## Steps Context

@@ -20,7 +20,6 @@ function writeFixture(name: string, content: string): string {
 const opts: ReaderOptions = {
   allowedDirs: [tempDir],
   maxFileSize: 1024,
-  maxDisplayRead: 64,
 };
 
 describe("buildStepIssue", () => {
@@ -37,7 +36,7 @@ describe("buildStepIssue", () => {
 
     const issue = buildStepIssue(step, "init", opts);
     expect(issue.id).toBe("init");
-    expect(issue.heading).toBe("`init` failed");
+    expect(issue.reason).toBe("failed");
     expect(issue.isFailed).toBe(true);
     expect(issue.stdout).toBe("command output");
     expect(issue.stderr).toBe("Error: something broke");
@@ -58,7 +57,7 @@ describe("buildStepIssue", () => {
       "Plan output could not be parsed",
     );
     expect(issue.id).toBe("show-plan");
-    expect(issue.heading).toBe("`show-plan`: output could not be parsed");
+    expect(issue.reason).toBe("parse-error");
     expect(issue.isFailed).toBe(false);
     expect(issue.diagnostic).toBe("Plan output could not be parsed");
     expect(issue.stdout).toBe("plan output");
@@ -69,7 +68,7 @@ describe("buildStepIssue", () => {
 
     const issue = buildStepIssue(step, "validate", opts);
     expect(issue.id).toBe("validate");
-    expect(issue.heading).toBe("`validate` failed");
+    expect(issue.reason).toBe("failed");
     expect(issue.isFailed).toBe(true);
     expect(issue.stdout).toBeUndefined();
     expect(issue.stderr).toBeUndefined();
@@ -79,11 +78,12 @@ describe("buildStepIssue", () => {
     const step: StepData = { outcome: "cancelled" };
 
     const issue = buildStepIssue(step, "plan", opts);
-    expect(issue.heading).toBe("`plan` cancelled");
+    expect(issue.reason).toBe("outcome");
+    expect(issue.outcome).toBe("cancelled");
     expect(issue.isFailed).toBe(false);
   });
 
-  it("marks truncated stdout when content exceeds display limit", () => {
+  it("reads full stdout even when content is large", () => {
     const bigContent = "x".repeat(128);
     const stdoutPath = writeFixture("big-stdout.txt", bigContent);
     const step: StepData = {
@@ -92,11 +92,10 @@ describe("buildStepIssue", () => {
     };
 
     const issue = buildStepIssue(step, "plan", opts);
-    expect(issue.stdout).toBe("x".repeat(64));
-    expect(issue.stdoutTruncated).toBe(true);
+    expect(issue.stdout).toBe("x".repeat(128));
   });
 
-  it("marks truncated stderr when content exceeds display limit", () => {
+  it("reads full stderr even when content is large", () => {
     const bigContent = "y".repeat(128);
     const stderrPath = writeFixture("big-stderr.txt", bigContent);
     const step: StepData = {
@@ -105,8 +104,7 @@ describe("buildStepIssue", () => {
     };
 
     const issue = buildStepIssue(step, "apply", opts);
-    expect(issue.stderr).toBe("y".repeat(64));
-    expect(issue.stderrTruncated).toBe(true);
+    expect(issue.stderr).toBe("y".repeat(128));
   });
 
   it("reports read errors when files are outside allowed dirs", () => {
@@ -131,7 +129,7 @@ describe("buildStepIssue", () => {
     expect("diagnostic" in issue).toBe(false);
   });
 
-  it("omits truncated flags when content fits within display limit", () => {
+  it("does not include truncation properties", () => {
     const stdoutPath = writeFixture("small-stdout.txt", "ok");
     const stderrPath = writeFixture("small-stderr.txt", "warn");
     const step: StepData = {
@@ -157,7 +155,6 @@ describe("buildStepIssue", () => {
     const issue = buildStepIssue(step, "apply", opts);
     expect(issue.stdout).toBe("output");
     expect("stderr" in issue).toBe(false);
-    expect("stderrTruncated" in issue).toBe(false);
   });
 
   it("omits stderr when the file is empty", () => {

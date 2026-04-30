@@ -12,7 +12,7 @@ import type { ScanResult } from "../jsonl-scanner/types.js";
 import { getStepOutcome } from "../steps/outcomes.js";
 import {
   readStepStdout,
-  readStepStdoutForDisplay,
+  peekStepStdout,
   getStepStdoutPath,
 } from "../steps/io.js";
 import { detectToolFromOutput } from "../parser/index.js";
@@ -21,6 +21,11 @@ import { isJsonLines } from "../jsonl-scanner/detect.js";
 import { buildStepIssue } from "./step-issues.js";
 import { buildSummaryFromScan } from "./summary.js";
 import { buildResourcesFromScan } from "./resources.js";
+import {
+  StepReadErrorWarning,
+  StepOutputMissingWarning,
+  StepScanFailureWarning,
+} from "./warnings.js";
 import {
   addScannerWarnings,
   filterStepIssueStdout,
@@ -51,7 +56,7 @@ export function processPlanStep(
   const path = getStepStdoutPath(step, readerOpts);
   if (path) {
     // Check first lines for JSONL detection
-    const peek = readStepStdoutForDisplay(step, readerOpts);
+    const peek = peekStepStdout(step, readerOpts);
     if (peek.content !== undefined) {
       const firstLines = peek.content.split("\n", 10);
       if (isJsonLines(firstLines)) {
@@ -79,12 +84,11 @@ export function processPlanStep(
         stepId,
         label: "Plan Output",
         content: read.content,
-        truncated: read.truncated === true,
       });
     } else if (read.error) {
-      report.warnings.push(`plan stdout: ${read.error}`);
+      report.warnings.push(new StepReadErrorWarning("plan", read.error));
     } else if (read.noFile) {
-      report.warnings.push("plan: stdout_file output missing in steps");
+      report.warnings.push(new StepOutputMissingWarning("plan"));
     }
   }
 }
@@ -102,7 +106,7 @@ function enrichFromPlanJsonl(
   try {
     scan = scanFile(filePath, readerOpts.maxFileSize);
   } catch {
-    report.warnings.push("Plan JSONL file could not be scanned");
+    report.warnings.push(new StepScanFailureWarning("plan"));
     return;
   }
 

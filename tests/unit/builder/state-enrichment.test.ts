@@ -5,6 +5,7 @@ import type { ResourceChange } from "../../../src/model/resource.js";
 import type { OutputChange } from "../../../src/model/output.js";
 import type { AttributeChange } from "../../../src/model/attribute.js";
 import type { RawState } from "../../../src/parser/state.js";
+import type { JsonValue } from "../../../src/tfjson/common.js";
 import {
   SENSITIVE_MASK,
   VALUE_NOT_IN_PLAN,
@@ -16,13 +17,13 @@ function makeReport(
   outputs?: OutputChange[],
 ): Report {
   return {
-    title: "test",
+    title: { status: "success", body: { kind: "no-changes" } },
     issues: [],
     steps: [],
     warnings: [],
     rawStdout: [],
-    resources,
-    outputs,
+    ...(resources !== undefined && { resources }),
+    ...(outputs !== undefined && { outputs }),
   };
 }
 
@@ -78,10 +79,10 @@ function makeResource(
 function makeState(
   resources: {
     address: string;
-    values?: Record<string, unknown>;
+    values?: Record<string, JsonValue>;
     sensitive_attrs?: string[];
   }[],
-  outputs?: Record<string, { value?: unknown; sensitive: boolean }>,
+  outputs?: Record<string, { value?: JsonValue; sensitive: boolean }>,
 ): RawState {
   return {
     version: 4,
@@ -107,15 +108,15 @@ function makeState(
         name,
         instances: [
           {
-            attributes: r.values,
+            ...(r.values !== undefined && { attributes: r.values }),
             sensitive_attributes: (r.sensitive_attrs ?? []).map((attr) => [
-              { type: "get_attr", value: attr },
+              { type: "get_attr" as const, value: attr },
             ]),
           },
         ],
       };
     }),
-    outputs,
+    ...(outputs !== undefined && { outputs }),
   };
 }
 

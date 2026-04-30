@@ -11,8 +11,8 @@ import {
   buildTruncationNotice,
   buildLogsNotice,
   buildArtifactNotice,
-} from "../compose/notices.js";
-import type { NoticeLink } from "../compose/notices.js";
+} from "./notices.js";
+import type { NoticeLink } from "./notices.js";
 
 /**
  * Build the truncation notice for a truncated report.

@@ -25,6 +25,7 @@ function baseEnv(overrides: Partial<Record<string, string>> = {}): Env {
     ACTIONS_RESULTS_URL: RESULTS_URL,
     GITHUB_SERVER_URL: "https://github.com",
     GITHUB_RUN_ID: "12345",
+    GITHUB_REPOSITORY: "owner/repo",
     ...overrides,
   } as Env;
 }
@@ -58,21 +59,10 @@ function sequenceTransport(artifactId = 42): ArtifactTransport {
   };
 }
 
-function fakeRenderMarkdown(): (params: {
-  text: string;
-  mode: "gfm";
-  context: string;
-}) => Promise<string> {
-  return (params) =>
-    Promise.resolve(`<p>Rendered: ${params.text.slice(0, 20)}</p>`);
-}
-
 function baseParams(overrides: Partial<TryUploadParams> = {}): TryUploadParams {
   return {
-    fullMarkdown: "# Plan\n\n3 to add",
-    renderMarkdown: fakeRenderMarkdown(),
+    htmlContent: "<h1>Plan</h1>\n<p>3 to add</p>",
     env: baseEnv(),
-    repoContext: "owner/repo",
     artifactName: "cluster-plan-report.html",
     logger: nullLogger(),
     deps: {
@@ -143,20 +133,7 @@ describe("tryUploadFullReport", () => {
     expect(url).toBeUndefined();
   });
 
-  it("returns undefined when renderMarkdown throws", async () => {
-    const { logger, messages } = capturingLogger();
-    const url = await tryUploadFullReport(
-      baseParams({
-        renderMarkdown: () => Promise.reject(new Error("API error")),
-        logger,
-      }),
-    );
-    expect(url).toBeUndefined();
-    expect(messages.warnings).toHaveLength(1);
-    expect(messages.warnings[0]).toContain("API error");
-  });
-
-  it("returns undefined when upload fails", async () => {
+  it("returns undefined when upload transport fails", async () => {
     const failTransport: ArtifactTransport = () =>
       Promise.resolve({
         status: 500,
@@ -235,20 +212,51 @@ describe("tryUploadFullReport", () => {
     expect(requests[2]).toMatch(/^POST/);
   });
 
-  it("passes fullMarkdown to renderMarkdown", async () => {
-    let capturedText = "";
-    const url = await tryUploadFullReport(
+  it("wraps htmlContent in a full HTML page", async () => {
+    let blobBody = "";
+    let callCount = 0;
+    const capturingTransport: ArtifactTransport = (
+      _method,
+      _url,
+      _headers,
+      body,
+    ) => {
+      callCount++;
+      if (callCount === 1) {
+        return Promise.resolve({
+          status: 200,
+          headers: {},
+          body: JSON.stringify({
+            ok: true,
+            signed_upload_url: "https://blob.example.com/upload?sig=test",
+          }),
+        });
+      }
+      if (callCount === 2) {
+        blobBody = body ?? "";
+        return Promise.resolve({ status: 201, headers: {}, body: "" });
+      }
+      return Promise.resolve({
+        status: 200,
+        headers: {},
+        body: JSON.stringify({ ok: true, artifact_id: "1" }),
+      });
+    };
+
+    await tryUploadFullReport(
       baseParams({
-        fullMarkdown: "# Full Report Content",
-        renderMarkdown: (params) => {
-          capturedText = params.text;
-          return Promise.resolve("<h1>Full Report Content</h1>");
+        htmlContent: "<h2>Test Report</h2><p>Details here</p>",
+        deps: {
+          transport: capturingTransport,
+          sleep: async () => {
+            /* no-op */
+          },
         },
       }),
     );
 
-    expect(url).toBeDefined();
-    expect(capturedText).toBe("# Full Report Content");
+    expect(blobBody).toContain("<!DOCTYPE html>");
+    expect(blobBody).toContain("<h2>Test Report</h2><p>Details here</p>");
   });
 
   it("strips .html extension from the HTML page <title>", async () => {
@@ -349,19 +357,13 @@ describe("tryUploadFullReport", () => {
     expect(parsed["mime_type"]).toBe("text/html");
   });
 
-  it("passes repoContext to renderMarkdown", async () => {
-    let capturedContext = "";
-    await tryUploadFullReport(
+  it("uses GITHUB_REPOSITORY for artifact URL path", async () => {
+    const url = await tryUploadFullReport(
       baseParams({
-        repoContext: "myorg/myrepo",
-        renderMarkdown: (params) => {
-          capturedContext = params.context;
-          return Promise.resolve("<p>html</p>");
-        },
+        env: baseEnv({ GITHUB_REPOSITORY: "myorg/myrepo" }),
       }),
     );
-
-    expect(capturedContext).toBe("myorg/myrepo");
+    expect(url).toContain("myorg/myrepo");
   });
 
   it("uses GITHUB_SERVER_URL in the artifact URL", async () => {

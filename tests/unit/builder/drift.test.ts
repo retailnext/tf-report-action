@@ -142,7 +142,6 @@ describe("buildReport — drift grouping", () => {
           address: "null_resource.root_drift",
           type: "null_resource",
           name: "root_drift",
-          module_address: undefined,
         }),
         makeDriftEntry({
           address: "module.network.aws_vpc.main",

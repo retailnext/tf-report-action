@@ -5,6 +5,8 @@ import type { Diagnostic } from "./diagnostic.js";
 import type { ApplyStatus } from "./apply-status.js";
 import type { StepIssue } from "./step-issue.js";
 import type { StepOutcome } from "./step-outcome.js";
+import type { ReportTitle } from "./report-title.js";
+import type { Renderable } from "./renderable.js";
 
 // ---------------------------------------------------------------------------
 // Tool identification
@@ -40,8 +42,6 @@ export interface RawStepStdout {
   readonly label: string;
   /** The raw stdout content. */
   readonly content: string;
-  /** Whether the content was truncated due to size limits. */
-  readonly truncated: boolean;
 }
 
 // ---------------------------------------------------------------------------
@@ -66,8 +66,8 @@ export interface RawStepStdout {
 export interface Report {
   // ── Always present ──────────────────────────────────────────────────────
 
-  /** Report title (rendered as the top-level heading). */
-  title: string;
+  /** Structured report title (rendered as the top-level heading). */
+  title: ReportTitle;
 
   /** Step-level issues (failed steps, parse errors, stderr warnings). */
   issues: StepIssue[];
@@ -76,7 +76,7 @@ export interface Report {
   steps: StepOutcome[];
 
   /** Warnings about missing data, scanner quality, parse failures. */
-  warnings: string[];
+  warnings: Renderable[];
 
   /**
    * Raw stdout from steps whose output could not be parsed structurally.

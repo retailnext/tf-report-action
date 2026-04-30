@@ -248,7 +248,7 @@ describe("applyToMarkdown — state enrichment", () => {
     expect(fixture).toBeDefined();
     expect(fixture!.stateJson).toBeDefined();
     const result = applyToMarkdown(fixture!.planJson, fixture!.applyJsonl, {
-      stateJson: fixture!.stateJson,
+      stateJson: fixture!.stateJson!,
     });
     expect(result).not.toContain("(value not in plan)");
   });
@@ -258,7 +258,7 @@ describe("applyToMarkdown — state enrichment", () => {
     expect(fixture).toBeDefined();
     expect(fixture!.stateJson).toBeDefined();
     const result = applyToMarkdown(fixture!.planJson, fixture!.applyJsonl, {
-      stateJson: fixture!.stateJson,
+      stateJson: fixture!.stateJson!,
     });
     expect(result).not.toContain("updated-secret-value");
   });

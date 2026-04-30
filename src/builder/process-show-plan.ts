@@ -10,6 +10,11 @@ import type { BuildOptions } from "./options.js";
 import type { RenderOptions } from "../model/render-options.js";
 import type { StepData, ReaderOptions } from "../steps/types.js";
 import type { Report, Tool } from "../model/report.js";
+import {
+  StepReadErrorWarning,
+  StepOutputMissingWarning,
+  StepOutputParseWarning,
+} from "./warnings.js";
 import { expectedCommand } from "../model/step-commands.js";
 import { readStepStdout } from "../steps/io.js";
 import { getStepOutcome } from "../steps/outcomes.js";
@@ -40,9 +45,9 @@ export function tryProcessShowPlan(
   const read = readStepStdout(showPlanStep, readerOpts);
   if (read.content === undefined) {
     if (read.error) {
-      report.warnings.push(`show-plan stdout: ${read.error}`);
+      report.warnings.push(new StepReadErrorWarning("show-plan", read.error));
     } else if (read.noFile) {
-      report.warnings.push("show-plan: stdout_file output missing in steps");
+      report.warnings.push(new StepOutputMissingWarning("show-plan"));
     }
     return false;
   }
@@ -76,9 +81,7 @@ export function tryProcessShowPlan(
         const applyScan = scanString(applyRead.content);
         enrichedReport = buildApplyReport(plan, applyScan, options);
       } catch {
-        report.warnings.push(
-          `Apply output from step \`${applyStepId}\` could not be parsed; using plan data only.`,
-        );
+        report.warnings.push(new StepOutputParseWarning(applyStepId));
         enrichedReport = buildReport(plan, options);
       }
     } else {

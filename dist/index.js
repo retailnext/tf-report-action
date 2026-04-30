@@ -17,6 +17,145 @@ function expectedCommand(tool, role) {
   }
 }
 
+// src/renderable/html-escape.ts
+function htmlEscape(text) {
+  return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+}
+
+// src/builder/warnings.ts
+function renderCommand(tool, role, format) {
+  const cmd = expectedCommand(tool, role);
+  return format === "markdown" ? `\`${cmd}\`` : `<code>${htmlEscape(cmd)}</code>`;
+}
+var NoShowPlanWarning = class {
+  tool;
+  constructor(tool) {
+    this.tool = tool;
+  }
+  size(format) {
+    return this.render(format).length;
+  }
+  render(format) {
+    const cmd = renderCommand(this.tool, "show-plan", format);
+    return `This report was generated without ${cmd} output. Resource attribute details are not available.`;
+  }
+};
+var RawTextFallbackWarning = class {
+  tool;
+  constructor(tool) {
+    this.tool = tool;
+  }
+  size(format) {
+    return this.render(format).length;
+  }
+  render(format) {
+    const cmd = renderCommand(this.tool, "show-plan", format);
+    return `Report limited because ${cmd} output was not available. Showing raw command output.`;
+  }
+};
+var NoStateWarning = class {
+  tool;
+  constructor(tool) {
+    this.tool = tool;
+  }
+  size(format) {
+    return this.render(format).length;
+  }
+  render(format) {
+    const cmd = renderCommand(this.tool, "state", format);
+    return `Some attribute values could not be resolved because ${cmd} output was not available. Add a state step after apply to see the actual values.`;
+  }
+};
+var StepOutputParseWarning = class {
+  stepId;
+  constructor(stepId) {
+    this.stepId = stepId;
+  }
+  size(format) {
+    return this.render(format).length;
+  }
+  render(format) {
+    const id = format === "markdown" ? `\`${this.stepId}\`` : `<code>${htmlEscape(this.stepId)}</code>`;
+    return `Output from step ${id} could not be parsed; using plan data only.`;
+  }
+};
+var StepReadErrorWarning = class {
+  role;
+  error;
+  constructor(role, error) {
+    this.role = role;
+    this.error = error;
+  }
+  size(format) {
+    return this.render(format).length;
+  }
+  render(format) {
+    const escaped = format === "markdown" ? this.error : htmlEscape(this.error);
+    return `${this.role} stdout: ${escaped}`;
+  }
+};
+var StepOutputMissingWarning = class {
+  role;
+  constructor(role) {
+    this.role = role;
+  }
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  size(_format) {
+    return this.render("markdown").length;
+  }
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  render(_format) {
+    return `${this.role}: stdout_file output missing in steps`;
+  }
+};
+var StepScanFailureWarning = class {
+  role;
+  constructor(role) {
+    this.role = role;
+  }
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  size(_format) {
+    return this.render("markdown").length;
+  }
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  render(_format) {
+    const label = this.role.charAt(0).toUpperCase() + this.role.slice(1);
+    return `${label} JSONL file could not be scanned`;
+  }
+};
+var UnparseableLinesWarning = class {
+  count;
+  role;
+  constructor(count, role) {
+    this.count = count;
+    this.role = role;
+  }
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  size(_format) {
+    return this.render("markdown").length;
+  }
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  render(_format) {
+    return `${String(this.count)} line(s) in ${this.role} output could not be parsed as JSON`;
+  }
+};
+var UnknownMessageTypesWarning = class {
+  count;
+  role;
+  constructor(count, role) {
+    this.count = count;
+    this.role = role;
+  }
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  size(_format) {
+    return this.render("markdown").length;
+  }
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  render(_format) {
+    return `${String(this.count)} line(s) in ${this.role} output had unrecognized message types`;
+  }
+};
+
 // src/steps/parse.ts
 function parseSteps(json) {
   let parsed;
@@ -85,7 +224,6 @@ function validateOutputs(value, stepId) {
 
 // src/steps/types.ts
 var DEFAULT_MAX_FILE_SIZE = 256 * 1024 * 1024;
-var DEFAULT_MAX_DISPLAY_READ = 64 * 1024;
 var DEFAULT_INIT_STEP = "init";
 var DEFAULT_VALIDATE_STEP = "validate";
 var DEFAULT_PLAN_STEP = "plan";
@@ -142,14 +280,14 @@ function readForParse(filePath, options) {
     return { error: "Failed to read file" };
   }
 }
-function readForDisplay(filePath, options) {
+var PEEK_SIZE = 8 * 1024;
+function readPeek(filePath, options) {
   const validated = validateFile(filePath, options);
   if (isReadError(validated)) {
     return validated;
   }
   const { realPath, size } = validated;
-  const truncated = size > options.maxDisplayRead;
-  const bytesToRead = Math.min(size, options.maxDisplayRead);
+  const bytesToRead = Math.min(size, PEEK_SIZE);
   try {
     const buffer = Buffer.alloc(bytesToRead);
     const fd = openSync(realPath, "r");
@@ -161,7 +299,7 @@ function readForDisplay(filePath, options) {
     }
     return {
       content: buffer.subarray(0, bytesRead).toString("utf-8"),
-      truncated
+      truncated: size > PEEK_SIZE
     };
   } catch {
     return { error: "Failed to read file" };
@@ -214,24 +352,32 @@ function formatSize(bytes) {
 }
 
 // src/steps/io.ts
-function readStepFile(step, outputKey, readerOpts, forDisplay) {
+function readStepFile(step, outputKey, readerOpts) {
   const filePath = step.outputs?.[outputKey];
   if (!filePath) return { noFile: true };
-  const result = forDisplay ? readForDisplay(filePath, readerOpts) : readForParse(filePath, readerOpts);
+  const result = readForParse(filePath, readerOpts);
   if (isReadError(result)) return { error: result.error };
-  if (result.truncated) {
-    return { content: result.content, truncated: true };
-  }
   return { content: result.content };
 }
 function readStepStdout(step, readerOpts) {
-  return readStepFile(step, OUTPUT_STDOUT_FILE, readerOpts, false);
+  return readStepFile(step, OUTPUT_STDOUT_FILE, readerOpts);
 }
-function readStepStdoutForDisplay(step, readerOpts) {
-  return readStepFile(step, OUTPUT_STDOUT_FILE, readerOpts, true);
+function readStepStderr(step, readerOpts) {
+  return readStepFile(step, OUTPUT_STDERR_FILE, readerOpts);
 }
-function readStepStderrForDisplay(step, readerOpts) {
-  return readStepFile(step, OUTPUT_STDERR_FILE, readerOpts, true);
+function peekStepStdout(step, readerOpts) {
+  const filePath = step.outputs?.[OUTPUT_STDOUT_FILE];
+  if (!filePath) return { noFile: true };
+  const result = readPeek(filePath, readerOpts);
+  if (isReadError(result)) return { error: result.error };
+  return { content: result.content };
+}
+function peekStepStderr(step, readerOpts) {
+  const filePath = step.outputs?.[OUTPUT_STDERR_FILE];
+  if (!filePath) return { noFile: true };
+  const result = readPeek(filePath, readerOpts);
+  if (isReadError(result)) return { error: result.error };
+  return { content: result.content };
 }
 function getStepStdoutPath(step, readerOpts) {
   const filePath = step.outputs?.[OUTPUT_STDOUT_FILE];
@@ -246,28 +392,29 @@ function buildStepIssue(step, stepId, readerOpts, diagnostic) {
   const outcome = getStepOutcome(step);
   const isFailed = outcome === "failure";
   const exitCode = getExitCode(step);
-  let heading;
+  let reason;
+  let stepOutcome;
   if (isFailed) {
-    heading = `\`${stepId}\` failed`;
+    reason = "failed";
   } else if (diagnostic) {
-    heading = `\`${stepId}\`: output could not be parsed`;
+    reason = "parse-error";
   } else {
-    heading = `\`${stepId}\` ${outcome}`;
+    reason = "outcome";
+    stepOutcome = outcome;
   }
-  const stdoutRead = readStepStdoutForDisplay(step, readerOpts);
-  const stderrRead = readStepStderrForDisplay(step, readerOpts);
+  const stdoutRead = readStepStdout(step, readerOpts);
+  const stderrRead = readStepStderr(step, readerOpts);
   const stderrContent = stderrRead.content !== void 0 && stderrRead.content.trim().length > 0 ? stderrRead.content : void 0;
   const issue = {
     id: stepId,
-    heading,
+    reason,
+    ...stepOutcome !== void 0 ? { outcome: stepOutcome } : {},
     isFailed,
     ...exitCode !== void 0 ? { exitCode } : {},
     ...diagnostic !== void 0 ? { diagnostic } : {},
     ...stdoutRead.content !== void 0 ? { stdout: stdoutRead.content } : {},
-    ...stdoutRead.truncated === true ? { stdoutTruncated: true } : {},
     ...stdoutRead.error !== void 0 ? { stdoutError: stdoutRead.error } : {},
     ...stderrContent !== void 0 ? { stderr: stderrContent } : {},
-    ...stderrContent !== void 0 && stderrRead.truncated === true ? { stderrTruncated: true } : {},
     ...stderrRead.error !== void 0 ? { stderrError: stderrRead.error } : {}
   };
   return issue;
@@ -276,111 +423,170 @@ function shouldCreateStepIssue(step, readerOpts, diagnostic) {
   const outcome = getStepOutcome(step);
   if (outcome === "failure") return true;
   if (diagnostic !== void 0) return true;
-  const stderrRead = readStepStderrForDisplay(step, readerOpts);
-  return stderrRead.content !== void 0 && stderrRead.content.trim().length > 0;
+  const stderrPeek = peekStepStderr(step, readerOpts);
+  return stderrPeek.content !== void 0 && stderrPeek.content.trim().length > 0;
 }
-
-// src/model/status-icons.ts
-var STATUS_SUCCESS = "\u2705";
-var STATUS_FAILURE = "\u274C";
-var DIAGNOSTIC_ERROR = "\u{1F6A8}";
-var DIAGNOSTIC_WARNING = "\u26A0\uFE0F";
-var MODULE_ICON = "\u{1F4E6}";
-var DRIFT_ICON = "\u{1F500}";
-var INFO_ICON = "\u2139\uFE0F";
-var ARTIFACT_ICON = "\u{1F4CE}";
 
 // src/builder/title.ts
 function buildTitle(report) {
-  const wsPrefix = report.workspace ? `\`${report.workspace}\` ` : "";
+  const workspace = report.workspace;
   if (report.error !== void 0) {
-    return `${STATUS_FAILURE} ${wsPrefix}Report Generation Failed`;
+    return {
+      status: "failure",
+      ...workspace !== void 0 ? { workspace } : {},
+      body: { kind: "error" }
+    };
   }
   const hasIacStepFailure = hasIacFailure(report);
   const hasAnyStepFailure = hasAnyFailure(report);
   if (hasIacStepFailure) {
-    const op = operationLabel(report.operation);
-    const label = op ? `${op} Failed` : "Failed";
-    return `${STATUS_FAILURE} ${wsPrefix}${label}`;
+    const op = normalizeOperation(report.operation);
+    return {
+      status: "failure",
+      ...workspace !== void 0 ? { workspace } : {},
+      body: op !== void 0 ? { kind: "operation-failed", operation: op } : { kind: "generic-failed" }
+    };
   }
   if (report.summary) {
     return buildSummaryTitle(
       report.summary,
       report.operation ?? "plan",
-      wsPrefix,
+      workspace,
       hasAnyStepFailure
     );
   }
   if (report.operationOutcome === "skipped") {
-    const op = operationLabel(report.operation);
-    const label = op ? `${op} Skipped` : "Skipped";
-    return `${DIAGNOSTIC_WARNING} ${wsPrefix}${label}`;
+    return {
+      status: "warning",
+      ...workspace !== void 0 ? { workspace } : {},
+      body: {
+        kind: "operation-skipped",
+        ...(() => {
+          const op = normalizeOperation(report.operation);
+          return op !== void 0 ? { operation: op } : {};
+        })()
+      }
+    };
   }
   if (report.steps.length > 0 && report.steps.every((s) => s.outcome === "skipped")) {
-    return `${DIAGNOSTIC_WARNING} ${wsPrefix}All Steps Skipped`;
+    return {
+      status: "warning",
+      ...workspace !== void 0 ? { workspace } : {},
+      body: { kind: "all-skipped" }
+    };
   }
   if (hasAnyStepFailure || report.issues.some((i) => i.isFailed)) {
-    const failLabel = singleFailedStepLabel(report);
-    return `${STATUS_FAILURE} ${wsPrefix}${failLabel}`;
+    return {
+      status: "failure",
+      ...workspace !== void 0 ? { workspace } : {},
+      body: buildFailedBody(report)
+    };
   }
-  const opLabel = report.operation ? `${operationLabel(report.operation)} ` : "";
-  return `${STATUS_SUCCESS} ${wsPrefix}${opLabel}Succeeded`;
+  return {
+    status: "success",
+    ...workspace !== void 0 ? { workspace } : {},
+    body: {
+      kind: "succeeded",
+      ...(() => {
+        const op = normalizeOperation(report.operation);
+        return op !== void 0 ? { operation: op } : {};
+      })()
+    }
+  };
 }
-function buildPlanCountParts(summary) {
+function buildPlanCounts(summary) {
   const counts = /* @__PURE__ */ new Map();
   for (const group of summary.actions) {
-    const label = planActionLabel(group.action);
-    counts.set(label, (counts.get(label) ?? 0) + group.total);
+    counts.set(group.action, (counts.get(group.action) ?? 0) + group.total);
   }
-  return formatCountParts(counts, "to ");
+  return mapToActionCounts(counts);
 }
-function buildApplyCountParts(summary) {
+function buildApplyCounts(summary) {
   const counts = /* @__PURE__ */ new Map();
   for (const group of summary.actions) {
-    const label = applyActionLabel(group.action);
-    counts.set(label, (counts.get(label) ?? 0) + group.total);
+    counts.set(group.action, (counts.get(group.action) ?? 0) + group.total);
   }
-  return formatCountParts(counts, "");
+  return mapToActionCounts(counts);
 }
-function buildFailureCountParts(summary) {
+function buildFailureCounts(summary) {
   const total = summary.failures.reduce((sum, g) => sum + g.total, 0);
   if (total === 0) return [];
-  return [`${String(total)} failed`];
+  return [{ action: "failed", count: total }];
 }
-function buildSummaryTitle(summary, operation, wsPrefix, hasAnyStepFailure) {
+function buildSummaryTitle(summary, operation, workspace, hasAnyStepFailure) {
   const hasFailures = summary.failures.length > 0;
-  const icon = hasFailures || hasAnyStepFailure ? STATUS_FAILURE : STATUS_SUCCESS;
+  const status = hasFailures || hasAnyStepFailure ? "failure" : "success";
   if (operation === "apply" || operation === "destroy") {
-    const parts2 = buildApplyCountParts(summary);
+    const counts2 = buildApplyCounts(summary);
+    const failures = buildFailureCounts(summary);
+    const failureTotal = summary.failures.reduce((sum, g) => sum + g.total, 0);
     if (hasFailures) {
-      const failParts = buildFailureCountParts(summary);
-      return `${icon} ${wsPrefix}Apply Failed: ${[...failParts, ...parts2].join(", ")}`;
+      return {
+        status,
+        ...workspace !== void 0 ? { workspace } : {},
+        body: {
+          kind: "summary",
+          operation,
+          counts: counts2,
+          failures,
+          failureTotal,
+          hasStepFailure: hasAnyStepFailure
+        }
+      };
     }
-    if (parts2.length === 0) {
-      return `${icon} ${wsPrefix}Apply Complete`;
-    }
-    return `${icon} ${wsPrefix}Apply: ${parts2.join(", ")}`;
+    return {
+      status,
+      ...workspace !== void 0 ? { workspace } : {},
+      body: {
+        kind: "summary",
+        operation,
+        counts: counts2,
+        failures: [],
+        failureTotal: 0,
+        hasStepFailure: hasAnyStepFailure
+      }
+    };
   }
   const totalActions = summary.actions.reduce((sum, g) => sum + g.total, 0);
   if (totalActions === 0 && !hasFailures && !hasAnyStepFailure) {
-    return `${icon} ${wsPrefix}No Changes`;
+    return {
+      status,
+      ...workspace !== void 0 ? { workspace } : {},
+      body: { kind: "no-changes" }
+    };
   }
   if (hasFailures || hasAnyStepFailure) {
-    return `${icon} ${wsPrefix}Plan Failed`;
+    return {
+      status,
+      ...workspace !== void 0 ? { workspace } : {},
+      body: {
+        kind: "operation-failed",
+        operation: "plan"
+      }
+    };
   }
-  const parts = buildPlanCountParts(summary);
-  return `${icon} ${wsPrefix}Plan: ${parts.join(", ")}`;
+  const counts = buildPlanCounts(summary);
+  return {
+    status,
+    ...workspace !== void 0 ? { workspace } : {},
+    body: {
+      kind: "summary",
+      operation: "plan",
+      counts,
+      failures: [],
+      failureTotal: 0,
+      hasStepFailure: false
+    }
+  };
 }
-function operationLabel(operation) {
+function normalizeOperation(operation) {
   switch (operation) {
     case "apply":
-      return "Apply";
     case "destroy":
-      return "Destroy";
     case "plan":
-      return "Plan";
+      return operation;
     default:
-      return "";
+      return void 0;
   }
 }
 function hasIacFailure(report) {
@@ -390,60 +596,20 @@ function hasIacFailure(report) {
 function hasAnyFailure(report) {
   return report.steps.some((s) => s.outcome === "failure");
 }
-function singleFailedStepLabel(report) {
+function buildFailedBody(report) {
   const failedSteps = report.steps.filter((s) => s.outcome === "failure");
   if (failedSteps.length === 1) {
     const name = failedSteps[0]?.id ?? "unknown";
-    return `\`${name}\` Failed`;
+    return { kind: "step-failed", stepId: name };
   }
-  return "Failed";
+  return { kind: "generic-failed" };
 }
-function formatCountParts(counts, prefix) {
-  const parts = [];
-  for (const [label, count] of counts) {
-    parts.push(`${String(count)} ${prefix}${label}`);
+function mapToActionCounts(counts) {
+  const result = [];
+  for (const [action, count] of counts) {
+    result.push({ action, count });
   }
-  return parts;
-}
-function planActionLabel(action) {
-  switch (action) {
-    case "create":
-      return "add";
-    case "update":
-      return "change";
-    case "delete":
-      return "destroy";
-    case "replace":
-      return "replace";
-    case "import":
-      return "import";
-    case "move":
-      return "move";
-    case "forget":
-      return "forget";
-    default:
-      return action;
-  }
-}
-function applyActionLabel(action) {
-  switch (action) {
-    case "create":
-      return "added";
-    case "update":
-      return "changed";
-    case "delete":
-      return "destroyed";
-    case "replace":
-      return "replaced";
-    case "import":
-      return "imported";
-    case "move":
-      return "moved";
-    case "forget":
-      return "forgotten";
-    default:
-      return action;
-  }
+  return result;
 }
 
 // src/parser/plan.ts
@@ -660,15 +826,15 @@ function filterStepIssueStdout(report, stepId, diagnostics) {
   const filtered = filterJsonlByAddresses(issue.stdout, addresses);
   report.issues[idx] = { ...issue, stdout: filtered };
 }
-function addScannerWarnings(report, scan, stepLabel) {
+function addScannerWarnings(report, scan, role) {
   if (scan.unparseableLines > 0) {
     report.warnings.push(
-      `${String(scan.unparseableLines)} line(s) in ${stepLabel} output could not be parsed as JSON`
+      new UnparseableLinesWarning(scan.unparseableLines, role)
     );
   }
   if (scan.unknownTypeLines > 0) {
     report.warnings.push(
-      `${String(scan.unknownTypeLines)} line(s) in ${stepLabel} output had unrecognized message types`
+      new UnknownMessageTypesWarning(scan.unknownTypeLines, role)
     );
   }
 }
@@ -1172,7 +1338,7 @@ function buildReport(plan, options = {}) {
   const summary = buildSummary(resources);
   const outputs = buildOutputChanges(plan);
   return {
-    title: "",
+    title: { status: "success", body: { kind: "no-changes" } },
     issues: [],
     steps: [],
     warnings: [],
@@ -1602,9 +1768,9 @@ function tryProcessShowPlan(showPlanStep, showPlanStepId, applyStep, applyStepId
   const read = readStepStdout(showPlanStep, readerOpts);
   if (read.content === void 0) {
     if (read.error) {
-      report.warnings.push(`show-plan stdout: ${read.error}`);
+      report.warnings.push(new StepReadErrorWarning("show-plan", read.error));
     } else if (read.noFile) {
-      report.warnings.push("show-plan: stdout_file output missing in steps");
+      report.warnings.push(new StepOutputMissingWarning("show-plan"));
     }
     return false;
   }
@@ -1634,9 +1800,7 @@ function tryProcessShowPlan(showPlanStep, showPlanStepId, applyStep, applyStepId
         const applyScan = scanString(applyRead.content);
         enrichedReport = buildApplyReport(plan, applyScan, options);
       } catch {
-        report.warnings.push(
-          `Apply output from step \`${applyStepId}\` could not be parsed; using plan data only.`
-        );
+        report.warnings.push(new StepOutputParseWarning(applyStepId));
         enrichedReport = buildReport(plan, options);
       }
     } else {
@@ -1695,7 +1859,7 @@ function processPlanStep(step, stepId, report, readerOpts, showPlanParsed) {
   }
   const path = getStepStdoutPath(step, readerOpts);
   if (path) {
-    const peek = readStepStdoutForDisplay(step, readerOpts);
+    const peek = peekStepStdout(step, readerOpts);
     if (peek.content !== void 0) {
       const firstLines = peek.content.split("\n", 10);
       if (isJsonLines(firstLines)) {
@@ -1717,13 +1881,12 @@ function processPlanStep(step, stepId, report, readerOpts, showPlanParsed) {
       report.rawStdout.push({
         stepId,
         label: "Plan Output",
-        content: read.content,
-        truncated: read.truncated === true
+        content: read.content
       });
     } else if (read.error) {
-      report.warnings.push(`plan stdout: ${read.error}`);
+      report.warnings.push(new StepReadErrorWarning("plan", read.error));
     } else if (read.noFile) {
-      report.warnings.push("plan: stdout_file output missing in steps");
+      report.warnings.push(new StepOutputMissingWarning("plan"));
     }
   }
 }
@@ -1732,7 +1895,7 @@ function enrichFromPlanJsonl(filePath, report, readerOpts, showPlanParsed) {
   try {
     scan = scanFile(filePath, readerOpts.maxFileSize);
   } catch {
-    report.warnings.push("Plan JSONL file could not be scanned");
+    report.warnings.push(new StepScanFailureWarning("plan"));
     return;
   }
   if (scan.tool !== void 0) report.tool = scan.tool;
@@ -1770,7 +1933,7 @@ function processApplyStep(step, stepId, report, readerOpts, showPlanParsed) {
   }
   const path = getStepStdoutPath(step, readerOpts);
   if (path) {
-    const peek = readStepStdoutForDisplay(step, readerOpts);
+    const peek = peekStepStdout(step, readerOpts);
     if (peek.content !== void 0) {
       const firstLines = peek.content.split("\n", 10);
       if (isJsonLines(firstLines)) {
@@ -1792,13 +1955,12 @@ function processApplyStep(step, stepId, report, readerOpts, showPlanParsed) {
       report.rawStdout.push({
         stepId,
         label: "Apply Output",
-        content: read.content,
-        truncated: read.truncated === true
+        content: read.content
       });
     } else if (read.error) {
-      report.warnings.push(`apply stdout: ${read.error}`);
+      report.warnings.push(new StepReadErrorWarning("apply", read.error));
     } else if (read.noFile) {
-      report.warnings.push("apply: stdout_file output missing in steps");
+      report.warnings.push(new StepOutputMissingWarning("apply"));
     }
   }
   report.operation = "apply";
@@ -1808,7 +1970,7 @@ function enrichFromApplyJsonl(filePath, report, readerOpts, showPlanParsed) {
   try {
     scan = scanFile(filePath, readerOpts.maxFileSize);
   } catch {
-    report.warnings.push("Apply JSONL file could not be scanned");
+    report.warnings.push(new StepScanFailureWarning("apply"));
     return;
   }
   if (scan.tool !== void 0) report.tool = scan.tool;
@@ -1977,7 +2139,7 @@ function isLargeValue3(value) {
 import { tmpdir } from "node:os";
 function createEmptyReport() {
   return {
-    title: "",
+    title: { status: "success", body: { kind: "no-changes" } },
     issues: [],
     steps: [],
     warnings: [],
@@ -2004,8 +2166,7 @@ function buildReportFromSteps(stepsJson, options) {
   ]);
   const readerOpts = {
     allowedDirs: options?.allowedDirs ?? [env["RUNNER_TEMP"] ?? tmpdir()],
-    maxFileSize: DEFAULT_MAX_FILE_SIZE,
-    maxDisplayRead: options?.maxDisplayRead ?? DEFAULT_MAX_DISPLAY_READ
+    maxFileSize: DEFAULT_MAX_FILE_SIZE
   };
   const parseResult = parseSteps(stepsJson);
   if (typeof parseResult === "string") {
@@ -2077,18 +2238,12 @@ function buildReportFromSteps(stepsJson, options) {
     }
   }
   if (!showPlanParsed && (report.resources !== void 0 || report.summary !== void 0)) {
-    report.warnings.push(
-      `This report was generated without \`${expectedCommand(tool, "show-plan")}\` output. Resource attribute details are not available.`
-    );
+    report.warnings.push(new NoShowPlanWarning(tool));
   } else if (!showPlanParsed && report.rawStdout.length > 0) {
-    report.warnings.push(
-      `Report limited because \`${expectedCommand(tool, "show-plan")}\` output was not available. Showing raw command output.`
-    );
+    report.warnings.push(new RawTextFallbackWarning(tool));
   }
   if (showPlanParsed && report.operation === "apply" && !report.stateEnriched && hasUnresolvedKnownAfterApply(report)) {
-    report.warnings.push(
-      `Some attribute values could not be resolved because \`${expectedCommand(tool, "state")}\` output was not available. Add a \`state\` step after apply to see the actual values.`
-    );
+    report.warnings.push(new NoStateWarning(tool));
   }
   if (tool !== void 0) report.tool = tool;
   if (report.operation === void 0) {
@@ -2147,7 +2302,798 @@ function hasUnresolvedKnownAfterApply(report) {
   return false;
 }
 
-// src/raw-formatter/jsonl.ts
+// src/renderable/markdown-escape.ts
+var ESCAPE_MAP = /* @__PURE__ */ new Map([
+  // HTML entities (security-critical — GitHub renders inline HTML)
+  ["&", "&amp;"],
+  ["<", "&lt;"],
+  [">", "&gt;"],
+  // Markdown inline syntax characters (GFM spec sections 6.1–6.6)
+  ["\\", "\\\\"],
+  // backslash escape initiator
+  ["`", "\\`"],
+  // code span delimiter
+  ["*", "\\*"],
+  // emphasis / strong emphasis
+  ["_", "\\_"],
+  // emphasis / strong emphasis
+  ["~", "\\~"],
+  // strikethrough (GFM extension)
+  ["[", "\\["],
+  // link / image text start
+  ["]", "\\]"],
+  // link / image text end
+  ["|", "\\|"]
+  // GFM table cell delimiter
+]);
+function markdownEscape(text) {
+  let result = "";
+  for (const ch of text) {
+    const replacement = ESCAPE_MAP.get(ch);
+    result += replacement ?? ch;
+  }
+  return result;
+}
+function markdownEscapeBlock(text) {
+  let escaped = markdownEscape(text);
+  escaped = escaped.replace(/^([-+])(?=[ \t])/, "\\$1");
+  escaped = escaped.replace(/^(\d{1,9})([.)])(?=[ \t])/, "$1\\$2");
+  escaped = escaped.replace(/^(#{1,6})(?=[ \t])/, "\\$1");
+  return escaped;
+}
+
+// src/renderable/primitives.ts
+var Empty = class {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  size(format) {
+    return 0;
+  }
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  render(format) {
+    return "";
+  }
+};
+var EMPTY = new Empty();
+var Heading = class {
+  text;
+  level;
+  constructor(text, level = 2) {
+    this.text = text;
+    this.level = level;
+  }
+  size(format) {
+    return this.render(format).length;
+  }
+  render(format) {
+    if (format === "markdown") {
+      return `${"#".repeat(this.level)} ${markdownEscape(this.text)}
+
+`;
+    }
+    return `<h${String(this.level)}>${htmlEscape(this.text)}</h${String(this.level)}>
+`;
+  }
+};
+var CodeBlock = class {
+  content;
+  language;
+  constructor(content, language = "") {
+    this.content = content;
+    this.language = language;
+  }
+  size(format) {
+    return this.render(format).length;
+  }
+  render(format) {
+    if (format === "markdown") {
+      return `\`\`\`${this.language}
+${this.content}
+\`\`\`
+
+`;
+    }
+    const langAttr = this.language.length > 0 ? ` class="language-${htmlEscape(this.language)}"` : "";
+    return `<pre><code${langAttr}>${htmlEscape(this.content)}</code></pre>
+`;
+  }
+};
+var Blockquote = class {
+  text;
+  constructor(text) {
+    this.text = text;
+  }
+  size(format) {
+    return this.render(format).length;
+  }
+  render(format) {
+    if (format === "markdown") {
+      const lines = this.text.split("\n");
+      return lines.map((l) => `> ${markdownEscapeBlock(l)}`).join("\n") + "\n\n";
+    }
+    return `<blockquote><p>${htmlEscape(this.text).replace(/\n/g, "<br>")}</p></blockquote>
+`;
+  }
+};
+var Table = class {
+  headers;
+  rows;
+  mdSize;
+  htSize;
+  constructor(headers, rows) {
+    this.headers = headers;
+    this.rows = rows;
+    this.mdSize = this.computeMdSize();
+    this.htSize = this.computeHtSize();
+  }
+  size(format) {
+    return format === "markdown" ? this.mdSize : this.htSize;
+  }
+  render(format) {
+    return format === "markdown" ? this.renderMarkdown() : this.renderHtml();
+  }
+  computeMdSize() {
+    const cols = this.headers.length;
+    let size = this.rowMdSize(this.headers);
+    size += 6 * cols + 2;
+    for (const row of this.rows) {
+      size += this.rowMdSize(row.cells);
+    }
+    size += 1;
+    return size;
+  }
+  /** Size of one markdown row: `| cell | cell |\n` */
+  rowMdSize(cells) {
+    let size = 3 * cells.length + 2;
+    for (const cell of cells) {
+      size += cell.size("markdown");
+    }
+    return size;
+  }
+  computeHtSize() {
+    const TH_OVERHEAD = 9;
+    const TD_OVERHEAD = 9;
+    let size = 8;
+    size += 8;
+    size += 4;
+    for (const h of this.headers) {
+      size += TH_OVERHEAD + h.size("html");
+    }
+    size += 6;
+    size += 9;
+    size += 8;
+    for (const row of this.rows) {
+      size += 4;
+      for (const cell of row.cells) {
+        size += TD_OVERHEAD + cell.size("html");
+      }
+      size += 6;
+    }
+    size += 9;
+    size += 9;
+    return size;
+  }
+  renderMarkdown() {
+    const cols = this.headers.length;
+    let out = this.renderMdRow(this.headers);
+    out += `| ${Array.from({ length: cols }, () => "---").join(" | ")} |
+`;
+    for (const row of this.rows) {
+      out += this.renderMdRow(row.cells);
+    }
+    out += "\n";
+    return out;
+  }
+  renderMdRow(cells) {
+    const rendered = cells.map((c) => c.render("markdown"));
+    return `| ${rendered.join(" | ")} |
+`;
+  }
+  renderHtml() {
+    let out = "<table>\n<thead>\n<tr>";
+    for (const h of this.headers) {
+      out += `<th>${h.render("html")}</th>`;
+    }
+    out += "</tr>\n</thead>\n<tbody>\n";
+    for (const row of this.rows) {
+      out += "<tr>";
+      for (const cell of row.cells) {
+        out += `<td>${cell.render("html")}</td>`;
+      }
+      out += "</tr>\n";
+    }
+    out += "</tbody>\n</table>\n";
+    return out;
+  }
+};
+var Details = class {
+  summary;
+  content;
+  open;
+  mdSize;
+  htSize;
+  constructor(summary, content, open = false) {
+    this.summary = summary;
+    this.content = content;
+    this.open = open;
+    const summaryHtmlSize = summary.size("html");
+    const openTag = open ? "<details open>" : "<details>";
+    const mdPre = `${openTag}
+<summary>`;
+    const mdMid = "</summary>\n\n";
+    const mdPost = "\n\n</details>\n\n";
+    this.mdSize = mdPre.length + summaryHtmlSize + mdMid.length + content.size("markdown") + mdPost.length;
+    const htPre = `${openTag}
+<summary>`;
+    const htMid = "</summary>\n";
+    const htPost = "\n</details>\n";
+    this.htSize = htPre.length + summaryHtmlSize + htMid.length + content.size("html") + htPost.length;
+  }
+  size(format) {
+    return format === "markdown" ? this.mdSize : this.htSize;
+  }
+  render(format) {
+    const summaryHtml = this.summary.render("html");
+    const openTag = this.open ? "<details open>" : "<details>";
+    if (format === "markdown") {
+      return `${openTag}
+<summary>${summaryHtml}</summary>
+
+${this.content.render("markdown")}
+
+</details>
+
+`;
+    }
+    return `${openTag}
+<summary>${summaryHtml}</summary>
+${this.content.render("html")}
+</details>
+`;
+  }
+};
+var Sequence = class {
+  children;
+  separator;
+  mdSize;
+  htSize;
+  constructor(children, separator = "") {
+    this.children = children;
+    this.separator = separator;
+    const sepLen = separator.length;
+    const count = children.length;
+    const sepTotal = count > 1 ? sepLen * (count - 1) : 0;
+    let md = sepTotal;
+    let ht = sepTotal;
+    for (const child of children) {
+      md += child.size("markdown");
+      ht += child.size("html");
+    }
+    this.mdSize = md;
+    this.htSize = ht;
+  }
+  size(format) {
+    return format === "markdown" ? this.mdSize : this.htSize;
+  }
+  render(format) {
+    if (this.children.length === 0) return "";
+    const first = this.children[0];
+    if (this.children.length === 1 && first !== void 0) {
+      return first.render(format);
+    }
+    return this.children.map((c) => c.render(format)).join(this.separator);
+  }
+};
+
+// src/model/status-icons.ts
+var STATUS_SUCCESS = "\u2705";
+var STATUS_FAILURE = "\u274C";
+var DIAGNOSTIC_ERROR = "\u{1F6A8}";
+var DIAGNOSTIC_WARNING = "\u26A0\uFE0F";
+var MODULE_ICON = "\u{1F4E6}";
+var DRIFT_ICON = "\u{1F500}";
+var INFO_ICON = "\u2139\uFE0F";
+var ARTIFACT_ICON = "\u{1F4CE}";
+
+// src/elements/title.ts
+var TitleElement = class {
+  id = "title";
+  fixed = true;
+  levels = 1;
+  title;
+  constructor(title) {
+    this.title = title;
+  }
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  size(format, _level) {
+    return renderTitle(this.title, format).length;
+  }
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  render(format, _level) {
+    return renderTitle(this.title, format);
+  }
+};
+function renderTitle(title, format) {
+  const icon = statusIcon(title.status);
+  const ws = renderWorkspace(title.workspace, format);
+  const bodyText = renderTitleBody(title.body, format);
+  const content = [icon, ws, bodyText].filter(Boolean).join(" ");
+  if (format === "markdown") {
+    return `## ${content}
+
+`;
+  }
+  return `<h2>${content}</h2>
+`;
+}
+function renderWorkspace(workspace, format) {
+  if (workspace === void 0) return "";
+  if (format === "markdown") {
+    return `\`${workspace}\``;
+  }
+  return `<code>${htmlEscape(workspace)}</code>`;
+}
+function renderTitleBody(body, format) {
+  switch (body.kind) {
+    case "summary":
+      return renderSummaryBody(body);
+    case "no-changes":
+      return "No Changes";
+    case "error":
+      return "Report Generation Failed";
+    case "operation-failed":
+      return `${operationLabel(body.operation)} Failed`;
+    case "step-failed":
+      return renderStepFailed(body.stepId, format);
+    case "generic-failed":
+      return "Failed";
+    case "operation-skipped":
+      return body.operation !== void 0 ? `${operationLabel(body.operation)} Skipped` : "Skipped";
+    case "all-skipped":
+      return "All Steps Skipped";
+    case "succeeded":
+      return body.operation !== void 0 ? `${operationLabel(body.operation)} Succeeded` : "Succeeded";
+  }
+}
+function renderStepFailed(stepId, format) {
+  if (format === "markdown") {
+    return `\`${stepId}\` Failed`;
+  }
+  return `<code>${htmlEscape(stepId)}</code> Failed`;
+}
+function renderSummaryBody(body) {
+  const isApply = body.operation === "apply" || body.operation === "destroy";
+  if (isApply) {
+    if (body.failureTotal > 0) {
+      const failParts = formatFailureParts(body.failures);
+      const countParts = formatApplyCountParts(body.counts);
+      return `Apply Failed: ${[...failParts, ...countParts].join(", ")}`;
+    }
+    const parts2 = formatApplyCountParts(body.counts);
+    if (parts2.length === 0) {
+      return "Apply Complete";
+    }
+    return `Apply: ${parts2.join(", ")}`;
+  }
+  const parts = formatPlanCountParts(body.counts);
+  return `Plan: ${parts.join(", ")}`;
+}
+function formatPlanCountParts(counts) {
+  return counts.map(
+    (c) => `${String(c.count)} to ${planActionLabel(c.action)}`
+  );
+}
+function formatApplyCountParts(counts) {
+  return counts.map((c) => `${String(c.count)} ${applyActionLabel(c.action)}`);
+}
+function formatFailureParts(failures) {
+  return failures.map((f) => `${String(f.count)} ${f.action}`);
+}
+function planActionLabel(action) {
+  switch (action) {
+    case "create":
+      return "add";
+    case "update":
+      return "change";
+    case "delete":
+      return "destroy";
+    case "replace":
+      return "replace";
+    case "import":
+      return "import";
+    case "move":
+      return "move";
+    case "forget":
+      return "forget";
+    default:
+      return action;
+  }
+}
+function applyActionLabel(action) {
+  switch (action) {
+    case "create":
+      return "added";
+    case "update":
+      return "changed";
+    case "delete":
+      return "destroyed";
+    case "replace":
+      return "replaced";
+    case "import":
+      return "imported";
+    case "move":
+      return "moved";
+    case "forget":
+      return "forgotten";
+    default:
+      return action;
+  }
+}
+function operationLabel(operation) {
+  switch (operation) {
+    case "apply":
+      return "Apply";
+    case "destroy":
+      return "Destroy";
+    case "plan":
+      return "Plan";
+    default:
+      return operation;
+  }
+}
+function statusIcon(status) {
+  switch (status) {
+    case "success":
+      return STATUS_SUCCESS;
+    case "failure":
+      return STATUS_FAILURE;
+    case "warning":
+      return DIAGNOSTIC_WARNING;
+  }
+}
+var MarkerElement = class {
+  id = "marker";
+  fixed = true;
+  levels = 1;
+  workspace;
+  constructor(workspace) {
+    this.workspace = workspace;
+  }
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  size(_format, _level) {
+    return this.render("markdown", 0).length;
+  }
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  render(_format, _level) {
+    const escaped = escapeMarkerWorkspace(this.workspace);
+    return `<!-- tf-report-action:"${escaped}" -->
+`;
+  }
+};
+var WarningElement = class {
+  fixed = true;
+  levels = 1;
+  id;
+  renderable;
+  constructor(warning, index) {
+    this.id = `warning-${String(index)}`;
+    this.renderable = new WarningBlockquoteChrome(warning);
+  }
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  size(format, _level) {
+    return this.renderable.size(format);
+  }
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  render(format, _level) {
+    return this.renderable.render(format);
+  }
+};
+var UserTitleElement = class {
+  id = "user-title";
+  fixed = true;
+  levels = 1;
+  renderable;
+  constructor(title) {
+    this.renderable = new Heading(title, 2);
+  }
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  size(format, _level) {
+    return this.renderable.size(format);
+  }
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  render(format, _level) {
+    return this.renderable.render(format);
+  }
+};
+var WarningBlockquoteChrome = class {
+  body;
+  constructor(body) {
+    this.body = body;
+  }
+  size(format) {
+    return this.render(format).length;
+  }
+  render(format) {
+    const text = this.body.render(format);
+    if (format === "markdown") {
+      return `> ${DIAGNOSTIC_WARNING} **Warning:** ${text}
+
+`;
+    }
+    return `<blockquote><p>${DIAGNOSTIC_WARNING} <strong>Warning:</strong> ${text}</p></blockquote>
+`;
+  }
+};
+function escapeMarkerWorkspace(workspace) {
+  return workspace.replace(/\\/g, "\\\\").replace(/"/g, '\\"').replace(/--/g, "-\u200B-");
+}
+
+// src/renderable/helpers.ts
+function mdCodeSpan(text) {
+  let maxRun = 0;
+  let currentRun = 0;
+  for (const ch of text) {
+    currentRun = ch === "`" ? currentRun + 1 : 0;
+    if (currentRun > maxRun) maxRun = currentRun;
+  }
+  const fence = "`".repeat(maxRun + 1);
+  const needsPadding = text.startsWith("`") || text.endsWith("`");
+  return needsPadding ? `${fence} ${text} ${fence}` : `${fence}${text}${fence}`;
+}
+function renderNote(text, format) {
+  return format === "markdown" ? `_${markdownEscape(text)}_
+
+` : `<p><em>${htmlEscape(text)}</em></p>
+`;
+}
+function textCell(text) {
+  const renderFn = (format) => format === "markdown" ? markdownEscape(text) : htmlEscape(text);
+  return { size: (f) => renderFn(f).length, render: renderFn };
+}
+function codeSpan(text) {
+  const renderFn = (format) => format === "markdown" ? mdCodeSpan(text) : `<code>${htmlEscape(text)}</code>`;
+  return { size: (f) => renderFn(f).length, render: renderFn };
+}
+function boldSpan(text) {
+  const renderFn = (format) => format === "markdown" ? `**${markdownEscape(text)}**` : `<strong>${htmlEscape(text)}</strong>`;
+  return { size: (f) => renderFn(f).length, render: renderFn };
+}
+function htmlCodeCell(value) {
+  const renderFn = (format) => {
+    const escaped = htmlEscape(value);
+    return format === "markdown" ? `<code>${escaped.replace(/\|/g, "&#124;")}</code>` : `<code>${escaped}</code>`;
+  };
+  return { size: (f) => renderFn(f).length, render: renderFn };
+}
+function htmlCodeCellMultiline(value) {
+  const renderFn = (format) => {
+    const escaped = htmlEscape(value).replace(/\n/g, "<br>");
+    return format === "markdown" ? `<code>${escaped.replace(/\|/g, "&#124;")}</code>` : `<code>${escaped}</code>`;
+  };
+  return { size: (f) => renderFn(f).length, render: renderFn };
+}
+function detailsSummary(text) {
+  const html = htmlEscape(text);
+  return { size: () => html.length, render: () => html };
+}
+
+// src/model/plan-action.ts
+var ACTION_SYMBOLS = {
+  create: "\u2795",
+  update: "\u{1F527}",
+  delete: "\u{1F5D1}\uFE0F",
+  replace: "\xB1",
+  read: "\u{1F441}",
+  "no-op": "\u2B1C",
+  forget: "\u{1F44B}",
+  move: "\u{1F69A}",
+  import: "\u{1F4E5}",
+  open: "\u{1F4C2}",
+  unknown: "\u2753"
+};
+
+// src/elements/summary.ts
+var PLAN_LABELS = {
+  create: "Add",
+  update: "Change",
+  replace: "Replace",
+  delete: "Destroy",
+  move: "Move",
+  import: "Import",
+  forget: "Forget"
+};
+var APPLY_LABELS = {
+  create: "Added",
+  update: "Changed",
+  replace: "Replaced",
+  delete: "Destroyed",
+  move: "Moved",
+  import: "Imported",
+  forget: "Forgotten"
+};
+var FAILURE_LABELS = {
+  create: "Add failed",
+  update: "Change failed",
+  replace: "Replace failed",
+  delete: "Destroy failed",
+  move: "Move failed",
+  import: "Import failed",
+  forget: "Forget failed"
+};
+var SummaryElement = class {
+  id = "summary";
+  fixed = true;
+  levels = 1;
+  heading;
+  summary;
+  isApply;
+  constructor(heading, summary, isApply) {
+    this.heading = heading;
+    this.summary = summary;
+    this.isApply = isApply;
+  }
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  size(format, _level) {
+    return this.render(format, 0).length;
+  }
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  render(format, _level) {
+    return renderSummary(this.heading, this.summary, this.isApply, format);
+  }
+};
+function renderSummary(headingText, summary, isApply, format) {
+  let result = new Heading(headingText, 2).render(format);
+  if (!summary) {
+    return result;
+  }
+  const labels = isApply ? APPLY_LABELS : PLAN_LABELS;
+  const hasContent = summary.actions.length > 0 || summary.failures.length > 0;
+  if (!hasContent) {
+    result += renderNote("No changes.", format);
+    return result;
+  }
+  const headers = [textCell("Action"), textCell("Resource"), textCell("Count")];
+  const rows = [];
+  for (const group of summary.actions) {
+    addGroupRows(group, labels, ACTION_SYMBOLS[group.action], rows);
+  }
+  for (const group of summary.failures) {
+    addGroupRows(group, FAILURE_LABELS, STATUS_FAILURE, rows);
+  }
+  result += new Table(headers, rows).render(format);
+  return result;
+}
+function addGroupRows(group, labels, symbol, rows) {
+  const label = labels[group.action] ?? group.action;
+  for (let i = 0; i < group.resourceTypes.length; i++) {
+    const rt = group.resourceTypes[i];
+    if (!rt) continue;
+    const actionText = i === 0 ? `${symbol} ${label}` : "";
+    rows.push({
+      cells: [
+        textCell(actionText),
+        textCell(rt.type),
+        textCell(String(rt.count))
+      ]
+    });
+  }
+  rows.push({
+    cells: [textCell(""), boldSpan(label), boldSpan(String(group.total))]
+  });
+}
+
+// src/elements/diagnostics.ts
+var DiagnosticsElement = class {
+  id;
+  fixed = true;
+  levels = 1;
+  diagnostics;
+  headingLevel;
+  constructor(id, diagnostics, headingLevel = 3) {
+    this.id = id;
+    this.diagnostics = diagnostics;
+    this.headingLevel = headingLevel;
+  }
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  size(format, _level) {
+    return this.render(format, 0).length;
+  }
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  render(format, _level) {
+    return renderDiagnostics(this.diagnostics, this.headingLevel, format);
+  }
+};
+function renderDiagnostics(diagnostics, headingLevel, format) {
+  const errors = diagnostics.filter((d) => d.severity === "error");
+  const warnings = diagnostics.filter((d) => d.severity === "warning");
+  let result = "";
+  if (errors.length > 0) {
+    result += renderPlainHeading("Errors", headingLevel, format);
+    for (const diag of errors) {
+      result += renderDiagnostic(diag, format);
+    }
+  }
+  if (warnings.length > 0) {
+    result += renderPlainHeading("Warnings", headingLevel, format);
+    for (const diag of warnings) {
+      result += renderDiagnostic(diag, format);
+    }
+  }
+  return result;
+}
+function renderDiagnostic(diag, format) {
+  let result = renderDiagnosticSummaryLine(
+    diag.severity,
+    diag.summary,
+    diag.address,
+    format
+  );
+  if (diag.detail) {
+    result += new Blockquote(diag.detail).render(format);
+  }
+  if (diag.snippet !== void 0) {
+    result += renderSnippet(diag.snippet, diag.range?.filename, format);
+  }
+  if (diag.detail || diag.snippet !== void 0) {
+    if (format === "markdown") result += "\n";
+  }
+  return result;
+}
+function renderSnippet(snippet, filename, format) {
+  let result = renderSnippetLine(
+    snippet.code,
+    snippet.context,
+    filename,
+    snippet.start_line,
+    format
+  );
+  for (const val of snippet.values) {
+    result += renderSnippetValue(val.traversal, val.statement, format);
+  }
+  return result;
+}
+function renderPlainHeading(text, level, format) {
+  if (format === "markdown") {
+    return `${"#".repeat(level)} ${markdownEscape(text)}
+
+`;
+  }
+  return `<h${String(level)}>${htmlEscape(text)}</h${String(level)}>
+`;
+}
+function renderDiagnosticSummaryLine(severity, summary, address, format) {
+  const icon = severity === "error" ? DIAGNOSTIC_ERROR : DIAGNOSTIC_WARNING;
+  if (format === "markdown") {
+    const addr2 = address !== void 0 ? ` \u2014 ${mdCodeSpan(address)}` : "";
+    return `${icon} **${markdownEscape(summary)}**${addr2}
+
+`;
+  }
+  const addr = address !== void 0 ? ` \u2014 <code>${htmlEscape(address)}</code>` : "";
+  return `<p>${icon} <strong>${htmlEscape(summary)}</strong>${addr}</p>
+`;
+}
+function renderSnippetLine(code, context, filename, startLine, format) {
+  if (format === "markdown") {
+    const loc2 = filename !== void 0 ? `${mdCodeSpan(code)} in ${markdownEscape(context)} (${mdCodeSpan(filename)}:${String(startLine)})` : `${mdCodeSpan(code)} in ${markdownEscape(context)}`;
+    return `> ${loc2}
+
+`;
+  }
+  const loc = filename !== void 0 ? `<code>${htmlEscape(code)}</code> in ${htmlEscape(context)} (<code>${htmlEscape(filename)}</code>:${String(startLine)})` : `<code>${htmlEscape(code)}</code> in ${htmlEscape(context)}`;
+  return `<blockquote><p>${loc}</p></blockquote>
+`;
+}
+function renderSnippetValue(traversal, statement, format) {
+  if (format === "markdown") {
+    return `> ${markdownEscapeBlock(traversal)} = ${markdownEscape(statement)}
+
+`;
+  }
+  return `<blockquote><p>${htmlEscape(traversal)} = ${htmlEscape(statement)}</p></blockquote>
+`;
+}
+
+// src/elements/raw-output.ts
 var ENVELOPE_KEYS = /* @__PURE__ */ new Set([
   "@level",
   "@message",
@@ -2184,9 +3130,6 @@ function flattenJsonFields(obj, skipKeys) {
   pairs.sort((a, b) => a[0].localeCompare(b[0]));
   return pairs.map(([k, v]) => `\`${k}=${v}\``);
 }
-function escapeHtml(text) {
-  return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
-}
 function levelIcon(level) {
   switch (level) {
     case "error":
@@ -2197,32 +3140,36 @@ function levelIcon(level) {
       return "";
   }
 }
-function formatJsonLinesMessage(msg) {
-  const level = typeof msg["@level"] === "string" ? msg["@level"] : "info";
-  const message = typeof msg["@message"] === "string" ? msg["@message"] : "(no message)";
-  const icon = levelIcon(level);
-  const prefix = icon ? `${icon} ` : "";
-  const typeStr = typeof msg.type === "string" ? msg.type : "";
-  const fields = flattenJsonFields(
-    msg,
-    ENVELOPE_KEYS
-  );
-  if (fields.length === 0) {
-    const typeSuffix2 = typeStr ? ` \`type=${typeStr}\`` : "";
-    return `${prefix}\`${message}\`${typeSuffix2}`;
-  }
-  const escapedMsg = escapeHtml(message);
-  const typeSuffix = typeStr ? ` <code>type=${escapeHtml(typeStr)}</code>` : "";
-  const fieldLines = fields.join("\n\n");
-  return `<details>
-<summary>${prefix}<code>${escapedMsg}</code>${typeSuffix}</summary>
-<br>
-
-${fieldLines}
-
-</details>`;
+function buildRawOutputRenderable(content) {
+  const trimmed = content.trim();
+  if (trimmed === "") return new CodeBlock("(empty)");
+  const validateResult = tryBuildValidateRenderable(trimmed, content);
+  if (validateResult !== void 0) return validateResult;
+  const jsonlResult = tryBuildJsonLinesRenderable(trimmed);
+  if (jsonlResult !== void 0) return jsonlResult;
+  return new FourTickCodeBlock(content);
 }
-function tryFormatJsonLines(content) {
+function tryBuildValidateRenderable(trimmed, raw) {
+  let parsed;
+  try {
+    parsed = JSON.parse(trimmed);
+  } catch {
+    return void 0;
+  }
+  if (typeof parsed !== "object" || parsed === null || Array.isArray(parsed)) {
+    return void 0;
+  }
+  const obj = parsed;
+  if (!("valid" in obj) || typeof obj["valid"] !== "boolean" || !("diagnostics" in obj) || !Array.isArray(obj["diagnostics"])) {
+    return void 0;
+  }
+  const valid = obj["valid"];
+  const diagnostics = obj["diagnostics"].filter(
+    (d) => typeof d === "object" && d !== null && !Array.isArray(d)
+  );
+  return new ValidateRenderable(valid, diagnostics, raw);
+}
+function tryBuildJsonLinesRenderable(content) {
   const lines = content.split("\n").filter((l) => l.trim() !== "");
   if (lines.length === 0) return void 0;
   const messages = [];
@@ -2240,6 +3187,155 @@ function tryFormatJsonLines(content) {
   if (!messages.some((m) => typeof m["@message"] === "string")) {
     return void 0;
   }
+  return new JsonLinesRenderable(messages);
+}
+var FourTickCodeBlock = class {
+  content;
+  constructor(content) {
+    this.content = content;
+  }
+  size(format) {
+    return this.render(format).length;
+  }
+  render(format) {
+    if (format === "markdown") {
+      return `\`\`\`\`
+${this.content}
+\`\`\`\`
+
+`;
+    }
+    return `<pre><code>${htmlEscape(this.content)}</code></pre>
+`;
+  }
+};
+var ValidateRenderable = class {
+  valid;
+  diagnostics;
+  raw;
+  constructor(valid, diagnostics, raw) {
+    this.valid = valid;
+    this.diagnostics = diagnostics;
+    this.raw = raw;
+  }
+  size(format) {
+    return this.render(format).length;
+  }
+  render(format) {
+    if (format === "markdown") {
+      return buildValidateMarkdown(this.valid, this.diagnostics, this.raw);
+    }
+    return buildValidateHtml(this.valid, this.diagnostics, this.raw);
+  }
+};
+function buildValidateMarkdown(valid, diagnostics, raw) {
+  let output = "";
+  if (valid) {
+    output += `${STATUS_SUCCESS} Configuration is valid
+
+`;
+  } else {
+    output += `${STATUS_FAILURE} Configuration is **invalid**
+
+`;
+  }
+  if (diagnostics.length > 0) {
+    for (const diag of diagnostics) {
+      output += formatValidateDiagMarkdown(diag);
+    }
+  }
+  output += `<details>
+<summary>Show raw JSON</summary>
+
+\`\`\`json
+${raw}
+\`\`\`
+
+</details>
+
+`;
+  return output;
+}
+function buildValidateHtml(valid, diagnostics, raw) {
+  let output = "";
+  if (valid) {
+    output += `<p>${STATUS_SUCCESS} Configuration is valid</p>
+`;
+  } else {
+    output += `<p>${STATUS_FAILURE} Configuration is <strong>invalid</strong></p>
+`;
+  }
+  if (diagnostics.length > 0) {
+    for (const diag of diagnostics) {
+      output += formatValidateDiagHtml(diag);
+    }
+  }
+  output += `<details>
+<summary>Show raw JSON</summary>
+<pre><code class="language-json">${htmlEscape(raw)}</code></pre>
+</details>
+`;
+  return output;
+}
+function formatValidateDiagMarkdown(diag) {
+  const severity = typeof diag["severity"] === "string" ? diag["severity"] : "error";
+  const icon = severity === "warning" ? DIAGNOSTIC_WARNING : DIAGNOSTIC_ERROR;
+  const summary = typeof diag["summary"] === "string" ? diag["summary"] : "(unknown)";
+  const detail = typeof diag["detail"] === "string" ? diag["detail"] : "";
+  let output = `${icon} **${markdownEscape(summary)}**
+`;
+  if (detail) {
+    const detailLines = detail.split("\n").map((l) => `> ${markdownEscapeBlock(l)}`).join("\n");
+    output += `${detailLines}
+
+`;
+  }
+  const snippet = diag["snippet"];
+  if (snippet && typeof snippet["code"] === "string") {
+    const lineInfo = typeof snippet["start_line"] === "number" ? ` (line ${String(snippet["start_line"])})` : "";
+    const ctx = typeof snippet["context"] === "string" ? ` in ${markdownEscape(snippet["context"])}` : "";
+    output += `> \`${snippet["code"]}\`${ctx}${lineInfo}
+`;
+  }
+  output += "\n";
+  return output;
+}
+function formatValidateDiagHtml(diag) {
+  const severity = typeof diag["severity"] === "string" ? diag["severity"] : "error";
+  const icon = severity === "warning" ? DIAGNOSTIC_WARNING : DIAGNOSTIC_ERROR;
+  const summary = typeof diag["summary"] === "string" ? diag["summary"] : "(unknown)";
+  const detail = typeof diag["detail"] === "string" ? diag["detail"] : "";
+  let output = `<p>${icon} <strong>${htmlEscape(summary)}</strong></p>
+`;
+  if (detail) {
+    output += `<blockquote><p>${htmlEscape(detail)}</p></blockquote>
+`;
+  }
+  const snippet = diag["snippet"];
+  if (snippet && typeof snippet["code"] === "string") {
+    const lineInfo = typeof snippet["start_line"] === "number" ? ` (line ${String(snippet["start_line"])})` : "";
+    const ctx = typeof snippet["context"] === "string" ? ` in ${htmlEscape(snippet["context"])}` : "";
+    output += `<blockquote><p><code>${htmlEscape(snippet["code"])}</code>${ctx}${lineInfo}</p></blockquote>
+`;
+  }
+  return output;
+}
+var JsonLinesRenderable = class {
+  messages;
+  constructor(messages) {
+    this.messages = messages;
+  }
+  size(format) {
+    return this.render(format).length;
+  }
+  render(format) {
+    if (format === "markdown") {
+      return buildJsonLinesMarkdown(this.messages);
+    }
+    return buildJsonLinesHtml(this.messages);
+  }
+};
+function buildJsonLinesMarkdown(messages) {
   const infoAndAbove = [];
   const debugTrace = [];
   for (const msg of messages) {
@@ -2252,7 +3348,7 @@ function tryFormatJsonLines(content) {
   }
   const parts = [];
   for (const msg of infoAndAbove) {
-    parts.push(formatJsonLinesMessage(msg));
+    parts.push(formatJsonLinesMsgMarkdown(msg));
   }
   if (debugTrace.length > 0) {
     const counts = /* @__PURE__ */ new Map();
@@ -2277,244 +3373,1104 @@ ${inner}
 </details>`
     );
   }
-  return parts.join("\n\n") + "\n";
+  return parts.join("\n\n") + "\n\n";
 }
+function formatJsonLinesMsgMarkdown(msg) {
+  const level = typeof msg["@level"] === "string" ? msg["@level"] : "info";
+  const message = typeof msg["@message"] === "string" ? msg["@message"] : "(no message)";
+  const icon = levelIcon(level);
+  const prefix = icon ? `${icon} ` : "";
+  const typeStr = typeof msg.type === "string" ? msg.type : "";
+  const fields = flattenJsonFields(
+    msg,
+    ENVELOPE_KEYS
+  );
+  if (fields.length === 0) {
+    const typeSuffix2 = typeStr ? ` \`type=${typeStr}\`` : "";
+    return `${prefix}\`${message}\`${typeSuffix2}`;
+  }
+  const escapedMsg = htmlEscape(message);
+  const typeSuffix = typeStr ? ` <code>type=${htmlEscape(typeStr)}</code>` : "";
+  const fieldLines = fields.join("\n\n");
+  return `<details>
+<summary>${prefix}<code>${escapedMsg}</code>${typeSuffix}</summary>
+<br>
 
-// src/renderer/writer.ts
-var MarkdownWriter = class {
-  lines = [];
-  /** Appends a heading at the given level. */
-  heading(text, level) {
-    this.lines.push(`${"#".repeat(level)} ${text}`);
-    this.lines.push("");
-    return this;
-  }
-  /** Appends a paragraph (text followed by a blank line). */
-  paragraph(text) {
-    this.lines.push(text);
-    this.lines.push("");
-    return this;
-  }
-  /** Appends blockquote lines (> prefix on every line). */
-  blockquote(text) {
-    for (const line of text.split("\n")) {
-      this.lines.push(`> ${line}`);
+${fieldLines}
+
+</details>`;
+}
+function buildJsonLinesHtml(messages) {
+  const infoAndAbove = [];
+  const debugTrace = [];
+  for (const msg of messages) {
+    const level = typeof msg["@level"] === "string" ? msg["@level"] : "info";
+    if (level === "trace" || level === "debug") {
+      debugTrace.push(msg);
+    } else {
+      infoAndAbove.push(msg);
     }
-    return this;
   }
-  /** Appends a blank line. */
-  blankLine() {
-    this.lines.push("");
-    return this;
+  const parts = [];
+  for (const msg of infoAndAbove) {
+    parts.push(formatJsonLinesMsgHtml(msg));
   }
-  /** Appends a table header row with separator. */
-  tableHeader(columns) {
-    this.lines.push(`| ${columns.join(" | ")} |`);
-    this.lines.push(`| ${columns.map(() => "---").join(" | ")} |`);
-    return this;
+  if (debugTrace.length > 0) {
+    const counts = /* @__PURE__ */ new Map();
+    for (const msg of debugTrace) {
+      const level = typeof msg["@level"] === "string" ? msg["@level"] : "debug";
+      counts.set(level, (counts.get(level) ?? 0) + 1);
+    }
+    const countParts = [...counts.entries()].map(
+      ([l, c]) => `${String(c)} ${l}`
+    );
+    const inner = debugTrace.map((msg) => {
+      const message = typeof msg["@message"] === "string" ? msg["@message"] : "(no message)";
+      return `<p><code>${htmlEscape(message)}</code></p>`;
+    }).join("\n");
+    parts.push(
+      `<details>
+<summary>${countParts.join(", ")} message(s) omitted</summary>
+${inner}
+</details>`
+    );
   }
-  /** Appends a table data row. */
-  tableRow(cells) {
-    this.lines.push(`| ${cells.join(" | ")} |`);
-    return this;
-  }
-  /**
-   * Opens a `<details>` block with an HTML-escaped `<summary>` line.
-   * Use `detailsOpenHtml()` when the summary contains intentional HTML markup.
-   */
-  detailsOpen(summary, open = false) {
-    this.lines.push(open ? "<details open>" : "<details>");
-    this.lines.push(`<summary>${escapeHtml(summary)}</summary>`);
-    this.lines.push("");
-    return this;
-  }
-  /**
-   * Opens a `<details>` block with a pre-escaped HTML `<summary>` line.
-   * Caller is responsible for ensuring `htmlSummary` is safe (all
-   * user-controlled content must be HTML-escaped before interpolation).
-   */
-  detailsOpenHtml(htmlSummary, open = false) {
-    this.lines.push(open ? "<details open>" : "<details>");
-    this.lines.push(`<summary>${htmlSummary}</summary>`);
-    this.lines.push("");
-    return this;
-  }
-  /** Closes a `<details>` block. */
-  detailsClose() {
-    this.lines.push("</details>");
-    this.lines.push("");
-    return this;
-  }
-  /** Appends a fenced code block. */
-  codeFence(content, language = "") {
-    this.lines.push(`\`\`\`${language}`);
-    this.lines.push(content);
-    this.lines.push("```");
-    this.lines.push("");
-    return this;
-  }
-  /** Appends raw text verbatim (no trailing newline added). */
-  raw(text) {
-    this.lines.push(text);
-    return this;
-  }
-  /**
-   * Post-processes and returns the accumulated markdown string.
-   * 1. Collapses runs of 3+ blank lines to 2 blank lines.
-   * 2. Ensures a blank line before each # heading.
-   */
-  build() {
-    let text = this.lines.join("\n");
-    text = text.replace(/\n{3,}/g, "\n\n");
-    text = text.replace(/([^\n])\n(#{1,6} )/g, "$1\n\n$2");
-    return text;
-  }
-  /** Escapes pipe characters in table cells (Markdown context, not HTML). */
-  static escapeCell(value) {
-    return value.replace(/\\/g, "\\\\").replace(/\|/g, "\\|");
-  }
-  /**
-   * Escapes a value for use inside HTML tags within a Markdown table cell.
-   * Uses HTML entity encoding for pipe characters instead of Markdown backslash
-   * escaping, since backslash escapes are not interpreted inside HTML tags.
-   */
-  static escapeHtmlCell(value) {
-    return escapeHtml(value).replace(/\|/g, "&#124;");
-  }
-  /**
-   * Escape characters that have special meaning in HTML.
-   * Delegates to the shared `escapeHtml` utility from `raw-formatter/jsonl`.
-   */
-  static escapeHtml(text) {
-    return escapeHtml(text);
-  }
-  /** Wraps value in `<code>` tags, HTML-escaping the content. */
-  static inlineCode(value) {
-    return `<code>${escapeHtml(value)}</code>`;
-  }
-  /**
-   * Wraps value in `<code>` tags with HTML escaping and table-safe pipe encoding.
-   * Use instead of `inlineCode(escapeCell(...))` in table cell contexts.
-   */
-  static inlineCodeCell(value) {
-    return `<code>${escapeHtml(value).replace(/\|/g, "&#124;")}</code>`;
-  }
-};
-
-// src/model/plan-action.ts
-var ACTION_SYMBOLS = {
-  create: "\u2795",
-  update: "\u{1F527}",
-  delete: "\u{1F5D1}\uFE0F",
-  replace: "\xB1",
-  read: "\u{1F441}",
-  "no-op": "\u2B1C",
-  forget: "\u{1F44B}",
-  move: "\u{1F69A}",
-  import: "\u{1F4E5}",
-  open: "\u{1F4C2}",
-  unknown: "\u2753"
-};
-
-// src/renderer/summary.ts
-var PLAN_LABELS = {
-  create: "Add",
-  update: "Change",
-  replace: "Replace",
-  delete: "Destroy",
-  move: "Move",
-  import: "Import",
-  forget: "Forget"
-};
-var APPLY_LABELS = {
-  create: "Added",
-  update: "Changed",
-  replace: "Replaced",
-  delete: "Destroyed",
-  move: "Moved",
-  import: "Imported",
-  forget: "Forgotten"
-};
-var FAILURE_LABELS = {
-  create: "Add failed",
-  update: "Change failed",
-  replace: "Replace failed",
-  delete: "Destroy failed",
-  move: "Move failed",
-  import: "Import failed",
-  forget: "Forget failed"
-};
-function renderSummary(summary, writer, isApply = false) {
-  const labels = isApply ? APPLY_LABELS : PLAN_LABELS;
-  const hasContent = summary.actions.length > 0 || summary.failures.length > 0;
-  if (!hasContent) {
-    writer.paragraph("_No changes._");
-    return;
-  }
-  writer.tableHeader(["Action", "Resource", "Count"]);
-  for (const group of summary.actions) {
-    renderActionGroup(group, labels, ACTION_SYMBOLS[group.action], writer);
-  }
-  for (const group of summary.failures) {
-    renderActionGroup(group, FAILURE_LABELS, STATUS_FAILURE, writer);
-  }
-  writer.blankLine();
+  return parts.join("\n") + "\n";
 }
-function renderActionGroup(group, labels, symbol, writer) {
-  const label = labels[group.action] ?? group.action;
-  for (let i = 0; i < group.resourceTypes.length; i++) {
-    const rt = group.resourceTypes[i];
-    if (!rt) continue;
-    const actionCell = i === 0 ? `${symbol} ${label}` : "";
-    writer.tableRow([actionCell, rt.type, String(rt.count)]);
+function formatJsonLinesMsgHtml(msg) {
+  const level = typeof msg["@level"] === "string" ? msg["@level"] : "info";
+  const message = typeof msg["@message"] === "string" ? msg["@message"] : "(no message)";
+  const icon = levelIcon(level);
+  const prefix = icon ? `${icon} ` : "";
+  const typeStr = typeof msg.type === "string" ? msg.type : "";
+  const fields = flattenJsonFields(
+    msg,
+    ENVELOPE_KEYS
+  );
+  if (fields.length === 0) {
+    const typeSuffix2 = typeStr ? ` <code>type=${htmlEscape(typeStr)}</code>` : "";
+    return `<p>${prefix}<code>${htmlEscape(message)}</code>${typeSuffix2}</p>`;
   }
-  writer.tableRow(["", `**${label}**`, `**${String(group.total)}**`]);
+  const escapedMsg = htmlEscape(message);
+  const typeSuffix = typeStr ? ` <code>type=${htmlEscape(typeStr)}</code>` : "";
+  const fieldEntries = fields.map((f) => `<p>${f}</p>`).join("\n");
+  return `<details>
+<summary>${prefix}<code>${escapedMsg}</code>${typeSuffix}</summary>
+${fieldEntries}
+</details>`;
 }
 
-// src/renderer/diagnostics.ts
-function renderDiagnostics(diagnostics, writer, headingLevel = 3) {
+// src/elements/step-issue.ts
+var StepIssueElement = class {
+  id;
+  fixed = false;
+  levels = 2;
+  issue;
+  constructor(issue) {
+    this.id = `issue-${issue.id}`;
+    this.issue = issue;
+  }
+  size(format, level) {
+    if (level === 0) {
+      return renderIssueHeading(this.issue, format).length;
+    }
+    return renderFullIssue(this.issue, format).length;
+  }
+  render(format, level) {
+    if (level === 0) {
+      return renderIssueHeading(this.issue, format);
+    }
+    return renderFullIssue(this.issue, format);
+  }
+};
+function renderIssueHeading(issue, format) {
+  const icon = issue.isFailed ? STATUS_FAILURE : DIAGNOSTIC_WARNING;
+  const suffix = issueHeadingSuffix(issue);
+  const stepId = issue.id;
+  if (format === "markdown") {
+    return `### ${icon} ${mdCodeSpan(stepId)}${markdownEscape(suffix)}
+
+`;
+  }
+  return `<h3>${icon} <code>${htmlEscape(stepId)}</code>${htmlEscape(suffix)}</h3>
+`;
+}
+function issueHeadingSuffix(issue) {
+  switch (issue.reason) {
+    case "failed":
+      return " failed";
+    case "parse-error":
+      return ": output could not be parsed";
+    case "outcome":
+      return issue.outcome !== void 0 ? ` ${issue.outcome}` : "";
+  }
+}
+function renderFullIssue(issue, format) {
+  let result = renderIssueHeading(issue, format);
+  if (issue.exitCode !== void 0) {
+    result += renderExitCode(issue.exitCode, format);
+  }
+  if (issue.diagnostic !== void 0) {
+    result += new Blockquote(issue.diagnostic).render(format);
+  }
+  if (issue.stdout !== void 0) {
+    const formatted = buildRawOutputRenderable(issue.stdout);
+    result += new Details(detailsSummary("stdout"), formatted, true).render(
+      format
+    );
+  } else if (issue.stdoutError !== void 0) {
+    result += renderWarningBlockquote(
+      `${DIAGNOSTIC_WARNING} stdout not available: ${issue.stdoutError}`,
+      format
+    );
+  }
+  if (issue.stderr !== void 0) {
+    const formatted = buildRawOutputRenderable(issue.stderr);
+    result += new Details(detailsSummary("stderr"), formatted, true).render(
+      format
+    );
+  } else if (issue.stderrError !== void 0) {
+    result += renderWarningBlockquote(
+      `${DIAGNOSTIC_WARNING} stderr not available: ${issue.stderrError}`,
+      format
+    );
+  }
+  if (issue.stdout === void 0 && issue.stderr === void 0 && issue.stdoutError === void 0 && issue.stderrError === void 0) {
+    result += renderNoOutputNotice(format);
+  }
+  return result;
+}
+function renderExitCode(exitCode, format) {
+  if (format === "markdown") {
+    return `Exit code: ${mdCodeSpan(exitCode)}
+
+`;
+  }
+  return `<p>Exit code: <code>${htmlEscape(exitCode)}</code></p>
+`;
+}
+function renderWarningBlockquote(text, format) {
+  if (format === "markdown") {
+    return `> ${markdownEscapeBlock(text)}
+
+`;
+  }
+  return `<blockquote><p>${htmlEscape(text)}</p></blockquote>
+`;
+}
+function renderNoOutputNotice(format) {
+  if (format === "markdown") {
+    return "No output captured.\n\n";
+  }
+  return "<p>No output captured.</p>\n";
+}
+
+// src/elements/text-fallback.ts
+var TextFallbackElement = class {
+  id;
+  fixed = false;
+  levels = 2;
+  heading;
+  full;
+  noteText = "omitted due to size";
+  constructor(stepId, label, content) {
+    this.id = `raw-${stepId}`;
+    this.heading = new Heading(label, 3);
+    this.full = new Sequence([this.heading, buildRawOutputRenderable(content)]);
+  }
+  size(format, level) {
+    if (level === 0) {
+      return this.heading.size(format) + renderNote(this.noteText, format).length;
+    }
+    return this.full.size(format);
+  }
+  render(format, level) {
+    if (level === 0) {
+      return this.heading.render(format) + renderNote(this.noteText, format);
+    }
+    return this.full.render(format);
+  }
+};
+
+// src/elements/step-table.ts
+function buildStepTable(steps, excludeIds) {
+  const filtered = excludeIds ? steps.filter((s) => !excludeIds.has(s.id)) : steps;
+  if (filtered.length === 0) return EMPTY;
+  return new StepOutcomes(filtered);
+}
+var StepOutcomes = class {
+  steps;
+  hasExitCodes;
+  constructor(steps) {
+    this.steps = steps;
+    this.hasExitCodes = steps.some((s) => s.exitCode !== void 0);
+  }
+  size(format) {
+    return this.render(format).length;
+  }
+  render(format) {
+    if (this.hasExitCodes) {
+      const headers2 = [
+        textCell("Step"),
+        textCell("Outcome"),
+        textCell("Exit Code")
+      ];
+      const rows2 = this.steps.map((step) => ({
+        cells: [
+          codeSpan(step.id),
+          textCell(step.outcome),
+          step.exitCode !== void 0 ? codeSpan(step.exitCode) : EMPTY
+        ]
+      }));
+      return new Table(headers2, rows2).render(format);
+    }
+    const headers = [textCell("Step"), textCell("Outcome")];
+    const rows = this.steps.map((step) => ({
+      cells: [codeSpan(step.id), textCell(step.outcome)]
+    }));
+    return new Table(headers, rows).render(format);
+  }
+};
+
+// src/elements/workflow.ts
+var WorkflowElement = class {
+  id = "step-table";
+  fixed = true;
+  levels = 1;
+  steps;
+  constructor(steps) {
+    this.steps = steps;
+  }
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  size(format, _level) {
+    return this.render(format, 0).length;
+  }
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  render(format, _level) {
+    const table = buildStepTable(this.steps);
+    if (table === EMPTY) return "";
+    return new Heading("Steps", 3).render(format) + table.render(format);
+  }
+};
+
+// src/elements/error.ts
+var ErrorMessageElement = class {
+  id = "message";
+  fixed = true;
+  levels = 1;
+  message;
+  constructor(message) {
+    this.message = message;
+  }
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  size(format, _level) {
+    return this.render(format, 0).length;
+  }
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  render(format, _level) {
+    if (format === "markdown") {
+      return `${markdownEscape(this.message)}
+
+`;
+    }
+    return `<p>${htmlEscape(this.message)}</p>
+`;
+  }
+};
+var ErrorStepTableElement = class {
+  id = "step-statuses";
+  fixed = true;
+  levels = 1;
+  steps;
+  constructor(steps) {
+    this.steps = steps;
+  }
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  size(format, _level) {
+    return this.render(format, 0).length;
+  }
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  render(format, _level) {
+    const table = buildStepTable(this.steps);
+    if (table === EMPTY) return "";
+    return new Heading("Steps", 3).render(format) + table.render(format);
+  }
+};
+
+// src/elements/raw-stdout.ts
+var RawStdoutElement = class {
+  id;
+  fixed = true;
+  levels = 1;
+  label;
+  content;
+  constructor(stepId, label, content) {
+    this.id = `raw-${stepId}`;
+    this.label = label;
+    this.content = content;
+  }
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  size(format, _level) {
+    return this.render(format, 0).length;
+  }
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  render(format, _level) {
+    const summary = detailsSummary(this.label);
+    const formatted = buildRawOutputRenderable(this.content);
+    return new Details(summary, formatted).render(format);
+  }
+};
+
+// src/elements/address.ts
+function deriveModuleAddress(address, type) {
+  const typePrefix = `${type}.`;
+  if (address.startsWith(typePrefix)) return "";
+  const dotType = `.${typePrefix}`;
+  const idx = address.lastIndexOf(dotType);
+  if (idx < 0) return "";
+  return address.slice(0, idx);
+}
+function deriveInstanceName(address, type) {
+  const typePrefix = `${type}.`;
+  if (address.startsWith(typePrefix)) return address.slice(typePrefix.length);
+  const dotType = `.${typePrefix}`;
+  const idx = address.lastIndexOf(dotType);
+  if (idx < 0) return address;
+  return address.slice(idx + dotType.length);
+}
+function groupByModule(resources) {
+  const map = /* @__PURE__ */ new Map();
+  for (const resource of resources) {
+    const moduleAddr = deriveModuleAddress(resource.address, resource.type);
+    let group = map.get(moduleAddr);
+    if (!group) {
+      group = [];
+      map.set(moduleAddr, group);
+    }
+    group.push(resource);
+  }
+  return [...map.entries()].sort(([a], [b]) => {
+    if (a === "") return -1;
+    if (b === "") return 1;
+    return a.localeCompare(b);
+  }).map(([moduleAddress, grouped]) => ({ moduleAddress, resources: grouped }));
+}
+
+// src/diff/lcs.ts
+var MAX_LCS_CELLS = 1e7;
+function computeLcsPairs(before, after) {
+  const m = before.length;
+  const n = after.length;
+  if (m === 0 || n === 0) return [];
+  if (m * n > MAX_LCS_CELLS) return [];
+  const dp = Array.from(
+    { length: m + 1 },
+    () => new Array(n + 1).fill(0)
+  );
+  for (let i2 = 1; i2 <= m; i2++) {
+    for (let j2 = 1; j2 <= n; j2++) {
+      if (before[i2 - 1] === after[j2 - 1]) {
+        dp[i2][j2] = (dp[i2 - 1]?.[j2 - 1] ?? 0) + 1;
+      } else {
+        dp[i2][j2] = Math.max(
+          dp[i2 - 1]?.[j2] ?? 0,
+          dp[i2]?.[j2 - 1] ?? 0
+        );
+      }
+    }
+  }
+  const pairs = [];
+  let i = m;
+  let j = n;
+  while (i > 0 && j > 0) {
+    if (before[i - 1] === after[j - 1]) {
+      pairs.push({ beforeIndex: i - 1, afterIndex: j - 1 });
+      i--;
+      j--;
+    } else if ((dp[i - 1]?.[j] ?? 0) >= (dp[i]?.[j - 1] ?? 0)) {
+      i--;
+    } else {
+      j--;
+    }
+  }
+  pairs.reverse();
+  return pairs;
+}
+
+// src/diff/line-diff.ts
+function buildLineDiff(before, after, cache) {
+  const cacheKey = `${before}\0${after}`;
+  const cached = cache.get(cacheKey);
+  if (cached !== void 0) return cached;
+  const beforeLines = before.split("\n");
+  const afterLines = after.split("\n");
+  const result = buildDiffFromSequences(beforeLines, afterLines);
+  cache.set(cacheKey, result);
+  return result;
+}
+function buildDiffFromSequences(before, after) {
+  const pairs = computeLcsPairs(before, after);
+  const result = [];
+  let bi = 0;
+  let ai = 0;
+  let pi = 0;
+  while (bi < before.length || ai < after.length) {
+    const pair = pi < pairs.length ? pairs[pi] : void 0;
+    if (pair?.beforeIndex === bi && pair.afterIndex === ai) {
+      result.push({ kind: "unchanged", value: before[bi] ?? "" });
+      bi++;
+      ai++;
+      pi++;
+    } else if (ai >= after.length || pair !== void 0 && bi < pair.beforeIndex) {
+      result.push({ kind: "removed", value: before[bi] ?? "" });
+      bi++;
+    } else {
+      result.push({ kind: "added", value: after[ai] ?? "" });
+      ai++;
+    }
+  }
+  return result;
+}
+
+// src/diff/char-diff.ts
+function buildCharDiff(before, after) {
+  const beforeChars = Array.from(before);
+  const afterChars = Array.from(after);
+  const pairs = computeLcsPairs(beforeChars, afterChars);
+  const result = [];
+  let bi = 0;
+  let ai = 0;
+  let pi = 0;
+  while (bi < beforeChars.length || ai < afterChars.length) {
+    const pair = pi < pairs.length ? pairs[pi] : void 0;
+    if (pair?.beforeIndex === bi && pair.afterIndex === ai) {
+      result.push({ kind: "unchanged", value: beforeChars[bi] ?? "" });
+      bi++;
+      ai++;
+      pi++;
+    } else if (ai >= afterChars.length || pair !== void 0 && bi < pair.beforeIndex) {
+      result.push({ kind: "removed", value: beforeChars[bi] ?? "" });
+      bi++;
+    } else {
+      result.push({ kind: "added", value: afterChars[ai] ?? "" });
+      ai++;
+    }
+  }
+  return result;
+}
+
+// src/elements/diff-value.ts
+var CONTEXT_LINES = 3;
+function buildInlineDiff(before, after, format) {
+  const b = before ?? "";
+  const a = after ?? "";
+  if (b === "" && a === "") return EMPTY;
+  if (b === a) {
+    return htmlCodeCell(b);
+  }
+  if (format === "simple") {
+    return simpleDiffCell(b, a);
+  }
+  return new InlineCharDiffCell(b, a);
+}
+function buildLargeValueDiff(name, before, after, cache) {
+  const bVal = before ? prettyPrint(before) : null;
+  const aVal = after ? prettyPrint(after) : null;
+  if (bVal === null && aVal === null) return EMPTY;
+  if (bVal !== null && aVal === null) {
+    return buildDetailsBlock(name, new CodeBlock(bVal), 0, 0);
+  }
+  if (bVal === null && aVal !== null) {
+    return buildDetailsBlock(name, new CodeBlock(aVal), 0, 0);
+  }
+  if (bVal === null || aVal === null) return EMPTY;
+  const diff = buildLineDiff(bVal, aVal, cache);
+  const addedLines = diff.filter((e) => e.kind === "added").length;
+  const removedLines = diff.filter((e) => e.kind === "removed").length;
+  const codeContent = diff.map((e) => {
+    const prefix = e.kind === "removed" ? "-" : e.kind === "added" ? "+" : " ";
+    return `${prefix} ${e.value}`;
+  }).join("\n");
+  return buildDetailsBlock(
+    name,
+    new CodeBlock(codeContent, "diff"),
+    addedLines,
+    removedLines
+  );
+}
+function buildLargeValueContextDiff(name, before, after, cache) {
+  const bVal = before ? prettyPrint(before) : null;
+  const aVal = after ? prettyPrint(after) : null;
+  if (bVal === null && aVal === null) return EMPTY;
+  if (bVal === null && aVal !== null) {
+    return buildDetailsBlock(name, new CodeBlock(aVal), 0, 0);
+  }
+  if (bVal !== null && aVal === null) {
+    return buildDetailsBlock(name, new CodeBlock(bVal), 0, 0);
+  }
+  if (bVal === null || aVal === null) return EMPTY;
+  const diff = buildLineDiff(bVal, aVal, cache);
+  return renderContextHunks(name, diff);
+}
+function renderContextHunks(name, diff) {
+  const visible = new Array(diff.length).fill(false);
+  let addedLines = 0;
+  let removedLines = 0;
+  for (let i = 0; i < diff.length; i++) {
+    const entry = diff[i];
+    if (entry === void 0) continue;
+    if (entry.kind !== "unchanged") {
+      if (entry.kind === "added") addedLines++;
+      if (entry.kind === "removed") removedLines++;
+      for (let j = Math.max(0, i - CONTEXT_LINES); j <= Math.min(diff.length - 1, i + CONTEXT_LINES); j++) {
+        visible[j] = true;
+      }
+    }
+  }
+  if (addedLines === 0 && removedLines === 0) return EMPTY;
+  const lines = [];
+  let inGap = false;
+  for (let i = 0; i < diff.length; i++) {
+    if (!visible[i]) {
+      if (!inGap) {
+        lines.push("  ...");
+        inGap = true;
+      }
+      continue;
+    }
+    inGap = false;
+    const entry = diff[i];
+    if (entry === void 0) continue;
+    const prefix = entry.kind === "removed" ? "-" : entry.kind === "added" ? "+" : " ";
+    lines.push(`${prefix} ${entry.value}`);
+  }
+  return buildDetailsBlock(
+    name,
+    new CodeBlock(lines.join("\n"), "diff"),
+    addedLines,
+    removedLines
+  );
+}
+function buildDetailsBlock(name, content, addedLines, removedLines) {
+  const hasDiff = addedLines > 0 || removedLines > 0;
+  const suffix = hasDiff ? ` (large value; +${String(addedLines)}, -${String(removedLines)})` : " (large value)";
+  const summary = detailsSummary(name + suffix);
+  return new Details(summary, content);
+}
+function prettyPrint(value) {
+  const trimmed = value.trim();
+  if (trimmed.startsWith("{") || trimmed.startsWith("[")) {
+    try {
+      const parsed = JSON.parse(trimmed);
+      return JSON.stringify(parsed, null, 2);
+    } catch {
+    }
+  }
+  return value;
+}
+function escapeHtmlCell(value) {
+  return htmlEscape(value).replace(/\|/g, "&#124;");
+}
+function simpleDiffCell(before, after) {
+  return {
+    size(format) {
+      return this.render(format).length;
+    },
+    render(format) {
+      const parts = [];
+      if (before !== "") parts.push(`- ${escapeHtmlCell(before)}`);
+      if (after !== "") parts.push(`+ ${escapeHtmlCell(after)}`);
+      const html = parts.join("<br>");
+      if (format === "markdown") {
+        return html.replace(/\|/g, "&#124;");
+      }
+      return html;
+    }
+  };
+}
+var InlineCharDiffCell = class {
+  before;
+  after;
+  constructor(before, after) {
+    this.before = before;
+    this.after = after;
+  }
+  size(format) {
+    return this.render(format).length;
+  }
+  render(format) {
+    const beforeLines = this.before.split("\n");
+    const afterLines = this.after.split("\n");
+    const maxLen = Math.max(beforeLines.length, afterLines.length);
+    const resultLines = [];
+    for (let i = 0; i < maxLen; i++) {
+      const bl = beforeLines[i] ?? "";
+      const al = afterLines[i] ?? "";
+      if (bl === al) {
+        resultLines.push(escapeHtmlCell(bl));
+        continue;
+      }
+      const charDiff = buildCharDiff(bl, al);
+      let line = "";
+      let delBuf = "";
+      let insBuf = "";
+      const flushBuffers = () => {
+        if (delBuf) {
+          line += `<del style="background:#fdd">${escapeHtmlCell(delBuf)}</del>`;
+          delBuf = "";
+        }
+        if (insBuf) {
+          line += `<ins style="background:#dfd">${escapeHtmlCell(insBuf)}</ins>`;
+          insBuf = "";
+        }
+      };
+      for (const entry of charDiff) {
+        if (entry.kind === "removed") {
+          if (insBuf) {
+            flushBuffers();
+          }
+          delBuf += entry.value;
+        } else if (entry.kind === "added") {
+          insBuf += entry.value;
+        } else {
+          flushBuffers();
+          line += escapeHtmlCell(entry.value);
+        }
+      }
+      flushBuffers();
+      resultLines.push(line);
+    }
+    const html = `<code>${resultLines.join("<br>")}</code>`;
+    if (format === "markdown") {
+      return html.replace(/\|/g, "&#124;");
+    }
+    return html;
+  }
+};
+
+// src/elements/resource.ts
+function buildResourceRenderable(resource, options, diffCache, level, applyContext) {
+  if (level === 0) {
+    return buildListingLine(resource);
+  }
+  return buildDetailsRenderable(
+    resource,
+    options,
+    diffCache,
+    level,
+    applyContext
+  );
+}
+function buildListingLine(resource) {
+  return new ResourceListingLine(resource.action, resource.address);
+}
+function buildDetailsRenderable(resource, options, diffCache, level, applyContext) {
+  const symbol = ACTION_SYMBOLS[resource.action];
+  const instanceName = deriveInstanceName(resource.address, resource.type);
+  const changedAttrs = resource.attributes.filter(
+    (a) => !a.isSensitive && !a.isKnownAfterApply && a.before !== a.after
+  ).map((a) => a.name);
+  const shouldOpen = applyContext !== void 0 && (applyContext.failed || applyContext.diagnostics.length > 0);
+  const summary = new ResourceDetailSummary(
+    symbol,
+    resource.type,
+    instanceName,
+    resource.action === "update" ? changedAttrs : [],
+    applyContext?.failed ?? false
+  );
+  const parts = [];
+  parts.push(new CodeBlock(resource.address));
+  if (resource.importId !== null) {
+    parts.push(new MetadataParagraph("Import ID", resource.importId));
+  }
+  if (resource.movedFromAddress !== null) {
+    parts.push(new MetadataParagraph("Moved from", resource.movedFromAddress));
+  }
+  if (level >= 2) {
+    const attrRenderable = buildAttributeRenderable(
+      resource,
+      options,
+      diffCache,
+      level
+    );
+    if (attrRenderable !== EMPTY) {
+      parts.push(attrRenderable);
+    }
+  }
+  if (applyContext && applyContext.diagnostics.length > 0) {
+    parts.push(buildInlineDiagnostics(applyContext.diagnostics));
+  }
+  const content = new Sequence(parts);
+  return new Details(summary, content, shouldOpen);
+}
+function buildAttributeRenderable(resource, options, diffCache, level) {
+  const diffFormat = options.diffFormat ?? "inline";
+  const useCharDiff = level >= 3;
+  if (resource.allUnknownAfterApply) {
+    return new NoteRenderable("all values known after apply");
+  }
+  if (resource.attributes.length === 0 && resource.hasAttributeDetail) {
+    return new NoteRenderable("No attribute changes.");
+  }
+  if (resource.attributes.length === 0) {
+    return EMPTY;
+  }
+  const parts = [];
+  const smallAttrs = resource.attributes.filter((a) => !a.isLarge);
+  const largeAttrs = resource.attributes.filter((a) => a.isLarge);
+  if (smallAttrs.length > 0) {
+    const headers = [
+      textCell("Attribute"),
+      textCell("Before"),
+      textCell("After")
+    ];
+    const rows = [];
+    for (const attr of smallAttrs) {
+      const skipDiff = attr.isSensitive || attr.isKnownAfterApply;
+      const beforeCell = skipDiff ? htmlCodeCell(attr.before ?? "") : htmlCodeCellMultiline(attr.before ?? "");
+      const afterCell = skipDiff || !useCharDiff ? htmlCodeCell(attr.after ?? "") : buildInlineDiff(attr.before, attr.after, diffFormat);
+      rows.push({
+        cells: [textCell(attr.name), beforeCell, afterCell]
+      });
+    }
+    parts.push(new Table(headers, rows));
+  }
+  for (const attr of largeAttrs) {
+    const block = level === 4 ? buildLargeValueDiff(attr.name, attr.before, attr.after, diffCache) : buildLargeValueContextDiff(
+      attr.name,
+      attr.before,
+      attr.after,
+      diffCache
+    );
+    if (block !== EMPTY) {
+      parts.push(block);
+    }
+  }
+  if (parts.length === 0) return EMPTY;
+  return new Sequence(parts);
+}
+function buildInlineDiagnostics(diagnostics) {
   const errors = diagnostics.filter((d) => d.severity === "error");
   const warnings = diagnostics.filter((d) => d.severity === "warning");
-  if (errors.length > 0) {
-    writer.heading("Errors", headingLevel);
-    for (const diag of errors) {
-      renderDiagnostic(diag, writer);
+  const parts = [];
+  for (const diag of [...errors, ...warnings]) {
+    parts.push(new ResourceDiagnosticLine(diag.severity, diag.summary));
+    if (diag.detail) {
+      parts.push(new CodeBlock(diag.detail));
     }
   }
-  if (warnings.length > 0) {
-    writer.heading("Warnings", headingLevel);
-    for (const diag of warnings) {
-      renderDiagnostic(diag, writer);
-    }
-  }
+  return new Sequence(parts);
 }
-function renderDiagnostic(diag, writer) {
-  const prefix = diag.severity === "error" ? DIAGNOSTIC_ERROR : DIAGNOSTIC_WARNING;
-  const addressSuffix = diag.address !== void 0 ? ` \u2014 \`${diag.address}\`` : "";
-  writer.paragraph(`${prefix} **${escapeHtml(diag.summary)}**${addressSuffix}`);
-  if (diag.detail) {
-    writer.blockquote(escapeHtml(diag.detail));
+var ResourceListingLine = class {
+  action;
+  address;
+  constructor(action, address) {
+    this.action = action;
+    this.address = address;
   }
-  if (diag.snippet !== void 0) {
-    renderSnippet(diag.snippet, diag.range?.filename, writer);
+  size(format) {
+    return this.render(format).length;
   }
-  if (diag.detail || diag.snippet !== void 0) {
-    writer.blankLine();
+  render(format) {
+    const symbol = ACTION_SYMBOLS[this.action];
+    if (format === "markdown") {
+      return `${symbol} ${markdownEscape(this.address)}`;
+    }
+    return `${symbol} ${htmlEscape(this.address)}`;
   }
+};
+var ResourceDetailSummary = class {
+  symbol;
+  type;
+  instanceName;
+  changedAttrs;
+  failed;
+  constructor(symbol, type, instanceName, changedAttrs, failed) {
+    this.symbol = symbol;
+    this.type = type;
+    this.instanceName = instanceName;
+    this.changedAttrs = changedAttrs;
+    this.failed = failed;
+  }
+  size(format) {
+    return this.render(format).length;
+  }
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  render(_format) {
+    let html = `${this.symbol} <strong>${htmlEscape(this.type)}</strong> ${htmlEscape(this.instanceName)}`;
+    if (this.changedAttrs.length > 0) {
+      const hint = this.changedAttrs.slice(0, 5).join(", ");
+      html += ` \u2014 changed: ${htmlEscape(hint)}`;
+    }
+    if (this.failed) {
+      html += ` ${STATUS_FAILURE}`;
+    }
+    return html;
+  }
+};
+var MetadataParagraph = class {
+  label;
+  value;
+  constructor(label, value) {
+    this.label = label;
+    this.value = value;
+  }
+  size(format) {
+    return this.render(format).length;
+  }
+  render(format) {
+    if (format === "markdown") {
+      return `**${markdownEscape(this.label)}:** ${mdCodeSpan(this.value)}
+
+`;
+    }
+    return `<p><strong>${htmlEscape(this.label)}:</strong> <code>${htmlEscape(this.value)}</code></p>
+`;
+  }
+};
+var ResourceDiagnosticLine = class {
+  severity;
+  summary;
+  constructor(severity, summary) {
+    this.severity = severity;
+    this.summary = summary;
+  }
+  size(format) {
+    return this.render(format).length;
+  }
+  render(format) {
+    const icon = this.severity === "error" ? DIAGNOSTIC_ERROR : DIAGNOSTIC_WARNING;
+    if (format === "markdown") {
+      return `${icon} **${markdownEscape(this.summary)}**
+
+`;
+    }
+    return `<p>${icon} <strong>${htmlEscape(this.summary)}</strong></p>
+`;
+  }
+};
+var NoteRenderable = class {
+  text;
+  constructor(text) {
+    this.text = text;
+  }
+  size(format) {
+    return renderNote(this.text, format).length;
+  }
+  render(format) {
+    return renderNote(this.text, format);
+  }
+};
+
+// src/elements/module-group.ts
+function buildModuleGroupRenderable(moduleAddress, resources, options, diffCache, level, applyContextFn) {
+  const heading = new ModuleHeading(moduleAddress);
+  const parts = [heading];
+  for (const resource of resources) {
+    const applyContext = applyContextFn?.(resource.address);
+    parts.push(
+      buildResourceRenderable(
+        resource,
+        options,
+        diffCache,
+        level,
+        applyContext
+      )
+    );
+  }
+  return new Sequence(parts);
 }
-function renderSnippet(snippet, filename, writer) {
-  const location = filename !== void 0 ? `\`${snippet.code}\` in ${escapeHtml(snippet.context)} (\`${filename}\`:${String(snippet.start_line)})` : `\`${snippet.code}\` in ${escapeHtml(snippet.context)}`;
-  writer.blockquote(location);
-  if (snippet.values.length > 0) {
-    for (const val of snippet.values) {
-      writer.blockquote(
-        `${escapeHtml(val.traversal)} = ${escapeHtml(val.statement)}`
-      );
+var ModuleHeading = class {
+  moduleAddress;
+  constructor(moduleAddress) {
+    this.moduleAddress = moduleAddress;
+  }
+  size(format) {
+    return this.render(format).length;
+  }
+  render(format) {
+    const label = this.renderLabel(format);
+    if (format === "markdown") {
+      return `### ${MODULE_ICON} Module: ${label}
+
+`;
+    }
+    return `<h3>${MODULE_ICON} Module: ${label}</h3>
+`;
+  }
+  renderLabel(format) {
+    if (this.moduleAddress === "") return "root";
+    if (format === "markdown") {
+      return mdCodeSpan(this.moduleAddress);
+    }
+    return `<code>${htmlEscape(this.moduleAddress)}</code>`;
+  }
+};
+
+// src/elements/outputs.ts
+function buildOutputsRenderable(outputs, options, diffCache, level) {
+  if (level <= 1) return EMPTY;
+  const useDiff = level >= 3;
+  const diffFormat = options.diffFormat ?? "inline";
+  const smallOutputs = outputs.filter(
+    (o) => !o.isLarge || o.isSensitive || o.isKnownAfterApply
+  );
+  const largeOutputs = outputs.filter(
+    (o) => o.isLarge && !o.isSensitive && !o.isKnownAfterApply
+  );
+  const parts = [];
+  if (smallOutputs.length > 0) {
+    const headers = [
+      textCell("Output"),
+      textCell("Action"),
+      textCell("Before"),
+      textCell("After")
+    ];
+    const rows = [];
+    for (const output of smallOutputs) {
+      const symbol = ACTION_SYMBOLS[output.action];
+      const skipDiff = output.isSensitive || output.isKnownAfterApply || !useDiff;
+      const before = output.isSensitive ? htmlCodeCell("(sensitive)") : output.before !== null ? skipDiff ? htmlCodeCell(output.before) : htmlCodeCellMultiline(output.before) : EMPTY;
+      const after = output.isSensitive ? htmlCodeCell("(sensitive)") : skipDiff ? htmlCodeCell(output.after ?? "") : buildInlineDiff(output.before, output.after, diffFormat);
+      rows.push({
+        cells: [textCell(output.name), textCell(symbol), before, after]
+      });
+    }
+    parts.push(new Table(headers, rows));
+  }
+  for (const output of largeOutputs) {
+    const symbol = ACTION_SYMBOLS[output.action];
+    const label = `${symbol} ${output.name}`;
+    const block = level === 4 ? buildLargeValueDiff(label, output.before, output.after, diffCache) : buildLargeValueContextDiff(
+      label,
+      output.before,
+      output.after,
+      diffCache
+    );
+    if (block !== EMPTY) {
+      parts.push(block);
     }
   }
+  if (parts.length === 0) return EMPTY;
+  return new Sequence(parts);
 }
 
-// src/renderer/apply-context.ts
+// src/elements/categories.ts
+var ResourceCategoryElement = class {
+  id = "resources";
+  fixed = false;
+  levels = 5;
+  levelRenderables;
+  constructor(resources, options, diffCache, applyContextFn) {
+    this.levelRenderables = buildResourceLevels(
+      "Resource Changes",
+      resources,
+      options,
+      diffCache,
+      applyContextFn
+    );
+  }
+  size(format, level) {
+    const r = this.levelRenderables[level];
+    return r ? r.size(format) : 0;
+  }
+  render(format, level) {
+    const r = this.levelRenderables[level];
+    return r ? r.render(format) : "";
+  }
+};
+var DriftCategoryElement = class {
+  fixed = false;
+  levels = 5;
+  id;
+  levelRenderables;
+  constructor(driftResources, options, diffCache) {
+    this.id = "drift";
+    const heading = `${DRIFT_ICON} Resource Drift (${String(driftResources.length)} detected)`;
+    this.levelRenderables = buildResourceLevels(
+      heading,
+      driftResources,
+      options,
+      diffCache
+    );
+  }
+  size(format, level) {
+    const r = this.levelRenderables[level];
+    return r ? r.size(format) : 0;
+  }
+  render(format, level) {
+    const r = this.levelRenderables[level];
+    return r ? r.render(format) : "";
+  }
+};
+var OutputCategoryElement = class {
+  id = "outputs";
+  fixed = false;
+  levels = 5;
+  levelRenderables;
+  constructor(outputs, options, diffCache) {
+    this.levelRenderables = buildOutputLevels(outputs, options, diffCache);
+  }
+  size(format, level) {
+    const r = this.levelRenderables[level];
+    return r ? r.size(format) : 0;
+  }
+  render(format, level) {
+    const r = this.levelRenderables[level];
+    return r ? r.render(format) : "";
+  }
+};
+function buildResourceLevels(headingText, resources, options, diffCache, applyContextFn) {
+  const moduleGroups = groupByModule(resources);
+  const listingLines = resources.map(
+    (r) => `${ACTION_SYMBOLS[r.action]} ${r.address}`
+  );
+  const level0 = new Sequence([
+    new Heading(headingText, 2),
+    new CodeBlock(listingLines.join("\n"))
+  ]);
+  const levels = [level0];
+  for (let lvl = 1; lvl <= 4; lvl++) {
+    const parts = [new Heading(headingText, 2)];
+    for (const mg of moduleGroups) {
+      parts.push(
+        buildModuleGroupRenderable(
+          mg.moduleAddress,
+          mg.resources,
+          options,
+          diffCache,
+          lvl,
+          applyContextFn
+        )
+      );
+    }
+    levels.push(new Sequence(parts));
+  }
+  return levels;
+}
+function buildOutputLevels(outputs, options, diffCache) {
+  const listingLines = outputs.map((o) => {
+    const suffix = o.isSensitive ? " (sensitive)" : "";
+    return `${ACTION_SYMBOLS[o.action]} ${o.name}${suffix}`;
+  });
+  const level0 = new Sequence([
+    new Heading("Output Changes", 2),
+    new CodeBlock(listingLines.join("\n"))
+  ]);
+  const level1 = level0;
+  const levels = [level0, level1];
+  for (let lvl = 2; lvl <= 4; lvl++) {
+    const content = buildOutputsRenderable(outputs, options, diffCache, lvl);
+    if (content === EMPTY) {
+      levels.push(level0);
+    } else {
+      levels.push(new Sequence([new Heading("Output Changes", 2), content]));
+    }
+  }
+  return levels;
+}
+
+// src/elements/apply-context.ts
 function isApplyReport(report) {
   return report.operation === "apply" || report.operation === "destroy";
 }
@@ -2560,1262 +4516,284 @@ function buildApplyContext(address, failedAddresses, diagByAddress) {
     diagnostics: diagByAddress.get(address) ?? []
   };
 }
-function buildApplyContextFn(report) {
-  if (!isApplyReport(report)) return void 0;
-  const failedAddresses = buildFailedSet(report);
-  const diagByAddress = buildDiagnosticMap(report);
-  return (addr) => buildApplyContext(addr, failedAddresses, diagByAddress);
-}
 
-// src/diff/lcs.ts
-var MAX_LCS_CELLS = 1e7;
-function computeLcsPairs(before, after) {
-  const m = before.length;
-  const n = after.length;
-  if (m === 0 || n === 0) return [];
-  if (m * n > MAX_LCS_CELLS) return [];
-  const dp = Array.from(
-    { length: m + 1 },
-    () => new Array(n + 1).fill(0)
-  );
-  for (let i2 = 1; i2 <= m; i2++) {
-    for (let j2 = 1; j2 <= n; j2++) {
-      if (before[i2 - 1] === after[j2 - 1]) {
-        dp[i2][j2] = (dp[i2 - 1]?.[j2 - 1] ?? 0) + 1;
-      } else {
-        dp[i2][j2] = Math.max(
-          dp[i2 - 1]?.[j2] ?? 0,
-          dp[i2]?.[j2 - 1] ?? 0
-        );
-      }
+// src/elements/report-elements.ts
+function buildReportElements(report, options) {
+  const elements = [];
+  if (report.workspace !== void 0) {
+    elements.push(new MarkerElement(report.workspace));
+  }
+  elements.push(new TitleElement(report.title));
+  for (let i = 0; i < report.warnings.length; i++) {
+    const warning = report.warnings[i];
+    if (warning !== void 0) {
+      elements.push(new WarningElement(warning, i));
     }
   }
-  const pairs = [];
-  let i = m;
-  let j = n;
-  while (i > 0 && j > 0) {
-    if (before[i - 1] === after[j - 1]) {
-      pairs.push({ beforeIndex: i - 1, afterIndex: j - 1 });
-      i--;
-      j--;
-    } else if ((dp[i - 1]?.[j] ?? 0) >= (dp[i]?.[j - 1] ?? 0)) {
-      i--;
-    } else {
-      j--;
-    }
+  for (const issue of report.issues) {
+    elements.push(new StepIssueElement(issue));
   }
-  pairs.reverse();
-  return pairs;
+  if (report.error !== void 0) {
+    elements.push(...buildErrorBody(report));
+  } else if (report.summary !== void 0 || report.resources !== void 0) {
+    elements.push(...buildStructuredBody(report, options));
+    elements.push(...buildRawStdoutElements(report));
+  } else if (report.rawStdout.length > 0) {
+    elements.push(...buildTextFallbackBody(report));
+  } else if (report.steps.length > 0) {
+    elements.push(new WorkflowElement(report.steps));
+  }
+  return elements;
 }
-
-// src/diff/char-diff.ts
-function buildCharDiff(before, after) {
-  const beforeChars = Array.from(before);
-  const afterChars = Array.from(after);
-  const pairs = computeLcsPairs(beforeChars, afterChars);
-  const result = [];
-  let bi = 0;
-  let ai = 0;
-  let pi = 0;
-  while (bi < beforeChars.length || ai < afterChars.length) {
-    const pair = pi < pairs.length ? pairs[pi] : void 0;
-    if (pair?.beforeIndex === bi && pair.afterIndex === ai) {
-      result.push({ kind: "unchanged", value: beforeChars[bi] ?? "" });
-      bi++;
-      ai++;
-      pi++;
-    } else if (ai >= afterChars.length || pair !== void 0 && bi < pair.beforeIndex) {
-      result.push({ kind: "removed", value: beforeChars[bi] ?? "" });
-      bi++;
-    } else {
-      result.push({ kind: "added", value: afterChars[ai] ?? "" });
-      ai++;
-    }
+function buildErrorBody(report) {
+  const elements = [];
+  if (report.error !== void 0) {
+    elements.push(new ErrorMessageElement(report.error));
   }
-  return result;
+  if (report.steps.length > 0) {
+    elements.push(new ErrorStepTableElement(report.steps));
+  }
+  return elements;
 }
-
-// src/renderer/diff-format.ts
-function formatDiff(before, after, format) {
-  const b = before ?? "";
-  const a = after ?? "";
-  if (b === "" && a === "") return "";
-  if (b === a) {
-    return MarkdownWriter.inlineCodeCell(b);
-  }
-  if (format === "simple") {
-    const parts = [];
-    if (b !== "")
-      parts.push(
-        `- ${MarkdownWriter.escapeCell(MarkdownWriter.escapeHtml(b))}`
-      );
-    if (a !== "")
-      parts.push(
-        `+ ${MarkdownWriter.escapeCell(MarkdownWriter.escapeHtml(a))}`
-      );
-    return parts.join("<br>");
-  }
-  const beforeLines = b.split("\n");
-  const afterLines = a.split("\n");
-  const maxLen = Math.max(beforeLines.length, afterLines.length);
-  const resultLines = [];
-  for (let i = 0; i < maxLen; i++) {
-    let flushBuffers2 = function() {
-      if (delBuf) {
-        line += `<del style="background:#fdd">${MarkdownWriter.escapeHtmlCell(delBuf)}</del>`;
-        delBuf = "";
-      }
-      if (insBuf) {
-        line += `<ins style="background:#dfd">${MarkdownWriter.escapeHtmlCell(insBuf)}</ins>`;
-        insBuf = "";
-      }
-    };
-    var flushBuffers = flushBuffers2;
-    const bl = beforeLines[i] ?? "";
-    const al = afterLines[i] ?? "";
-    if (bl === al) {
-      resultLines.push(MarkdownWriter.escapeHtmlCell(bl));
-      continue;
-    }
-    const charDiff = buildCharDiff(bl, al);
-    let line = "";
-    let delBuf = "";
-    let insBuf = "";
-    for (const entry of charDiff) {
-      if (entry.kind === "removed") {
-        if (insBuf) {
-          flushBuffers2();
-        }
-        delBuf += entry.value;
-      } else if (entry.kind === "added") {
-        insBuf += entry.value;
-      } else {
-        flushBuffers2();
-        line += MarkdownWriter.escapeHtmlCell(entry.value);
-      }
-    }
-    flushBuffers2();
-    resultLines.push(line);
-  }
-  return `<code>${resultLines.join("<br>")}</code>`;
-}
-
-// src/diff/line-diff.ts
-function buildLineDiff(before, after, cache) {
-  const cacheKey = `${before}\0${after}`;
-  const cached = cache.get(cacheKey);
-  if (cached !== void 0) return cached;
-  const beforeLines = before.split("\n");
-  const afterLines = after.split("\n");
-  const result = buildDiffFromSequences(beforeLines, afterLines);
-  cache.set(cacheKey, result);
-  return result;
-}
-function buildDiffFromSequences(before, after) {
-  const pairs = computeLcsPairs(before, after);
-  const result = [];
-  let bi = 0;
-  let ai = 0;
-  let pi = 0;
-  while (bi < before.length || ai < after.length) {
-    const pair = pi < pairs.length ? pairs[pi] : void 0;
-    if (pair?.beforeIndex === bi && pair.afterIndex === ai) {
-      result.push({ kind: "unchanged", value: before[bi] ?? "" });
-      bi++;
-      ai++;
-      pi++;
-    } else if (ai >= after.length || pair !== void 0 && bi < pair.beforeIndex) {
-      result.push({ kind: "removed", value: before[bi] ?? "" });
-      bi++;
-    } else {
-      result.push({ kind: "added", value: after[ai] ?? "" });
-      ai++;
-    }
-  }
-  return result;
-}
-
-// src/renderer/large-value.ts
-function renderLargeValue(name, before, after, cache) {
-  const bVal = before ? prettyPrint(before) : null;
-  const aVal = after ? prettyPrint(after) : null;
-  if (bVal === null && aVal === null) return "";
-  if (bVal !== null && aVal === null) {
-    return buildDetailsBlock(name, `\`\`\`
-${bVal}
-\`\`\``, 0, 0);
-  }
-  if (bVal === null && aVal !== null) {
-    return buildDetailsBlock(name, `\`\`\`
-${aVal}
-\`\`\``, 0, 0);
-  }
-  if (bVal === null || aVal === null) {
-    return "";
-  }
-  const diff = buildLineDiff(bVal, aVal, cache);
-  const addedLines = diff.filter((e) => e.kind === "added").length;
-  const removedLines = diff.filter((e) => e.kind === "removed").length;
-  const codeContent = diff.map((e) => {
-    const prefix = e.kind === "removed" ? "-" : e.kind === "added" ? "+" : " ";
-    return `${prefix} ${e.value}`;
-  }).join("\n");
-  const fenced = `\`\`\`diff
-${codeContent}
-\`\`\``;
-  return buildDetailsBlock(name, fenced, addedLines, removedLines);
-}
-function buildDetailsBlock(name, content, addedLines, removedLines) {
-  const escapedName = escapeHtml(name);
-  const hasDiff = addedLines > 0 || removedLines > 0;
-  const suffix = hasDiff ? ` (large value; +${String(addedLines)}, -${String(removedLines)})` : " (large value)";
-  return `<details>
-<summary>${escapedName}${suffix}</summary>
-
-${content}
-
-</details>
-`;
-}
-function prettyPrint(value) {
-  const trimmed = value.trim();
-  if (trimmed.startsWith("{") || trimmed.startsWith("[")) {
-    try {
-      const parsed = JSON.parse(trimmed);
-      return JSON.stringify(parsed, null, 2);
-    } catch {
-    }
-  }
-  return value;
-}
-
-// src/diff/context-diff.ts
-var CONTEXT_LINES = 3;
-function renderLargeValueContextDiff(name, before, after, cache) {
-  const bVal = before ? prettyPrint2(before) : null;
-  const aVal = after ? prettyPrint2(after) : null;
-  if (bVal === null && aVal === null) return "";
-  if (bVal === null && aVal !== null) {
-    return buildBlock(name, `\`\`\`
-${aVal}
-\`\`\``, 0, 0);
-  }
-  if (bVal !== null && aVal === null) {
-    return buildBlock(name, `\`\`\`
-${bVal}
-\`\`\``, 0, 0);
-  }
-  if (bVal === null || aVal === null) return "";
-  const diff = buildLineDiff(bVal, aVal, cache);
-  return renderContextHunks(name, diff);
-}
-function renderContextHunks(name, diff) {
-  const visible = new Array(diff.length).fill(false);
-  let addedLines = 0;
-  let removedLines = 0;
-  for (let i = 0; i < diff.length; i++) {
-    const entry = diff[i];
-    if (entry === void 0) continue;
-    if (entry.kind !== "unchanged") {
-      if (entry.kind === "added") addedLines++;
-      if (entry.kind === "removed") removedLines++;
-      for (let j = Math.max(0, i - CONTEXT_LINES); j <= Math.min(diff.length - 1, i + CONTEXT_LINES); j++) {
-        visible[j] = true;
-      }
-    }
-  }
-  if (addedLines === 0 && removedLines === 0) return "";
-  const lines = [];
-  let inGap = false;
-  for (let i = 0; i < diff.length; i++) {
-    if (!visible[i]) {
-      if (!inGap) {
-        lines.push("  ...");
-        inGap = true;
-      }
-      continue;
-    }
-    inGap = false;
-    const entry = diff[i];
-    if (entry === void 0) continue;
-    const prefix = entry.kind === "removed" ? "-" : entry.kind === "added" ? "+" : " ";
-    lines.push(`${prefix} ${entry.value}`);
-  }
-  const fenced = `\`\`\`diff
-${lines.join("\n")}
-\`\`\``;
-  return buildBlock(name, fenced, addedLines, removedLines);
-}
-function buildBlock(name, content, addedLines, removedLines) {
-  const escapedName = escapeHtml(name);
-  const hasDiff = addedLines > 0 || removedLines > 0;
-  const suffix = hasDiff ? ` (large value; +${String(addedLines)}, -${String(removedLines)})` : " (large value)";
-  return `<details>
-<summary>${escapedName}${suffix}</summary>
-
-${content}
-
-</details>
-`;
-}
-function prettyPrint2(value) {
-  const trimmed = value.trim();
-  if (trimmed.startsWith("{") || trimmed.startsWith("[")) {
-    try {
-      const parsed = JSON.parse(trimmed);
-      return JSON.stringify(parsed, null, 2);
-    } catch {
-    }
-  }
-  return value;
-}
-
-// src/renderer/address.ts
-function deriveModuleAddress(address, type) {
-  const typePrefix = `${type}.`;
-  if (address.startsWith(typePrefix)) return "";
-  const dotType = `.${typePrefix}`;
-  const idx = address.lastIndexOf(dotType);
-  if (idx < 0) return "";
-  return address.slice(0, idx);
-}
-function deriveInstanceName(address, type) {
-  const typePrefix = `${type}.`;
-  if (address.startsWith(typePrefix)) return address.slice(typePrefix.length);
-  const dotType = `.${typePrefix}`;
-  const idx = address.lastIndexOf(dotType);
-  if (idx < 0) return address;
-  return address.slice(idx + dotType.length);
-}
-
-// src/renderer/resource.ts
-function renderResource(resource, writer, options, diffCache, mode = "full", applyContext) {
-  const symbol = ACTION_SYMBOLS[resource.action];
-  const changedAttrs = resource.attributes.filter(
-    (a) => !a.isSensitive && !a.isKnownAfterApply && a.before !== a.after
-  ).map((a) => a.name);
-  let summaryText = `${symbol} <strong>${MarkdownWriter.escapeHtml(resource.type)}</strong> ${MarkdownWriter.escapeHtml(deriveInstanceName(resource.address, resource.type))}`;
-  if (resource.action === "update" && changedAttrs.length > 0) {
-    const hint = changedAttrs.slice(0, 5).join(", ");
-    summaryText += ` \u2014 changed: ${MarkdownWriter.escapeHtml(hint)}`;
-  }
-  if (applyContext?.failed) {
-    summaryText += ` ${STATUS_FAILURE}`;
-  }
-  const shouldOpen = applyContext !== void 0 && (applyContext.failed || applyContext.diagnostics.length > 0);
-  writer.detailsOpenHtml(summaryText, shouldOpen);
-  writer.codeFence(resource.address);
-  if (resource.importId !== null) {
-    writer.paragraph(
-      `**Import ID:** ${MarkdownWriter.inlineCode(resource.importId)}`
-    );
-  }
-  if (resource.movedFromAddress !== null) {
-    writer.paragraph(
-      `**Moved from:** ${MarkdownWriter.inlineCode(resource.movedFromAddress)}`
-    );
-  }
-  if (mode !== "compact") {
-    renderAttributes(resource, writer, options, diffCache, mode);
-  }
-  if (applyContext && applyContext.diagnostics.length > 0) {
-    renderInlineDiagnostics(applyContext.diagnostics, writer);
-  }
-  writer.detailsClose();
-}
-function renderAttributes(resource, writer, options, diffCache, mode) {
-  const smallAttrs = resource.attributes.filter((a) => !a.isLarge);
-  const largeAttrs = resource.attributes.filter((a) => a.isLarge);
-  const useCharDiff = mode === "attrs-char-diff" || mode === "full";
-  const diffFormat = options.diffFormat ?? "inline";
-  if (resource.allUnknownAfterApply) {
-    writer.paragraph("_(all values known after apply)_");
-  } else if (resource.attributes.length === 0 && resource.hasAttributeDetail) {
-    writer.paragraph("_No attribute changes._");
-  } else if (resource.attributes.length > 0) {
-    if (smallAttrs.length > 0) {
-      writer.tableHeader(["Attribute", "Before", "After"]);
-      for (const attr of smallAttrs) {
-        const skipDiff = attr.isSensitive || attr.isKnownAfterApply;
-        const beforeCell = skipDiff ? MarkdownWriter.inlineCodeCell(attr.before ?? "") : `<code>${MarkdownWriter.escapeHtmlCell(attr.before ?? "").replace(/\n/g, "<br>")}</code>`;
-        const afterCell = skipDiff || !useCharDiff ? MarkdownWriter.inlineCodeCell(attr.after ?? "") : formatDiff(attr.before, attr.after, diffFormat);
-        writer.tableRow([
-          MarkdownWriter.escapeCell(MarkdownWriter.escapeHtml(attr.name)),
-          beforeCell,
-          afterCell
-        ]);
-      }
-      writer.blankLine();
-    }
-    for (const attr of largeAttrs) {
-      const block = mode === "full" ? renderLargeValue(attr.name, attr.before, attr.after, diffCache) : renderLargeValueContextDiff(
-        attr.name,
-        attr.before,
-        attr.after,
-        diffCache
-      );
-      if (block) {
-        writer.raw(block);
-      }
-    }
-  }
-}
-function renderInlineDiagnostics(diagnostics, writer) {
-  const errors = diagnostics.filter((d) => d.severity === "error");
-  const warnings = diagnostics.filter((d) => d.severity === "warning");
-  for (const diag of [...errors, ...warnings]) {
-    const prefix = diag.severity === "error" ? DIAGNOSTIC_ERROR : DIAGNOSTIC_WARNING;
-    writer.paragraph(
-      `${prefix} **${MarkdownWriter.escapeHtml(diag.summary)}**`
-    );
-    if (diag.detail) {
-      writer.codeFence(diag.detail);
-    }
-  }
-}
-
-// src/renderer/module-section.ts
-function groupByModule(resources) {
-  const map = /* @__PURE__ */ new Map();
-  for (const resource of resources) {
-    const moduleAddr = deriveModuleAddress(resource.address, resource.type);
-    let group = map.get(moduleAddr);
-    if (!group) {
-      group = [];
-      map.set(moduleAddr, group);
-    }
-    group.push(resource);
-  }
-  return [...map.entries()].sort(([a], [b]) => {
-    if (a === "") return -1;
-    if (b === "") return 1;
-    return a.localeCompare(b);
-  }).map(([moduleAddress, grouped]) => ({ moduleAddress, resources: grouped }));
-}
-function moduleLabel(moduleAddress) {
-  return moduleAddress === "" ? "root" : `\`${moduleAddress}\``;
-}
-function renderModuleSection(moduleGroup, writer, options, diffCache, mode, applyContextFn) {
-  const label = moduleLabel(moduleGroup.moduleAddress);
-  writer.heading(`${MODULE_ICON} Module: ${label}`, 3);
-  for (const resource of moduleGroup.resources) {
-    const applyContext = applyContextFn?.(resource.address);
-    renderResource(resource, writer, options, diffCache, mode, applyContext);
-  }
-}
-
-// src/renderer/outputs.ts
-function renderOutputs(outputs, writer, options, diffCache, mode = "full") {
-  if (mode === "compact") return;
-  const useDiff = mode === "attrs-char-diff" || mode === "full";
-  const diffFormat = options.diffFormat ?? "inline";
-  const smallOutputs = outputs.filter(
-    (o) => !o.isLarge || o.isSensitive || o.isKnownAfterApply
-  );
-  const largeOutputs = outputs.filter(
-    (o) => o.isLarge && !o.isSensitive && !o.isKnownAfterApply
-  );
-  if (smallOutputs.length > 0) {
-    writer.tableHeader(["Output", "Action", "Before", "After"]);
-    for (const output of smallOutputs) {
-      const symbol = ACTION_SYMBOLS[output.action];
-      const skipDiff = output.isSensitive || output.isKnownAfterApply || !useDiff;
-      const before = output.isSensitive ? MarkdownWriter.inlineCode("(sensitive)") : output.before !== null ? skipDiff ? MarkdownWriter.inlineCodeCell(output.before) : `<code>${MarkdownWriter.escapeHtmlCell(output.before).replace(/\n/g, "<br>")}</code>` : "";
-      const after = output.isSensitive ? MarkdownWriter.inlineCode("(sensitive)") : skipDiff ? MarkdownWriter.inlineCodeCell(output.after ?? "") : formatDiff(output.before, output.after, diffFormat);
-      writer.tableRow([
-        MarkdownWriter.escapeCell(output.name),
-        symbol,
-        before,
-        after
-      ]);
-    }
-    writer.blankLine();
-  }
-  for (const output of largeOutputs) {
-    const symbol = ACTION_SYMBOLS[output.action];
-    const label = `${symbol} ${output.name}`;
-    const block = mode === "full" ? renderLargeValue(label, output.before, output.after, diffCache) : renderLargeValueContextDiff(
-      label,
-      output.before,
-      output.after,
-      diffCache
-    );
-    if (block) {
-      writer.raw(block);
-    }
-  }
-}
-
-// src/renderer/index.ts
-function ensureTrailingBlankLine(content) {
-  const trimmed = content.replace(/\n+$/, "");
-  return trimmed + "\n\n";
-}
-function renderStructuredSections(report, options = {}) {
+function buildStructuredBody(report, options) {
   const diffCache = /* @__PURE__ */ new Map();
   const isApply = isApplyReport(report);
   const summaryHeading = isApply ? "Apply Summary" : "Plan Summary";
-  const summary = report.summary;
   const resources = report.resources ?? [];
   const outputs = report.outputs ?? [];
   const driftResources = report.driftResources ?? [];
-  const sections = [];
+  const elements = [];
   const failedAddresses = buildFailedSet(report);
   const diagByAddress = buildDiagnosticMap(report);
   const nonResourceDiags = extractNonResourceDiagnostics(report);
   const applyContextFn = isApply ? (addr) => buildApplyContext(addr, failedAddresses, diagByAddress) : void 0;
-  if (options.title) {
-    sections.push({
-      id: "user-title",
-      full: `## ${options.title}
-
-`,
-      fixed: true
-    });
+  const renderOpts = {
+    diffFormat: options?.diffFormat,
+    showUnchangedAttributes: options?.showUnchangedAttributes
+  };
+  if (options?.title) {
+    elements.push(new UserTitleElement(options.title));
   }
-  {
-    const writer = new MarkdownWriter();
-    writer.heading(summaryHeading, 2);
-    if (summary) {
-      renderSummary(summary, writer, isApply);
-    }
-    sections.push({
-      id: "summary",
-      full: ensureTrailingBlankLine(writer.build()),
-      fixed: true
-    });
-  }
+  elements.push(new SummaryElement(summaryHeading, report.summary, isApply));
   if (nonResourceDiags.length > 0) {
-    const writer = new MarkdownWriter();
-    renderDiagnostics(nonResourceDiags, writer, 2);
-    sections.push({
-      id: "non-resource-diagnostics",
-      full: ensureTrailingBlankLine(writer.build()),
-      fixed: true
-    });
+    elements.push(
+      new DiagnosticsElement("non-resource-diagnostics", nonResourceDiags, 2)
+    );
   }
   if (driftResources.length > 0) {
-    sections.push(...renderDriftSections(driftResources, options, diffCache));
+    elements.push(
+      new DriftCategoryElement(driftResources, renderOpts, diffCache)
+    );
   }
-  const moduleGroups = groupByModule(resources);
-  if (moduleGroups.length > 0) {
-    sections.push(
-      ...renderResourceSections(
-        moduleGroups,
-        options,
+  if (resources.length > 0) {
+    elements.push(
+      new ResourceCategoryElement(
+        resources,
+        renderOpts,
         diffCache,
         applyContextFn
       )
     );
   }
   if (outputs.length > 0) {
-    const writer = new MarkdownWriter();
-    writer.heading("Output Changes", 2);
-    renderOutputs(outputs, writer, options, diffCache);
-    sections.push({
-      id: "outputs",
-      full: ensureTrailingBlankLine(writer.build())
-    });
+    elements.push(new OutputCategoryElement(outputs, renderOpts, diffCache));
   }
-  return sections;
+  return elements;
 }
-function renderResourceSections(moduleGroups, options, diffCache, applyContextFn) {
-  const sections = [];
-  const hw = new MarkdownWriter();
-  hw.heading("Resource Changes", 2);
-  sections.push({
-    id: "resource-changes-heading",
-    full: ensureTrailingBlankLine(hw.build()),
-    fixed: true
-  });
-  for (const moduleGroup of moduleGroups) {
-    const label = moduleLabel(moduleGroup.moduleAddress);
-    const mw = new MarkdownWriter();
-    renderModuleSection(
-      moduleGroup,
-      mw,
-      options,
-      diffCache,
-      "full",
-      applyContextFn
-    );
-    sections.push({
-      id: `module-${moduleGroup.moduleAddress || "root"}`,
-      full: ensureTrailingBlankLine(mw.build()),
-      compact: `### ${label}
-
-_(details omitted)_
-
-`
-    });
-  }
-  return sections;
-}
-function renderDriftSections(driftResources, options, diffCache) {
-  const sections = [];
-  const hw = new MarkdownWriter();
-  hw.heading(
-    `${DRIFT_ICON} Resource Drift (${String(driftResources.length)} detected)`,
-    2
+function buildRawStdoutElements(report) {
+  return report.rawStdout.map(
+    (raw) => new RawStdoutElement(raw.stepId, raw.label, raw.content)
   );
-  sections.push({
-    id: "drift-heading",
-    full: ensureTrailingBlankLine(hw.build()),
-    fixed: true
-  });
-  const driftModules = groupByModule(driftResources);
-  for (const moduleGroup of driftModules) {
-    const label = moduleLabel(moduleGroup.moduleAddress);
-    const mw = new MarkdownWriter();
-    renderModuleSection(moduleGroup, mw, options, diffCache, "full");
-    sections.push({
-      id: `drift-module-${moduleGroup.moduleAddress || "root"}`,
-      full: ensureTrailingBlankLine(mw.build()),
-      compact: `### ${label}
-
-_(details omitted)_
-
-`
-    });
-  }
-  return sections;
 }
-
-// src/renderer/title.ts
-function renderTitle(report) {
-  return {
-    id: "title",
-    full: `## ${report.title}
-
-`,
-    fixed: true
-  };
-}
-function renderWorkspaceMarker(report) {
-  const workspace = getWorkspace(report);
-  if (workspace === void 0) return void 0;
-  return {
-    id: "marker",
-    full: `<!-- tf-report-action:"${escapeMarkerWorkspace(workspace)}" -->
-`,
-    fixed: true
-  };
-}
-function getWorkspace(report) {
-  return report.workspace;
-}
-function escapeMarkerWorkspace(workspace) {
-  return workspace.replace(/\\/g, "\\\\").replace(/"/g, '\\"').replace(/--/g, "-\u200B-");
-}
-
-// src/raw-formatter/validate.ts
-function tryFormatValidateOutput(content) {
-  let parsed;
-  try {
-    parsed = JSON.parse(content);
-  } catch {
-    return void 0;
-  }
-  if (typeof parsed !== "object" || parsed === null || Array.isArray(parsed)) {
-    return void 0;
-  }
-  const obj = parsed;
-  if (!("valid" in obj) || typeof obj["valid"] !== "boolean" || !("diagnostics" in obj) || !Array.isArray(obj["diagnostics"])) {
-    return void 0;
-  }
-  const valid = obj["valid"];
-  const diagnostics = obj["diagnostics"].filter(
-    (d) => typeof d === "object" && d !== null && !Array.isArray(d)
+function buildTextFallbackBody(report) {
+  return report.rawStdout.map(
+    (raw) => new TextFallbackElement(raw.stepId, raw.label, raw.content)
   );
-  let output = "";
-  if (valid) {
-    output += `${STATUS_SUCCESS} Configuration is valid
+}
 
-`;
-  } else {
-    output += `${STATUS_FAILURE} Configuration is **invalid**
-
-`;
-  }
-  if (diagnostics.length > 0) {
-    for (const diag of diagnostics) {
-      const severity = typeof diag["severity"] === "string" ? diag["severity"] : "error";
-      const icon = severity === "warning" ? DIAGNOSTIC_WARNING : DIAGNOSTIC_ERROR;
-      const summary = typeof diag["summary"] === "string" ? diag["summary"] : "(unknown)";
-      const detail = typeof diag["detail"] === "string" ? diag["detail"] : "";
-      output += `${icon} **${escapeHtml(summary)}**
-`;
-      if (detail) {
-        const detailLines = escapeHtml(detail).split("\n").map((l) => `> ${l}`).join("\n");
-        output += `${detailLines}
-`;
+// src/elements/composed-report.ts
+var UPGRADE_PRIORITY = /* @__PURE__ */ new Map([
+  ["resources", 0],
+  ["outputs", 1],
+  ["drift", 2]
+]);
+function composeReport(elements) {
+  return new ComposedReportImpl(elements);
+}
+var ComposedReportImpl = class {
+  elements;
+  /** Flex entries for elements that can be degraded. */
+  flexEntries;
+  constructor(elements) {
+    this.elements = elements;
+    const flex = [];
+    for (const [idx, el] of elements.entries()) {
+      if (!el.fixed && el.levels > 1) {
+        flex.push({ idx, el, level: 0 });
       }
-      const snippet = diag["snippet"];
-      if (snippet && typeof snippet["code"] === "string") {
-        const lineInfo = typeof snippet["start_line"] === "number" ? ` (line ${String(snippet["start_line"])})` : "";
-        const ctx = typeof snippet["context"] === "string" ? ` in ${escapeHtml(snippet["context"])}` : "";
-        output += `> \`${snippet["code"]}\`${ctx}${lineInfo}
-`;
+    }
+    this.flexEntries = flex;
+  }
+  fullSize(format) {
+    let total = 0;
+    for (const el of this.elements) {
+      total += el.size(format, el.levels - 1);
+    }
+    return total;
+  }
+  render(format, limit) {
+    const maxLevels = this.elements.map((el) => el.levels - 1);
+    if (limit === void 0 || limit === Infinity) {
+      return this.renderAtLevels(format, maxLevels, false);
+    }
+    let fixedCost = 0;
+    for (const el of this.elements) {
+      if (el.fixed || el.levels <= 1) {
+        fixedCost += el.size(format, el.levels - 1);
       }
-      output += "\n";
     }
-  }
-  output += `<details>
-<summary>Show raw JSON</summary>
-
-\`\`\`json
-${content}
-\`\`\`
-
-</details>`;
-  return output;
-}
-
-// src/raw-formatter/index.ts
-function formatRawOutput(content) {
-  const trimmed = content.trim();
-  if (trimmed === "") return "```\n(empty)\n```";
-  const validateResult = tryFormatValidateOutput(trimmed);
-  if (validateResult !== void 0) return validateResult;
-  const jsonlResult = tryFormatJsonLines(trimmed);
-  if (jsonlResult !== void 0) return jsonlResult;
-  return `\`\`\`\`
-${content}
-\`\`\`\``;
-}
-
-// src/renderer/step-issue.ts
-function renderStepIssue(issue) {
-  const icon = issue.isFailed ? STATUS_FAILURE : DIAGNOSTIC_WARNING;
-  let content = `### ${icon} ${issue.heading}
-
-`;
-  if (issue.exitCode !== void 0) {
-    content += `Exit code: \`${issue.exitCode}\`
-
-`;
-  }
-  if (issue.diagnostic !== void 0) {
-    content += `> ${issue.diagnostic}
-
-`;
-  }
-  if (issue.stdout !== void 0) {
-    const displayContent = issue.stdoutTruncated === true ? issue.stdout + "\n\u2026 (truncated)" : issue.stdout;
-    const formatted = formatRawOutput(displayContent);
-    content += `<details open>
-<summary>stdout</summary>
-
-${formatted}
-
-</details>
-
-`;
-  } else if (issue.stdoutError !== void 0) {
-    content += `> ${DIAGNOSTIC_WARNING} stdout not available: ${issue.stdoutError}
-
-`;
-  }
-  if (issue.stderr !== void 0) {
-    const displayContent = issue.stderrTruncated === true ? issue.stderr + "\n\u2026 (truncated)" : issue.stderr;
-    const formattedStderr = formatRawOutput(displayContent);
-    content += `<details open>
-<summary>stderr</summary>
-
-${formattedStderr}
-
-</details>
-
-`;
-  } else if (issue.stderrError !== void 0) {
-    content += `> ${DIAGNOSTIC_WARNING} stderr not available: ${issue.stderrError}
-
-`;
-  }
-  if (issue.stdout === void 0 && issue.stderr === void 0 && issue.stdoutError === void 0 && issue.stderrError === void 0) {
-    content += "No output captured.\n\n";
-  }
-  return {
-    id: `issue-${issue.id}`,
-    full: content,
-    compact: `### ${icon} ${issue.heading}
-
-`
-  };
-}
-
-// src/renderer/text-fallback.ts
-function renderTextFallbackBody(report) {
-  const sections = [];
-  for (const raw of report.rawStdout) {
-    const displayContent = raw.truncated ? raw.content + "\n\u2026 (truncated)" : raw.content;
-    sections.push({
-      id: `raw-${raw.stepId}`,
-      full: `### ${raw.label}
-
-${formatRawOutput(displayContent)}
-
-`,
-      compact: `### ${raw.label}
-
-_(omitted due to size)_
-
-`
-    });
-  }
-  return sections;
-}
-
-// src/renderer/step-table.ts
-function renderStepStatusTable(steps, excludeIds) {
-  const filtered = excludeIds ? steps.filter((s) => !excludeIds.has(s.id)) : steps;
-  if (filtered.length === 0) return "";
-  const hasExitCodes = filtered.some((s) => s.exitCode !== void 0);
-  if (hasExitCodes) {
-    let table2 = "| Step | Outcome | Exit Code |\n|------|--------|----------|\n";
-    for (const step of filtered) {
-      const exitCode = step.exitCode !== void 0 ? `\`${step.exitCode}\`` : "";
-      table2 += `| \`${step.id}\` | ${step.outcome} | ${exitCode} |
-`;
+    if (this.flexEntries.length === 0) {
+      const truncated2 = fixedCost > limit;
+      return this.renderAtLevels(format, maxLevels, truncated2);
     }
-    return table2 + "\n";
-  }
-  let table = "| Step | Outcome |\n|------|--------|\n";
-  for (const step of filtered) {
-    table += `| \`${step.id}\` | ${step.outcome} |
-`;
-  }
-  return table + "\n";
-}
-
-// src/renderer/workflow.ts
-function renderWorkflowBody(report) {
-  const stepTable = renderStepStatusTable(report.steps);
-  return [{ id: "step-table", full: `### Steps
-
-${stepTable}` }];
-}
-
-// src/renderer/error.ts
-function renderErrorBody(report) {
-  const sections = [];
-  if (report.error !== void 0) {
-    sections.push({ id: "message", full: `${report.error}
-
-` });
-  }
-  if (report.steps.length > 0) {
-    const stepTable = renderStepStatusTable(report.steps);
-    if (stepTable.length > 0) {
-      sections.push({ id: "step-statuses", full: `### Steps
-
-${stepTable}` });
+    const levels = [...maxLevels];
+    const entries = this.flexEntries.map((e) => ({ ...e, level: 0 }));
+    for (const entry of entries) {
+      levels[entry.idx] = 0;
     }
-  }
-  return sections;
-}
-
-// src/renderer/report-sections.ts
-function renderReportSections(report, options) {
-  const sections = [];
-  const marker = renderWorkspaceMarker(report);
-  if (marker !== void 0) {
-    sections.push(marker);
-  }
-  sections.push(renderTitle(report));
-  for (const [i, warning] of report.warnings.entries()) {
-    sections.push({
-      id: `warning-${String(i)}`,
-      full: `> ${DIAGNOSTIC_WARNING} **Warning:** ${warning}
-
-`,
-      fixed: true
-    });
-  }
-  for (const issue of report.issues) {
-    sections.push(renderStepIssue(issue));
-  }
-  if (report.error !== void 0) {
-    sections.push(...renderErrorBody(report));
-  } else if (report.summary !== void 0 || report.resources !== void 0) {
-    const { title: _discardTitle, ...renderOptsNoTitle } = options ?? {};
-    sections.push(...renderStructuredSections(report, renderOptsNoTitle));
-    sections.push(...renderRawStdoutSections(report));
-  } else if (report.rawStdout.length > 0) {
-    sections.push(...renderTextFallbackBody(report));
-  } else if (report.steps.length > 0) {
-    sections.push(...renderWorkflowBody(report));
-  }
-  return sections;
-}
-function renderRawStdoutSections(report) {
-  const sections = [];
-  for (const raw of report.rawStdout) {
-    const displayContent = raw.truncated ? raw.content + "\n\u2026 (truncated)" : raw.content;
-    const formatted = formatRawOutput(displayContent);
-    const escapedLabel = MarkdownWriter.escapeHtml(raw.label);
-    const full = `<details><summary>${escapedLabel}</summary>
-
-${formatted}
-
-</details>
-
-`;
-    sections.push({ id: `raw-${raw.stepId}`, full });
-  }
-  return sections;
-}
-
-// src/compose/listing.ts
-function renderResourceListing(heading, resources, maxLength) {
-  const lines = resources.map(
-    (r) => `${ACTION_SYMBOLS[r.action]} ${r.address}`
-  );
-  return buildListing(heading, lines, maxLength);
-}
-function renderOutputListing(heading, outputs, maxLength) {
-  const lines = outputs.map((o) => {
-    const suffix = o.isSensitive ? " (sensitive)" : "";
-    return `${ACTION_SYMBOLS[o.action]} ${o.name}${suffix}`;
-  });
-  return buildListing(heading, lines, maxLength);
-}
-function buildListing(heading, lines, maxLength) {
-  const headerLine = `## ${heading}
-`;
-  const fenceOpen = "```\n";
-  const fenceClose = "\n```\n";
-  if (maxLength === void 0) {
-    return headerLine + fenceOpen + lines.join("\n") + fenceClose;
-  }
-  const overhead = headerLine.length + fenceOpen.length + fenceClose.length;
-  let remaining = maxLength - overhead;
-  const shown = [];
-  for (let i = 0; i < lines.length; i++) {
-    const line = lines[i];
-    if (line === void 0) continue;
-    const lineLen = shown.length > 0 ? line.length + 1 : line.length;
-    const moreItems = lines.length - (i + 1);
-    const omittedSuffix = moreItems > 0 ? `
-... and ${String(moreItems)} more` : "";
-    const neededForRest = omittedSuffix.length;
-    if (lineLen + neededForRest <= remaining) {
-      shown.push(line);
-      remaining -= lineLen;
-    } else {
-      const totalOmitted = lines.length - shown.length;
-      if (totalOmitted > 0) {
-        shown.push(`... and ${String(totalOmitted)} more`);
+    let currentTotal = this.totalSize(format, levels);
+    if (currentTotal > limit) {
+      return this.renderAtLevels(format, levels, true);
+    }
+    let maxFlexLevel = 0;
+    for (const entry of entries) {
+      const ml = entry.el.levels - 1;
+      if (ml > maxFlexLevel) maxFlexLevel = ml;
+    }
+    for (let targetLevel = 1; targetLevel <= maxFlexLevel; targetLevel++) {
+      let candidateTotal = fixedCost;
+      const candidateLevels = [];
+      for (const entry of entries) {
+        const newLevel = Math.min(targetLevel, entry.el.levels - 1);
+        candidateLevels.push(newLevel);
+        candidateTotal += entry.el.size(format, newLevel);
       }
-      break;
-    }
-  }
-  return headerLine + fenceOpen + shown.join("\n") + fenceClose;
-}
-
-// src/compose/category-renderer.ts
-function tierToMode(tier) {
-  switch (tier) {
-    case 1:
-      return "compact";
-    case 2:
-      return "compact";
-    case 3:
-      return "attrs-no-diff";
-    case 4:
-      return "attrs-char-diff";
-    case 5:
-      return "full";
-  }
-}
-function renderCategoryAtTier(category, tier, report, options, diffCache, maxLength) {
-  switch (category) {
-    case "resources":
-      return renderResourcesAtTier(tier, report, options, diffCache, maxLength);
-    case "outputs":
-      return renderOutputsAtTier(tier, report, options, diffCache, maxLength);
-    case "drift":
-      return renderDriftAtTier(tier, report, options, diffCache, maxLength);
-  }
-}
-function renderResourcesAtTier(tier, report, options, diffCache, maxLength) {
-  const resources = report.resources ?? [];
-  if (resources.length === 0) return "";
-  if (tier === 1) {
-    return renderResourceListing("Resource Changes", resources, maxLength);
-  }
-  const mode = tierToMode(tier);
-  const moduleGroups = groupByModule(resources);
-  const applyContextFn = buildApplyContextFn(report);
-  const writer = new MarkdownWriter();
-  writer.heading("Resource Changes", 2);
-  for (const moduleGroup of moduleGroups) {
-    renderModuleSection(
-      moduleGroup,
-      writer,
-      options,
-      diffCache,
-      mode,
-      applyContextFn
-    );
-  }
-  return ensureTrailingBlankLine(writer.build());
-}
-function renderOutputsAtTier(tier, report, options, diffCache, maxLength) {
-  const outputs = report.outputs ?? [];
-  if (outputs.length === 0) return "";
-  if (tier === 1) {
-    return renderOutputListing("Output Changes", outputs, maxLength);
-  }
-  const mode = tierToMode(tier);
-  const writer = new MarkdownWriter();
-  writer.heading("Output Changes", 2);
-  renderOutputs(outputs, writer, options, diffCache, mode);
-  return ensureTrailingBlankLine(writer.build());
-}
-function renderDriftAtTier(tier, report, options, diffCache, maxLength) {
-  const driftResources = report.driftResources ?? [];
-  if (driftResources.length === 0) return "";
-  if (tier === 1) {
-    return renderResourceListing(
-      `${DRIFT_ICON} Resource Drift (${String(driftResources.length)} detected)`,
-      driftResources,
-      maxLength
-    );
-  }
-  const mode = tierToMode(tier);
-  const moduleGroups = groupByModule(driftResources);
-  const writer = new MarkdownWriter();
-  writer.heading(
-    `${DRIFT_ICON} Resource Drift (${String(driftResources.length)} detected)`,
-    2
-  );
-  for (const moduleGroup of moduleGroups) {
-    renderModuleSection(moduleGroup, writer, options, diffCache, mode);
-  }
-  return ensureTrailingBlankLine(writer.build());
-}
-
-// src/compose/progressive.ts
-var UPGRADE_PRIORITY = ["resources", "outputs", "drift"];
-var DISPLAY_ORDER = ["drift", "resources", "outputs"];
-var TIERS = [1, 2, 3, 4, 5];
-function composeProgressively(prefix, suffix, report, options, budget) {
-  const diffCache = /* @__PURE__ */ new Map();
-  const fixedLen = prefix.length + suffix.length;
-  const activeCategories = UPGRADE_PRIORITY.filter(
-    (c) => categoryHasContent(c, report)
-  );
-  if (activeCategories.length === 0) {
-    return { markdown: prefix + suffix, wasTruncated: false };
-  }
-  const tierMap = /* @__PURE__ */ new Map();
-  const contentMap = /* @__PURE__ */ new Map();
-  for (const cat of activeCategories) {
-    tierMap.set(cat, 1);
-    contentMap.set(cat, "");
-  }
-  for (const cat of activeCategories) {
-    contentMap.set(
-      cat,
-      renderCategoryAtTier(cat, 1, report, options, diffCache)
-    );
-  }
-  const tier1Total = fixedLen + [...contentMap.values()].reduce((s, c) => s + c.length, 0);
-  if (tier1Total > budget) {
-    const categoryBudget = budget - fixedLen;
-    let spent = 0;
-    for (const cat of activeCategories) {
-      const available = Math.max(0, categoryBudget - spent);
-      const content = renderCategoryAtTier(
-        cat,
-        1,
-        report,
-        options,
-        diffCache,
-        available
-      );
-      contentMap.set(cat, content);
-      spent += content.length;
-    }
-  }
-  for (const targetTier of TIERS.slice(1)) {
-    const candidates = /* @__PURE__ */ new Map();
-    let allFit = true;
-    for (const cat of activeCategories) {
-      const currentTier = tierMap.get(cat) ?? 1;
-      if (currentTier >= targetTier) continue;
-      const candidateContent = renderCategoryAtTier(
-        cat,
-        targetTier,
-        report,
-        options,
-        diffCache
-      );
-      const otherContent = totalContentExcluding(contentMap, cat);
-      const totalSize = fixedLen + otherContent + candidateContent.length;
-      if (totalSize <= budget) {
-        candidates.set(cat, candidateContent);
+      for (const el of this.elements) {
+        if (!el.fixed && el.levels <= 1) {
+          candidateTotal += el.size(format, 0);
+        }
+      }
+      if (candidateTotal <= limit) {
+        for (const [i, entry] of entries.entries()) {
+          const cl = candidateLevels[i];
+          if (cl !== void 0) {
+            entry.level = cl;
+            levels[entry.idx] = cl;
+          }
+        }
+        currentTotal = candidateTotal;
       } else {
-        allFit = false;
         break;
       }
     }
-    if (!allFit) break;
-    for (const [cat, content] of candidates) {
-      tierMap.set(cat, targetTier);
-      contentMap.set(cat, content);
-    }
-  }
-  for (const targetTier of TIERS.slice(1)) {
-    for (const cat of activeCategories) {
-      const currentTier = tierMap.get(cat) ?? 1;
-      if (currentTier >= targetTier) continue;
-      const candidateContent = renderCategoryAtTier(
-        cat,
-        targetTier,
-        report,
-        options,
-        diffCache
-      );
-      const otherContent = totalContentExcluding(contentMap, cat);
-      const totalSize = fixedLen + otherContent + candidateContent.length;
-      if (totalSize <= budget) {
-        tierMap.set(cat, targetTier);
-        contentMap.set(cat, candidateContent);
+    const sortedEntries = [...entries].sort((a, b) => {
+      const pa = UPGRADE_PRIORITY.get(a.el.id) ?? 99;
+      const pb = UPGRADE_PRIORITY.get(b.el.id) ?? 99;
+      if (pa !== pb) return pa - pb;
+      return a.idx - b.idx;
+    });
+    for (const entry of sortedEntries) {
+      const maxLevel = entry.el.levels - 1;
+      for (let targetLevel = entry.level + 1; targetLevel <= maxLevel; targetLevel++) {
+        const oldSize = entry.el.size(format, entry.level);
+        const newSize = entry.el.size(format, targetLevel);
+        const delta = newSize - oldSize;
+        if (currentTotal + delta <= limit) {
+          entry.level = targetLevel;
+          levels[entry.idx] = targetLevel;
+          currentTotal += delta;
+        } else {
+          break;
+        }
       }
     }
+    const truncated = entries.some(
+      (entry) => entry.level < entry.el.levels - 1
+    );
+    return this.renderAtLevels(format, levels, truncated);
   }
-  const parts = [prefix];
-  for (const cat of DISPLAY_ORDER) {
-    const content = contentMap.get(cat);
-    if (content) parts.push(content);
-  }
-  parts.push(suffix);
-  const markdown = parts.join("");
-  const wasTruncated = activeCategories.some(
-    (cat) => (tierMap.get(cat) ?? 1) < 5
-  );
-  return { markdown, wasTruncated };
-}
-function categoryHasContent(category, report) {
-  switch (category) {
-    case "resources":
-      return (report.resources ?? []).length > 0;
-    case "outputs":
-      return (report.outputs ?? []).length > 0;
-    case "drift":
-      return (report.driftResources ?? []).length > 0;
-  }
-}
-function totalContentExcluding(contentMap, exclude) {
-  let total = 0;
-  for (const [cat, content] of contentMap) {
-    if (cat !== exclude) total += content.length;
-  }
-  return total;
-}
-
-// src/compose/notices.ts
-function buildTruncationNotice(link) {
-  if (link !== void 0) {
-    return `
----
-
-> ${DIAGNOSTIC_WARNING} **Output truncated** \u2014 some details were shortened or omitted to fit within the comment size limit.
-> [${link.label}](${link.url})
-`;
-  }
-  return `
----
-
-> ${DIAGNOSTIC_WARNING} **Output truncated** \u2014 some details were shortened or omitted to fit within the comment size limit. Check the workflow run logs for complete output.
-`;
-}
-function buildLogsNotice(link) {
-  return `
----
-
-> ${INFO_ICON} Some step errors are not shown \u2014 see the [${link.label}](${link.url}) for details.
-`;
-}
-function buildArtifactNotice(link) {
-  return `
-${ARTIFACT_ICON} [${link.label}](${link.url})
-`;
-}
-
-// src/compose/index.ts
-function composeWithBudget(sections, report, options, budget) {
-  const hasCategories = (report.resources?.length ?? 0) > 0 || (report.outputs?.length ?? 0) > 0 || (report.driftResources?.length ?? 0) > 0;
-  if (hasCategories) {
-    const { prefix, suffix } = splitAroundCategories(sections);
-    return composeProgressively(prefix, suffix, report, options, budget);
-  }
-  const full = sections.map((s) => s.full).join("");
-  if (full.length <= budget) {
-    return { markdown: full, wasTruncated: false };
-  }
-  return { markdown: full.slice(0, budget), wasTruncated: true };
-}
-function isCategorySection(section) {
-  const { id } = section;
-  return id === "resource-changes-heading" || id === "drift-heading" || id === "outputs" || id.startsWith("module-") || id.startsWith("drift-module-");
-}
-function splitAroundCategories(sections) {
-  let firstCat = -1;
-  let lastCat = -1;
-  for (let i = 0; i < sections.length; i++) {
-    const s = sections[i];
-    if (s !== void 0 && isCategorySection(s)) {
-      if (firstCat === -1) firstCat = i;
-      lastCat = i;
+  /** Compute total size for all elements at given levels. */
+  totalSize(format, levels) {
+    let total = 0;
+    for (const [i, el] of this.elements.entries()) {
+      const level = levels[i];
+      if (level !== void 0) {
+        total += el.size(format, level);
+      }
     }
+    return total;
   }
-  const prefix = sections.slice(0, firstCat === -1 ? sections.length : firstCat).map((s) => s.full).join("");
-  const suffix = lastCat === -1 ? "" : sections.slice(lastCat + 1).map((s) => s.full).join("");
-  return { prefix, suffix };
-}
+  /** Render all elements at given levels, concatenating the output. */
+  renderAtLevels(format, levels, truncated) {
+    const parts = [];
+    for (const [i, el] of this.elements.entries()) {
+      const level = levels[i];
+      if (level !== void 0) {
+        const rendered = el.render(format, level);
+        if (rendered.length > 0) {
+          parts.push(rendered);
+        }
+      }
+    }
+    return { output: parts.join(""), truncated };
+  }
+};
 
 // src/pipelines/steps.ts
-var DEFAULT_MAX_OUTPUT_LENGTH = 64512;
 function reportFromSteps(stepsJson, options) {
   try {
-    const maxOutputLength = options?.maxOutputLength ?? DEFAULT_MAX_OUTPUT_LENGTH;
     const report = buildReportFromSteps(stepsJson, options);
-    const sections = renderReportSections(report, options);
-    const fullMarkdown = sections.map((s) => s.full).join("");
-    const result = composeWithBudget(
-      sections,
-      report,
-      options ?? {},
-      maxOutputLength
-    );
+    const elements = buildReportElements(report, options);
+    const composed = composeReport(elements);
     return {
-      markdown: result.markdown,
-      fullMarkdown,
-      wasTruncated: result.wasTruncated,
+      report: composed,
       ...report.operation !== void 0 && { operation: report.operation },
       hasUnresolvedFailures: report.hasUnresolvedFailures ?? false
     };
   } catch (err) {
     const message = err instanceof Error ? err.message : "Unknown error";
-    const errorMarkdown = `## ${STATUS_FAILURE} Report Generation Failed
-
-An unexpected error occurred while generating the report:
-
-\`\`\`
-${message}
-\`\`\`
-`;
+    const errorRenderable = new PipelineErrorRenderable(message);
+    const errorReport = {
+      render: (format) => ({
+        output: errorRenderable.render(format),
+        truncated: false
+      }),
+      fullSize: (format) => errorRenderable.size(format)
+    };
     return {
-      markdown: errorMarkdown,
-      fullMarkdown: errorMarkdown,
-      wasTruncated: false,
+      report: errorReport,
       hasUnresolvedFailures: false
     };
   }
 }
+var PipelineErrorRenderable = class {
+  message;
+  constructor(message) {
+    this.message = message;
+  }
+  size(format) {
+    return this.render(format).length;
+  }
+  render(format) {
+    const heading = new Heading(
+      `${STATUS_FAILURE} Report Generation Failed`,
+      2
+    );
+    const preamble = format === "markdown" ? "An unexpected error occurred while generating the report:\n\n" : "<p>An unexpected error occurred while generating the report:</p>\n";
+    const code = new CodeBlock(this.message);
+    return heading.render(format) + preamble + code.render(format);
+  }
+};
 
 // src/github/client.ts
 var DEFAULT_BASE_URL = "https://api.github.com";
@@ -4298,6 +5276,35 @@ function calculateBudget(footerLength) {
   return Math.max(0, COMMENT_LIMIT - footerLength - OVERHEAD_RESERVE);
 }
 
+// src/comment/notices.ts
+function buildTruncationNotice(link) {
+  if (link !== void 0) {
+    return `
+---
+
+> ${DIAGNOSTIC_WARNING} **Output truncated** \u2014 some details were shortened or omitted to fit within the comment size limit.
+> [${link.label}](${link.url})
+`;
+  }
+  return `
+---
+
+> ${DIAGNOSTIC_WARNING} **Output truncated** \u2014 some details were shortened or omitted to fit within the comment size limit. Check the workflow run logs for complete output.
+`;
+}
+function buildLogsNotice(link) {
+  return `
+---
+
+> ${INFO_ICON} Some step errors are not shown \u2014 see the [${link.label}](${link.url}) for details.
+`;
+}
+function buildArtifactNotice(link) {
+  return `
+${ARTIFACT_ICON} [${link.label}](${link.url})
+`;
+}
+
 // src/comment/body.ts
 function buildTruncation(artifactUrl, logsUrl) {
   const link = artifactUrl ? { url: artifactUrl, label: "View full report" } : { url: logsUrl, label: "View full workflow run logs" };
@@ -4647,7 +5654,7 @@ function buildHtmlPage(htmlFragment, title) {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>${escapeHtml2(pageTitle)}</title>
+  <title>${escapeHtml(pageTitle)}</title>
   <style>
     body { max-width: 1012px; margin: 0 auto; padding: 32px; background: #fff; }
     ${MARKDOWN_CSS}
@@ -4660,7 +5667,7 @@ function buildHtmlPage(htmlFragment, title) {
 </html>
 `;
 }
-function escapeHtml2(s) {
+function escapeHtml(s) {
   return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 }
 
@@ -4673,16 +5680,12 @@ async function tryUploadFullReport(params) {
     if (runtimeToken === void 0 || runtimeToken === "" || resultsUrl === void 0 || resultsUrl === "" || runId === void 0 || runId === "") {
       return void 0;
     }
-    const htmlFragment = await params.renderMarkdown({
-      text: params.fullMarkdown,
-      mode: "gfm",
-      context: params.repoContext
-    });
     const dotIndex = params.artifactName.lastIndexOf(".");
     const pageTitle = dotIndex > 0 ? params.artifactName.slice(0, dotIndex) : params.artifactName;
-    const htmlPage = buildHtmlPage(htmlFragment, pageTitle);
+    const htmlPage = buildHtmlPage(params.htmlContent, pageTitle);
     const filename = params.artifactName;
     const serverUrl = params.env["GITHUB_SERVER_URL"];
+    const repoContext = params.env["GITHUB_REPOSITORY"] ?? "";
     const uploader = createArtifactUploader({
       runtimeToken,
       resultsUrl,
@@ -4701,7 +5704,7 @@ async function tryUploadFullReport(params) {
       content: htmlPage
     });
     const artifactServerUrl = params.env["GITHUB_SERVER_URL"] ?? "https://github.com";
-    return `${artifactServerUrl}/${params.repoContext}/actions/runs/${runId}/artifacts/${String(result.id)}`;
+    return `${artifactServerUrl}/${repoContext}/actions/runs/${runId}/artifacts/${String(result.id)}`;
   } catch (error) {
     const msg = error instanceof Error ? error.message : String(error);
     const log = params.logger;
@@ -4745,7 +5748,6 @@ async function run(env = process.env, deps) {
     const reportOptions = {
       workspace: inputs.workspace,
       env,
-      maxOutputLength: 0,
       initStepId: inputs.initStepId,
       validateStepId: inputs.validateStepId,
       planStepId: inputs.planStepId,
@@ -4770,23 +5772,21 @@ async function run(env = process.env, deps) {
       transport
     });
     const fullBudget = calculateBudget(footer.length);
-    const result = reportFromSteps(inputs.steps, {
-      ...reportOptions,
-      maxOutputLength: fullBudget
-    });
-    let { markdown } = result;
-    const { fullMarkdown, wasTruncated, operation, hasUnresolvedFailures } = result;
+    const result = reportFromSteps(inputs.steps, reportOptions);
+    const { operation, hasUnresolvedFailures } = result;
+    const mdResult = result.report.render("markdown", fullBudget);
+    let markdown = mdResult.output;
+    const wasTruncated = mdResult.truncated;
     const shouldUpload = wasTruncated || inputs.alwaysUploadReport;
     let artifactUrl;
     if (shouldUpload) {
       const workspacePart = inputs.workspace ? `${sanitizeArtifactSegment(inputs.workspace)}-` : "";
       const opPart = operation !== void 0 ? `${operation}-` : "";
       const artifactName = `${workspacePart}${opPart}report.html`;
+      const htmlResult = result.report.render("html");
       artifactUrl = await tryUpload({
-        fullMarkdown,
-        renderMarkdown: client.renderMarkdown.bind(client),
+        htmlContent: htmlResult.output,
         env,
-        repoContext: `${owner}/${repo}`,
         artifactName,
         logger,
         deps: { transport }
@@ -4795,11 +5795,7 @@ async function run(env = process.env, deps) {
     if (wasTruncated) {
       const truncationNotice = buildTruncation(artifactUrl, logsUrl);
       const reducedBudget = Math.max(0, fullBudget - truncationNotice.length);
-      ({ markdown } = reportFromSteps(inputs.steps, {
-        ...reportOptions,
-        maxOutputLength: reducedBudget
-      }));
-      markdown += truncationNotice;
+      markdown = result.report.render("markdown", reducedBudget).output + truncationNotice;
     }
     const body = assembleCommentBody(markdown, footer, {
       artifactUrl: wasTruncated ? void 0 : artifactUrl,

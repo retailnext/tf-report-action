@@ -89,18 +89,21 @@ export function readForParse(
   }
 }
 
+/** Maximum bytes to read for JSONL detection peeks (8 KiB). */
+const PEEK_SIZE = 8 * 1024;
+
 /**
- * Read a file for display (first `maxDisplayRead` bytes only).
+ * Read the first few bytes of a file for format detection (e.g. JSONL).
  *
- * Use this for files whose contents will be shown as-is in fenced code
- * blocks (failed step stdout/stderr). Large files are truncated to a
- * prefix — the full content is never loaded into memory.
+ * This is a lightweight partial read used to inspect the first lines of a
+ * file without loading the entire content into memory. The file is validated
+ * with the same security checks as {@link readForParse}.
  *
- * @param filePath - Absolute or relative path to the file
- * @param options - Reader security and size options
- * @returns The file contents (possibly truncated), or an error description
+ * @param filePath - Absolute path to the file
+ * @param options - Reader security options (allowedDirs)
+ * @returns The file prefix (possibly shorter than full content), or an error
  */
-export function readForDisplay(
+export function readPeek(
   filePath: string,
   options: ReaderOptions,
 ): FileReadOutcome {
@@ -110,8 +113,7 @@ export function readForDisplay(
   }
 
   const { realPath, size } = validated;
-  const truncated = size > options.maxDisplayRead;
-  const bytesToRead = Math.min(size, options.maxDisplayRead);
+  const bytesToRead = Math.min(size, PEEK_SIZE);
 
   try {
     const buffer = Buffer.alloc(bytesToRead);
@@ -124,7 +126,7 @@ export function readForDisplay(
     }
     return {
       content: buffer.subarray(0, bytesRead).toString("utf-8"),
-      truncated,
+      truncated: size > PEEK_SIZE,
     };
   } catch {
     return { error: "Failed to read file" };

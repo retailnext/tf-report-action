@@ -51,16 +51,6 @@ describe("render-plan.ts E2E", () => {
     return readFileSync(htmlPath, "utf-8");
   }
 
-  /**
-   * Extract the markdown string from the HTML template.
-   * The render script embeds it as a template literal: const markdown = `...`;
-   */
-  function extractMarkdown(html: string): string {
-    const match = /const markdown = `([\s\S]*?)`;/.exec(html);
-    expect(match).toBeTruthy();
-    return match![1]!;
-  }
-
   it("produces meaningful output for a normal plan fixture", () => {
     const stepsFile = join(
       GENERATED_DIR,
@@ -71,11 +61,10 @@ describe("render-plan.ts E2E", () => {
       `Fixture missing: ${stepsFile}. Run: bash scripts/generate-fixtures.sh`,
     ).toBe(true);
     const html = runRender(stepsFile);
-    const md = extractMarkdown(html);
-    // Should have structured content, not empty/stub
-    expect(md).toContain("Summary");
-    expect(md).toContain("Resource Changes");
-    expect(md.length).toBeGreaterThan(200);
+    // The render script now produces native HTML — validate content directly
+    expect(html).toContain("Summary");
+    expect(html).toContain("Resource Changes");
+    expect(html.length).toBeGreaterThan(200);
   });
 
   it("produces meaningful output for an apply fixture", () => {
@@ -88,10 +77,9 @@ describe("render-plan.ts E2E", () => {
       `Fixture missing: ${stepsFile}. Run: bash scripts/generate-fixtures.sh`,
     ).toBe(true);
     const html = runRender(stepsFile);
-    const md = extractMarkdown(html);
-    expect(md).toContain("Apply");
-    expect(md).toContain("Resource Changes");
-    expect(md.length).toBeGreaterThan(200);
+    expect(html).toContain("Apply");
+    expect(html).toContain("Resource Changes");
+    expect(html.length).toBeGreaterThan(200);
   });
 
   it("produces meaningful output for a no-op fixture", () => {
@@ -104,10 +92,9 @@ describe("render-plan.ts E2E", () => {
       `Fixture missing: ${stepsFile}. Run: bash scripts/generate-fixtures.sh`,
     ).toBe(true);
     const html = runRender(stepsFile);
-    const md = extractMarkdown(html);
     // No-op has an apply step, so it renders as apply complete with no changes
-    expect(md).toMatch(/No [Cc]hanges|Apply Complete|_No changes_/);
-    expect(md.length).toBeGreaterThan(20);
+    expect(html).toMatch(/No [Cc]hanges|Apply Complete|No changes/);
+    expect(html.length).toBeGreaterThan(200);
   });
 
   it("produces meaningful output for an apply-error fixture", () => {
@@ -117,10 +104,9 @@ describe("render-plan.ts E2E", () => {
       `Fixture missing: ${stepsFile}. Run: bash scripts/generate-fixtures.sh`,
     ).toBe(true);
     const html = runRender(stepsFile);
-    const md = extractMarkdown(html);
-    expect(md).toContain("Apply");
-    expect(md).toContain("will_fail");
-    expect(md.length).toBeGreaterThan(200);
+    expect(html).toContain("Apply");
+    expect(html).toContain("will_fail");
+    expect(html.length).toBeGreaterThan(200);
   });
 });
 
@@ -141,7 +127,7 @@ function renderFixtureInProcess(stepsJson: string, fixtureDir: string): string {
   return reportFromSteps(resolved, {
     allowedDirs: [fixtureDir],
     env: NO_GITHUB_ENV,
-  }).markdown;
+  }).report.render("markdown").output;
 }
 
 describe("reportFromSteps — generated steps fixtures (full plan+apply)", () => {
@@ -259,7 +245,7 @@ describe("reportFromSteps — manual error fixtures", () => {
       const result = reportFromSteps(fixture.stepsJson, {
         allowedDirs: [fixture.fixtureDir],
         env: NO_GITHUB_ENV,
-      }).markdown;
+      }).report.render("markdown").output;
       expect(result.length).toBeGreaterThan(50);
       // Should explain why output wasn't available
       expect(result).toMatch(
@@ -271,7 +257,7 @@ describe("reportFromSteps — manual error fixtures", () => {
       const result = reportFromSteps(fixture.stepsJson, {
         allowedDirs: [fixture.fixtureDir],
         env: NO_GITHUB_ENV,
-      }).markdown;
+      }).report.render("markdown").output;
       // Should show step outcomes
       expect(result).toContain("Steps");
       expect(result).toContain("show-plan");
@@ -282,7 +268,7 @@ describe("reportFromSteps — manual error fixtures", () => {
       const result = reportFromSteps(fixture.stepsJson, {
         allowedDirs: [fixture.fixtureDir],
         env: NO_GITHUB_ENV,
-      }).markdown;
+      }).report.render("markdown").output;
       expect(result).not.toContain("Showing raw command output");
     });
   });
@@ -294,7 +280,7 @@ describe("reportFromSteps — manual error fixtures", () => {
       const result = reportFromSteps(fixture.stepsJson, {
         allowedDirs: [fixture.fixtureDir],
         env: NO_GITHUB_ENV,
-      }).markdown;
+      }).report.render("markdown").output;
       expect(result.length).toBeGreaterThan(50);
     });
 
@@ -302,7 +288,7 @@ describe("reportFromSteps — manual error fixtures", () => {
       const result = reportFromSteps(fixture.stepsJson, {
         allowedDirs: [fixture.fixtureDir],
         env: NO_GITHUB_ENV,
-      }).markdown;
+      }).report.render("markdown").output;
       expect(result).toContain("Steps");
       expect(result).toContain("show-plan");
     });
@@ -311,7 +297,7 @@ describe("reportFromSteps — manual error fixtures", () => {
       const result = reportFromSteps(fixture.stepsJson, {
         allowedDirs: [fixture.fixtureDir],
         env: NO_GITHUB_ENV,
-      }).markdown;
+      }).report.render("markdown").output;
       // Read errors are shown as standalone warning sections
       expect(result).toContain("stdout_file output missing in steps");
     });
@@ -328,7 +314,7 @@ describe("reportFromSteps — manual error fixtures", () => {
       const result = reportFromSteps(resolved, {
         allowedDirs: [fixture.fixtureDir],
         env: NO_GITHUB_ENV,
-      }).markdown;
+      }).report.render("markdown").output;
       expect(result.length).toBeGreaterThan(50);
       // Should indicate a processing error
       expect(result).toMatch(/error|fail/i);
@@ -346,7 +332,7 @@ describe("reportFromSteps — manual error fixtures", () => {
       const result = reportFromSteps(resolved, {
         allowedDirs: [fixture.fixtureDir],
         env: NO_GITHUB_ENV,
-      }).markdown;
+      }).report.render("markdown").output;
       expect(result.length).toBeGreaterThan(20);
       // Should list the steps it found
       expect(result).toContain("Step");
@@ -376,7 +362,7 @@ describe("reportFromSteps — manual error fixtures", () => {
           GITHUB_RUN_ATTEMPT: "1",
         },
         allowedDirs: [fixture.fixtureDir],
-      }).markdown;
+      }).report.render("markdown").output;
       const body = buildFullBody(result, true);
       // Count occurrences of the logs URL — catches any link text variant
       const urlCount = body.split(LOGS_URL).length - 1;
@@ -395,7 +381,7 @@ describe("reportFromSteps — manual error fixtures", () => {
           GITHUB_RUN_ATTEMPT: "1",
         },
         allowedDirs: [fixture.fixtureDir],
-      }).markdown;
+      }).report.render("markdown").output;
       const body = buildFullBody(result, false);
       const urlCount = body.split(LOGS_URL).length - 1;
       expect(
@@ -413,7 +399,7 @@ describe("reportFromSteps — manual error fixtures", () => {
           GITHUB_RUN_ATTEMPT: "1",
         },
         allowedDirs: [fixture.fixtureDir],
-      }).markdown;
+      }).report.render("markdown").output;
       expect(result).not.toContain("[View workflow run logs]");
     });
   });
@@ -429,7 +415,7 @@ describe("reportFromSteps — manual error fixtures", () => {
       const result = reportFromSteps(resolved, {
         allowedDirs: [fixture.fixtureDir],
         env: NO_GITHUB_ENV,
-      }).markdown;
+      }).report.render("markdown").output;
       expect(result).toContain("build");
       expect(result).toContain("warning: deprecated API usage");
     });
@@ -442,22 +428,9 @@ describe("reportFromSteps — manual error fixtures", () => {
       const result = reportFromSteps(resolved, {
         allowedDirs: [fixture.fixtureDir],
         env: NO_GITHUB_ENV,
-      }).markdown;
+      }).report.render("markdown").output;
       // The heading uses the DIAGNOSTIC_WARNING icon and includes outcome
       expect(result).toContain("`build` success");
-    });
-
-    it("truncates stderr when maxDisplayRead is very small", () => {
-      const resolved = resolveStepFilePaths(
-        fixture.stepsJson,
-        fixture.fixtureDir,
-      );
-      const result = reportFromSteps(resolved, {
-        allowedDirs: [fixture.fixtureDir],
-        env: NO_GITHUB_ENV,
-        maxDisplayRead: 1,
-      }).markdown;
-      expect(result).toContain("… (truncated)");
     });
   });
 
@@ -470,7 +443,7 @@ describe("reportFromSteps — manual error fixtures", () => {
       const result = reportFromSteps(fixture.stepsJson, {
         allowedDirs: [fixture.fixtureDir],
         env: NO_GITHUB_ENV,
-      }).markdown;
+      }).report.render("markdown").output;
       expect(result).toMatch(/stdout not available/i);
     });
 
@@ -478,7 +451,7 @@ describe("reportFromSteps — manual error fixtures", () => {
       const result = reportFromSteps(fixture.stepsJson, {
         allowedDirs: [fixture.fixtureDir],
         env: NO_GITHUB_ENV,
-      }).markdown;
+      }).report.render("markdown").output;
       expect(result).toMatch(/stderr not available/i);
     });
   });

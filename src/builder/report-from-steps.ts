@@ -23,7 +23,11 @@ import type { RenderOptions } from "../model/render-options.js";
 import type { Env } from "../env/index.js";
 import type { ReaderOptions } from "../steps/types.js";
 import type { Report, Tool } from "../model/report.js";
-import { expectedCommand } from "../model/step-commands.js";
+import {
+  NoShowPlanWarning,
+  RawTextFallbackWarning,
+  NoStateWarning,
+} from "./warnings.js";
 import { parseSteps } from "../steps/parse.js";
 import {
   DEFAULT_INIT_STEP,
@@ -33,7 +37,6 @@ import {
   DEFAULT_APPLY_STEP,
   DEFAULT_STATE_STEP,
   DEFAULT_MAX_FILE_SIZE,
-  DEFAULT_MAX_DISPLAY_READ,
 } from "../steps/types.js";
 import { getStepOutcome, buildStepOutcomes } from "../steps/outcomes.js";
 import { buildStepIssue, shouldCreateStepIssue } from "./step-issues.js";
@@ -54,8 +57,6 @@ import { tmpdir } from "node:os";
 export interface ReportOptions extends BuildOptions, RenderOptions {
   /** Directories from which stdout/stderr files may be read. Defaults to RUNNER_TEMP or OS temp. */
   allowedDirs?: readonly string[];
-  /** Maximum total output length in characters. Default: 63 * 1024 */
-  maxOutputLength?: number;
   /** Workspace name — used in the title and dedup marker. */
   workspace?: string;
   /** Environment variables (defaults to process.env). Injected for testability. */
@@ -67,11 +68,6 @@ export interface ReportOptions extends BuildOptions, RenderOptions {
    * to override auto-detection.
    */
   tool?: Tool;
-  /**
-   * Maximum bytes to read from a step's stdout/stderr file for display.
-   * Default: 64 KiB. Set lower in tests to exercise truncation paths.
-   */
-  maxDisplayRead?: number;
   /** Step ID for the init step. Default: "init" */
   initStepId?: string;
   /** Step ID for the validate step. Default: "validate" */
@@ -89,7 +85,7 @@ export interface ReportOptions extends BuildOptions, RenderOptions {
 /** Create an empty Report with required fields initialized. */
 function createEmptyReport(): Report {
   return {
-    title: "",
+    title: { status: "success", body: { kind: "no-changes" } },
     issues: [],
     steps: [],
     warnings: [],
@@ -138,7 +134,6 @@ export function buildReportFromSteps(
   const readerOpts: ReaderOptions = {
     allowedDirs: options?.allowedDirs ?? [env["RUNNER_TEMP"] ?? tmpdir()],
     maxFileSize: DEFAULT_MAX_FILE_SIZE,
-    maxDisplayRead: options?.maxDisplayRead ?? DEFAULT_MAX_DISPLAY_READ,
   };
 
   // Parse steps JSON
@@ -252,14 +247,10 @@ export function buildReportFromSteps(
     (report.resources !== undefined || report.summary !== undefined)
   ) {
     // JSONL-enriched report — has structure but no attribute detail
-    report.warnings.push(
-      `This report was generated without \`${expectedCommand(tool, "show-plan")}\` output. Resource attribute details are not available.`,
-    );
+    report.warnings.push(new NoShowPlanWarning(tool));
   } else if (!showPlanParsed && report.rawStdout.length > 0) {
     // Raw text fallback — no structured data at all
-    report.warnings.push(
-      `Report limited because \`${expectedCommand(tool, "show-plan")}\` output was not available. Showing raw command output.`,
-    );
+    report.warnings.push(new RawTextFallbackWarning(tool));
   }
 
   // Missing state warning — only for structured apply reports with unresolved values
@@ -269,9 +260,7 @@ export function buildReportFromSteps(
     !report.stateEnriched &&
     hasUnresolvedKnownAfterApply(report)
   ) {
-    report.warnings.push(
-      `Some attribute values could not be resolved because \`${expectedCommand(tool, "state")}\` output was not available. Add a \`state\` step after apply to see the actual values.`,
-    );
+    report.warnings.push(new NoStateWarning(tool));
   }
 
   // Store detected tool

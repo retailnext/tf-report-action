@@ -77,34 +77,46 @@ function baseOpts(extra?: Partial<ReportOptions>): ReportOptions {
 
 describe("invalid inputs", () => {
   it("returns markdown error for invalid JSON", () => {
-    const result = reportFromSteps("{not valid json", baseOpts()).markdown;
+    const result = reportFromSteps("{not valid json", baseOpts()).report.render(
+      "markdown",
+    ).output;
     expect(result).toContain("Report Generation Failed");
     expect(result).toContain("not valid JSON");
   });
 
   it("returns markdown error for empty string", () => {
-    const result = reportFromSteps("", baseOpts()).markdown;
+    const result = reportFromSteps("", baseOpts()).report.render(
+      "markdown",
+    ).output;
     expect(result).toContain("Report Generation Failed");
   });
 
   it("returns general workflow for valid JSON array", () => {
-    const result = reportFromSteps("[1,2,3]", baseOpts()).markdown;
+    const result = reportFromSteps("[1,2,3]", baseOpts()).report.render(
+      "markdown",
+    ).output;
     expect(result).toContain("Report Generation Failed");
     expect(result).toContain("must be a JSON object");
   });
 
   it("returns markdown error for JSON number", () => {
-    const result = reportFromSteps("42", baseOpts()).markdown;
+    const result = reportFromSteps("42", baseOpts()).report.render(
+      "markdown",
+    ).output;
     expect(result).toContain("Report Generation Failed");
   });
 
   it("returns markdown error for JSON string", () => {
-    const result = reportFromSteps('"hello"', baseOpts()).markdown;
+    const result = reportFromSteps('"hello"', baseOpts()).report.render(
+      "markdown",
+    ).output;
     expect(result).toContain("Report Generation Failed");
   });
 
   it("returns markdown error for JSON null", () => {
-    const result = reportFromSteps("null", baseOpts()).markdown;
+    const result = reportFromSteps("null", baseOpts()).report.render(
+      "markdown",
+    ).output;
     expect(result).toContain("Report Generation Failed");
   });
 
@@ -119,7 +131,10 @@ describe("invalid inputs", () => {
       '{"valid":"json"}',
     ];
     for (const input of inputs) {
-      expect(() => reportFromSteps(input, baseOpts()).markdown).not.toThrow();
+      expect(
+        () =>
+          reportFromSteps(input, baseOpts()).report.render("markdown").output,
+      ).not.toThrow();
     }
   });
 });
@@ -128,7 +143,9 @@ describe("invalid inputs", () => {
 
 describe("tier 4 — general workflow", () => {
   it("renders report for empty steps {}", () => {
-    const result = reportFromSteps(stepsJson({}), baseOpts()).markdown;
+    const result = reportFromSteps(stepsJson({}), baseOpts()).report.render(
+      "markdown",
+    ).output;
     expect(result).toContain("Succeeded");
   });
 
@@ -140,7 +157,7 @@ describe("tier 4 — general workflow", () => {
         test: { outcome: "success" },
       }),
       baseOpts(),
-    ).markdown;
+    ).report.render("markdown").output;
     expect(result).toContain("Succeeded");
     expect(result).toContain("`checkout`");
     expect(result).toContain("`build`");
@@ -152,7 +169,7 @@ describe("tier 4 — general workflow", () => {
     const result = reportFromSteps(
       stepsJson({ checkout: { outcome: "success" } }),
       baseOpts({ workspace: "staging" }),
-    ).markdown;
+    ).report.render("markdown").output;
     expect(result).toContain('<!-- tf-report-action:"staging" -->');
     expect(result).toContain("`staging`");
   });
@@ -164,7 +181,7 @@ describe("tier 4 — general workflow", () => {
         deploy: { outcome: "success" },
       }),
       baseOpts(),
-    ).markdown;
+    ).report.render("markdown").output;
     expect(result).toContain("❌");
     expect(result).toContain("Failed");
   });
@@ -176,53 +193,63 @@ describe("tier 4 — general workflow", () => {
         deploy: { outcome: "success" },
       }),
       baseOpts(),
-    ).markdown;
+    ).report.render("markdown").output;
     expect(result).toContain("✅");
     expect(result).toContain("Succeeded");
   });
 
   it("sets wasTruncated when output is constrained", () => {
-    const { wasTruncated } = reportFromSteps(
-      stepsJson({ checkout: { outcome: "success" } }),
+    const planFile = writeFile("trunc-tier4.json", MINIMAL_PLAN);
+    const { truncated } = reportFromSteps(
+      stepsJson({
+        "show-plan": {
+          outcome: "success",
+          outputs: { stdout_file: planFile },
+        },
+      }),
       baseOpts({
         env: {
           GITHUB_REPOSITORY: "owner/repo",
           GITHUB_RUN_ID: "12345",
         },
-        maxOutputLength: 1, // force truncation
       }),
-    );
-    expect(wasTruncated).toBe(true);
+    ).report.render("markdown", 1); // force truncation via budget
+    expect(truncated).toBe(true);
   });
 
   it("does not set wasTruncated when env vars are missing and output fits", () => {
-    const { wasTruncated } = reportFromSteps(
+    const { truncated } = reportFromSteps(
       stepsJson({ checkout: { outcome: "success" } }),
       baseOpts({ env: {} }),
-    );
-    expect(wasTruncated).toBe(false);
+    ).report.render("markdown");
+    expect(truncated).toBe(false);
   });
 
   it("sets wasTruncated with GITHUB_RUN_ATTEMPT set", () => {
-    const { wasTruncated } = reportFromSteps(
-      stepsJson({ checkout: { outcome: "success" } }),
+    const planFile = writeFile("trunc-attempt.json", MINIMAL_PLAN);
+    const { truncated } = reportFromSteps(
+      stepsJson({
+        "show-plan": {
+          outcome: "success",
+          outputs: { stdout_file: planFile },
+        },
+      }),
       baseOpts({
         env: {
           GITHUB_REPOSITORY: "owner/repo",
           GITHUB_RUN_ID: "99",
           GITHUB_RUN_ATTEMPT: "3",
         },
-        maxOutputLength: 1,
       }),
-    );
-    expect(wasTruncated).toBe(true);
+    ).report.render("markdown", 1); // force truncation via budget
+    expect(truncated).toBe(true);
   });
 
   it("handles steps with only conclusion (no outcome)", () => {
     const result = reportFromSteps(
       stepsJson({ deploy: { conclusion: "success" } }),
       baseOpts(),
-    ).markdown;
+    ).report.render("markdown").output;
     expect(result).toContain("Succeeded");
     expect(result).toContain("success");
   });
@@ -241,7 +268,7 @@ describe("tier 1 — full structured plan", () => {
         },
       }),
       baseOpts(),
-    ).markdown;
+    ).report.render("markdown").output;
     expect(result).toContain("Plan:");
     expect(result).toContain("1 to add");
     expect(result).toContain("null_resource");
@@ -258,7 +285,7 @@ describe("tier 1 — full structured plan", () => {
         },
       }),
       baseOpts(),
-    ).markdown;
+    ).report.render("markdown").output;
     expect(result).toContain("No Changes");
     expect(result).toContain("✅");
   });
@@ -273,7 +300,7 @@ describe("tier 1 — full structured plan", () => {
         },
       }),
       baseOpts({ workspace: "myws" }),
-    ).markdown;
+    ).report.render("markdown").output;
     expect(result).toContain("`myws` Plan:");
   });
 
@@ -293,7 +320,7 @@ describe("tier 1 — full structured plan", () => {
         },
       }),
       baseOpts(),
-    ).markdown;
+    ).report.render("markdown").output;
     // Apply mode was entered (title reflects apply, not plan)
     expect(result).toContain("Apply");
   });
@@ -311,7 +338,7 @@ describe("tier 1 — full structured plan", () => {
         },
       }),
       baseOpts(),
-    ).markdown;
+    ).report.render("markdown").output;
     expect(result).toContain("Plan:");
     expect(result).not.toContain("Apply");
   });
@@ -326,7 +353,7 @@ describe("tier 1 — full structured plan", () => {
         },
       }),
       baseOpts({ showPlanStepId: "my-show" }),
-    ).markdown;
+    ).report.render("markdown").output;
     expect(result).toContain("Plan:");
     expect(result).toContain("1 to add");
   });
@@ -345,7 +372,7 @@ describe("tier 3 — text fallback", () => {
         },
       }),
       baseOpts(),
-    ).markdown;
+    ).report.render("markdown").output;
     expect(result).toContain("show -json <tfplan>");
     expect(result).toContain("was not available");
     expect(result).toContain("Plan: 2 to add");
@@ -361,7 +388,7 @@ describe("tier 3 — text fallback", () => {
         },
       }),
       baseOpts(),
-    ).markdown;
+    ).report.render("markdown").output;
     expect(result).toContain("### Plan Output");
     expect(result).toContain("```\nresource changes here\n```");
   });
@@ -380,7 +407,7 @@ describe("tier 3 — text fallback", () => {
         },
       }),
       baseOpts(),
-    ).markdown;
+    ).report.render("markdown").output;
     expect(result).toContain("show -json <tfplan>");
     expect(result).toContain("was not available");
     expect(result).toContain("some plan text");
@@ -396,7 +423,7 @@ describe("tier 3 — text fallback", () => {
         },
       }),
       baseOpts(),
-    ).markdown;
+    ).report.render("markdown").output;
     expect(result).toContain("Apply");
     expect(result).toContain("### Apply Output");
   });
@@ -415,7 +442,7 @@ describe("workspace marker", () => {
         },
       }),
       baseOpts({ workspace: "prod" }),
-    ).markdown;
+    ).report.render("markdown").output;
     expect(result).toMatch(/^<!-- tf-report-action:"prod" -->/);
   });
 
@@ -429,7 +456,7 @@ describe("workspace marker", () => {
         },
       }),
       baseOpts(),
-    ).markdown;
+    ).report.render("markdown").output;
     expect(result).not.toContain("<!-- tf-report-action:");
   });
 
@@ -437,7 +464,7 @@ describe("workspace marker", () => {
     const result = reportFromSteps(
       stepsJson({}),
       baseOpts({ workspace: 'my"ws' }),
-    ).markdown;
+    ).report.render("markdown").output;
     expect(result).toContain('<!-- tf-report-action:"my\\"ws" -->');
   });
 
@@ -445,7 +472,7 @@ describe("workspace marker", () => {
     const result = reportFromSteps(
       stepsJson({}),
       baseOpts({ workspace: "my\\ws" }),
-    ).markdown;
+    ).report.render("markdown").output;
     expect(result).toContain('<!-- tf-report-action:"my\\\\ws" -->');
   });
 
@@ -453,7 +480,7 @@ describe("workspace marker", () => {
     const result = reportFromSteps(
       stepsJson({}),
       baseOpts({ workspace: "a-->b" }),
-    ).markdown;
+    ).report.render("markdown").output;
     // Zero-width space breaks the -- sequence to prevent comment termination
     expect(result).toContain("a-\u200B->b");
     // The workspace value inside the comment must not contain unbroken --
@@ -466,7 +493,7 @@ describe("workspace marker", () => {
     const result = reportFromSteps(
       stepsJson({}),
       baseOpts({ workspace: "a--!>b" }),
-    ).markdown;
+    ).report.render("markdown").output;
     expect(result).toContain("a-\u200B-!>b");
   });
 });
@@ -484,7 +511,7 @@ describe("dynamic titles", () => {
         },
       }),
       baseOpts(),
-    ).markdown;
+    ).report.render("markdown").output;
     expect(result).toContain("✅ Plan:");
     expect(result).toContain("1 to add");
   });
@@ -499,7 +526,7 @@ describe("dynamic titles", () => {
         },
       }),
       baseOpts(),
-    ).markdown;
+    ).report.render("markdown").output;
     expect(result).toContain("✅ No Changes");
   });
 
@@ -513,7 +540,7 @@ describe("dynamic titles", () => {
         },
       }),
       baseOpts({ workspace: "myws" }),
-    ).markdown;
+    ).report.render("markdown").output;
     expect(result).toContain("✅ `myws` Plan:");
   });
 
@@ -527,7 +554,7 @@ describe("dynamic titles", () => {
         },
       }),
       baseOpts({ workspace: "myws" }),
-    ).markdown;
+    ).report.render("markdown").output;
     expect(result).toContain("✅ `myws` No Changes");
   });
 
@@ -535,7 +562,7 @@ describe("dynamic titles", () => {
     const result = reportFromSteps(
       stepsJson({ deploy: { outcome: "failure" } }),
       baseOpts(),
-    ).markdown;
+    ).report.render("markdown").output;
     expect(result).toContain("❌");
     expect(result).toContain("Failed");
   });
@@ -544,7 +571,7 @@ describe("dynamic titles", () => {
     const result = reportFromSteps(
       stepsJson({ deploy: { outcome: "success" } }),
       baseOpts(),
-    ).markdown;
+    ).report.render("markdown").output;
     expect(result).toContain("✅");
     expect(result).toContain("Succeeded");
   });
@@ -553,74 +580,84 @@ describe("dynamic titles", () => {
 // ─── 7. Output Size Limits ──────────────────────────────────────────────────
 
 describe("output size limits", () => {
-  it("constrains markdown length to maxOutputLength", () => {
+  it("constrains markdown length to render budget", () => {
     const planFile = writeFile("trunc-plan.json", MINIMAL_PLAN);
-    const { markdown } = reportFromSteps(
+    const { output: markdown } = reportFromSteps(
       stepsJson({
         "show-plan": {
           outcome: "success",
           outputs: { stdout_file: planFile },
         },
       }),
-      baseOpts({ maxOutputLength: 200 }),
-    );
+      baseOpts(),
+    ).report.render("markdown", 200);
     expect(markdown.length).toBeLessThanOrEqual(200);
   });
 
   it("sets wasTruncated when content is degraded", () => {
     const planFile = writeFile("trunc-notice.json", MINIMAL_PLAN);
-    const { wasTruncated } = reportFromSteps(
+    const { truncated } = reportFromSteps(
       stepsJson({
         "show-plan": {
           outcome: "success",
           outputs: { stdout_file: planFile },
         },
       }),
-      baseOpts({ maxOutputLength: 300 }),
-    );
-    expect(wasTruncated).toBe(true);
+      baseOpts(),
+    ).report.render("markdown", 300);
+    expect(truncated).toBe(true);
   });
 
   it("does not include truncation notice in markdown", () => {
     const planFile = writeFile("trunc-no-notice.json", MINIMAL_PLAN);
-    const { markdown } = reportFromSteps(
+    const { output: markdown } = reportFromSteps(
       stepsJson({
         "show-plan": {
           outcome: "success",
           outputs: { stdout_file: planFile },
         },
       }),
-      baseOpts({ maxOutputLength: 300 }),
-    );
+      baseOpts(),
+    ).report.render("markdown", 300);
     expect(markdown).not.toContain("Output truncated");
   });
 
   it("provides fullMarkdown with all sections at full size", () => {
     const planFile = writeFile("full-md.json", MINIMAL_PLAN);
-    const { markdown, fullMarkdown, wasTruncated } = reportFromSteps(
+    const result = reportFromSteps(
       stepsJson({
         "show-plan": {
           outcome: "success",
           outputs: { stdout_file: planFile },
         },
       }),
-      baseOpts({ maxOutputLength: 300 }),
+      baseOpts(),
     );
+    const { output: markdown, truncated: wasTruncated } = result.report.render(
+      "markdown",
+      300,
+    );
+    const fullMarkdown = result.report.render("markdown").output;
     expect(wasTruncated).toBe(true);
     expect(fullMarkdown.length).toBeGreaterThanOrEqual(markdown.length);
   });
 
   it("sets wasTruncated false when content fits", () => {
     const planFile = writeFile("no-trunc.json", NO_CHANGES_PLAN);
-    const { wasTruncated, markdown, fullMarkdown } = reportFromSteps(
+    const result = reportFromSteps(
       stepsJson({
         "show-plan": {
           outcome: "success",
           outputs: { stdout_file: planFile },
         },
       }),
-      baseOpts({ maxOutputLength: 65536 }),
+      baseOpts(),
     );
+    const { truncated: wasTruncated, output: markdown } = result.report.render(
+      "markdown",
+      65536,
+    );
+    const fullMarkdown = result.report.render("markdown").output;
     expect(wasTruncated).toBe(false);
     expect(markdown).toBe(fullMarkdown);
   });
@@ -647,7 +684,7 @@ describe("failed init/validate", () => {
         },
       }),
       baseOpts(),
-    ).markdown;
+    ).report.render("markdown").output;
     expect(result).toContain("`init` failed");
     expect(result).toContain("provider not found");
     expect(result).toContain("❌");
@@ -668,7 +705,7 @@ describe("failed init/validate", () => {
         },
       }),
       baseOpts(),
-    ).markdown;
+    ).report.render("markdown").output;
     expect(result).toContain("`validate` failed");
     expect(result).toContain("invalid config");
   });
@@ -684,7 +721,7 @@ describe("failed init/validate", () => {
         },
       }),
       baseOpts(),
-    ).markdown;
+    ).report.render("markdown").output;
     expect(result).toContain("❌");
     expect(result).toContain("Plan Failed");
   });
@@ -700,7 +737,7 @@ describe("failed init/validate", () => {
         },
       }),
       baseOpts(),
-    ).markdown;
+    ).report.render("markdown").output;
     expect(result).toContain("`init` failed");
     expect(result).toContain("No output captured");
   });
@@ -720,7 +757,7 @@ describe("failed init/validate", () => {
         },
       }),
       baseOpts(),
-    ).markdown;
+    ).report.render("markdown").output;
     expect(result).toContain("Initializing backend...");
   });
 
@@ -735,7 +772,7 @@ describe("failed init/validate", () => {
         },
       }),
       baseOpts({ initStepId: "my-init" }),
-    ).markdown;
+    ).report.render("markdown").output;
     expect(result).toContain("`my-init` failed");
   });
 
@@ -750,7 +787,7 @@ describe("failed init/validate", () => {
         },
       }),
       baseOpts(),
-    ).markdown;
+    ).report.render("markdown").output;
     expect(result).not.toContain("`init` failed");
   });
 });
@@ -759,44 +796,60 @@ describe("failed init/validate", () => {
 // Logs URL is no longer rendered by reportFromSteps — the truncation notice
 // (which carried the logs link) is now the caller's responsibility. The
 // action layer (src/action/main.ts) builds and appends the truncation notice
-// using buildTruncationNotice(). These tests verify that wasTruncated is
-// correctly set under various env configurations.
+// using buildTruncationNotice(). These tests verify that truncation is
+// correctly reported under various env configurations when a budget is passed
+// to render().
 
 describe("logs URL (wasTruncated under env configs)", () => {
   it("reports wasTruncated when GITHUB_REPOSITORY and GITHUB_RUN_ID are set", () => {
-    const { wasTruncated } = reportFromSteps(
-      stepsJson({ checkout: { outcome: "success" } }),
+    const planFile = writeFile("logs-url-repo-run.json", MINIMAL_PLAN);
+    const { truncated } = reportFromSteps(
+      stepsJson({
+        "show-plan": {
+          outcome: "success",
+          outputs: { stdout_file: planFile },
+        },
+      }),
       baseOpts({
         env: {
           GITHUB_REPOSITORY: "myorg/myrepo",
           GITHUB_RUN_ID: "555",
         },
-        maxOutputLength: 1,
       }),
-    );
-    expect(wasTruncated).toBe(true);
+    ).report.render("markdown", 1);
+    expect(truncated).toBe(true);
   });
 
   it("reports wasTruncated when GITHUB_REPOSITORY is missing", () => {
-    const { wasTruncated } = reportFromSteps(
-      stepsJson({ checkout: { outcome: "success" } }),
+    const planFile = writeFile("logs-url-no-repo.json", MINIMAL_PLAN);
+    const { truncated } = reportFromSteps(
+      stepsJson({
+        "show-plan": {
+          outcome: "success",
+          outputs: { stdout_file: planFile },
+        },
+      }),
       baseOpts({
         env: { GITHUB_RUN_ID: "555" },
-        maxOutputLength: 1,
       }),
-    );
-    expect(wasTruncated).toBe(true);
+    ).report.render("markdown", 1);
+    expect(truncated).toBe(true);
   });
 
   it("reports wasTruncated when GITHUB_RUN_ID is missing", () => {
-    const { wasTruncated } = reportFromSteps(
-      stepsJson({ checkout: { outcome: "success" } }),
+    const planFile = writeFile("logs-url-no-run.json", MINIMAL_PLAN);
+    const { truncated } = reportFromSteps(
+      stepsJson({
+        "show-plan": {
+          outcome: "success",
+          outputs: { stdout_file: planFile },
+        },
+      }),
       baseOpts({
         env: { GITHUB_REPOSITORY: "myorg/myrepo" },
-        maxOutputLength: 1,
       }),
-    );
-    expect(wasTruncated).toBe(true);
+    ).report.render("markdown", 1);
+    expect(truncated).toBe(true);
   });
 });
 
@@ -809,7 +862,7 @@ describe("edge cases", () => {
         "show-plan": { outcome: "success" },
       }),
       baseOpts(),
-    ).markdown;
+    ).report.render("markdown").output;
     // Falls back because no stdout_file output → tier 4
     expect(result).toContain("Succeeded");
   });
@@ -823,7 +876,7 @@ describe("edge cases", () => {
         },
       }),
       baseOpts(),
-    ).markdown;
+    ).report.render("markdown").output;
     // Can't read file → tier 4 (general workflow)
     expect(result).toBeDefined();
     expect(typeof result).toBe("string");
@@ -835,7 +888,7 @@ describe("edge cases", () => {
         "show-plan": { outcome: "success", outputs: {} },
       }),
       baseOpts(),
-    ).markdown;
+    ).report.render("markdown").output;
     expect(result).toBeDefined();
   });
 
@@ -845,12 +898,14 @@ describe("edge cases", () => {
         checkout: {},
       }),
       baseOpts(),
-    ).markdown;
+    ).report.render("markdown").output;
     expect(result).toContain("unknown");
   });
 
   it("produces valid output when called with no options", () => {
-    const result = reportFromSteps(stepsJson({})).markdown;
+    const result = reportFromSteps(stepsJson({})).report.render(
+      "markdown",
+    ).output;
     expect(result).toBeDefined();
     expect(typeof result).toBe("string");
     expect(result.length).toBeGreaterThan(0);
@@ -879,7 +934,7 @@ describe("edge cases", () => {
         },
       }),
       baseOpts(),
-    ).markdown;
+    ).report.render("markdown").output;
     // Should NOT silently produce empty content — should explain the error
     expect(result).toMatch(/[Rr]elative file path/);
     expect(result).not.toContain("Showing raw command output");
@@ -900,7 +955,7 @@ describe("edge cases", () => {
         },
       }),
       baseOpts(),
-    ).markdown;
+    ).report.render("markdown").output;
     expect(result).toContain("Steps");
     expect(result).toContain("show-plan");
     expect(result).toContain("plan");

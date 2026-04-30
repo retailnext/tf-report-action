@@ -12,10 +12,7 @@
 
 import type { StepData, ReaderOptions } from "../steps/types.js";
 import type { StepIssue } from "../model/step-issue.js";
-import {
-  readStepStdoutForDisplay,
-  readStepStderrForDisplay,
-} from "../steps/io.js";
+import { readStepStdout, readStepStderr, peekStepStderr } from "../steps/io.js";
 import { getStepOutcome, getExitCode } from "../steps/outcomes.js";
 
 /**
@@ -36,17 +33,19 @@ export function buildStepIssue(
   const isFailed = outcome === "failure";
   const exitCode = getExitCode(step);
 
-  let heading: string;
+  let reason: "failed" | "parse-error" | "outcome";
+  let stepOutcome: string | undefined;
   if (isFailed) {
-    heading = `\`${stepId}\` failed`;
+    reason = "failed";
   } else if (diagnostic) {
-    heading = `\`${stepId}\`: output could not be parsed`;
+    reason = "parse-error";
   } else {
-    heading = `\`${stepId}\` ${outcome}`;
+    reason = "outcome";
+    stepOutcome = outcome;
   }
 
-  const stdoutRead = readStepStdoutForDisplay(step, readerOpts);
-  const stderrRead = readStepStderrForDisplay(step, readerOpts);
+  const stdoutRead = readStepStdout(step, readerOpts);
+  const stderrRead = readStepStderr(step, readerOpts);
 
   // Build with conditional spreads to preserve type safety while
   // respecting exactOptionalPropertyTypes (fields must not be undefined).
@@ -60,21 +59,16 @@ export function buildStepIssue(
 
   const issue: StepIssue = {
     id: stepId,
-    heading,
+    reason,
+    ...(stepOutcome !== undefined ? { outcome: stepOutcome } : {}),
     isFailed,
     ...(exitCode !== undefined ? { exitCode } : {}),
     ...(diagnostic !== undefined ? { diagnostic } : {}),
     ...(stdoutRead.content !== undefined ? { stdout: stdoutRead.content } : {}),
-    ...(stdoutRead.truncated === true
-      ? { stdoutTruncated: true as const }
-      : {}),
     ...(stdoutRead.error !== undefined
       ? { stdoutError: stdoutRead.error }
       : {}),
     ...(stderrContent !== undefined ? { stderr: stderrContent } : {}),
-    ...(stderrContent !== undefined && stderrRead.truncated === true
-      ? { stderrTruncated: true as const }
-      : {}),
     ...(stderrRead.error !== undefined
       ? { stderrError: stderrRead.error }
       : {}),
@@ -101,9 +95,9 @@ export function shouldCreateStepIssue(
   const outcome = getStepOutcome(step);
   if (outcome === "failure") return true;
   if (diagnostic !== undefined) return true;
-  // Check for stderr on successful steps (warnings/deprecations)
-  const stderrRead = readStepStderrForDisplay(step, readerOpts);
+  // Peek at stderr to check for warnings/deprecations without reading the full file
+  const stderrPeek = peekStepStderr(step, readerOpts);
   return (
-    stderrRead.content !== undefined && stderrRead.content.trim().length > 0
+    stderrPeek.content !== undefined && stderrPeek.content.trim().length > 0
   );
 }

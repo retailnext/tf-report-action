@@ -11,7 +11,7 @@ interface TransportCall {
   method: string;
   url: string;
   headers: Record<string, string>;
-  body?: string;
+  body?: string | undefined;
 }
 
 function mockTransport(responses: HttpResponse[]): {

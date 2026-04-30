@@ -15,7 +15,6 @@ export type {
 export {
   isStepResult,
   DEFAULT_MAX_FILE_SIZE,
-  DEFAULT_MAX_DISPLAY_READ,
   DEFAULT_INIT_STEP,
   DEFAULT_VALIDATE_STEP,
   DEFAULT_PLAN_STEP,
@@ -35,15 +34,16 @@ export type {
 } from "./reader.js";
 export {
   readForParse,
-  readForDisplay,
+  readPeek,
   isReadError,
   getValidatedPath,
 } from "./reader.js";
 export {
   readStepFile,
   readStepStdout,
-  readStepStdoutForDisplay,
-  readStepStderrForDisplay,
+  readStepStderr,
+  peekStepStdout,
+  peekStepStderr,
   getStepStdoutPath,
 } from "./io.js";
 export {

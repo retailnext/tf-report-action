@@ -10,7 +10,7 @@ import { join } from "node:path";
 import { tmpdir } from "node:os";
 import {
   readForParse,
-  readForDisplay,
+  readPeek,
   isReadError,
 } from "../../../src/steps/reader.js";
 import type { ReaderOptions } from "../../../src/steps/types.js";
@@ -23,7 +23,6 @@ beforeEach(() => {
   options = {
     allowedDirs: [tempDir],
     maxFileSize: 1024,
-    maxDisplayRead: 256,
   };
 });
 
@@ -189,10 +188,10 @@ describe("readForParse", () => {
   });
 });
 
-describe("readForDisplay", () => {
+describe("readPeek", () => {
   it("reads a small file completely", () => {
     const path = writeFixture("output.txt", "hello world");
-    const result = readForDisplay(path, options);
+    const result = readPeek(path, options);
     expect(isReadError(result)).toBe(false);
     if (!isReadError(result)) {
       expect(result.content).toBe("hello world");
@@ -200,38 +199,27 @@ describe("readForDisplay", () => {
     }
   });
 
-  it("truncates file exceeding maxDisplayRead", () => {
-    const content = "a".repeat(512);
+  it("truncates file exceeding peek size (8 KiB)", () => {
+    const content = "a".repeat(16 * 1024);
     const path = writeFixture("big.txt", content);
-    const result = readForDisplay(path, options);
+    // Use a large maxFileSize so readPeek doesn't hit parse limit
+    const bigOpts = { ...options, maxFileSize: 1024 * 1024 };
+    const result = readPeek(path, bigOpts);
     expect(isReadError(result)).toBe(false);
     if (!isReadError(result)) {
-      expect(result.content.length).toBe(256);
-      expect(result.content).toBe("a".repeat(256));
-      expect(result.truncated).toBe(true);
-    }
-  });
-
-  it("does NOT reject large files (unlike readForParse)", () => {
-    // Display reads should work on any size file — they just truncate
-    const content = "b".repeat(2048);
-    const path = writeFixture("huge.txt", content);
-    const result = readForDisplay(path, options);
-    expect(isReadError(result)).toBe(false);
-    if (!isReadError(result)) {
-      expect(result.content.length).toBe(256);
+      expect(result.content.length).toBe(8 * 1024);
       expect(result.truncated).toBe(true);
     }
   });
 
   it("applies same security checks as readForParse", () => {
-    const result = readForDisplay(join(tempDir, "nope.txt"), options);
+    const result = readPeek(join(tempDir, "nope.txt"), options);
     expect(isReadError(result)).toBe(true);
   });
 
   it("rejects relative file paths", () => {
     writeFixture("output.txt", "hello");
-    const result = readForDisplay("output.txt", options);
+    const result = readPeek("output.txt", options);
     expect(isReadError(result)).toBe(true);
     if (isReadError(result)) {
       expect(result.error).toBe("Relative file paths are not allowed");
@@ -240,7 +228,7 @@ describe("readForDisplay", () => {
 
   it("reads empty file", () => {
     const path = writeFixture("empty.txt", "");
-    const result = readForDisplay(path, options);
+    const result = readPeek(path, options);
     expect(isReadError(result)).toBe(false);
     if (!isReadError(result)) {
       expect(result.content).toBe("");

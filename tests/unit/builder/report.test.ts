@@ -1,6 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { buildReport } from "../../../src/builder/index.js";
 import type { Plan } from "../../../src/tfjson/plan.js";
+import type { AttributeValues } from "../../../src/tfjson/common.js";
 
 function basePlan(overrides: Partial<Plan> = {}): Plan {
   return {
@@ -38,7 +39,6 @@ describe("buildReport", () => {
       resource_changes: [
         {
           address: "null_resource.root",
-          module_address: undefined,
           mode: "managed",
           type: "null_resource",
           name: "root",
@@ -97,7 +97,6 @@ describe("buildReport", () => {
         },
         {
           address: "null_resource.root",
-          module_address: undefined,
           mode: "managed",
           type: "null_resource",
           name: "root",
@@ -156,15 +155,15 @@ describe("buildReport", () => {
     });
 
     const report = buildReport(plan);
-    const createGroup = report.summary.actions.find(
+    const createGroup = report.summary!.actions.find(
       (g) => g.action === "create",
     );
-    const deleteGroup = report.summary.actions.find(
+    const deleteGroup = report.summary!.actions.find(
       (g) => g.action === "delete",
     );
     expect(createGroup?.total).toBe(1);
     expect(deleteGroup?.total).toBe(1);
-    expect(report.summary.failures).toEqual([]);
+    expect(report.summary!.failures).toEqual([]);
   });
 
   it("skips data source read-only changes", () => {
@@ -198,7 +197,7 @@ describe("buildReport", () => {
         my_output: {
           actions: ["create"],
           before: null,
-          after: "result",
+          after: "result" as unknown as AttributeValues,
           before_sensitive: false,
           after_sensitive: false,
         },
@@ -207,7 +206,7 @@ describe("buildReport", () => {
 
     const report = buildReport(plan);
     expect(report.outputs).toHaveLength(1);
-    expect(report.outputs[0]!.name).toBe("my_output");
+    expect(report.outputs![0]!.name).toBe("my_output");
   });
 
   it("passes showUnchangedAttributes option to attribute builder", () => {

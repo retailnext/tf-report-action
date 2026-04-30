@@ -9,7 +9,6 @@ import {
   DEFAULT_STATE_STEP,
   DEFAULT_KNOWN_STEP_IDS,
   DEFAULT_MAX_FILE_SIZE,
-  DEFAULT_MAX_DISPLAY_READ,
   OUTPUT_STDOUT_FILE,
   OUTPUT_STDERR_FILE,
   OUTPUT_EXIT_CODE,
@@ -55,10 +54,6 @@ describe("default step IDs", () => {
 describe("constants", () => {
   it("DEFAULT_MAX_FILE_SIZE is 256 MiB", () => {
     expect(DEFAULT_MAX_FILE_SIZE).toBe(256 * 1024 * 1024);
-  });
-
-  it("DEFAULT_MAX_DISPLAY_READ is 64 KiB", () => {
-    expect(DEFAULT_MAX_DISPLAY_READ).toBe(64 * 1024);
   });
 
   it("output keys match exec-action convention", () => {

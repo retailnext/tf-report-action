@@ -108,7 +108,7 @@ export function discoverApplyFixtures(): ApplyFixture[] {
         label,
         planJson: readFileSync(planPath, "utf-8"),
         applyJsonl: applyContent,
-        stateJson,
+        ...(stateJson !== undefined && { stateJson }),
       });
     }
   });
