@@ -30,7 +30,7 @@ describe("buildResourceChanges", () => {
           after_sensitive: false,
           after_unknown: false,
         },
-      } as NonNullable<Plan["resource_changes"]>[number],
+      },
     ]);
     const result = buildResourceChanges(plan, {});
     expect(result[0]!.address).toBe("null_resource.fallback");
@@ -48,7 +48,7 @@ describe("buildResourceChanges", () => {
           after_sensitive: false,
           after_unknown: false,
         },
-      } as NonNullable<Plan["resource_changes"]>[number],
+      },
     ]);
     const result = buildResourceChanges(plan, {});
     expect(result[0]!.address).toBe("unknown.unknown");

@@ -32,7 +32,7 @@ function makeDriftEntry(
       after_unknown: false,
     },
     ...overrides,
-  } as TFResourceChange;
+  };
 }
 
 /** A registry containing a single rule. */

@@ -27,7 +27,7 @@ function baseEnv(overrides: Partial<Record<string, string>> = {}): Env {
     GITHUB_RUN_ID: "12345",
     GITHUB_REPOSITORY: "owner/repo",
     ...overrides,
-  } as Env;
+  };
 }
 
 /**

@@ -3400,10 +3400,7 @@ function formatJsonLinesMsgMarkdown(msg) {
   const icon = levelIcon(level);
   const prefix = icon ? `${icon} ` : "";
   const typeStr = typeof msg.type === "string" ? msg.type : "";
-  const fields = flattenJsonFields(
-    msg,
-    ENVELOPE_KEYS
-  );
+  const fields = flattenJsonFields(msg, ENVELOPE_KEYS);
   if (fields.length === 0) {
     const typeSuffix2 = typeStr ? ` \`type=${typeStr}\`` : "";
     return `${prefix}\`${message}\`${typeSuffix2}`;
@@ -3462,10 +3459,7 @@ function formatJsonLinesMsgHtml(msg) {
   const icon = levelIcon(level);
   const prefix = icon ? `${icon} ` : "";
   const typeStr = typeof msg.type === "string" ? msg.type : "";
-  const fields = flattenJsonFields(
-    msg,
-    ENVELOPE_KEYS
-  );
+  const fields = flattenJsonFields(msg, ENVELOPE_KEYS);
   if (fields.length === 0) {
     const typeSuffix2 = typeStr ? ` <code>type=${htmlEscape(typeStr)}</code>` : "";
     return `<p>${prefix}<code>${htmlEscape(message)}</code>${typeSuffix2}</p>`;
@@ -4938,6 +4932,7 @@ var ActionsError = class extends Error {
     this.statusCode = statusCode;
     this.name = "ActionsError";
   }
+  statusCode;
 };
 
 // src/http/retry.ts

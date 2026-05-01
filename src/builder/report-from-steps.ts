@@ -110,7 +110,7 @@ export function buildReportFromSteps(
   stepsJson: string,
   options?: ReportOptions,
 ): Report {
-  const env = options?.env ?? (process.env as Env);
+  const env = options?.env ?? process.env;
   const workspace = options?.workspace;
   const logsUrl = buildLogsUrl(env);
 

@@ -112,7 +112,7 @@ export interface RunDeps {
  * via `logger.error()` and `exit(1)`.
  */
 export async function run(
-  env: Env = process.env as Env,
+  env: Env = process.env,
   deps?: RunDeps,
 ): Promise<void> {
   const logger = deps?.logger ?? actionsLogger();

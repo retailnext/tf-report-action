@@ -55,7 +55,7 @@ export async function httpRequest(
   options?: TransportOptions,
 ): Promise<HttpResponse> {
   const target = new URL(url);
-  const env = options?.env ?? (process.env as Env);
+  const env = options?.env ?? process.env;
   const proxyUrl = getProxyUrl(target, env);
 
   if (!proxyUrl) {
@@ -237,7 +237,7 @@ function collectResponse(
   res.on("end", () => {
     resolve({
       status: res.statusCode ?? 0,
-      headers: res.headers as Record<string, string | string[] | undefined>,
+      headers: res.headers,
       body: Buffer.concat(chunks).toString("utf-8"),
     });
   });
