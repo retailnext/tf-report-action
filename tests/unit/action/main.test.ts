@@ -336,10 +336,10 @@ describe("run — error handling", () => {
       await run(env, {
         clientFactory: () => mockClient().client,
         logger,
-        exit: ((code: number) => {
+        exit: (code: number) => {
           exitCode = code;
           throw new ExitError(code);
-        }) as (code: number) => never,
+        },
       });
     } catch {
       // Expected

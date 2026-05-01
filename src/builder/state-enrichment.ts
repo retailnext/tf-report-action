@@ -150,7 +150,7 @@ function buildInstanceMap(
       const rawValues = inst.attributes;
       const flatValues =
         rawValues !== undefined
-          ? flatten(rawValues as JsonValue)
+          ? flatten(rawValues)
           : new Map<string, string | null>();
       const sensitiveNames = extractSensitiveNames(inst);
       map.set(address, { rawValues, flatValues, sensitiveNames });

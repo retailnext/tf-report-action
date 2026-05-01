@@ -425,10 +425,7 @@ function formatJsonLinesMsgMarkdown(msg: JsonLinesMsg): string {
   const prefix = icon ? `${icon} ` : "";
   const typeStr = typeof msg.type === "string" ? msg.type : "";
 
-  const fields = flattenJsonFields(
-    msg as Record<string, unknown>,
-    ENVELOPE_KEYS,
-  );
+  const fields = flattenJsonFields(msg, ENVELOPE_KEYS);
 
   if (fields.length === 0) {
     const typeSuffix = typeStr ? ` \`type=${typeStr}\`` : "";
@@ -494,10 +491,7 @@ function formatJsonLinesMsgHtml(msg: JsonLinesMsg): string {
   const prefix = icon ? `${icon} ` : "";
   const typeStr = typeof msg.type === "string" ? msg.type : "";
 
-  const fields = flattenJsonFields(
-    msg as Record<string, unknown>,
-    ENVELOPE_KEYS,
-  );
+  const fields = flattenJsonFields(msg, ENVELOPE_KEYS);
 
   if (fields.length === 0) {
     const typeSuffix = typeStr

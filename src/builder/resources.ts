@@ -1,6 +1,5 @@
 import type { ResourceChange as TFResourceChange } from "../tfjson/resource.js";
 import type { Plan, Change } from "../tfjson/plan.js";
-import type { JsonValue } from "../tfjson/common.js";
 import type { ResourceChange as ModelResourceChange } from "../model/resource.js";
 import type { PlanAction } from "../model/plan-action.js";
 import type { BuildOptions } from "./options.js";
@@ -170,12 +169,12 @@ function hasRawValueChanges(change: Change): boolean {
   if (change.after_unknown === true) return true;
   if (
     typeof change.after_unknown === "object" &&
-    Object.keys(change.after_unknown as object).length > 0
+    Object.keys(change.after_unknown).length > 0
   )
     return true;
 
-  const beforeFlat = flatten(before as unknown as JsonValue);
-  const afterFlat = flatten(after as unknown as JsonValue);
+  const beforeFlat = flatten(before);
+  const afterFlat = flatten(after);
 
   if (beforeFlat.size !== afterFlat.size) return true;
 
