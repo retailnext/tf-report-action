@@ -1,11 +1,13 @@
 import type { ResourceChange as TFResourceChange } from "../tfjson/resource.js";
-import type { Plan } from "../tfjson/plan.js";
+import type { Plan, Change } from "../tfjson/plan.js";
+import type { JsonValue } from "../tfjson/common.js";
 import type { ResourceChange as ModelResourceChange } from "../model/resource.js";
 import type { PlanAction } from "../model/plan-action.js";
 import type { BuildOptions } from "./options.js";
 import type { PlannedChange } from "../jsonl-scanner/types.js";
 import { determineAction } from "./action.js";
 import { buildAttributeChanges } from "./attributes.js";
+import { flatten } from "../flattener/index.js";
 import { createDefaultDriftRuleRegistry } from "../drift-filter/index.js";
 
 /**
@@ -109,11 +111,15 @@ export function buildDriftChanges(
     )
       continue;
 
-    // Suppress drift with no visible attribute changes. This only applies
-    // when full before/after attribute data is known (always true for plan
-    // JSON resource_drift entries). Move/import entries are kept because the
-    // address change or import ID is meaningful independent of attributes.
-    if (attributes.length === 0 && action !== "move" && action !== "import")
+    // Suppress drift with no actual value changes. Compares raw (unmasked)
+    // before/after values so sensitive attributes that genuinely differ are
+    // correctly detected. Independent of showUnchangedAttributes. Move/import
+    // entries are kept because they carry meaningful non-attribute information.
+    if (
+      !hasRawValueChanges(rc.change) &&
+      action !== "move" &&
+      action !== "import"
+    )
       continue;
 
     result.push({
@@ -138,6 +144,46 @@ function shouldSkip(rc: TFResourceChange): boolean {
   if (rc.mode === "data") {
     return true;
   }
+  return false;
+}
+
+/**
+ * Compares raw (unmasked) before/after values to detect actual changes.
+ *
+ * Flattens `change.before` and `change.after` into string maps and compares
+ * them directly — no masking, no sensitivity handling. This ensures the
+ * suppression decision reflects real value differences, not display artifacts.
+ *
+ * Returns `true` if the values actually differ (drift should be kept).
+ */
+function hasRawValueChanges(change: Change): boolean {
+  const before = change.before ?? null;
+  const after = change.after ?? null;
+
+  // One side null, other not — definitely changed (create/delete)
+  if ((before === null) !== (after === null)) return true;
+
+  // Both null — no change
+  if (before === null && after === null) return false;
+
+  // Any after_unknown values mean we can't determine equality — assume changed
+  if (change.after_unknown === true) return true;
+  if (
+    typeof change.after_unknown === "object" &&
+    Object.keys(change.after_unknown as object).length > 0
+  )
+    return true;
+
+  const beforeFlat = flatten(before as unknown as JsonValue);
+  const afterFlat = flatten(after as unknown as JsonValue);
+
+  if (beforeFlat.size !== afterFlat.size) return true;
+
+  for (const [key, beforeVal] of beforeFlat) {
+    if (!afterFlat.has(key)) return true;
+    if (beforeVal !== afterFlat.get(key)) return true;
+  }
+
   return false;
 }
 

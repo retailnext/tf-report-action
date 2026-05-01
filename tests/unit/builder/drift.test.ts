@@ -172,6 +172,96 @@ describe("buildDriftChanges", () => {
       expect(result).toHaveLength(0);
     });
 
+    it("keeps drift with after_unknown values (cannot determine equality)", () => {
+      const plan = basePlan([
+        makeDriftEntry({
+          change: {
+            actions: ["update"],
+            before: { id: "abc", computed: "old" },
+            after: { id: "abc", computed: "old" },
+            before_sensitive: false,
+            after_sensitive: false,
+            after_unknown: { computed: true },
+          },
+        }),
+      ]);
+
+      const result = buildDriftChanges(plan, {});
+      expect(result).toHaveLength(1);
+    });
+
+    it("keeps drift when after_unknown is boolean true", () => {
+      const plan = basePlan([
+        makeDriftEntry({
+          change: {
+            actions: ["update"],
+            before: { id: "abc" },
+            after: { id: "abc" },
+            before_sensitive: false,
+            after_sensitive: false,
+            after_unknown: true,
+          },
+        }),
+      ]);
+
+      const result = buildDriftChanges(plan, {});
+      expect(result).toHaveLength(1);
+    });
+
+    it("keeps drift where before/after have different key counts", () => {
+      const plan = basePlan([
+        makeDriftEntry({
+          change: {
+            actions: ["update"],
+            before: { id: "abc" },
+            after: { id: "abc", new_field: "added" },
+            before_sensitive: false,
+            after_sensitive: false,
+            after_unknown: false,
+          },
+        }),
+      ]);
+
+      const result = buildDriftChanges(plan, {});
+      expect(result).toHaveLength(1);
+    });
+
+    it("keeps drift where keys differ even with same count", () => {
+      const plan = basePlan([
+        makeDriftEntry({
+          change: {
+            actions: ["update"],
+            before: { old_key: "val" },
+            after: { new_key: "val" },
+            before_sensitive: false,
+            after_sensitive: false,
+            after_unknown: false,
+          },
+        }),
+      ]);
+
+      const result = buildDriftChanges(plan, {});
+      expect(result).toHaveLength(1);
+    });
+
+    it("suppresses drift when both before and after are null", () => {
+      const plan = basePlan([
+        makeDriftEntry({
+          change: {
+            actions: ["no-op"],
+            before: null,
+            after: null,
+            before_sensitive: false,
+            after_sensitive: false,
+            after_unknown: false,
+          },
+        }),
+      ]);
+
+      const result = buildDriftChanges(plan, {});
+      expect(result).toHaveLength(0);
+    });
+
     it("keeps update drift with actual attribute changes", () => {
       const plan = basePlan([
         makeDriftEntry({
@@ -274,7 +364,7 @@ describe("buildDriftChanges", () => {
       expect(result[0]!.importId).toBe("imported-123");
     });
 
-    it("keeps drift with sensitive attributes (values masked but present)", () => {
+    it("keeps drift with sensitive attributes that actually changed", () => {
       const plan = basePlan([
         makeDriftEntry({
           change: {
@@ -290,8 +380,26 @@ describe("buildDriftChanges", () => {
 
       const result = buildDriftChanges(plan, {});
       expect(result).toHaveLength(1);
-      // The sensitive attribute is included even though its masked values are equal
+      // Raw value comparison detects that underlying values differ
       expect(result[0]!.attributes.length).toBeGreaterThan(0);
+    });
+
+    it("suppresses drift where sensitive values are identical", () => {
+      const plan = basePlan([
+        makeDriftEntry({
+          change: {
+            actions: ["update"],
+            before: { id: "abc", secret: "same-value" },
+            after: { id: "abc", secret: "same-value" },
+            before_sensitive: { secret: true },
+            after_sensitive: { secret: true },
+            after_unknown: false,
+          },
+        }),
+      ]);
+
+      const result = buildDriftChanges(plan, {});
+      expect(result).toHaveLength(0);
     });
 
     it("suppresses drift where all attributes are identical including nested", () => {
@@ -390,6 +498,51 @@ describe("buildDriftChanges", () => {
       const result = buildDriftChanges(plan, {});
       expect(result).toHaveLength(1);
       expect(result[0]!.address).toBe("aws_instance.real_drift");
+    });
+
+    it("suppresses identical drift even when showUnchangedAttributes is true", () => {
+      const plan = basePlan([
+        makeDriftEntry({
+          address: "kubernetes_namespace_v1.ns",
+          type: "kubernetes_namespace_v1",
+          name: "ns",
+          change: {
+            actions: ["update"],
+            before: { id: "abc", metadata: "same", labels: "same" },
+            after: { id: "abc", metadata: "same", labels: "same" },
+            before_sensitive: false,
+            after_sensitive: false,
+            after_unknown: false,
+          },
+        }),
+      ]);
+
+      const result = buildDriftChanges(plan, {
+        showUnchangedAttributes: true,
+      });
+      expect(result).toHaveLength(0);
+    });
+
+    it("keeps changed drift when showUnchangedAttributes is true", () => {
+      const plan = basePlan([
+        makeDriftEntry({
+          change: {
+            actions: ["update"],
+            before: { id: "abc", version: "1" },
+            after: { id: "abc", version: "2" },
+            before_sensitive: false,
+            after_sensitive: false,
+            after_unknown: false,
+          },
+        }),
+      ]);
+
+      const result = buildDriftChanges(plan, {
+        showUnchangedAttributes: true,
+      });
+      expect(result).toHaveLength(1);
+      // With showUnchangedAttributes, all attributes are present in output
+      expect(result[0]!.attributes.length).toBeGreaterThan(1);
     });
   });
 });

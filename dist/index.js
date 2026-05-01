@@ -1154,7 +1154,7 @@ function buildDriftChanges(plan, options) {
       allAttributesForSuppression
     ))
       continue;
-    if (attributes.length === 0 && action !== "move" && action !== "import")
+    if (!hasRawValueChanges(rc.change) && action !== "move" && action !== "import")
       continue;
     result.push({
       address,
@@ -1173,6 +1173,23 @@ function buildDriftChanges(plan, options) {
 function shouldSkip(rc) {
   if (rc.mode === "data") {
     return true;
+  }
+  return false;
+}
+function hasRawValueChanges(change) {
+  const before = change.before ?? null;
+  const after = change.after ?? null;
+  if (before === null !== (after === null)) return true;
+  if (before === null && after === null) return false;
+  if (change.after_unknown === true) return true;
+  if (typeof change.after_unknown === "object" && Object.keys(change.after_unknown).length > 0)
+    return true;
+  const beforeFlat = flatten(before);
+  const afterFlat = flatten(after);
+  if (beforeFlat.size !== afterFlat.size) return true;
+  for (const [key, beforeVal] of beforeFlat) {
+    if (!afterFlat.has(key)) return true;
+    if (beforeVal !== afterFlat.get(key)) return true;
   }
   return false;
 }
