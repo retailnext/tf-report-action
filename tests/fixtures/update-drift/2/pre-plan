@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+# Pre-plan hook: write back the SAME content that Terraform expects.
+# This verifies the provider detects no drift when values are unchanged.
+# If somehow drift IS reported (as happens with some providers), the
+# suppression logic in hasRawValueChanges() will filter it out.
+printf "original-content" > managed.txt

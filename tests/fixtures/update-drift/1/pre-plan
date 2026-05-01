@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+# Pre-plan hook: modify the managed file content to simulate external drift.
+# The filesystem provider reads the file during refresh and detects the
+# content differs from state, producing a resource_drift entry with "update"
+# action (both before and after non-null with differing values).
+echo "externally-modified-content" > managed.txt

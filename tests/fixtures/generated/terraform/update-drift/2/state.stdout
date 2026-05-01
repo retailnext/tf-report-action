@@ -1,0 +1,43 @@
+{
+  "version": 4,
+  "terraform_version": "1.14.9",
+  "serial": 1,
+  "lineage": "4783d864-6664-1fe1-4552-557c250a4702",
+  "outputs": {},
+  "resources": [
+    {
+      "mode": "managed",
+      "type": "filesystem_file_writer",
+      "name": "managed",
+      "provider": "provider[\"registry.terraform.io/sethvargo/filesystem\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "contents": "original-content",
+            "create_parent_dirs": true,
+            "delete_on_destroy": true,
+            "id": "managed.txt",
+            "mode": "0644",
+            "name": "managed.txt",
+            "path": "managed.txt",
+            "root": null,
+            "size": 16
+          },
+          "sensitive_attributes": [
+            [
+              {
+                "type": "get_attr",
+                "value": "contents"
+              }
+            ]
+          ],
+          "identity_schema_version": 0,
+          "private": "bnVsbA=="
+        }
+      ]
+    }
+  ],
+  "check_results": null
+}
+
