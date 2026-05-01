@@ -28,7 +28,9 @@ export default defineConfig({
         "src/model/index.ts", // barrel re-exports; tests import from specific files
         "src/model/output.ts",
         "src/model/render-options.ts",
+        "src/model/renderable.ts",
         "src/model/report.ts",
+        "src/model/report-title.ts",
         "src/model/resource.ts",
         "src/model/step-file-read.ts",
         "src/model/step-issue.ts",
