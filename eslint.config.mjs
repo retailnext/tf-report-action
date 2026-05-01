@@ -1,8 +1,14 @@
 import eslint from "@eslint/js";
 import tseslint from "typescript-eslint";
 import importPlugin from "eslint-plugin-import-x";
+import noBarrelFiles from "eslint-plugin-no-barrel-files";
+import boundaries from "eslint-plugin-boundaries";
+import { resolve } from "node:path";
 
 export default tseslint.config(
+  // .mjs files in scripts/ use plain JS and can't be included in tsconfig —
+  // exclude them from TypeScript type-aware linting.
+  { ignores: ["scripts/*.mjs"] },
   eslint.configs.recommended,
   ...tseslint.configs.strictTypeChecked,
   ...tseslint.configs.stylisticTypeChecked,
@@ -79,143 +85,230 @@ export default tseslint.config(
       "@typescript-eslint/explicit-module-boundary-types": "off",
     },
   },
+  // ---------------------------------------------------------------------------
+  // Folder dependency graph — enforced by eslint-plugin-boundaries
+  //
+  // Every src/ folder is declared as an element type. The boundaries/dependencies
+  // rule uses an allowlist (default: "disallow") so any import not listed below
+  // is an error. This statically guarantees the folder-level dependency graph
+  // is acyclic; a governance test (tests/unit/governance/no-folder-cycles.test.ts)
+  // additionally verifies that the declared rules cannot form a cycle.
+  // ---------------------------------------------------------------------------
   {
-    // The action layer may only import from pipelines, model, github, env,
-    // http, logger, inputs, and comment. It must not reach into internal
-    // library modules.
-    files: ["src/action/**/*.ts"],
-    rules: {
-      "no-restricted-imports": [
-        "error",
-        {
-          patterns: [
-            {
-              group: [
-                "../builder/*",
-                "../diff/*",
-                "../flattener/*",
-                "../sensitivity/*",
-                "../parser/*",
-                "../steps/*",
-                "../jsonl-scanner/*",
-                "../tfjson/*",
-                "../drift-filter/*",
-                "../renderable/*",
-                "../elements/*",
-              ],
-              message:
-                "The action layer may only import from src/pipelines/, src/model/, src/github/, src/env/, src/http/, src/logger/, src/inputs/, src/html/, and src/comment/.",
-            },
-          ],
-        },
+    settings: {
+      // Resolve .js extensions to .ts files so boundaries can classify imports
+      "import/resolver": {
+        typescript: { project: "./tsconfig.test.json" },
+      },
+      "boundaries/root-path": resolve(import.meta.dirname),
+      "boundaries/include": ["src/**/*.ts", "tests/**/*.ts", "scripts/**/*.ts"],
+      "boundaries/legacy-templates": false,
+      "boundaries/elements": [
+        { type: "action", pattern: "src/action", mode: "folder" },
+        { type: "artifact", pattern: "src/artifact", mode: "folder" },
+        { type: "builder", pattern: "src/builder", mode: "folder" },
+        { type: "comment", pattern: "src/comment", mode: "folder" },
+        { type: "diff", pattern: "src/diff", mode: "folder" },
+        { type: "drift-filter", pattern: "src/drift-filter", mode: "folder" },
+        { type: "elements", pattern: "src/elements", mode: "folder" },
+        { type: "env", pattern: "src/env", mode: "folder" },
+        { type: "flattener", pattern: "src/flattener", mode: "folder" },
+        { type: "github", pattern: "src/github", mode: "folder" },
+        { type: "html", pattern: "src/html", mode: "folder" },
+        { type: "http", pattern: "src/http", mode: "folder" },
+        { type: "inputs", pattern: "src/inputs", mode: "folder" },
+        { type: "jsonl-scanner", pattern: "src/jsonl-scanner", mode: "folder" },
+        { type: "logger", pattern: "src/logger", mode: "folder" },
+        { type: "model", pattern: "src/model", mode: "folder" },
+        { type: "parser", pattern: "src/parser", mode: "folder" },
+        { type: "pipelines", pattern: "src/pipelines", mode: "folder" },
+        { type: "raw-formatter", pattern: "src/raw-formatter", mode: "folder" },
+        { type: "renderable", pattern: "src/renderable", mode: "folder" },
+        { type: "sensitivity", pattern: "src/sensitivity", mode: "folder" },
+        { type: "steps", pattern: "src/steps", mode: "folder" },
+        { type: "tfjson", pattern: "src/tfjson", mode: "folder" },
+        { type: "tests", pattern: "tests", mode: "folder" },
+        { type: "scripts", pattern: "scripts", mode: "folder" },
       ],
     },
-  },
-  {
-    // The comment module may only import from env/ and model/ (status icons).
-    files: ["src/comment/**/*.ts"],
+    plugins: { boundaries },
     rules: {
-      "no-restricted-imports": [
+      "boundaries/no-unknown": [2],
+      "boundaries/no-unknown-files": [2],
+      "boundaries/no-ignored": [2],
+      "boundaries/dependencies": [
         "error",
         {
-          patterns: [
+          default: "disallow",
+          checkAllOrigins: true,
+          checkUnknownLocals: true,
+          rules: [
+            // Folders with no local dependencies
+            { from: { type: "tfjson" }, allow: [] },
+            { from: { type: "env" }, allow: [] },
+            { from: { type: "diff" }, allow: [] },
+            { from: { type: "sensitivity" }, allow: [] },
+            { from: { type: "raw-formatter" }, allow: [] },
+            { from: { type: "logger" }, allow: [] },
+            { from: { type: "html" }, allow: [] },
+
+            { from: { type: "model" }, allow: [{ to: { type: "tfjson" } }] },
+
             {
-              group: [
-                "../builder/*",
-                "../diff/*",
-                "../flattener/*",
-                "../sensitivity/*",
-                "../parser/*",
-                "../steps/*",
-                "../jsonl-scanner/*",
-                "../tfjson/*",
-                "../action/*",
-                "../github/*",
-                "../http/*",
-                "../logger/*",
-                "../inputs/*",
-                "../html/*",
-                "../artifact/*",
-                "../renderable/*",
-                "../elements/*",
-                "../pipelines/*",
-                "../index.js",
-              ],
-              message:
-                "The comment module may only import from src/env/ and src/model/.",
+              from: { type: "renderable" },
+              allow: [{ to: { type: "model" } }],
             },
-          ],
-        },
-      ],
-    },
-  },
-  {
-    // The GitHub API client may only import from http/ (for the HttpResponse type).
-    // It must not reach into any library internals.
-    files: ["src/github/**/*.ts"],
-    rules: {
-      "no-restricted-imports": [
-        "error",
-        {
-          patterns: [
+
             {
-              group: [
-                "../builder/*",
-                "../diff/*",
-                "../flattener/*",
-                "../sensitivity/*",
-                "../parser/*",
-                "../steps/*",
-                "../jsonl-scanner/*",
-                "../tfjson/*",
-                "../action/*",
-                "../comment/*",
-                "../logger/*",
-                "../inputs/*",
-                "../env/*",
-                "../model/*",
-                "../renderable/*",
-                "../elements/*",
-                "../pipelines/*",
-                "../index.js",
-              ],
-              message: "The GitHub client may only import from src/http/.",
+              from: { type: "flattener" },
+              allow: [{ to: { type: "tfjson" } }],
             },
-          ],
-        },
-      ],
-    },
-  },
-  {
-    // The HTTP module may only import from env/ (DI abstraction).
-    files: ["src/http/**/*.ts"],
-    rules: {
-      "no-restricted-imports": [
-        "error",
-        {
-          patterns: [
+
             {
-              group: [
-                "../builder/*",
-                "../diff/*",
-                "../flattener/*",
-                "../sensitivity/*",
-                "../parser/*",
-                "../steps/*",
-                "../jsonl-scanner/*",
-                "../tfjson/*",
-                "../action/*",
-                "../comment/*",
-                "../logger/*",
-                "../inputs/*",
-                "../model/*",
-                "../github/*",
-                "../renderable/*",
-                "../elements/*",
-                "../pipelines/*",
-                "../index.js",
+              from: { type: "jsonl-scanner" },
+              allow: [
+                { to: { type: "model" } },
+                { to: { type: "tfjson" } },
+                { to: { origin: "core" }, dependency: { module: "node:fs" } },
               ],
-              message: "The HTTP module may only import from src/env/.",
+            },
+
+            {
+              from: { type: "http" },
+              allow: [
+                { to: { type: "env" } },
+                { to: { origin: "core" }, dependency: { module: "node:http" } },
+                {
+                  to: { origin: "core" },
+                  dependency: { module: "node:https" },
+                },
+                { to: { origin: "core" }, dependency: { module: "node:tls" } },
+              ],
+            },
+
+            {
+              from: { type: "parser" },
+              allow: [{ to: { type: "model" } }, { to: { type: "tfjson" } }],
+            },
+
+            {
+              from: { type: "steps" },
+              allow: [
+                { to: { type: "env" } },
+                { to: { type: "model" } },
+                { to: { origin: "core" }, dependency: { module: "node:fs" } },
+                { to: { origin: "core" }, dependency: { module: "node:path" } },
+              ],
+            },
+
+            { from: { type: "github" }, allow: [{ to: { type: "http" } }] },
+
+            {
+              from: { type: "inputs" },
+              allow: [
+                { to: { type: "env" } },
+                { to: { origin: "core" }, dependency: { module: "node:fs" } },
+              ],
+            },
+
+            {
+              from: { type: "drift-filter" },
+              allow: [{ to: { type: "model" } }],
+            },
+
+            {
+              from: { type: "artifact" },
+              allow: [
+                { to: { type: "http" } },
+                {
+                  to: { origin: "core" },
+                  dependency: { module: "node:crypto" },
+                },
+              ],
+            },
+
+            {
+              from: { type: "comment" },
+              allow: [{ to: { type: "env" } }, { to: { type: "model" } }],
+            },
+
+            {
+              from: { type: "builder" },
+              allow: [
+                { to: { type: "diff" } },
+                { to: { type: "drift-filter" } },
+                { to: { type: "env" } },
+                { to: { type: "flattener" } },
+                { to: { type: "jsonl-scanner" } },
+                { to: { type: "model" } },
+                { to: { type: "parser" } },
+                { to: { type: "renderable" } },
+                { to: { type: "sensitivity" } },
+                { to: { type: "steps" } },
+                { to: { type: "tfjson" } },
+                { to: { origin: "core" }, dependency: { module: "node:os" } },
+              ],
+            },
+
+            {
+              from: { type: "elements" },
+              allow: [
+                { to: { type: "builder" } },
+                { to: { type: "diff" } },
+                { to: { type: "model" } },
+                { to: { type: "renderable" } },
+                { to: { type: "tfjson" } },
+              ],
+            },
+
+            {
+              from: { type: "pipelines" },
+              allow: [
+                { to: { type: "builder" } },
+                { to: { type: "elements" } },
+                { to: { type: "jsonl-scanner" } },
+                { to: { type: "model" } },
+                { to: { type: "parser" } },
+                { to: { type: "renderable" } },
+              ],
+            },
+
+            {
+              from: { type: "action" },
+              allow: [
+                { to: { type: "artifact" } },
+                { to: { type: "builder" } },
+                { to: { type: "comment" } },
+                { to: { type: "env" } },
+                { to: { type: "github" } },
+                { to: { type: "html" } },
+                { to: { type: "http" } },
+                { to: { type: "inputs" } },
+                { to: { type: "logger" } },
+                { to: { type: "pipelines" } },
+                {
+                  to: { origin: "core" },
+                  dependency: { module: "node:crypto" },
+                },
+              ],
+            },
+
+            // tests and scripts may import anything
+            {
+              from: { type: "tests" },
+              allow: [
+                { to: { origin: "local" } },
+                { to: { origin: "core" } },
+                { to: { origin: "external" } },
+              ],
+            },
+            {
+              from: { type: "scripts" },
+              allow: [
+                { to: { origin: "local" } },
+                { to: { origin: "core" } },
+                { to: { origin: "external" } },
+              ],
             },
           ],
         },
@@ -226,11 +319,19 @@ export default tseslint.config(
     // Forbid direct process/console access in source files — all I/O must go
     // through the injected Logger interface. The only exception is
     // src/logger/index.ts which provides the production implementation.
+    //
+    // Also forbid inline import("...") type expressions; they are invisible to
+    // eslint-plugin-boundaries and bypass folder dependency checks.
     files: ["src/**/*.ts"],
     ignores: ["src/logger/index.ts"],
     rules: {
       "no-restricted-syntax": [
         "error",
+        {
+          selector: "TSImportType",
+          message:
+            "Use a top-level 'import type' declaration instead of an inline import() type expression. Inline import() types are invisible to eslint-plugin-boundaries and bypass folder dependency checks.",
+        },
         {
           selector:
             "MemberExpression[object.name='process'][property.name='stderr']",
@@ -265,6 +366,34 @@ export default tseslint.config(
     },
   },
   {
+    // Also forbid inline import("...") type expressions in tests and scripts.
+    // Kept as a separate block because the src/ block above uses `ignores` to
+    // carve out src/logger/index.ts; these two dirs have no such exception.
+    files: ["tests/**/*.ts", "scripts/**/*.ts"],
+    rules: {
+      "no-restricted-syntax": [
+        "error",
+        {
+          selector: "TSImportType",
+          message:
+            "Use a top-level 'import type' declaration instead of an inline import() type expression. Inline import() types are invisible to eslint-plugin-boundaries and bypass folder dependency checks.",
+        },
+      ],
+    },
+  },
+  {
     ignores: ["dist/**", "coverage/**", "node_modules/**"],
+  },
+  {
+    // Prohibit barrel files (re-exporting imported bindings) across all source.
+    // This codebase is not a library; every import must point to the file that
+    // defines the symbol.
+    files: ["src/**/*.ts", "tests/**/*.ts", "scripts/**/*.ts"],
+    plugins: {
+      "no-barrel-files": noBarrelFiles,
+    },
+    rules: {
+      "no-barrel-files/no-barrel-files": "error",
+    },
   },
 );
