@@ -5,7 +5,7 @@
  * need to show step statuses.
  */
 
-import type { Renderable, OutputFormat } from "../renderable/types.js";
+import type { Renderable, OutputFormat } from "../model/renderable.js";
 import type { StepOutcome } from "../model/step-outcome.js";
 import { Table, EMPTY } from "../renderable/primitives.js";
 import { textCell, codeSpan } from "../renderable/helpers.js";

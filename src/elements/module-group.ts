@@ -7,7 +7,7 @@
  * level that the category element wraps.
  */
 
-import type { Renderable, OutputFormat } from "../renderable/types.js";
+import type { Renderable, OutputFormat } from "../model/renderable.js";
 import type { ResourceChange } from "../model/resource.js";
 import type { DiffEntry } from "../diff/types.js";
 import type { ApplyContext } from "./apply-context.js";

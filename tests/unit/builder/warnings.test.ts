@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import type { OutputFormat } from "../../../src/renderable/types.js";
+import type { OutputFormat } from "../../../src/model/renderable.js";
 import {
   NoShowPlanWarning,
   RawTextFallbackWarning,

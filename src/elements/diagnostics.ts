@@ -3,10 +3,10 @@
  * ReportElement with headings and formatted diagnostic details.
  */
 
-import type { OutputFormat } from "../renderable/types.js";
+import type { OutputFormat } from "../model/renderable.js";
 import type { ReportElement } from "../renderable/types.js";
 import type { Diagnostic } from "../model/diagnostic.js";
-import type { UIDiagnosticSnippet } from "../model/index.js";
+import type { UIDiagnosticSnippet } from "../tfjson/machine-readable-ui.js";
 import { Blockquote } from "../renderable/primitives.js";
 import { DIAGNOSTIC_ERROR, DIAGNOSTIC_WARNING } from "../model/status-icons.js";
 import { htmlEscape } from "../renderable/html-escape.js";

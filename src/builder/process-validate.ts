@@ -10,7 +10,7 @@ import type { Report } from "../model/report.js";
 import type { UIDiagnostic } from "../tfjson/machine-readable-ui.js";
 import { getStepOutcome } from "../steps/outcomes.js";
 import { readStepStdout } from "../steps/io.js";
-import { parseValidateOutput } from "../parser/index.js";
+import { parseValidateOutput } from "../parser/validate-output.js";
 import { buildStepIssue } from "./step-issues.js";
 import { uiDiagnosticToModel } from "./process-helpers.js";
 

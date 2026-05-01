@@ -1,10 +1,8 @@
 import { describe, expect, it } from "vitest";
 import { composeReport } from "../../../src/elements/composed-report.js";
 import { buildReportElements } from "../../../src/elements/report-elements.js";
-import type {
-  OutputFormat,
-  ReportElement,
-} from "../../../src/renderable/types.js";
+import type { OutputFormat } from "../../../src/model/renderable.js";
+import type { ReportElement } from "../../../src/renderable/types.js";
 
 // ---------------------------------------------------------------------------
 // Test helpers

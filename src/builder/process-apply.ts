@@ -15,7 +15,7 @@ import {
   peekStepStdout,
   getStepStdoutPath,
 } from "../steps/io.js";
-import { detectToolFromOutput } from "../parser/index.js";
+import { detectToolFromOutput } from "../parser/detect-tool.js";
 import { scanFile } from "../jsonl-scanner/scan.js";
 import { isJsonLines } from "../jsonl-scanner/detect.js";
 import { buildStepIssue } from "./step-issues.js";

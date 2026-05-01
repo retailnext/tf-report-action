@@ -7,8 +7,8 @@
  * objects that can render to both markdown and HTML.
  */
 
-import type { Renderable, OutputFormat } from "../renderable/types.js";
-import type { DiffEntry } from "../diff/types.js";
+import type { Renderable, OutputFormat } from "../model/renderable.js";
+import type { DiffEntry, DiffFormat } from "../diff/types.js";
 import { Details, CodeBlock, EMPTY } from "../renderable/primitives.js";
 import { buildLineDiff } from "../diff/line-diff.js";
 import { buildCharDiff } from "../diff/char-diff.js";
@@ -17,13 +17,6 @@ import { detailsSummary, htmlCodeCell } from "../renderable/helpers.js";
 
 /** Number of unchanged lines to show around each changed hunk in context diffs. */
 const CONTEXT_LINES = 3;
-
-// ---------------------------------------------------------------------------
-// Inline table-cell diffs
-// ---------------------------------------------------------------------------
-
-/** Diff format for inline attribute changes: "inline" or "simple". */
-export type DiffFormat = "inline" | "simple";
 
 /**
  * Formats a before/after pair as an inline diff suitable for a table cell.

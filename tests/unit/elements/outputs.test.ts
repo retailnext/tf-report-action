@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import type { Renderable } from "../../../src/renderable/types.js";
+import type { Renderable } from "../../../src/model/renderable.js";
 import type { OutputChange } from "../../../src/model/output.js";
 import type { DiffEntry } from "../../../src/diff/types.js";
 import { buildOutputsRenderable } from "../../../src/elements/outputs.js";

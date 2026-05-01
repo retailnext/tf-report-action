@@ -3,7 +3,7 @@
  * details section (used when structured + raw content coexist in a report).
  */
 
-import type { OutputFormat } from "../renderable/types.js";
+import type { OutputFormat } from "../model/renderable.js";
 import type { ReportElement } from "../renderable/types.js";
 import { Details } from "../renderable/primitives.js";
 import { detailsSummary } from "../renderable/helpers.js";

@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { parsePlan } from "../../src/parser/index.js";
+import { parsePlan } from "../../src/parser/plan.js";
 
 describe("parsePlan", () => {
   const minimalValidPlan = JSON.stringify({

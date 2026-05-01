@@ -11,7 +11,7 @@
  * - Level 4 (full): table with char diffs, large values shown in full
  */
 
-import type { Renderable } from "../renderable/types.js";
+import type { Renderable } from "../model/renderable.js";
 import type { OutputChange } from "../model/output.js";
 import type { DiffEntry } from "../diff/types.js";
 import { Table, Sequence, EMPTY } from "../renderable/primitives.js";
@@ -26,7 +26,7 @@ import {
   buildLargeValueDiff,
   buildLargeValueContextDiff,
 } from "./diff-value.js";
-import type { DiffFormat } from "./diff-value.js";
+import type { DiffFormat } from "../diff/types.js";
 
 /**
  * Options for building output renderables.

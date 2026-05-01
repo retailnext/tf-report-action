@@ -9,7 +9,7 @@
 import type { ReportElement } from "../renderable/types.js";
 import type { Report } from "../model/report.js";
 import type { DiffEntry } from "../diff/types.js";
-import type { DiffFormat } from "./diff-value.js";
+import type { DiffFormat } from "../diff/types.js";
 import {
   TitleElement,
   MarkerElement,

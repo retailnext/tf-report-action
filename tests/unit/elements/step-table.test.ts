@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import type { Renderable } from "../../../src/renderable/types.js";
+import type { Renderable } from "../../../src/model/renderable.js";
 import { EMPTY } from "../../../src/renderable/primitives.js";
 import { buildStepTable } from "../../../src/elements/step-table.js";
 import type { StepOutcome } from "../../../src/model/step-outcome.js";

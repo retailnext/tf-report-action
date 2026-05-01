@@ -1,10 +1,6 @@
 import type { ReportOptions } from "../builder/report-from-steps.js";
-export type { ReportOptions };
-import type {
-  ComposedReport,
-  OutputFormat,
-  Renderable,
-} from "../renderable/types.js";
+import type { ComposedReport } from "../renderable/types.js";
+import type { OutputFormat, Renderable } from "../model/renderable.js";
 import { buildReportFromSteps } from "../builder/report-from-steps.js";
 import { buildReportElements } from "../elements/report-elements.js";
 import { composeReport } from "../elements/composed-report.js";

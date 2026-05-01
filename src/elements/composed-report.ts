@@ -17,8 +17,8 @@
  *    then outputs, then drift) to maximize useful information.
  */
 
+import type { OutputFormat } from "../model/renderable.js";
 import type {
-  OutputFormat,
   ReportElement,
   RenderResult,
   ComposedReport,

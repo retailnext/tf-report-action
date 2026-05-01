@@ -7,7 +7,7 @@
  * - Level 1 (full): heading + formatted raw output
  */
 
-import type { Renderable, OutputFormat } from "../renderable/types.js";
+import type { Renderable, OutputFormat } from "../model/renderable.js";
 import type { ReportElement } from "../renderable/types.js";
 import { Heading, Sequence } from "../renderable/primitives.js";
 import { renderNote } from "../renderable/helpers.js";

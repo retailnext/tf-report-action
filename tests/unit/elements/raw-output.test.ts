@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import type { Renderable } from "../../../src/renderable/types.js";
+import type { Renderable } from "../../../src/model/renderable.js";
 import { buildRawOutputRenderable } from "../../../src/elements/raw-output.js";
 
 /**

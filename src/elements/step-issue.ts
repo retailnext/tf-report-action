@@ -7,7 +7,7 @@
  * - Level 1 (full): heading + exit code + diagnostic + stdout/stderr
  */
 
-import type { OutputFormat } from "../renderable/types.js";
+import type { OutputFormat } from "../model/renderable.js";
 import type { ReportElement } from "../renderable/types.js";
 import type { StepIssue } from "../model/step-issue.js";
 import { Blockquote, Details } from "../renderable/primitives.js";

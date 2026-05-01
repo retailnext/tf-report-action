@@ -1,7 +1,7 @@
 import type { BuildOptions } from "../builder/options.js";
-import type { RenderOptions } from "../model/render-options.js";
+import type { RenderOptions } from "../builder/render-options.js";
 import type { ComposedReport } from "../renderable/types.js";
-import { parsePlan } from "../parser/index.js";
+import { parsePlan } from "../parser/plan.js";
 import { parseState } from "../parser/state.js";
 import { buildApplyReport } from "../builder/apply.js";
 import { buildTitle } from "../builder/title.js";

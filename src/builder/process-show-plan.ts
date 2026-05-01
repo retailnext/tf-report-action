@@ -7,7 +7,7 @@
  */
 
 import type { BuildOptions } from "./options.js";
-import type { RenderOptions } from "../model/render-options.js";
+import type { RenderOptions } from "./render-options.js";
 import type { StepData, ReaderOptions } from "../steps/types.js";
 import type { Report, Tool } from "../model/report.js";
 import {
@@ -18,7 +18,8 @@ import {
 import { expectedCommand } from "../model/step-commands.js";
 import { readStepStdout } from "../steps/io.js";
 import { getStepOutcome } from "../steps/outcomes.js";
-import { parsePlan, detectToolFromPlan } from "../parser/index.js";
+import { parsePlan } from "../parser/plan.js";
+import { detectToolFromPlan } from "../parser/detect-tool.js";
 import { buildReport } from "./index.js";
 import { buildApplyReport } from "./apply.js";
 import { buildStepIssue } from "./step-issues.js";

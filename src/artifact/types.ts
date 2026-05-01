@@ -7,7 +7,8 @@
  * avoid a cross-layer import from `src/github/`.
  */
 
-import type { HttpResponse } from "../http/index.js";
+import type { Hash } from "node:crypto";
+import type { HttpResponse } from "../http/transport.js";
 
 /**
  * HTTP transport function for artifact API calls.
@@ -52,7 +53,7 @@ export interface ArtifactUploaderDeps {
   /** HTTP transport — injected for proxy support and testability. */
   readonly transport?: ArtifactTransport;
   /** Hash factory — injectable for testing SHA-256 computation. */
-  readonly createHash?: (algorithm: string) => import("node:crypto").Hash;
+  readonly createHash?: (algorithm: string) => Hash;
   /** Sleep implementation — injectable to avoid real delays in tests. */
   readonly sleep?: (ms: number) => Promise<void>;
 }
