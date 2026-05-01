@@ -72,7 +72,12 @@ export function buildResourceChanges(
  * use the same ResourceChange schema, just from a different source field.
  * Drift entries are passed through the drift suppression registry; by default,
  * data sources and other unimportant drift are omitted.
- * No-op drift entries are kept (drift detection is always informational).
+ *
+ * Drift entries with no visible attribute changes are suppressed — they
+ * provide no actionable information. This relies on full before/after data
+ * being available in the plan JSON (always the case for `resource_drift`
+ * entries from `tofu show -json`). Move and import entries are exempt
+ * because they carry meaningful non-attribute information.
  */
 export function buildDriftChanges(
   plan: Plan,
@@ -102,6 +107,13 @@ export function buildDriftChanges(
         allAttributesForSuppression,
       )
     )
+      continue;
+
+    // Suppress drift with no visible attribute changes. This only applies
+    // when full before/after attribute data is known (always true for plan
+    // JSON resource_drift entries). Move/import entries are kept because the
+    // address change or import ID is meaningful independent of attributes.
+    if (attributes.length === 0 && action !== "move" && action !== "import")
       continue;
 
     result.push({

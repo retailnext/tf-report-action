@@ -1154,6 +1154,8 @@ function buildDriftChanges(plan, options) {
       allAttributesForSuppression
     ))
       continue;
+    if (attributes.length === 0 && action !== "move" && action !== "import")
+      continue;
     result.push({
       address,
       type: rc.type ?? "unknown",
