@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { ActionsError } from "../../../src/http/index.js";
+import { ActionsError } from "../../../src/http/errors.js";
 import {
   createArtifact,
   finalizeArtifact,

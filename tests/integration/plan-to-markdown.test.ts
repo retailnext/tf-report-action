@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeAll } from "vitest";
 import { planToMarkdown } from "../../src/pipelines/plan.js";
 import type { BuildOptions } from "../../src/builder/options.js";
-import type { RenderOptions } from "../../src/model/render-options.js";
+import type { RenderOptions } from "../../src/builder/render-options.js";
 import {
   discoverPlanFixtures,
   assertCorrectToolName,

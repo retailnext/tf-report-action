@@ -71,16 +71,6 @@ export interface StepData {
 export type Steps = Readonly<Record<string, StepData>>;
 
 // ---------------------------------------------------------------------------
-// Environment abstraction
-// ---------------------------------------------------------------------------
-
-/**
- * Re-exported from `env/` for backward compatibility. The canonical
- * definition lives in `src/env/index.ts`.
- */
-export type { Env } from "../env/index.js";
-
-// ---------------------------------------------------------------------------
 // Reader options (internal)
 // ---------------------------------------------------------------------------
 

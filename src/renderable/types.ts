@@ -7,8 +7,6 @@
  * markdown and HTML on demand.
  */
 
-// Re-export the fundamental contract from model/ (Layer 0) where it is defined.
-export type { OutputFormat, Renderable } from "../model/renderable.js";
 import type { OutputFormat } from "../model/renderable.js";
 
 // ---------------------------------------------------------------------------

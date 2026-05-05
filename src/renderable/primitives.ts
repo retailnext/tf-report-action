@@ -11,7 +11,7 @@
  * protobuf marshalling.
  */
 
-import type { OutputFormat, Renderable } from "./types.js";
+import type { OutputFormat, Renderable } from "../model/renderable.js";
 import { htmlEscape } from "./html-escape.js";
 import { markdownEscape, markdownEscapeBlock } from "./markdown-escape.js";
 

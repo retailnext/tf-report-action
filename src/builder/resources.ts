@@ -7,7 +7,7 @@ import type { PlannedChange } from "../jsonl-scanner/types.js";
 import { determineAction } from "./action.js";
 import { buildAttributeChanges } from "./attributes.js";
 import { flatten } from "../flattener/index.js";
-import { createDefaultDriftRuleRegistry } from "../drift-filter/index.js";
+import { createDefaultDriftRuleRegistry } from "../drift-filter/registry.js";
 
 /**
  * Refine a base action using resource metadata.

@@ -3,7 +3,7 @@
  * ReportElement (always shown at full detail).
  */
 
-import type { Renderable, OutputFormat } from "../renderable/types.js";
+import type { Renderable, OutputFormat } from "../model/renderable.js";
 import type { ReportElement } from "../renderable/types.js";
 import type { Summary, SummaryActionGroup } from "../model/summary.js";
 import type { PlanAction } from "../model/plan-action.js";

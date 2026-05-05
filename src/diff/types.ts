@@ -9,3 +9,6 @@ export interface LcsPair {
   beforeIndex: number;
   afterIndex: number;
 }
+
+/** Diff format for inline attribute changes. */
+export type DiffFormat = "inline" | "simple";

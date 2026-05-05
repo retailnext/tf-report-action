@@ -5,7 +5,7 @@
  * results). Falls back to a plain code block for unrecognized formats.
  */
 
-import type { Renderable, OutputFormat } from "../renderable/types.js";
+import type { Renderable, OutputFormat } from "../model/renderable.js";
 import { CodeBlock } from "../renderable/primitives.js";
 import {
   DIAGNOSTIC_WARNING,

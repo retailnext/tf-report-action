@@ -612,56 +612,6 @@ function mapToActionCounts(counts) {
   return result;
 }
 
-// src/parser/plan.ts
-function parsePlan(json) {
-  let parsed;
-  try {
-    parsed = JSON.parse(json);
-  } catch {
-    throw new Error("Failed to parse plan JSON: input is not valid JSON");
-  }
-  if (typeof parsed !== "object" || parsed === null || Array.isArray(parsed)) {
-    throw new Error("Plan JSON must be a JSON object");
-  }
-  const obj = parsed;
-  const formatVersion = obj["format_version"];
-  if (typeof formatVersion !== "string") {
-    throw new Error("Plan JSON is missing required field: format_version");
-  }
-  const majorStr = formatVersion.split(".")[0] ?? "0";
-  const major = parseInt(majorStr, 10);
-  if (isNaN(major) || major > 1) {
-    throw new Error(
-      `Unsupported plan format_version: ${formatVersion} (major version ${String(major)} > 1)`
-    );
-  }
-  return parsed;
-}
-
-// src/parser/state.ts
-function parseState(json) {
-  let parsed;
-  try {
-    parsed = JSON.parse(json);
-  } catch {
-    throw new Error("Failed to parse state JSON: input is not valid JSON");
-  }
-  if (typeof parsed !== "object" || parsed === null || Array.isArray(parsed)) {
-    throw new Error("State JSON must be a JSON object");
-  }
-  const obj = parsed;
-  const version = obj["version"];
-  if (typeof version !== "number") {
-    throw new Error("State JSON is missing required field: version");
-  }
-  if (version > 4) {
-    throw new Error(
-      `Unsupported state version: ${String(version)} (expected <= 4)`
-    );
-  }
-  return parsed;
-}
-
 // src/parser/validate-output.ts
 function parseValidateOutput(json) {
   let parsed;
@@ -698,51 +648,6 @@ function parseValidateOutput(json) {
     );
   }
   return parsed;
-}
-
-// src/parser/detect-tool.ts
-function detectToolFromPlan(plan) {
-  if (plan.applyable !== void 0) return "terraform";
-  if (plan.timestamp !== void 0) return "tofu";
-  const version = plan.terraform_version;
-  if (version !== void 0) {
-    const lower = version.toLowerCase();
-    if (lower.includes("tofu")) return "tofu";
-  }
-  return void 0;
-}
-function detectToolFromOutput(content) {
-  if (content === void 0 || content.length === 0) return void 0;
-  const versionResult = detectFromVersionMessage(content);
-  if (versionResult !== void 0) return versionResult;
-  return detectFromRawText(content);
-}
-function detectFromVersionMessage(content) {
-  const lines = content.split("\n", 5);
-  for (const line of lines) {
-    const trimmed = line.trim();
-    if (trimmed.length === 0 || !trimmed.startsWith("{")) continue;
-    let parsed;
-    try {
-      parsed = JSON.parse(trimmed);
-    } catch {
-      continue;
-    }
-    if (typeof parsed !== "object" || parsed === null || Array.isArray(parsed)) {
-      continue;
-    }
-    const obj = parsed;
-    if (obj["type"] !== "version") continue;
-    if ("tofu" in obj) return "tofu";
-    if ("terraform" in obj) return "terraform";
-  }
-  return void 0;
-}
-function detectFromRawText(content) {
-  const sample = content.slice(0, 4096).toLowerCase();
-  if (sample.includes("opentofu")) return "tofu";
-  if (sample.includes("terraform")) return "terraform";
-  return void 0;
 }
 
 // src/builder/process-helpers.ts
@@ -858,6 +763,77 @@ function processValidateStep(step, stepId, report, readerOpts) {
     } catch {
     }
   }
+}
+
+// src/parser/plan.ts
+function parsePlan(json) {
+  let parsed;
+  try {
+    parsed = JSON.parse(json);
+  } catch {
+    throw new Error("Failed to parse plan JSON: input is not valid JSON");
+  }
+  if (typeof parsed !== "object" || parsed === null || Array.isArray(parsed)) {
+    throw new Error("Plan JSON must be a JSON object");
+  }
+  const obj = parsed;
+  const formatVersion = obj["format_version"];
+  if (typeof formatVersion !== "string") {
+    throw new Error("Plan JSON is missing required field: format_version");
+  }
+  const majorStr = formatVersion.split(".")[0] ?? "0";
+  const major = parseInt(majorStr, 10);
+  if (isNaN(major) || major > 1) {
+    throw new Error(
+      `Unsupported plan format_version: ${formatVersion} (major version ${String(major)} > 1)`
+    );
+  }
+  return parsed;
+}
+
+// src/parser/detect-tool.ts
+function detectToolFromPlan(plan) {
+  if (plan.applyable !== void 0) return "terraform";
+  if (plan.timestamp !== void 0) return "tofu";
+  const version = plan.terraform_version;
+  if (version !== void 0) {
+    const lower = version.toLowerCase();
+    if (lower.includes("tofu")) return "tofu";
+  }
+  return void 0;
+}
+function detectToolFromOutput(content) {
+  if (content === void 0 || content.length === 0) return void 0;
+  const versionResult = detectFromVersionMessage(content);
+  if (versionResult !== void 0) return versionResult;
+  return detectFromRawText(content);
+}
+function detectFromVersionMessage(content) {
+  const lines = content.split("\n", 5);
+  for (const line of lines) {
+    const trimmed = line.trim();
+    if (trimmed.length === 0 || !trimmed.startsWith("{")) continue;
+    let parsed;
+    try {
+      parsed = JSON.parse(trimmed);
+    } catch {
+      continue;
+    }
+    if (typeof parsed !== "object" || parsed === null || Array.isArray(parsed)) {
+      continue;
+    }
+    const obj = parsed;
+    if (obj["type"] !== "version") continue;
+    if ("tofu" in obj) return "tofu";
+    if ("terraform" in obj) return "terraform";
+  }
+  return void 0;
+}
+function detectFromRawText(content) {
+  const sample = content.slice(0, 4096).toLowerCase();
+  if (sample.includes("opentofu")) return "tofu";
+  if (sample.includes("terraform")) return "terraform";
+  return void 0;
 }
 
 // src/builder/action.ts
@@ -2152,6 +2128,30 @@ function isLargeValue3(value) {
     }
   }
   return false;
+}
+
+// src/parser/state.ts
+function parseState(json) {
+  let parsed;
+  try {
+    parsed = JSON.parse(json);
+  } catch {
+    throw new Error("Failed to parse state JSON: input is not valid JSON");
+  }
+  if (typeof parsed !== "object" || parsed === null || Array.isArray(parsed)) {
+    throw new Error("State JSON must be a JSON object");
+  }
+  const obj = parsed;
+  const version = obj["version"];
+  if (typeof version !== "number") {
+    throw new Error("State JSON is missing required field: version");
+  }
+  if (version > 4) {
+    throw new Error(
+      `Unsupported state version: ${String(version)} (expected <= 4)`
+    );
+  }
+  return parsed;
 }
 
 // src/builder/report-from-steps.ts
@@ -4925,6 +4925,11 @@ function createGitHubClient(deps) {
   };
 }
 
+// src/http/transport.ts
+import * as http from "node:http";
+import * as https from "node:https";
+import * as tls from "node:tls";
+
 // src/http/errors.ts
 var ActionsError = class extends Error {
   constructor(message, statusCode) {
@@ -4934,41 +4939,6 @@ var ActionsError = class extends Error {
   }
   statusCode;
 };
-
-// src/http/retry.ts
-var DEFAULT_MAX_ATTEMPTS = 5;
-var DEFAULT_BASE_INTERVAL_MS = 3e3;
-var DEFAULT_MULTIPLIER = 1.5;
-async function withRetry(fn, isRetryable3, options) {
-  const maxAttempts = options?.maxAttempts ?? DEFAULT_MAX_ATTEMPTS;
-  const baseIntervalMs = options?.baseIntervalMs ?? DEFAULT_BASE_INTERVAL_MS;
-  const multiplier = options?.multiplier ?? DEFAULT_MULTIPLIER;
-  const sleep = options?.sleep ?? realSleep;
-  let lastError;
-  for (let attempt = 0; attempt < maxAttempts; attempt++) {
-    try {
-      return await fn();
-    } catch (error) {
-      lastError = error;
-      const isLastAttempt = attempt === maxAttempts - 1;
-      if (isLastAttempt || !isRetryable3(error)) {
-        throw error;
-      }
-      const minDelay = baseIntervalMs * multiplier ** attempt;
-      const maxDelay = minDelay * multiplier;
-      const delay = Math.floor(
-        minDelay + Math.random() * (maxDelay - minDelay)
-      );
-      await sleep(delay);
-    }
-  }
-  throw lastError;
-}
-function realSleep(ms) {
-  return new Promise((resolve2) => {
-    setTimeout(resolve2, ms);
-  });
-}
 
 // src/http/proxy.ts
 function isLoopbackAddress(host) {
@@ -5031,9 +5001,6 @@ function getProxyUrl(reqUrl, env) {
 }
 
 // src/http/transport.ts
-import * as http from "node:http";
-import * as https from "node:https";
-import * as tls from "node:tls";
 async function httpRequest(method, url, headers, body, options) {
   const target = new URL(url);
   const env = options?.env ?? process.env;
@@ -5395,6 +5362,41 @@ function extractBackendIds(runtimeToken) {
     throw new Error("Backend IDs in Actions.Results scope must not be empty");
   }
   return { workflowRunBackendId, workflowJobRunBackendId };
+}
+
+// src/http/retry.ts
+var DEFAULT_MAX_ATTEMPTS = 5;
+var DEFAULT_BASE_INTERVAL_MS = 3e3;
+var DEFAULT_MULTIPLIER = 1.5;
+async function withRetry(fn, isRetryable3, options) {
+  const maxAttempts = options?.maxAttempts ?? DEFAULT_MAX_ATTEMPTS;
+  const baseIntervalMs = options?.baseIntervalMs ?? DEFAULT_BASE_INTERVAL_MS;
+  const multiplier = options?.multiplier ?? DEFAULT_MULTIPLIER;
+  const sleep = options?.sleep ?? realSleep;
+  let lastError;
+  for (let attempt = 0; attempt < maxAttempts; attempt++) {
+    try {
+      return await fn();
+    } catch (error) {
+      lastError = error;
+      const isLastAttempt = attempt === maxAttempts - 1;
+      if (isLastAttempt || !isRetryable3(error)) {
+        throw error;
+      }
+      const minDelay = baseIntervalMs * multiplier ** attempt;
+      const maxDelay = minDelay * multiplier;
+      const delay = Math.floor(
+        minDelay + Math.random() * (maxDelay - minDelay)
+      );
+      await sleep(delay);
+    }
+  }
+  throw lastError;
+}
+function realSleep(ms) {
+  return new Promise((resolve2) => {
+    setTimeout(resolve2, ms);
+  });
 }
 
 // src/artifact/twirp.ts

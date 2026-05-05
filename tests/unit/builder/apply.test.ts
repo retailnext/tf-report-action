@@ -1,14 +1,12 @@
 import { describe, it, expect } from "vitest";
 import { buildApplyReport } from "../../../src/builder/apply.js";
+import type { Plan, Change, Importing } from "../../../src/tfjson/plan.js";
 import type {
-  Plan,
-  Change,
-  Importing,
-  ChangeActions,
   AttributeValues,
   AttributeShadow,
   JsonValue,
-} from "../../../src/tfjson/index.js";
+  ChangeActions,
+} from "../../../src/tfjson/common.js";
 import type { UIOutputsMessage } from "../../../src/tfjson/machine-readable-ui.js";
 import type { ScanResult } from "../../../src/jsonl-scanner/types.js";
 import { VALUE_NOT_IN_PLAN } from "../../../src/model/sentinels.js";

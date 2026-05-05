@@ -10,7 +10,7 @@
  * - Level 4 (tier 5): + full large-value blocks
  */
 
-import type { Renderable, OutputFormat } from "../renderable/types.js";
+import type { Renderable, OutputFormat } from "../model/renderable.js";
 import type { ReportElement } from "../renderable/types.js";
 import type { ResourceChange } from "../model/resource.js";
 import type { OutputChange } from "../model/output.js";

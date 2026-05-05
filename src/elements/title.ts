@@ -3,7 +3,7 @@
  * at full detail and never degraded by the progressive composer.
  */
 
-import type { Renderable, OutputFormat } from "../renderable/types.js";
+import type { Renderable, OutputFormat } from "../model/renderable.js";
 import type { ReportElement } from "../renderable/types.js";
 import type { ReportTitle, TitleActionCount } from "../model/report-title.js";
 import { Heading } from "../renderable/primitives.js";

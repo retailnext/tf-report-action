@@ -8,7 +8,7 @@
  * The element layer wraps these in blockquote chrome (`> ⚠️ **Warning:** …`).
  */
 
-import type { Renderable, OutputFormat } from "../renderable/types.js";
+import type { Renderable, OutputFormat } from "../model/renderable.js";
 import type { Tool } from "../model/report.js";
 import type { StepRole } from "../model/step-commands.js";
 import { expectedCommand } from "../model/step-commands.js";

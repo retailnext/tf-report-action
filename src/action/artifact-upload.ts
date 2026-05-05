@@ -9,10 +9,11 @@
  * All I/O dependencies are injected via parameters for testability.
  */
 
+import type { Hash } from "node:crypto";
 import type { Env } from "../env/index.js";
 import type { ArtifactTransport } from "../artifact/types.js";
-import { createArtifactUploader } from "../artifact/index.js";
-import { buildHtmlPage } from "../html/index.js";
+import { createArtifactUploader } from "../artifact/upload.js";
+import { buildHtmlPage } from "../html/page.js";
 import type { Logger } from "../logger/index.js";
 
 /** Injectable dependencies for the upload process. */
@@ -20,7 +21,7 @@ export interface TryUploadDeps {
   /** HTTP transport — reuse the same proxy-aware transport from main. */
   readonly transport?: ArtifactTransport;
   /** Hash factory — injectable for testing. */
-  readonly createHash?: (algorithm: string) => import("node:crypto").Hash;
+  readonly createHash?: (algorithm: string) => Hash;
   /** Sleep implementation — injectable to avoid real delays in tests. */
   readonly sleep?: (ms: number) => Promise<void>;
 }

@@ -1,4 +1,11 @@
-export type DiffFormat = "inline" | "simple";
+/**
+ * RenderOptions — display options that control how reports are rendered.
+ *
+ * This type is the single source of truth for render-time options. It is
+ * consumed by the builder (to forward options to the renderer) and by the
+ * pipeline entry points.
+ */
+import type { DiffFormat } from "../diff/types.js";
 
 export interface RenderOptions {
   /**

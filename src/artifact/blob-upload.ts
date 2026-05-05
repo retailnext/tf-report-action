@@ -9,7 +9,9 @@
  * exponential backoff used by the Twirp calls.
  */
 
-import { ActionsError, assertOk, withRetry } from "../http/index.js";
+import { ActionsError } from "../http/errors.js";
+import { withRetry } from "../http/retry.js";
+import { assertOk } from "../http/transport.js";
 import type { ArtifactTransport } from "./types.js";
 
 /** Status codes that trigger a retry on blob upload. */

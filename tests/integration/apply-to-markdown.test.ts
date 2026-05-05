@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeAll } from "vitest";
 import { applyToMarkdown } from "../../src/pipelines/apply.js";
 import type { BuildOptions } from "../../src/builder/options.js";
-import type { RenderOptions } from "../../src/model/render-options.js";
+import type { RenderOptions } from "../../src/builder/render-options.js";
 import {
   discoverApplyFixtures,
   assertCorrectToolName,

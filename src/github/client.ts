@@ -1,4 +1,4 @@
-import type { HttpResponse } from "../http/index.js";
+import type { HttpResponse } from "../http/transport.js";
 
 // ---------------------------------------------------------------------------
 // Types

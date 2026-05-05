@@ -9,7 +9,9 @@
  * (429, 5xx) with exponential backoff.
  */
 
-import { ActionsError, assertOk, withRetry } from "../http/index.js";
+import { ActionsError } from "../http/errors.js";
+import { withRetry } from "../http/retry.js";
+import { assertOk } from "../http/transport.js";
 import type { ArtifactTransport, BackendIds } from "./types.js";
 
 const SERVICE = "github.actions.results.api.v1.ArtifactService";

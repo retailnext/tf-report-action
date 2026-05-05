@@ -8,7 +8,7 @@
  */
 
 import { createHash as nodeCreateHash } from "node:crypto";
-import { ActionsError } from "../http/index.js";
+import { ActionsError } from "../http/errors.js";
 import { extractBackendIds } from "./jwt.js";
 import { createArtifact, finalizeArtifact } from "./twirp.js";
 import { uploadBlob } from "./blob-upload.js";

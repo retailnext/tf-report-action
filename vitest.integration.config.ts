@@ -25,9 +25,7 @@ export default defineConfig({
         "src/model/apply-status.ts",
         "src/model/attribute.ts",
         "src/model/diagnostic.ts",
-        "src/model/index.ts", // barrel re-exports; tests import from specific files
         "src/model/output.ts",
-        "src/model/render-options.ts",
         "src/model/renderable.ts",
         "src/model/report.ts",
         "src/model/report-title.ts",
@@ -44,6 +42,8 @@ export default defineConfig({
         "src/**/*.d.ts",
         "src/diff/types.ts",
         "src/builder/options.ts",
+        // render-options.ts (now in builder/) is type-only; no executable code
+        "src/builder/render-options.ts",
         // steps/types.ts has runtime guard functions; the one guarding
         // OUTPUT_EXIT_CODE is not reachable through standard fixtures.
         "src/steps/types.ts",
@@ -51,16 +51,13 @@ export default defineConfig({
         "tests/**",
         // Parser error-path branches (invalid JSON, unsupported format versions,
         // malformed state) are covered by unit tests. Integration tests supply
-        // valid plan/state JSON from real tool runs. The parser barrel re-export
-        // (index.ts) and detect-tool error paths significantly reduce coverage
-        // when included.
+        // valid plan/state JSON from real tool runs. The detect-tool error paths
+        // significantly reduce coverage when included.
         "src/parser/**",
         // Steps reader has extensive security/error-path branches (symlink
         // rejection, size limits, permission errors) not reachable through
         // fixture-driven integration tests. Happy paths are covered.
         "src/steps/reader.ts",
-        // Steps barrel re-exports are trivially covered by unit tests.
-        "src/steps/index.ts",
         // Steps parse has error-path branches for malformed/invalid step data
         // not reachable through standard generated fixtures.
         "src/steps/parse.ts",
@@ -68,16 +65,13 @@ export default defineConfig({
         // hasAnyFailedKnownStep) require fixtures with step failures outside
         // the known IaC steps — covered by unit tests.
         "src/steps/outcomes.ts",
-        // jsonl-scanner barrel and types — no executable logic
-        "src/jsonl-scanner/index.ts",
+        // jsonl-scanner types — no executable logic
         "src/jsonl-scanner/types.ts",
         // Drift filter rule implementations — pure predicates with no side
         // effects. The registry (registry.ts) is exercised by
         // tests/integration/drift-filter.test.ts: null-lifecycle/4 covers
         // both the suppressed and unsuppressed paths.
         "src/drift-filter/rules/**",
-        // Barrel re-export — no executable logic
-        "src/drift-filter/index.ts",
         // The action module is the GitHub Action entry point — it is exercised
         // by unit tests with mocked clients, not integration tests.
         "src/action/**",
@@ -105,9 +99,6 @@ export default defineConfig({
         "src/comment/**",
         // Type-only file — interfaces with no executable code.
         "src/renderable/types.ts",
-        // Barrel re-exports — no executable logic.
-        "src/renderable/index.ts",
-        "src/elements/index.ts",
         // ErrorElement is only produced on pipeline/parse failures —
         // integration tests supply valid fixture data. Covered by unit tests.
         "src/elements/error.ts",

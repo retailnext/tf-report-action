@@ -6,12 +6,13 @@ import type {
   GitHubClient,
   Comment,
   SearchIssue,
-} from "../../../src/github/index.js";
+} from "../../../src/github/client.js";
 import { writeFileSync, mkdtempSync, rmSync } from "node:fs";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
 import { nullLogger, capturingLogger } from "../../helpers/logger.js";
 import type { RunDeps } from "../../../src/action/main.js";
+import type { TryUploadParams } from "../../../src/action/artifact-upload.js";
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -381,7 +382,7 @@ describe("run — artifact upload on truncation", () => {
     const { client } = mockClient();
     const uploadCalls: unknown[] = [];
     const fakeTryUpload = (
-      params: import("../../../src/action/artifact-upload.js").TryUploadParams,
+      params: TryUploadParams,
     ): Promise<string | undefined> => {
       uploadCalls.push(params);
       return Promise.resolve(undefined);
@@ -405,11 +406,10 @@ describe("run — artifact upload on truncation", () => {
 
 describe("run — always-upload-report", () => {
   it("calls tryUploadFullReport when always-upload-report is true", async () => {
-    const uploadCalls: import("../../../src/action/artifact-upload.js").TryUploadParams[] =
-      [];
+    const uploadCalls: TryUploadParams[] = [];
     const { client } = mockClient();
     const fakeTryUpload = (
-      params: import("../../../src/action/artifact-upload.js").TryUploadParams,
+      params: TryUploadParams,
     ): Promise<string | undefined> => {
       uploadCalls.push(params);
       return Promise.resolve(
@@ -497,7 +497,7 @@ describe("run — artifact naming", () => {
     let capturedName: string | undefined;
     const { client } = mockClient();
     const fakeTryUpload = (
-      params: import("../../../src/action/artifact-upload.js").TryUploadParams,
+      params: TryUploadParams,
     ): Promise<string | undefined> => {
       capturedName = params.artifactName;
       return Promise.resolve(undefined);

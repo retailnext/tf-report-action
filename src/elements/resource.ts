@@ -13,12 +13,12 @@
  * module-group rendering.
  */
 
-import type { Renderable, OutputFormat } from "../renderable/types.js";
+import type { Renderable, OutputFormat } from "../model/renderable.js";
 import type { ResourceChange } from "../model/resource.js";
 import type { Diagnostic } from "../model/diagnostic.js";
 import type { DiffEntry } from "../diff/types.js";
 import type { ApplyContext } from "./apply-context.js";
-import type { DiffFormat } from "./diff-value.js";
+import type { DiffFormat } from "../diff/types.js";
 import type { PlanAction } from "../model/plan-action.js";
 import {
   Details,

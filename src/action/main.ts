@@ -10,23 +10,22 @@
  */
 
 import type { Env } from "../env/index.js";
-import type { ReportOptions } from "../pipelines/steps.js";
+import type { ReportOptions } from "../builder/report-from-steps.js";
 import { reportFromSteps } from "../pipelines/steps.js";
-import type { GitHubClient, GitHubClientDeps } from "../github/index.js";
-import { createGitHubClient } from "../github/index.js";
-import { httpRequest } from "../http/index.js";
+import type { GitHubClient, GitHubClientDeps } from "../github/client.js";
+import { createGitHubClient } from "../github/client.js";
+import { httpRequest } from "../http/transport.js";
 import type { Logger } from "../logger/index.js";
 import { actionsLogger } from "../logger/index.js";
 import { parseInputs, readPrNumber } from "../inputs/index.js";
+import { buildMarker } from "../comment/marker.js";
 import {
   buildLogsUrl,
   parseRepo,
   buildFooter,
   calculateBudget,
-  buildMarker,
-  assembleCommentBody,
-  buildTruncation,
-} from "../comment/index.js";
+} from "../comment/footer.js";
+import { buildTruncation, assembleCommentBody } from "../comment/body.js";
 import { tryUploadFullReport } from "./artifact-upload.js";
 import type { TryUploadParams } from "./artifact-upload.js";
 

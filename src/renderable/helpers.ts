@@ -7,7 +7,7 @@
  * the same format-switching logic across multiple element files.
  */
 
-import type { Renderable, OutputFormat } from "./types.js";
+import type { Renderable, OutputFormat } from "../model/renderable.js";
 import { htmlEscape } from "./html-escape.js";
 import { markdownEscape } from "./markdown-escape.js";
 

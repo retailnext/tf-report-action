@@ -30,11 +30,12 @@
 import { readFileSync } from "node:fs";
 import { writeFile } from "node:fs/promises";
 import { execSync } from "node:child_process";
+import { resolve, dirname, join, isAbsolute, relative } from "node:path";
 import { reportFromSteps } from "../src/pipelines/steps.js";
-import type { ReportOptions } from "../src/pipelines/steps.js";
+import type { ReportOptions } from "../src/builder/report-from-steps.js";
 import type { BuildOptions } from "../src/builder/options.js";
-import type { RenderOptions } from "../src/model/render-options.js";
-import { buildHtmlPage, MARKDOWN_CSS } from "../src/html/index.js";
+import type { RenderOptions } from "../src/builder/render-options.js";
+import { buildHtmlPage, MARKDOWN_CSS } from "../src/html/page.js";
 
 // ---------------------------------------------------------------------------
 // Argument parsing
@@ -82,6 +83,7 @@ interface ParsedArgs {
   output: string | null;
   gallery: boolean;
   noOpen: boolean;
+  maxOutputLength: number | undefined;
   options: BuildOptions & RenderOptions;
   reportOptions: Partial<ReportOptions>;
 }
@@ -94,6 +96,7 @@ function parseArgs(argv: string[]): ParsedArgs {
   let output: string | null = null;
   let gallery = false;
   let noOpen = false;
+  let maxOutputLength: number | undefined;
 
   // Normalize --flag=value into ["--flag", "value"] so the switch/case
   // handles both --flag value and --flag=value uniformly.
@@ -114,7 +117,7 @@ function parseArgs(argv: string[]): ParsedArgs {
         const val = normalized[++i];
         if (val !== "html" && val !== "markdown") {
           process.stderr.write(
-            `Error: --format must be "html" or "markdown", got "${val}"\n`,
+            `Error: --format must be "html" or "markdown", got "${String(val)}"\n`,
           );
           process.exit(1);
         }
@@ -125,18 +128,22 @@ function parseArgs(argv: string[]): ParsedArgs {
       case "-o":
         output = normalized[++i] ?? null;
         break;
-      case "--title":
-        options.title = normalized[++i];
+      case "--title": {
+        const title = normalized[++i];
+        if (title !== undefined) options.title = title;
         break;
+      }
       case "--show-unchanged":
         options.showUnchangedAttributes = true;
         break;
       case "--diff-format":
         options.diffFormat = normalized[++i] as "inline" | "simple";
         break;
-      case "--workspace":
-        reportOptions.workspace = normalized[++i];
+      case "--workspace": {
+        const ws = normalized[++i];
+        if (ws !== undefined) reportOptions.workspace = ws;
         break;
+      }
       case "--logs-url": {
         // Parse a GitHub Actions run URL into env vars for the library
         const url = normalized[++i];
@@ -162,7 +169,7 @@ function parseArgs(argv: string[]): ParsedArgs {
         break;
       case "--max-output-length": {
         const val = parseInt(normalized[++i] ?? "", 10);
-        if (!isNaN(val)) reportOptions.maxOutputLength = val;
+        if (!isNaN(val)) maxOutputLength = val;
         break;
       }
       case "--no-open":
@@ -178,11 +185,28 @@ function parseArgs(argv: string[]): ParsedArgs {
     }
   }
 
-  return { file, format, output, gallery, noOpen, options, reportOptions };
+  return {
+    file,
+    format,
+    output,
+    gallery,
+    noOpen,
+    maxOutputLength,
+    options,
+    reportOptions,
+  };
 }
 
-const { file, format, output, gallery, noOpen, options, reportOptions } =
-  parseArgs(args);
+const {
+  file,
+  format,
+  output,
+  gallery,
+  noOpen,
+  maxOutputLength,
+  options,
+  reportOptions,
+} = parseArgs(args);
 
 // Markdown format always implies --no-open (no browser to open for raw text)
 const effectiveNoOpen = noOpen || format === "markdown" || output !== null;
@@ -245,8 +269,6 @@ if (gallery) {
     process.exit(1);
   }
 
-  const { resolve, dirname, join, isAbsolute, relative } =
-    await import("node:path");
   const { readdirSync } = await import("node:fs");
 
   const repoRoot = resolve(import.meta.dirname, "..");
@@ -278,11 +300,11 @@ if (gallery) {
   }
 
   process.stderr.write(
-    `Found ${allStepsFiles.length} fixture steps files. Rendering...\n`,
+    `Found ${String(allStepsFiles.length)} fixture steps files. Rendering...\n`,
   );
 
   // Render each fixture and collect { path, markdown, html }
-  const entries: Array<{ path: string; markdown: string; html: string }> = [];
+  const entries: { path: string; markdown: string; html: string }[] = [];
   for (const absPath of allStepsFiles) {
     const relPath = relative(repoRoot, absPath);
     const stepsDir = dirname(absPath);
@@ -315,7 +337,7 @@ if (gallery) {
   }
 
   process.stderr.write(
-    `Rendered ${entries.length} fixtures. Building gallery HTML...\n`,
+    `Rendered ${String(entries.length)} fixtures. Building gallery HTML...\n`,
   );
 
   const galleryDataJson = JSON.stringify(
@@ -357,7 +379,7 @@ if (gallery) {
     }
 
     process.stderr.write(
-      `Gallery written to ${outPath} (${entries.length} fixtures)\n`,
+      `Gallery written to ${outPath} (${String(entries.length)} fixtures)\n`,
     );
   }
 }
@@ -799,8 +821,6 @@ function resolveRelativeFilePaths(
 // ---------------------------------------------------------------------------
 
 if (!gallery) {
-  const { dirname, resolve, join, isAbsolute } = await import("node:path");
-
   let stepsJson: string;
   let stepsDir: string;
 
@@ -837,16 +857,12 @@ if (!gallery) {
   }
 
   const result = reportFromSteps(stepsJson, stepsOpts);
-  const maxLen =
-    stepsOpts.maxOutputLength !== undefined
-      ? stepsOpts.maxOutputLength
-      : undefined;
   if (format === "html") {
-    const htmlResult = result.report.render("html", maxLen);
+    const htmlResult = result.report.render("html", maxOutputLength);
     const htmlPage = buildHtmlPage(htmlResult.output, options.title);
     await writeOutputContent(htmlPage, ".html", output, effectiveNoOpen);
   } else {
-    const mdResult = result.report.render("markdown", maxLen);
+    const mdResult = result.report.render("markdown", maxOutputLength);
     await writeOutputContent(mdResult.output, ".md", output, effectiveNoOpen);
   }
 }

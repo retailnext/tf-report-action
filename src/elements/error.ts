@@ -3,7 +3,7 @@
  * and optional step status table.
  */
 
-import type { OutputFormat } from "../renderable/types.js";
+import type { OutputFormat } from "../model/renderable.js";
 import type { ReportElement } from "../renderable/types.js";
 import type { StepOutcome } from "../model/step-outcome.js";
 import { Heading, EMPTY } from "../renderable/primitives.js";

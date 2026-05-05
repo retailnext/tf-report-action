@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { createGitHubClient } from "../../../src/github/client.js";
 import type { HttpTransport } from "../../../src/github/client.js";
-import type { HttpResponse } from "../../../src/http/index.js";
+import type { HttpResponse } from "../../../src/http/transport.js";
 
 // ---------------------------------------------------------------------------
 // Helpers

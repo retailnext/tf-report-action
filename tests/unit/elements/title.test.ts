@@ -1,9 +1,9 @@
 import { describe, expect, it } from "vitest";
+import type { ReportElement } from "../../../src/renderable/types.js";
 import type {
-  ReportElement,
   Renderable,
   OutputFormat,
-} from "../../../src/renderable/types.js";
+} from "../../../src/model/renderable.js";
 import type { ReportTitle } from "../../../src/model/report-title.js";
 import {
   TitleElement,
