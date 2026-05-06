@@ -14,10 +14,11 @@ const TESTS = resolve(ROOT, "tests");
  */
 const V8_IGNORE = /\/[/*]\s*v8 ignore/;
 
-/** Recursively collect all .ts files under a directory. */
+/** Recursively collect all .ts files under a directory, skipping fixtures. */
 function collectTsFiles(dir: string): string[] {
   const results: string[] = [];
   for (const entry of readdirSync(dir)) {
+    if (entry === "fixtures") continue;
     const full = resolve(dir, entry);
     if (statSync(full).isDirectory()) {
       results.push(...collectTsFiles(full));
