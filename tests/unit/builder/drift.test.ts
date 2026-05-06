@@ -544,6 +544,184 @@ describe("buildDriftChanges", () => {
       // With showUnchangedAttributes, all attributes are present in output
       expect(result[0]!.attributes.length).toBeGreaterThan(1);
     });
+
+    describe("null-vs-absent key equivalence", () => {
+      it("suppresses drift where before has null key that after omits", () => {
+        const plan = basePlan([
+          makeDriftEntry({
+            address: "google_compute_firewall.example",
+            type: "google_compute_firewall",
+            name: "example",
+            change: {
+              actions: ["update"],
+              before: { id: "abc", name: "fw", description: null },
+              after: { id: "abc", name: "fw" },
+              before_sensitive: false,
+              after_sensitive: false,
+              after_unknown: false,
+            },
+          }),
+        ]);
+
+        const result = buildDriftChanges(plan, {});
+        expect(result).toHaveLength(0);
+      });
+
+      it("suppresses drift where after has null key that before omits", () => {
+        const plan = basePlan([
+          makeDriftEntry({
+            address: "google_compute_firewall.example",
+            type: "google_compute_firewall",
+            name: "example",
+            change: {
+              actions: ["update"],
+              before: { id: "abc", name: "fw" },
+              after: { id: "abc", name: "fw", description: null },
+              before_sensitive: false,
+              after_sensitive: false,
+              after_unknown: false,
+            },
+          }),
+        ]);
+
+        const result = buildDriftChanges(plan, {});
+        expect(result).toHaveLength(0);
+      });
+
+      it("keeps drift where before has null but after has non-null value", () => {
+        const plan = basePlan([
+          makeDriftEntry({
+            change: {
+              actions: ["update"],
+              before: { id: "abc", description: null },
+              after: { id: "abc", description: "new value" },
+              before_sensitive: false,
+              after_sensitive: false,
+              after_unknown: false,
+            },
+          }),
+        ]);
+
+        const result = buildDriftChanges(plan, {});
+        expect(result).toHaveLength(1);
+        expect(
+          result[0]!.attributes.some((a) => a.name === "description"),
+        ).toBe(true);
+      });
+
+      it("keeps drift where before has non-null value but after omits key", () => {
+        const plan = basePlan([
+          makeDriftEntry({
+            change: {
+              actions: ["update"],
+              before: { id: "abc", description: "old value" },
+              after: { id: "abc" },
+              before_sensitive: false,
+              after_sensitive: false,
+              after_unknown: false,
+            },
+          }),
+        ]);
+
+        const result = buildDriftChanges(plan, {});
+        expect(result).toHaveLength(1);
+        expect(
+          result[0]!.attributes.some((a) => a.name === "description"),
+        ).toBe(true);
+      });
+
+      it("suppresses drift where both sides have key with null value", () => {
+        const plan = basePlan([
+          makeDriftEntry({
+            change: {
+              actions: ["update"],
+              before: { id: "abc", description: null },
+              after: { id: "abc", description: null },
+              before_sensitive: false,
+              after_sensitive: false,
+              after_unknown: false,
+            },
+          }),
+        ]);
+
+        const result = buildDriftChanges(plan, {});
+        expect(result).toHaveLength(0);
+      });
+
+      it("suppresses drift with nested null-vs-absent in objects", () => {
+        const plan = basePlan([
+          makeDriftEntry({
+            address: "google_compute_firewall.nested",
+            type: "google_compute_firewall",
+            name: "nested",
+            change: {
+              actions: ["update"],
+              before: {
+                id: "abc",
+                name: "fw",
+                log_config: { metadata: null },
+              },
+              after: { id: "abc", name: "fw", log_config: {} },
+              before_sensitive: false,
+              after_sensitive: false,
+              after_unknown: false,
+            },
+          }),
+        ]);
+
+        const result = buildDriftChanges(plan, {});
+        expect(result).toHaveLength(0);
+      });
+
+      it("suppresses drift with null-vs-absent in arrays", () => {
+        const plan = basePlan([
+          makeDriftEntry({
+            address: "google_compute_firewall.array",
+            type: "google_compute_firewall",
+            name: "array",
+            change: {
+              actions: ["update"],
+              before: { id: "abc", tags: [null, "a"] },
+              after: { id: "abc", tags: ["a"] },
+              before_sensitive: false,
+              after_sensitive: false,
+              after_unknown: false,
+            },
+          }),
+        ]);
+
+        // The array shapes genuinely differ (different indices) — this is kept
+        const result = buildDriftChanges(plan, {});
+        expect(result).toHaveLength(1);
+      });
+
+      it("suppresses drift where multiple null keys differ from absent", () => {
+        const plan = basePlan([
+          makeDriftEntry({
+            address: "google_compute_firewall.multi_null",
+            type: "google_compute_firewall",
+            name: "multi_null",
+            change: {
+              actions: ["update"],
+              before: {
+                id: "abc",
+                name: "fw",
+                description: null,
+                disabled: null,
+                priority: null,
+              },
+              after: { id: "abc", name: "fw" },
+              before_sensitive: false,
+              after_sensitive: false,
+              after_unknown: false,
+            },
+          }),
+        ]);
+
+        const result = buildDriftChanges(plan, {});
+        expect(result).toHaveLength(0);
+      });
+    });
   });
 });
 

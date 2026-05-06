@@ -1162,10 +1162,17 @@ function hasRawValueChanges(change) {
     return true;
   const beforeFlat = flatten(before);
   const afterFlat = flatten(after);
-  if (beforeFlat.size !== afterFlat.size) return true;
   for (const [key, beforeVal] of beforeFlat) {
-    if (!afterFlat.has(key)) return true;
-    if (beforeVal !== afterFlat.get(key)) return true;
+    if (beforeVal === null) {
+      const afterVal = afterFlat.get(key);
+      if (afterVal !== void 0 && afterVal !== null) return true;
+    } else {
+      if (!afterFlat.has(key)) return true;
+      if (beforeVal !== afterFlat.get(key)) return true;
+    }
+  }
+  for (const [key, afterVal] of afterFlat) {
+    if (!beforeFlat.has(key) && afterVal !== null) return true;
   }
   return false;
 }
