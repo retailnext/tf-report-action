@@ -153,6 +153,11 @@ function shouldSkip(rc: TFResourceChange): boolean {
  * them directly — no masking, no sensitivity handling. This ensures the
  * suppression decision reflects real value differences, not display artifacts.
  *
+ * Null-valued entries in the flattened map are treated as equivalent to absent
+ * entries — Terraform/OpenTofu providers may serialize unset attributes as
+ * explicit null in one direction and omit them in the other. Both represent
+ * "no value" and should not count as drift.
+ *
  * Returns `true` if the values actually differ (drift should be kept).
  */
 function hasRawValueChanges(change: Change): boolean {
@@ -176,11 +181,23 @@ function hasRawValueChanges(change: Change): boolean {
   const beforeFlat = flatten(before);
   const afterFlat = flatten(after);
 
-  if (beforeFlat.size !== afterFlat.size) return true;
-
+  // Check all before keys — a non-null before value must match after
   for (const [key, beforeVal] of beforeFlat) {
-    if (!afterFlat.has(key)) return true;
-    if (beforeVal !== afterFlat.get(key)) return true;
+    if (beforeVal === null) {
+      // Null in before is equivalent to absent — only a change if after has
+      // a non-null value for this key.
+      const afterVal = afterFlat.get(key);
+      if (afterVal !== undefined && afterVal !== null) return true;
+    } else {
+      // Non-null before value — after must have the same value
+      if (!afterFlat.has(key)) return true;
+      if (beforeVal !== afterFlat.get(key)) return true;
+    }
+  }
+
+  // Check after keys not present in before — only a change if non-null
+  for (const [key, afterVal] of afterFlat) {
+    if (!beforeFlat.has(key) && afterVal !== null) return true;
   }
 
   return false;
