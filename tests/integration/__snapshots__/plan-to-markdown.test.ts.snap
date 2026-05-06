@@ -1427,6 +1427,221 @@ terraform_data.worker_c
 "
 `;
 
+exports[`planToMarkdown integration > terraform/empty-block-addition/0 > renders without error and matches snapshot [default] 1`] = `
+"## ✅ Plan: 1 to add
+
+## Plan Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Add | terraform\\_data | 1 |
+|  | **Add** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>➕ <strong>terraform_data</strong> example</summary>
+
+\`\`\`
+terraform_data.example
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | <code></code> | <code>(known after apply)</code> |
+| input.name | <code></code> | <code><ins style="background:#dfd">test</ins></code> |
+| input.value | <code></code> | <code><ins style="background:#dfd">hello</ins></code> |
+| output | <code></code> | <code>(known after apply)</code> |
+
+
+
+</details>
+
+"
+`;
+
+exports[`planToMarkdown integration > terraform/empty-block-addition/0 > renders without error and matches snapshot [diffFormat-simple] 1`] = `
+"## ✅ Plan: 1 to add
+
+## Plan Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Add | terraform\\_data | 1 |
+|  | **Add** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>➕ <strong>terraform_data</strong> example</summary>
+
+\`\`\`
+terraform_data.example
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | <code></code> | <code>(known after apply)</code> |
+| input.name | <code></code> | + test |
+| input.value | <code></code> | + hello |
+| output | <code></code> | <code>(known after apply)</code> |
+
+
+
+</details>
+
+"
+`;
+
+exports[`planToMarkdown integration > terraform/empty-block-addition/0 > renders without error and matches snapshot [showUnchangedAttributes] 1`] = `
+"## ✅ Plan: 1 to add
+
+## Plan Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Add | terraform\\_data | 1 |
+|  | **Add** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>➕ <strong>terraform_data</strong> example</summary>
+
+\`\`\`
+terraform_data.example
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | <code></code> | <code>(known after apply)</code> |
+| input.name | <code></code> | <code><ins style="background:#dfd">test</ins></code> |
+| input.value | <code></code> | <code><ins style="background:#dfd">hello</ins></code> |
+| output | <code></code> | <code>(known after apply)</code> |
+| triggers\\_replace | <code></code> |  |
+
+
+
+</details>
+
+"
+`;
+
+exports[`planToMarkdown integration > terraform/empty-block-addition/1 > renders without error and matches snapshot [default] 1`] = `
+"## ✅ Plan: 1 to change
+
+## Plan Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| 🔧 Change | terraform\\_data | 1 |
+|  | **Change** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>🔧 <strong>terraform_data</strong> example — changed: input.nested, output.name, output.value</summary>
+
+\`\`\`
+terraform_data.example
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| input.nested | <code></code> | <code><ins style="background:#dfd">{}</ins></code> |
+| output | <code></code> | <code>(known after apply)</code> |
+| output.name | <code>test</code> | <code><del style="background:#fdd">test</del></code> |
+| output.value | <code>hello</code> | <code><del style="background:#fdd">hello</del></code> |
+
+
+
+</details>
+
+"
+`;
+
+exports[`planToMarkdown integration > terraform/empty-block-addition/1 > renders without error and matches snapshot [diffFormat-simple] 1`] = `
+"## ✅ Plan: 1 to change
+
+## Plan Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| 🔧 Change | terraform\\_data | 1 |
+|  | **Change** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>🔧 <strong>terraform_data</strong> example — changed: input.nested, output.name, output.value</summary>
+
+\`\`\`
+terraform_data.example
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| input.nested | <code></code> | + {} |
+| output | <code></code> | <code>(known after apply)</code> |
+| output.name | <code>test</code> | - test |
+| output.value | <code>hello</code> | - hello |
+
+
+
+</details>
+
+"
+`;
+
+exports[`planToMarkdown integration > terraform/empty-block-addition/1 > renders without error and matches snapshot [showUnchangedAttributes] 1`] = `
+"## ✅ Plan: 1 to change
+
+## Plan Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| 🔧 Change | terraform\\_data | 1 |
+|  | **Change** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>🔧 <strong>terraform_data</strong> example — changed: input.nested, output.name, output.value</summary>
+
+\`\`\`
+terraform_data.example
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | <code>943674a3-b07a-19ed-77fd-f229d5477d9d</code> | <code>943674a3-b07a-19ed-77fd-f229d5477d9d</code> |
+| input.name | <code>test</code> | <code>test</code> |
+| input.nested | <code></code> | <code><ins style="background:#dfd">{}</ins></code> |
+| input.value | <code>hello</code> | <code>hello</code> |
+| output | <code></code> | <code>(known after apply)</code> |
+| output.name | <code>test</code> | <code><del style="background:#fdd">test</del></code> |
+| output.value | <code>hello</code> | <code><del style="background:#fdd">hello</del></code> |
+| triggers\\_replace | <code></code> |  |
+
+
+
+</details>
+
+"
+`;
+
 exports[`planToMarkdown integration > terraform/error-stages/0 > renders without error and matches snapshot [default] 1`] = `
 "## ✅ Plan: 1 to add
 
@@ -6241,6 +6456,221 @@ terraform_data.worker_c
 | Output | Action | Before | After |
 | --- | --- | --- | --- |
 | config\\_value | 🔧 | <code>{&quot;worker_a&quot;:&quot;alpha&quot;,&quot;worker_b&quot;:&quot;bravo&quot;,&quot;worker_c&quot;:&quot;charlie&quot;}</code> | <code>(known after apply)</code> |
+
+"
+`;
+
+exports[`planToMarkdown integration > tofu/empty-block-addition/0 > renders without error and matches snapshot [default] 1`] = `
+"## ✅ Plan: 1 to add
+
+## Plan Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Add | terraform\\_data | 1 |
+|  | **Add** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>➕ <strong>terraform_data</strong> example</summary>
+
+\`\`\`
+terraform_data.example
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | <code></code> | <code>(known after apply)</code> |
+| input.name | <code></code> | <code><ins style="background:#dfd">test</ins></code> |
+| input.value | <code></code> | <code><ins style="background:#dfd">hello</ins></code> |
+| output | <code></code> | <code>(known after apply)</code> |
+
+
+
+</details>
+
+"
+`;
+
+exports[`planToMarkdown integration > tofu/empty-block-addition/0 > renders without error and matches snapshot [diffFormat-simple] 1`] = `
+"## ✅ Plan: 1 to add
+
+## Plan Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Add | terraform\\_data | 1 |
+|  | **Add** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>➕ <strong>terraform_data</strong> example</summary>
+
+\`\`\`
+terraform_data.example
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | <code></code> | <code>(known after apply)</code> |
+| input.name | <code></code> | + test |
+| input.value | <code></code> | + hello |
+| output | <code></code> | <code>(known after apply)</code> |
+
+
+
+</details>
+
+"
+`;
+
+exports[`planToMarkdown integration > tofu/empty-block-addition/0 > renders without error and matches snapshot [showUnchangedAttributes] 1`] = `
+"## ✅ Plan: 1 to add
+
+## Plan Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Add | terraform\\_data | 1 |
+|  | **Add** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>➕ <strong>terraform_data</strong> example</summary>
+
+\`\`\`
+terraform_data.example
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | <code></code> | <code>(known after apply)</code> |
+| input.name | <code></code> | <code><ins style="background:#dfd">test</ins></code> |
+| input.value | <code></code> | <code><ins style="background:#dfd">hello</ins></code> |
+| output | <code></code> | <code>(known after apply)</code> |
+| triggers\\_replace | <code></code> |  |
+
+
+
+</details>
+
+"
+`;
+
+exports[`planToMarkdown integration > tofu/empty-block-addition/1 > renders without error and matches snapshot [default] 1`] = `
+"## ✅ Plan: 1 to change
+
+## Plan Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| 🔧 Change | terraform\\_data | 1 |
+|  | **Change** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>🔧 <strong>terraform_data</strong> example — changed: input.nested, output.name, output.value</summary>
+
+\`\`\`
+terraform_data.example
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| input.nested | <code></code> | <code><ins style="background:#dfd">{}</ins></code> |
+| output | <code></code> | <code>(known after apply)</code> |
+| output.name | <code>test</code> | <code><del style="background:#fdd">test</del></code> |
+| output.value | <code>hello</code> | <code><del style="background:#fdd">hello</del></code> |
+
+
+
+</details>
+
+"
+`;
+
+exports[`planToMarkdown integration > tofu/empty-block-addition/1 > renders without error and matches snapshot [diffFormat-simple] 1`] = `
+"## ✅ Plan: 1 to change
+
+## Plan Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| 🔧 Change | terraform\\_data | 1 |
+|  | **Change** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>🔧 <strong>terraform_data</strong> example — changed: input.nested, output.name, output.value</summary>
+
+\`\`\`
+terraform_data.example
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| input.nested | <code></code> | + {} |
+| output | <code></code> | <code>(known after apply)</code> |
+| output.name | <code>test</code> | - test |
+| output.value | <code>hello</code> | - hello |
+
+
+
+</details>
+
+"
+`;
+
+exports[`planToMarkdown integration > tofu/empty-block-addition/1 > renders without error and matches snapshot [showUnchangedAttributes] 1`] = `
+"## ✅ Plan: 1 to change
+
+## Plan Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| 🔧 Change | terraform\\_data | 1 |
+|  | **Change** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>🔧 <strong>terraform_data</strong> example — changed: input.nested, output.name, output.value</summary>
+
+\`\`\`
+terraform_data.example
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | <code>399de8ed-f521-6e2d-e51a-de345654d0a2</code> | <code>399de8ed-f521-6e2d-e51a-de345654d0a2</code> |
+| input.name | <code>test</code> | <code>test</code> |
+| input.nested | <code></code> | <code><ins style="background:#dfd">{}</ins></code> |
+| input.value | <code>hello</code> | <code>hello</code> |
+| output | <code></code> | <code>(known after apply)</code> |
+| output.name | <code>test</code> | <code><del style="background:#fdd">test</del></code> |
+| output.value | <code>hello</code> | <code><del style="background:#fdd">hello</del></code> |
+| triggers\\_replace | <code></code> |  |
+
+
+
+</details>
 
 "
 `;

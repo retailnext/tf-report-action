@@ -45,10 +45,17 @@ function flattenInto(
     }
   } else {
     // object
-    for (const [key, child] of Object.entries(value)) {
-      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- defensive: JSON.parse can produce objects with undefined values at runtime
-      if (child !== undefined) {
-        flattenInto(child, prefix === "" ? key : `${prefix}.${key}`, result);
+    const entries = Object.entries(value);
+    if (entries.length === 0 && prefix !== "") {
+      // Empty object represents an empty block — emit as a leaf so
+      // additions/removals of empty blocks are visible in the diff.
+      result.set(prefix, "{}");
+    } else {
+      for (const [key, child] of entries) {
+        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- defensive: JSON.parse can produce objects with undefined values at runtime
+        if (child !== undefined) {
+          flattenInto(child, prefix === "" ? key : `${prefix}.${key}`, result);
+        }
       }
     }
   }

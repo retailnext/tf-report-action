@@ -103,4 +103,24 @@ describe("flatten", () => {
     expect(result.get("tags[1].key")).toBe("app");
     expect(result.get("tags[1].value")).toBe("web");
   });
+
+  it("emits entry for nested empty object (empty block)", () => {
+    const result = flatten({ spec: [{ egress: [{}] }] });
+    expect(result.get("spec[0].egress[0]")).toBe("{}");
+  });
+
+  it("emits entry for empty object inside object", () => {
+    const result = flatten({ resources: { limits: {} } });
+    expect(result.get("resources.limits")).toBe("{}");
+  });
+
+  it("does not emit entry for root-level empty object", () => {
+    const result = flatten({});
+    expect(result.size).toBe(0);
+  });
+
+  it("does not emit entry for nested empty arrays", () => {
+    const result = flatten({ items: [] });
+    expect(result.size).toBe(0);
+  });
 });

@@ -886,9 +886,14 @@ function flattenInto(value, prefix, result) {
       }
     }
   } else {
-    for (const [key, child] of Object.entries(value)) {
-      if (child !== void 0) {
-        flattenInto(child, prefix === "" ? key : `${prefix}.${key}`, result);
+    const entries = Object.entries(value);
+    if (entries.length === 0 && prefix !== "") {
+      result.set(prefix, "{}");
+    } else {
+      for (const [key, child] of entries) {
+        if (child !== void 0) {
+          flattenInto(child, prefix === "" ? key : `${prefix}.${key}`, result);
+        }
       }
     }
   }
@@ -951,7 +956,7 @@ function isUnknownAfterApply(key, unknownMap) {
 function isLargeValue(value) {
   if (value === null) return false;
   const trimmed = value.trim();
-  if (trimmed.startsWith("{") || trimmed.startsWith("[") || trimmed.startsWith("<")) {
+  if (trimmed.length > 2 && (trimmed.startsWith("{") || trimmed.startsWith("[") || trimmed.startsWith("<"))) {
     return true;
   }
   let count = 0;
@@ -1166,15 +1171,36 @@ function hasRawValueChanges(change) {
     if (beforeVal === null) {
       const afterVal = afterFlat.get(key);
       if (afterVal !== void 0 && afterVal !== null) return true;
+    } else if (beforeVal === "{}") {
+      if (!isEmptyBlockEquivalent(key, afterFlat)) return true;
     } else {
       if (!afterFlat.has(key)) return true;
       if (beforeVal !== afterFlat.get(key)) return true;
     }
   }
   for (const [key, afterVal] of afterFlat) {
-    if (!beforeFlat.has(key) && afterVal !== null) return true;
+    if (!beforeFlat.has(key)) {
+      if (afterVal === null) continue;
+      if (afterVal === "{}") {
+        if (!isEmptyBlockEquivalent(key, beforeFlat)) return true;
+        continue;
+      }
+      return true;
+    }
   }
   return false;
+}
+function isEmptyBlockEquivalent(emptyBlockKey, otherMap) {
+  for (const [k, v] of otherMap) {
+    if (isChildKey(emptyBlockKey, k) && v !== null) return false;
+  }
+  return true;
+}
+function isChildKey(parentKey, candidateKey) {
+  if (!candidateKey.startsWith(parentKey)) return false;
+  if (candidateKey.length <= parentKey.length) return false;
+  const next = candidateKey[parentKey.length];
+  return next === "." || next === "[";
 }
 function isAllUnknownAfterApply(rc, attributes) {
   if (rc.change.after_unknown === true) return true;

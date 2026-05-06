@@ -1,0 +1,54 @@
+{
+  "version": 4,
+  "terraform_version": "1.14.9",
+  "serial": 1,
+  "lineage": "1c008a07-9ef0-5dab-4765-c68bac6dd627",
+  "outputs": {},
+  "resources": [
+    {
+      "mode": "managed",
+      "type": "terraform_data",
+      "name": "example",
+      "provider": "provider[\"terraform.io/builtin/terraform\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "id": "943674a3-b07a-19ed-77fd-f229d5477d9d",
+            "input": {
+              "value": {
+                "name": "test",
+                "value": "hello"
+              },
+              "type": [
+                "object",
+                {
+                  "name": "string",
+                  "value": "string"
+                }
+              ]
+            },
+            "output": {
+              "value": {
+                "name": "test",
+                "value": "hello"
+              },
+              "type": [
+                "object",
+                {
+                  "name": "string",
+                  "value": "string"
+                }
+              ]
+            },
+            "triggers_replace": null
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0
+        }
+      ]
+    }
+  ],
+  "check_results": null
+}
+

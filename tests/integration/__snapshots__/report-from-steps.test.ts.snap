@@ -604,6 +604,66 @@ data.local_command.read_config
 "
 `;
 
+exports[`reportFromSteps integration — apply-no-show fixtures > terraform/empty-block-addition/0/apply-no-show > renders without error and matches snapshot 1`] = `
+"## ✅ Apply: 1 added
+
+> ⚠️ **Warning:** This report was generated without \`terraform show -json <tfplan>\` output. Resource attribute details are not available.
+
+## Apply Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Added | terraform\\_data | 1 |
+|  | **Added** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>➕ <strong>terraform_data</strong> example</summary>
+
+\`\`\`
+terraform_data.example
+\`\`\`
+
+
+
+</details>
+
+"
+`;
+
+exports[`reportFromSteps integration — apply-no-show fixtures > terraform/empty-block-addition/1/apply-no-show > renders without error and matches snapshot 1`] = `
+"## ✅ Apply: 1 changed
+
+> ⚠️ **Warning:** This report was generated without \`terraform show -json <tfplan>\` output. Resource attribute details are not available.
+
+## Apply Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| 🔧 Changed | terraform\\_data | 1 |
+|  | **Changed** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>🔧 <strong>terraform_data</strong> example</summary>
+
+\`\`\`
+terraform_data.example
+\`\`\`
+
+
+
+</details>
+
+"
+`;
+
 exports[`reportFromSteps integration — apply-no-show fixtures > terraform/error-stages/0/apply-no-show > renders without error and matches snapshot 1`] = `
 "## ✅ Apply: 1 added
 
@@ -2249,6 +2309,66 @@ terraform_data.worker_a
 
 \`\`\`
 data.local_command.read_config
+\`\`\`
+
+
+
+</details>
+
+"
+`;
+
+exports[`reportFromSteps integration — apply-no-show fixtures > tofu/empty-block-addition/0/apply-no-show > renders without error and matches snapshot 1`] = `
+"## ✅ Apply: 1 added
+
+> ⚠️ **Warning:** This report was generated without \`tofu show -json <tfplan>\` output. Resource attribute details are not available.
+
+## Apply Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Added | terraform\\_data | 1 |
+|  | **Added** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>➕ <strong>terraform_data</strong> example</summary>
+
+\`\`\`
+terraform_data.example
+\`\`\`
+
+
+
+</details>
+
+"
+`;
+
+exports[`reportFromSteps integration — apply-no-show fixtures > tofu/empty-block-addition/1/apply-no-show > renders without error and matches snapshot 1`] = `
+"## ✅ Apply: 1 changed
+
+> ⚠️ **Warning:** This report was generated without \`tofu show -json <tfplan>\` output. Resource attribute details are not available.
+
+## Apply Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| 🔧 Changed | terraform\\_data | 1 |
+|  | **Changed** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>🔧 <strong>terraform_data</strong> example</summary>
+
+\`\`\`
+terraform_data.example
 \`\`\`
 
 
@@ -3911,6 +4031,66 @@ data.local_command.read_config
 "
 `;
 
+exports[`reportFromSteps integration — apply-only fixtures > terraform/empty-block-addition/0/apply-only > renders without error and matches snapshot 1`] = `
+"## ✅ Apply: 1 added
+
+> ⚠️ **Warning:** This report was generated without \`terraform show -json <tfplan>\` output. Resource attribute details are not available.
+
+## Apply Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Added | terraform\\_data | 1 |
+|  | **Added** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>➕ <strong>terraform_data</strong> example</summary>
+
+\`\`\`
+terraform_data.example
+\`\`\`
+
+
+
+</details>
+
+"
+`;
+
+exports[`reportFromSteps integration — apply-only fixtures > terraform/empty-block-addition/1/apply-only > renders without error and matches snapshot 1`] = `
+"## ✅ Apply: 1 changed
+
+> ⚠️ **Warning:** This report was generated without \`terraform show -json <tfplan>\` output. Resource attribute details are not available.
+
+## Apply Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| 🔧 Changed | terraform\\_data | 1 |
+|  | **Changed** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>🔧 <strong>terraform_data</strong> example</summary>
+
+\`\`\`
+terraform_data.example
+\`\`\`
+
+
+
+</details>
+
+"
+`;
+
 exports[`reportFromSteps integration — apply-only fixtures > terraform/error-stages/0/apply-only > renders without error and matches snapshot 1`] = `
 "## ✅ Apply: 1 added
 
@@ -5319,6 +5499,66 @@ terraform_data.worker_a
 
 \`\`\`
 data.local_command.read_config
+\`\`\`
+
+
+
+</details>
+
+"
+`;
+
+exports[`reportFromSteps integration — apply-only fixtures > tofu/empty-block-addition/0/apply-only > renders without error and matches snapshot 1`] = `
+"## ✅ Apply: 1 added
+
+> ⚠️ **Warning:** This report was generated without \`tofu show -json <tfplan>\` output. Resource attribute details are not available.
+
+## Apply Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Added | terraform\\_data | 1 |
+|  | **Added** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>➕ <strong>terraform_data</strong> example</summary>
+
+\`\`\`
+terraform_data.example
+\`\`\`
+
+
+
+</details>
+
+"
+`;
+
+exports[`reportFromSteps integration — apply-only fixtures > tofu/empty-block-addition/1/apply-only > renders without error and matches snapshot 1`] = `
+"## ✅ Apply: 1 changed
+
+> ⚠️ **Warning:** This report was generated without \`tofu show -json <tfplan>\` output. Resource attribute details are not available.
+
+## Apply Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| 🔧 Changed | terraform\\_data | 1 |
+|  | **Changed** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>🔧 <strong>terraform_data</strong> example</summary>
+
+\`\`\`
+terraform_data.example
 \`\`\`
 
 
@@ -7846,6 +8086,246 @@ terraform_data.worker_a
     "worker_c": "charlie"
   }
 \`\`\`
+
+
+
+</details>
+
+"
+`;
+
+exports[`reportFromSteps integration — generated fixtures > terraform/empty-block-addition/0 > renders with workspace and matches snapshot 1`] = `
+"<!-- tf-report-action:"test-workspace" -->
+## ✅ \`test-workspace\` Apply: 1 added
+
+## Apply Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Added | terraform\\_data | 1 |
+|  | **Added** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>➕ <strong>terraform_data</strong> example</summary>
+
+\`\`\`
+terraform_data.example
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | <code></code> | <code><ins style="background:#dfd">943674a3-b07a-19ed-77fd-f229d5477d9d</ins></code> |
+| input.name | <code></code> | <code><ins style="background:#dfd">test</ins></code> |
+| input.value | <code></code> | <code><ins style="background:#dfd">hello</ins></code> |
+
+<details>
+<summary>output (large value)</summary>
+
+\`\`\`
+{
+  "value": {
+    "name": "test",
+    "value": "hello"
+  },
+  "type": [
+    "object",
+    {
+      "name": "string",
+      "value": "string"
+    }
+  ]
+}
+\`\`\`
+
+
+
+</details>
+
+
+
+</details>
+
+"
+`;
+
+exports[`reportFromSteps integration — generated fixtures > terraform/empty-block-addition/0 > renders without error and matches snapshot [default] 1`] = `
+"## ✅ Apply: 1 added
+
+## Apply Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Added | terraform\\_data | 1 |
+|  | **Added** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>➕ <strong>terraform_data</strong> example</summary>
+
+\`\`\`
+terraform_data.example
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | <code></code> | <code><ins style="background:#dfd">943674a3-b07a-19ed-77fd-f229d5477d9d</ins></code> |
+| input.name | <code></code> | <code><ins style="background:#dfd">test</ins></code> |
+| input.value | <code></code> | <code><ins style="background:#dfd">hello</ins></code> |
+
+<details>
+<summary>output (large value)</summary>
+
+\`\`\`
+{
+  "value": {
+    "name": "test",
+    "value": "hello"
+  },
+  "type": [
+    "object",
+    {
+      "name": "string",
+      "value": "string"
+    }
+  ]
+}
+\`\`\`
+
+
+
+</details>
+
+
+
+</details>
+
+"
+`;
+
+exports[`reportFromSteps integration — generated fixtures > terraform/empty-block-addition/1 > renders with workspace and matches snapshot 1`] = `
+"<!-- tf-report-action:"test-workspace" -->
+## ✅ \`test-workspace\` Apply: 1 changed
+
+## Apply Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| 🔧 Changed | terraform\\_data | 1 |
+|  | **Changed** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>🔧 <strong>terraform_data</strong> example — changed: input.nested, output, output.name, output.value</summary>
+
+\`\`\`
+terraform_data.example
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| input.nested | <code></code> | <code><ins style="background:#dfd">{}</ins></code> |
+| output.name | <code>test</code> | <code><del style="background:#fdd">test</del></code> |
+| output.value | <code>hello</code> | <code><del style="background:#fdd">hello</del></code> |
+
+<details>
+<summary>output (large value)</summary>
+
+\`\`\`
+{
+  "value": {
+    "name": "test",
+    "nested": {},
+    "value": "hello"
+  },
+  "type": [
+    "object",
+    {
+      "name": "string",
+      "nested": [
+        "object",
+        {}
+      ],
+      "value": "string"
+    }
+  ]
+}
+\`\`\`
+
+
+
+</details>
+
+
+
+</details>
+
+"
+`;
+
+exports[`reportFromSteps integration — generated fixtures > terraform/empty-block-addition/1 > renders without error and matches snapshot [default] 1`] = `
+"## ✅ Apply: 1 changed
+
+## Apply Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| 🔧 Changed | terraform\\_data | 1 |
+|  | **Changed** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>🔧 <strong>terraform_data</strong> example — changed: input.nested, output, output.name, output.value</summary>
+
+\`\`\`
+terraform_data.example
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| input.nested | <code></code> | <code><ins style="background:#dfd">{}</ins></code> |
+| output.name | <code>test</code> | <code><del style="background:#fdd">test</del></code> |
+| output.value | <code>hello</code> | <code><del style="background:#fdd">hello</del></code> |
+
+<details>
+<summary>output (large value)</summary>
+
+\`\`\`
+{
+  "value": {
+    "name": "test",
+    "nested": {},
+    "value": "hello"
+  },
+  "type": [
+    "object",
+    {
+      "name": "string",
+      "nested": [
+        "object",
+        {}
+      ],
+      "value": "string"
+    }
+  ]
+}
+\`\`\`
+
+
+
+</details>
 
 
 
@@ -12428,6 +12908,246 @@ terraform_data.worker_a
 "
 `;
 
+exports[`reportFromSteps integration — generated fixtures > tofu/empty-block-addition/0 > renders with workspace and matches snapshot 1`] = `
+"<!-- tf-report-action:"test-workspace" -->
+## ✅ \`test-workspace\` Apply: 1 added
+
+## Apply Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Added | terraform\\_data | 1 |
+|  | **Added** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>➕ <strong>terraform_data</strong> example</summary>
+
+\`\`\`
+terraform_data.example
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | <code></code> | <code><ins style="background:#dfd">399de8ed-f521-6e2d-e51a-de345654d0a2</ins></code> |
+| input.name | <code></code> | <code><ins style="background:#dfd">test</ins></code> |
+| input.value | <code></code> | <code><ins style="background:#dfd">hello</ins></code> |
+
+<details>
+<summary>output (large value)</summary>
+
+\`\`\`
+{
+  "value": {
+    "name": "test",
+    "value": "hello"
+  },
+  "type": [
+    "object",
+    {
+      "name": "string",
+      "value": "string"
+    }
+  ]
+}
+\`\`\`
+
+
+
+</details>
+
+
+
+</details>
+
+"
+`;
+
+exports[`reportFromSteps integration — generated fixtures > tofu/empty-block-addition/0 > renders without error and matches snapshot [default] 1`] = `
+"## ✅ Apply: 1 added
+
+## Apply Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Added | terraform\\_data | 1 |
+|  | **Added** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>➕ <strong>terraform_data</strong> example</summary>
+
+\`\`\`
+terraform_data.example
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | <code></code> | <code><ins style="background:#dfd">399de8ed-f521-6e2d-e51a-de345654d0a2</ins></code> |
+| input.name | <code></code> | <code><ins style="background:#dfd">test</ins></code> |
+| input.value | <code></code> | <code><ins style="background:#dfd">hello</ins></code> |
+
+<details>
+<summary>output (large value)</summary>
+
+\`\`\`
+{
+  "value": {
+    "name": "test",
+    "value": "hello"
+  },
+  "type": [
+    "object",
+    {
+      "name": "string",
+      "value": "string"
+    }
+  ]
+}
+\`\`\`
+
+
+
+</details>
+
+
+
+</details>
+
+"
+`;
+
+exports[`reportFromSteps integration — generated fixtures > tofu/empty-block-addition/1 > renders with workspace and matches snapshot 1`] = `
+"<!-- tf-report-action:"test-workspace" -->
+## ✅ \`test-workspace\` Apply: 1 changed
+
+## Apply Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| 🔧 Changed | terraform\\_data | 1 |
+|  | **Changed** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>🔧 <strong>terraform_data</strong> example — changed: input.nested, output, output.name, output.value</summary>
+
+\`\`\`
+terraform_data.example
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| input.nested | <code></code> | <code><ins style="background:#dfd">{}</ins></code> |
+| output.name | <code>test</code> | <code><del style="background:#fdd">test</del></code> |
+| output.value | <code>hello</code> | <code><del style="background:#fdd">hello</del></code> |
+
+<details>
+<summary>output (large value)</summary>
+
+\`\`\`
+{
+  "value": {
+    "name": "test",
+    "nested": {},
+    "value": "hello"
+  },
+  "type": [
+    "object",
+    {
+      "name": "string",
+      "nested": [
+        "object",
+        {}
+      ],
+      "value": "string"
+    }
+  ]
+}
+\`\`\`
+
+
+
+</details>
+
+
+
+</details>
+
+"
+`;
+
+exports[`reportFromSteps integration — generated fixtures > tofu/empty-block-addition/1 > renders without error and matches snapshot [default] 1`] = `
+"## ✅ Apply: 1 changed
+
+## Apply Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| 🔧 Changed | terraform\\_data | 1 |
+|  | **Changed** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>🔧 <strong>terraform_data</strong> example — changed: input.nested, output, output.name, output.value</summary>
+
+\`\`\`
+terraform_data.example
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| input.nested | <code></code> | <code><ins style="background:#dfd">{}</ins></code> |
+| output.name | <code>test</code> | <code><del style="background:#fdd">test</del></code> |
+| output.value | <code>hello</code> | <code><del style="background:#fdd">hello</del></code> |
+
+<details>
+<summary>output (large value)</summary>
+
+\`\`\`
+{
+  "value": {
+    "name": "test",
+    "nested": {},
+    "value": "hello"
+  },
+  "type": [
+    "object",
+    {
+      "name": "string",
+      "nested": [
+        "object",
+        {}
+      ],
+      "value": "string"
+    }
+  ]
+}
+\`\`\`
+
+
+
+</details>
+
+
+
+</details>
+
+"
+`;
+
 exports[`reportFromSteps integration — generated fixtures > tofu/error-stages/0 > renders with workspace and matches snapshot 1`] = `
 "<!-- tf-report-action:"test-workspace" -->
 ## ✅ \`test-workspace\` Apply: 1 added
@@ -15817,6 +16537,66 @@ data.local_command.read_config
 "
 `;
 
+exports[`reportFromSteps integration — no-show fixtures (Tier 3) > terraform/empty-block-addition/0/no-show > renders without error and matches snapshot 1`] = `
+"## ✅ Plan: 1 to add
+
+> ⚠️ **Warning:** This report was generated without \`terraform show -json <tfplan>\` output. Resource attribute details are not available.
+
+## Plan Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Add | terraform\\_data | 1 |
+|  | **Add** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>➕ <strong>terraform_data</strong> example</summary>
+
+\`\`\`
+terraform_data.example
+\`\`\`
+
+
+
+</details>
+
+"
+`;
+
+exports[`reportFromSteps integration — no-show fixtures (Tier 3) > terraform/empty-block-addition/1/no-show > renders without error and matches snapshot 1`] = `
+"## ✅ Plan: 1 to change
+
+> ⚠️ **Warning:** This report was generated without \`terraform show -json <tfplan>\` output. Resource attribute details are not available.
+
+## Plan Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| 🔧 Change | terraform\\_data | 1 |
+|  | **Change** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>🔧 <strong>terraform_data</strong> example</summary>
+
+\`\`\`
+terraform_data.example
+\`\`\`
+
+
+
+</details>
+
+"
+`;
+
 exports[`reportFromSteps integration — no-show fixtures (Tier 3) > terraform/error-stages/0/no-show > renders without error and matches snapshot 1`] = `
 "## ✅ Plan: 1 to add
 
@@ -17181,6 +17961,66 @@ terraform_data.worker_a
 
 \`\`\`
 data.local_command.read_config
+\`\`\`
+
+
+
+</details>
+
+"
+`;
+
+exports[`reportFromSteps integration — no-show fixtures (Tier 3) > tofu/empty-block-addition/0/no-show > renders without error and matches snapshot 1`] = `
+"## ✅ Plan: 1 to add
+
+> ⚠️ **Warning:** This report was generated without \`tofu show -json <tfplan>\` output. Resource attribute details are not available.
+
+## Plan Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Add | terraform\\_data | 1 |
+|  | **Add** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>➕ <strong>terraform_data</strong> example</summary>
+
+\`\`\`
+terraform_data.example
+\`\`\`
+
+
+
+</details>
+
+"
+`;
+
+exports[`reportFromSteps integration — no-show fixtures (Tier 3) > tofu/empty-block-addition/1/no-show > renders without error and matches snapshot 1`] = `
+"## ✅ Plan: 1 to change
+
+> ⚠️ **Warning:** This report was generated without \`tofu show -json <tfplan>\` output. Resource attribute details are not available.
+
+## Plan Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| 🔧 Change | terraform\\_data | 1 |
+|  | **Change** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>🔧 <strong>terraform_data</strong> example</summary>
+
+\`\`\`
+terraform_data.example
 \`\`\`
 
 
@@ -18660,6 +19500,76 @@ _all values known after apply_
 | Output | Action | Before | After |
 | --- | --- | --- | --- |
 | config\\_value | 🔧 | <code>{&quot;worker_a&quot;:&quot;alpha&quot;,&quot;worker_b&quot;:&quot;bravo&quot;,&quot;worker_c&quot;:&quot;charlie&quot;}</code> | <code>(known after apply)</code> |
+
+"
+`;
+
+exports[`reportFromSteps integration — plan-only fixtures > terraform/empty-block-addition/0/plan-only > renders plan report and matches snapshot 1`] = `
+"## ✅ Plan: 1 to add
+
+## Plan Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Add | terraform\\_data | 1 |
+|  | **Add** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>➕ <strong>terraform_data</strong> example</summary>
+
+\`\`\`
+terraform_data.example
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | <code></code> | <code>(known after apply)</code> |
+| input.name | <code></code> | <code><ins style="background:#dfd">test</ins></code> |
+| input.value | <code></code> | <code><ins style="background:#dfd">hello</ins></code> |
+| output | <code></code> | <code>(known after apply)</code> |
+
+
+
+</details>
+
+"
+`;
+
+exports[`reportFromSteps integration — plan-only fixtures > terraform/empty-block-addition/1/plan-only > renders plan report and matches snapshot 1`] = `
+"## ✅ Plan: 1 to change
+
+## Plan Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| 🔧 Change | terraform\\_data | 1 |
+|  | **Change** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>🔧 <strong>terraform_data</strong> example — changed: input.nested, output.name, output.value</summary>
+
+\`\`\`
+terraform_data.example
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| input.nested | <code></code> | <code><ins style="background:#dfd">{}</ins></code> |
+| output | <code></code> | <code>(known after apply)</code> |
+| output.name | <code>test</code> | <code><del style="background:#fdd">test</del></code> |
+| output.value | <code>hello</code> | <code><del style="background:#fdd">hello</del></code> |
+
+
+
+</details>
 
 "
 `;
@@ -20497,6 +21407,76 @@ _all values known after apply_
 | Output | Action | Before | After |
 | --- | --- | --- | --- |
 | config\\_value | 🔧 | <code>{&quot;worker_a&quot;:&quot;alpha&quot;,&quot;worker_b&quot;:&quot;bravo&quot;,&quot;worker_c&quot;:&quot;charlie&quot;}</code> | <code>(known after apply)</code> |
+
+"
+`;
+
+exports[`reportFromSteps integration — plan-only fixtures > tofu/empty-block-addition/0/plan-only > renders plan report and matches snapshot 1`] = `
+"## ✅ Plan: 1 to add
+
+## Plan Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Add | terraform\\_data | 1 |
+|  | **Add** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>➕ <strong>terraform_data</strong> example</summary>
+
+\`\`\`
+terraform_data.example
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | <code></code> | <code>(known after apply)</code> |
+| input.name | <code></code> | <code><ins style="background:#dfd">test</ins></code> |
+| input.value | <code></code> | <code><ins style="background:#dfd">hello</ins></code> |
+| output | <code></code> | <code>(known after apply)</code> |
+
+
+
+</details>
+
+"
+`;
+
+exports[`reportFromSteps integration — plan-only fixtures > tofu/empty-block-addition/1/plan-only > renders plan report and matches snapshot 1`] = `
+"## ✅ Plan: 1 to change
+
+## Plan Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| 🔧 Change | terraform\\_data | 1 |
+|  | **Change** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>🔧 <strong>terraform_data</strong> example — changed: input.nested, output.name, output.value</summary>
+
+\`\`\`
+terraform_data.example
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| input.nested | <code></code> | <code><ins style="background:#dfd">{}</ins></code> |
+| output | <code></code> | <code>(known after apply)</code> |
+| output.name | <code>test</code> | <code><del style="background:#fdd">test</del></code> |
+| output.value | <code>hello</code> | <code><del style="background:#fdd">hello</del></code> |
+
+
+
+</details>
 
 "
 `;
@@ -22522,6 +23502,80 @@ _all values known after apply_
 | Output | Action | Before | After |
 | --- | --- | --- | --- |
 | config\\_value | 🔧 | <code>{&quot;worker_a&quot;:&quot;alpha&quot;,&quot;worker_b&quot;:&quot;bravo&quot;,&quot;worker_c&quot;:&quot;charlie&quot;}</code> | <code>{&quot;worker_a&quot;:&quot;ALPHA&quot;,&quot;worker_b&quot;:&quot;bravo&quot;,&quot;worker_c&quot;:&quot;charlie&quot;}</code> |
+
+"
+`;
+
+exports[`reportFromSteps — state enrichment > no-state snapshot: terraform/empty-block-addition/0/no-state 1`] = `
+"## ✅ Apply: 1 added
+
+> ⚠️ **Warning:** Some attribute values could not be resolved because \`terraform state pull\` output was not available. Add a state step after apply to see the actual values.
+
+## Apply Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Added | terraform\\_data | 1 |
+|  | **Added** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>➕ <strong>terraform_data</strong> example</summary>
+
+\`\`\`
+terraform_data.example
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | <code></code> | <code>(value not in plan)</code> |
+| input.name | <code></code> | <code><ins style="background:#dfd">test</ins></code> |
+| input.value | <code></code> | <code><ins style="background:#dfd">hello</ins></code> |
+| output | <code></code> | <code>(value not in plan)</code> |
+
+
+
+</details>
+
+"
+`;
+
+exports[`reportFromSteps — state enrichment > no-state snapshot: terraform/empty-block-addition/1/no-state 1`] = `
+"## ✅ Apply: 1 changed
+
+> ⚠️ **Warning:** Some attribute values could not be resolved because \`terraform state pull\` output was not available. Add a state step after apply to see the actual values.
+
+## Apply Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| 🔧 Changed | terraform\\_data | 1 |
+|  | **Changed** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>🔧 <strong>terraform_data</strong> example — changed: input.nested, output.name, output.value</summary>
+
+\`\`\`
+terraform_data.example
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| input.nested | <code></code> | <code><ins style="background:#dfd">{}</ins></code> |
+| output | <code></code> | <code>(value not in plan)</code> |
+| output.name | <code>test</code> | <code><del style="background:#fdd">test</del></code> |
+| output.value | <code>hello</code> | <code><del style="background:#fdd">hello</del></code> |
+
+
+
+</details>
 
 "
 `;
@@ -24579,6 +25633,80 @@ _all values known after apply_
 | Output | Action | Before | After |
 | --- | --- | --- | --- |
 | config\\_value | 🔧 | <code>{&quot;worker_a&quot;:&quot;alpha&quot;,&quot;worker_b&quot;:&quot;bravo&quot;,&quot;worker_c&quot;:&quot;charlie&quot;}</code> | <code>{&quot;worker_a&quot;:&quot;ALPHA&quot;,&quot;worker_b&quot;:&quot;bravo&quot;,&quot;worker_c&quot;:&quot;charlie&quot;}</code> |
+
+"
+`;
+
+exports[`reportFromSteps — state enrichment > no-state snapshot: tofu/empty-block-addition/0/no-state 1`] = `
+"## ✅ Apply: 1 added
+
+> ⚠️ **Warning:** Some attribute values could not be resolved because \`tofu state pull\` output was not available. Add a state step after apply to see the actual values.
+
+## Apply Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Added | terraform\\_data | 1 |
+|  | **Added** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>➕ <strong>terraform_data</strong> example</summary>
+
+\`\`\`
+terraform_data.example
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | <code></code> | <code>(value not in plan)</code> |
+| input.name | <code></code> | <code><ins style="background:#dfd">test</ins></code> |
+| input.value | <code></code> | <code><ins style="background:#dfd">hello</ins></code> |
+| output | <code></code> | <code>(value not in plan)</code> |
+
+
+
+</details>
+
+"
+`;
+
+exports[`reportFromSteps — state enrichment > no-state snapshot: tofu/empty-block-addition/1/no-state 1`] = `
+"## ✅ Apply: 1 changed
+
+> ⚠️ **Warning:** Some attribute values could not be resolved because \`tofu state pull\` output was not available. Add a state step after apply to see the actual values.
+
+## Apply Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| 🔧 Changed | terraform\\_data | 1 |
+|  | **Changed** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>🔧 <strong>terraform_data</strong> example — changed: input.nested, output.name, output.value</summary>
+
+\`\`\`
+terraform_data.example
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| input.nested | <code></code> | <code><ins style="background:#dfd">{}</ins></code> |
+| output | <code></code> | <code>(value not in plan)</code> |
+| output.name | <code>test</code> | <code><del style="background:#fdd">test</del></code> |
+| output.value | <code>hello</code> | <code><del style="background:#fdd">hello</del></code> |
+
+
+
+</details>
 
 "
 `;

@@ -379,6 +379,76 @@ _all values known after apply_
 "
 `;
 
+exports[`applyToMarkdown integration > terraform/empty-block-addition/0 > renders without error and matches snapshot [default] 1`] = `
+"## ✅ Apply: 1 added
+
+## Apply Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Added | terraform\\_data | 1 |
+|  | **Added** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>➕ <strong>terraform_data</strong> example</summary>
+
+\`\`\`
+terraform_data.example
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | <code></code> | <code>(value not in plan)</code> |
+| input.name | <code></code> | <code><ins style="background:#dfd">test</ins></code> |
+| input.value | <code></code> | <code><ins style="background:#dfd">hello</ins></code> |
+| output | <code></code> | <code>(value not in plan)</code> |
+
+
+
+</details>
+
+"
+`;
+
+exports[`applyToMarkdown integration > terraform/empty-block-addition/1 > renders without error and matches snapshot [default] 1`] = `
+"## ✅ Apply: 1 changed
+
+## Apply Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| 🔧 Changed | terraform\\_data | 1 |
+|  | **Changed** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>🔧 <strong>terraform_data</strong> example — changed: input.nested, output.name, output.value</summary>
+
+\`\`\`
+terraform_data.example
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| input.nested | <code></code> | <code><ins style="background:#dfd">{}</ins></code> |
+| output | <code></code> | <code>(value not in plan)</code> |
+| output.name | <code>test</code> | <code><del style="background:#fdd">test</del></code> |
+| output.value | <code>hello</code> | <code><del style="background:#fdd">hello</del></code> |
+
+
+
+</details>
+
+"
+`;
+
 exports[`applyToMarkdown integration > terraform/error-stages/0 > renders without error and matches snapshot [default] 1`] = `
 "## ✅ Apply: 1 added
 
@@ -1818,6 +1888,76 @@ _all values known after apply_
 | Output | Action | Before | After |
 | --- | --- | --- | --- |
 | config\\_value | 🔧 | <code>{&quot;worker_a&quot;:&quot;alpha&quot;,&quot;worker_b&quot;:&quot;bravo&quot;,&quot;worker_c&quot;:&quot;charlie&quot;}</code> | <code>{&quot;worker_a&quot;:&quot;ALPHA&quot;,&quot;worker_b&quot;:&quot;bravo&quot;,&quot;worker_c&quot;:&quot;charlie&quot;}</code> |
+
+"
+`;
+
+exports[`applyToMarkdown integration > tofu/empty-block-addition/0 > renders without error and matches snapshot [default] 1`] = `
+"## ✅ Apply: 1 added
+
+## Apply Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Added | terraform\\_data | 1 |
+|  | **Added** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>➕ <strong>terraform_data</strong> example</summary>
+
+\`\`\`
+terraform_data.example
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | <code></code> | <code>(value not in plan)</code> |
+| input.name | <code></code> | <code><ins style="background:#dfd">test</ins></code> |
+| input.value | <code></code> | <code><ins style="background:#dfd">hello</ins></code> |
+| output | <code></code> | <code>(value not in plan)</code> |
+
+
+
+</details>
+
+"
+`;
+
+exports[`applyToMarkdown integration > tofu/empty-block-addition/1 > renders without error and matches snapshot [default] 1`] = `
+"## ✅ Apply: 1 changed
+
+## Apply Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| 🔧 Changed | terraform\\_data | 1 |
+|  | **Changed** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>🔧 <strong>terraform_data</strong> example — changed: input.nested, output.name, output.value</summary>
+
+\`\`\`
+terraform_data.example
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| input.nested | <code></code> | <code><ins style="background:#dfd">{}</ins></code> |
+| output | <code></code> | <code>(value not in plan)</code> |
+| output.name | <code>test</code> | <code><del style="background:#fdd">test</del></code> |
+| output.value | <code>hello</code> | <code><del style="background:#fdd">hello</del></code> |
+
+
+
+</details>
 
 "
 `;
@@ -3479,6 +3619,125 @@ terraform_data.worker_a
     "worker_c": "charlie"
   }
 \`\`\`
+
+
+
+</details>
+
+"
+`;
+
+exports[`applyToMarkdown — state enrichment > state-enriched snapshot: terraform/empty-block-addition/0 1`] = `
+"## ✅ Apply: 1 added
+
+## Apply Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Added | terraform\\_data | 1 |
+|  | **Added** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>➕ <strong>terraform_data</strong> example</summary>
+
+\`\`\`
+terraform_data.example
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | <code></code> | <code><ins style="background:#dfd">943674a3-b07a-19ed-77fd-f229d5477d9d</ins></code> |
+| input.name | <code></code> | <code><ins style="background:#dfd">test</ins></code> |
+| input.value | <code></code> | <code><ins style="background:#dfd">hello</ins></code> |
+
+<details>
+<summary>output (large value)</summary>
+
+\`\`\`
+{
+  "value": {
+    "name": "test",
+    "value": "hello"
+  },
+  "type": [
+    "object",
+    {
+      "name": "string",
+      "value": "string"
+    }
+  ]
+}
+\`\`\`
+
+
+
+</details>
+
+
+
+</details>
+
+"
+`;
+
+exports[`applyToMarkdown — state enrichment > state-enriched snapshot: terraform/empty-block-addition/1 1`] = `
+"## ✅ Apply: 1 changed
+
+## Apply Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| 🔧 Changed | terraform\\_data | 1 |
+|  | **Changed** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>🔧 <strong>terraform_data</strong> example — changed: input.nested, output, output.name, output.value</summary>
+
+\`\`\`
+terraform_data.example
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| input.nested | <code></code> | <code><ins style="background:#dfd">{}</ins></code> |
+| output.name | <code>test</code> | <code><del style="background:#fdd">test</del></code> |
+| output.value | <code>hello</code> | <code><del style="background:#fdd">hello</del></code> |
+
+<details>
+<summary>output (large value)</summary>
+
+\`\`\`
+{
+  "value": {
+    "name": "test",
+    "nested": {},
+    "value": "hello"
+  },
+  "type": [
+    "object",
+    {
+      "name": "string",
+      "nested": [
+        "object",
+        {}
+      ],
+      "value": "string"
+    }
+  ]
+}
+\`\`\`
+
+
+
+</details>
 
 
 
@@ -5171,6 +5430,125 @@ terraform_data.worker_a
     "worker_c": "charlie"
   }
 \`\`\`
+
+
+
+</details>
+
+"
+`;
+
+exports[`applyToMarkdown — state enrichment > state-enriched snapshot: tofu/empty-block-addition/0 1`] = `
+"## ✅ Apply: 1 added
+
+## Apply Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Added | terraform\\_data | 1 |
+|  | **Added** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>➕ <strong>terraform_data</strong> example</summary>
+
+\`\`\`
+terraform_data.example
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | <code></code> | <code><ins style="background:#dfd">399de8ed-f521-6e2d-e51a-de345654d0a2</ins></code> |
+| input.name | <code></code> | <code><ins style="background:#dfd">test</ins></code> |
+| input.value | <code></code> | <code><ins style="background:#dfd">hello</ins></code> |
+
+<details>
+<summary>output (large value)</summary>
+
+\`\`\`
+{
+  "value": {
+    "name": "test",
+    "value": "hello"
+  },
+  "type": [
+    "object",
+    {
+      "name": "string",
+      "value": "string"
+    }
+  ]
+}
+\`\`\`
+
+
+
+</details>
+
+
+
+</details>
+
+"
+`;
+
+exports[`applyToMarkdown — state enrichment > state-enriched snapshot: tofu/empty-block-addition/1 1`] = `
+"## ✅ Apply: 1 changed
+
+## Apply Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| 🔧 Changed | terraform\\_data | 1 |
+|  | **Changed** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>🔧 <strong>terraform_data</strong> example — changed: input.nested, output, output.name, output.value</summary>
+
+\`\`\`
+terraform_data.example
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| input.nested | <code></code> | <code><ins style="background:#dfd">{}</ins></code> |
+| output.name | <code>test</code> | <code><del style="background:#fdd">test</del></code> |
+| output.value | <code>hello</code> | <code><del style="background:#fdd">hello</del></code> |
+
+<details>
+<summary>output (large value)</summary>
+
+\`\`\`
+{
+  "value": {
+    "name": "test",
+    "nested": {},
+    "value": "hello"
+  },
+  "type": [
+    "object",
+    {
+      "name": "string",
+      "nested": [
+        "object",
+        {}
+      ],
+      "value": "string"
+    }
+  ]
+}
+\`\`\`
+
+
+
+</details>
 
 
 
