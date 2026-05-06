@@ -192,11 +192,6 @@ function hasRawValueChanges(change: Change): boolean {
       // a non-null value for this key.
       const afterVal = afterFlat.get(key);
       if (afterVal !== undefined && afterVal !== null) return true;
-    } else if (beforeVal === "{}") {
-      // Empty block in before — equivalent to absent if after has only
-      // null-valued children under this prefix.
-      /* v8 ignore next -- unit-tested; no safe fixture provider produces empty-block drift normalization */
-      if (!isEmptyBlockEquivalent(key, afterFlat)) return true;
     } else {
       // Non-null before value — after must have the same value
       if (!afterFlat.has(key)) return true;
@@ -208,44 +203,12 @@ function hasRawValueChanges(change: Change): boolean {
   for (const [key, afterVal] of afterFlat) {
     if (!beforeFlat.has(key)) {
       if (afterVal === null) continue;
-      // Empty block in after — equivalent to absent if before has only
-      // null-valued children under this prefix.
-      /* v8 ignore next 3 -- unit-tested; no safe fixture provider produces empty-block drift normalization */
-      if (afterVal === "{}") {
-        if (!isEmptyBlockEquivalent(key, beforeFlat)) return true;
-        continue;
-      }
       return true;
     }
   }
 
   return false;
 }
-
-/**
- * Returns true if an empty block marker at `emptyBlockKey` is equivalent to
- * the entries in `otherMap` under that prefix. Equivalent means: all entries
- * in `otherMap` that are children of `emptyBlockKey` have null values.
- */
-/* v8 ignore start -- unit-tested; no safe fixture provider produces empty-block drift normalization */
-function isEmptyBlockEquivalent(
-  emptyBlockKey: string,
-  otherMap: Map<string, string | null>,
-): boolean {
-  for (const [k, v] of otherMap) {
-    if (isChildKey(emptyBlockKey, k) && v !== null) return false;
-  }
-  return true;
-}
-
-/** Returns true if `candidateKey` is a child path of `parentKey`. */
-function isChildKey(parentKey: string, candidateKey: string): boolean {
-  if (!candidateKey.startsWith(parentKey)) return false;
-  if (candidateKey.length <= parentKey.length) return false;
-  const next = candidateKey[parentKey.length];
-  return next === "." || next === "[";
-}
-/* v8 ignore stop */
 
 function isAllUnknownAfterApply(
   rc: TFResourceChange,

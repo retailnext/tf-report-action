@@ -386,7 +386,7 @@ exports[`applyToMarkdown integration > terraform/empty-block-addition/0 > render
 
 | Action | Resource | Count |
 | --- | --- | --- |
-| ➕ Added | terraform\\_data | 1 |
+| ➕ Added | tfcoremock\\_network\\_policy | 1 |
 |  | **Added** | **1** |
 
 ## Resource Changes
@@ -394,18 +394,17 @@ exports[`applyToMarkdown integration > terraform/empty-block-addition/0 > render
 ### 📦 Module: root
 
 <details>
-<summary>➕ <strong>terraform_data</strong> example</summary>
+<summary>➕ <strong>tfcoremock_network_policy</strong> deny_all</summary>
 
 \`\`\`
-terraform_data.example
+tfcoremock_network_policy.deny_all
 \`\`\`
 
 | Attribute | Before | After |
 | --- | --- | --- |
 | id | <code></code> | <code>(value not in plan)</code> |
-| input.name | <code></code> | <code><ins style="background:#dfd">test</ins></code> |
-| input.value | <code></code> | <code><ins style="background:#dfd">hello</ins></code> |
-| output | <code></code> | <code>(value not in plan)</code> |
+| name | <code></code> | <code><ins style="background:#dfd">deny-all-egress</ins></code> |
+| spec\\[0\\].policy\\_types\\[0\\] | <code></code> | <code><ins style="background:#dfd">Egress</ins></code> |
 
 
 
@@ -421,7 +420,7 @@ exports[`applyToMarkdown integration > terraform/empty-block-addition/1 > render
 
 | Action | Resource | Count |
 | --- | --- | --- |
-| 🔧 Changed | terraform\\_data | 1 |
+| 🔧 Changed | tfcoremock\\_network\\_policy | 1 |
 |  | **Changed** | **1** |
 
 ## Resource Changes
@@ -429,18 +428,15 @@ exports[`applyToMarkdown integration > terraform/empty-block-addition/1 > render
 ### 📦 Module: root
 
 <details>
-<summary>🔧 <strong>terraform_data</strong> example — changed: input.nested, output.name, output.value</summary>
+<summary>🔧 <strong>tfcoremock_network_policy</strong> deny_all — changed: spec[0].egress[0]</summary>
 
 \`\`\`
-terraform_data.example
+tfcoremock_network_policy.deny_all
 \`\`\`
 
 | Attribute | Before | After |
 | --- | --- | --- |
-| input.nested | <code></code> | <code><ins style="background:#dfd">{}</ins></code> |
-| output | <code></code> | <code>(value not in plan)</code> |
-| output.name | <code>test</code> | <code><del style="background:#fdd">test</del></code> |
-| output.value | <code>hello</code> | <code><del style="background:#fdd">hello</del></code> |
+| spec\\[0\\].egress\\[0\\] | <code></code> | <code><ins style="background:#dfd">{}</ins></code> |
 
 
 
@@ -1899,7 +1895,7 @@ exports[`applyToMarkdown integration > tofu/empty-block-addition/0 > renders wit
 
 | Action | Resource | Count |
 | --- | --- | --- |
-| ➕ Added | terraform\\_data | 1 |
+| ➕ Added | tfcoremock\\_network\\_policy | 1 |
 |  | **Added** | **1** |
 
 ## Resource Changes
@@ -1907,18 +1903,17 @@ exports[`applyToMarkdown integration > tofu/empty-block-addition/0 > renders wit
 ### 📦 Module: root
 
 <details>
-<summary>➕ <strong>terraform_data</strong> example</summary>
+<summary>➕ <strong>tfcoremock_network_policy</strong> deny_all</summary>
 
 \`\`\`
-terraform_data.example
+tfcoremock_network_policy.deny_all
 \`\`\`
 
 | Attribute | Before | After |
 | --- | --- | --- |
 | id | <code></code> | <code>(value not in plan)</code> |
-| input.name | <code></code> | <code><ins style="background:#dfd">test</ins></code> |
-| input.value | <code></code> | <code><ins style="background:#dfd">hello</ins></code> |
-| output | <code></code> | <code>(value not in plan)</code> |
+| name | <code></code> | <code><ins style="background:#dfd">deny-all-egress</ins></code> |
+| spec\\[0\\].policy\\_types\\[0\\] | <code></code> | <code><ins style="background:#dfd">Egress</ins></code> |
 
 
 
@@ -1934,7 +1929,7 @@ exports[`applyToMarkdown integration > tofu/empty-block-addition/1 > renders wit
 
 | Action | Resource | Count |
 | --- | --- | --- |
-| 🔧 Changed | terraform\\_data | 1 |
+| 🔧 Changed | tfcoremock\\_network\\_policy | 1 |
 |  | **Changed** | **1** |
 
 ## Resource Changes
@@ -1942,18 +1937,15 @@ exports[`applyToMarkdown integration > tofu/empty-block-addition/1 > renders wit
 ### 📦 Module: root
 
 <details>
-<summary>🔧 <strong>terraform_data</strong> example — changed: input.nested, output.name, output.value</summary>
+<summary>🔧 <strong>tfcoremock_network_policy</strong> deny_all — changed: spec[0].egress[0]</summary>
 
 \`\`\`
-terraform_data.example
+tfcoremock_network_policy.deny_all
 \`\`\`
 
 | Attribute | Before | After |
 | --- | --- | --- |
-| input.nested | <code></code> | <code><ins style="background:#dfd">{}</ins></code> |
-| output | <code></code> | <code>(value not in plan)</code> |
-| output.name | <code>test</code> | <code><del style="background:#fdd">test</del></code> |
-| output.value | <code>hello</code> | <code><del style="background:#fdd">hello</del></code> |
+| spec\\[0\\].egress\\[0\\] | <code></code> | <code><ins style="background:#dfd">{}</ins></code> |
 
 
 
@@ -3634,7 +3626,7 @@ exports[`applyToMarkdown — state enrichment > state-enriched snapshot: terrafo
 
 | Action | Resource | Count |
 | --- | --- | --- |
-| ➕ Added | terraform\\_data | 1 |
+| ➕ Added | tfcoremock\\_network\\_policy | 1 |
 |  | **Added** | **1** |
 
 ## Resource Changes
@@ -3642,40 +3634,17 @@ exports[`applyToMarkdown — state enrichment > state-enriched snapshot: terrafo
 ### 📦 Module: root
 
 <details>
-<summary>➕ <strong>terraform_data</strong> example</summary>
+<summary>➕ <strong>tfcoremock_network_policy</strong> deny_all</summary>
 
 \`\`\`
-terraform_data.example
+tfcoremock_network_policy.deny_all
 \`\`\`
 
 | Attribute | Before | After |
 | --- | --- | --- |
-| id | <code></code> | <code><ins style="background:#dfd">943674a3-b07a-19ed-77fd-f229d5477d9d</ins></code> |
-| input.name | <code></code> | <code><ins style="background:#dfd">test</ins></code> |
-| input.value | <code></code> | <code><ins style="background:#dfd">hello</ins></code> |
-
-<details>
-<summary>output (large value)</summary>
-
-\`\`\`
-{
-  "value": {
-    "name": "test",
-    "value": "hello"
-  },
-  "type": [
-    "object",
-    {
-      "name": "string",
-      "value": "string"
-    }
-  ]
-}
-\`\`\`
-
-
-
-</details>
+| id | <code></code> | <code><ins style="background:#dfd">ec4df8c1-6a26-d4b2-399f-57f752226fe3</ins></code> |
+| name | <code></code> | <code><ins style="background:#dfd">deny-all-egress</ins></code> |
+| spec\\[0\\].policy\\_types\\[0\\] | <code></code> | <code><ins style="background:#dfd">Egress</ins></code> |
 
 
 
@@ -3691,7 +3660,7 @@ exports[`applyToMarkdown — state enrichment > state-enriched snapshot: terrafo
 
 | Action | Resource | Count |
 | --- | --- | --- |
-| 🔧 Changed | terraform\\_data | 1 |
+| 🔧 Changed | tfcoremock\\_network\\_policy | 1 |
 |  | **Changed** | **1** |
 
 ## Resource Changes
@@ -3699,45 +3668,15 @@ exports[`applyToMarkdown — state enrichment > state-enriched snapshot: terrafo
 ### 📦 Module: root
 
 <details>
-<summary>🔧 <strong>terraform_data</strong> example — changed: input.nested, output, output.name, output.value</summary>
+<summary>🔧 <strong>tfcoremock_network_policy</strong> deny_all — changed: spec[0].egress[0]</summary>
 
 \`\`\`
-terraform_data.example
+tfcoremock_network_policy.deny_all
 \`\`\`
 
 | Attribute | Before | After |
 | --- | --- | --- |
-| input.nested | <code></code> | <code><ins style="background:#dfd">{}</ins></code> |
-| output.name | <code>test</code> | <code><del style="background:#fdd">test</del></code> |
-| output.value | <code>hello</code> | <code><del style="background:#fdd">hello</del></code> |
-
-<details>
-<summary>output (large value)</summary>
-
-\`\`\`
-{
-  "value": {
-    "name": "test",
-    "nested": {},
-    "value": "hello"
-  },
-  "type": [
-    "object",
-    {
-      "name": "string",
-      "nested": [
-        "object",
-        {}
-      ],
-      "value": "string"
-    }
-  ]
-}
-\`\`\`
-
-
-
-</details>
+| spec\\[0\\].egress\\[0\\] | <code></code> | <code><ins style="background:#dfd">{}</ins></code> |
 
 
 
@@ -5445,7 +5384,7 @@ exports[`applyToMarkdown — state enrichment > state-enriched snapshot: tofu/em
 
 | Action | Resource | Count |
 | --- | --- | --- |
-| ➕ Added | terraform\\_data | 1 |
+| ➕ Added | tfcoremock\\_network\\_policy | 1 |
 |  | **Added** | **1** |
 
 ## Resource Changes
@@ -5453,40 +5392,17 @@ exports[`applyToMarkdown — state enrichment > state-enriched snapshot: tofu/em
 ### 📦 Module: root
 
 <details>
-<summary>➕ <strong>terraform_data</strong> example</summary>
+<summary>➕ <strong>tfcoremock_network_policy</strong> deny_all</summary>
 
 \`\`\`
-terraform_data.example
+tfcoremock_network_policy.deny_all
 \`\`\`
 
 | Attribute | Before | After |
 | --- | --- | --- |
-| id | <code></code> | <code><ins style="background:#dfd">399de8ed-f521-6e2d-e51a-de345654d0a2</ins></code> |
-| input.name | <code></code> | <code><ins style="background:#dfd">test</ins></code> |
-| input.value | <code></code> | <code><ins style="background:#dfd">hello</ins></code> |
-
-<details>
-<summary>output (large value)</summary>
-
-\`\`\`
-{
-  "value": {
-    "name": "test",
-    "value": "hello"
-  },
-  "type": [
-    "object",
-    {
-      "name": "string",
-      "value": "string"
-    }
-  ]
-}
-\`\`\`
-
-
-
-</details>
+| id | <code></code> | <code><ins style="background:#dfd">ccf70fe0-ef67-939f-3ec0-32a4853caba4</ins></code> |
+| name | <code></code> | <code><ins style="background:#dfd">deny-all-egress</ins></code> |
+| spec\\[0\\].policy\\_types\\[0\\] | <code></code> | <code><ins style="background:#dfd">Egress</ins></code> |
 
 
 
@@ -5502,7 +5418,7 @@ exports[`applyToMarkdown — state enrichment > state-enriched snapshot: tofu/em
 
 | Action | Resource | Count |
 | --- | --- | --- |
-| 🔧 Changed | terraform\\_data | 1 |
+| 🔧 Changed | tfcoremock\\_network\\_policy | 1 |
 |  | **Changed** | **1** |
 
 ## Resource Changes
@@ -5510,45 +5426,15 @@ exports[`applyToMarkdown — state enrichment > state-enriched snapshot: tofu/em
 ### 📦 Module: root
 
 <details>
-<summary>🔧 <strong>terraform_data</strong> example — changed: input.nested, output, output.name, output.value</summary>
+<summary>🔧 <strong>tfcoremock_network_policy</strong> deny_all — changed: spec[0].egress[0]</summary>
 
 \`\`\`
-terraform_data.example
+tfcoremock_network_policy.deny_all
 \`\`\`
 
 | Attribute | Before | After |
 | --- | --- | --- |
-| input.nested | <code></code> | <code><ins style="background:#dfd">{}</ins></code> |
-| output.name | <code>test</code> | <code><del style="background:#fdd">test</del></code> |
-| output.value | <code>hello</code> | <code><del style="background:#fdd">hello</del></code> |
-
-<details>
-<summary>output (large value)</summary>
-
-\`\`\`
-{
-  "value": {
-    "name": "test",
-    "nested": {},
-    "value": "hello"
-  },
-  "type": [
-    "object",
-    {
-      "name": "string",
-      "nested": [
-        "object",
-        {}
-      ],
-      "value": "string"
-    }
-  ]
-}
-\`\`\`
-
-
-
-</details>
+| spec\\[0\\].egress\\[0\\] | <code></code> | <code><ins style="background:#dfd">{}</ins></code> |
 
 
 

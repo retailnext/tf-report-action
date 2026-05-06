@@ -2,46 +2,29 @@
   "version": 4,
   "terraform_version": "1.14.9",
   "serial": 1,
-  "lineage": "1c008a07-9ef0-5dab-4765-c68bac6dd627",
+  "lineage": "887f4919-0bbf-4930-f2d0-581fdc024480",
   "outputs": {},
   "resources": [
     {
       "mode": "managed",
-      "type": "terraform_data",
-      "name": "example",
-      "provider": "provider[\"terraform.io/builtin/terraform\"]",
+      "type": "tfcoremock_network_policy",
+      "name": "deny_all",
+      "provider": "provider[\"registry.terraform.io/hashicorp/tfcoremock\"]",
       "instances": [
         {
           "schema_version": 0,
           "attributes": {
-            "id": "943674a3-b07a-19ed-77fd-f229d5477d9d",
-            "input": {
-              "value": {
-                "name": "test",
-                "value": "hello"
-              },
-              "type": [
-                "object",
-                {
-                  "name": "string",
-                  "value": "string"
-                }
-              ]
-            },
-            "output": {
-              "value": {
-                "name": "test",
-                "value": "hello"
-              },
-              "type": [
-                "object",
-                {
-                  "name": "string",
-                  "value": "string"
-                }
-              ]
-            },
-            "triggers_replace": null
+            "id": "ec4df8c1-6a26-d4b2-399f-57f752226fe3",
+            "name": "deny-all-egress",
+            "spec": [
+              {
+                "egress": [],
+                "ingress": [],
+                "policy_types": [
+                  "Egress"
+                ]
+              }
+            ]
           },
           "sensitive_attributes": [],
           "identity_schema_version": 0

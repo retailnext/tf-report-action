@@ -1434,7 +1434,7 @@ exports[`planToMarkdown integration > terraform/empty-block-addition/0 > renders
 
 | Action | Resource | Count |
 | --- | --- | --- |
-| ➕ Add | terraform\\_data | 1 |
+| ➕ Add | tfcoremock\\_network\\_policy | 1 |
 |  | **Add** | **1** |
 
 ## Resource Changes
@@ -1442,18 +1442,17 @@ exports[`planToMarkdown integration > terraform/empty-block-addition/0 > renders
 ### 📦 Module: root
 
 <details>
-<summary>➕ <strong>terraform_data</strong> example</summary>
+<summary>➕ <strong>tfcoremock_network_policy</strong> deny_all</summary>
 
 \`\`\`
-terraform_data.example
+tfcoremock_network_policy.deny_all
 \`\`\`
 
 | Attribute | Before | After |
 | --- | --- | --- |
 | id | <code></code> | <code>(known after apply)</code> |
-| input.name | <code></code> | <code><ins style="background:#dfd">test</ins></code> |
-| input.value | <code></code> | <code><ins style="background:#dfd">hello</ins></code> |
-| output | <code></code> | <code>(known after apply)</code> |
+| name | <code></code> | <code><ins style="background:#dfd">deny-all-egress</ins></code> |
+| spec\\[0\\].policy\\_types\\[0\\] | <code></code> | <code><ins style="background:#dfd">Egress</ins></code> |
 
 
 
@@ -1469,7 +1468,7 @@ exports[`planToMarkdown integration > terraform/empty-block-addition/0 > renders
 
 | Action | Resource | Count |
 | --- | --- | --- |
-| ➕ Add | terraform\\_data | 1 |
+| ➕ Add | tfcoremock\\_network\\_policy | 1 |
 |  | **Add** | **1** |
 
 ## Resource Changes
@@ -1477,18 +1476,17 @@ exports[`planToMarkdown integration > terraform/empty-block-addition/0 > renders
 ### 📦 Module: root
 
 <details>
-<summary>➕ <strong>terraform_data</strong> example</summary>
+<summary>➕ <strong>tfcoremock_network_policy</strong> deny_all</summary>
 
 \`\`\`
-terraform_data.example
+tfcoremock_network_policy.deny_all
 \`\`\`
 
 | Attribute | Before | After |
 | --- | --- | --- |
 | id | <code></code> | <code>(known after apply)</code> |
-| input.name | <code></code> | + test |
-| input.value | <code></code> | + hello |
-| output | <code></code> | <code>(known after apply)</code> |
+| name | <code></code> | + deny-all-egress |
+| spec\\[0\\].policy\\_types\\[0\\] | <code></code> | + Egress |
 
 
 
@@ -1504,7 +1502,7 @@ exports[`planToMarkdown integration > terraform/empty-block-addition/0 > renders
 
 | Action | Resource | Count |
 | --- | --- | --- |
-| ➕ Add | terraform\\_data | 1 |
+| ➕ Add | tfcoremock\\_network\\_policy | 1 |
 |  | **Add** | **1** |
 
 ## Resource Changes
@@ -1512,19 +1510,17 @@ exports[`planToMarkdown integration > terraform/empty-block-addition/0 > renders
 ### 📦 Module: root
 
 <details>
-<summary>➕ <strong>terraform_data</strong> example</summary>
+<summary>➕ <strong>tfcoremock_network_policy</strong> deny_all</summary>
 
 \`\`\`
-terraform_data.example
+tfcoremock_network_policy.deny_all
 \`\`\`
 
 | Attribute | Before | After |
 | --- | --- | --- |
 | id | <code></code> | <code>(known after apply)</code> |
-| input.name | <code></code> | <code><ins style="background:#dfd">test</ins></code> |
-| input.value | <code></code> | <code><ins style="background:#dfd">hello</ins></code> |
-| output | <code></code> | <code>(known after apply)</code> |
-| triggers\\_replace | <code></code> |  |
+| name | <code></code> | <code><ins style="background:#dfd">deny-all-egress</ins></code> |
+| spec\\[0\\].policy\\_types\\[0\\] | <code></code> | <code><ins style="background:#dfd">Egress</ins></code> |
 
 
 
@@ -1540,7 +1536,7 @@ exports[`planToMarkdown integration > terraform/empty-block-addition/1 > renders
 
 | Action | Resource | Count |
 | --- | --- | --- |
-| 🔧 Change | terraform\\_data | 1 |
+| 🔧 Change | tfcoremock\\_network\\_policy | 1 |
 |  | **Change** | **1** |
 
 ## Resource Changes
@@ -1548,18 +1544,15 @@ exports[`planToMarkdown integration > terraform/empty-block-addition/1 > renders
 ### 📦 Module: root
 
 <details>
-<summary>🔧 <strong>terraform_data</strong> example — changed: input.nested, output.name, output.value</summary>
+<summary>🔧 <strong>tfcoremock_network_policy</strong> deny_all — changed: spec[0].egress[0]</summary>
 
 \`\`\`
-terraform_data.example
+tfcoremock_network_policy.deny_all
 \`\`\`
 
 | Attribute | Before | After |
 | --- | --- | --- |
-| input.nested | <code></code> | <code><ins style="background:#dfd">{}</ins></code> |
-| output | <code></code> | <code>(known after apply)</code> |
-| output.name | <code>test</code> | <code><del style="background:#fdd">test</del></code> |
-| output.value | <code>hello</code> | <code><del style="background:#fdd">hello</del></code> |
+| spec\\[0\\].egress\\[0\\] | <code></code> | <code><ins style="background:#dfd">{}</ins></code> |
 
 
 
@@ -1575,7 +1568,7 @@ exports[`planToMarkdown integration > terraform/empty-block-addition/1 > renders
 
 | Action | Resource | Count |
 | --- | --- | --- |
-| 🔧 Change | terraform\\_data | 1 |
+| 🔧 Change | tfcoremock\\_network\\_policy | 1 |
 |  | **Change** | **1** |
 
 ## Resource Changes
@@ -1583,18 +1576,15 @@ exports[`planToMarkdown integration > terraform/empty-block-addition/1 > renders
 ### 📦 Module: root
 
 <details>
-<summary>🔧 <strong>terraform_data</strong> example — changed: input.nested, output.name, output.value</summary>
+<summary>🔧 <strong>tfcoremock_network_policy</strong> deny_all — changed: spec[0].egress[0]</summary>
 
 \`\`\`
-terraform_data.example
+tfcoremock_network_policy.deny_all
 \`\`\`
 
 | Attribute | Before | After |
 | --- | --- | --- |
-| input.nested | <code></code> | + {} |
-| output | <code></code> | <code>(known after apply)</code> |
-| output.name | <code>test</code> | - test |
-| output.value | <code>hello</code> | - hello |
+| spec\\[0\\].egress\\[0\\] | <code></code> | + {} |
 
 
 
@@ -1610,7 +1600,7 @@ exports[`planToMarkdown integration > terraform/empty-block-addition/1 > renders
 
 | Action | Resource | Count |
 | --- | --- | --- |
-| 🔧 Change | terraform\\_data | 1 |
+| 🔧 Change | tfcoremock\\_network\\_policy | 1 |
 |  | **Change** | **1** |
 
 ## Resource Changes
@@ -1618,22 +1608,18 @@ exports[`planToMarkdown integration > terraform/empty-block-addition/1 > renders
 ### 📦 Module: root
 
 <details>
-<summary>🔧 <strong>terraform_data</strong> example — changed: input.nested, output.name, output.value</summary>
+<summary>🔧 <strong>tfcoremock_network_policy</strong> deny_all — changed: spec[0].egress[0]</summary>
 
 \`\`\`
-terraform_data.example
+tfcoremock_network_policy.deny_all
 \`\`\`
 
 | Attribute | Before | After |
 | --- | --- | --- |
-| id | <code>943674a3-b07a-19ed-77fd-f229d5477d9d</code> | <code>943674a3-b07a-19ed-77fd-f229d5477d9d</code> |
-| input.name | <code>test</code> | <code>test</code> |
-| input.nested | <code></code> | <code><ins style="background:#dfd">{}</ins></code> |
-| input.value | <code>hello</code> | <code>hello</code> |
-| output | <code></code> | <code>(known after apply)</code> |
-| output.name | <code>test</code> | <code><del style="background:#fdd">test</del></code> |
-| output.value | <code>hello</code> | <code><del style="background:#fdd">hello</del></code> |
-| triggers\\_replace | <code></code> |  |
+| id | <code>ec4df8c1-6a26-d4b2-399f-57f752226fe3</code> | <code>ec4df8c1-6a26-d4b2-399f-57f752226fe3</code> |
+| name | <code>deny-all-egress</code> | <code>deny-all-egress</code> |
+| spec\\[0\\].egress\\[0\\] | <code></code> | <code><ins style="background:#dfd">{}</ins></code> |
+| spec\\[0\\].policy\\_types\\[0\\] | <code>Egress</code> | <code>Egress</code> |
 
 
 
@@ -6467,7 +6453,7 @@ exports[`planToMarkdown integration > tofu/empty-block-addition/0 > renders with
 
 | Action | Resource | Count |
 | --- | --- | --- |
-| ➕ Add | terraform\\_data | 1 |
+| ➕ Add | tfcoremock\\_network\\_policy | 1 |
 |  | **Add** | **1** |
 
 ## Resource Changes
@@ -6475,18 +6461,17 @@ exports[`planToMarkdown integration > tofu/empty-block-addition/0 > renders with
 ### 📦 Module: root
 
 <details>
-<summary>➕ <strong>terraform_data</strong> example</summary>
+<summary>➕ <strong>tfcoremock_network_policy</strong> deny_all</summary>
 
 \`\`\`
-terraform_data.example
+tfcoremock_network_policy.deny_all
 \`\`\`
 
 | Attribute | Before | After |
 | --- | --- | --- |
 | id | <code></code> | <code>(known after apply)</code> |
-| input.name | <code></code> | <code><ins style="background:#dfd">test</ins></code> |
-| input.value | <code></code> | <code><ins style="background:#dfd">hello</ins></code> |
-| output | <code></code> | <code>(known after apply)</code> |
+| name | <code></code> | <code><ins style="background:#dfd">deny-all-egress</ins></code> |
+| spec\\[0\\].policy\\_types\\[0\\] | <code></code> | <code><ins style="background:#dfd">Egress</ins></code> |
 
 
 
@@ -6502,7 +6487,7 @@ exports[`planToMarkdown integration > tofu/empty-block-addition/0 > renders with
 
 | Action | Resource | Count |
 | --- | --- | --- |
-| ➕ Add | terraform\\_data | 1 |
+| ➕ Add | tfcoremock\\_network\\_policy | 1 |
 |  | **Add** | **1** |
 
 ## Resource Changes
@@ -6510,18 +6495,17 @@ exports[`planToMarkdown integration > tofu/empty-block-addition/0 > renders with
 ### 📦 Module: root
 
 <details>
-<summary>➕ <strong>terraform_data</strong> example</summary>
+<summary>➕ <strong>tfcoremock_network_policy</strong> deny_all</summary>
 
 \`\`\`
-terraform_data.example
+tfcoremock_network_policy.deny_all
 \`\`\`
 
 | Attribute | Before | After |
 | --- | --- | --- |
 | id | <code></code> | <code>(known after apply)</code> |
-| input.name | <code></code> | + test |
-| input.value | <code></code> | + hello |
-| output | <code></code> | <code>(known after apply)</code> |
+| name | <code></code> | + deny-all-egress |
+| spec\\[0\\].policy\\_types\\[0\\] | <code></code> | + Egress |
 
 
 
@@ -6537,7 +6521,7 @@ exports[`planToMarkdown integration > tofu/empty-block-addition/0 > renders with
 
 | Action | Resource | Count |
 | --- | --- | --- |
-| ➕ Add | terraform\\_data | 1 |
+| ➕ Add | tfcoremock\\_network\\_policy | 1 |
 |  | **Add** | **1** |
 
 ## Resource Changes
@@ -6545,19 +6529,17 @@ exports[`planToMarkdown integration > tofu/empty-block-addition/0 > renders with
 ### 📦 Module: root
 
 <details>
-<summary>➕ <strong>terraform_data</strong> example</summary>
+<summary>➕ <strong>tfcoremock_network_policy</strong> deny_all</summary>
 
 \`\`\`
-terraform_data.example
+tfcoremock_network_policy.deny_all
 \`\`\`
 
 | Attribute | Before | After |
 | --- | --- | --- |
 | id | <code></code> | <code>(known after apply)</code> |
-| input.name | <code></code> | <code><ins style="background:#dfd">test</ins></code> |
-| input.value | <code></code> | <code><ins style="background:#dfd">hello</ins></code> |
-| output | <code></code> | <code>(known after apply)</code> |
-| triggers\\_replace | <code></code> |  |
+| name | <code></code> | <code><ins style="background:#dfd">deny-all-egress</ins></code> |
+| spec\\[0\\].policy\\_types\\[0\\] | <code></code> | <code><ins style="background:#dfd">Egress</ins></code> |
 
 
 
@@ -6573,7 +6555,7 @@ exports[`planToMarkdown integration > tofu/empty-block-addition/1 > renders with
 
 | Action | Resource | Count |
 | --- | --- | --- |
-| 🔧 Change | terraform\\_data | 1 |
+| 🔧 Change | tfcoremock\\_network\\_policy | 1 |
 |  | **Change** | **1** |
 
 ## Resource Changes
@@ -6581,18 +6563,15 @@ exports[`planToMarkdown integration > tofu/empty-block-addition/1 > renders with
 ### 📦 Module: root
 
 <details>
-<summary>🔧 <strong>terraform_data</strong> example — changed: input.nested, output.name, output.value</summary>
+<summary>🔧 <strong>tfcoremock_network_policy</strong> deny_all — changed: spec[0].egress[0]</summary>
 
 \`\`\`
-terraform_data.example
+tfcoremock_network_policy.deny_all
 \`\`\`
 
 | Attribute | Before | After |
 | --- | --- | --- |
-| input.nested | <code></code> | <code><ins style="background:#dfd">{}</ins></code> |
-| output | <code></code> | <code>(known after apply)</code> |
-| output.name | <code>test</code> | <code><del style="background:#fdd">test</del></code> |
-| output.value | <code>hello</code> | <code><del style="background:#fdd">hello</del></code> |
+| spec\\[0\\].egress\\[0\\] | <code></code> | <code><ins style="background:#dfd">{}</ins></code> |
 
 
 
@@ -6608,7 +6587,7 @@ exports[`planToMarkdown integration > tofu/empty-block-addition/1 > renders with
 
 | Action | Resource | Count |
 | --- | --- | --- |
-| 🔧 Change | terraform\\_data | 1 |
+| 🔧 Change | tfcoremock\\_network\\_policy | 1 |
 |  | **Change** | **1** |
 
 ## Resource Changes
@@ -6616,18 +6595,15 @@ exports[`planToMarkdown integration > tofu/empty-block-addition/1 > renders with
 ### 📦 Module: root
 
 <details>
-<summary>🔧 <strong>terraform_data</strong> example — changed: input.nested, output.name, output.value</summary>
+<summary>🔧 <strong>tfcoremock_network_policy</strong> deny_all — changed: spec[0].egress[0]</summary>
 
 \`\`\`
-terraform_data.example
+tfcoremock_network_policy.deny_all
 \`\`\`
 
 | Attribute | Before | After |
 | --- | --- | --- |
-| input.nested | <code></code> | + {} |
-| output | <code></code> | <code>(known after apply)</code> |
-| output.name | <code>test</code> | - test |
-| output.value | <code>hello</code> | - hello |
+| spec\\[0\\].egress\\[0\\] | <code></code> | + {} |
 
 
 
@@ -6643,7 +6619,7 @@ exports[`planToMarkdown integration > tofu/empty-block-addition/1 > renders with
 
 | Action | Resource | Count |
 | --- | --- | --- |
-| 🔧 Change | terraform\\_data | 1 |
+| 🔧 Change | tfcoremock\\_network\\_policy | 1 |
 |  | **Change** | **1** |
 
 ## Resource Changes
@@ -6651,22 +6627,18 @@ exports[`planToMarkdown integration > tofu/empty-block-addition/1 > renders with
 ### 📦 Module: root
 
 <details>
-<summary>🔧 <strong>terraform_data</strong> example — changed: input.nested, output.name, output.value</summary>
+<summary>🔧 <strong>tfcoremock_network_policy</strong> deny_all — changed: spec[0].egress[0]</summary>
 
 \`\`\`
-terraform_data.example
+tfcoremock_network_policy.deny_all
 \`\`\`
 
 | Attribute | Before | After |
 | --- | --- | --- |
-| id | <code>399de8ed-f521-6e2d-e51a-de345654d0a2</code> | <code>399de8ed-f521-6e2d-e51a-de345654d0a2</code> |
-| input.name | <code>test</code> | <code>test</code> |
-| input.nested | <code></code> | <code><ins style="background:#dfd">{}</ins></code> |
-| input.value | <code>hello</code> | <code>hello</code> |
-| output | <code></code> | <code>(known after apply)</code> |
-| output.name | <code>test</code> | <code><del style="background:#fdd">test</del></code> |
-| output.value | <code>hello</code> | <code><del style="background:#fdd">hello</del></code> |
-| triggers\\_replace | <code></code> |  |
+| id | <code>ccf70fe0-ef67-939f-3ec0-32a4853caba4</code> | <code>ccf70fe0-ef67-939f-3ec0-32a4853caba4</code> |
+| name | <code>deny-all-egress</code> | <code>deny-all-egress</code> |
+| spec\\[0\\].egress\\[0\\] | <code></code> | <code><ins style="background:#dfd">{}</ins></code> |
+| spec\\[0\\].policy\\_types\\[0\\] | <code>Egress</code> | <code>Egress</code> |
 
 
 

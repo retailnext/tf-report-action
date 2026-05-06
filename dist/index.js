@@ -875,14 +875,21 @@ function flattenInto(value, prefix, result) {
   } else if (typeof value === "boolean") {
     result.set(prefix, value ? "true" : "false");
   } else if (Array.isArray(value)) {
-    for (let i = 0; i < value.length; i++) {
-      const child = value[i];
-      if (child !== void 0) {
-        flattenInto(
-          child,
-          prefix === "" ? `[${String(i)}]` : `${prefix}[${String(i)}]`,
-          result
-        );
+    if (value.length === 0 && prefix !== "") {
+    } else {
+      const sizeBefore = result.size;
+      for (let i = 0; i < value.length; i++) {
+        const child = value[i];
+        if (child !== void 0) {
+          flattenInto(
+            child,
+            prefix === "" ? `[${String(i)}]` : `${prefix}[${String(i)}]`,
+            result
+          );
+        }
+      }
+      if (prefix !== "" && result.size === sizeBefore && value.length > 0) {
+        result.set(prefix, "{}");
       }
     }
   } else {
@@ -890,13 +897,22 @@ function flattenInto(value, prefix, result) {
     if (entries.length === 0 && prefix !== "") {
       result.set(prefix, "{}");
     } else {
+      const sizeBefore = result.size;
       for (const [key, child] of entries) {
         if (child !== void 0) {
           flattenInto(child, prefix === "" ? key : `${prefix}.${key}`, result);
         }
       }
+      if (prefix !== "" && allChildEntriesNullOrAbsent(result, sizeBefore)) {
+        result.set(prefix, "{}");
+      }
     }
   }
+}
+function allChildEntriesNullOrAbsent(result, sizeBefore) {
+  if (result.size === sizeBefore) return true;
+  const entries = [...result.entries()].slice(sizeBefore);
+  return entries.every(([, v]) => v === null);
 }
 
 // src/sensitivity/index.ts
@@ -1171,8 +1187,6 @@ function hasRawValueChanges(change) {
     if (beforeVal === null) {
       const afterVal = afterFlat.get(key);
       if (afterVal !== void 0 && afterVal !== null) return true;
-    } else if (beforeVal === "{}") {
-      if (!isEmptyBlockEquivalent(key, afterFlat)) return true;
     } else {
       if (!afterFlat.has(key)) return true;
       if (beforeVal !== afterFlat.get(key)) return true;
@@ -1181,26 +1195,10 @@ function hasRawValueChanges(change) {
   for (const [key, afterVal] of afterFlat) {
     if (!beforeFlat.has(key)) {
       if (afterVal === null) continue;
-      if (afterVal === "{}") {
-        if (!isEmptyBlockEquivalent(key, beforeFlat)) return true;
-        continue;
-      }
       return true;
     }
   }
   return false;
-}
-function isEmptyBlockEquivalent(emptyBlockKey, otherMap) {
-  for (const [k, v] of otherMap) {
-    if (isChildKey(emptyBlockKey, k) && v !== null) return false;
-  }
-  return true;
-}
-function isChildKey(parentKey, candidateKey) {
-  if (!candidateKey.startsWith(parentKey)) return false;
-  if (candidateKey.length <= parentKey.length) return false;
-  const next = candidateKey[parentKey.length];
-  return next === "." || next === "[";
 }
 function isAllUnknownAfterApply(rc, attributes) {
   if (rc.change.after_unknown === true) return true;

@@ -613,7 +613,7 @@ exports[`reportFromSteps integration — apply-no-show fixtures > terraform/empt
 
 | Action | Resource | Count |
 | --- | --- | --- |
-| ➕ Added | terraform\\_data | 1 |
+| ➕ Added | tfcoremock\\_network\\_policy | 1 |
 |  | **Added** | **1** |
 
 ## Resource Changes
@@ -621,10 +621,10 @@ exports[`reportFromSteps integration — apply-no-show fixtures > terraform/empt
 ### 📦 Module: root
 
 <details>
-<summary>➕ <strong>terraform_data</strong> example</summary>
+<summary>➕ <strong>tfcoremock_network_policy</strong> deny_all</summary>
 
 \`\`\`
-terraform_data.example
+tfcoremock_network_policy.deny_all
 \`\`\`
 
 
@@ -643,7 +643,7 @@ exports[`reportFromSteps integration — apply-no-show fixtures > terraform/empt
 
 | Action | Resource | Count |
 | --- | --- | --- |
-| 🔧 Changed | terraform\\_data | 1 |
+| 🔧 Changed | tfcoremock\\_network\\_policy | 1 |
 |  | **Changed** | **1** |
 
 ## Resource Changes
@@ -651,10 +651,10 @@ exports[`reportFromSteps integration — apply-no-show fixtures > terraform/empt
 ### 📦 Module: root
 
 <details>
-<summary>🔧 <strong>terraform_data</strong> example</summary>
+<summary>🔧 <strong>tfcoremock_network_policy</strong> deny_all</summary>
 
 \`\`\`
-terraform_data.example
+tfcoremock_network_policy.deny_all
 \`\`\`
 
 
@@ -2327,7 +2327,7 @@ exports[`reportFromSteps integration — apply-no-show fixtures > tofu/empty-blo
 
 | Action | Resource | Count |
 | --- | --- | --- |
-| ➕ Added | terraform\\_data | 1 |
+| ➕ Added | tfcoremock\\_network\\_policy | 1 |
 |  | **Added** | **1** |
 
 ## Resource Changes
@@ -2335,10 +2335,10 @@ exports[`reportFromSteps integration — apply-no-show fixtures > tofu/empty-blo
 ### 📦 Module: root
 
 <details>
-<summary>➕ <strong>terraform_data</strong> example</summary>
+<summary>➕ <strong>tfcoremock_network_policy</strong> deny_all</summary>
 
 \`\`\`
-terraform_data.example
+tfcoremock_network_policy.deny_all
 \`\`\`
 
 
@@ -2357,7 +2357,7 @@ exports[`reportFromSteps integration — apply-no-show fixtures > tofu/empty-blo
 
 | Action | Resource | Count |
 | --- | --- | --- |
-| 🔧 Changed | terraform\\_data | 1 |
+| 🔧 Changed | tfcoremock\\_network\\_policy | 1 |
 |  | **Changed** | **1** |
 
 ## Resource Changes
@@ -2365,10 +2365,10 @@ exports[`reportFromSteps integration — apply-no-show fixtures > tofu/empty-blo
 ### 📦 Module: root
 
 <details>
-<summary>🔧 <strong>terraform_data</strong> example</summary>
+<summary>🔧 <strong>tfcoremock_network_policy</strong> deny_all</summary>
 
 \`\`\`
-terraform_data.example
+tfcoremock_network_policy.deny_all
 \`\`\`
 
 
@@ -4040,7 +4040,7 @@ exports[`reportFromSteps integration — apply-only fixtures > terraform/empty-b
 
 | Action | Resource | Count |
 | --- | --- | --- |
-| ➕ Added | terraform\\_data | 1 |
+| ➕ Added | tfcoremock\\_network\\_policy | 1 |
 |  | **Added** | **1** |
 
 ## Resource Changes
@@ -4048,10 +4048,10 @@ exports[`reportFromSteps integration — apply-only fixtures > terraform/empty-b
 ### 📦 Module: root
 
 <details>
-<summary>➕ <strong>terraform_data</strong> example</summary>
+<summary>➕ <strong>tfcoremock_network_policy</strong> deny_all</summary>
 
 \`\`\`
-terraform_data.example
+tfcoremock_network_policy.deny_all
 \`\`\`
 
 
@@ -4070,7 +4070,7 @@ exports[`reportFromSteps integration — apply-only fixtures > terraform/empty-b
 
 | Action | Resource | Count |
 | --- | --- | --- |
-| 🔧 Changed | terraform\\_data | 1 |
+| 🔧 Changed | tfcoremock\\_network\\_policy | 1 |
 |  | **Changed** | **1** |
 
 ## Resource Changes
@@ -4078,10 +4078,10 @@ exports[`reportFromSteps integration — apply-only fixtures > terraform/empty-b
 ### 📦 Module: root
 
 <details>
-<summary>🔧 <strong>terraform_data</strong> example</summary>
+<summary>🔧 <strong>tfcoremock_network_policy</strong> deny_all</summary>
 
 \`\`\`
-terraform_data.example
+tfcoremock_network_policy.deny_all
 \`\`\`
 
 
@@ -5517,7 +5517,7 @@ exports[`reportFromSteps integration — apply-only fixtures > tofu/empty-block-
 
 | Action | Resource | Count |
 | --- | --- | --- |
-| ➕ Added | terraform\\_data | 1 |
+| ➕ Added | tfcoremock\\_network\\_policy | 1 |
 |  | **Added** | **1** |
 
 ## Resource Changes
@@ -5525,10 +5525,10 @@ exports[`reportFromSteps integration — apply-only fixtures > tofu/empty-block-
 ### 📦 Module: root
 
 <details>
-<summary>➕ <strong>terraform_data</strong> example</summary>
+<summary>➕ <strong>tfcoremock_network_policy</strong> deny_all</summary>
 
 \`\`\`
-terraform_data.example
+tfcoremock_network_policy.deny_all
 \`\`\`
 
 
@@ -5547,7 +5547,7 @@ exports[`reportFromSteps integration — apply-only fixtures > tofu/empty-block-
 
 | Action | Resource | Count |
 | --- | --- | --- |
-| 🔧 Changed | terraform\\_data | 1 |
+| 🔧 Changed | tfcoremock\\_network\\_policy | 1 |
 |  | **Changed** | **1** |
 
 ## Resource Changes
@@ -5555,10 +5555,10 @@ exports[`reportFromSteps integration — apply-only fixtures > tofu/empty-block-
 ### 📦 Module: root
 
 <details>
-<summary>🔧 <strong>terraform_data</strong> example</summary>
+<summary>🔧 <strong>tfcoremock_network_policy</strong> deny_all</summary>
 
 \`\`\`
-terraform_data.example
+tfcoremock_network_policy.deny_all
 \`\`\`
 
 
@@ -8102,7 +8102,7 @@ exports[`reportFromSteps integration — generated fixtures > terraform/empty-bl
 
 | Action | Resource | Count |
 | --- | --- | --- |
-| ➕ Added | terraform\\_data | 1 |
+| ➕ Added | tfcoremock\\_network\\_policy | 1 |
 |  | **Added** | **1** |
 
 ## Resource Changes
@@ -8110,40 +8110,17 @@ exports[`reportFromSteps integration — generated fixtures > terraform/empty-bl
 ### 📦 Module: root
 
 <details>
-<summary>➕ <strong>terraform_data</strong> example</summary>
+<summary>➕ <strong>tfcoremock_network_policy</strong> deny_all</summary>
 
 \`\`\`
-terraform_data.example
+tfcoremock_network_policy.deny_all
 \`\`\`
 
 | Attribute | Before | After |
 | --- | --- | --- |
-| id | <code></code> | <code><ins style="background:#dfd">943674a3-b07a-19ed-77fd-f229d5477d9d</ins></code> |
-| input.name | <code></code> | <code><ins style="background:#dfd">test</ins></code> |
-| input.value | <code></code> | <code><ins style="background:#dfd">hello</ins></code> |
-
-<details>
-<summary>output (large value)</summary>
-
-\`\`\`
-{
-  "value": {
-    "name": "test",
-    "value": "hello"
-  },
-  "type": [
-    "object",
-    {
-      "name": "string",
-      "value": "string"
-    }
-  ]
-}
-\`\`\`
-
-
-
-</details>
+| id | <code></code> | <code><ins style="background:#dfd">ec4df8c1-6a26-d4b2-399f-57f752226fe3</ins></code> |
+| name | <code></code> | <code><ins style="background:#dfd">deny-all-egress</ins></code> |
+| spec\\[0\\].policy\\_types\\[0\\] | <code></code> | <code><ins style="background:#dfd">Egress</ins></code> |
 
 
 
@@ -8159,7 +8136,7 @@ exports[`reportFromSteps integration — generated fixtures > terraform/empty-bl
 
 | Action | Resource | Count |
 | --- | --- | --- |
-| ➕ Added | terraform\\_data | 1 |
+| ➕ Added | tfcoremock\\_network\\_policy | 1 |
 |  | **Added** | **1** |
 
 ## Resource Changes
@@ -8167,40 +8144,17 @@ exports[`reportFromSteps integration — generated fixtures > terraform/empty-bl
 ### 📦 Module: root
 
 <details>
-<summary>➕ <strong>terraform_data</strong> example</summary>
+<summary>➕ <strong>tfcoremock_network_policy</strong> deny_all</summary>
 
 \`\`\`
-terraform_data.example
+tfcoremock_network_policy.deny_all
 \`\`\`
 
 | Attribute | Before | After |
 | --- | --- | --- |
-| id | <code></code> | <code><ins style="background:#dfd">943674a3-b07a-19ed-77fd-f229d5477d9d</ins></code> |
-| input.name | <code></code> | <code><ins style="background:#dfd">test</ins></code> |
-| input.value | <code></code> | <code><ins style="background:#dfd">hello</ins></code> |
-
-<details>
-<summary>output (large value)</summary>
-
-\`\`\`
-{
-  "value": {
-    "name": "test",
-    "value": "hello"
-  },
-  "type": [
-    "object",
-    {
-      "name": "string",
-      "value": "string"
-    }
-  ]
-}
-\`\`\`
-
-
-
-</details>
+| id | <code></code> | <code><ins style="background:#dfd">ec4df8c1-6a26-d4b2-399f-57f752226fe3</ins></code> |
+| name | <code></code> | <code><ins style="background:#dfd">deny-all-egress</ins></code> |
+| spec\\[0\\].policy\\_types\\[0\\] | <code></code> | <code><ins style="background:#dfd">Egress</ins></code> |
 
 
 
@@ -8217,7 +8171,7 @@ exports[`reportFromSteps integration — generated fixtures > terraform/empty-bl
 
 | Action | Resource | Count |
 | --- | --- | --- |
-| 🔧 Changed | terraform\\_data | 1 |
+| 🔧 Changed | tfcoremock\\_network\\_policy | 1 |
 |  | **Changed** | **1** |
 
 ## Resource Changes
@@ -8225,45 +8179,15 @@ exports[`reportFromSteps integration — generated fixtures > terraform/empty-bl
 ### 📦 Module: root
 
 <details>
-<summary>🔧 <strong>terraform_data</strong> example — changed: input.nested, output, output.name, output.value</summary>
+<summary>🔧 <strong>tfcoremock_network_policy</strong> deny_all — changed: spec[0].egress[0]</summary>
 
 \`\`\`
-terraform_data.example
+tfcoremock_network_policy.deny_all
 \`\`\`
 
 | Attribute | Before | After |
 | --- | --- | --- |
-| input.nested | <code></code> | <code><ins style="background:#dfd">{}</ins></code> |
-| output.name | <code>test</code> | <code><del style="background:#fdd">test</del></code> |
-| output.value | <code>hello</code> | <code><del style="background:#fdd">hello</del></code> |
-
-<details>
-<summary>output (large value)</summary>
-
-\`\`\`
-{
-  "value": {
-    "name": "test",
-    "nested": {},
-    "value": "hello"
-  },
-  "type": [
-    "object",
-    {
-      "name": "string",
-      "nested": [
-        "object",
-        {}
-      ],
-      "value": "string"
-    }
-  ]
-}
-\`\`\`
-
-
-
-</details>
+| spec\\[0\\].egress\\[0\\] | <code></code> | <code><ins style="background:#dfd">{}</ins></code> |
 
 
 
@@ -8279,7 +8203,7 @@ exports[`reportFromSteps integration — generated fixtures > terraform/empty-bl
 
 | Action | Resource | Count |
 | --- | --- | --- |
-| 🔧 Changed | terraform\\_data | 1 |
+| 🔧 Changed | tfcoremock\\_network\\_policy | 1 |
 |  | **Changed** | **1** |
 
 ## Resource Changes
@@ -8287,45 +8211,15 @@ exports[`reportFromSteps integration — generated fixtures > terraform/empty-bl
 ### 📦 Module: root
 
 <details>
-<summary>🔧 <strong>terraform_data</strong> example — changed: input.nested, output, output.name, output.value</summary>
+<summary>🔧 <strong>tfcoremock_network_policy</strong> deny_all — changed: spec[0].egress[0]</summary>
 
 \`\`\`
-terraform_data.example
+tfcoremock_network_policy.deny_all
 \`\`\`
 
 | Attribute | Before | After |
 | --- | --- | --- |
-| input.nested | <code></code> | <code><ins style="background:#dfd">{}</ins></code> |
-| output.name | <code>test</code> | <code><del style="background:#fdd">test</del></code> |
-| output.value | <code>hello</code> | <code><del style="background:#fdd">hello</del></code> |
-
-<details>
-<summary>output (large value)</summary>
-
-\`\`\`
-{
-  "value": {
-    "name": "test",
-    "nested": {},
-    "value": "hello"
-  },
-  "type": [
-    "object",
-    {
-      "name": "string",
-      "nested": [
-        "object",
-        {}
-      ],
-      "value": "string"
-    }
-  ]
-}
-\`\`\`
-
-
-
-</details>
+| spec\\[0\\].egress\\[0\\] | <code></code> | <code><ins style="background:#dfd">{}</ins></code> |
 
 
 
@@ -12916,7 +12810,7 @@ exports[`reportFromSteps integration — generated fixtures > tofu/empty-block-a
 
 | Action | Resource | Count |
 | --- | --- | --- |
-| ➕ Added | terraform\\_data | 1 |
+| ➕ Added | tfcoremock\\_network\\_policy | 1 |
 |  | **Added** | **1** |
 
 ## Resource Changes
@@ -12924,40 +12818,17 @@ exports[`reportFromSteps integration — generated fixtures > tofu/empty-block-a
 ### 📦 Module: root
 
 <details>
-<summary>➕ <strong>terraform_data</strong> example</summary>
+<summary>➕ <strong>tfcoremock_network_policy</strong> deny_all</summary>
 
 \`\`\`
-terraform_data.example
+tfcoremock_network_policy.deny_all
 \`\`\`
 
 | Attribute | Before | After |
 | --- | --- | --- |
-| id | <code></code> | <code><ins style="background:#dfd">399de8ed-f521-6e2d-e51a-de345654d0a2</ins></code> |
-| input.name | <code></code> | <code><ins style="background:#dfd">test</ins></code> |
-| input.value | <code></code> | <code><ins style="background:#dfd">hello</ins></code> |
-
-<details>
-<summary>output (large value)</summary>
-
-\`\`\`
-{
-  "value": {
-    "name": "test",
-    "value": "hello"
-  },
-  "type": [
-    "object",
-    {
-      "name": "string",
-      "value": "string"
-    }
-  ]
-}
-\`\`\`
-
-
-
-</details>
+| id | <code></code> | <code><ins style="background:#dfd">ccf70fe0-ef67-939f-3ec0-32a4853caba4</ins></code> |
+| name | <code></code> | <code><ins style="background:#dfd">deny-all-egress</ins></code> |
+| spec\\[0\\].policy\\_types\\[0\\] | <code></code> | <code><ins style="background:#dfd">Egress</ins></code> |
 
 
 
@@ -12973,7 +12844,7 @@ exports[`reportFromSteps integration — generated fixtures > tofu/empty-block-a
 
 | Action | Resource | Count |
 | --- | --- | --- |
-| ➕ Added | terraform\\_data | 1 |
+| ➕ Added | tfcoremock\\_network\\_policy | 1 |
 |  | **Added** | **1** |
 
 ## Resource Changes
@@ -12981,40 +12852,17 @@ exports[`reportFromSteps integration — generated fixtures > tofu/empty-block-a
 ### 📦 Module: root
 
 <details>
-<summary>➕ <strong>terraform_data</strong> example</summary>
+<summary>➕ <strong>tfcoremock_network_policy</strong> deny_all</summary>
 
 \`\`\`
-terraform_data.example
+tfcoremock_network_policy.deny_all
 \`\`\`
 
 | Attribute | Before | After |
 | --- | --- | --- |
-| id | <code></code> | <code><ins style="background:#dfd">399de8ed-f521-6e2d-e51a-de345654d0a2</ins></code> |
-| input.name | <code></code> | <code><ins style="background:#dfd">test</ins></code> |
-| input.value | <code></code> | <code><ins style="background:#dfd">hello</ins></code> |
-
-<details>
-<summary>output (large value)</summary>
-
-\`\`\`
-{
-  "value": {
-    "name": "test",
-    "value": "hello"
-  },
-  "type": [
-    "object",
-    {
-      "name": "string",
-      "value": "string"
-    }
-  ]
-}
-\`\`\`
-
-
-
-</details>
+| id | <code></code> | <code><ins style="background:#dfd">ccf70fe0-ef67-939f-3ec0-32a4853caba4</ins></code> |
+| name | <code></code> | <code><ins style="background:#dfd">deny-all-egress</ins></code> |
+| spec\\[0\\].policy\\_types\\[0\\] | <code></code> | <code><ins style="background:#dfd">Egress</ins></code> |
 
 
 
@@ -13031,7 +12879,7 @@ exports[`reportFromSteps integration — generated fixtures > tofu/empty-block-a
 
 | Action | Resource | Count |
 | --- | --- | --- |
-| 🔧 Changed | terraform\\_data | 1 |
+| 🔧 Changed | tfcoremock\\_network\\_policy | 1 |
 |  | **Changed** | **1** |
 
 ## Resource Changes
@@ -13039,45 +12887,15 @@ exports[`reportFromSteps integration — generated fixtures > tofu/empty-block-a
 ### 📦 Module: root
 
 <details>
-<summary>🔧 <strong>terraform_data</strong> example — changed: input.nested, output, output.name, output.value</summary>
+<summary>🔧 <strong>tfcoremock_network_policy</strong> deny_all — changed: spec[0].egress[0]</summary>
 
 \`\`\`
-terraform_data.example
+tfcoremock_network_policy.deny_all
 \`\`\`
 
 | Attribute | Before | After |
 | --- | --- | --- |
-| input.nested | <code></code> | <code><ins style="background:#dfd">{}</ins></code> |
-| output.name | <code>test</code> | <code><del style="background:#fdd">test</del></code> |
-| output.value | <code>hello</code> | <code><del style="background:#fdd">hello</del></code> |
-
-<details>
-<summary>output (large value)</summary>
-
-\`\`\`
-{
-  "value": {
-    "name": "test",
-    "nested": {},
-    "value": "hello"
-  },
-  "type": [
-    "object",
-    {
-      "name": "string",
-      "nested": [
-        "object",
-        {}
-      ],
-      "value": "string"
-    }
-  ]
-}
-\`\`\`
-
-
-
-</details>
+| spec\\[0\\].egress\\[0\\] | <code></code> | <code><ins style="background:#dfd">{}</ins></code> |
 
 
 
@@ -13093,7 +12911,7 @@ exports[`reportFromSteps integration — generated fixtures > tofu/empty-block-a
 
 | Action | Resource | Count |
 | --- | --- | --- |
-| 🔧 Changed | terraform\\_data | 1 |
+| 🔧 Changed | tfcoremock\\_network\\_policy | 1 |
 |  | **Changed** | **1** |
 
 ## Resource Changes
@@ -13101,45 +12919,15 @@ exports[`reportFromSteps integration — generated fixtures > tofu/empty-block-a
 ### 📦 Module: root
 
 <details>
-<summary>🔧 <strong>terraform_data</strong> example — changed: input.nested, output, output.name, output.value</summary>
+<summary>🔧 <strong>tfcoremock_network_policy</strong> deny_all — changed: spec[0].egress[0]</summary>
 
 \`\`\`
-terraform_data.example
+tfcoremock_network_policy.deny_all
 \`\`\`
 
 | Attribute | Before | After |
 | --- | --- | --- |
-| input.nested | <code></code> | <code><ins style="background:#dfd">{}</ins></code> |
-| output.name | <code>test</code> | <code><del style="background:#fdd">test</del></code> |
-| output.value | <code>hello</code> | <code><del style="background:#fdd">hello</del></code> |
-
-<details>
-<summary>output (large value)</summary>
-
-\`\`\`
-{
-  "value": {
-    "name": "test",
-    "nested": {},
-    "value": "hello"
-  },
-  "type": [
-    "object",
-    {
-      "name": "string",
-      "nested": [
-        "object",
-        {}
-      ],
-      "value": "string"
-    }
-  ]
-}
-\`\`\`
-
-
-
-</details>
+| spec\\[0\\].egress\\[0\\] | <code></code> | <code><ins style="background:#dfd">{}</ins></code> |
 
 
 
@@ -16546,7 +16334,7 @@ exports[`reportFromSteps integration — no-show fixtures (Tier 3) > terraform/e
 
 | Action | Resource | Count |
 | --- | --- | --- |
-| ➕ Add | terraform\\_data | 1 |
+| ➕ Add | tfcoremock\\_network\\_policy | 1 |
 |  | **Add** | **1** |
 
 ## Resource Changes
@@ -16554,10 +16342,10 @@ exports[`reportFromSteps integration — no-show fixtures (Tier 3) > terraform/e
 ### 📦 Module: root
 
 <details>
-<summary>➕ <strong>terraform_data</strong> example</summary>
+<summary>➕ <strong>tfcoremock_network_policy</strong> deny_all</summary>
 
 \`\`\`
-terraform_data.example
+tfcoremock_network_policy.deny_all
 \`\`\`
 
 
@@ -16576,7 +16364,7 @@ exports[`reportFromSteps integration — no-show fixtures (Tier 3) > terraform/e
 
 | Action | Resource | Count |
 | --- | --- | --- |
-| 🔧 Change | terraform\\_data | 1 |
+| 🔧 Change | tfcoremock\\_network\\_policy | 1 |
 |  | **Change** | **1** |
 
 ## Resource Changes
@@ -16584,10 +16372,10 @@ exports[`reportFromSteps integration — no-show fixtures (Tier 3) > terraform/e
 ### 📦 Module: root
 
 <details>
-<summary>🔧 <strong>terraform_data</strong> example</summary>
+<summary>🔧 <strong>tfcoremock_network_policy</strong> deny_all</summary>
 
 \`\`\`
-terraform_data.example
+tfcoremock_network_policy.deny_all
 \`\`\`
 
 
@@ -17979,7 +17767,7 @@ exports[`reportFromSteps integration — no-show fixtures (Tier 3) > tofu/empty-
 
 | Action | Resource | Count |
 | --- | --- | --- |
-| ➕ Add | terraform\\_data | 1 |
+| ➕ Add | tfcoremock\\_network\\_policy | 1 |
 |  | **Add** | **1** |
 
 ## Resource Changes
@@ -17987,10 +17775,10 @@ exports[`reportFromSteps integration — no-show fixtures (Tier 3) > tofu/empty-
 ### 📦 Module: root
 
 <details>
-<summary>➕ <strong>terraform_data</strong> example</summary>
+<summary>➕ <strong>tfcoremock_network_policy</strong> deny_all</summary>
 
 \`\`\`
-terraform_data.example
+tfcoremock_network_policy.deny_all
 \`\`\`
 
 
@@ -18009,7 +17797,7 @@ exports[`reportFromSteps integration — no-show fixtures (Tier 3) > tofu/empty-
 
 | Action | Resource | Count |
 | --- | --- | --- |
-| 🔧 Change | terraform\\_data | 1 |
+| 🔧 Change | tfcoremock\\_network\\_policy | 1 |
 |  | **Change** | **1** |
 
 ## Resource Changes
@@ -18017,10 +17805,10 @@ exports[`reportFromSteps integration — no-show fixtures (Tier 3) > tofu/empty-
 ### 📦 Module: root
 
 <details>
-<summary>🔧 <strong>terraform_data</strong> example</summary>
+<summary>🔧 <strong>tfcoremock_network_policy</strong> deny_all</summary>
 
 \`\`\`
-terraform_data.example
+tfcoremock_network_policy.deny_all
 \`\`\`
 
 
@@ -19511,7 +19299,7 @@ exports[`reportFromSteps integration — plan-only fixtures > terraform/empty-bl
 
 | Action | Resource | Count |
 | --- | --- | --- |
-| ➕ Add | terraform\\_data | 1 |
+| ➕ Add | tfcoremock\\_network\\_policy | 1 |
 |  | **Add** | **1** |
 
 ## Resource Changes
@@ -19519,18 +19307,17 @@ exports[`reportFromSteps integration — plan-only fixtures > terraform/empty-bl
 ### 📦 Module: root
 
 <details>
-<summary>➕ <strong>terraform_data</strong> example</summary>
+<summary>➕ <strong>tfcoremock_network_policy</strong> deny_all</summary>
 
 \`\`\`
-terraform_data.example
+tfcoremock_network_policy.deny_all
 \`\`\`
 
 | Attribute | Before | After |
 | --- | --- | --- |
 | id | <code></code> | <code>(known after apply)</code> |
-| input.name | <code></code> | <code><ins style="background:#dfd">test</ins></code> |
-| input.value | <code></code> | <code><ins style="background:#dfd">hello</ins></code> |
-| output | <code></code> | <code>(known after apply)</code> |
+| name | <code></code> | <code><ins style="background:#dfd">deny-all-egress</ins></code> |
+| spec\\[0\\].policy\\_types\\[0\\] | <code></code> | <code><ins style="background:#dfd">Egress</ins></code> |
 
 
 
@@ -19546,7 +19333,7 @@ exports[`reportFromSteps integration — plan-only fixtures > terraform/empty-bl
 
 | Action | Resource | Count |
 | --- | --- | --- |
-| 🔧 Change | terraform\\_data | 1 |
+| 🔧 Change | tfcoremock\\_network\\_policy | 1 |
 |  | **Change** | **1** |
 
 ## Resource Changes
@@ -19554,18 +19341,15 @@ exports[`reportFromSteps integration — plan-only fixtures > terraform/empty-bl
 ### 📦 Module: root
 
 <details>
-<summary>🔧 <strong>terraform_data</strong> example — changed: input.nested, output.name, output.value</summary>
+<summary>🔧 <strong>tfcoremock_network_policy</strong> deny_all — changed: spec[0].egress[0]</summary>
 
 \`\`\`
-terraform_data.example
+tfcoremock_network_policy.deny_all
 \`\`\`
 
 | Attribute | Before | After |
 | --- | --- | --- |
-| input.nested | <code></code> | <code><ins style="background:#dfd">{}</ins></code> |
-| output | <code></code> | <code>(known after apply)</code> |
-| output.name | <code>test</code> | <code><del style="background:#fdd">test</del></code> |
-| output.value | <code>hello</code> | <code><del style="background:#fdd">hello</del></code> |
+| spec\\[0\\].egress\\[0\\] | <code></code> | <code><ins style="background:#dfd">{}</ins></code> |
 
 
 
@@ -21418,7 +21202,7 @@ exports[`reportFromSteps integration — plan-only fixtures > tofu/empty-block-a
 
 | Action | Resource | Count |
 | --- | --- | --- |
-| ➕ Add | terraform\\_data | 1 |
+| ➕ Add | tfcoremock\\_network\\_policy | 1 |
 |  | **Add** | **1** |
 
 ## Resource Changes
@@ -21426,18 +21210,17 @@ exports[`reportFromSteps integration — plan-only fixtures > tofu/empty-block-a
 ### 📦 Module: root
 
 <details>
-<summary>➕ <strong>terraform_data</strong> example</summary>
+<summary>➕ <strong>tfcoremock_network_policy</strong> deny_all</summary>
 
 \`\`\`
-terraform_data.example
+tfcoremock_network_policy.deny_all
 \`\`\`
 
 | Attribute | Before | After |
 | --- | --- | --- |
 | id | <code></code> | <code>(known after apply)</code> |
-| input.name | <code></code> | <code><ins style="background:#dfd">test</ins></code> |
-| input.value | <code></code> | <code><ins style="background:#dfd">hello</ins></code> |
-| output | <code></code> | <code>(known after apply)</code> |
+| name | <code></code> | <code><ins style="background:#dfd">deny-all-egress</ins></code> |
+| spec\\[0\\].policy\\_types\\[0\\] | <code></code> | <code><ins style="background:#dfd">Egress</ins></code> |
 
 
 
@@ -21453,7 +21236,7 @@ exports[`reportFromSteps integration — plan-only fixtures > tofu/empty-block-a
 
 | Action | Resource | Count |
 | --- | --- | --- |
-| 🔧 Change | terraform\\_data | 1 |
+| 🔧 Change | tfcoremock\\_network\\_policy | 1 |
 |  | **Change** | **1** |
 
 ## Resource Changes
@@ -21461,18 +21244,15 @@ exports[`reportFromSteps integration — plan-only fixtures > tofu/empty-block-a
 ### 📦 Module: root
 
 <details>
-<summary>🔧 <strong>terraform_data</strong> example — changed: input.nested, output.name, output.value</summary>
+<summary>🔧 <strong>tfcoremock_network_policy</strong> deny_all — changed: spec[0].egress[0]</summary>
 
 \`\`\`
-terraform_data.example
+tfcoremock_network_policy.deny_all
 \`\`\`
 
 | Attribute | Before | After |
 | --- | --- | --- |
-| input.nested | <code></code> | <code><ins style="background:#dfd">{}</ins></code> |
-| output | <code></code> | <code>(known after apply)</code> |
-| output.name | <code>test</code> | <code><del style="background:#fdd">test</del></code> |
-| output.value | <code>hello</code> | <code><del style="background:#fdd">hello</del></code> |
+| spec\\[0\\].egress\\[0\\] | <code></code> | <code><ins style="background:#dfd">{}</ins></code> |
 
 
 
@@ -23515,7 +23295,7 @@ exports[`reportFromSteps — state enrichment > no-state snapshot: terraform/emp
 
 | Action | Resource | Count |
 | --- | --- | --- |
-| ➕ Added | terraform\\_data | 1 |
+| ➕ Added | tfcoremock\\_network\\_policy | 1 |
 |  | **Added** | **1** |
 
 ## Resource Changes
@@ -23523,18 +23303,17 @@ exports[`reportFromSteps — state enrichment > no-state snapshot: terraform/emp
 ### 📦 Module: root
 
 <details>
-<summary>➕ <strong>terraform_data</strong> example</summary>
+<summary>➕ <strong>tfcoremock_network_policy</strong> deny_all</summary>
 
 \`\`\`
-terraform_data.example
+tfcoremock_network_policy.deny_all
 \`\`\`
 
 | Attribute | Before | After |
 | --- | --- | --- |
 | id | <code></code> | <code>(value not in plan)</code> |
-| input.name | <code></code> | <code><ins style="background:#dfd">test</ins></code> |
-| input.value | <code></code> | <code><ins style="background:#dfd">hello</ins></code> |
-| output | <code></code> | <code>(value not in plan)</code> |
+| name | <code></code> | <code><ins style="background:#dfd">deny-all-egress</ins></code> |
+| spec\\[0\\].policy\\_types\\[0\\] | <code></code> | <code><ins style="background:#dfd">Egress</ins></code> |
 
 
 
@@ -23546,13 +23325,11 @@ terraform_data.example
 exports[`reportFromSteps — state enrichment > no-state snapshot: terraform/empty-block-addition/1/no-state 1`] = `
 "## ✅ Apply: 1 changed
 
-> ⚠️ **Warning:** Some attribute values could not be resolved because \`terraform state pull\` output was not available. Add a state step after apply to see the actual values.
-
 ## Apply Summary
 
 | Action | Resource | Count |
 | --- | --- | --- |
-| 🔧 Changed | terraform\\_data | 1 |
+| 🔧 Changed | tfcoremock\\_network\\_policy | 1 |
 |  | **Changed** | **1** |
 
 ## Resource Changes
@@ -23560,18 +23337,15 @@ exports[`reportFromSteps — state enrichment > no-state snapshot: terraform/emp
 ### 📦 Module: root
 
 <details>
-<summary>🔧 <strong>terraform_data</strong> example — changed: input.nested, output.name, output.value</summary>
+<summary>🔧 <strong>tfcoremock_network_policy</strong> deny_all — changed: spec[0].egress[0]</summary>
 
 \`\`\`
-terraform_data.example
+tfcoremock_network_policy.deny_all
 \`\`\`
 
 | Attribute | Before | After |
 | --- | --- | --- |
-| input.nested | <code></code> | <code><ins style="background:#dfd">{}</ins></code> |
-| output | <code></code> | <code>(value not in plan)</code> |
-| output.name | <code>test</code> | <code><del style="background:#fdd">test</del></code> |
-| output.value | <code>hello</code> | <code><del style="background:#fdd">hello</del></code> |
+| spec\\[0\\].egress\\[0\\] | <code></code> | <code><ins style="background:#dfd">{}</ins></code> |
 
 
 
@@ -25646,7 +25420,7 @@ exports[`reportFromSteps — state enrichment > no-state snapshot: tofu/empty-bl
 
 | Action | Resource | Count |
 | --- | --- | --- |
-| ➕ Added | terraform\\_data | 1 |
+| ➕ Added | tfcoremock\\_network\\_policy | 1 |
 |  | **Added** | **1** |
 
 ## Resource Changes
@@ -25654,18 +25428,17 @@ exports[`reportFromSteps — state enrichment > no-state snapshot: tofu/empty-bl
 ### 📦 Module: root
 
 <details>
-<summary>➕ <strong>terraform_data</strong> example</summary>
+<summary>➕ <strong>tfcoremock_network_policy</strong> deny_all</summary>
 
 \`\`\`
-terraform_data.example
+tfcoremock_network_policy.deny_all
 \`\`\`
 
 | Attribute | Before | After |
 | --- | --- | --- |
 | id | <code></code> | <code>(value not in plan)</code> |
-| input.name | <code></code> | <code><ins style="background:#dfd">test</ins></code> |
-| input.value | <code></code> | <code><ins style="background:#dfd">hello</ins></code> |
-| output | <code></code> | <code>(value not in plan)</code> |
+| name | <code></code> | <code><ins style="background:#dfd">deny-all-egress</ins></code> |
+| spec\\[0\\].policy\\_types\\[0\\] | <code></code> | <code><ins style="background:#dfd">Egress</ins></code> |
 
 
 
@@ -25677,13 +25450,11 @@ terraform_data.example
 exports[`reportFromSteps — state enrichment > no-state snapshot: tofu/empty-block-addition/1/no-state 1`] = `
 "## ✅ Apply: 1 changed
 
-> ⚠️ **Warning:** Some attribute values could not be resolved because \`tofu state pull\` output was not available. Add a state step after apply to see the actual values.
-
 ## Apply Summary
 
 | Action | Resource | Count |
 | --- | --- | --- |
-| 🔧 Changed | terraform\\_data | 1 |
+| 🔧 Changed | tfcoremock\\_network\\_policy | 1 |
 |  | **Changed** | **1** |
 
 ## Resource Changes
@@ -25691,18 +25462,15 @@ exports[`reportFromSteps — state enrichment > no-state snapshot: tofu/empty-bl
 ### 📦 Module: root
 
 <details>
-<summary>🔧 <strong>terraform_data</strong> example — changed: input.nested, output.name, output.value</summary>
+<summary>🔧 <strong>tfcoremock_network_policy</strong> deny_all — changed: spec[0].egress[0]</summary>
 
 \`\`\`
-terraform_data.example
+tfcoremock_network_policy.deny_all
 \`\`\`
 
 | Attribute | Before | After |
 | --- | --- | --- |
-| input.nested | <code></code> | <code><ins style="background:#dfd">{}</ins></code> |
-| output | <code></code> | <code>(value not in plan)</code> |
-| output.name | <code>test</code> | <code><del style="background:#fdd">test</del></code> |
-| output.value | <code>hello</code> | <code><del style="background:#fdd">hello</del></code> |
+| spec\\[0\\].egress\\[0\\] | <code></code> | <code><ins style="background:#dfd">{}</ins></code> |
 
 
 
