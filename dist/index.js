@@ -1346,7 +1346,7 @@ function valueToString(val) {
 function isLargeValue2(value) {
   if (value === null) return false;
   const trimmed = value.trim();
-  if (trimmed.startsWith("{") || trimmed.startsWith("[") || trimmed.startsWith("<")) {
+  if (trimmed.length > 2 && (trimmed.startsWith("{") || trimmed.startsWith("[") || trimmed.startsWith("<"))) {
     return true;
   }
   let count = 0;
@@ -2150,7 +2150,7 @@ function stringifyValue(value) {
 function isLargeValue3(value) {
   if (value === null) return false;
   const trimmed = value.trim();
-  if (trimmed.startsWith("{") || trimmed.startsWith("[") || trimmed.startsWith("<")) {
+  if (trimmed.length > 2 && (trimmed.startsWith("{") || trimmed.startsWith("[") || trimmed.startsWith("<"))) {
     return true;
   }
   let count = 0;

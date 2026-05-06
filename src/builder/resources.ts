@@ -195,7 +195,7 @@ function hasRawValueChanges(change: Change): boolean {
     } else if (beforeVal === "{}") {
       // Empty block in before — equivalent to absent if after has only
       // null-valued children under this prefix.
-      /* v8 ignore next -- drift with empty-block normalization requires complex-schema providers unavailable in safe fixtures */
+      /* v8 ignore next -- unit-tested; no safe fixture provider produces empty-block drift normalization */
       if (!isEmptyBlockEquivalent(key, afterFlat)) return true;
     } else {
       // Non-null before value — after must have the same value
@@ -210,7 +210,7 @@ function hasRawValueChanges(change: Change): boolean {
       if (afterVal === null) continue;
       // Empty block in after — equivalent to absent if before has only
       // null-valued children under this prefix.
-      /* v8 ignore next 3 -- drift with empty-block normalization requires complex-schema providers unavailable in safe fixtures */
+      /* v8 ignore next 3 -- unit-tested; no safe fixture provider produces empty-block drift normalization */
       if (afterVal === "{}") {
         if (!isEmptyBlockEquivalent(key, beforeFlat)) return true;
         continue;
@@ -227,7 +227,7 @@ function hasRawValueChanges(change: Change): boolean {
  * the entries in `otherMap` under that prefix. Equivalent means: all entries
  * in `otherMap` that are children of `emptyBlockKey` have null values.
  */
-/* v8 ignore start -- drift with empty-block normalization requires complex-schema providers unavailable in safe fixtures */
+/* v8 ignore start -- unit-tested; no safe fixture provider produces empty-block drift normalization */
 function isEmptyBlockEquivalent(
   emptyBlockKey: string,
   otherMap: Map<string, string | null>,

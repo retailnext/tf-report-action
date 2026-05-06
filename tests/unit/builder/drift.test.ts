@@ -809,4 +809,96 @@ describe("buildReport — drift grouping", () => {
     const report = buildReport(plan);
     expect(report.driftResources).toHaveLength(0);
   });
+
+  describe("empty-block equivalence in drift suppression", () => {
+    it("suppresses drift when before has empty block and after has null children", () => {
+      const plan = basePlan([
+        makeDriftEntry({
+          change: {
+            actions: ["update"],
+            before: { id: "abc", metadata: {} },
+            after: { id: "abc", metadata: { key: null } },
+            before_sensitive: false,
+            after_sensitive: false,
+            after_unknown: false,
+          },
+        }),
+      ]);
+
+      const result = buildDriftChanges(plan, {});
+      expect(result).toHaveLength(0);
+    });
+
+    it("does not suppress drift when before has empty block and after has non-null children", () => {
+      const plan = basePlan([
+        makeDriftEntry({
+          change: {
+            actions: ["update"],
+            before: { id: "abc", metadata: {} },
+            after: { id: "abc", metadata: { key: "value" } },
+            before_sensitive: false,
+            after_sensitive: false,
+            after_unknown: false,
+          },
+        }),
+      ]);
+
+      const result = buildDriftChanges(plan, {});
+      expect(result).toHaveLength(1);
+    });
+
+    it("suppresses drift when after has empty block and before has null children", () => {
+      const plan = basePlan([
+        makeDriftEntry({
+          change: {
+            actions: ["update"],
+            before: { id: "abc", metadata: { key: null } },
+            after: { id: "abc", metadata: {} },
+            before_sensitive: false,
+            after_sensitive: false,
+            after_unknown: false,
+          },
+        }),
+      ]);
+
+      const result = buildDriftChanges(plan, {});
+      expect(result).toHaveLength(0);
+    });
+
+    it("does not suppress drift when after has empty block and before has non-null children", () => {
+      const plan = basePlan([
+        makeDriftEntry({
+          change: {
+            actions: ["update"],
+            before: { id: "abc", metadata: { key: "value" } },
+            after: { id: "abc", metadata: {} },
+            before_sensitive: false,
+            after_sensitive: false,
+            after_unknown: false,
+          },
+        }),
+      ]);
+
+      const result = buildDriftChanges(plan, {});
+      expect(result).toHaveLength(1);
+    });
+
+    it("suppresses drift when both sides have empty block", () => {
+      const plan = basePlan([
+        makeDriftEntry({
+          change: {
+            actions: ["update"],
+            before: { id: "abc", config: {} },
+            after: { id: "abc", config: {} },
+            before_sensitive: false,
+            after_sensitive: false,
+            after_unknown: false,
+          },
+        }),
+      ]);
+
+      const result = buildDriftChanges(plan, {});
+      expect(result).toHaveLength(0);
+    });
+  });
 });
