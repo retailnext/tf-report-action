@@ -1,0 +1,42 @@
+{
+  "version": 4,
+  "terraform_version": "1.14.9",
+  "serial": 3,
+  "lineage": "887f4919-0bbf-4930-f2d0-581fdc024480",
+  "outputs": {},
+  "resources": [
+    {
+      "mode": "managed",
+      "type": "tfcoremock_network_policy",
+      "name": "deny_all",
+      "provider": "provider[\"registry.terraform.io/hashicorp/tfcoremock\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "id": "ec4df8c1-6a26-d4b2-399f-57f752226fe3",
+            "name": "deny-all-egress",
+            "spec": [
+              {
+                "egress": [
+                  {
+                    "ports": [],
+                    "to": []
+                  }
+                ],
+                "ingress": [],
+                "policy_types": [
+                  "Egress"
+                ]
+              }
+            ]
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0
+        }
+      ]
+    }
+  ],
+  "check_results": null
+}
+

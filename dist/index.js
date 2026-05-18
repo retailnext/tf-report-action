@@ -868,29 +868,59 @@ function flatten(value) {
 function flattenInto(value, prefix, result) {
   if (value === null) {
     result.set(prefix, null);
+    return false;
   } else if (typeof value === "string") {
     result.set(prefix, value);
+    return true;
   } else if (typeof value === "number") {
     result.set(prefix, String(value));
+    return true;
   } else if (typeof value === "boolean") {
     result.set(prefix, value ? "true" : "false");
+    return true;
   } else if (Array.isArray(value)) {
+    if (value.length === 0 && prefix !== "") {
+      return false;
+    }
+    let emittedNonNull = false;
     for (let i = 0; i < value.length; i++) {
       const child = value[i];
       if (child !== void 0) {
-        flattenInto(
+        const childResult = flattenInto(
           child,
           prefix === "" ? `[${String(i)}]` : `${prefix}[${String(i)}]`,
           result
         );
+        emittedNonNull = emittedNonNull || childResult;
       }
     }
+    if (prefix !== "" && !emittedNonNull && value.length > 0) {
+      result.set(prefix, "{}");
+      return true;
+    }
+    return emittedNonNull;
   } else {
-    for (const [key, child] of Object.entries(value)) {
+    const entries = Object.entries(value);
+    if (entries.length === 0 && prefix !== "") {
+      result.set(prefix, "{}");
+      return true;
+    }
+    let emittedNonNull = false;
+    for (const [key, child] of entries) {
       if (child !== void 0) {
-        flattenInto(child, prefix === "" ? key : `${prefix}.${key}`, result);
+        const childResult = flattenInto(
+          child,
+          prefix === "" ? key : `${prefix}.${key}`,
+          result
+        );
+        emittedNonNull = emittedNonNull || childResult;
       }
     }
+    if (prefix !== "" && !emittedNonNull) {
+      result.set(prefix, "{}");
+      return true;
+    }
+    return emittedNonNull;
   }
 }
 
@@ -951,7 +981,7 @@ function isUnknownAfterApply(key, unknownMap) {
 function isLargeValue(value) {
   if (value === null) return false;
   const trimmed = value.trim();
-  if (trimmed.startsWith("{") || trimmed.startsWith("[") || trimmed.startsWith("<")) {
+  if (trimmed.length > 2 && (trimmed.startsWith("{") || trimmed.startsWith("[") || trimmed.startsWith("<"))) {
     return true;
   }
   let count = 0;
@@ -1172,7 +1202,10 @@ function hasRawValueChanges(change) {
     }
   }
   for (const [key, afterVal] of afterFlat) {
-    if (!beforeFlat.has(key) && afterVal !== null) return true;
+    if (!beforeFlat.has(key)) {
+      if (afterVal === null) continue;
+      return true;
+    }
   }
   return false;
 }
@@ -1320,7 +1353,7 @@ function valueToString(val) {
 function isLargeValue2(value) {
   if (value === null) return false;
   const trimmed = value.trim();
-  if (trimmed.startsWith("{") || trimmed.startsWith("[") || trimmed.startsWith("<")) {
+  if (trimmed.length > 2 && (trimmed.startsWith("{") || trimmed.startsWith("[") || trimmed.startsWith("<"))) {
     return true;
   }
   let count = 0;
@@ -2124,7 +2157,7 @@ function stringifyValue(value) {
 function isLargeValue3(value) {
   if (value === null) return false;
   const trimmed = value.trim();
-  if (trimmed.startsWith("{") || trimmed.startsWith("[") || trimmed.startsWith("<")) {
+  if (trimmed.length > 2 && (trimmed.startsWith("{") || trimmed.startsWith("[") || trimmed.startsWith("<"))) {
     return true;
   }
   let count = 0;

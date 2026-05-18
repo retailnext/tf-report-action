@@ -1427,6 +1427,207 @@ terraform_data.worker_c
 "
 `;
 
+exports[`planToMarkdown integration > terraform/empty-block-addition/0 > renders without error and matches snapshot [default] 1`] = `
+"## ✅ Plan: 1 to add
+
+## Plan Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Add | tfcoremock\\_network\\_policy | 1 |
+|  | **Add** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>➕ <strong>tfcoremock_network_policy</strong> deny_all</summary>
+
+\`\`\`
+tfcoremock_network_policy.deny_all
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | <code></code> | <code>(known after apply)</code> |
+| name | <code></code> | <code><ins style="background:#dfd">deny-all-egress</ins></code> |
+| spec\\[0\\].policy\\_types\\[0\\] | <code></code> | <code><ins style="background:#dfd">Egress</ins></code> |
+
+
+
+</details>
+
+"
+`;
+
+exports[`planToMarkdown integration > terraform/empty-block-addition/0 > renders without error and matches snapshot [diffFormat-simple] 1`] = `
+"## ✅ Plan: 1 to add
+
+## Plan Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Add | tfcoremock\\_network\\_policy | 1 |
+|  | **Add** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>➕ <strong>tfcoremock_network_policy</strong> deny_all</summary>
+
+\`\`\`
+tfcoremock_network_policy.deny_all
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | <code></code> | <code>(known after apply)</code> |
+| name | <code></code> | + deny-all-egress |
+| spec\\[0\\].policy\\_types\\[0\\] | <code></code> | + Egress |
+
+
+
+</details>
+
+"
+`;
+
+exports[`planToMarkdown integration > terraform/empty-block-addition/0 > renders without error and matches snapshot [showUnchangedAttributes] 1`] = `
+"## ✅ Plan: 1 to add
+
+## Plan Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Add | tfcoremock\\_network\\_policy | 1 |
+|  | **Add** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>➕ <strong>tfcoremock_network_policy</strong> deny_all</summary>
+
+\`\`\`
+tfcoremock_network_policy.deny_all
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | <code></code> | <code>(known after apply)</code> |
+| name | <code></code> | <code><ins style="background:#dfd">deny-all-egress</ins></code> |
+| spec\\[0\\].policy\\_types\\[0\\] | <code></code> | <code><ins style="background:#dfd">Egress</ins></code> |
+
+
+
+</details>
+
+"
+`;
+
+exports[`planToMarkdown integration > terraform/empty-block-addition/1 > renders without error and matches snapshot [default] 1`] = `
+"## ✅ Plan: 1 to change
+
+## Plan Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| 🔧 Change | tfcoremock\\_network\\_policy | 1 |
+|  | **Change** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>🔧 <strong>tfcoremock_network_policy</strong> deny_all — changed: spec[0].egress[0]</summary>
+
+\`\`\`
+tfcoremock_network_policy.deny_all
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| spec\\[0\\].egress\\[0\\] | <code></code> | <code><ins style="background:#dfd">{}</ins></code> |
+
+
+
+</details>
+
+"
+`;
+
+exports[`planToMarkdown integration > terraform/empty-block-addition/1 > renders without error and matches snapshot [diffFormat-simple] 1`] = `
+"## ✅ Plan: 1 to change
+
+## Plan Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| 🔧 Change | tfcoremock\\_network\\_policy | 1 |
+|  | **Change** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>🔧 <strong>tfcoremock_network_policy</strong> deny_all — changed: spec[0].egress[0]</summary>
+
+\`\`\`
+tfcoremock_network_policy.deny_all
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| spec\\[0\\].egress\\[0\\] | <code></code> | + {} |
+
+
+
+</details>
+
+"
+`;
+
+exports[`planToMarkdown integration > terraform/empty-block-addition/1 > renders without error and matches snapshot [showUnchangedAttributes] 1`] = `
+"## ✅ Plan: 1 to change
+
+## Plan Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| 🔧 Change | tfcoremock\\_network\\_policy | 1 |
+|  | **Change** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>🔧 <strong>tfcoremock_network_policy</strong> deny_all — changed: spec[0].egress[0]</summary>
+
+\`\`\`
+tfcoremock_network_policy.deny_all
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | <code>ec4df8c1-6a26-d4b2-399f-57f752226fe3</code> | <code>ec4df8c1-6a26-d4b2-399f-57f752226fe3</code> |
+| name | <code>deny-all-egress</code> | <code>deny-all-egress</code> |
+| spec\\[0\\].egress\\[0\\] | <code></code> | <code><ins style="background:#dfd">{}</ins></code> |
+| spec\\[0\\].policy\\_types\\[0\\] | <code>Egress</code> | <code>Egress</code> |
+
+
+
+</details>
+
+"
+`;
+
 exports[`planToMarkdown integration > terraform/error-stages/0 > renders without error and matches snapshot [default] 1`] = `
 "## ✅ Plan: 1 to add
 
@@ -6241,6 +6442,207 @@ terraform_data.worker_c
 | Output | Action | Before | After |
 | --- | --- | --- | --- |
 | config\\_value | 🔧 | <code>{&quot;worker_a&quot;:&quot;alpha&quot;,&quot;worker_b&quot;:&quot;bravo&quot;,&quot;worker_c&quot;:&quot;charlie&quot;}</code> | <code>(known after apply)</code> |
+
+"
+`;
+
+exports[`planToMarkdown integration > tofu/empty-block-addition/0 > renders without error and matches snapshot [default] 1`] = `
+"## ✅ Plan: 1 to add
+
+## Plan Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Add | tfcoremock\\_network\\_policy | 1 |
+|  | **Add** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>➕ <strong>tfcoremock_network_policy</strong> deny_all</summary>
+
+\`\`\`
+tfcoremock_network_policy.deny_all
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | <code></code> | <code>(known after apply)</code> |
+| name | <code></code> | <code><ins style="background:#dfd">deny-all-egress</ins></code> |
+| spec\\[0\\].policy\\_types\\[0\\] | <code></code> | <code><ins style="background:#dfd">Egress</ins></code> |
+
+
+
+</details>
+
+"
+`;
+
+exports[`planToMarkdown integration > tofu/empty-block-addition/0 > renders without error and matches snapshot [diffFormat-simple] 1`] = `
+"## ✅ Plan: 1 to add
+
+## Plan Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Add | tfcoremock\\_network\\_policy | 1 |
+|  | **Add** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>➕ <strong>tfcoremock_network_policy</strong> deny_all</summary>
+
+\`\`\`
+tfcoremock_network_policy.deny_all
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | <code></code> | <code>(known after apply)</code> |
+| name | <code></code> | + deny-all-egress |
+| spec\\[0\\].policy\\_types\\[0\\] | <code></code> | + Egress |
+
+
+
+</details>
+
+"
+`;
+
+exports[`planToMarkdown integration > tofu/empty-block-addition/0 > renders without error and matches snapshot [showUnchangedAttributes] 1`] = `
+"## ✅ Plan: 1 to add
+
+## Plan Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Add | tfcoremock\\_network\\_policy | 1 |
+|  | **Add** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>➕ <strong>tfcoremock_network_policy</strong> deny_all</summary>
+
+\`\`\`
+tfcoremock_network_policy.deny_all
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | <code></code> | <code>(known after apply)</code> |
+| name | <code></code> | <code><ins style="background:#dfd">deny-all-egress</ins></code> |
+| spec\\[0\\].policy\\_types\\[0\\] | <code></code> | <code><ins style="background:#dfd">Egress</ins></code> |
+
+
+
+</details>
+
+"
+`;
+
+exports[`planToMarkdown integration > tofu/empty-block-addition/1 > renders without error and matches snapshot [default] 1`] = `
+"## ✅ Plan: 1 to change
+
+## Plan Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| 🔧 Change | tfcoremock\\_network\\_policy | 1 |
+|  | **Change** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>🔧 <strong>tfcoremock_network_policy</strong> deny_all — changed: spec[0].egress[0]</summary>
+
+\`\`\`
+tfcoremock_network_policy.deny_all
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| spec\\[0\\].egress\\[0\\] | <code></code> | <code><ins style="background:#dfd">{}</ins></code> |
+
+
+
+</details>
+
+"
+`;
+
+exports[`planToMarkdown integration > tofu/empty-block-addition/1 > renders without error and matches snapshot [diffFormat-simple] 1`] = `
+"## ✅ Plan: 1 to change
+
+## Plan Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| 🔧 Change | tfcoremock\\_network\\_policy | 1 |
+|  | **Change** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>🔧 <strong>tfcoremock_network_policy</strong> deny_all — changed: spec[0].egress[0]</summary>
+
+\`\`\`
+tfcoremock_network_policy.deny_all
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| spec\\[0\\].egress\\[0\\] | <code></code> | + {} |
+
+
+
+</details>
+
+"
+`;
+
+exports[`planToMarkdown integration > tofu/empty-block-addition/1 > renders without error and matches snapshot [showUnchangedAttributes] 1`] = `
+"## ✅ Plan: 1 to change
+
+## Plan Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| 🔧 Change | tfcoremock\\_network\\_policy | 1 |
+|  | **Change** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>🔧 <strong>tfcoremock_network_policy</strong> deny_all — changed: spec[0].egress[0]</summary>
+
+\`\`\`
+tfcoremock_network_policy.deny_all
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | <code>ccf70fe0-ef67-939f-3ec0-32a4853caba4</code> | <code>ccf70fe0-ef67-939f-3ec0-32a4853caba4</code> |
+| name | <code>deny-all-egress</code> | <code>deny-all-egress</code> |
+| spec\\[0\\].egress\\[0\\] | <code></code> | <code><ins style="background:#dfd">{}</ins></code> |
+| spec\\[0\\].policy\\_types\\[0\\] | <code>Egress</code> | <code>Egress</code> |
+
+
+
+</details>
 
 "
 `;

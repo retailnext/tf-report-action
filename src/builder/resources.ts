@@ -158,6 +158,10 @@ function shouldSkip(rc: TFResourceChange): boolean {
  * explicit null in one direction and omit them in the other. Both represent
  * "no value" and should not count as drift.
  *
+ * Empty block markers (`"{}"`) are treated as equivalent to an absent block or
+ * a block with all-null children — providers may normalize `{ attr: null }` to
+ * `{}` or vice versa across plan/refresh cycles.
+ *
  * Returns `true` if the values actually differ (drift should be kept).
  */
 function hasRawValueChanges(change: Change): boolean {
@@ -197,7 +201,10 @@ function hasRawValueChanges(change: Change): boolean {
 
   // Check after keys not present in before — only a change if non-null
   for (const [key, afterVal] of afterFlat) {
-    if (!beforeFlat.has(key) && afterVal !== null) return true;
+    if (!beforeFlat.has(key)) {
+      if (afterVal === null) continue;
+      return true;
+    }
   }
 
   return false;

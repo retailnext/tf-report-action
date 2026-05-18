@@ -604,6 +604,66 @@ data.local_command.read_config
 "
 `;
 
+exports[`reportFromSteps integration — apply-no-show fixtures > terraform/empty-block-addition/0/apply-no-show > renders without error and matches snapshot 1`] = `
+"## ✅ Apply: 1 added
+
+> ⚠️ **Warning:** This report was generated without \`terraform show -json <tfplan>\` output. Resource attribute details are not available.
+
+## Apply Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Added | tfcoremock\\_network\\_policy | 1 |
+|  | **Added** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>➕ <strong>tfcoremock_network_policy</strong> deny_all</summary>
+
+\`\`\`
+tfcoremock_network_policy.deny_all
+\`\`\`
+
+
+
+</details>
+
+"
+`;
+
+exports[`reportFromSteps integration — apply-no-show fixtures > terraform/empty-block-addition/1/apply-no-show > renders without error and matches snapshot 1`] = `
+"## ✅ Apply: 1 changed
+
+> ⚠️ **Warning:** This report was generated without \`terraform show -json <tfplan>\` output. Resource attribute details are not available.
+
+## Apply Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| 🔧 Changed | tfcoremock\\_network\\_policy | 1 |
+|  | **Changed** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>🔧 <strong>tfcoremock_network_policy</strong> deny_all</summary>
+
+\`\`\`
+tfcoremock_network_policy.deny_all
+\`\`\`
+
+
+
+</details>
+
+"
+`;
+
 exports[`reportFromSteps integration — apply-no-show fixtures > terraform/error-stages/0/apply-no-show > renders without error and matches snapshot 1`] = `
 "## ✅ Apply: 1 added
 
@@ -2249,6 +2309,66 @@ terraform_data.worker_a
 
 \`\`\`
 data.local_command.read_config
+\`\`\`
+
+
+
+</details>
+
+"
+`;
+
+exports[`reportFromSteps integration — apply-no-show fixtures > tofu/empty-block-addition/0/apply-no-show > renders without error and matches snapshot 1`] = `
+"## ✅ Apply: 1 added
+
+> ⚠️ **Warning:** This report was generated without \`tofu show -json <tfplan>\` output. Resource attribute details are not available.
+
+## Apply Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Added | tfcoremock\\_network\\_policy | 1 |
+|  | **Added** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>➕ <strong>tfcoremock_network_policy</strong> deny_all</summary>
+
+\`\`\`
+tfcoremock_network_policy.deny_all
+\`\`\`
+
+
+
+</details>
+
+"
+`;
+
+exports[`reportFromSteps integration — apply-no-show fixtures > tofu/empty-block-addition/1/apply-no-show > renders without error and matches snapshot 1`] = `
+"## ✅ Apply: 1 changed
+
+> ⚠️ **Warning:** This report was generated without \`tofu show -json <tfplan>\` output. Resource attribute details are not available.
+
+## Apply Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| 🔧 Changed | tfcoremock\\_network\\_policy | 1 |
+|  | **Changed** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>🔧 <strong>tfcoremock_network_policy</strong> deny_all</summary>
+
+\`\`\`
+tfcoremock_network_policy.deny_all
 \`\`\`
 
 
@@ -3911,6 +4031,66 @@ data.local_command.read_config
 "
 `;
 
+exports[`reportFromSteps integration — apply-only fixtures > terraform/empty-block-addition/0/apply-only > renders without error and matches snapshot 1`] = `
+"## ✅ Apply: 1 added
+
+> ⚠️ **Warning:** This report was generated without \`terraform show -json <tfplan>\` output. Resource attribute details are not available.
+
+## Apply Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Added | tfcoremock\\_network\\_policy | 1 |
+|  | **Added** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>➕ <strong>tfcoremock_network_policy</strong> deny_all</summary>
+
+\`\`\`
+tfcoremock_network_policy.deny_all
+\`\`\`
+
+
+
+</details>
+
+"
+`;
+
+exports[`reportFromSteps integration — apply-only fixtures > terraform/empty-block-addition/1/apply-only > renders without error and matches snapshot 1`] = `
+"## ✅ Apply: 1 changed
+
+> ⚠️ **Warning:** This report was generated without \`terraform show -json <tfplan>\` output. Resource attribute details are not available.
+
+## Apply Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| 🔧 Changed | tfcoremock\\_network\\_policy | 1 |
+|  | **Changed** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>🔧 <strong>tfcoremock_network_policy</strong> deny_all</summary>
+
+\`\`\`
+tfcoremock_network_policy.deny_all
+\`\`\`
+
+
+
+</details>
+
+"
+`;
+
 exports[`reportFromSteps integration — apply-only fixtures > terraform/error-stages/0/apply-only > renders without error and matches snapshot 1`] = `
 "## ✅ Apply: 1 added
 
@@ -5319,6 +5499,66 @@ terraform_data.worker_a
 
 \`\`\`
 data.local_command.read_config
+\`\`\`
+
+
+
+</details>
+
+"
+`;
+
+exports[`reportFromSteps integration — apply-only fixtures > tofu/empty-block-addition/0/apply-only > renders without error and matches snapshot 1`] = `
+"## ✅ Apply: 1 added
+
+> ⚠️ **Warning:** This report was generated without \`tofu show -json <tfplan>\` output. Resource attribute details are not available.
+
+## Apply Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Added | tfcoremock\\_network\\_policy | 1 |
+|  | **Added** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>➕ <strong>tfcoremock_network_policy</strong> deny_all</summary>
+
+\`\`\`
+tfcoremock_network_policy.deny_all
+\`\`\`
+
+
+
+</details>
+
+"
+`;
+
+exports[`reportFromSteps integration — apply-only fixtures > tofu/empty-block-addition/1/apply-only > renders without error and matches snapshot 1`] = `
+"## ✅ Apply: 1 changed
+
+> ⚠️ **Warning:** This report was generated without \`tofu show -json <tfplan>\` output. Resource attribute details are not available.
+
+## Apply Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| 🔧 Changed | tfcoremock\\_network\\_policy | 1 |
+|  | **Changed** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>🔧 <strong>tfcoremock_network_policy</strong> deny_all</summary>
+
+\`\`\`
+tfcoremock_network_policy.deny_all
 \`\`\`
 
 
@@ -7846,6 +8086,140 @@ terraform_data.worker_a
     "worker_c": "charlie"
   }
 \`\`\`
+
+
+
+</details>
+
+"
+`;
+
+exports[`reportFromSteps integration — generated fixtures > terraform/empty-block-addition/0 > renders with workspace and matches snapshot 1`] = `
+"<!-- tf-report-action:"test-workspace" -->
+## ✅ \`test-workspace\` Apply: 1 added
+
+## Apply Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Added | tfcoremock\\_network\\_policy | 1 |
+|  | **Added** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>➕ <strong>tfcoremock_network_policy</strong> deny_all</summary>
+
+\`\`\`
+tfcoremock_network_policy.deny_all
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | <code></code> | <code><ins style="background:#dfd">ec4df8c1-6a26-d4b2-399f-57f752226fe3</ins></code> |
+| name | <code></code> | <code><ins style="background:#dfd">deny-all-egress</ins></code> |
+| spec\\[0\\].policy\\_types\\[0\\] | <code></code> | <code><ins style="background:#dfd">Egress</ins></code> |
+
+
+
+</details>
+
+"
+`;
+
+exports[`reportFromSteps integration — generated fixtures > terraform/empty-block-addition/0 > renders without error and matches snapshot [default] 1`] = `
+"## ✅ Apply: 1 added
+
+## Apply Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Added | tfcoremock\\_network\\_policy | 1 |
+|  | **Added** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>➕ <strong>tfcoremock_network_policy</strong> deny_all</summary>
+
+\`\`\`
+tfcoremock_network_policy.deny_all
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | <code></code> | <code><ins style="background:#dfd">ec4df8c1-6a26-d4b2-399f-57f752226fe3</ins></code> |
+| name | <code></code> | <code><ins style="background:#dfd">deny-all-egress</ins></code> |
+| spec\\[0\\].policy\\_types\\[0\\] | <code></code> | <code><ins style="background:#dfd">Egress</ins></code> |
+
+
+
+</details>
+
+"
+`;
+
+exports[`reportFromSteps integration — generated fixtures > terraform/empty-block-addition/1 > renders with workspace and matches snapshot 1`] = `
+"<!-- tf-report-action:"test-workspace" -->
+## ✅ \`test-workspace\` Apply: 1 changed
+
+## Apply Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| 🔧 Changed | tfcoremock\\_network\\_policy | 1 |
+|  | **Changed** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>🔧 <strong>tfcoremock_network_policy</strong> deny_all — changed: spec[0].egress[0]</summary>
+
+\`\`\`
+tfcoremock_network_policy.deny_all
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| spec\\[0\\].egress\\[0\\] | <code></code> | <code><ins style="background:#dfd">{}</ins></code> |
+
+
+
+</details>
+
+"
+`;
+
+exports[`reportFromSteps integration — generated fixtures > terraform/empty-block-addition/1 > renders without error and matches snapshot [default] 1`] = `
+"## ✅ Apply: 1 changed
+
+## Apply Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| 🔧 Changed | tfcoremock\\_network\\_policy | 1 |
+|  | **Changed** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>🔧 <strong>tfcoremock_network_policy</strong> deny_all — changed: spec[0].egress[0]</summary>
+
+\`\`\`
+tfcoremock_network_policy.deny_all
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| spec\\[0\\].egress\\[0\\] | <code></code> | <code><ins style="background:#dfd">{}</ins></code> |
 
 
 
@@ -12428,6 +12802,140 @@ terraform_data.worker_a
 "
 `;
 
+exports[`reportFromSteps integration — generated fixtures > tofu/empty-block-addition/0 > renders with workspace and matches snapshot 1`] = `
+"<!-- tf-report-action:"test-workspace" -->
+## ✅ \`test-workspace\` Apply: 1 added
+
+## Apply Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Added | tfcoremock\\_network\\_policy | 1 |
+|  | **Added** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>➕ <strong>tfcoremock_network_policy</strong> deny_all</summary>
+
+\`\`\`
+tfcoremock_network_policy.deny_all
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | <code></code> | <code><ins style="background:#dfd">ccf70fe0-ef67-939f-3ec0-32a4853caba4</ins></code> |
+| name | <code></code> | <code><ins style="background:#dfd">deny-all-egress</ins></code> |
+| spec\\[0\\].policy\\_types\\[0\\] | <code></code> | <code><ins style="background:#dfd">Egress</ins></code> |
+
+
+
+</details>
+
+"
+`;
+
+exports[`reportFromSteps integration — generated fixtures > tofu/empty-block-addition/0 > renders without error and matches snapshot [default] 1`] = `
+"## ✅ Apply: 1 added
+
+## Apply Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Added | tfcoremock\\_network\\_policy | 1 |
+|  | **Added** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>➕ <strong>tfcoremock_network_policy</strong> deny_all</summary>
+
+\`\`\`
+tfcoremock_network_policy.deny_all
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | <code></code> | <code><ins style="background:#dfd">ccf70fe0-ef67-939f-3ec0-32a4853caba4</ins></code> |
+| name | <code></code> | <code><ins style="background:#dfd">deny-all-egress</ins></code> |
+| spec\\[0\\].policy\\_types\\[0\\] | <code></code> | <code><ins style="background:#dfd">Egress</ins></code> |
+
+
+
+</details>
+
+"
+`;
+
+exports[`reportFromSteps integration — generated fixtures > tofu/empty-block-addition/1 > renders with workspace and matches snapshot 1`] = `
+"<!-- tf-report-action:"test-workspace" -->
+## ✅ \`test-workspace\` Apply: 1 changed
+
+## Apply Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| 🔧 Changed | tfcoremock\\_network\\_policy | 1 |
+|  | **Changed** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>🔧 <strong>tfcoremock_network_policy</strong> deny_all — changed: spec[0].egress[0]</summary>
+
+\`\`\`
+tfcoremock_network_policy.deny_all
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| spec\\[0\\].egress\\[0\\] | <code></code> | <code><ins style="background:#dfd">{}</ins></code> |
+
+
+
+</details>
+
+"
+`;
+
+exports[`reportFromSteps integration — generated fixtures > tofu/empty-block-addition/1 > renders without error and matches snapshot [default] 1`] = `
+"## ✅ Apply: 1 changed
+
+## Apply Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| 🔧 Changed | tfcoremock\\_network\\_policy | 1 |
+|  | **Changed** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>🔧 <strong>tfcoremock_network_policy</strong> deny_all — changed: spec[0].egress[0]</summary>
+
+\`\`\`
+tfcoremock_network_policy.deny_all
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| spec\\[0\\].egress\\[0\\] | <code></code> | <code><ins style="background:#dfd">{}</ins></code> |
+
+
+
+</details>
+
+"
+`;
+
 exports[`reportFromSteps integration — generated fixtures > tofu/error-stages/0 > renders with workspace and matches snapshot 1`] = `
 "<!-- tf-report-action:"test-workspace" -->
 ## ✅ \`test-workspace\` Apply: 1 added
@@ -15817,6 +16325,66 @@ data.local_command.read_config
 "
 `;
 
+exports[`reportFromSteps integration — no-show fixtures (Tier 3) > terraform/empty-block-addition/0/no-show > renders without error and matches snapshot 1`] = `
+"## ✅ Plan: 1 to add
+
+> ⚠️ **Warning:** This report was generated without \`terraform show -json <tfplan>\` output. Resource attribute details are not available.
+
+## Plan Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Add | tfcoremock\\_network\\_policy | 1 |
+|  | **Add** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>➕ <strong>tfcoremock_network_policy</strong> deny_all</summary>
+
+\`\`\`
+tfcoremock_network_policy.deny_all
+\`\`\`
+
+
+
+</details>
+
+"
+`;
+
+exports[`reportFromSteps integration — no-show fixtures (Tier 3) > terraform/empty-block-addition/1/no-show > renders without error and matches snapshot 1`] = `
+"## ✅ Plan: 1 to change
+
+> ⚠️ **Warning:** This report was generated without \`terraform show -json <tfplan>\` output. Resource attribute details are not available.
+
+## Plan Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| 🔧 Change | tfcoremock\\_network\\_policy | 1 |
+|  | **Change** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>🔧 <strong>tfcoremock_network_policy</strong> deny_all</summary>
+
+\`\`\`
+tfcoremock_network_policy.deny_all
+\`\`\`
+
+
+
+</details>
+
+"
+`;
+
 exports[`reportFromSteps integration — no-show fixtures (Tier 3) > terraform/error-stages/0/no-show > renders without error and matches snapshot 1`] = `
 "## ✅ Plan: 1 to add
 
@@ -17181,6 +17749,66 @@ terraform_data.worker_a
 
 \`\`\`
 data.local_command.read_config
+\`\`\`
+
+
+
+</details>
+
+"
+`;
+
+exports[`reportFromSteps integration — no-show fixtures (Tier 3) > tofu/empty-block-addition/0/no-show > renders without error and matches snapshot 1`] = `
+"## ✅ Plan: 1 to add
+
+> ⚠️ **Warning:** This report was generated without \`tofu show -json <tfplan>\` output. Resource attribute details are not available.
+
+## Plan Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Add | tfcoremock\\_network\\_policy | 1 |
+|  | **Add** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>➕ <strong>tfcoremock_network_policy</strong> deny_all</summary>
+
+\`\`\`
+tfcoremock_network_policy.deny_all
+\`\`\`
+
+
+
+</details>
+
+"
+`;
+
+exports[`reportFromSteps integration — no-show fixtures (Tier 3) > tofu/empty-block-addition/1/no-show > renders without error and matches snapshot 1`] = `
+"## ✅ Plan: 1 to change
+
+> ⚠️ **Warning:** This report was generated without \`tofu show -json <tfplan>\` output. Resource attribute details are not available.
+
+## Plan Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| 🔧 Change | tfcoremock\\_network\\_policy | 1 |
+|  | **Change** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>🔧 <strong>tfcoremock_network_policy</strong> deny_all</summary>
+
+\`\`\`
+tfcoremock_network_policy.deny_all
 \`\`\`
 
 
@@ -18660,6 +19288,72 @@ _all values known after apply_
 | Output | Action | Before | After |
 | --- | --- | --- | --- |
 | config\\_value | 🔧 | <code>{&quot;worker_a&quot;:&quot;alpha&quot;,&quot;worker_b&quot;:&quot;bravo&quot;,&quot;worker_c&quot;:&quot;charlie&quot;}</code> | <code>(known after apply)</code> |
+
+"
+`;
+
+exports[`reportFromSteps integration — plan-only fixtures > terraform/empty-block-addition/0/plan-only > renders plan report and matches snapshot 1`] = `
+"## ✅ Plan: 1 to add
+
+## Plan Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Add | tfcoremock\\_network\\_policy | 1 |
+|  | **Add** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>➕ <strong>tfcoremock_network_policy</strong> deny_all</summary>
+
+\`\`\`
+tfcoremock_network_policy.deny_all
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | <code></code> | <code>(known after apply)</code> |
+| name | <code></code> | <code><ins style="background:#dfd">deny-all-egress</ins></code> |
+| spec\\[0\\].policy\\_types\\[0\\] | <code></code> | <code><ins style="background:#dfd">Egress</ins></code> |
+
+
+
+</details>
+
+"
+`;
+
+exports[`reportFromSteps integration — plan-only fixtures > terraform/empty-block-addition/1/plan-only > renders plan report and matches snapshot 1`] = `
+"## ✅ Plan: 1 to change
+
+## Plan Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| 🔧 Change | tfcoremock\\_network\\_policy | 1 |
+|  | **Change** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>🔧 <strong>tfcoremock_network_policy</strong> deny_all — changed: spec[0].egress[0]</summary>
+
+\`\`\`
+tfcoremock_network_policy.deny_all
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| spec\\[0\\].egress\\[0\\] | <code></code> | <code><ins style="background:#dfd">{}</ins></code> |
+
+
+
+</details>
 
 "
 `;
@@ -20497,6 +21191,72 @@ _all values known after apply_
 | Output | Action | Before | After |
 | --- | --- | --- | --- |
 | config\\_value | 🔧 | <code>{&quot;worker_a&quot;:&quot;alpha&quot;,&quot;worker_b&quot;:&quot;bravo&quot;,&quot;worker_c&quot;:&quot;charlie&quot;}</code> | <code>(known after apply)</code> |
+
+"
+`;
+
+exports[`reportFromSteps integration — plan-only fixtures > tofu/empty-block-addition/0/plan-only > renders plan report and matches snapshot 1`] = `
+"## ✅ Plan: 1 to add
+
+## Plan Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Add | tfcoremock\\_network\\_policy | 1 |
+|  | **Add** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>➕ <strong>tfcoremock_network_policy</strong> deny_all</summary>
+
+\`\`\`
+tfcoremock_network_policy.deny_all
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | <code></code> | <code>(known after apply)</code> |
+| name | <code></code> | <code><ins style="background:#dfd">deny-all-egress</ins></code> |
+| spec\\[0\\].policy\\_types\\[0\\] | <code></code> | <code><ins style="background:#dfd">Egress</ins></code> |
+
+
+
+</details>
+
+"
+`;
+
+exports[`reportFromSteps integration — plan-only fixtures > tofu/empty-block-addition/1/plan-only > renders plan report and matches snapshot 1`] = `
+"## ✅ Plan: 1 to change
+
+## Plan Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| 🔧 Change | tfcoremock\\_network\\_policy | 1 |
+|  | **Change** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>🔧 <strong>tfcoremock_network_policy</strong> deny_all — changed: spec[0].egress[0]</summary>
+
+\`\`\`
+tfcoremock_network_policy.deny_all
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| spec\\[0\\].egress\\[0\\] | <code></code> | <code><ins style="background:#dfd">{}</ins></code> |
+
+
+
+</details>
 
 "
 `;
@@ -22522,6 +23282,74 @@ _all values known after apply_
 | Output | Action | Before | After |
 | --- | --- | --- | --- |
 | config\\_value | 🔧 | <code>{&quot;worker_a&quot;:&quot;alpha&quot;,&quot;worker_b&quot;:&quot;bravo&quot;,&quot;worker_c&quot;:&quot;charlie&quot;}</code> | <code>{&quot;worker_a&quot;:&quot;ALPHA&quot;,&quot;worker_b&quot;:&quot;bravo&quot;,&quot;worker_c&quot;:&quot;charlie&quot;}</code> |
+
+"
+`;
+
+exports[`reportFromSteps — state enrichment > no-state snapshot: terraform/empty-block-addition/0/no-state 1`] = `
+"## ✅ Apply: 1 added
+
+> ⚠️ **Warning:** Some attribute values could not be resolved because \`terraform state pull\` output was not available. Add a state step after apply to see the actual values.
+
+## Apply Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Added | tfcoremock\\_network\\_policy | 1 |
+|  | **Added** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>➕ <strong>tfcoremock_network_policy</strong> deny_all</summary>
+
+\`\`\`
+tfcoremock_network_policy.deny_all
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | <code></code> | <code>(value not in plan)</code> |
+| name | <code></code> | <code><ins style="background:#dfd">deny-all-egress</ins></code> |
+| spec\\[0\\].policy\\_types\\[0\\] | <code></code> | <code><ins style="background:#dfd">Egress</ins></code> |
+
+
+
+</details>
+
+"
+`;
+
+exports[`reportFromSteps — state enrichment > no-state snapshot: terraform/empty-block-addition/1/no-state 1`] = `
+"## ✅ Apply: 1 changed
+
+## Apply Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| 🔧 Changed | tfcoremock\\_network\\_policy | 1 |
+|  | **Changed** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>🔧 <strong>tfcoremock_network_policy</strong> deny_all — changed: spec[0].egress[0]</summary>
+
+\`\`\`
+tfcoremock_network_policy.deny_all
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| spec\\[0\\].egress\\[0\\] | <code></code> | <code><ins style="background:#dfd">{}</ins></code> |
+
+
+
+</details>
 
 "
 `;
@@ -24579,6 +25407,74 @@ _all values known after apply_
 | Output | Action | Before | After |
 | --- | --- | --- | --- |
 | config\\_value | 🔧 | <code>{&quot;worker_a&quot;:&quot;alpha&quot;,&quot;worker_b&quot;:&quot;bravo&quot;,&quot;worker_c&quot;:&quot;charlie&quot;}</code> | <code>{&quot;worker_a&quot;:&quot;ALPHA&quot;,&quot;worker_b&quot;:&quot;bravo&quot;,&quot;worker_c&quot;:&quot;charlie&quot;}</code> |
+
+"
+`;
+
+exports[`reportFromSteps — state enrichment > no-state snapshot: tofu/empty-block-addition/0/no-state 1`] = `
+"## ✅ Apply: 1 added
+
+> ⚠️ **Warning:** Some attribute values could not be resolved because \`tofu state pull\` output was not available. Add a state step after apply to see the actual values.
+
+## Apply Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Added | tfcoremock\\_network\\_policy | 1 |
+|  | **Added** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>➕ <strong>tfcoremock_network_policy</strong> deny_all</summary>
+
+\`\`\`
+tfcoremock_network_policy.deny_all
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | <code></code> | <code>(value not in plan)</code> |
+| name | <code></code> | <code><ins style="background:#dfd">deny-all-egress</ins></code> |
+| spec\\[0\\].policy\\_types\\[0\\] | <code></code> | <code><ins style="background:#dfd">Egress</ins></code> |
+
+
+
+</details>
+
+"
+`;
+
+exports[`reportFromSteps — state enrichment > no-state snapshot: tofu/empty-block-addition/1/no-state 1`] = `
+"## ✅ Apply: 1 changed
+
+## Apply Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| 🔧 Changed | tfcoremock\\_network\\_policy | 1 |
+|  | **Changed** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>🔧 <strong>tfcoremock_network_policy</strong> deny_all — changed: spec[0].egress[0]</summary>
+
+\`\`\`
+tfcoremock_network_policy.deny_all
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| spec\\[0\\].egress\\[0\\] | <code></code> | <code><ins style="background:#dfd">{}</ins></code> |
+
+
+
+</details>
 
 "
 `;

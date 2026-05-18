@@ -1,0 +1,90 @@
+{
+  "tfcoremock_network_policy": {
+    "attributes": {
+      "name": {
+        "type": "string",
+        "required": true
+      }
+    },
+    "blocks": {
+      "spec": {
+        "attributes": {
+          "policy_types": {
+            "type": "list",
+            "list": {
+              "type": "string"
+            },
+            "optional": true
+          }
+        },
+        "blocks": {
+          "egress": {
+            "blocks": {
+              "ports": {
+                "attributes": {
+                  "port": {
+                    "type": "string",
+                    "optional": true
+                  },
+                  "protocol": {
+                    "type": "string",
+                    "optional": true
+                  }
+                },
+                "mode": "list"
+              },
+              "to": {
+                "blocks": {
+                  "ip_block": {
+                    "attributes": {
+                      "cidr": {
+                        "type": "string",
+                        "optional": true
+                      }
+                    },
+                    "mode": "list"
+                  }
+                },
+                "mode": "list"
+              }
+            },
+            "mode": "list"
+          },
+          "ingress": {
+            "blocks": {
+              "ports": {
+                "attributes": {
+                  "port": {
+                    "type": "string",
+                    "optional": true
+                  },
+                  "protocol": {
+                    "type": "string",
+                    "optional": true
+                  }
+                },
+                "mode": "list"
+              },
+              "from": {
+                "blocks": {
+                  "ip_block": {
+                    "attributes": {
+                      "cidr": {
+                        "type": "string",
+                        "optional": true
+                      }
+                    },
+                    "mode": "list"
+                  }
+                },
+                "mode": "list"
+              }
+            },
+            "mode": "list"
+          }
+        },
+        "mode": "list"
+      }
+    }
+  }
+}
