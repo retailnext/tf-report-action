@@ -1,0 +1,18 @@
+{
+  "tfcoremock_webhook_config": {
+    "attributes": {
+      "name": {
+        "type": "string",
+        "required": true
+      },
+      "ca_bundle": {
+        "type": "string",
+        "optional": true
+      },
+      "endpoint_url": {
+        "type": "string",
+        "required": true
+      }
+    }
+  }
+}

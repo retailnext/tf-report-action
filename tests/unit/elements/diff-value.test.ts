@@ -103,7 +103,10 @@ describe("buildLargeValueDiff", () => {
     const r = buildLargeValueDiff("attr", null, "new\nvalue", cache);
     const md = r.render("markdown");
     expect(md).toContain("attr");
-    expect(md).toContain("(large value)");
+    expect(md).toContain("(large value; +2, -0)");
+    expect(md).toContain("+ new");
+    expect(md).toContain("+ value");
+    expect(md).toContain("diff");
     assertSizeInvariant(r, "large-create");
   });
 
@@ -112,6 +115,10 @@ describe("buildLargeValueDiff", () => {
     const r = buildLargeValueDiff("attr", "old\nvalue", null, cache);
     const md = r.render("markdown");
     expect(md).toContain("attr");
+    expect(md).toContain("(large value; +0, -2)");
+    expect(md).toContain("- old");
+    expect(md).toContain("- value");
+    expect(md).toContain("diff");
     assertSizeInvariant(r, "large-delete");
   });
 
@@ -174,6 +181,9 @@ describe("buildLargeValueContextDiff", () => {
     const r = buildLargeValueContextDiff("attr", null, "content", cache);
     const md = r.render("markdown");
     expect(md).toContain("attr");
+    expect(md).toContain("(large value; +1, -0)");
+    expect(md).toContain("+ content");
+    expect(md).toContain("diff");
     assertSizeInvariant(r, "context-create");
   });
 

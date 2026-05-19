@@ -153,14 +153,14 @@ local_file.config
 | sensitive\\_content | <code></code> | <code>(sensitive)</code> |
 
 <details>
-<summary>content (large value)</summary>
+<summary>content (large value; +5, -0)</summary>
 
-\`\`\`
-{
-  "worker_a": "alpha",
-  "worker_b": "bravo",
-  "worker_c": "charlie"
-}
+\`\`\`diff
++ {
++   "worker_a": "alpha",
++   "worker_b": "bravo",
++   "worker_c": "charlie"
++ }
 \`\`\`
 
 
@@ -478,6 +478,149 @@ null_resource.baseline
 "
 `;
 
+exports[`applyToMarkdown integration > terraform/large-value-update/0 > renders without error and matches snapshot [default] 1`] = `
+"## ✅ Apply: 1 added
+
+## Apply Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Added | tfcoremock\\_webhook\\_config | 1 |
+|  | **Added** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>➕ <strong>tfcoremock_webhook_config</strong> admission</summary>
+
+\`\`\`
+tfcoremock_webhook_config.admission
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| endpoint\\_url | <code></code> | <code><ins style="background:#dfd">https://webhook.example.com/validate</ins></code> |
+| id | <code></code> | <code>(value not in plan)</code> |
+| name | <code></code> | <code><ins style="background:#dfd">admission-webhook</ins></code> |
+
+
+
+</details>
+
+"
+`;
+
+exports[`applyToMarkdown integration > terraform/large-value-update/1 > renders without error and matches snapshot [default] 1`] = `
+"## ✅ Apply: 1 changed
+
+## Apply Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| 🔧 Changed | tfcoremock\\_webhook\\_config | 1 |
+|  | **Changed** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>🔧 <strong>tfcoremock_webhook_config</strong> admission — changed: ca_bundle</summary>
+
+\`\`\`
+tfcoremock_webhook_config.admission
+\`\`\`
+
+<details>
+<summary>ca_bundle (large value; +12, -0)</summary>
+
+\`\`\`diff
++ -----BEGIN CERTIFICATE-----
++ MIIB0zCCAXmgAwIBAgIUYWRtaXNzaW9uLXdlYmhvb2stZmFrZTAKBggqhkjOPQQD
++ AzAiMSAwHgYDVQQDExdmaXh0dXJlLXdlYmhvb2stY2EtZmFrZTAeFw0yNjAxMDEw
++ MDAwMDBaFw0yNzAxMDEwMDAwMDBaMCIxIDAeBgNVBAMTF2ZpeHR1cmUtd2ViaG9v
++ ay1jYS1mYWtlMHYwEAYHKoZIzj0CAQYFK4EEACIDYgAEAAAAAAAAAAAAAAAAAAAA
++ AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
++ AAAAAAAAAAAAAAAAAAAAAAAAAABo0IwQDAOBgNVHQ8BAf8EBAMCAqQwDwYDVR0T
++ AQH/BAUwAwEB/zAdBgNVHQ4EFgQUZmFrZS1jYS1maW5nZXJwcmludC0xMB0wCgYI
++ KoZIzj0EAwMDaAAwZQIxAFRoaXMtaXMtYS1mYWtlLWNlcnRpZmljYXRlLWZvci10
++ ZXN0aW5nLXB1cnBvc2VzAjBUaGlzLWlzLW5vdC1hLXJlYWwtc2lnbmF0dXJl
++ -----END CERTIFICATE-----
++ 
+\`\`\`
+
+
+
+</details>
+
+
+
+</details>
+
+"
+`;
+
+exports[`applyToMarkdown integration > terraform/large-value-update/2 > renders without error and matches snapshot [default] 1`] = `
+"## ✅ Apply: 1 changed
+
+## Apply Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| 🔧 Changed | tfcoremock\\_webhook\\_config | 1 |
+|  | **Changed** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>🔧 <strong>tfcoremock_webhook_config</strong> admission — changed: ca_bundle</summary>
+
+\`\`\`
+tfcoremock_webhook_config.admission
+\`\`\`
+
+<details>
+<summary>ca_bundle (large value; +9, -9)</summary>
+
+\`\`\`diff
+  -----BEGIN CERTIFICATE-----
+- MIIB0zCCAXmgAwIBAgIUYWRtaXNzaW9uLXdlYmhvb2stZmFrZTAKBggqhkjOPQQD
+- AzAiMSAwHgYDVQQDExdmaXh0dXJlLXdlYmhvb2stY2EtZmFrZTAeFw0yNjAxMDEw
+- MDAwMDBaFw0yNzAxMDEwMDAwMDBaMCIxIDAeBgNVBAMTF2ZpeHR1cmUtd2ViaG9v
+- ay1jYS1mYWtlMHYwEAYHKoZIzj0CAQYFK4EEACIDYgAEAAAAAAAAAAAAAAAAAAAA
+- AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+- AAAAAAAAAAAAAAAAAAAAAAAAAABo0IwQDAOBgNVHQ8BAf8EBAMCAqQwDwYDVR0T
+- AQH/BAUwAwEB/zAdBgNVHQ4EFgQUZmFrZS1jYS1maW5nZXJwcmludC0xMB0wCgYI
+- KoZIzj0EAwMDaAAwZQIxAFRoaXMtaXMtYS1mYWtlLWNlcnRpZmljYXRlLWZvci10
+- ZXN0aW5nLXB1cnBvc2VzAjBUaGlzLWlzLW5vdC1hLXJlYWwtc2lnbmF0dXJl
++ MIIBzTCCAXOgAwIBAgIUcm90YXRlZC13ZWJob29rLWNhLWZha2UwCgYIKoZIzj0E
++ AwMwIjEgMB4GA1UEAxMXZml4dHVyZS13ZWJob29rLWNhLXYyMB4XDTI3MDEwMTAw
++ MDAwMFoXDTI4MDEwMTAwMDAwMFowIjEgMB4GA1UEAxMXZml4dHVyZS13ZWJob29r
++ LWNhLXYyMHYwEAYHKoZIzj0CAQYFK4EEACIDYgAEQkJCQkJCQkJCQkJCQkJCQkJC
++ QkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJC
++ QkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCo0IwQDAOBgNVHQ8BAf8EBAMC
++ AqQwDwYDVR0TAQH/BAUwAwEB/zAdBgNVHQ4EFgQUZmFrZS1jYS1maW5nZXJwcmlu
++ dC0yMB0wCgYIKoZIzj0EAwMDaAAwZQIxAFJvdGF0ZWQtY2VydGlmaWNhdGUtZm9y
++ LXRlc3RpbmctcHVycG9zZXMtb25seQIwTm90LWEtcmVhbC1zaWduYXR1cmUtdjI=
+  -----END CERTIFICATE-----
+  
+\`\`\`
+
+
+
+</details>
+
+
+
+</details>
+
+"
+`;
+
 exports[`applyToMarkdown integration > terraform/local-files/0 > renders without error and matches snapshot [default] 1`] = `
 "## ✅ Apply: 1 added
 
@@ -514,22 +657,22 @@ local_file.readme
 | sensitive\\_content | <code></code> | <code>(sensitive)</code> |
 
 <details>
-<summary>content (large value)</summary>
+<summary>content (large value; +13, -0)</summary>
 
-\`\`\`
-Project: tf-plan-md fixture
-Version: 1.0.0
-Status: active
-
-This file is managed by Terraform.
-It contains multiple lines of plain text
-so that the large-value renderer is exercised.
-
-Line 9: additional content
-Line 10: additional content
-Line 11: additional content
-Line 12: end of file
-
+\`\`\`diff
++ Project: tf-plan-md fixture
++ Version: 1.0.0
++ Status: active
++ 
++ This file is managed by Terraform.
++ It contains multiple lines of plain text
++ so that the large-value renderer is exercised.
++ 
++ Line 9: additional content
++ Line 10: additional content
++ Line 11: additional content
++ Line 12: end of file
++ 
 \`\`\`
 
 
@@ -1662,14 +1805,14 @@ local_file.config
 | sensitive\\_content | <code></code> | <code>(sensitive)</code> |
 
 <details>
-<summary>content (large value)</summary>
+<summary>content (large value; +5, -0)</summary>
 
-\`\`\`
-{
-  "worker_a": "alpha",
-  "worker_b": "bravo",
-  "worker_c": "charlie"
-}
+\`\`\`diff
++ {
++   "worker_a": "alpha",
++   "worker_b": "bravo",
++   "worker_c": "charlie"
++ }
 \`\`\`
 
 
@@ -1987,6 +2130,149 @@ null_resource.baseline
 "
 `;
 
+exports[`applyToMarkdown integration > tofu/large-value-update/0 > renders without error and matches snapshot [default] 1`] = `
+"## ✅ Apply: 1 added
+
+## Apply Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Added | tfcoremock\\_webhook\\_config | 1 |
+|  | **Added** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>➕ <strong>tfcoremock_webhook_config</strong> admission</summary>
+
+\`\`\`
+tfcoremock_webhook_config.admission
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| endpoint\\_url | <code></code> | <code><ins style="background:#dfd">https://webhook.example.com/validate</ins></code> |
+| id | <code></code> | <code>(value not in plan)</code> |
+| name | <code></code> | <code><ins style="background:#dfd">admission-webhook</ins></code> |
+
+
+
+</details>
+
+"
+`;
+
+exports[`applyToMarkdown integration > tofu/large-value-update/1 > renders without error and matches snapshot [default] 1`] = `
+"## ✅ Apply: 1 changed
+
+## Apply Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| 🔧 Changed | tfcoremock\\_webhook\\_config | 1 |
+|  | **Changed** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>🔧 <strong>tfcoremock_webhook_config</strong> admission — changed: ca_bundle</summary>
+
+\`\`\`
+tfcoremock_webhook_config.admission
+\`\`\`
+
+<details>
+<summary>ca_bundle (large value; +12, -0)</summary>
+
+\`\`\`diff
++ -----BEGIN CERTIFICATE-----
++ MIIB0zCCAXmgAwIBAgIUYWRtaXNzaW9uLXdlYmhvb2stZmFrZTAKBggqhkjOPQQD
++ AzAiMSAwHgYDVQQDExdmaXh0dXJlLXdlYmhvb2stY2EtZmFrZTAeFw0yNjAxMDEw
++ MDAwMDBaFw0yNzAxMDEwMDAwMDBaMCIxIDAeBgNVBAMTF2ZpeHR1cmUtd2ViaG9v
++ ay1jYS1mYWtlMHYwEAYHKoZIzj0CAQYFK4EEACIDYgAEAAAAAAAAAAAAAAAAAAAA
++ AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
++ AAAAAAAAAAAAAAAAAAAAAAAAAABo0IwQDAOBgNVHQ8BAf8EBAMCAqQwDwYDVR0T
++ AQH/BAUwAwEB/zAdBgNVHQ4EFgQUZmFrZS1jYS1maW5nZXJwcmludC0xMB0wCgYI
++ KoZIzj0EAwMDaAAwZQIxAFRoaXMtaXMtYS1mYWtlLWNlcnRpZmljYXRlLWZvci10
++ ZXN0aW5nLXB1cnBvc2VzAjBUaGlzLWlzLW5vdC1hLXJlYWwtc2lnbmF0dXJl
++ -----END CERTIFICATE-----
++ 
+\`\`\`
+
+
+
+</details>
+
+
+
+</details>
+
+"
+`;
+
+exports[`applyToMarkdown integration > tofu/large-value-update/2 > renders without error and matches snapshot [default] 1`] = `
+"## ✅ Apply: 1 changed
+
+## Apply Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| 🔧 Changed | tfcoremock\\_webhook\\_config | 1 |
+|  | **Changed** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>🔧 <strong>tfcoremock_webhook_config</strong> admission — changed: ca_bundle</summary>
+
+\`\`\`
+tfcoremock_webhook_config.admission
+\`\`\`
+
+<details>
+<summary>ca_bundle (large value; +9, -9)</summary>
+
+\`\`\`diff
+  -----BEGIN CERTIFICATE-----
+- MIIB0zCCAXmgAwIBAgIUYWRtaXNzaW9uLXdlYmhvb2stZmFrZTAKBggqhkjOPQQD
+- AzAiMSAwHgYDVQQDExdmaXh0dXJlLXdlYmhvb2stY2EtZmFrZTAeFw0yNjAxMDEw
+- MDAwMDBaFw0yNzAxMDEwMDAwMDBaMCIxIDAeBgNVBAMTF2ZpeHR1cmUtd2ViaG9v
+- ay1jYS1mYWtlMHYwEAYHKoZIzj0CAQYFK4EEACIDYgAEAAAAAAAAAAAAAAAAAAAA
+- AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+- AAAAAAAAAAAAAAAAAAAAAAAAAABo0IwQDAOBgNVHQ8BAf8EBAMCAqQwDwYDVR0T
+- AQH/BAUwAwEB/zAdBgNVHQ4EFgQUZmFrZS1jYS1maW5nZXJwcmludC0xMB0wCgYI
+- KoZIzj0EAwMDaAAwZQIxAFRoaXMtaXMtYS1mYWtlLWNlcnRpZmljYXRlLWZvci10
+- ZXN0aW5nLXB1cnBvc2VzAjBUaGlzLWlzLW5vdC1hLXJlYWwtc2lnbmF0dXJl
++ MIIBzTCCAXOgAwIBAgIUcm90YXRlZC13ZWJob29rLWNhLWZha2UwCgYIKoZIzj0E
++ AwMwIjEgMB4GA1UEAxMXZml4dHVyZS13ZWJob29rLWNhLXYyMB4XDTI3MDEwMTAw
++ MDAwMFoXDTI4MDEwMTAwMDAwMFowIjEgMB4GA1UEAxMXZml4dHVyZS13ZWJob29r
++ LWNhLXYyMHYwEAYHKoZIzj0CAQYFK4EEACIDYgAEQkJCQkJCQkJCQkJCQkJCQkJC
++ QkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJC
++ QkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCo0IwQDAOBgNVHQ8BAf8EBAMC
++ AqQwDwYDVR0TAQH/BAUwAwEB/zAdBgNVHQ4EFgQUZmFrZS1jYS1maW5nZXJwcmlu
++ dC0yMB0wCgYIKoZIzj0EAwMDaAAwZQIxAFJvdGF0ZWQtY2VydGlmaWNhdGUtZm9y
++ LXRlc3RpbmctcHVycG9zZXMtb25seQIwTm90LWEtcmVhbC1zaWduYXR1cmUtdjI=
+  -----END CERTIFICATE-----
+  
+\`\`\`
+
+
+
+</details>
+
+
+
+</details>
+
+"
+`;
+
 exports[`applyToMarkdown integration > tofu/local-files/0 > renders without error and matches snapshot [default] 1`] = `
 "## ✅ Apply: 1 added
 
@@ -2023,22 +2309,22 @@ local_file.readme
 | sensitive\\_content | <code></code> | <code>(sensitive)</code> |
 
 <details>
-<summary>content (large value)</summary>
+<summary>content (large value; +13, -0)</summary>
 
-\`\`\`
-Project: tf-plan-md fixture
-Version: 1.0.0
-Status: active
-
-This file is managed by Terraform.
-It contains multiple lines of plain text
-so that the large-value renderer is exercised.
-
-Line 9: additional content
-Line 10: additional content
-Line 11: additional content
-Line 12: end of file
-
+\`\`\`diff
++ Project: tf-plan-md fixture
++ Version: 1.0.0
++ Status: active
++ 
++ This file is managed by Terraform.
++ It contains multiple lines of plain text
++ so that the large-value renderer is exercised.
++ 
++ Line 9: additional content
++ Line 10: additional content
++ Line 11: additional content
++ Line 12: end of file
++ 
 \`\`\`
 
 
@@ -3061,13 +3347,13 @@ terraform_data.depends_on_fail
 | id | <code></code> | <code><ins style="background:#dfd">0e26e812-d7e5-9051-5db2-910e6210a2f6</ins></code> |
 
 <details>
-<summary>input (large value)</summary>
+<summary>input (large value; +4, -0)</summary>
 
-\`\`\`
-{
-  "value": "18876309414156996",
-  "type": "string"
-}
+\`\`\`diff
++ {
++   "value": "18876309414156996",
++   "type": "string"
++ }
 \`\`\`
 
 
@@ -3075,13 +3361,13 @@ terraform_data.depends_on_fail
 </details>
 
 <details>
-<summary>output (large value)</summary>
+<summary>output (large value; +4, -0)</summary>
 
-\`\`\`
-{
-  "value": "18876309414156996",
-  "type": "string"
-}
+\`\`\`diff
++ {
++   "value": "18876309414156996",
++   "type": "string"
++ }
 \`\`\`
 
 
@@ -3105,13 +3391,13 @@ terraform_data.success
 | input | <code></code> | <code><ins style="background:#dfd">stable</ins></code> |
 
 <details>
-<summary>output (large value)</summary>
+<summary>output (large value; +4, -0)</summary>
 
-\`\`\`
-{
-  "value": "stable",
-  "type": "string"
-}
+\`\`\`diff
++ {
++   "value": "stable",
++   "type": "string"
++ }
 \`\`\`
 
 
@@ -3214,14 +3500,14 @@ local_file.config
 | sensitive\\_content | <code></code> | <code>(sensitive)</code> |
 
 <details>
-<summary>content (large value)</summary>
+<summary>content (large value; +5, -0)</summary>
 
-\`\`\`
-{
-  "worker_a": "alpha",
-  "worker_b": "bravo",
-  "worker_c": "charlie"
-}
+\`\`\`diff
++ {
++   "worker_a": "alpha",
++   "worker_b": "bravo",
++   "worker_c": "charlie"
++ }
 \`\`\`
 
 
@@ -3245,13 +3531,13 @@ terraform_data.independent
 | input | <code></code> | <code><ins style="background:#dfd">v1</ins></code> |
 
 <details>
-<summary>output (large value)</summary>
+<summary>output (large value; +4, -0)</summary>
 
-\`\`\`
-{
-  "value": "v1",
-  "type": "string"
-}
+\`\`\`diff
++ {
++   "value": "v1",
++   "type": "string"
++ }
 \`\`\`
 
 
@@ -3274,13 +3560,13 @@ terraform_data.worker_a
 | id | <code></code> | <code><ins style="background:#dfd">3068beb4-da22-038a-3f8e-01e6423a93a9</ins></code> |
 
 <details>
-<summary>input (large value)</summary>
+<summary>input (large value; +4, -0)</summary>
 
-\`\`\`
-{
-  "value": "alpha",
-  "type": "string"
-}
+\`\`\`diff
++ {
++   "value": "alpha",
++   "type": "string"
++ }
 \`\`\`
 
 
@@ -3288,13 +3574,13 @@ terraform_data.worker_a
 </details>
 
 <details>
-<summary>output (large value)</summary>
+<summary>output (large value; +4, -0)</summary>
 
-\`\`\`
-{
-  "value": "alpha",
-  "type": "string"
-}
+\`\`\`diff
++ {
++   "value": "alpha",
++   "type": "string"
++ }
 \`\`\`
 
 
@@ -3317,13 +3603,13 @@ terraform_data.worker_b
 | id | <code></code> | <code><ins style="background:#dfd">09504b51-fcb3-1ae7-31b0-ba22cfa1aa63</ins></code> |
 
 <details>
-<summary>input (large value)</summary>
+<summary>input (large value; +4, -0)</summary>
 
-\`\`\`
-{
-  "value": "bravo",
-  "type": "string"
-}
+\`\`\`diff
++ {
++   "value": "bravo",
++   "type": "string"
++ }
 \`\`\`
 
 
@@ -3331,13 +3617,13 @@ terraform_data.worker_b
 </details>
 
 <details>
-<summary>output (large value)</summary>
+<summary>output (large value; +4, -0)</summary>
 
-\`\`\`
-{
-  "value": "bravo",
-  "type": "string"
-}
+\`\`\`diff
++ {
++   "value": "bravo",
++   "type": "string"
++ }
 \`\`\`
 
 
@@ -3360,13 +3646,13 @@ terraform_data.worker_c
 | id | <code></code> | <code><ins style="background:#dfd">f925fa17-aa75-41c4-9fe4-44866db3b6dc</ins></code> |
 
 <details>
-<summary>input (large value)</summary>
+<summary>input (large value; +4, -0)</summary>
 
-\`\`\`
-{
-  "value": "charlie",
-  "type": "string"
-}
+\`\`\`diff
++ {
++   "value": "charlie",
++   "type": "string"
++ }
 \`\`\`
 
 
@@ -3374,13 +3660,13 @@ terraform_data.worker_c
 </details>
 
 <details>
-<summary>output (large value)</summary>
+<summary>output (large value; +4, -0)</summary>
 
-\`\`\`
-{
-  "value": "charlie",
-  "type": "string"
-}
+\`\`\`diff
++ {
++   "value": "charlie",
++   "type": "string"
++ }
 \`\`\`
 
 
@@ -3394,14 +3680,14 @@ terraform_data.worker_c
 ## Output Changes
 
 <details>
-<summary>➕ config_value (large value)</summary>
+<summary>➕ config_value (large value; +5, -0)</summary>
 
-\`\`\`
-{
-  "worker_a": "alpha",
-  "worker_b": "bravo",
-  "worker_c": "charlie"
-}
+\`\`\`diff
++ {
++   "worker_a": "alpha",
++   "worker_b": "bravo",
++   "worker_c": "charlie"
++ }
 \`\`\`
 
 
@@ -3718,6 +4004,149 @@ null_resource.baseline
 "
 `;
 
+exports[`applyToMarkdown — state enrichment > state-enriched snapshot: terraform/large-value-update/0 1`] = `
+"## ✅ Apply: 1 added
+
+## Apply Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Added | tfcoremock\\_webhook\\_config | 1 |
+|  | **Added** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>➕ <strong>tfcoremock_webhook_config</strong> admission</summary>
+
+\`\`\`
+tfcoremock_webhook_config.admission
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| endpoint\\_url | <code></code> | <code><ins style="background:#dfd">https://webhook.example.com/validate</ins></code> |
+| id | <code></code> | <code><ins style="background:#dfd">011c4a35-8d96-6a56-2f12-7d1cfb5251a7</ins></code> |
+| name | <code></code> | <code><ins style="background:#dfd">admission-webhook</ins></code> |
+
+
+
+</details>
+
+"
+`;
+
+exports[`applyToMarkdown — state enrichment > state-enriched snapshot: terraform/large-value-update/1 1`] = `
+"## ✅ Apply: 1 changed
+
+## Apply Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| 🔧 Changed | tfcoremock\\_webhook\\_config | 1 |
+|  | **Changed** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>🔧 <strong>tfcoremock_webhook_config</strong> admission — changed: ca_bundle</summary>
+
+\`\`\`
+tfcoremock_webhook_config.admission
+\`\`\`
+
+<details>
+<summary>ca_bundle (large value; +12, -0)</summary>
+
+\`\`\`diff
++ -----BEGIN CERTIFICATE-----
++ MIIB0zCCAXmgAwIBAgIUYWRtaXNzaW9uLXdlYmhvb2stZmFrZTAKBggqhkjOPQQD
++ AzAiMSAwHgYDVQQDExdmaXh0dXJlLXdlYmhvb2stY2EtZmFrZTAeFw0yNjAxMDEw
++ MDAwMDBaFw0yNzAxMDEwMDAwMDBaMCIxIDAeBgNVBAMTF2ZpeHR1cmUtd2ViaG9v
++ ay1jYS1mYWtlMHYwEAYHKoZIzj0CAQYFK4EEACIDYgAEAAAAAAAAAAAAAAAAAAAA
++ AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
++ AAAAAAAAAAAAAAAAAAAAAAAAAABo0IwQDAOBgNVHQ8BAf8EBAMCAqQwDwYDVR0T
++ AQH/BAUwAwEB/zAdBgNVHQ4EFgQUZmFrZS1jYS1maW5nZXJwcmludC0xMB0wCgYI
++ KoZIzj0EAwMDaAAwZQIxAFRoaXMtaXMtYS1mYWtlLWNlcnRpZmljYXRlLWZvci10
++ ZXN0aW5nLXB1cnBvc2VzAjBUaGlzLWlzLW5vdC1hLXJlYWwtc2lnbmF0dXJl
++ -----END CERTIFICATE-----
++ 
+\`\`\`
+
+
+
+</details>
+
+
+
+</details>
+
+"
+`;
+
+exports[`applyToMarkdown — state enrichment > state-enriched snapshot: terraform/large-value-update/2 1`] = `
+"## ✅ Apply: 1 changed
+
+## Apply Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| 🔧 Changed | tfcoremock\\_webhook\\_config | 1 |
+|  | **Changed** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>🔧 <strong>tfcoremock_webhook_config</strong> admission — changed: ca_bundle</summary>
+
+\`\`\`
+tfcoremock_webhook_config.admission
+\`\`\`
+
+<details>
+<summary>ca_bundle (large value; +9, -9)</summary>
+
+\`\`\`diff
+  -----BEGIN CERTIFICATE-----
+- MIIB0zCCAXmgAwIBAgIUYWRtaXNzaW9uLXdlYmhvb2stZmFrZTAKBggqhkjOPQQD
+- AzAiMSAwHgYDVQQDExdmaXh0dXJlLXdlYmhvb2stY2EtZmFrZTAeFw0yNjAxMDEw
+- MDAwMDBaFw0yNzAxMDEwMDAwMDBaMCIxIDAeBgNVBAMTF2ZpeHR1cmUtd2ViaG9v
+- ay1jYS1mYWtlMHYwEAYHKoZIzj0CAQYFK4EEACIDYgAEAAAAAAAAAAAAAAAAAAAA
+- AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+- AAAAAAAAAAAAAAAAAAAAAAAAAABo0IwQDAOBgNVHQ8BAf8EBAMCAqQwDwYDVR0T
+- AQH/BAUwAwEB/zAdBgNVHQ4EFgQUZmFrZS1jYS1maW5nZXJwcmludC0xMB0wCgYI
+- KoZIzj0EAwMDaAAwZQIxAFRoaXMtaXMtYS1mYWtlLWNlcnRpZmljYXRlLWZvci10
+- ZXN0aW5nLXB1cnBvc2VzAjBUaGlzLWlzLW5vdC1hLXJlYWwtc2lnbmF0dXJl
++ MIIBzTCCAXOgAwIBAgIUcm90YXRlZC13ZWJob29rLWNhLWZha2UwCgYIKoZIzj0E
++ AwMwIjEgMB4GA1UEAxMXZml4dHVyZS13ZWJob29rLWNhLXYyMB4XDTI3MDEwMTAw
++ MDAwMFoXDTI4MDEwMTAwMDAwMFowIjEgMB4GA1UEAxMXZml4dHVyZS13ZWJob29r
++ LWNhLXYyMHYwEAYHKoZIzj0CAQYFK4EEACIDYgAEQkJCQkJCQkJCQkJCQkJCQkJC
++ QkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJC
++ QkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCo0IwQDAOBgNVHQ8BAf8EBAMC
++ AqQwDwYDVR0TAQH/BAUwAwEB/zAdBgNVHQ4EFgQUZmFrZS1jYS1maW5nZXJwcmlu
++ dC0yMB0wCgYIKoZIzj0EAwMDaAAwZQIxAFJvdGF0ZWQtY2VydGlmaWNhdGUtZm9y
++ LXRlc3RpbmctcHVycG9zZXMtb25seQIwTm90LWEtcmVhbC1zaWduYXR1cmUtdjI=
+  -----END CERTIFICATE-----
+  
+\`\`\`
+
+
+
+</details>
+
+
+
+</details>
+
+"
+`;
+
 exports[`applyToMarkdown — state enrichment > state-enriched snapshot: terraform/local-files/0 1`] = `
 "## ✅ Apply: 1 added
 
@@ -3754,22 +4183,22 @@ local_file.readme
 | sensitive\\_content | <code></code> | <code>(sensitive)</code> |
 
 <details>
-<summary>content (large value)</summary>
+<summary>content (large value; +13, -0)</summary>
 
-\`\`\`
-Project: tf-plan-md fixture
-Version: 1.0.0
-Status: active
-
-This file is managed by Terraform.
-It contains multiple lines of plain text
-so that the large-value renderer is exercised.
-
-Line 9: additional content
-Line 10: additional content
-Line 11: additional content
-Line 12: end of file
-
+\`\`\`diff
++ Project: tf-plan-md fixture
++ Version: 1.0.0
++ Status: active
++ 
++ This file is managed by Terraform.
++ It contains multiple lines of plain text
++ so that the large-value renderer is exercised.
++ 
++ Line 9: additional content
++ Line 10: additional content
++ Line 11: additional content
++ Line 12: end of file
++ 
 \`\`\`
 
 
@@ -4233,13 +4662,13 @@ terraform_data.meta
 | input | <code></code> | <code><ins style="background:#dfd">v1</ins></code> |
 
 <details>
-<summary>output (large value)</summary>
+<summary>output (large value; +4, -0)</summary>
 
-\`\`\`
-{
-  "value": "v1",
-  "type": "string"
-}
+\`\`\`diff
++ {
++   "value": "v1",
++   "type": "string"
++ }
 \`\`\`
 
 
@@ -4819,13 +5248,13 @@ terraform_data.depends_on_fail
 | id | <code></code> | <code><ins style="background:#dfd">187022b4-6440-9fcf-3593-4b6f27d3a442</ins></code> |
 
 <details>
-<summary>input (large value)</summary>
+<summary>input (large value; +4, -0)</summary>
 
-\`\`\`
-{
-  "value": "5805321220910071849",
-  "type": "string"
-}
+\`\`\`diff
++ {
++   "value": "5805321220910071849",
++   "type": "string"
++ }
 \`\`\`
 
 
@@ -4833,13 +5262,13 @@ terraform_data.depends_on_fail
 </details>
 
 <details>
-<summary>output (large value)</summary>
+<summary>output (large value; +4, -0)</summary>
 
-\`\`\`
-{
-  "value": "5805321220910071849",
-  "type": "string"
-}
+\`\`\`diff
++ {
++   "value": "5805321220910071849",
++   "type": "string"
++ }
 \`\`\`
 
 
@@ -4863,13 +5292,13 @@ terraform_data.success
 | input | <code></code> | <code><ins style="background:#dfd">stable</ins></code> |
 
 <details>
-<summary>output (large value)</summary>
+<summary>output (large value; +4, -0)</summary>
 
-\`\`\`
-{
-  "value": "stable",
-  "type": "string"
-}
+\`\`\`diff
++ {
++   "value": "stable",
++   "type": "string"
++ }
 \`\`\`
 
 
@@ -4972,14 +5401,14 @@ local_file.config
 | sensitive\\_content | <code></code> | <code>(sensitive)</code> |
 
 <details>
-<summary>content (large value)</summary>
+<summary>content (large value; +5, -0)</summary>
 
-\`\`\`
-{
-  "worker_a": "alpha",
-  "worker_b": "bravo",
-  "worker_c": "charlie"
-}
+\`\`\`diff
++ {
++   "worker_a": "alpha",
++   "worker_b": "bravo",
++   "worker_c": "charlie"
++ }
 \`\`\`
 
 
@@ -5003,13 +5432,13 @@ terraform_data.independent
 | input | <code></code> | <code><ins style="background:#dfd">v1</ins></code> |
 
 <details>
-<summary>output (large value)</summary>
+<summary>output (large value; +4, -0)</summary>
 
-\`\`\`
-{
-  "value": "v1",
-  "type": "string"
-}
+\`\`\`diff
++ {
++   "value": "v1",
++   "type": "string"
++ }
 \`\`\`
 
 
@@ -5032,13 +5461,13 @@ terraform_data.worker_a
 | id | <code></code> | <code><ins style="background:#dfd">0d9f36ea-9187-50de-26ad-3679b9fac8c9</ins></code> |
 
 <details>
-<summary>input (large value)</summary>
+<summary>input (large value; +4, -0)</summary>
 
-\`\`\`
-{
-  "value": "alpha",
-  "type": "string"
-}
+\`\`\`diff
++ {
++   "value": "alpha",
++   "type": "string"
++ }
 \`\`\`
 
 
@@ -5046,13 +5475,13 @@ terraform_data.worker_a
 </details>
 
 <details>
-<summary>output (large value)</summary>
+<summary>output (large value; +4, -0)</summary>
 
-\`\`\`
-{
-  "value": "alpha",
-  "type": "string"
-}
+\`\`\`diff
++ {
++   "value": "alpha",
++   "type": "string"
++ }
 \`\`\`
 
 
@@ -5075,13 +5504,13 @@ terraform_data.worker_b
 | id | <code></code> | <code><ins style="background:#dfd">3112a96b-8d7e-1ab5-e88d-671b3f3b41b4</ins></code> |
 
 <details>
-<summary>input (large value)</summary>
+<summary>input (large value; +4, -0)</summary>
 
-\`\`\`
-{
-  "value": "bravo",
-  "type": "string"
-}
+\`\`\`diff
++ {
++   "value": "bravo",
++   "type": "string"
++ }
 \`\`\`
 
 
@@ -5089,13 +5518,13 @@ terraform_data.worker_b
 </details>
 
 <details>
-<summary>output (large value)</summary>
+<summary>output (large value; +4, -0)</summary>
 
-\`\`\`
-{
-  "value": "bravo",
-  "type": "string"
-}
+\`\`\`diff
++ {
++   "value": "bravo",
++   "type": "string"
++ }
 \`\`\`
 
 
@@ -5118,13 +5547,13 @@ terraform_data.worker_c
 | id | <code></code> | <code><ins style="background:#dfd">8031ba13-c0a5-1c61-f45b-981dee5e2587</ins></code> |
 
 <details>
-<summary>input (large value)</summary>
+<summary>input (large value; +4, -0)</summary>
 
-\`\`\`
-{
-  "value": "charlie",
-  "type": "string"
-}
+\`\`\`diff
++ {
++   "value": "charlie",
++   "type": "string"
++ }
 \`\`\`
 
 
@@ -5132,13 +5561,13 @@ terraform_data.worker_c
 </details>
 
 <details>
-<summary>output (large value)</summary>
+<summary>output (large value; +4, -0)</summary>
 
-\`\`\`
-{
-  "value": "charlie",
-  "type": "string"
-}
+\`\`\`diff
++ {
++   "value": "charlie",
++   "type": "string"
++ }
 \`\`\`
 
 
@@ -5152,14 +5581,14 @@ terraform_data.worker_c
 ## Output Changes
 
 <details>
-<summary>➕ config_value (large value)</summary>
+<summary>➕ config_value (large value; +5, -0)</summary>
 
-\`\`\`
-{
-  "worker_a": "alpha",
-  "worker_b": "bravo",
-  "worker_c": "charlie"
-}
+\`\`\`diff
++ {
++   "worker_a": "alpha",
++   "worker_b": "bravo",
++   "worker_c": "charlie"
++ }
 \`\`\`
 
 
@@ -5476,6 +5905,149 @@ null_resource.baseline
 "
 `;
 
+exports[`applyToMarkdown — state enrichment > state-enriched snapshot: tofu/large-value-update/0 1`] = `
+"## ✅ Apply: 1 added
+
+## Apply Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Added | tfcoremock\\_webhook\\_config | 1 |
+|  | **Added** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>➕ <strong>tfcoremock_webhook_config</strong> admission</summary>
+
+\`\`\`
+tfcoremock_webhook_config.admission
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| endpoint\\_url | <code></code> | <code><ins style="background:#dfd">https://webhook.example.com/validate</ins></code> |
+| id | <code></code> | <code><ins style="background:#dfd">eeed9b28-f8a0-cd59-288c-f7723c3f78e4</ins></code> |
+| name | <code></code> | <code><ins style="background:#dfd">admission-webhook</ins></code> |
+
+
+
+</details>
+
+"
+`;
+
+exports[`applyToMarkdown — state enrichment > state-enriched snapshot: tofu/large-value-update/1 1`] = `
+"## ✅ Apply: 1 changed
+
+## Apply Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| 🔧 Changed | tfcoremock\\_webhook\\_config | 1 |
+|  | **Changed** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>🔧 <strong>tfcoremock_webhook_config</strong> admission — changed: ca_bundle</summary>
+
+\`\`\`
+tfcoremock_webhook_config.admission
+\`\`\`
+
+<details>
+<summary>ca_bundle (large value; +12, -0)</summary>
+
+\`\`\`diff
++ -----BEGIN CERTIFICATE-----
++ MIIB0zCCAXmgAwIBAgIUYWRtaXNzaW9uLXdlYmhvb2stZmFrZTAKBggqhkjOPQQD
++ AzAiMSAwHgYDVQQDExdmaXh0dXJlLXdlYmhvb2stY2EtZmFrZTAeFw0yNjAxMDEw
++ MDAwMDBaFw0yNzAxMDEwMDAwMDBaMCIxIDAeBgNVBAMTF2ZpeHR1cmUtd2ViaG9v
++ ay1jYS1mYWtlMHYwEAYHKoZIzj0CAQYFK4EEACIDYgAEAAAAAAAAAAAAAAAAAAAA
++ AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
++ AAAAAAAAAAAAAAAAAAAAAAAAAABo0IwQDAOBgNVHQ8BAf8EBAMCAqQwDwYDVR0T
++ AQH/BAUwAwEB/zAdBgNVHQ4EFgQUZmFrZS1jYS1maW5nZXJwcmludC0xMB0wCgYI
++ KoZIzj0EAwMDaAAwZQIxAFRoaXMtaXMtYS1mYWtlLWNlcnRpZmljYXRlLWZvci10
++ ZXN0aW5nLXB1cnBvc2VzAjBUaGlzLWlzLW5vdC1hLXJlYWwtc2lnbmF0dXJl
++ -----END CERTIFICATE-----
++ 
+\`\`\`
+
+
+
+</details>
+
+
+
+</details>
+
+"
+`;
+
+exports[`applyToMarkdown — state enrichment > state-enriched snapshot: tofu/large-value-update/2 1`] = `
+"## ✅ Apply: 1 changed
+
+## Apply Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| 🔧 Changed | tfcoremock\\_webhook\\_config | 1 |
+|  | **Changed** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>🔧 <strong>tfcoremock_webhook_config</strong> admission — changed: ca_bundle</summary>
+
+\`\`\`
+tfcoremock_webhook_config.admission
+\`\`\`
+
+<details>
+<summary>ca_bundle (large value; +9, -9)</summary>
+
+\`\`\`diff
+  -----BEGIN CERTIFICATE-----
+- MIIB0zCCAXmgAwIBAgIUYWRtaXNzaW9uLXdlYmhvb2stZmFrZTAKBggqhkjOPQQD
+- AzAiMSAwHgYDVQQDExdmaXh0dXJlLXdlYmhvb2stY2EtZmFrZTAeFw0yNjAxMDEw
+- MDAwMDBaFw0yNzAxMDEwMDAwMDBaMCIxIDAeBgNVBAMTF2ZpeHR1cmUtd2ViaG9v
+- ay1jYS1mYWtlMHYwEAYHKoZIzj0CAQYFK4EEACIDYgAEAAAAAAAAAAAAAAAAAAAA
+- AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+- AAAAAAAAAAAAAAAAAAAAAAAAAABo0IwQDAOBgNVHQ8BAf8EBAMCAqQwDwYDVR0T
+- AQH/BAUwAwEB/zAdBgNVHQ4EFgQUZmFrZS1jYS1maW5nZXJwcmludC0xMB0wCgYI
+- KoZIzj0EAwMDaAAwZQIxAFRoaXMtaXMtYS1mYWtlLWNlcnRpZmljYXRlLWZvci10
+- ZXN0aW5nLXB1cnBvc2VzAjBUaGlzLWlzLW5vdC1hLXJlYWwtc2lnbmF0dXJl
++ MIIBzTCCAXOgAwIBAgIUcm90YXRlZC13ZWJob29rLWNhLWZha2UwCgYIKoZIzj0E
++ AwMwIjEgMB4GA1UEAxMXZml4dHVyZS13ZWJob29rLWNhLXYyMB4XDTI3MDEwMTAw
++ MDAwMFoXDTI4MDEwMTAwMDAwMFowIjEgMB4GA1UEAxMXZml4dHVyZS13ZWJob29r
++ LWNhLXYyMHYwEAYHKoZIzj0CAQYFK4EEACIDYgAEQkJCQkJCQkJCQkJCQkJCQkJC
++ QkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJC
++ QkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCo0IwQDAOBgNVHQ8BAf8EBAMC
++ AqQwDwYDVR0TAQH/BAUwAwEB/zAdBgNVHQ4EFgQUZmFrZS1jYS1maW5nZXJwcmlu
++ dC0yMB0wCgYIKoZIzj0EAwMDaAAwZQIxAFJvdGF0ZWQtY2VydGlmaWNhdGUtZm9y
++ LXRlc3RpbmctcHVycG9zZXMtb25seQIwTm90LWEtcmVhbC1zaWduYXR1cmUtdjI=
+  -----END CERTIFICATE-----
+  
+\`\`\`
+
+
+
+</details>
+
+
+
+</details>
+
+"
+`;
+
 exports[`applyToMarkdown — state enrichment > state-enriched snapshot: tofu/local-files/0 1`] = `
 "## ✅ Apply: 1 added
 
@@ -5512,22 +6084,22 @@ local_file.readme
 | sensitive\\_content | <code></code> | <code>(sensitive)</code> |
 
 <details>
-<summary>content (large value)</summary>
+<summary>content (large value; +13, -0)</summary>
 
-\`\`\`
-Project: tf-plan-md fixture
-Version: 1.0.0
-Status: active
-
-This file is managed by Terraform.
-It contains multiple lines of plain text
-so that the large-value renderer is exercised.
-
-Line 9: additional content
-Line 10: additional content
-Line 11: additional content
-Line 12: end of file
-
+\`\`\`diff
++ Project: tf-plan-md fixture
++ Version: 1.0.0
++ Status: active
++ 
++ This file is managed by Terraform.
++ It contains multiple lines of plain text
++ so that the large-value renderer is exercised.
++ 
++ Line 9: additional content
++ Line 10: additional content
++ Line 11: additional content
++ Line 12: end of file
++ 
 \`\`\`
 
 
@@ -5991,13 +6563,13 @@ terraform_data.meta
 | input | <code></code> | <code><ins style="background:#dfd">v1</ins></code> |
 
 <details>
-<summary>output (large value)</summary>
+<summary>output (large value; +4, -0)</summary>
 
-\`\`\`
-{
-  "value": "v1",
-  "type": "string"
-}
+\`\`\`diff
++ {
++   "value": "v1",
++   "type": "string"
++ }
 \`\`\`
 
 

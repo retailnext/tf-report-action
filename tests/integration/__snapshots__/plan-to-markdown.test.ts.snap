@@ -423,14 +423,14 @@ local_file.config
 | sensitive\\_content | <code></code> | <code>(sensitive)</code> |
 
 <details>
-<summary>content (large value)</summary>
+<summary>content (large value; +5, -0)</summary>
 
-\`\`\`
-{
-  "worker_a": "alpha",
-  "worker_b": "bravo",
-  "worker_c": "charlie"
-}
+\`\`\`diff
++ {
++   "worker_a": "alpha",
++   "worker_b": "bravo",
++   "worker_c": "charlie"
++ }
 \`\`\`
 
 
@@ -543,14 +543,14 @@ local_file.config
 | sensitive\\_content | <code></code> | <code>(sensitive)</code> |
 
 <details>
-<summary>content (large value)</summary>
+<summary>content (large value; +5, -0)</summary>
 
-\`\`\`
-{
-  "worker_a": "alpha",
-  "worker_b": "bravo",
-  "worker_c": "charlie"
-}
+\`\`\`diff
++ {
++   "worker_a": "alpha",
++   "worker_b": "bravo",
++   "worker_c": "charlie"
++ }
 \`\`\`
 
 
@@ -665,14 +665,14 @@ local_file.config
 | source | <code></code> |  |
 
 <details>
-<summary>content (large value)</summary>
+<summary>content (large value; +5, -0)</summary>
 
-\`\`\`
-{
-  "worker_a": "alpha",
-  "worker_b": "bravo",
-  "worker_c": "charlie"
-}
+\`\`\`diff
++ {
++   "worker_a": "alpha",
++   "worker_b": "bravo",
++   "worker_c": "charlie"
++ }
 \`\`\`
 
 
@@ -1856,6 +1856,448 @@ _No changes._
 "
 `;
 
+exports[`planToMarkdown integration > terraform/large-value-update/0 > renders without error and matches snapshot [default] 1`] = `
+"## ✅ Plan: 1 to add
+
+## Plan Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Add | tfcoremock\\_webhook\\_config | 1 |
+|  | **Add** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>➕ <strong>tfcoremock_webhook_config</strong> admission</summary>
+
+\`\`\`
+tfcoremock_webhook_config.admission
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| endpoint\\_url | <code></code> | <code><ins style="background:#dfd">https://webhook.example.com/validate</ins></code> |
+| id | <code></code> | <code>(known after apply)</code> |
+| name | <code></code> | <code><ins style="background:#dfd">admission-webhook</ins></code> |
+
+
+
+</details>
+
+"
+`;
+
+exports[`planToMarkdown integration > terraform/large-value-update/0 > renders without error and matches snapshot [diffFormat-simple] 1`] = `
+"## ✅ Plan: 1 to add
+
+## Plan Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Add | tfcoremock\\_webhook\\_config | 1 |
+|  | **Add** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>➕ <strong>tfcoremock_webhook_config</strong> admission</summary>
+
+\`\`\`
+tfcoremock_webhook_config.admission
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| endpoint\\_url | <code></code> | + https://webhook.example.com/validate |
+| id | <code></code> | <code>(known after apply)</code> |
+| name | <code></code> | + admission-webhook |
+
+
+
+</details>
+
+"
+`;
+
+exports[`planToMarkdown integration > terraform/large-value-update/0 > renders without error and matches snapshot [showUnchangedAttributes] 1`] = `
+"## ✅ Plan: 1 to add
+
+## Plan Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Add | tfcoremock\\_webhook\\_config | 1 |
+|  | **Add** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>➕ <strong>tfcoremock_webhook_config</strong> admission</summary>
+
+\`\`\`
+tfcoremock_webhook_config.admission
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| ca\\_bundle | <code></code> |  |
+| endpoint\\_url | <code></code> | <code><ins style="background:#dfd">https://webhook.example.com/validate</ins></code> |
+| id | <code></code> | <code>(known after apply)</code> |
+| name | <code></code> | <code><ins style="background:#dfd">admission-webhook</ins></code> |
+
+
+
+</details>
+
+"
+`;
+
+exports[`planToMarkdown integration > terraform/large-value-update/1 > renders without error and matches snapshot [default] 1`] = `
+"## ✅ Plan: 1 to change
+
+## Plan Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| 🔧 Change | tfcoremock\\_webhook\\_config | 1 |
+|  | **Change** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>🔧 <strong>tfcoremock_webhook_config</strong> admission — changed: ca_bundle</summary>
+
+\`\`\`
+tfcoremock_webhook_config.admission
+\`\`\`
+
+<details>
+<summary>ca_bundle (large value; +12, -0)</summary>
+
+\`\`\`diff
++ -----BEGIN CERTIFICATE-----
++ MIIB0zCCAXmgAwIBAgIUYWRtaXNzaW9uLXdlYmhvb2stZmFrZTAKBggqhkjOPQQD
++ AzAiMSAwHgYDVQQDExdmaXh0dXJlLXdlYmhvb2stY2EtZmFrZTAeFw0yNjAxMDEw
++ MDAwMDBaFw0yNzAxMDEwMDAwMDBaMCIxIDAeBgNVBAMTF2ZpeHR1cmUtd2ViaG9v
++ ay1jYS1mYWtlMHYwEAYHKoZIzj0CAQYFK4EEACIDYgAEAAAAAAAAAAAAAAAAAAAA
++ AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
++ AAAAAAAAAAAAAAAAAAAAAAAAAABo0IwQDAOBgNVHQ8BAf8EBAMCAqQwDwYDVR0T
++ AQH/BAUwAwEB/zAdBgNVHQ4EFgQUZmFrZS1jYS1maW5nZXJwcmludC0xMB0wCgYI
++ KoZIzj0EAwMDaAAwZQIxAFRoaXMtaXMtYS1mYWtlLWNlcnRpZmljYXRlLWZvci10
++ ZXN0aW5nLXB1cnBvc2VzAjBUaGlzLWlzLW5vdC1hLXJlYWwtc2lnbmF0dXJl
++ -----END CERTIFICATE-----
++ 
+\`\`\`
+
+
+
+</details>
+
+
+
+</details>
+
+"
+`;
+
+exports[`planToMarkdown integration > terraform/large-value-update/1 > renders without error and matches snapshot [diffFormat-simple] 1`] = `
+"## ✅ Plan: 1 to change
+
+## Plan Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| 🔧 Change | tfcoremock\\_webhook\\_config | 1 |
+|  | **Change** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>🔧 <strong>tfcoremock_webhook_config</strong> admission — changed: ca_bundle</summary>
+
+\`\`\`
+tfcoremock_webhook_config.admission
+\`\`\`
+
+<details>
+<summary>ca_bundle (large value; +12, -0)</summary>
+
+\`\`\`diff
++ -----BEGIN CERTIFICATE-----
++ MIIB0zCCAXmgAwIBAgIUYWRtaXNzaW9uLXdlYmhvb2stZmFrZTAKBggqhkjOPQQD
++ AzAiMSAwHgYDVQQDExdmaXh0dXJlLXdlYmhvb2stY2EtZmFrZTAeFw0yNjAxMDEw
++ MDAwMDBaFw0yNzAxMDEwMDAwMDBaMCIxIDAeBgNVBAMTF2ZpeHR1cmUtd2ViaG9v
++ ay1jYS1mYWtlMHYwEAYHKoZIzj0CAQYFK4EEACIDYgAEAAAAAAAAAAAAAAAAAAAA
++ AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
++ AAAAAAAAAAAAAAAAAAAAAAAAAABo0IwQDAOBgNVHQ8BAf8EBAMCAqQwDwYDVR0T
++ AQH/BAUwAwEB/zAdBgNVHQ4EFgQUZmFrZS1jYS1maW5nZXJwcmludC0xMB0wCgYI
++ KoZIzj0EAwMDaAAwZQIxAFRoaXMtaXMtYS1mYWtlLWNlcnRpZmljYXRlLWZvci10
++ ZXN0aW5nLXB1cnBvc2VzAjBUaGlzLWlzLW5vdC1hLXJlYWwtc2lnbmF0dXJl
++ -----END CERTIFICATE-----
++ 
+\`\`\`
+
+
+
+</details>
+
+
+
+</details>
+
+"
+`;
+
+exports[`planToMarkdown integration > terraform/large-value-update/1 > renders without error and matches snapshot [showUnchangedAttributes] 1`] = `
+"## ✅ Plan: 1 to change
+
+## Plan Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| 🔧 Change | tfcoremock\\_webhook\\_config | 1 |
+|  | **Change** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>🔧 <strong>tfcoremock_webhook_config</strong> admission — changed: ca_bundle</summary>
+
+\`\`\`
+tfcoremock_webhook_config.admission
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| endpoint\\_url | <code>https://webhook.example.com/validate</code> | <code>https://webhook.example.com/validate</code> |
+| id | <code>011c4a35-8d96-6a56-2f12-7d1cfb5251a7</code> | <code>011c4a35-8d96-6a56-2f12-7d1cfb5251a7</code> |
+| name | <code>admission-webhook</code> | <code>admission-webhook</code> |
+
+<details>
+<summary>ca_bundle (large value; +12, -0)</summary>
+
+\`\`\`diff
++ -----BEGIN CERTIFICATE-----
++ MIIB0zCCAXmgAwIBAgIUYWRtaXNzaW9uLXdlYmhvb2stZmFrZTAKBggqhkjOPQQD
++ AzAiMSAwHgYDVQQDExdmaXh0dXJlLXdlYmhvb2stY2EtZmFrZTAeFw0yNjAxMDEw
++ MDAwMDBaFw0yNzAxMDEwMDAwMDBaMCIxIDAeBgNVBAMTF2ZpeHR1cmUtd2ViaG9v
++ ay1jYS1mYWtlMHYwEAYHKoZIzj0CAQYFK4EEACIDYgAEAAAAAAAAAAAAAAAAAAAA
++ AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
++ AAAAAAAAAAAAAAAAAAAAAAAAAABo0IwQDAOBgNVHQ8BAf8EBAMCAqQwDwYDVR0T
++ AQH/BAUwAwEB/zAdBgNVHQ4EFgQUZmFrZS1jYS1maW5nZXJwcmludC0xMB0wCgYI
++ KoZIzj0EAwMDaAAwZQIxAFRoaXMtaXMtYS1mYWtlLWNlcnRpZmljYXRlLWZvci10
++ ZXN0aW5nLXB1cnBvc2VzAjBUaGlzLWlzLW5vdC1hLXJlYWwtc2lnbmF0dXJl
++ -----END CERTIFICATE-----
++ 
+\`\`\`
+
+
+
+</details>
+
+
+
+</details>
+
+"
+`;
+
+exports[`planToMarkdown integration > terraform/large-value-update/2 > renders without error and matches snapshot [default] 1`] = `
+"## ✅ Plan: 1 to change
+
+## Plan Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| 🔧 Change | tfcoremock\\_webhook\\_config | 1 |
+|  | **Change** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>🔧 <strong>tfcoremock_webhook_config</strong> admission — changed: ca_bundle</summary>
+
+\`\`\`
+tfcoremock_webhook_config.admission
+\`\`\`
+
+<details>
+<summary>ca_bundle (large value; +9, -9)</summary>
+
+\`\`\`diff
+  -----BEGIN CERTIFICATE-----
+- MIIB0zCCAXmgAwIBAgIUYWRtaXNzaW9uLXdlYmhvb2stZmFrZTAKBggqhkjOPQQD
+- AzAiMSAwHgYDVQQDExdmaXh0dXJlLXdlYmhvb2stY2EtZmFrZTAeFw0yNjAxMDEw
+- MDAwMDBaFw0yNzAxMDEwMDAwMDBaMCIxIDAeBgNVBAMTF2ZpeHR1cmUtd2ViaG9v
+- ay1jYS1mYWtlMHYwEAYHKoZIzj0CAQYFK4EEACIDYgAEAAAAAAAAAAAAAAAAAAAA
+- AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+- AAAAAAAAAAAAAAAAAAAAAAAAAABo0IwQDAOBgNVHQ8BAf8EBAMCAqQwDwYDVR0T
+- AQH/BAUwAwEB/zAdBgNVHQ4EFgQUZmFrZS1jYS1maW5nZXJwcmludC0xMB0wCgYI
+- KoZIzj0EAwMDaAAwZQIxAFRoaXMtaXMtYS1mYWtlLWNlcnRpZmljYXRlLWZvci10
+- ZXN0aW5nLXB1cnBvc2VzAjBUaGlzLWlzLW5vdC1hLXJlYWwtc2lnbmF0dXJl
++ MIIBzTCCAXOgAwIBAgIUcm90YXRlZC13ZWJob29rLWNhLWZha2UwCgYIKoZIzj0E
++ AwMwIjEgMB4GA1UEAxMXZml4dHVyZS13ZWJob29rLWNhLXYyMB4XDTI3MDEwMTAw
++ MDAwMFoXDTI4MDEwMTAwMDAwMFowIjEgMB4GA1UEAxMXZml4dHVyZS13ZWJob29r
++ LWNhLXYyMHYwEAYHKoZIzj0CAQYFK4EEACIDYgAEQkJCQkJCQkJCQkJCQkJCQkJC
++ QkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJC
++ QkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCo0IwQDAOBgNVHQ8BAf8EBAMC
++ AqQwDwYDVR0TAQH/BAUwAwEB/zAdBgNVHQ4EFgQUZmFrZS1jYS1maW5nZXJwcmlu
++ dC0yMB0wCgYIKoZIzj0EAwMDaAAwZQIxAFJvdGF0ZWQtY2VydGlmaWNhdGUtZm9y
++ LXRlc3RpbmctcHVycG9zZXMtb25seQIwTm90LWEtcmVhbC1zaWduYXR1cmUtdjI=
+  -----END CERTIFICATE-----
+  
+\`\`\`
+
+
+
+</details>
+
+
+
+</details>
+
+"
+`;
+
+exports[`planToMarkdown integration > terraform/large-value-update/2 > renders without error and matches snapshot [diffFormat-simple] 1`] = `
+"## ✅ Plan: 1 to change
+
+## Plan Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| 🔧 Change | tfcoremock\\_webhook\\_config | 1 |
+|  | **Change** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>🔧 <strong>tfcoremock_webhook_config</strong> admission — changed: ca_bundle</summary>
+
+\`\`\`
+tfcoremock_webhook_config.admission
+\`\`\`
+
+<details>
+<summary>ca_bundle (large value; +9, -9)</summary>
+
+\`\`\`diff
+  -----BEGIN CERTIFICATE-----
+- MIIB0zCCAXmgAwIBAgIUYWRtaXNzaW9uLXdlYmhvb2stZmFrZTAKBggqhkjOPQQD
+- AzAiMSAwHgYDVQQDExdmaXh0dXJlLXdlYmhvb2stY2EtZmFrZTAeFw0yNjAxMDEw
+- MDAwMDBaFw0yNzAxMDEwMDAwMDBaMCIxIDAeBgNVBAMTF2ZpeHR1cmUtd2ViaG9v
+- ay1jYS1mYWtlMHYwEAYHKoZIzj0CAQYFK4EEACIDYgAEAAAAAAAAAAAAAAAAAAAA
+- AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+- AAAAAAAAAAAAAAAAAAAAAAAAAABo0IwQDAOBgNVHQ8BAf8EBAMCAqQwDwYDVR0T
+- AQH/BAUwAwEB/zAdBgNVHQ4EFgQUZmFrZS1jYS1maW5nZXJwcmludC0xMB0wCgYI
+- KoZIzj0EAwMDaAAwZQIxAFRoaXMtaXMtYS1mYWtlLWNlcnRpZmljYXRlLWZvci10
+- ZXN0aW5nLXB1cnBvc2VzAjBUaGlzLWlzLW5vdC1hLXJlYWwtc2lnbmF0dXJl
++ MIIBzTCCAXOgAwIBAgIUcm90YXRlZC13ZWJob29rLWNhLWZha2UwCgYIKoZIzj0E
++ AwMwIjEgMB4GA1UEAxMXZml4dHVyZS13ZWJob29rLWNhLXYyMB4XDTI3MDEwMTAw
++ MDAwMFoXDTI4MDEwMTAwMDAwMFowIjEgMB4GA1UEAxMXZml4dHVyZS13ZWJob29r
++ LWNhLXYyMHYwEAYHKoZIzj0CAQYFK4EEACIDYgAEQkJCQkJCQkJCQkJCQkJCQkJC
++ QkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJC
++ QkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCo0IwQDAOBgNVHQ8BAf8EBAMC
++ AqQwDwYDVR0TAQH/BAUwAwEB/zAdBgNVHQ4EFgQUZmFrZS1jYS1maW5nZXJwcmlu
++ dC0yMB0wCgYIKoZIzj0EAwMDaAAwZQIxAFJvdGF0ZWQtY2VydGlmaWNhdGUtZm9y
++ LXRlc3RpbmctcHVycG9zZXMtb25seQIwTm90LWEtcmVhbC1zaWduYXR1cmUtdjI=
+  -----END CERTIFICATE-----
+  
+\`\`\`
+
+
+
+</details>
+
+
+
+</details>
+
+"
+`;
+
+exports[`planToMarkdown integration > terraform/large-value-update/2 > renders without error and matches snapshot [showUnchangedAttributes] 1`] = `
+"## ✅ Plan: 1 to change
+
+## Plan Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| 🔧 Change | tfcoremock\\_webhook\\_config | 1 |
+|  | **Change** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>🔧 <strong>tfcoremock_webhook_config</strong> admission — changed: ca_bundle</summary>
+
+\`\`\`
+tfcoremock_webhook_config.admission
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| endpoint\\_url | <code>https://webhook.example.com/validate</code> | <code>https://webhook.example.com/validate</code> |
+| id | <code>011c4a35-8d96-6a56-2f12-7d1cfb5251a7</code> | <code>011c4a35-8d96-6a56-2f12-7d1cfb5251a7</code> |
+| name | <code>admission-webhook</code> | <code>admission-webhook</code> |
+
+<details>
+<summary>ca_bundle (large value; +9, -9)</summary>
+
+\`\`\`diff
+  -----BEGIN CERTIFICATE-----
+- MIIB0zCCAXmgAwIBAgIUYWRtaXNzaW9uLXdlYmhvb2stZmFrZTAKBggqhkjOPQQD
+- AzAiMSAwHgYDVQQDExdmaXh0dXJlLXdlYmhvb2stY2EtZmFrZTAeFw0yNjAxMDEw
+- MDAwMDBaFw0yNzAxMDEwMDAwMDBaMCIxIDAeBgNVBAMTF2ZpeHR1cmUtd2ViaG9v
+- ay1jYS1mYWtlMHYwEAYHKoZIzj0CAQYFK4EEACIDYgAEAAAAAAAAAAAAAAAAAAAA
+- AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+- AAAAAAAAAAAAAAAAAAAAAAAAAABo0IwQDAOBgNVHQ8BAf8EBAMCAqQwDwYDVR0T
+- AQH/BAUwAwEB/zAdBgNVHQ4EFgQUZmFrZS1jYS1maW5nZXJwcmludC0xMB0wCgYI
+- KoZIzj0EAwMDaAAwZQIxAFRoaXMtaXMtYS1mYWtlLWNlcnRpZmljYXRlLWZvci10
+- ZXN0aW5nLXB1cnBvc2VzAjBUaGlzLWlzLW5vdC1hLXJlYWwtc2lnbmF0dXJl
++ MIIBzTCCAXOgAwIBAgIUcm90YXRlZC13ZWJob29rLWNhLWZha2UwCgYIKoZIzj0E
++ AwMwIjEgMB4GA1UEAxMXZml4dHVyZS13ZWJob29rLWNhLXYyMB4XDTI3MDEwMTAw
++ MDAwMFoXDTI4MDEwMTAwMDAwMFowIjEgMB4GA1UEAxMXZml4dHVyZS13ZWJob29r
++ LWNhLXYyMHYwEAYHKoZIzj0CAQYFK4EEACIDYgAEQkJCQkJCQkJCQkJCQkJCQkJC
++ QkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJC
++ QkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCo0IwQDAOBgNVHQ8BAf8EBAMC
++ AqQwDwYDVR0TAQH/BAUwAwEB/zAdBgNVHQ4EFgQUZmFrZS1jYS1maW5nZXJwcmlu
++ dC0yMB0wCgYIKoZIzj0EAwMDaAAwZQIxAFJvdGF0ZWQtY2VydGlmaWNhdGUtZm9y
++ LXRlc3RpbmctcHVycG9zZXMtb25seQIwTm90LWEtcmVhbC1zaWduYXR1cmUtdjI=
+  -----END CERTIFICATE-----
+  
+\`\`\`
+
+
+
+</details>
+
+
+
+</details>
+
+"
+`;
+
 exports[`planToMarkdown integration > terraform/local-files/0 > renders without error and matches snapshot [default] 1`] = `
 "## ✅ Plan: 1 to add
 
@@ -1892,22 +2334,22 @@ local_file.readme
 | sensitive\\_content | <code></code> | <code>(sensitive)</code> |
 
 <details>
-<summary>content (large value)</summary>
+<summary>content (large value; +13, -0)</summary>
 
-\`\`\`
-Project: tf-plan-md fixture
-Version: 1.0.0
-Status: active
-
-This file is managed by Terraform.
-It contains multiple lines of plain text
-so that the large-value renderer is exercised.
-
-Line 9: additional content
-Line 10: additional content
-Line 11: additional content
-Line 12: end of file
-
+\`\`\`diff
++ Project: tf-plan-md fixture
++ Version: 1.0.0
++ Status: active
++ 
++ This file is managed by Terraform.
++ It contains multiple lines of plain text
++ so that the large-value renderer is exercised.
++ 
++ Line 9: additional content
++ Line 10: additional content
++ Line 11: additional content
++ Line 12: end of file
++ 
 \`\`\`
 
 
@@ -1963,22 +2405,22 @@ local_file.readme
 | sensitive\\_content | <code></code> | <code>(sensitive)</code> |
 
 <details>
-<summary>content (large value)</summary>
+<summary>content (large value; +13, -0)</summary>
 
-\`\`\`
-Project: tf-plan-md fixture
-Version: 1.0.0
-Status: active
-
-This file is managed by Terraform.
-It contains multiple lines of plain text
-so that the large-value renderer is exercised.
-
-Line 9: additional content
-Line 10: additional content
-Line 11: additional content
-Line 12: end of file
-
+\`\`\`diff
++ Project: tf-plan-md fixture
++ Version: 1.0.0
++ Status: active
++ 
++ This file is managed by Terraform.
++ It contains multiple lines of plain text
++ so that the large-value renderer is exercised.
++ 
++ Line 9: additional content
++ Line 10: additional content
++ Line 11: additional content
++ Line 12: end of file
++ 
 \`\`\`
 
 
@@ -2036,22 +2478,22 @@ local_file.readme
 | source | <code></code> |  |
 
 <details>
-<summary>content (large value)</summary>
+<summary>content (large value; +13, -0)</summary>
 
-\`\`\`
-Project: tf-plan-md fixture
-Version: 1.0.0
-Status: active
-
-This file is managed by Terraform.
-It contains multiple lines of plain text
-so that the large-value renderer is exercised.
-
-Line 9: additional content
-Line 10: additional content
-Line 11: additional content
-Line 12: end of file
-
+\`\`\`diff
++ Project: tf-plan-md fixture
++ Version: 1.0.0
++ Status: active
++ 
++ This file is managed by Terraform.
++ It contains multiple lines of plain text
++ so that the large-value renderer is exercised.
++ 
++ Line 9: additional content
++ Line 10: additional content
++ Line 11: additional content
++ Line 12: end of file
++ 
 \`\`\`
 
 
@@ -5442,14 +5884,14 @@ local_file.config
 | sensitive\\_content | <code></code> | <code>(sensitive)</code> |
 
 <details>
-<summary>content (large value)</summary>
+<summary>content (large value; +5, -0)</summary>
 
-\`\`\`
-{
-  "worker_a": "alpha",
-  "worker_b": "bravo",
-  "worker_c": "charlie"
-}
+\`\`\`diff
++ {
++   "worker_a": "alpha",
++   "worker_b": "bravo",
++   "worker_c": "charlie"
++ }
 \`\`\`
 
 
@@ -5562,14 +6004,14 @@ local_file.config
 | sensitive\\_content | <code></code> | <code>(sensitive)</code> |
 
 <details>
-<summary>content (large value)</summary>
+<summary>content (large value; +5, -0)</summary>
 
-\`\`\`
-{
-  "worker_a": "alpha",
-  "worker_b": "bravo",
-  "worker_c": "charlie"
-}
+\`\`\`diff
++ {
++   "worker_a": "alpha",
++   "worker_b": "bravo",
++   "worker_c": "charlie"
++ }
 \`\`\`
 
 
@@ -5684,14 +6126,14 @@ local_file.config
 | source | <code></code> |  |
 
 <details>
-<summary>content (large value)</summary>
+<summary>content (large value; +5, -0)</summary>
 
-\`\`\`
-{
-  "worker_a": "alpha",
-  "worker_b": "bravo",
-  "worker_c": "charlie"
-}
+\`\`\`diff
++ {
++   "worker_a": "alpha",
++   "worker_b": "bravo",
++   "worker_c": "charlie"
++ }
 \`\`\`
 
 
@@ -6875,6 +7317,448 @@ _No changes._
 "
 `;
 
+exports[`planToMarkdown integration > tofu/large-value-update/0 > renders without error and matches snapshot [default] 1`] = `
+"## ✅ Plan: 1 to add
+
+## Plan Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Add | tfcoremock\\_webhook\\_config | 1 |
+|  | **Add** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>➕ <strong>tfcoremock_webhook_config</strong> admission</summary>
+
+\`\`\`
+tfcoremock_webhook_config.admission
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| endpoint\\_url | <code></code> | <code><ins style="background:#dfd">https://webhook.example.com/validate</ins></code> |
+| id | <code></code> | <code>(known after apply)</code> |
+| name | <code></code> | <code><ins style="background:#dfd">admission-webhook</ins></code> |
+
+
+
+</details>
+
+"
+`;
+
+exports[`planToMarkdown integration > tofu/large-value-update/0 > renders without error and matches snapshot [diffFormat-simple] 1`] = `
+"## ✅ Plan: 1 to add
+
+## Plan Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Add | tfcoremock\\_webhook\\_config | 1 |
+|  | **Add** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>➕ <strong>tfcoremock_webhook_config</strong> admission</summary>
+
+\`\`\`
+tfcoremock_webhook_config.admission
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| endpoint\\_url | <code></code> | + https://webhook.example.com/validate |
+| id | <code></code> | <code>(known after apply)</code> |
+| name | <code></code> | + admission-webhook |
+
+
+
+</details>
+
+"
+`;
+
+exports[`planToMarkdown integration > tofu/large-value-update/0 > renders without error and matches snapshot [showUnchangedAttributes] 1`] = `
+"## ✅ Plan: 1 to add
+
+## Plan Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Add | tfcoremock\\_webhook\\_config | 1 |
+|  | **Add** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>➕ <strong>tfcoremock_webhook_config</strong> admission</summary>
+
+\`\`\`
+tfcoremock_webhook_config.admission
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| ca\\_bundle | <code></code> |  |
+| endpoint\\_url | <code></code> | <code><ins style="background:#dfd">https://webhook.example.com/validate</ins></code> |
+| id | <code></code> | <code>(known after apply)</code> |
+| name | <code></code> | <code><ins style="background:#dfd">admission-webhook</ins></code> |
+
+
+
+</details>
+
+"
+`;
+
+exports[`planToMarkdown integration > tofu/large-value-update/1 > renders without error and matches snapshot [default] 1`] = `
+"## ✅ Plan: 1 to change
+
+## Plan Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| 🔧 Change | tfcoremock\\_webhook\\_config | 1 |
+|  | **Change** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>🔧 <strong>tfcoremock_webhook_config</strong> admission — changed: ca_bundle</summary>
+
+\`\`\`
+tfcoremock_webhook_config.admission
+\`\`\`
+
+<details>
+<summary>ca_bundle (large value; +12, -0)</summary>
+
+\`\`\`diff
++ -----BEGIN CERTIFICATE-----
++ MIIB0zCCAXmgAwIBAgIUYWRtaXNzaW9uLXdlYmhvb2stZmFrZTAKBggqhkjOPQQD
++ AzAiMSAwHgYDVQQDExdmaXh0dXJlLXdlYmhvb2stY2EtZmFrZTAeFw0yNjAxMDEw
++ MDAwMDBaFw0yNzAxMDEwMDAwMDBaMCIxIDAeBgNVBAMTF2ZpeHR1cmUtd2ViaG9v
++ ay1jYS1mYWtlMHYwEAYHKoZIzj0CAQYFK4EEACIDYgAEAAAAAAAAAAAAAAAAAAAA
++ AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
++ AAAAAAAAAAAAAAAAAAAAAAAAAABo0IwQDAOBgNVHQ8BAf8EBAMCAqQwDwYDVR0T
++ AQH/BAUwAwEB/zAdBgNVHQ4EFgQUZmFrZS1jYS1maW5nZXJwcmludC0xMB0wCgYI
++ KoZIzj0EAwMDaAAwZQIxAFRoaXMtaXMtYS1mYWtlLWNlcnRpZmljYXRlLWZvci10
++ ZXN0aW5nLXB1cnBvc2VzAjBUaGlzLWlzLW5vdC1hLXJlYWwtc2lnbmF0dXJl
++ -----END CERTIFICATE-----
++ 
+\`\`\`
+
+
+
+</details>
+
+
+
+</details>
+
+"
+`;
+
+exports[`planToMarkdown integration > tofu/large-value-update/1 > renders without error and matches snapshot [diffFormat-simple] 1`] = `
+"## ✅ Plan: 1 to change
+
+## Plan Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| 🔧 Change | tfcoremock\\_webhook\\_config | 1 |
+|  | **Change** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>🔧 <strong>tfcoremock_webhook_config</strong> admission — changed: ca_bundle</summary>
+
+\`\`\`
+tfcoremock_webhook_config.admission
+\`\`\`
+
+<details>
+<summary>ca_bundle (large value; +12, -0)</summary>
+
+\`\`\`diff
++ -----BEGIN CERTIFICATE-----
++ MIIB0zCCAXmgAwIBAgIUYWRtaXNzaW9uLXdlYmhvb2stZmFrZTAKBggqhkjOPQQD
++ AzAiMSAwHgYDVQQDExdmaXh0dXJlLXdlYmhvb2stY2EtZmFrZTAeFw0yNjAxMDEw
++ MDAwMDBaFw0yNzAxMDEwMDAwMDBaMCIxIDAeBgNVBAMTF2ZpeHR1cmUtd2ViaG9v
++ ay1jYS1mYWtlMHYwEAYHKoZIzj0CAQYFK4EEACIDYgAEAAAAAAAAAAAAAAAAAAAA
++ AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
++ AAAAAAAAAAAAAAAAAAAAAAAAAABo0IwQDAOBgNVHQ8BAf8EBAMCAqQwDwYDVR0T
++ AQH/BAUwAwEB/zAdBgNVHQ4EFgQUZmFrZS1jYS1maW5nZXJwcmludC0xMB0wCgYI
++ KoZIzj0EAwMDaAAwZQIxAFRoaXMtaXMtYS1mYWtlLWNlcnRpZmljYXRlLWZvci10
++ ZXN0aW5nLXB1cnBvc2VzAjBUaGlzLWlzLW5vdC1hLXJlYWwtc2lnbmF0dXJl
++ -----END CERTIFICATE-----
++ 
+\`\`\`
+
+
+
+</details>
+
+
+
+</details>
+
+"
+`;
+
+exports[`planToMarkdown integration > tofu/large-value-update/1 > renders without error and matches snapshot [showUnchangedAttributes] 1`] = `
+"## ✅ Plan: 1 to change
+
+## Plan Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| 🔧 Change | tfcoremock\\_webhook\\_config | 1 |
+|  | **Change** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>🔧 <strong>tfcoremock_webhook_config</strong> admission — changed: ca_bundle</summary>
+
+\`\`\`
+tfcoremock_webhook_config.admission
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| endpoint\\_url | <code>https://webhook.example.com/validate</code> | <code>https://webhook.example.com/validate</code> |
+| id | <code>eeed9b28-f8a0-cd59-288c-f7723c3f78e4</code> | <code>eeed9b28-f8a0-cd59-288c-f7723c3f78e4</code> |
+| name | <code>admission-webhook</code> | <code>admission-webhook</code> |
+
+<details>
+<summary>ca_bundle (large value; +12, -0)</summary>
+
+\`\`\`diff
++ -----BEGIN CERTIFICATE-----
++ MIIB0zCCAXmgAwIBAgIUYWRtaXNzaW9uLXdlYmhvb2stZmFrZTAKBggqhkjOPQQD
++ AzAiMSAwHgYDVQQDExdmaXh0dXJlLXdlYmhvb2stY2EtZmFrZTAeFw0yNjAxMDEw
++ MDAwMDBaFw0yNzAxMDEwMDAwMDBaMCIxIDAeBgNVBAMTF2ZpeHR1cmUtd2ViaG9v
++ ay1jYS1mYWtlMHYwEAYHKoZIzj0CAQYFK4EEACIDYgAEAAAAAAAAAAAAAAAAAAAA
++ AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
++ AAAAAAAAAAAAAAAAAAAAAAAAAABo0IwQDAOBgNVHQ8BAf8EBAMCAqQwDwYDVR0T
++ AQH/BAUwAwEB/zAdBgNVHQ4EFgQUZmFrZS1jYS1maW5nZXJwcmludC0xMB0wCgYI
++ KoZIzj0EAwMDaAAwZQIxAFRoaXMtaXMtYS1mYWtlLWNlcnRpZmljYXRlLWZvci10
++ ZXN0aW5nLXB1cnBvc2VzAjBUaGlzLWlzLW5vdC1hLXJlYWwtc2lnbmF0dXJl
++ -----END CERTIFICATE-----
++ 
+\`\`\`
+
+
+
+</details>
+
+
+
+</details>
+
+"
+`;
+
+exports[`planToMarkdown integration > tofu/large-value-update/2 > renders without error and matches snapshot [default] 1`] = `
+"## ✅ Plan: 1 to change
+
+## Plan Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| 🔧 Change | tfcoremock\\_webhook\\_config | 1 |
+|  | **Change** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>🔧 <strong>tfcoremock_webhook_config</strong> admission — changed: ca_bundle</summary>
+
+\`\`\`
+tfcoremock_webhook_config.admission
+\`\`\`
+
+<details>
+<summary>ca_bundle (large value; +9, -9)</summary>
+
+\`\`\`diff
+  -----BEGIN CERTIFICATE-----
+- MIIB0zCCAXmgAwIBAgIUYWRtaXNzaW9uLXdlYmhvb2stZmFrZTAKBggqhkjOPQQD
+- AzAiMSAwHgYDVQQDExdmaXh0dXJlLXdlYmhvb2stY2EtZmFrZTAeFw0yNjAxMDEw
+- MDAwMDBaFw0yNzAxMDEwMDAwMDBaMCIxIDAeBgNVBAMTF2ZpeHR1cmUtd2ViaG9v
+- ay1jYS1mYWtlMHYwEAYHKoZIzj0CAQYFK4EEACIDYgAEAAAAAAAAAAAAAAAAAAAA
+- AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+- AAAAAAAAAAAAAAAAAAAAAAAAAABo0IwQDAOBgNVHQ8BAf8EBAMCAqQwDwYDVR0T
+- AQH/BAUwAwEB/zAdBgNVHQ4EFgQUZmFrZS1jYS1maW5nZXJwcmludC0xMB0wCgYI
+- KoZIzj0EAwMDaAAwZQIxAFRoaXMtaXMtYS1mYWtlLWNlcnRpZmljYXRlLWZvci10
+- ZXN0aW5nLXB1cnBvc2VzAjBUaGlzLWlzLW5vdC1hLXJlYWwtc2lnbmF0dXJl
++ MIIBzTCCAXOgAwIBAgIUcm90YXRlZC13ZWJob29rLWNhLWZha2UwCgYIKoZIzj0E
++ AwMwIjEgMB4GA1UEAxMXZml4dHVyZS13ZWJob29rLWNhLXYyMB4XDTI3MDEwMTAw
++ MDAwMFoXDTI4MDEwMTAwMDAwMFowIjEgMB4GA1UEAxMXZml4dHVyZS13ZWJob29r
++ LWNhLXYyMHYwEAYHKoZIzj0CAQYFK4EEACIDYgAEQkJCQkJCQkJCQkJCQkJCQkJC
++ QkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJC
++ QkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCo0IwQDAOBgNVHQ8BAf8EBAMC
++ AqQwDwYDVR0TAQH/BAUwAwEB/zAdBgNVHQ4EFgQUZmFrZS1jYS1maW5nZXJwcmlu
++ dC0yMB0wCgYIKoZIzj0EAwMDaAAwZQIxAFJvdGF0ZWQtY2VydGlmaWNhdGUtZm9y
++ LXRlc3RpbmctcHVycG9zZXMtb25seQIwTm90LWEtcmVhbC1zaWduYXR1cmUtdjI=
+  -----END CERTIFICATE-----
+  
+\`\`\`
+
+
+
+</details>
+
+
+
+</details>
+
+"
+`;
+
+exports[`planToMarkdown integration > tofu/large-value-update/2 > renders without error and matches snapshot [diffFormat-simple] 1`] = `
+"## ✅ Plan: 1 to change
+
+## Plan Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| 🔧 Change | tfcoremock\\_webhook\\_config | 1 |
+|  | **Change** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>🔧 <strong>tfcoremock_webhook_config</strong> admission — changed: ca_bundle</summary>
+
+\`\`\`
+tfcoremock_webhook_config.admission
+\`\`\`
+
+<details>
+<summary>ca_bundle (large value; +9, -9)</summary>
+
+\`\`\`diff
+  -----BEGIN CERTIFICATE-----
+- MIIB0zCCAXmgAwIBAgIUYWRtaXNzaW9uLXdlYmhvb2stZmFrZTAKBggqhkjOPQQD
+- AzAiMSAwHgYDVQQDExdmaXh0dXJlLXdlYmhvb2stY2EtZmFrZTAeFw0yNjAxMDEw
+- MDAwMDBaFw0yNzAxMDEwMDAwMDBaMCIxIDAeBgNVBAMTF2ZpeHR1cmUtd2ViaG9v
+- ay1jYS1mYWtlMHYwEAYHKoZIzj0CAQYFK4EEACIDYgAEAAAAAAAAAAAAAAAAAAAA
+- AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+- AAAAAAAAAAAAAAAAAAAAAAAAAABo0IwQDAOBgNVHQ8BAf8EBAMCAqQwDwYDVR0T
+- AQH/BAUwAwEB/zAdBgNVHQ4EFgQUZmFrZS1jYS1maW5nZXJwcmludC0xMB0wCgYI
+- KoZIzj0EAwMDaAAwZQIxAFRoaXMtaXMtYS1mYWtlLWNlcnRpZmljYXRlLWZvci10
+- ZXN0aW5nLXB1cnBvc2VzAjBUaGlzLWlzLW5vdC1hLXJlYWwtc2lnbmF0dXJl
++ MIIBzTCCAXOgAwIBAgIUcm90YXRlZC13ZWJob29rLWNhLWZha2UwCgYIKoZIzj0E
++ AwMwIjEgMB4GA1UEAxMXZml4dHVyZS13ZWJob29rLWNhLXYyMB4XDTI3MDEwMTAw
++ MDAwMFoXDTI4MDEwMTAwMDAwMFowIjEgMB4GA1UEAxMXZml4dHVyZS13ZWJob29r
++ LWNhLXYyMHYwEAYHKoZIzj0CAQYFK4EEACIDYgAEQkJCQkJCQkJCQkJCQkJCQkJC
++ QkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJC
++ QkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCo0IwQDAOBgNVHQ8BAf8EBAMC
++ AqQwDwYDVR0TAQH/BAUwAwEB/zAdBgNVHQ4EFgQUZmFrZS1jYS1maW5nZXJwcmlu
++ dC0yMB0wCgYIKoZIzj0EAwMDaAAwZQIxAFJvdGF0ZWQtY2VydGlmaWNhdGUtZm9y
++ LXRlc3RpbmctcHVycG9zZXMtb25seQIwTm90LWEtcmVhbC1zaWduYXR1cmUtdjI=
+  -----END CERTIFICATE-----
+  
+\`\`\`
+
+
+
+</details>
+
+
+
+</details>
+
+"
+`;
+
+exports[`planToMarkdown integration > tofu/large-value-update/2 > renders without error and matches snapshot [showUnchangedAttributes] 1`] = `
+"## ✅ Plan: 1 to change
+
+## Plan Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| 🔧 Change | tfcoremock\\_webhook\\_config | 1 |
+|  | **Change** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>🔧 <strong>tfcoremock_webhook_config</strong> admission — changed: ca_bundle</summary>
+
+\`\`\`
+tfcoremock_webhook_config.admission
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| endpoint\\_url | <code>https://webhook.example.com/validate</code> | <code>https://webhook.example.com/validate</code> |
+| id | <code>eeed9b28-f8a0-cd59-288c-f7723c3f78e4</code> | <code>eeed9b28-f8a0-cd59-288c-f7723c3f78e4</code> |
+| name | <code>admission-webhook</code> | <code>admission-webhook</code> |
+
+<details>
+<summary>ca_bundle (large value; +9, -9)</summary>
+
+\`\`\`diff
+  -----BEGIN CERTIFICATE-----
+- MIIB0zCCAXmgAwIBAgIUYWRtaXNzaW9uLXdlYmhvb2stZmFrZTAKBggqhkjOPQQD
+- AzAiMSAwHgYDVQQDExdmaXh0dXJlLXdlYmhvb2stY2EtZmFrZTAeFw0yNjAxMDEw
+- MDAwMDBaFw0yNzAxMDEwMDAwMDBaMCIxIDAeBgNVBAMTF2ZpeHR1cmUtd2ViaG9v
+- ay1jYS1mYWtlMHYwEAYHKoZIzj0CAQYFK4EEACIDYgAEAAAAAAAAAAAAAAAAAAAA
+- AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+- AAAAAAAAAAAAAAAAAAAAAAAAAABo0IwQDAOBgNVHQ8BAf8EBAMCAqQwDwYDVR0T
+- AQH/BAUwAwEB/zAdBgNVHQ4EFgQUZmFrZS1jYS1maW5nZXJwcmludC0xMB0wCgYI
+- KoZIzj0EAwMDaAAwZQIxAFRoaXMtaXMtYS1mYWtlLWNlcnRpZmljYXRlLWZvci10
+- ZXN0aW5nLXB1cnBvc2VzAjBUaGlzLWlzLW5vdC1hLXJlYWwtc2lnbmF0dXJl
++ MIIBzTCCAXOgAwIBAgIUcm90YXRlZC13ZWJob29rLWNhLWZha2UwCgYIKoZIzj0E
++ AwMwIjEgMB4GA1UEAxMXZml4dHVyZS13ZWJob29rLWNhLXYyMB4XDTI3MDEwMTAw
++ MDAwMFoXDTI4MDEwMTAwMDAwMFowIjEgMB4GA1UEAxMXZml4dHVyZS13ZWJob29r
++ LWNhLXYyMHYwEAYHKoZIzj0CAQYFK4EEACIDYgAEQkJCQkJCQkJCQkJCQkJCQkJC
++ QkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJC
++ QkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCo0IwQDAOBgNVHQ8BAf8EBAMC
++ AqQwDwYDVR0TAQH/BAUwAwEB/zAdBgNVHQ4EFgQUZmFrZS1jYS1maW5nZXJwcmlu
++ dC0yMB0wCgYIKoZIzj0EAwMDaAAwZQIxAFJvdGF0ZWQtY2VydGlmaWNhdGUtZm9y
++ LXRlc3RpbmctcHVycG9zZXMtb25seQIwTm90LWEtcmVhbC1zaWduYXR1cmUtdjI=
+  -----END CERTIFICATE-----
+  
+\`\`\`
+
+
+
+</details>
+
+
+
+</details>
+
+"
+`;
+
 exports[`planToMarkdown integration > tofu/local-files/0 > renders without error and matches snapshot [default] 1`] = `
 "## ✅ Plan: 1 to add
 
@@ -6911,22 +7795,22 @@ local_file.readme
 | sensitive\\_content | <code></code> | <code>(sensitive)</code> |
 
 <details>
-<summary>content (large value)</summary>
+<summary>content (large value; +13, -0)</summary>
 
-\`\`\`
-Project: tf-plan-md fixture
-Version: 1.0.0
-Status: active
-
-This file is managed by Terraform.
-It contains multiple lines of plain text
-so that the large-value renderer is exercised.
-
-Line 9: additional content
-Line 10: additional content
-Line 11: additional content
-Line 12: end of file
-
+\`\`\`diff
++ Project: tf-plan-md fixture
++ Version: 1.0.0
++ Status: active
++ 
++ This file is managed by Terraform.
++ It contains multiple lines of plain text
++ so that the large-value renderer is exercised.
++ 
++ Line 9: additional content
++ Line 10: additional content
++ Line 11: additional content
++ Line 12: end of file
++ 
 \`\`\`
 
 
@@ -6982,22 +7866,22 @@ local_file.readme
 | sensitive\\_content | <code></code> | <code>(sensitive)</code> |
 
 <details>
-<summary>content (large value)</summary>
+<summary>content (large value; +13, -0)</summary>
 
-\`\`\`
-Project: tf-plan-md fixture
-Version: 1.0.0
-Status: active
-
-This file is managed by Terraform.
-It contains multiple lines of plain text
-so that the large-value renderer is exercised.
-
-Line 9: additional content
-Line 10: additional content
-Line 11: additional content
-Line 12: end of file
-
+\`\`\`diff
++ Project: tf-plan-md fixture
++ Version: 1.0.0
++ Status: active
++ 
++ This file is managed by Terraform.
++ It contains multiple lines of plain text
++ so that the large-value renderer is exercised.
++ 
++ Line 9: additional content
++ Line 10: additional content
++ Line 11: additional content
++ Line 12: end of file
++ 
 \`\`\`
 
 
@@ -7055,22 +7939,22 @@ local_file.readme
 | source | <code></code> |  |
 
 <details>
-<summary>content (large value)</summary>
+<summary>content (large value; +13, -0)</summary>
 
-\`\`\`
-Project: tf-plan-md fixture
-Version: 1.0.0
-Status: active
-
-This file is managed by Terraform.
-It contains multiple lines of plain text
-so that the large-value renderer is exercised.
-
-Line 9: additional content
-Line 10: additional content
-Line 11: additional content
-Line 12: end of file
-
+\`\`\`diff
++ Project: tf-plan-md fixture
++ Version: 1.0.0
++ Status: active
++ 
++ This file is managed by Terraform.
++ It contains multiple lines of plain text
++ so that the large-value renderer is exercised.
++ 
++ Line 9: additional content
++ Line 10: additional content
++ Line 11: additional content
++ Line 12: end of file
++ 
 \`\`\`
 
 

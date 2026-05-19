@@ -3931,10 +3931,10 @@ function buildLargeValueDiff(name, before, after, cache) {
   const aVal = after ? prettyPrint(after) : null;
   if (bVal === null && aVal === null) return EMPTY;
   if (bVal !== null && aVal === null) {
-    return buildDetailsBlock(name, new CodeBlock(bVal), 0, 0);
+    return buildOneSidedBlock(name, bVal, "removed");
   }
   if (bVal === null && aVal !== null) {
-    return buildDetailsBlock(name, new CodeBlock(aVal), 0, 0);
+    return buildOneSidedBlock(name, aVal, "added");
   }
   if (bVal === null || aVal === null) return EMPTY;
   const diff = buildLineDiff(bVal, aVal, cache);
@@ -3956,10 +3956,10 @@ function buildLargeValueContextDiff(name, before, after, cache) {
   const aVal = after ? prettyPrint(after) : null;
   if (bVal === null && aVal === null) return EMPTY;
   if (bVal === null && aVal !== null) {
-    return buildDetailsBlock(name, new CodeBlock(aVal), 0, 0);
+    return buildOneSidedBlock(name, aVal, "added");
   }
   if (bVal !== null && aVal === null) {
-    return buildDetailsBlock(name, new CodeBlock(bVal), 0, 0);
+    return buildOneSidedBlock(name, bVal, "removed");
   }
   if (bVal === null || aVal === null) return EMPTY;
   const diff = buildLineDiff(bVal, aVal, cache);
@@ -4000,6 +4000,20 @@ function renderContextHunks(name, diff) {
   return buildDetailsBlock(
     name,
     new CodeBlock(lines.join("\n"), "diff"),
+    addedLines,
+    removedLines
+  );
+}
+function buildOneSidedBlock(name, value, kind) {
+  const prefix = kind === "added" ? "+" : "-";
+  const lines = value.split("\n");
+  const codeContent = lines.map((line) => `${prefix} ${line}`).join("\n");
+  const lineCount = lines.length;
+  const addedLines = kind === "added" ? lineCount : 0;
+  const removedLines = kind === "removed" ? lineCount : 0;
+  return buildDetailsBlock(
+    name,
+    new CodeBlock(codeContent, "diff"),
     addedLines,
     removedLines
   );
