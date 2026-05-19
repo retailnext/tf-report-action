@@ -69,11 +69,11 @@ export function buildLargeValueDiff(
   if (bVal === null && aVal === null) return EMPTY;
 
   if (bVal !== null && aVal === null) {
-    return buildDetailsBlock(name, new CodeBlock(bVal), 0, 0);
+    return buildOneSidedBlock(name, bVal, "removed");
   }
 
   if (bVal === null && aVal !== null) {
-    return buildDetailsBlock(name, new CodeBlock(aVal), 0, 0);
+    return buildOneSidedBlock(name, aVal, "added");
   }
 
   if (bVal === null || aVal === null) return EMPTY;
@@ -116,10 +116,10 @@ export function buildLargeValueContextDiff(
   if (bVal === null && aVal === null) return EMPTY;
 
   if (bVal === null && aVal !== null) {
-    return buildDetailsBlock(name, new CodeBlock(aVal), 0, 0);
+    return buildOneSidedBlock(name, aVal, "added");
   }
   if (bVal !== null && aVal === null) {
-    return buildDetailsBlock(name, new CodeBlock(bVal), 0, 0);
+    return buildOneSidedBlock(name, bVal, "removed");
   }
 
   if (bVal === null || aVal === null) return EMPTY;
@@ -185,6 +185,30 @@ function renderContextHunks(
 // ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------
+
+/**
+ * Builds a one-sided diff block where only before or after exists.
+ * Prefixes every line with `+` (added) or `-` (removed) so direction
+ * is unambiguous.
+ */
+function buildOneSidedBlock(
+  name: string,
+  value: string,
+  kind: "added" | "removed",
+): Renderable {
+  const prefix = kind === "added" ? "+" : "-";
+  const lines = value.split("\n");
+  const codeContent = lines.map((line) => `${prefix} ${line}`).join("\n");
+  const lineCount = lines.length;
+  const addedLines = kind === "added" ? lineCount : 0;
+  const removedLines = kind === "removed" ? lineCount : 0;
+  return buildDetailsBlock(
+    name,
+    new CodeBlock(codeContent, "diff"),
+    addedLines,
+    removedLines,
+  );
+}
 
 /** Builds a Details block with a summary showing diff stats. */
 function buildDetailsBlock(

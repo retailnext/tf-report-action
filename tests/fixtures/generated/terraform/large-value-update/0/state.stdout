@@ -1,0 +1,30 @@
+{
+  "version": 4,
+  "terraform_version": "1.14.9",
+  "serial": 1,
+  "lineage": "3d29b98f-6c79-9fc0-934a-6042888bea87",
+  "outputs": {},
+  "resources": [
+    {
+      "mode": "managed",
+      "type": "tfcoremock_webhook_config",
+      "name": "admission",
+      "provider": "provider[\"registry.terraform.io/hashicorp/tfcoremock\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "ca_bundle": null,
+            "endpoint_url": "https://webhook.example.com/validate",
+            "id": "011c4a35-8d96-6a56-2f12-7d1cfb5251a7",
+            "name": "admission-webhook"
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0
+        }
+      ]
+    }
+  ],
+  "check_results": null
+}
+
