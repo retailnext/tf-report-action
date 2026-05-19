@@ -352,14 +352,14 @@ npm run ci && npm run check:dist
 Never commit with a stale dist. Never run only `npm run ci` without also running
 `npm run check:dist` before committing — `npm run ci` does not include bundling.
 
-**Do not substitute ad-hoc commands**: Running `tsc --noEmit`, `eslint`, `npx
-esbuild`, or any individual tool directly is **not** a substitute for `npm run ci
-&& npm run check:dist`. These partial or direct invocations do not run the full
-pipeline and will produce incorrect results. When a script produces an unexpected
-outcome, the correct response is to **investigate the discrepancy** (check diffs,
-re-read error messages, inspect intermediate state) — never to bypass the script
-with a direct tool invocation. The full two-command sequence is the only accepted
-pre-commit verification.
+**Do not substitute ad-hoc commands**: Running `tsc --noEmit`, `eslint`,
+`npx esbuild`, or any individual tool directly is **not** a substitute for
+`npm run ci && npm run check:dist`. These partial or direct invocations do not
+run the full pipeline and will produce incorrect results. When a script produces
+an unexpected outcome, the correct response is to **investigate the discrepancy**
+(check diffs, re-read error messages, inspect intermediate state) — never to
+bypass the script with a direct tool invocation. The full two-command sequence is
+the only accepted pre-commit verification.
 
 ---
 
