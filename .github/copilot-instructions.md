@@ -335,21 +335,30 @@ npm run ci && npm run check:dist
 ```
 
 `npm run check:dist` runs `npm run bundle` then checks `git diff --exit-code dist/`
-(working tree vs index). If it fails because dist changed, stage the updated dist
-and include it in the commit:
+(working tree vs index). If it reports dist is out of date, follow this sequence:
 
-```bash
-git add dist/
-git commit  # include dist/ in the commit
-```
+1. **This is expected** after any source change — it means `npm run bundle`
+   produced output that differs from what is currently staged/committed.
+2. Run `git diff --stat dist/` to verify the changes look reasonable (e.g.,
+   only `dist/index.js` and `dist/index.js.map` changed, size delta is plausible).
+3. If the diff is what you expect: `git add dist/` and include it in the commit.
+4. If the diff is unexpected or confusing: investigate **why** (e.g., did
+   `npm run format` inside `bundle` reformat a source file? did a dependency
+   change?). Re-run `npm run ci && npm run check:dist` after resolving.
+5. **Never** bypass `npm run bundle` with direct tool invocations (e.g., running
+   `npx esbuild` manually) — the bundle script includes formatting and other
+   steps that must run together.
 
 Never commit with a stale dist. Never run only `npm run ci` without also running
 `npm run check:dist` before committing — `npm run ci` does not include bundling.
 
-**Do not substitute ad-hoc checks**: Running `tsc --noEmit`, `eslint`, or any
-individual tool directly is **not** a substitute for `npm run ci && npm run
-check:dist`. These partial checks do not rebuild `dist/` and will allow a stale
-bundle to be committed. The full two-command sequence is the only accepted
+**Do not substitute ad-hoc commands**: Running `tsc --noEmit`, `eslint`, `npx
+esbuild`, or any individual tool directly is **not** a substitute for `npm run ci
+&& npm run check:dist`. These partial or direct invocations do not run the full
+pipeline and will produce incorrect results. When a script produces an unexpected
+outcome, the correct response is to **investigate the discrepancy** (check diffs,
+re-read error messages, inspect intermediate state) — never to bypass the script
+with a direct tool invocation. The full two-command sequence is the only accepted
 pre-commit verification.
 
 ---
@@ -616,10 +625,64 @@ the wrong tool via `assertCorrectToolName()` in `tests/helpers/fixture-loader.ts
 - **After adding or modifying any source code, run `npm run ci` and verify all checks
   pass.** `npm run ci` runs lint, typecheck, full coverage (unit + integration combined),
   and integration-only coverage in sequence. If coverage drops below thresholds, add
-  tests until thresholds are satisfied before committing. If snapshots need updating,
-  run `npx vitest run -u` first, then re-run `npm run ci`.
+  tests until thresholds are satisfied before committing.
+- **Snapshot updates require examination.** If snapshots need updating, run
+  `npx vitest run -u`, then review the snapshot diffs (`git diff` on `.snap` files)
+  before re-running `npm run ci`. Do not blindly accept snapshot updates — verify:
+  - The changed output matches your intent (new behavior appears, old behavior is gone)
+  - No unrelated snapshots changed in surprising ways
+  - The change appears in **integration** test snapshots, not only unit test ones
 - Use the `/add-fixture-workspace` skill to add fixture workspaces.
 - Use the `/generate-fixtures` skill to regenerate fixture JSON files.
+
+### Change Validation Checklist
+
+After any code change to a module exercisable by integration tests (i.e., not in
+the integration coverage exclusion list), complete these steps before committing:
+
+1. **Verify fixture coverage of changed code paths** — identify the specific
+   conditions your change handles (e.g., "large attribute with `before=null`")
+   and confirm at least one integration fixture exercises that path. Check by:
+   - Searching integration snapshot diffs for output produced by your new code
+   - Grepping fixture `show-plan.stdout` files for the structural pattern
+   - If no fixture covers the path: add coverage (see step 2)
+
+2. **Ensure real-world scenarios are represented in fixtures** — when a change
+   is motivated by a real-world report, the scenario that triggered it must be
+   exercisable by integration tests. Prefer (in order):
+   - Adding attributes or resources to an **existing** fixture workspace that
+     already exercises related behavior (e.g., add a large attribute to a
+     resource in a fixture that already tests attribute rendering)
+   - Increasing complexity of existing fixture resources (e.g., adding a nested
+     block that was previously absent)
+   - Adding a new stage to an existing fixture workspace
+   - Creating a new fixture workspace (last resort — only when the scenario
+     requires a fundamentally different provider or resource type)
+
+3. **Confirm integration coverage does not decrease** — run
+   `npm run test:integration:coverage` and compare branch coverage to main.
+   If coverage decreased, add fixture complexity or new fixture stages until
+   it recovers.
+
+### Fixture Design Guidelines
+
+**Use tfcoremock for producing changes.** The `hashicorp/tfcoremock` provider
+(with `use_only_state = true`) is the preferred way to create fixture workspaces
+that exercise plan/apply behavior. It runs without cloud credentials, produces
+deterministic plans, and allows custom resource schemas via
+`dynamic_resources.json`. Only use real providers (e.g., `hashicorp/local`,
+`hashicorp/null`) when the specific behavior being tested cannot be replicated
+with tfcoremock.
+
+**Every fixture must document its purpose.** Each `main.tf` file must include a
+header comment block that describes:
+
+- What rendering/builder behavior the fixture exercises
+- Why it was created (what real-world scenario or code path it covers)
+- What each stage does and what transition it tests
+
+This documentation ensures fixtures remain understandable and prevents duplicate
+fixtures from being created for the same scenario.
 
 ### Integration Test Rule (non-negotiable)
 
