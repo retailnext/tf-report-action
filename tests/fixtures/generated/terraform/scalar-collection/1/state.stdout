@@ -1,0 +1,80 @@
+{
+  "version": 4,
+  "terraform_version": "1.14.9",
+  "serial": 3,
+  "lineage": "0d500429-18e6-d5b2-00cf-7ddccbe00fa4",
+  "outputs": {},
+  "resources": [
+    {
+      "mode": "managed",
+      "type": "tfcoremock_iam_role",
+      "name": "ops",
+      "provider": "provider[\"registry.terraform.io/hashicorp/tfcoremock\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "description": "Read-only access for cloud operations",
+            "id": "59ad72fa-a623-8ea2-7e91-3de168ddb3b8",
+            "labels": [
+              "app:cloud-ops",
+              "cost-center:engineering",
+              "owner:platform-team",
+              "region:us-central1"
+            ],
+            "name": "cloud-ops-reader",
+            "ordered_rules": [
+              "allow 10.0.0.0/8",
+              "deny 192.168.1.0/24",
+              "allow 172.16.0.0/12",
+              "allow 192.168.0.0/16",
+              "deny all"
+            ],
+            "permissions": [
+              "compute.addresses.get",
+              "compute.addresses.list",
+              "compute.disks.get",
+              "compute.disks.list",
+              "compute.firewalls.get",
+              "compute.firewalls.list",
+              "compute.instances.get",
+              "compute.instances.getEffectiveFirewalls",
+              "compute.instances.getIamPolicy",
+              "compute.instances.list",
+              "compute.instances.listReferrers",
+              "compute.networks.get",
+              "compute.networks.list",
+              "compute.subnetworks.get",
+              "compute.subnetworks.list",
+              "container.clusters.get",
+              "container.clusters.list",
+              "dns.managedZones.get",
+              "dns.managedZones.list",
+              "monitoring.alertPolicies.get",
+              "monitoring.alertPolicies.list",
+              "monitoring.dashboards.get",
+              "monitoring.dashboards.list"
+            ],
+            "tags": [
+              "environment:production",
+              "managed-by:terraform",
+              "team:platform",
+              "tier:core"
+            ]
+          },
+          "sensitive_attributes": [
+            [
+              {
+                "type": "get_attr",
+                "value": "tags"
+              }
+            ]
+          ],
+          "identity_schema_version": 0
+        }
+      ]
+    }
+  ],
+  "check_results": null
+}
+

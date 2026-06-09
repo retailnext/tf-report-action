@@ -965,6 +965,7 @@ var VALUE_NOT_IN_PLAN = "(value not in plan)";
 
 // src/builder/attributes.ts
 var LARGE_LINE_THRESHOLD = 3;
+var COLLECTION_MIN_ELEMENTS = 4;
 function shadowToMap(shadow) {
   if (shadow === void 0) return /* @__PURE__ */ new Map();
   if (typeof shadow === "boolean") {
@@ -993,9 +994,105 @@ function isLargeValue(value) {
   }
   return false;
 }
+function isFlatScalarArray(value) {
+  if (!Array.isArray(value)) return false;
+  if (value.length < COLLECTION_MIN_ELEMENTS) return false;
+  for (const elem of value) {
+    if (elem === null || typeof elem === "object") return false;
+  }
+  return true;
+}
+function getAttributeShadow(shadow, key) {
+  if (shadow === void 0) return void 0;
+  if (shadow === true) return true;
+  if (shadow === false) return void 0;
+  if (Array.isArray(shadow)) return void 0;
+  const val = shadow[key];
+  return val;
+}
+function isCollectionShadowSimple(shadow) {
+  if (shadow === void 0 || shadow === false) return true;
+  if (shadow === true) return true;
+  if (Array.isArray(shadow)) {
+    return shadow.every((el) => el === false);
+  }
+  return false;
+}
+function buildCollectionAttributeChange(key, beforeArr, afterArr, beforeSensitiveShadow, afterSensitiveShadow, afterUnknownShadow) {
+  const sensitive = beforeSensitiveShadow === true || afterSensitiveShadow === true;
+  const knownAfterApply = afterUnknownShadow === true;
+  let beforeVal;
+  let afterVal;
+  if (sensitive) {
+    beforeVal = beforeArr != null ? SENSITIVE_MASK : null;
+    afterVal = afterArr != null || knownAfterApply ? SENSITIVE_MASK : null;
+  } else if (knownAfterApply) {
+    beforeVal = Array.isArray(beforeArr) ? joinElements(beforeArr) : null;
+    afterVal = KNOWN_AFTER_APPLY;
+  } else {
+    beforeVal = Array.isArray(beforeArr) ? joinElements(beforeArr) : null;
+    afterVal = Array.isArray(afterArr) ? joinElements(afterArr) : null;
+  }
+  return {
+    name: key,
+    before: beforeVal,
+    after: afterVal,
+    isSensitive: sensitive,
+    isLarge: true,
+    isKnownAfterApply: knownAfterApply
+  };
+}
+function joinElements(arr) {
+  return arr.map((el) => String(el)).join("\n");
+}
 function buildAttributeChanges(change, options) {
   const before = change.before ?? null;
   const after = change.after ?? null;
+  const collectionKeys = /* @__PURE__ */ new Set();
+  const result = [];
+  if (before !== null || after !== null) {
+    const beforeObj = before !== null && typeof before === "object" && !Array.isArray(before) ? before : null;
+    const afterObj = after !== null && typeof after === "object" && !Array.isArray(after) ? after : null;
+    const candidateKeys = /* @__PURE__ */ new Set();
+    if (beforeObj) {
+      for (const k of Object.keys(beforeObj)) {
+        if (isFlatScalarArray(beforeObj[k])) candidateKeys.add(k);
+      }
+    }
+    if (afterObj) {
+      for (const k of Object.keys(afterObj)) {
+        if (isFlatScalarArray(afterObj[k])) candidateKeys.add(k);
+      }
+    }
+    for (const key of candidateKeys) {
+      const bVal = beforeObj?.[key] ?? null;
+      const aVal = afterObj?.[key] ?? null;
+      if (bVal !== null && !Array.isArray(bVal)) continue;
+      if (aVal !== null && !Array.isArray(aVal)) continue;
+      if (Array.isArray(bVal) && !isAllScalars(bVal)) continue;
+      if (Array.isArray(aVal) && !isAllScalars(aVal)) continue;
+      const bSensitive = getAttributeShadow(change.before_sensitive, key);
+      const aSensitive = getAttributeShadow(change.after_sensitive, key);
+      const aUnknown = getAttributeShadow(change.after_unknown, key);
+      if (!isCollectionShadowSimple(bSensitive)) continue;
+      if (!isCollectionShadowSimple(aSensitive)) continue;
+      if (!isCollectionShadowSimple(aUnknown)) continue;
+      const attrChange = buildCollectionAttributeChange(
+        key,
+        bVal,
+        aVal,
+        bSensitive,
+        aSensitive,
+        aUnknown
+      );
+      if (!options.showUnchangedAttributes && attrChange.before === attrChange.after && !attrChange.isKnownAfterApply && !attrChange.isSensitive) {
+        collectionKeys.add(key);
+        continue;
+      }
+      collectionKeys.add(key);
+      result.push(attrChange);
+    }
+  }
   const beforeSensitiveMap = shadowToMap(change.before_sensitive);
   const afterSensitiveMap = shadowToMap(change.after_sensitive);
   const unknownMap = shadowToMap(change.after_unknown);
@@ -1008,8 +1105,8 @@ function buildAttributeChanges(change, options) {
   for (const [k, v] of unknownMap) {
     if (k !== "" && v === "true") flatKeys.add(k);
   }
-  const result = [];
   for (const key of flatKeys) {
+    if (belongsToCollection(key, collectionKeys)) continue;
     const sensitive = isSensitive(key, beforeSensitiveMap, afterSensitiveMap);
     let beforeVal;
     let afterVal;
@@ -1041,6 +1138,19 @@ function buildAttributeChanges(change, options) {
   }
   result.sort((a, b) => a.name.localeCompare(b.name));
   return result;
+}
+function isAllScalars(arr) {
+  for (const elem of arr) {
+    if (elem === null || typeof elem === "object") return false;
+  }
+  return true;
+}
+function belongsToCollection(flatKey, collectionKeys) {
+  for (const ck of collectionKeys) {
+    if (flatKey === ck) return true;
+    if (flatKey.startsWith(`${ck}[`)) return true;
+  }
+  return false;
 }
 
 // src/drift-filter/rules/google-artifact-registry-repository.ts

@@ -1,0 +1,43 @@
+{
+  "tfcoremock_iam_role": {
+    "attributes": {
+      "name": {
+        "type": "string",
+        "required": true
+      },
+      "description": {
+        "type": "string",
+        "optional": true
+      },
+      "permissions": {
+        "type": "set",
+        "set": {
+          "type": "string"
+        },
+        "optional": true
+      },
+      "ordered_rules": {
+        "type": "list",
+        "list": {
+          "type": "string"
+        },
+        "optional": true
+      },
+      "tags": {
+        "type": "set",
+        "set": {
+          "type": "string"
+        },
+        "optional": true,
+        "sensitive": true
+      },
+      "labels": {
+        "type": "set",
+        "set": {
+          "type": "string"
+        },
+        "optional": true
+      }
+    }
+  }
+}

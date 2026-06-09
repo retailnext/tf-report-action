@@ -1,5 +1,8 @@
 import { describe, it, expect } from "vitest";
-import { buildAttributeChanges } from "../../../src/builder/attributes.js";
+import {
+  buildAttributeChanges,
+  isFlatScalarArray,
+} from "../../../src/builder/attributes.js";
 import type { Change } from "../../../src/tfjson/plan.js";
 
 function makeChange(overrides: Partial<Change> = {}): Change {
@@ -169,5 +172,290 @@ describe("buildAttributeChanges", () => {
     expect(attr).toBeDefined();
     expect(attr!.before).toBe("staging");
     expect(attr!.after).toBe("prod");
+  });
+});
+
+describe("isFlatScalarArray", () => {
+  it("returns true for array of 4+ strings", () => {
+    expect(isFlatScalarArray(["a", "b", "c", "d"])).toBe(true);
+  });
+
+  it("returns true for array of numbers", () => {
+    expect(isFlatScalarArray([1, 2, 3, 4])).toBe(true);
+  });
+
+  it("returns true for array of booleans", () => {
+    expect(isFlatScalarArray([true, false, true, false])).toBe(true);
+  });
+
+  it("returns true for mixed scalar types", () => {
+    expect(isFlatScalarArray(["a", 1, true, "b"])).toBe(true);
+  });
+
+  it("returns false for small arrays (< 4 elements)", () => {
+    expect(isFlatScalarArray(["a", "b", "c"])).toBe(false);
+  });
+
+  it("returns false for arrays with null elements", () => {
+    expect(isFlatScalarArray(["a", null, "c", "d"])).toBe(false);
+  });
+
+  it("returns false for arrays with object elements", () => {
+    expect(isFlatScalarArray(["a", { x: 1 }, "c", "d"])).toBe(false);
+  });
+
+  it("returns false for arrays with nested arrays", () => {
+    expect(isFlatScalarArray(["a", ["b"], "c", "d"])).toBe(false);
+  });
+
+  it("returns false for non-array values", () => {
+    expect(isFlatScalarArray("hello")).toBe(false);
+    expect(isFlatScalarArray(42)).toBe(false);
+    expect(isFlatScalarArray(null)).toBe(false);
+    expect(isFlatScalarArray({ a: 1 })).toBe(false);
+  });
+
+  it("returns false for empty array", () => {
+    expect(isFlatScalarArray([])).toBe(false);
+  });
+});
+
+describe("buildAttributeChanges - collection-aware rendering", () => {
+  it("renders a large set (sorted array of strings) as a single large attribute", () => {
+    const perms = [
+      "compute.instances.get",
+      "compute.instances.list",
+      "compute.networks.get",
+      "iam.roles.list",
+      "storage.buckets.get",
+    ];
+    const newPerms = [
+      "compute.instances.get",
+      "compute.instances.list",
+      "compute.instances.setMetadata",
+      "compute.networks.get",
+      "iam.roles.list",
+    ];
+    const result = buildAttributeChanges(
+      makeChange({
+        before: { permissions: perms },
+        after: { permissions: newPerms },
+      }),
+      {},
+    );
+    const attr = result.find((a) => a.name === "permissions");
+    expect(attr).toBeDefined();
+    expect(attr!.isLarge).toBe(true);
+    expect(attr!.before).toBe(perms.join("\n"));
+    expect(attr!.after).toBe(newPerms.join("\n"));
+    expect(attr!.isSensitive).toBe(false);
+    expect(attr!.isKnownAfterApply).toBe(false);
+    // No individual permissions[N] entries should exist
+    const indexed = result.filter((a) => a.name.startsWith("permissions["));
+    expect(indexed).toHaveLength(0);
+  });
+
+  it("preserves original order for unsorted lists", () => {
+    const before = [
+      "deny 10.0.0.0/8",
+      "allow 192.168.0.0/16",
+      "deny 172.16.0.0/12",
+      "allow all",
+    ];
+    const after = [
+      "allow 192.168.0.0/16",
+      "deny 10.0.0.0/8",
+      "deny 172.16.0.0/12",
+      "allow all",
+    ];
+    const result = buildAttributeChanges(
+      makeChange({ before: { rules: before }, after: { rules: after } }),
+      {},
+    );
+    const attr = result.find((a) => a.name === "rules");
+    expect(attr).toBeDefined();
+    expect(attr!.isLarge).toBe(true);
+    expect(attr!.before).toBe(before.join("\n"));
+    expect(attr!.after).toBe(after.join("\n"));
+  });
+
+  it("does not use collection rendering for small arrays (< 4 elements)", () => {
+    const result = buildAttributeChanges(
+      makeChange({
+        before: { tags: ["a", "b", "c"] },
+        after: { tags: ["a", "b", "d"] },
+      }),
+      {},
+    );
+    // Small array should be flattened into individual entries
+    const indexed = result.filter((a) => a.name.startsWith("tags["));
+    expect(indexed.length).toBeGreaterThan(0);
+    const collection = result.find((a) => a.name === "tags");
+    expect(collection).toBeUndefined();
+  });
+
+  it("falls back to flattened rendering for per-element sensitivity", () => {
+    const perms = ["a", "b", "c", "d", "e"];
+    const result = buildAttributeChanges(
+      makeChange({
+        before: { items: perms },
+        after: { items: [...perms, "f"] },
+        before_sensitive: { items: [false, true, false, false, false] },
+      }),
+      {},
+    );
+    // Per-element sensitivity forces fallback to flattened
+    const collection = result.find((a) => a.name === "items");
+    expect(collection).toBeUndefined();
+    const indexed = result.filter((a) => a.name.startsWith("items["));
+    expect(indexed.length).toBeGreaterThan(0);
+  });
+
+  it("handles whole-attribute sensitivity for collections", () => {
+    const perms = ["perm1", "perm2", "perm3", "perm4"];
+    const result = buildAttributeChanges(
+      makeChange({
+        before: { secrets: perms },
+        after: { secrets: [...perms, "perm5"] },
+        before_sensitive: { secrets: true },
+        after_sensitive: { secrets: true },
+      }),
+      {},
+    );
+    const attr = result.find((a) => a.name === "secrets");
+    expect(attr).toBeDefined();
+    expect(attr!.isSensitive).toBe(true);
+    expect(attr!.before).toBe("(sensitive)");
+    expect(attr!.after).toBe("(sensitive)");
+  });
+
+  it("handles collection where before is null (resource creation)", () => {
+    const perms = ["perm1", "perm2", "perm3", "perm4"];
+    const result = buildAttributeChanges(
+      makeChange({
+        before: null,
+        after: { permissions: perms },
+      }),
+      {},
+    );
+    const attr = result.find((a) => a.name === "permissions");
+    expect(attr).toBeDefined();
+    expect(attr!.isLarge).toBe(true);
+    expect(attr!.before).toBe(null);
+    expect(attr!.after).toBe(perms.join("\n"));
+  });
+
+  it("handles collection where after is null (resource deletion)", () => {
+    const perms = ["perm1", "perm2", "perm3", "perm4"];
+    const result = buildAttributeChanges(
+      makeChange({
+        before: { permissions: perms },
+        after: null,
+      }),
+      {},
+    );
+    const attr = result.find((a) => a.name === "permissions");
+    expect(attr).toBeDefined();
+    expect(attr!.isLarge).toBe(true);
+    expect(attr!.before).toBe(perms.join("\n"));
+    expect(attr!.after).toBe(null);
+  });
+
+  it("handles collection where after_unknown is true for the attribute", () => {
+    const perms = ["perm1", "perm2", "perm3", "perm4"];
+    const result = buildAttributeChanges(
+      makeChange({
+        before: { permissions: perms },
+        after: null,
+        after_unknown: { permissions: true },
+      }),
+      {},
+    );
+    const attr = result.find((a) => a.name === "permissions");
+    expect(attr).toBeDefined();
+    expect(attr!.isKnownAfterApply).toBe(true);
+    expect(attr!.after).toBe("(known after apply)");
+  });
+
+  it("skips unchanged collection when showUnchangedAttributes is false", () => {
+    const perms = ["perm1", "perm2", "perm3", "perm4"];
+    const result = buildAttributeChanges(
+      makeChange({
+        before: { permissions: perms },
+        after: { permissions: perms },
+      }),
+      {},
+    );
+    const attr = result.find((a) => a.name === "permissions");
+    expect(attr).toBeUndefined();
+    // Also no individual entries
+    const indexed = result.filter((a) => a.name.startsWith("permissions["));
+    expect(indexed).toHaveLength(0);
+  });
+
+  it("includes unchanged collection when showUnchangedAttributes is true", () => {
+    const perms = ["perm1", "perm2", "perm3", "perm4"];
+    const result = buildAttributeChanges(
+      makeChange({
+        before: { permissions: perms },
+        after: { permissions: perms },
+      }),
+      { showUnchangedAttributes: true },
+    );
+    const attr = result.find((a) => a.name === "permissions");
+    expect(attr).toBeDefined();
+    expect(attr!.before).toBe(attr!.after);
+    expect(attr!.isLarge).toBe(true);
+  });
+
+  it("does not interfere with non-collection attributes on the same resource", () => {
+    const perms = ["perm1", "perm2", "perm3", "perm4"];
+    const result = buildAttributeChanges(
+      makeChange({
+        before: { name: "old-role", permissions: perms },
+        after: { name: "new-role", permissions: [...perms, "perm5"] },
+      }),
+      {},
+    );
+    const nameAttr = result.find((a) => a.name === "name");
+    expect(nameAttr).toBeDefined();
+    expect(nameAttr!.before).toBe("old-role");
+    expect(nameAttr!.after).toBe("new-role");
+    expect(nameAttr!.isLarge).toBe(false);
+
+    const permAttr = result.find((a) => a.name === "permissions");
+    expect(permAttr).toBeDefined();
+    expect(permAttr!.isLarge).toBe(true);
+  });
+
+  it("falls back to flattened for per-element after_unknown", () => {
+    const perms = ["perm1", "perm2", "perm3", "perm4"];
+    const result = buildAttributeChanges(
+      makeChange({
+        before: { items: perms },
+        after: null,
+        after_unknown: { items: [true, false, true, false] },
+      }),
+      {},
+    );
+    // Per-element unknown forces fallback
+    const collection = result.find((a) => a.name === "items");
+    expect(collection).toBeUndefined();
+    const indexed = result.filter((a) => a.name.startsWith("items["));
+    expect(indexed.length).toBeGreaterThan(0);
+  });
+
+  it("renders numbers as strings in collection output", () => {
+    const result = buildAttributeChanges(
+      makeChange({
+        before: { ports: [80, 443, 8080, 8443] },
+        after: { ports: [80, 443, 8080, 9090] },
+      }),
+      {},
+    );
+    const attr = result.find((a) => a.name === "ports");
+    expect(attr).toBeDefined();
+    expect(attr!.before).toBe("80\n443\n8080\n8443");
+    expect(attr!.after).toBe("80\n443\n8080\n9090");
   });
 });

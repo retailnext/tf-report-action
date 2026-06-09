@@ -1523,6 +1523,66 @@ local_file.managed
 "
 `;
 
+exports[`reportFromSteps integration — apply-no-show fixtures > terraform/scalar-collection/0/apply-no-show > renders without error and matches snapshot 1`] = `
+"## ✅ Apply: 1 added
+
+> ⚠️ **Warning:** This report was generated without \`terraform show -json <tfplan>\` output. Resource attribute details are not available.
+
+## Apply Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Added | tfcoremock\\_iam\\_role | 1 |
+|  | **Added** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>➕ <strong>tfcoremock_iam_role</strong> ops</summary>
+
+\`\`\`
+tfcoremock_iam_role.ops
+\`\`\`
+
+
+
+</details>
+
+"
+`;
+
+exports[`reportFromSteps integration — apply-no-show fixtures > terraform/scalar-collection/1/apply-no-show > renders without error and matches snapshot 1`] = `
+"## ✅ Apply: 1 changed
+
+> ⚠️ **Warning:** This report was generated without \`terraform show -json <tfplan>\` output. Resource attribute details are not available.
+
+## Apply Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| 🔧 Changed | tfcoremock\\_iam\\_role | 1 |
+|  | **Changed** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>🔧 <strong>tfcoremock_iam_role</strong> ops</summary>
+
+\`\`\`
+tfcoremock_iam_role.ops
+\`\`\`
+
+
+
+</details>
+
+"
+`;
+
 exports[`reportFromSteps integration — apply-no-show fixtures > terraform/sensitive-values/0/apply-no-show > renders without error and matches snapshot 1`] = `
 "## ✅ Apply: 1 added
 
@@ -3327,6 +3387,66 @@ local_file.managed
 "
 `;
 
+exports[`reportFromSteps integration — apply-no-show fixtures > tofu/scalar-collection/0/apply-no-show > renders without error and matches snapshot 1`] = `
+"## ✅ Apply: 1 added
+
+> ⚠️ **Warning:** This report was generated without \`tofu show -json <tfplan>\` output. Resource attribute details are not available.
+
+## Apply Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Added | tfcoremock\\_iam\\_role | 1 |
+|  | **Added** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>➕ <strong>tfcoremock_iam_role</strong> ops</summary>
+
+\`\`\`
+tfcoremock_iam_role.ops
+\`\`\`
+
+
+
+</details>
+
+"
+`;
+
+exports[`reportFromSteps integration — apply-no-show fixtures > tofu/scalar-collection/1/apply-no-show > renders without error and matches snapshot 1`] = `
+"## ✅ Apply: 1 changed
+
+> ⚠️ **Warning:** This report was generated without \`tofu show -json <tfplan>\` output. Resource attribute details are not available.
+
+## Apply Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| 🔧 Changed | tfcoremock\\_iam\\_role | 1 |
+|  | **Changed** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>🔧 <strong>tfcoremock_iam_role</strong> ops</summary>
+
+\`\`\`
+tfcoremock_iam_role.ops
+\`\`\`
+
+
+
+</details>
+
+"
+`;
+
 exports[`reportFromSteps integration — apply-no-show fixtures > tofu/sensitive-values/0/apply-no-show > renders without error and matches snapshot 1`] = `
 "## ✅ Apply: 1 added
 
@@ -4945,6 +5065,66 @@ local_file.managed
 "
 `;
 
+exports[`reportFromSteps integration — apply-only fixtures > terraform/scalar-collection/0/apply-only > renders without error and matches snapshot 1`] = `
+"## ✅ Apply: 1 added
+
+> ⚠️ **Warning:** This report was generated without \`terraform show -json <tfplan>\` output. Resource attribute details are not available.
+
+## Apply Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Added | tfcoremock\\_iam\\_role | 1 |
+|  | **Added** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>➕ <strong>tfcoremock_iam_role</strong> ops</summary>
+
+\`\`\`
+tfcoremock_iam_role.ops
+\`\`\`
+
+
+
+</details>
+
+"
+`;
+
+exports[`reportFromSteps integration — apply-only fixtures > terraform/scalar-collection/1/apply-only > renders without error and matches snapshot 1`] = `
+"## ✅ Apply: 1 changed
+
+> ⚠️ **Warning:** This report was generated without \`terraform show -json <tfplan>\` output. Resource attribute details are not available.
+
+## Apply Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| 🔧 Changed | tfcoremock\\_iam\\_role | 1 |
+|  | **Changed** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>🔧 <strong>tfcoremock_iam_role</strong> ops</summary>
+
+\`\`\`
+tfcoremock_iam_role.ops
+\`\`\`
+
+
+
+</details>
+
+"
+`;
+
 exports[`reportFromSteps integration — apply-only fixtures > terraform/sensitive-values/0/apply-only > renders without error and matches snapshot 1`] = `
 "## ✅ Apply: 1 added
 
@@ -6503,6 +6683,66 @@ exports[`reportFromSteps integration — apply-only fixtures > tofu/null-lifecyc
 
 \`\`\`
 local_file.managed
+\`\`\`
+
+
+
+</details>
+
+"
+`;
+
+exports[`reportFromSteps integration — apply-only fixtures > tofu/scalar-collection/0/apply-only > renders without error and matches snapshot 1`] = `
+"## ✅ Apply: 1 added
+
+> ⚠️ **Warning:** This report was generated without \`tofu show -json <tfplan>\` output. Resource attribute details are not available.
+
+## Apply Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Added | tfcoremock\\_iam\\_role | 1 |
+|  | **Added** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>➕ <strong>tfcoremock_iam_role</strong> ops</summary>
+
+\`\`\`
+tfcoremock_iam_role.ops
+\`\`\`
+
+
+
+</details>
+
+"
+`;
+
+exports[`reportFromSteps integration — apply-only fixtures > tofu/scalar-collection/1/apply-only > renders without error and matches snapshot 1`] = `
+"## ✅ Apply: 1 changed
+
+> ⚠️ **Warning:** This report was generated without \`tofu show -json <tfplan>\` output. Resource attribute details are not available.
+
+## Apply Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| 🔧 Changed | tfcoremock\\_iam\\_role | 1 |
+|  | **Changed** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>🔧 <strong>tfcoremock_iam_role</strong> ops</summary>
+
+\`\`\`
+tfcoremock_iam_role.ops
 \`\`\`
 
 
@@ -10991,6 +11231,404 @@ local_file.managed
 | filename | <code></code> | <code><ins style="background:#dfd">./managed.txt</ins></code> |
 | id | <code></code> | <code><ins style="background:#dfd">cb8176dbfb48c249d883ead398fda6590e06adba</ins></code> |
 | sensitive\\_content | <code></code> | <code>(sensitive)</code> |
+
+
+
+</details>
+
+"
+`;
+
+exports[`reportFromSteps integration — generated fixtures > terraform/scalar-collection/0 > renders with workspace and matches snapshot 1`] = `
+"<!-- tf-report-action:"test-workspace" -->
+## ✅ \`test-workspace\` Apply: 1 added
+
+## Apply Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Added | tfcoremock\\_iam\\_role | 1 |
+|  | **Added** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>➕ <strong>tfcoremock_iam_role</strong> ops</summary>
+
+\`\`\`
+tfcoremock_iam_role.ops
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| description | <code></code> | <code><ins style="background:#dfd">Read-only access for cloud operations</ins></code> |
+| id | <code></code> | <code><ins style="background:#dfd">59ad72fa-a623-8ea2-7e91-3de168ddb3b8</ins></code> |
+| name | <code></code> | <code><ins style="background:#dfd">cloud-ops-reader</ins></code> |
+
+<details>
+<summary>labels (large value; +4, -0)</summary>
+
+\`\`\`diff
++ app:cloud-ops
++ cost-center:engineering
++ owner:platform-team
++ region:us-central1
+\`\`\`
+
+
+
+</details>
+
+<details>
+<summary>ordered_rules (large value; +5, -0)</summary>
+
+\`\`\`diff
++ allow 10.0.0.0/8
++ allow 172.16.0.0/12
++ deny 192.168.1.0/24
++ allow 192.168.0.0/16
++ deny all
+\`\`\`
+
+
+
+</details>
+
+<details>
+<summary>permissions (large value; +22, -0)</summary>
+
+\`\`\`diff
++ compute.addresses.get
++ compute.addresses.list
++ compute.disks.get
++ compute.disks.list
++ compute.firewalls.get
++ compute.firewalls.list
++ compute.instances.get
++ compute.instances.list
++ compute.networks.get
++ compute.networks.list
++ compute.subnetworks.get
++ compute.subnetworks.list
++ container.clusters.get
++ container.clusters.list
++ dns.managedZones.get
++ dns.managedZones.list
++ iam.roles.get
++ iam.roles.list
++ monitoring.alertPolicies.get
++ monitoring.alertPolicies.list
++ storage.buckets.get
++ storage.buckets.list
+\`\`\`
+
+
+
+</details>
+
+<details>
+<summary>tags (large value; +1, -0)</summary>
+
+\`\`\`diff
++ (sensitive)
+\`\`\`
+
+
+
+</details>
+
+
+
+</details>
+
+"
+`;
+
+exports[`reportFromSteps integration — generated fixtures > terraform/scalar-collection/0 > renders without error and matches snapshot [default] 1`] = `
+"## ✅ Apply: 1 added
+
+## Apply Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Added | tfcoremock\\_iam\\_role | 1 |
+|  | **Added** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>➕ <strong>tfcoremock_iam_role</strong> ops</summary>
+
+\`\`\`
+tfcoremock_iam_role.ops
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| description | <code></code> | <code><ins style="background:#dfd">Read-only access for cloud operations</ins></code> |
+| id | <code></code> | <code><ins style="background:#dfd">59ad72fa-a623-8ea2-7e91-3de168ddb3b8</ins></code> |
+| name | <code></code> | <code><ins style="background:#dfd">cloud-ops-reader</ins></code> |
+
+<details>
+<summary>labels (large value; +4, -0)</summary>
+
+\`\`\`diff
++ app:cloud-ops
++ cost-center:engineering
++ owner:platform-team
++ region:us-central1
+\`\`\`
+
+
+
+</details>
+
+<details>
+<summary>ordered_rules (large value; +5, -0)</summary>
+
+\`\`\`diff
++ allow 10.0.0.0/8
++ allow 172.16.0.0/12
++ deny 192.168.1.0/24
++ allow 192.168.0.0/16
++ deny all
+\`\`\`
+
+
+
+</details>
+
+<details>
+<summary>permissions (large value; +22, -0)</summary>
+
+\`\`\`diff
++ compute.addresses.get
++ compute.addresses.list
++ compute.disks.get
++ compute.disks.list
++ compute.firewalls.get
++ compute.firewalls.list
++ compute.instances.get
++ compute.instances.list
++ compute.networks.get
++ compute.networks.list
++ compute.subnetworks.get
++ compute.subnetworks.list
++ container.clusters.get
++ container.clusters.list
++ dns.managedZones.get
++ dns.managedZones.list
++ iam.roles.get
++ iam.roles.list
++ monitoring.alertPolicies.get
++ monitoring.alertPolicies.list
++ storage.buckets.get
++ storage.buckets.list
+\`\`\`
+
+
+
+</details>
+
+<details>
+<summary>tags (large value; +1, -0)</summary>
+
+\`\`\`diff
++ (sensitive)
+\`\`\`
+
+
+
+</details>
+
+
+
+</details>
+
+"
+`;
+
+exports[`reportFromSteps integration — generated fixtures > terraform/scalar-collection/1 > renders with workspace and matches snapshot 1`] = `
+"<!-- tf-report-action:"test-workspace" -->
+## ✅ \`test-workspace\` Apply: 1 changed
+
+## Apply Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| 🔧 Changed | tfcoremock\\_iam\\_role | 1 |
+|  | **Changed** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>🔧 <strong>tfcoremock_iam_role</strong> ops — changed: ordered_rules, permissions</summary>
+
+\`\`\`
+tfcoremock_iam_role.ops
+\`\`\`
+
+<details>
+<summary>ordered_rules (large value; +1, -1)</summary>
+
+\`\`\`diff
+  allow 10.0.0.0/8
++ deny 192.168.1.0/24
+  allow 172.16.0.0/12
+- deny 192.168.1.0/24
+  allow 192.168.0.0/16
+  deny all
+\`\`\`
+
+
+
+</details>
+
+<details>
+<summary>permissions (large value; +5, -4)</summary>
+
+\`\`\`diff
+  compute.addresses.get
+  compute.addresses.list
+  compute.disks.get
+  compute.disks.list
+  compute.firewalls.get
+  compute.firewalls.list
+  compute.instances.get
++ compute.instances.getEffectiveFirewalls
++ compute.instances.getIamPolicy
+  compute.instances.list
++ compute.instances.listReferrers
+  compute.networks.get
+  compute.networks.list
+  compute.subnetworks.get
+  compute.subnetworks.list
+  container.clusters.get
+  container.clusters.list
+  dns.managedZones.get
+  dns.managedZones.list
+- iam.roles.get
+- iam.roles.list
+  monitoring.alertPolicies.get
+  monitoring.alertPolicies.list
++ monitoring.dashboards.get
++ monitoring.dashboards.list
+- storage.buckets.get
+- storage.buckets.list
+\`\`\`
+
+
+
+</details>
+
+<details>
+<summary>tags (large value)</summary>
+
+\`\`\`diff
+  (sensitive)
+\`\`\`
+
+
+
+</details>
+
+
+
+</details>
+
+"
+`;
+
+exports[`reportFromSteps integration — generated fixtures > terraform/scalar-collection/1 > renders without error and matches snapshot [default] 1`] = `
+"## ✅ Apply: 1 changed
+
+## Apply Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| 🔧 Changed | tfcoremock\\_iam\\_role | 1 |
+|  | **Changed** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>🔧 <strong>tfcoremock_iam_role</strong> ops — changed: ordered_rules, permissions</summary>
+
+\`\`\`
+tfcoremock_iam_role.ops
+\`\`\`
+
+<details>
+<summary>ordered_rules (large value; +1, -1)</summary>
+
+\`\`\`diff
+  allow 10.0.0.0/8
++ deny 192.168.1.0/24
+  allow 172.16.0.0/12
+- deny 192.168.1.0/24
+  allow 192.168.0.0/16
+  deny all
+\`\`\`
+
+
+
+</details>
+
+<details>
+<summary>permissions (large value; +5, -4)</summary>
+
+\`\`\`diff
+  compute.addresses.get
+  compute.addresses.list
+  compute.disks.get
+  compute.disks.list
+  compute.firewalls.get
+  compute.firewalls.list
+  compute.instances.get
++ compute.instances.getEffectiveFirewalls
++ compute.instances.getIamPolicy
+  compute.instances.list
++ compute.instances.listReferrers
+  compute.networks.get
+  compute.networks.list
+  compute.subnetworks.get
+  compute.subnetworks.list
+  container.clusters.get
+  container.clusters.list
+  dns.managedZones.get
+  dns.managedZones.list
+- iam.roles.get
+- iam.roles.list
+  monitoring.alertPolicies.get
+  monitoring.alertPolicies.list
++ monitoring.dashboards.get
++ monitoring.dashboards.list
+- storage.buckets.get
+- storage.buckets.list
+\`\`\`
+
+
+
+</details>
+
+<details>
+<summary>tags (large value)</summary>
+
+\`\`\`diff
+  (sensitive)
+\`\`\`
+
+
+
+</details>
 
 
 
@@ -15996,6 +16634,404 @@ local_file.managed
 "
 `;
 
+exports[`reportFromSteps integration — generated fixtures > tofu/scalar-collection/0 > renders with workspace and matches snapshot 1`] = `
+"<!-- tf-report-action:"test-workspace" -->
+## ✅ \`test-workspace\` Apply: 1 added
+
+## Apply Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Added | tfcoremock\\_iam\\_role | 1 |
+|  | **Added** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>➕ <strong>tfcoremock_iam_role</strong> ops</summary>
+
+\`\`\`
+tfcoremock_iam_role.ops
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| description | <code></code> | <code><ins style="background:#dfd">Read-only access for cloud operations</ins></code> |
+| id | <code></code> | <code><ins style="background:#dfd">d6053906-c924-82af-9cf7-be70ff6080bd</ins></code> |
+| name | <code></code> | <code><ins style="background:#dfd">cloud-ops-reader</ins></code> |
+
+<details>
+<summary>labels (large value; +4, -0)</summary>
+
+\`\`\`diff
++ app:cloud-ops
++ cost-center:engineering
++ owner:platform-team
++ region:us-central1
+\`\`\`
+
+
+
+</details>
+
+<details>
+<summary>ordered_rules (large value; +5, -0)</summary>
+
+\`\`\`diff
++ allow 10.0.0.0/8
++ allow 172.16.0.0/12
++ deny 192.168.1.0/24
++ allow 192.168.0.0/16
++ deny all
+\`\`\`
+
+
+
+</details>
+
+<details>
+<summary>permissions (large value; +22, -0)</summary>
+
+\`\`\`diff
++ compute.addresses.get
++ compute.addresses.list
++ compute.disks.get
++ compute.disks.list
++ compute.firewalls.get
++ compute.firewalls.list
++ compute.instances.get
++ compute.instances.list
++ compute.networks.get
++ compute.networks.list
++ compute.subnetworks.get
++ compute.subnetworks.list
++ container.clusters.get
++ container.clusters.list
++ dns.managedZones.get
++ dns.managedZones.list
++ iam.roles.get
++ iam.roles.list
++ monitoring.alertPolicies.get
++ monitoring.alertPolicies.list
++ storage.buckets.get
++ storage.buckets.list
+\`\`\`
+
+
+
+</details>
+
+<details>
+<summary>tags (large value; +1, -0)</summary>
+
+\`\`\`diff
++ (sensitive)
+\`\`\`
+
+
+
+</details>
+
+
+
+</details>
+
+"
+`;
+
+exports[`reportFromSteps integration — generated fixtures > tofu/scalar-collection/0 > renders without error and matches snapshot [default] 1`] = `
+"## ✅ Apply: 1 added
+
+## Apply Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Added | tfcoremock\\_iam\\_role | 1 |
+|  | **Added** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>➕ <strong>tfcoremock_iam_role</strong> ops</summary>
+
+\`\`\`
+tfcoremock_iam_role.ops
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| description | <code></code> | <code><ins style="background:#dfd">Read-only access for cloud operations</ins></code> |
+| id | <code></code> | <code><ins style="background:#dfd">d6053906-c924-82af-9cf7-be70ff6080bd</ins></code> |
+| name | <code></code> | <code><ins style="background:#dfd">cloud-ops-reader</ins></code> |
+
+<details>
+<summary>labels (large value; +4, -0)</summary>
+
+\`\`\`diff
++ app:cloud-ops
++ cost-center:engineering
++ owner:platform-team
++ region:us-central1
+\`\`\`
+
+
+
+</details>
+
+<details>
+<summary>ordered_rules (large value; +5, -0)</summary>
+
+\`\`\`diff
++ allow 10.0.0.0/8
++ allow 172.16.0.0/12
++ deny 192.168.1.0/24
++ allow 192.168.0.0/16
++ deny all
+\`\`\`
+
+
+
+</details>
+
+<details>
+<summary>permissions (large value; +22, -0)</summary>
+
+\`\`\`diff
++ compute.addresses.get
++ compute.addresses.list
++ compute.disks.get
++ compute.disks.list
++ compute.firewalls.get
++ compute.firewalls.list
++ compute.instances.get
++ compute.instances.list
++ compute.networks.get
++ compute.networks.list
++ compute.subnetworks.get
++ compute.subnetworks.list
++ container.clusters.get
++ container.clusters.list
++ dns.managedZones.get
++ dns.managedZones.list
++ iam.roles.get
++ iam.roles.list
++ monitoring.alertPolicies.get
++ monitoring.alertPolicies.list
++ storage.buckets.get
++ storage.buckets.list
+\`\`\`
+
+
+
+</details>
+
+<details>
+<summary>tags (large value; +1, -0)</summary>
+
+\`\`\`diff
++ (sensitive)
+\`\`\`
+
+
+
+</details>
+
+
+
+</details>
+
+"
+`;
+
+exports[`reportFromSteps integration — generated fixtures > tofu/scalar-collection/1 > renders with workspace and matches snapshot 1`] = `
+"<!-- tf-report-action:"test-workspace" -->
+## ✅ \`test-workspace\` Apply: 1 changed
+
+## Apply Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| 🔧 Changed | tfcoremock\\_iam\\_role | 1 |
+|  | **Changed** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>🔧 <strong>tfcoremock_iam_role</strong> ops — changed: ordered_rules, permissions</summary>
+
+\`\`\`
+tfcoremock_iam_role.ops
+\`\`\`
+
+<details>
+<summary>ordered_rules (large value; +1, -1)</summary>
+
+\`\`\`diff
+  allow 10.0.0.0/8
++ deny 192.168.1.0/24
+  allow 172.16.0.0/12
+- deny 192.168.1.0/24
+  allow 192.168.0.0/16
+  deny all
+\`\`\`
+
+
+
+</details>
+
+<details>
+<summary>permissions (large value; +5, -4)</summary>
+
+\`\`\`diff
+  compute.addresses.get
+  compute.addresses.list
+  compute.disks.get
+  compute.disks.list
+  compute.firewalls.get
+  compute.firewalls.list
+  compute.instances.get
++ compute.instances.getEffectiveFirewalls
++ compute.instances.getIamPolicy
+  compute.instances.list
++ compute.instances.listReferrers
+  compute.networks.get
+  compute.networks.list
+  compute.subnetworks.get
+  compute.subnetworks.list
+  container.clusters.get
+  container.clusters.list
+  dns.managedZones.get
+  dns.managedZones.list
+- iam.roles.get
+- iam.roles.list
+  monitoring.alertPolicies.get
+  monitoring.alertPolicies.list
++ monitoring.dashboards.get
++ monitoring.dashboards.list
+- storage.buckets.get
+- storage.buckets.list
+\`\`\`
+
+
+
+</details>
+
+<details>
+<summary>tags (large value)</summary>
+
+\`\`\`diff
+  (sensitive)
+\`\`\`
+
+
+
+</details>
+
+
+
+</details>
+
+"
+`;
+
+exports[`reportFromSteps integration — generated fixtures > tofu/scalar-collection/1 > renders without error and matches snapshot [default] 1`] = `
+"## ✅ Apply: 1 changed
+
+## Apply Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| 🔧 Changed | tfcoremock\\_iam\\_role | 1 |
+|  | **Changed** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>🔧 <strong>tfcoremock_iam_role</strong> ops — changed: ordered_rules, permissions</summary>
+
+\`\`\`
+tfcoremock_iam_role.ops
+\`\`\`
+
+<details>
+<summary>ordered_rules (large value; +1, -1)</summary>
+
+\`\`\`diff
+  allow 10.0.0.0/8
++ deny 192.168.1.0/24
+  allow 172.16.0.0/12
+- deny 192.168.1.0/24
+  allow 192.168.0.0/16
+  deny all
+\`\`\`
+
+
+
+</details>
+
+<details>
+<summary>permissions (large value; +5, -4)</summary>
+
+\`\`\`diff
+  compute.addresses.get
+  compute.addresses.list
+  compute.disks.get
+  compute.disks.list
+  compute.firewalls.get
+  compute.firewalls.list
+  compute.instances.get
++ compute.instances.getEffectiveFirewalls
++ compute.instances.getIamPolicy
+  compute.instances.list
++ compute.instances.listReferrers
+  compute.networks.get
+  compute.networks.list
+  compute.subnetworks.get
+  compute.subnetworks.list
+  container.clusters.get
+  container.clusters.list
+  dns.managedZones.get
+  dns.managedZones.list
+- iam.roles.get
+- iam.roles.list
+  monitoring.alertPolicies.get
+  monitoring.alertPolicies.list
++ monitoring.dashboards.get
++ monitoring.dashboards.list
+- storage.buckets.get
+- storage.buckets.list
+\`\`\`
+
+
+
+</details>
+
+<details>
+<summary>tags (large value)</summary>
+
+\`\`\`diff
+  (sensitive)
+\`\`\`
+
+
+
+</details>
+
+
+
+</details>
+
+"
+`;
+
 exports[`reportFromSteps integration — generated fixtures > tofu/sensitive-values/0 > renders with workspace and matches snapshot 1`] = `
 "<!-- tf-report-action:"test-workspace" -->
 ## ✅ \`test-workspace\` Apply: 1 added
@@ -18156,6 +19192,66 @@ local_file.managed
 "
 `;
 
+exports[`reportFromSteps integration — no-show fixtures (Tier 3) > terraform/scalar-collection/0/no-show > renders without error and matches snapshot 1`] = `
+"## ✅ Plan: 1 to add
+
+> ⚠️ **Warning:** This report was generated without \`terraform show -json <tfplan>\` output. Resource attribute details are not available.
+
+## Plan Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Add | tfcoremock\\_iam\\_role | 1 |
+|  | **Add** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>➕ <strong>tfcoremock_iam_role</strong> ops</summary>
+
+\`\`\`
+tfcoremock_iam_role.ops
+\`\`\`
+
+
+
+</details>
+
+"
+`;
+
+exports[`reportFromSteps integration — no-show fixtures (Tier 3) > terraform/scalar-collection/1/no-show > renders without error and matches snapshot 1`] = `
+"## ✅ Plan: 1 to change
+
+> ⚠️ **Warning:** This report was generated without \`terraform show -json <tfplan>\` output. Resource attribute details are not available.
+
+## Plan Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| 🔧 Change | tfcoremock\\_iam\\_role | 1 |
+|  | **Change** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>🔧 <strong>tfcoremock_iam_role</strong> ops</summary>
+
+\`\`\`
+tfcoremock_iam_role.ops
+\`\`\`
+
+
+
+</details>
+
+"
+`;
+
 exports[`reportFromSteps integration — no-show fixtures (Tier 3) > terraform/sensitive-values/0/no-show > renders without error and matches snapshot 1`] = `
 "## ✅ Plan: 1 to add
 
@@ -19670,6 +20766,66 @@ local_file.managed
 
 \`\`\`
 local_file.managed
+\`\`\`
+
+
+
+</details>
+
+"
+`;
+
+exports[`reportFromSteps integration — no-show fixtures (Tier 3) > tofu/scalar-collection/0/no-show > renders without error and matches snapshot 1`] = `
+"## ✅ Plan: 1 to add
+
+> ⚠️ **Warning:** This report was generated without \`tofu show -json <tfplan>\` output. Resource attribute details are not available.
+
+## Plan Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Add | tfcoremock\\_iam\\_role | 1 |
+|  | **Add** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>➕ <strong>tfcoremock_iam_role</strong> ops</summary>
+
+\`\`\`
+tfcoremock_iam_role.ops
+\`\`\`
+
+
+
+</details>
+
+"
+`;
+
+exports[`reportFromSteps integration — no-show fixtures (Tier 3) > tofu/scalar-collection/1/no-show > renders without error and matches snapshot 1`] = `
+"## ✅ Plan: 1 to change
+
+> ⚠️ **Warning:** This report was generated without \`tofu show -json <tfplan>\` output. Resource attribute details are not available.
+
+## Plan Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| 🔧 Change | tfcoremock\\_iam\\_role | 1 |
+|  | **Change** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>🔧 <strong>tfcoremock_iam_role</strong> ops</summary>
+
+\`\`\`
+tfcoremock_iam_role.ops
 \`\`\`
 
 
@@ -21629,6 +22785,204 @@ local_file.managed
 | filename | <code></code> | <code><ins style="background:#dfd">./managed.txt</ins></code> |
 | id | <code></code> | <code>(known after apply)</code> |
 | sensitive\\_content | <code></code> | <code>(sensitive)</code> |
+
+
+
+</details>
+
+"
+`;
+
+exports[`reportFromSteps integration — plan-only fixtures > terraform/scalar-collection/0/plan-only > renders plan report and matches snapshot 1`] = `
+"## ✅ Plan: 1 to add
+
+## Plan Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Add | tfcoremock\\_iam\\_role | 1 |
+|  | **Add** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>➕ <strong>tfcoremock_iam_role</strong> ops</summary>
+
+\`\`\`
+tfcoremock_iam_role.ops
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| description | <code></code> | <code><ins style="background:#dfd">Read-only access for cloud operations</ins></code> |
+| id | <code></code> | <code>(known after apply)</code> |
+| name | <code></code> | <code><ins style="background:#dfd">cloud-ops-reader</ins></code> |
+
+<details>
+<summary>labels (large value; +4, -0)</summary>
+
+\`\`\`diff
++ app:cloud-ops
++ cost-center:engineering
++ owner:platform-team
++ region:us-central1
+\`\`\`
+
+
+
+</details>
+
+<details>
+<summary>ordered_rules (large value; +5, -0)</summary>
+
+\`\`\`diff
++ allow 10.0.0.0/8
++ allow 172.16.0.0/12
++ deny 192.168.1.0/24
++ allow 192.168.0.0/16
++ deny all
+\`\`\`
+
+
+
+</details>
+
+<details>
+<summary>permissions (large value; +22, -0)</summary>
+
+\`\`\`diff
++ compute.addresses.get
++ compute.addresses.list
++ compute.disks.get
++ compute.disks.list
++ compute.firewalls.get
++ compute.firewalls.list
++ compute.instances.get
++ compute.instances.list
++ compute.networks.get
++ compute.networks.list
++ compute.subnetworks.get
++ compute.subnetworks.list
++ container.clusters.get
++ container.clusters.list
++ dns.managedZones.get
++ dns.managedZones.list
++ iam.roles.get
++ iam.roles.list
++ monitoring.alertPolicies.get
++ monitoring.alertPolicies.list
++ storage.buckets.get
++ storage.buckets.list
+\`\`\`
+
+
+
+</details>
+
+<details>
+<summary>tags (large value; +1, -0)</summary>
+
+\`\`\`diff
++ (sensitive)
+\`\`\`
+
+
+
+</details>
+
+
+
+</details>
+
+"
+`;
+
+exports[`reportFromSteps integration — plan-only fixtures > terraform/scalar-collection/1/plan-only > renders plan report and matches snapshot 1`] = `
+"## ✅ Plan: 1 to change
+
+## Plan Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| 🔧 Change | tfcoremock\\_iam\\_role | 1 |
+|  | **Change** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>🔧 <strong>tfcoremock_iam_role</strong> ops — changed: ordered_rules, permissions</summary>
+
+\`\`\`
+tfcoremock_iam_role.ops
+\`\`\`
+
+<details>
+<summary>ordered_rules (large value; +1, -1)</summary>
+
+\`\`\`diff
+  allow 10.0.0.0/8
++ deny 192.168.1.0/24
+  allow 172.16.0.0/12
+- deny 192.168.1.0/24
+  allow 192.168.0.0/16
+  deny all
+\`\`\`
+
+
+
+</details>
+
+<details>
+<summary>permissions (large value; +5, -4)</summary>
+
+\`\`\`diff
+  compute.addresses.get
+  compute.addresses.list
+  compute.disks.get
+  compute.disks.list
+  compute.firewalls.get
+  compute.firewalls.list
+  compute.instances.get
++ compute.instances.getEffectiveFirewalls
++ compute.instances.getIamPolicy
+  compute.instances.list
++ compute.instances.listReferrers
+  compute.networks.get
+  compute.networks.list
+  compute.subnetworks.get
+  compute.subnetworks.list
+  container.clusters.get
+  container.clusters.list
+  dns.managedZones.get
+  dns.managedZones.list
+- iam.roles.get
+- iam.roles.list
+  monitoring.alertPolicies.get
+  monitoring.alertPolicies.list
++ monitoring.dashboards.get
++ monitoring.dashboards.list
+- storage.buckets.get
+- storage.buckets.list
+\`\`\`
+
+
+
+</details>
+
+<details>
+<summary>tags (large value)</summary>
+
+\`\`\`diff
+  (sensitive)
+\`\`\`
+
+
+
+</details>
 
 
 
@@ -23675,6 +25029,204 @@ local_file.managed
 | filename | <code></code> | <code><ins style="background:#dfd">./managed.txt</ins></code> |
 | id | <code></code> | <code>(known after apply)</code> |
 | sensitive\\_content | <code></code> | <code>(sensitive)</code> |
+
+
+
+</details>
+
+"
+`;
+
+exports[`reportFromSteps integration — plan-only fixtures > tofu/scalar-collection/0/plan-only > renders plan report and matches snapshot 1`] = `
+"## ✅ Plan: 1 to add
+
+## Plan Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Add | tfcoremock\\_iam\\_role | 1 |
+|  | **Add** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>➕ <strong>tfcoremock_iam_role</strong> ops</summary>
+
+\`\`\`
+tfcoremock_iam_role.ops
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| description | <code></code> | <code><ins style="background:#dfd">Read-only access for cloud operations</ins></code> |
+| id | <code></code> | <code>(known after apply)</code> |
+| name | <code></code> | <code><ins style="background:#dfd">cloud-ops-reader</ins></code> |
+
+<details>
+<summary>labels (large value; +4, -0)</summary>
+
+\`\`\`diff
++ app:cloud-ops
++ cost-center:engineering
++ owner:platform-team
++ region:us-central1
+\`\`\`
+
+
+
+</details>
+
+<details>
+<summary>ordered_rules (large value; +5, -0)</summary>
+
+\`\`\`diff
++ allow 10.0.0.0/8
++ allow 172.16.0.0/12
++ deny 192.168.1.0/24
++ allow 192.168.0.0/16
++ deny all
+\`\`\`
+
+
+
+</details>
+
+<details>
+<summary>permissions (large value; +22, -0)</summary>
+
+\`\`\`diff
++ compute.addresses.get
++ compute.addresses.list
++ compute.disks.get
++ compute.disks.list
++ compute.firewalls.get
++ compute.firewalls.list
++ compute.instances.get
++ compute.instances.list
++ compute.networks.get
++ compute.networks.list
++ compute.subnetworks.get
++ compute.subnetworks.list
++ container.clusters.get
++ container.clusters.list
++ dns.managedZones.get
++ dns.managedZones.list
++ iam.roles.get
++ iam.roles.list
++ monitoring.alertPolicies.get
++ monitoring.alertPolicies.list
++ storage.buckets.get
++ storage.buckets.list
+\`\`\`
+
+
+
+</details>
+
+<details>
+<summary>tags (large value; +1, -0)</summary>
+
+\`\`\`diff
++ (sensitive)
+\`\`\`
+
+
+
+</details>
+
+
+
+</details>
+
+"
+`;
+
+exports[`reportFromSteps integration — plan-only fixtures > tofu/scalar-collection/1/plan-only > renders plan report and matches snapshot 1`] = `
+"## ✅ Plan: 1 to change
+
+## Plan Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| 🔧 Change | tfcoremock\\_iam\\_role | 1 |
+|  | **Change** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>🔧 <strong>tfcoremock_iam_role</strong> ops — changed: ordered_rules, permissions</summary>
+
+\`\`\`
+tfcoremock_iam_role.ops
+\`\`\`
+
+<details>
+<summary>ordered_rules (large value; +1, -1)</summary>
+
+\`\`\`diff
+  allow 10.0.0.0/8
++ deny 192.168.1.0/24
+  allow 172.16.0.0/12
+- deny 192.168.1.0/24
+  allow 192.168.0.0/16
+  deny all
+\`\`\`
+
+
+
+</details>
+
+<details>
+<summary>permissions (large value; +5, -4)</summary>
+
+\`\`\`diff
+  compute.addresses.get
+  compute.addresses.list
+  compute.disks.get
+  compute.disks.list
+  compute.firewalls.get
+  compute.firewalls.list
+  compute.instances.get
++ compute.instances.getEffectiveFirewalls
++ compute.instances.getIamPolicy
+  compute.instances.list
++ compute.instances.listReferrers
+  compute.networks.get
+  compute.networks.list
+  compute.subnetworks.get
+  compute.subnetworks.list
+  container.clusters.get
+  container.clusters.list
+  dns.managedZones.get
+  dns.managedZones.list
+- iam.roles.get
+- iam.roles.list
+  monitoring.alertPolicies.get
+  monitoring.alertPolicies.list
++ monitoring.dashboards.get
++ monitoring.dashboards.list
+- storage.buckets.get
+- storage.buckets.list
+\`\`\`
+
+
+
+</details>
+
+<details>
+<summary>tags (large value)</summary>
+
+\`\`\`diff
+  (sensitive)
+\`\`\`
+
+
+
+</details>
 
 
 
@@ -25936,6 +27488,206 @@ local_file.managed
 | filename | <code></code> | <code><ins style="background:#dfd">./managed.txt</ins></code> |
 | id | <code></code> | <code>(value not in plan)</code> |
 | sensitive\\_content | <code></code> | <code>(sensitive)</code> |
+
+
+
+</details>
+
+"
+`;
+
+exports[`reportFromSteps — state enrichment > no-state snapshot: terraform/scalar-collection/0/no-state 1`] = `
+"## ✅ Apply: 1 added
+
+> ⚠️ **Warning:** Some attribute values could not be resolved because \`terraform state pull\` output was not available. Add a state step after apply to see the actual values.
+
+## Apply Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Added | tfcoremock\\_iam\\_role | 1 |
+|  | **Added** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>➕ <strong>tfcoremock_iam_role</strong> ops</summary>
+
+\`\`\`
+tfcoremock_iam_role.ops
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| description | <code></code> | <code><ins style="background:#dfd">Read-only access for cloud operations</ins></code> |
+| id | <code></code> | <code>(value not in plan)</code> |
+| name | <code></code> | <code><ins style="background:#dfd">cloud-ops-reader</ins></code> |
+
+<details>
+<summary>labels (large value; +4, -0)</summary>
+
+\`\`\`diff
++ app:cloud-ops
++ cost-center:engineering
++ owner:platform-team
++ region:us-central1
+\`\`\`
+
+
+
+</details>
+
+<details>
+<summary>ordered_rules (large value; +5, -0)</summary>
+
+\`\`\`diff
++ allow 10.0.0.0/8
++ allow 172.16.0.0/12
++ deny 192.168.1.0/24
++ allow 192.168.0.0/16
++ deny all
+\`\`\`
+
+
+
+</details>
+
+<details>
+<summary>permissions (large value; +22, -0)</summary>
+
+\`\`\`diff
++ compute.addresses.get
++ compute.addresses.list
++ compute.disks.get
++ compute.disks.list
++ compute.firewalls.get
++ compute.firewalls.list
++ compute.instances.get
++ compute.instances.list
++ compute.networks.get
++ compute.networks.list
++ compute.subnetworks.get
++ compute.subnetworks.list
++ container.clusters.get
++ container.clusters.list
++ dns.managedZones.get
++ dns.managedZones.list
++ iam.roles.get
++ iam.roles.list
++ monitoring.alertPolicies.get
++ monitoring.alertPolicies.list
++ storage.buckets.get
++ storage.buckets.list
+\`\`\`
+
+
+
+</details>
+
+<details>
+<summary>tags (large value; +1, -0)</summary>
+
+\`\`\`diff
++ (sensitive)
+\`\`\`
+
+
+
+</details>
+
+
+
+</details>
+
+"
+`;
+
+exports[`reportFromSteps — state enrichment > no-state snapshot: terraform/scalar-collection/1/no-state 1`] = `
+"## ✅ Apply: 1 changed
+
+## Apply Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| 🔧 Changed | tfcoremock\\_iam\\_role | 1 |
+|  | **Changed** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>🔧 <strong>tfcoremock_iam_role</strong> ops — changed: ordered_rules, permissions</summary>
+
+\`\`\`
+tfcoremock_iam_role.ops
+\`\`\`
+
+<details>
+<summary>ordered_rules (large value; +1, -1)</summary>
+
+\`\`\`diff
+  allow 10.0.0.0/8
++ deny 192.168.1.0/24
+  allow 172.16.0.0/12
+- deny 192.168.1.0/24
+  allow 192.168.0.0/16
+  deny all
+\`\`\`
+
+
+
+</details>
+
+<details>
+<summary>permissions (large value; +5, -4)</summary>
+
+\`\`\`diff
+  compute.addresses.get
+  compute.addresses.list
+  compute.disks.get
+  compute.disks.list
+  compute.firewalls.get
+  compute.firewalls.list
+  compute.instances.get
++ compute.instances.getEffectiveFirewalls
++ compute.instances.getIamPolicy
+  compute.instances.list
++ compute.instances.listReferrers
+  compute.networks.get
+  compute.networks.list
+  compute.subnetworks.get
+  compute.subnetworks.list
+  container.clusters.get
+  container.clusters.list
+  dns.managedZones.get
+  dns.managedZones.list
+- iam.roles.get
+- iam.roles.list
+  monitoring.alertPolicies.get
+  monitoring.alertPolicies.list
++ monitoring.dashboards.get
++ monitoring.dashboards.list
+- storage.buckets.get
+- storage.buckets.list
+\`\`\`
+
+
+
+</details>
+
+<details>
+<summary>tags (large value)</summary>
+
+\`\`\`diff
+  (sensitive)
+\`\`\`
+
+
+
+</details>
 
 
 
@@ -28206,6 +29958,206 @@ local_file.managed
 | filename | <code></code> | <code><ins style="background:#dfd">./managed.txt</ins></code> |
 | id | <code></code> | <code>(value not in plan)</code> |
 | sensitive\\_content | <code></code> | <code>(sensitive)</code> |
+
+
+
+</details>
+
+"
+`;
+
+exports[`reportFromSteps — state enrichment > no-state snapshot: tofu/scalar-collection/0/no-state 1`] = `
+"## ✅ Apply: 1 added
+
+> ⚠️ **Warning:** Some attribute values could not be resolved because \`tofu state pull\` output was not available. Add a state step after apply to see the actual values.
+
+## Apply Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Added | tfcoremock\\_iam\\_role | 1 |
+|  | **Added** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>➕ <strong>tfcoremock_iam_role</strong> ops</summary>
+
+\`\`\`
+tfcoremock_iam_role.ops
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| description | <code></code> | <code><ins style="background:#dfd">Read-only access for cloud operations</ins></code> |
+| id | <code></code> | <code>(value not in plan)</code> |
+| name | <code></code> | <code><ins style="background:#dfd">cloud-ops-reader</ins></code> |
+
+<details>
+<summary>labels (large value; +4, -0)</summary>
+
+\`\`\`diff
++ app:cloud-ops
++ cost-center:engineering
++ owner:platform-team
++ region:us-central1
+\`\`\`
+
+
+
+</details>
+
+<details>
+<summary>ordered_rules (large value; +5, -0)</summary>
+
+\`\`\`diff
++ allow 10.0.0.0/8
++ allow 172.16.0.0/12
++ deny 192.168.1.0/24
++ allow 192.168.0.0/16
++ deny all
+\`\`\`
+
+
+
+</details>
+
+<details>
+<summary>permissions (large value; +22, -0)</summary>
+
+\`\`\`diff
++ compute.addresses.get
++ compute.addresses.list
++ compute.disks.get
++ compute.disks.list
++ compute.firewalls.get
++ compute.firewalls.list
++ compute.instances.get
++ compute.instances.list
++ compute.networks.get
++ compute.networks.list
++ compute.subnetworks.get
++ compute.subnetworks.list
++ container.clusters.get
++ container.clusters.list
++ dns.managedZones.get
++ dns.managedZones.list
++ iam.roles.get
++ iam.roles.list
++ monitoring.alertPolicies.get
++ monitoring.alertPolicies.list
++ storage.buckets.get
++ storage.buckets.list
+\`\`\`
+
+
+
+</details>
+
+<details>
+<summary>tags (large value; +1, -0)</summary>
+
+\`\`\`diff
++ (sensitive)
+\`\`\`
+
+
+
+</details>
+
+
+
+</details>
+
+"
+`;
+
+exports[`reportFromSteps — state enrichment > no-state snapshot: tofu/scalar-collection/1/no-state 1`] = `
+"## ✅ Apply: 1 changed
+
+## Apply Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| 🔧 Changed | tfcoremock\\_iam\\_role | 1 |
+|  | **Changed** | **1** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>🔧 <strong>tfcoremock_iam_role</strong> ops — changed: ordered_rules, permissions</summary>
+
+\`\`\`
+tfcoremock_iam_role.ops
+\`\`\`
+
+<details>
+<summary>ordered_rules (large value; +1, -1)</summary>
+
+\`\`\`diff
+  allow 10.0.0.0/8
++ deny 192.168.1.0/24
+  allow 172.16.0.0/12
+- deny 192.168.1.0/24
+  allow 192.168.0.0/16
+  deny all
+\`\`\`
+
+
+
+</details>
+
+<details>
+<summary>permissions (large value; +5, -4)</summary>
+
+\`\`\`diff
+  compute.addresses.get
+  compute.addresses.list
+  compute.disks.get
+  compute.disks.list
+  compute.firewalls.get
+  compute.firewalls.list
+  compute.instances.get
++ compute.instances.getEffectiveFirewalls
++ compute.instances.getIamPolicy
+  compute.instances.list
++ compute.instances.listReferrers
+  compute.networks.get
+  compute.networks.list
+  compute.subnetworks.get
+  compute.subnetworks.list
+  container.clusters.get
+  container.clusters.list
+  dns.managedZones.get
+  dns.managedZones.list
+- iam.roles.get
+- iam.roles.list
+  monitoring.alertPolicies.get
+  monitoring.alertPolicies.list
++ monitoring.dashboards.get
++ monitoring.dashboards.list
+- storage.buckets.get
+- storage.buckets.list
+\`\`\`
+
+
+
+</details>
+
+<details>
+<summary>tags (large value)</summary>
+
+\`\`\`diff
+  (sensitive)
+\`\`\`
+
+
+
+</details>
 
 
 
