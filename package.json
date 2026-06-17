@@ -52,6 +52,8 @@
     "vitest": "^4.0.0"
   },
   "overrides": {
-    "glob": "^13.0.6"
+    "glob": "^13.0.6",
+    "js-yaml": "^4.2.0",
+    "markdown-it": "^14.2.0"
   }
 }
