@@ -22,12 +22,17 @@ import { getStepOutcome, getExitCode } from "../steps/outcomes.js";
  * @param stepId - Step identifier for display
  * @param readerOpts - Security and size constraints for reading step files
  * @param diagnostic - Optional diagnostic message (e.g. "Plan output could not be parsed: ...")
+ * @param opts - When `skipStdout` is true, the step's stdout is not read here.
+ *   Used by the failed plan/apply path, which replaces stdout with a focused,
+ *   memory-bounded emit rather than slurping the full (potentially hundreds of
+ *   MB) JSONL into the issue.
  */
 export function buildStepIssue(
   step: StepData,
   stepId: string,
   readerOpts: ReaderOptions,
   diagnostic?: string,
+  opts?: { skipStdout?: boolean },
 ): StepIssue {
   const outcome = getStepOutcome(step);
   const isFailed = outcome === "failure";
@@ -44,7 +49,9 @@ export function buildStepIssue(
     stepOutcome = outcome;
   }
 
-  const stdoutRead = readStepStdout(step, readerOpts);
+  const stdoutRead = opts?.skipStdout
+    ? undefined
+    : readStepStdout(step, readerOpts);
   const stderrRead = readStepStderr(step, readerOpts);
 
   // Build with conditional spreads to preserve type safety while
@@ -64,8 +71,10 @@ export function buildStepIssue(
     isFailed,
     ...(exitCode !== undefined ? { exitCode } : {}),
     ...(diagnostic !== undefined ? { diagnostic } : {}),
-    ...(stdoutRead.content !== undefined ? { stdout: stdoutRead.content } : {}),
-    ...(stdoutRead.error !== undefined
+    ...(stdoutRead?.content !== undefined
+      ? { stdout: stdoutRead.content }
+      : {}),
+    ...(stdoutRead?.error !== undefined
       ? { stdoutError: stdoutRead.error }
       : {}),
     ...(stderrContent !== undefined ? { stderr: stderrContent } : {}),

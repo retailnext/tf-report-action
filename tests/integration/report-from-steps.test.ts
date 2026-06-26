@@ -677,6 +677,34 @@ describe("reportFromSteps integration — manual fixtures", () => {
 // ---------- Targeted assertions — error fixtures ----------
 
 describe("reportFromSteps integration — error fixture scenarios", () => {
+  it("addressless-plan-error/1: focuses out refresh-hook noise, keeping the addressless error", () => {
+    // Reproduces a real report: a failed plan whose only concern is an
+    // addressless `Invalid index` error emitted alongside many unrelated
+    // refresh hooks. The causal focusing filter must drop the refresh hooks
+    // (and structural version/change_summary lines) and surface the error.
+    for (const tool of ["terraform", "tofu"]) {
+      const fixture = generatedFixtures.find((f) =>
+        f.label.includes(`${tool}/addressless-plan-error/1`),
+      );
+      expect(fixture, `missing fixture for ${tool}`).toBeDefined();
+      const resolved = resolveStepFilePaths(
+        fixture!.stepsJson,
+        fixture!.fixtureDir,
+      );
+      const result = reportFromSteps(resolved, {
+        allowedDirs: [fixture!.fixtureDir],
+        env: NO_GITHUB_ENV,
+      }).report.render("markdown").output;
+
+      // The real error survives.
+      expect(result).toContain("Invalid index");
+      // The unrelated refresh-hook noise is dropped.
+      expect(result).not.toContain("Refreshing state");
+      expect(result).not.toContain("change_summary");
+      assertCorrectToolName(result, fixture!.label);
+    }
+  });
+
   it("error-stages/1: renders failed validate with error details", () => {
     const fixture = generatedFixtures.find((f) =>
       f.label.includes("error-stages/1"),
