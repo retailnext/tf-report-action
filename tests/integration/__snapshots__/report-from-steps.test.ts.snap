@@ -1,5 +1,161 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
+exports[`reportFromSteps integration — apply-no-show fixtures > terraform/addressless-plan-error/0/apply-no-show > renders without error and matches snapshot 1`] = `
+"## ✅ Apply: 6 added
+
+> ⚠️ **Warning:** This report was generated without \`terraform show -json <tfplan>\` output. Resource attribute details are not available.
+
+## Apply Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Added | null\\_resource | 6 |
+|  | **Added** | **6** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>➕ <strong>null_resource</strong> noise[5]</summary>
+
+\`\`\`
+null_resource.noise[5]
+\`\`\`
+
+
+
+</details>
+
+<details>
+<summary>➕ <strong>null_resource</strong> noise[3]</summary>
+
+\`\`\`
+null_resource.noise[3]
+\`\`\`
+
+
+
+</details>
+
+<details>
+<summary>➕ <strong>null_resource</strong> noise[0]</summary>
+
+\`\`\`
+null_resource.noise[0]
+\`\`\`
+
+
+
+</details>
+
+<details>
+<summary>➕ <strong>null_resource</strong> noise[1]</summary>
+
+\`\`\`
+null_resource.noise[1]
+\`\`\`
+
+
+
+</details>
+
+<details>
+<summary>➕ <strong>null_resource</strong> noise[4]</summary>
+
+\`\`\`
+null_resource.noise[4]
+\`\`\`
+
+
+
+</details>
+
+<details>
+<summary>➕ <strong>null_resource</strong> noise[2]</summary>
+
+\`\`\`
+null_resource.noise[2]
+\`\`\`
+
+
+
+</details>
+
+"
+`;
+
+exports[`reportFromSteps integration — apply-no-show fixtures > terraform/addressless-plan-error/1/apply-no-show > renders without error and matches snapshot 1`] = `
+"## ❌ Plan Failed
+
+### ❌ \`plan\` failed
+
+Exit code: \`1\`
+
+<details open>
+<summary>stdout</summary>
+
+<details>
+<summary>🚨 <code>Error: Invalid index</code> <code>type=diagnostic</code></summary>
+<br>
+
+\`diagnostic.detail=The given key does not identify an element in this collection value.\`
+
+\`diagnostic.range.end.byte=1103\`
+
+\`diagnostic.range.end.column=56\`
+
+\`diagnostic.range.end.line=53\`
+
+\`diagnostic.range.filename=main.tf\`
+
+\`diagnostic.range.start.byte=1076\`
+
+\`diagnostic.range.start.column=29\`
+
+\`diagnostic.range.start.line=53\`
+
+\`diagnostic.severity=error\`
+
+\`diagnostic.snippet.code=  value = local.present_keys[null_resource.noise[0].id]\`
+
+\`diagnostic.snippet.context=output "broken_index"\`
+
+\`diagnostic.snippet.highlight_end_offset=55\`
+
+\`diagnostic.snippet.highlight_start_offset=28\`
+
+\`diagnostic.snippet.start_line=53\`
+
+\`diagnostic.snippet.values.0.statement=is object with 1 attribute "only"\`
+
+\`diagnostic.snippet.values.0.traversal=local.present_keys\`
+
+\`diagnostic.snippet.values.1.statement=is "3853406371777912885"\`
+
+\`diagnostic.snippet.values.1.traversal=null_resource.noise[0].id\`
+
+\`diagnostic.summary=Invalid index\`
+
+</details>
+
+
+
+</details>
+
+### Steps
+
+| Step | Outcome | Exit Code |
+| --- | --- | --- |
+| \`init\` | success | \`0\` |
+| \`validate\` | success | \`0\` |
+| \`plan\` | failure | \`1\` |
+| \`apply\` | skipped | \`0\` |
+| \`state\` | skipped | \`0\` |
+
+"
+`;
+
 exports[`reportFromSteps integration — apply-no-show fixtures > terraform/apply-error/0/apply-no-show > renders without error and matches snapshot 1`] = `
 "## ✅ Apply: 3 added
 
@@ -64,16 +220,6 @@ Exit code: \`1\`
 
 <details open>
 <summary>stdout</summary>
-
-<details>
-<summary><code>Terraform 1.14.6</code> <code>type=version</code></summary>
-<br>
-
-\`terraform=1.14.6\`
-
-\`ui=1.2\`
-
-</details>
 
 <details>
 <summary><code>null_resource.will_fail: Plan to replace</code> <code>type=planned_change</code></summary>
@@ -784,16 +930,6 @@ Exit code: \`1\`
 <summary>stdout</summary>
 
 <details>
-<summary><code>Terraform 1.14.6</code> <code>type=version</code></summary>
-<br>
-
-\`terraform=1.14.6\`
-
-\`ui=1.2\`
-
-</details>
-
-<details>
 <summary><code>data.local_file.missing: Refreshing...</code> <code>type=apply_start</code></summary>
 <br>
 
@@ -812,24 +948,6 @@ Exit code: \`1\`
 \`hook.resource.resource_name=missing\`
 
 \`hook.resource.resource_type=local_file\`
-
-</details>
-
-<details>
-<summary><code>Plan: 0 to add, 0 to change, 0 to destroy.</code> <code>type=change_summary</code></summary>
-<br>
-
-\`changes.action_invocation=0\`
-
-\`changes.add=0\`
-
-\`changes.change=0\`
-
-\`changes.import=0\`
-
-\`changes.operation=plan\`
-
-\`changes.remove=0\`
 
 </details>
 
@@ -1864,6 +1982,162 @@ exports[`reportFromSteps integration — apply-no-show fixtures > terraform/upda
 "
 `;
 
+exports[`reportFromSteps integration — apply-no-show fixtures > tofu/addressless-plan-error/0/apply-no-show > renders without error and matches snapshot 1`] = `
+"## ✅ Apply: 6 added
+
+> ⚠️ **Warning:** This report was generated without \`tofu show -json <tfplan>\` output. Resource attribute details are not available.
+
+## Apply Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Added | null\\_resource | 6 |
+|  | **Added** | **6** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>➕ <strong>null_resource</strong> noise[1]</summary>
+
+\`\`\`
+null_resource.noise[1]
+\`\`\`
+
+
+
+</details>
+
+<details>
+<summary>➕ <strong>null_resource</strong> noise[0]</summary>
+
+\`\`\`
+null_resource.noise[0]
+\`\`\`
+
+
+
+</details>
+
+<details>
+<summary>➕ <strong>null_resource</strong> noise[2]</summary>
+
+\`\`\`
+null_resource.noise[2]
+\`\`\`
+
+
+
+</details>
+
+<details>
+<summary>➕ <strong>null_resource</strong> noise[4]</summary>
+
+\`\`\`
+null_resource.noise[4]
+\`\`\`
+
+
+
+</details>
+
+<details>
+<summary>➕ <strong>null_resource</strong> noise[3]</summary>
+
+\`\`\`
+null_resource.noise[3]
+\`\`\`
+
+
+
+</details>
+
+<details>
+<summary>➕ <strong>null_resource</strong> noise[5]</summary>
+
+\`\`\`
+null_resource.noise[5]
+\`\`\`
+
+
+
+</details>
+
+"
+`;
+
+exports[`reportFromSteps integration — apply-no-show fixtures > tofu/addressless-plan-error/1/apply-no-show > renders without error and matches snapshot 1`] = `
+"## ❌ Plan Failed
+
+### ❌ \`plan\` failed
+
+Exit code: \`1\`
+
+<details open>
+<summary>stdout</summary>
+
+<details>
+<summary>🚨 <code>Error: Invalid index</code> <code>type=diagnostic</code></summary>
+<br>
+
+\`diagnostic.detail=The given key does not identify an element in this collection value.\`
+
+\`diagnostic.range.end.byte=1103\`
+
+\`diagnostic.range.end.column=56\`
+
+\`diagnostic.range.end.line=53\`
+
+\`diagnostic.range.filename=main.tf\`
+
+\`diagnostic.range.start.byte=1076\`
+
+\`diagnostic.range.start.column=29\`
+
+\`diagnostic.range.start.line=53\`
+
+\`diagnostic.severity=error\`
+
+\`diagnostic.snippet.code=  value = local.present_keys[null_resource.noise[0].id]\`
+
+\`diagnostic.snippet.context=output "broken_index"\`
+
+\`diagnostic.snippet.highlight_end_offset=55\`
+
+\`diagnostic.snippet.highlight_start_offset=28\`
+
+\`diagnostic.snippet.start_line=53\`
+
+\`diagnostic.snippet.values.0.statement=is object with 1 attribute "only"\`
+
+\`diagnostic.snippet.values.0.traversal=local.present_keys\`
+
+\`diagnostic.snippet.values.1.statement=is "6209945319932785212"\`
+
+\`diagnostic.snippet.values.1.traversal=null_resource.noise[0].id\`
+
+\`diagnostic.summary=Invalid index\`
+
+</details>
+
+
+
+</details>
+
+### Steps
+
+| Step | Outcome | Exit Code |
+| --- | --- | --- |
+| \`init\` | success | \`0\` |
+| \`validate\` | success | \`0\` |
+| \`plan\` | failure | \`1\` |
+| \`apply\` | skipped | \`0\` |
+| \`state\` | skipped | \`0\` |
+
+"
+`;
+
 exports[`reportFromSteps integration — apply-no-show fixtures > tofu/apply-error/0/apply-no-show > renders without error and matches snapshot 1`] = `
 "## ✅ Apply: 3 added
 
@@ -1928,16 +2202,6 @@ Exit code: \`1\`
 
 <details open>
 <summary>stdout</summary>
-
-<details>
-<summary><code>OpenTofu 1.11.5</code> <code>type=version</code></summary>
-<br>
-
-\`tofu=1.11.5\`
-
-\`ui=1.2\`
-
-</details>
 
 <details>
 <summary><code>null_resource.will_fail: Plan to replace</code> <code>type=planned_change</code></summary>
@@ -2648,16 +2912,6 @@ Exit code: \`1\`
 <summary>stdout</summary>
 
 <details>
-<summary><code>OpenTofu 1.11.5</code> <code>type=version</code></summary>
-<br>
-
-\`tofu=1.11.5\`
-
-\`ui=1.2\`
-
-</details>
-
-<details>
 <summary><code>data.local_file.missing: Refreshing...</code> <code>type=apply_start</code></summary>
 <br>
 
@@ -2676,24 +2930,6 @@ Exit code: \`1\`
 \`hook.resource.resource_name=missing\`
 
 \`hook.resource.resource_type=local_file\`
-
-</details>
-
-<details>
-<summary><code>Plan: 0 to add, 0 to change, 0 to destroy.</code> <code>type=change_summary</code></summary>
-<br>
-
-\`changes.add=0\`
-
-\`changes.change=0\`
-
-\`changes.forget=0\`
-
-\`changes.import=0\`
-
-\`changes.operation=plan\`
-
-\`changes.remove=0\`
 
 </details>
 
@@ -3727,6 +3963,106 @@ exports[`reportFromSteps integration — apply-no-show fixtures > tofu/update-dr
 "
 `;
 
+exports[`reportFromSteps integration — apply-only fixtures > terraform/addressless-plan-error/0/apply-only > renders without error and matches snapshot 1`] = `
+"## ✅ Apply: 6 added
+
+> ⚠️ **Warning:** This report was generated without \`terraform show -json <tfplan>\` output. Resource attribute details are not available.
+
+## Apply Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Added | null\\_resource | 6 |
+|  | **Added** | **6** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>➕ <strong>null_resource</strong> noise[5]</summary>
+
+\`\`\`
+null_resource.noise[5]
+\`\`\`
+
+
+
+</details>
+
+<details>
+<summary>➕ <strong>null_resource</strong> noise[3]</summary>
+
+\`\`\`
+null_resource.noise[3]
+\`\`\`
+
+
+
+</details>
+
+<details>
+<summary>➕ <strong>null_resource</strong> noise[0]</summary>
+
+\`\`\`
+null_resource.noise[0]
+\`\`\`
+
+
+
+</details>
+
+<details>
+<summary>➕ <strong>null_resource</strong> noise[1]</summary>
+
+\`\`\`
+null_resource.noise[1]
+\`\`\`
+
+
+
+</details>
+
+<details>
+<summary>➕ <strong>null_resource</strong> noise[4]</summary>
+
+\`\`\`
+null_resource.noise[4]
+\`\`\`
+
+
+
+</details>
+
+<details>
+<summary>➕ <strong>null_resource</strong> noise[2]</summary>
+
+\`\`\`
+null_resource.noise[2]
+\`\`\`
+
+
+
+</details>
+
+"
+`;
+
+exports[`reportFromSteps integration — apply-only fixtures > terraform/addressless-plan-error/1/apply-only > renders without error and matches snapshot 1`] = `
+"## ⚠️ Apply Skipped
+
+### Steps
+
+| Step | Outcome | Exit Code |
+| --- | --- | --- |
+| \`init\` | success | \`0\` |
+| \`validate\` | success | \`0\` |
+| \`apply\` | skipped | \`0\` |
+| \`state\` | skipped | \`0\` |
+
+"
+`;
+
 exports[`reportFromSteps integration — apply-only fixtures > terraform/apply-error/0/apply-only > renders without error and matches snapshot 1`] = `
 "## ✅ Apply: 3 added
 
@@ -3791,16 +4127,6 @@ Exit code: \`1\`
 
 <details open>
 <summary>stdout</summary>
-
-<details>
-<summary><code>Terraform 1.14.6</code> <code>type=version</code></summary>
-<br>
-
-\`terraform=1.14.6\`
-
-\`ui=1.2\`
-
-</details>
 
 <details>
 <summary><code>null_resource.will_fail: Plan to replace</code> <code>type=planned_change</code></summary>
@@ -5354,6 +5680,106 @@ exports[`reportFromSteps integration — apply-only fixtures > terraform/update-
 "
 `;
 
+exports[`reportFromSteps integration — apply-only fixtures > tofu/addressless-plan-error/0/apply-only > renders without error and matches snapshot 1`] = `
+"## ✅ Apply: 6 added
+
+> ⚠️ **Warning:** This report was generated without \`tofu show -json <tfplan>\` output. Resource attribute details are not available.
+
+## Apply Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Added | null\\_resource | 6 |
+|  | **Added** | **6** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>➕ <strong>null_resource</strong> noise[1]</summary>
+
+\`\`\`
+null_resource.noise[1]
+\`\`\`
+
+
+
+</details>
+
+<details>
+<summary>➕ <strong>null_resource</strong> noise[0]</summary>
+
+\`\`\`
+null_resource.noise[0]
+\`\`\`
+
+
+
+</details>
+
+<details>
+<summary>➕ <strong>null_resource</strong> noise[2]</summary>
+
+\`\`\`
+null_resource.noise[2]
+\`\`\`
+
+
+
+</details>
+
+<details>
+<summary>➕ <strong>null_resource</strong> noise[4]</summary>
+
+\`\`\`
+null_resource.noise[4]
+\`\`\`
+
+
+
+</details>
+
+<details>
+<summary>➕ <strong>null_resource</strong> noise[3]</summary>
+
+\`\`\`
+null_resource.noise[3]
+\`\`\`
+
+
+
+</details>
+
+<details>
+<summary>➕ <strong>null_resource</strong> noise[5]</summary>
+
+\`\`\`
+null_resource.noise[5]
+\`\`\`
+
+
+
+</details>
+
+"
+`;
+
+exports[`reportFromSteps integration — apply-only fixtures > tofu/addressless-plan-error/1/apply-only > renders without error and matches snapshot 1`] = `
+"## ⚠️ Apply Skipped
+
+### Steps
+
+| Step | Outcome | Exit Code |
+| --- | --- | --- |
+| \`init\` | success | \`0\` |
+| \`validate\` | success | \`0\` |
+| \`apply\` | skipped | \`0\` |
+| \`state\` | skipped | \`0\` |
+
+"
+`;
+
 exports[`reportFromSteps integration — apply-only fixtures > tofu/apply-error/0/apply-only > renders without error and matches snapshot 1`] = `
 "## ✅ Apply: 3 added
 
@@ -5418,16 +5844,6 @@ Exit code: \`1\`
 
 <details open>
 <summary>stdout</summary>
-
-<details>
-<summary><code>OpenTofu 1.11.5</code> <code>type=version</code></summary>
-<br>
-
-\`tofu=1.11.5\`
-
-\`ui=1.2\`
-
-</details>
 
 <details>
 <summary><code>null_resource.will_fail: Plan to replace</code> <code>type=planned_change</code></summary>
@@ -6981,6 +7397,450 @@ exports[`reportFromSteps integration — apply-only fixtures > tofu/update-drift
 "
 `;
 
+exports[`reportFromSteps integration — generated fixtures > terraform/addressless-plan-error/0 > renders with workspace and matches snapshot 1`] = `
+"<!-- tf-report-action:"test-workspace" -->
+## ✅ \`test-workspace\` Apply: 6 added
+
+## Apply Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Added | null\\_resource | 6 |
+|  | **Added** | **6** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>➕ <strong>null_resource</strong> noise[0]</summary>
+
+\`\`\`
+null_resource.noise[0]
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | <code></code> | <code><ins style="background:#dfd">3853406371777912885</ins></code> |
+| triggers.index | <code></code> | <code><ins style="background:#dfd">0</ins></code> |
+
+
+
+</details>
+
+<details>
+<summary>➕ <strong>null_resource</strong> noise[1]</summary>
+
+\`\`\`
+null_resource.noise[1]
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | <code></code> | <code><ins style="background:#dfd">7769823641427348376</ins></code> |
+| triggers.index | <code></code> | <code><ins style="background:#dfd">1</ins></code> |
+
+
+
+</details>
+
+<details>
+<summary>➕ <strong>null_resource</strong> noise[2]</summary>
+
+\`\`\`
+null_resource.noise[2]
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | <code></code> | <code><ins style="background:#dfd">3475655045609791004</ins></code> |
+| triggers.index | <code></code> | <code><ins style="background:#dfd">2</ins></code> |
+
+
+
+</details>
+
+<details>
+<summary>➕ <strong>null_resource</strong> noise[3]</summary>
+
+\`\`\`
+null_resource.noise[3]
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | <code></code> | <code><ins style="background:#dfd">4507876836298560482</ins></code> |
+| triggers.index | <code></code> | <code><ins style="background:#dfd">3</ins></code> |
+
+
+
+</details>
+
+<details>
+<summary>➕ <strong>null_resource</strong> noise[4]</summary>
+
+\`\`\`
+null_resource.noise[4]
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | <code></code> | <code><ins style="background:#dfd">1567203202823363942</ins></code> |
+| triggers.index | <code></code> | <code><ins style="background:#dfd">4</ins></code> |
+
+
+
+</details>
+
+<details>
+<summary>➕ <strong>null_resource</strong> noise[5]</summary>
+
+\`\`\`
+null_resource.noise[5]
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | <code></code> | <code><ins style="background:#dfd">5257056199730408499</ins></code> |
+| triggers.index | <code></code> | <code><ins style="background:#dfd">5</ins></code> |
+
+
+
+</details>
+
+## Output Changes
+
+| Output | Action | Before | After |
+| --- | --- | --- | --- |
+| noise\\_count | ➕ |  | <code><ins style="background:#dfd">6</ins></code> |
+| noise\\_enabled | ➕ |  | <code><ins style="background:#dfd">true</ins></code> |
+
+<details>
+<summary>➕ noise_banner (large value; +5, -0)</summary>
+
+\`\`\`diff
++ line one
++ line two
++ line three
++ line four
++ line five
+\`\`\`
+
+
+
+</details>
+
+<details>
+<summary>➕ noise_config (large value; +4, -0)</summary>
+
+\`\`\`diff
++ {
++   "enabled": true,
++   "name": "noise"
++ }
+\`\`\`
+
+
+
+</details>
+
+"
+`;
+
+exports[`reportFromSteps integration — generated fixtures > terraform/addressless-plan-error/0 > renders without error and matches snapshot [default] 1`] = `
+"## ✅ Apply: 6 added
+
+## Apply Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Added | null\\_resource | 6 |
+|  | **Added** | **6** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>➕ <strong>null_resource</strong> noise[0]</summary>
+
+\`\`\`
+null_resource.noise[0]
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | <code></code> | <code><ins style="background:#dfd">3853406371777912885</ins></code> |
+| triggers.index | <code></code> | <code><ins style="background:#dfd">0</ins></code> |
+
+
+
+</details>
+
+<details>
+<summary>➕ <strong>null_resource</strong> noise[1]</summary>
+
+\`\`\`
+null_resource.noise[1]
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | <code></code> | <code><ins style="background:#dfd">7769823641427348376</ins></code> |
+| triggers.index | <code></code> | <code><ins style="background:#dfd">1</ins></code> |
+
+
+
+</details>
+
+<details>
+<summary>➕ <strong>null_resource</strong> noise[2]</summary>
+
+\`\`\`
+null_resource.noise[2]
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | <code></code> | <code><ins style="background:#dfd">3475655045609791004</ins></code> |
+| triggers.index | <code></code> | <code><ins style="background:#dfd">2</ins></code> |
+
+
+
+</details>
+
+<details>
+<summary>➕ <strong>null_resource</strong> noise[3]</summary>
+
+\`\`\`
+null_resource.noise[3]
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | <code></code> | <code><ins style="background:#dfd">4507876836298560482</ins></code> |
+| triggers.index | <code></code> | <code><ins style="background:#dfd">3</ins></code> |
+
+
+
+</details>
+
+<details>
+<summary>➕ <strong>null_resource</strong> noise[4]</summary>
+
+\`\`\`
+null_resource.noise[4]
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | <code></code> | <code><ins style="background:#dfd">1567203202823363942</ins></code> |
+| triggers.index | <code></code> | <code><ins style="background:#dfd">4</ins></code> |
+
+
+
+</details>
+
+<details>
+<summary>➕ <strong>null_resource</strong> noise[5]</summary>
+
+\`\`\`
+null_resource.noise[5]
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | <code></code> | <code><ins style="background:#dfd">5257056199730408499</ins></code> |
+| triggers.index | <code></code> | <code><ins style="background:#dfd">5</ins></code> |
+
+
+
+</details>
+
+## Output Changes
+
+| Output | Action | Before | After |
+| --- | --- | --- | --- |
+| noise\\_count | ➕ |  | <code><ins style="background:#dfd">6</ins></code> |
+| noise\\_enabled | ➕ |  | <code><ins style="background:#dfd">true</ins></code> |
+
+<details>
+<summary>➕ noise_banner (large value; +5, -0)</summary>
+
+\`\`\`diff
++ line one
++ line two
++ line three
++ line four
++ line five
+\`\`\`
+
+
+
+</details>
+
+<details>
+<summary>➕ noise_config (large value; +4, -0)</summary>
+
+\`\`\`diff
++ {
++   "enabled": true,
++   "name": "noise"
++ }
+\`\`\`
+
+
+
+</details>
+
+"
+`;
+
+exports[`reportFromSteps integration — generated fixtures > terraform/addressless-plan-error/1 > renders with workspace and matches snapshot 1`] = `
+"<!-- tf-report-action:"test-workspace" -->
+## ❌ \`test-workspace\` Plan Failed
+
+### ❌ \`plan\` failed
+
+Exit code: \`1\`
+
+<details open>
+<summary>stdout</summary>
+
+<details>
+<summary>🚨 <code>Error: Invalid index</code> <code>type=diagnostic</code></summary>
+<br>
+
+\`diagnostic.detail=The given key does not identify an element in this collection value.\`
+
+\`diagnostic.range.end.byte=1103\`
+
+\`diagnostic.range.end.column=56\`
+
+\`diagnostic.range.end.line=53\`
+
+\`diagnostic.range.filename=main.tf\`
+
+\`diagnostic.range.start.byte=1076\`
+
+\`diagnostic.range.start.column=29\`
+
+\`diagnostic.range.start.line=53\`
+
+\`diagnostic.severity=error\`
+
+\`diagnostic.snippet.code=  value = local.present_keys[null_resource.noise[0].id]\`
+
+\`diagnostic.snippet.context=output "broken_index"\`
+
+\`diagnostic.snippet.highlight_end_offset=55\`
+
+\`diagnostic.snippet.highlight_start_offset=28\`
+
+\`diagnostic.snippet.start_line=53\`
+
+\`diagnostic.snippet.values.0.statement=is object with 1 attribute "only"\`
+
+\`diagnostic.snippet.values.0.traversal=local.present_keys\`
+
+\`diagnostic.snippet.values.1.statement=is "3853406371777912885"\`
+
+\`diagnostic.snippet.values.1.traversal=null_resource.noise[0].id\`
+
+\`diagnostic.summary=Invalid index\`
+
+</details>
+
+
+
+</details>
+
+### Steps
+
+| Step | Outcome | Exit Code |
+| --- | --- | --- |
+| \`init\` | success | \`0\` |
+| \`validate\` | success | \`0\` |
+| \`plan\` | failure | \`1\` |
+| \`show-plan\` | skipped | \`0\` |
+| \`apply\` | skipped | \`0\` |
+| \`state\` | skipped | \`0\` |
+
+"
+`;
+
+exports[`reportFromSteps integration — generated fixtures > terraform/addressless-plan-error/1 > renders without error and matches snapshot [default] 1`] = `
+"## ❌ Plan Failed
+
+### ❌ \`plan\` failed
+
+Exit code: \`1\`
+
+<details open>
+<summary>stdout</summary>
+
+<details>
+<summary>🚨 <code>Error: Invalid index</code> <code>type=diagnostic</code></summary>
+<br>
+
+\`diagnostic.detail=The given key does not identify an element in this collection value.\`
+
+\`diagnostic.range.end.byte=1103\`
+
+\`diagnostic.range.end.column=56\`
+
+\`diagnostic.range.end.line=53\`
+
+\`diagnostic.range.filename=main.tf\`
+
+\`diagnostic.range.start.byte=1076\`
+
+\`diagnostic.range.start.column=29\`
+
+\`diagnostic.range.start.line=53\`
+
+\`diagnostic.severity=error\`
+
+\`diagnostic.snippet.code=  value = local.present_keys[null_resource.noise[0].id]\`
+
+\`diagnostic.snippet.context=output "broken_index"\`
+
+\`diagnostic.snippet.highlight_end_offset=55\`
+
+\`diagnostic.snippet.highlight_start_offset=28\`
+
+\`diagnostic.snippet.start_line=53\`
+
+\`diagnostic.snippet.values.0.statement=is object with 1 attribute "only"\`
+
+\`diagnostic.snippet.values.0.traversal=local.present_keys\`
+
+\`diagnostic.snippet.values.1.statement=is "3853406371777912885"\`
+
+\`diagnostic.snippet.values.1.traversal=null_resource.noise[0].id\`
+
+\`diagnostic.summary=Invalid index\`
+
+</details>
+
+
+
+</details>
+
+### Steps
+
+| Step | Outcome | Exit Code |
+| --- | --- | --- |
+| \`init\` | success | \`0\` |
+| \`validate\` | success | \`0\` |
+| \`plan\` | failure | \`1\` |
+| \`show-plan\` | skipped | \`0\` |
+| \`apply\` | skipped | \`0\` |
+| \`state\` | skipped | \`0\` |
+
+"
+`;
+
 exports[`reportFromSteps integration — generated fixtures > terraform/apply-error/0 > renders with workspace and matches snapshot 1`] = `
 "<!-- tf-report-action:"test-workspace" -->
 ## ✅ \`test-workspace\` Apply: 3 added
@@ -7220,16 +8080,6 @@ Exit code: \`1\`
 
 <details open>
 <summary>stdout</summary>
-
-<details>
-<summary><code>Terraform 1.14.6</code> <code>type=version</code></summary>
-<br>
-
-\`terraform=1.14.6\`
-
-\`ui=1.2\`
-
-</details>
 
 <details>
 <summary><code>null_resource.will_fail: Plan to replace</code> <code>type=planned_change</code></summary>
@@ -7518,16 +8368,6 @@ Exit code: \`1\`
 
 <details open>
 <summary>stdout</summary>
-
-<details>
-<summary><code>Terraform 1.14.6</code> <code>type=version</code></summary>
-<br>
-
-\`terraform=1.14.6\`
-
-\`ui=1.2\`
-
-</details>
 
 <details>
 <summary><code>null_resource.will_fail: Plan to replace</code> <code>type=planned_change</code></summary>
@@ -9068,16 +9908,6 @@ Exit code: \`1\`
 <summary>stdout</summary>
 
 <details>
-<summary><code>Terraform 1.14.6</code> <code>type=version</code></summary>
-<br>
-
-\`terraform=1.14.6\`
-
-\`ui=1.2\`
-
-</details>
-
-<details>
 <summary><code>data.local_file.missing: Refreshing...</code> <code>type=apply_start</code></summary>
 <br>
 
@@ -9096,24 +9926,6 @@ Exit code: \`1\`
 \`hook.resource.resource_name=missing\`
 
 \`hook.resource.resource_type=local_file\`
-
-</details>
-
-<details>
-<summary><code>Plan: 0 to add, 0 to change, 0 to destroy.</code> <code>type=change_summary</code></summary>
-<br>
-
-\`changes.action_invocation=0\`
-
-\`changes.add=0\`
-
-\`changes.change=0\`
-
-\`changes.import=0\`
-
-\`changes.operation=plan\`
-
-\`changes.remove=0\`
 
 </details>
 
@@ -9186,16 +9998,6 @@ Exit code: \`1\`
 <summary>stdout</summary>
 
 <details>
-<summary><code>Terraform 1.14.6</code> <code>type=version</code></summary>
-<br>
-
-\`terraform=1.14.6\`
-
-\`ui=1.2\`
-
-</details>
-
-<details>
 <summary><code>data.local_file.missing: Refreshing...</code> <code>type=apply_start</code></summary>
 <br>
 
@@ -9214,24 +10016,6 @@ Exit code: \`1\`
 \`hook.resource.resource_name=missing\`
 
 \`hook.resource.resource_type=local_file\`
-
-</details>
-
-<details>
-<summary><code>Plan: 0 to add, 0 to change, 0 to destroy.</code> <code>type=change_summary</code></summary>
-<br>
-
-\`changes.action_invocation=0\`
-
-\`changes.add=0\`
-
-\`changes.change=0\`
-
-\`changes.import=0\`
-
-\`changes.operation=plan\`
-
-\`changes.remove=0\`
 
 </details>
 
@@ -12376,6 +13160,450 @@ _No changes._
 "
 `;
 
+exports[`reportFromSteps integration — generated fixtures > tofu/addressless-plan-error/0 > renders with workspace and matches snapshot 1`] = `
+"<!-- tf-report-action:"test-workspace" -->
+## ✅ \`test-workspace\` Apply: 6 added
+
+## Apply Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Added | null\\_resource | 6 |
+|  | **Added** | **6** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>➕ <strong>null_resource</strong> noise[0]</summary>
+
+\`\`\`
+null_resource.noise[0]
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | <code></code> | <code><ins style="background:#dfd">6209945319932785212</ins></code> |
+| triggers.index | <code></code> | <code><ins style="background:#dfd">0</ins></code> |
+
+
+
+</details>
+
+<details>
+<summary>➕ <strong>null_resource</strong> noise[1]</summary>
+
+\`\`\`
+null_resource.noise[1]
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | <code></code> | <code><ins style="background:#dfd">6442504314621750657</ins></code> |
+| triggers.index | <code></code> | <code><ins style="background:#dfd">1</ins></code> |
+
+
+
+</details>
+
+<details>
+<summary>➕ <strong>null_resource</strong> noise[2]</summary>
+
+\`\`\`
+null_resource.noise[2]
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | <code></code> | <code><ins style="background:#dfd">4121865452533457449</ins></code> |
+| triggers.index | <code></code> | <code><ins style="background:#dfd">2</ins></code> |
+
+
+
+</details>
+
+<details>
+<summary>➕ <strong>null_resource</strong> noise[3]</summary>
+
+\`\`\`
+null_resource.noise[3]
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | <code></code> | <code><ins style="background:#dfd">6207478115075946183</ins></code> |
+| triggers.index | <code></code> | <code><ins style="background:#dfd">3</ins></code> |
+
+
+
+</details>
+
+<details>
+<summary>➕ <strong>null_resource</strong> noise[4]</summary>
+
+\`\`\`
+null_resource.noise[4]
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | <code></code> | <code><ins style="background:#dfd">2177699876287386886</ins></code> |
+| triggers.index | <code></code> | <code><ins style="background:#dfd">4</ins></code> |
+
+
+
+</details>
+
+<details>
+<summary>➕ <strong>null_resource</strong> noise[5]</summary>
+
+\`\`\`
+null_resource.noise[5]
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | <code></code> | <code><ins style="background:#dfd">9059665812576583902</ins></code> |
+| triggers.index | <code></code> | <code><ins style="background:#dfd">5</ins></code> |
+
+
+
+</details>
+
+## Output Changes
+
+| Output | Action | Before | After |
+| --- | --- | --- | --- |
+| noise\\_count | ➕ |  | <code><ins style="background:#dfd">6</ins></code> |
+| noise\\_enabled | ➕ |  | <code><ins style="background:#dfd">true</ins></code> |
+
+<details>
+<summary>➕ noise_banner (large value; +5, -0)</summary>
+
+\`\`\`diff
++ line one
++ line two
++ line three
++ line four
++ line five
+\`\`\`
+
+
+
+</details>
+
+<details>
+<summary>➕ noise_config (large value; +4, -0)</summary>
+
+\`\`\`diff
++ {
++   "enabled": true,
++   "name": "noise"
++ }
+\`\`\`
+
+
+
+</details>
+
+"
+`;
+
+exports[`reportFromSteps integration — generated fixtures > tofu/addressless-plan-error/0 > renders without error and matches snapshot [default] 1`] = `
+"## ✅ Apply: 6 added
+
+## Apply Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Added | null\\_resource | 6 |
+|  | **Added** | **6** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>➕ <strong>null_resource</strong> noise[0]</summary>
+
+\`\`\`
+null_resource.noise[0]
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | <code></code> | <code><ins style="background:#dfd">6209945319932785212</ins></code> |
+| triggers.index | <code></code> | <code><ins style="background:#dfd">0</ins></code> |
+
+
+
+</details>
+
+<details>
+<summary>➕ <strong>null_resource</strong> noise[1]</summary>
+
+\`\`\`
+null_resource.noise[1]
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | <code></code> | <code><ins style="background:#dfd">6442504314621750657</ins></code> |
+| triggers.index | <code></code> | <code><ins style="background:#dfd">1</ins></code> |
+
+
+
+</details>
+
+<details>
+<summary>➕ <strong>null_resource</strong> noise[2]</summary>
+
+\`\`\`
+null_resource.noise[2]
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | <code></code> | <code><ins style="background:#dfd">4121865452533457449</ins></code> |
+| triggers.index | <code></code> | <code><ins style="background:#dfd">2</ins></code> |
+
+
+
+</details>
+
+<details>
+<summary>➕ <strong>null_resource</strong> noise[3]</summary>
+
+\`\`\`
+null_resource.noise[3]
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | <code></code> | <code><ins style="background:#dfd">6207478115075946183</ins></code> |
+| triggers.index | <code></code> | <code><ins style="background:#dfd">3</ins></code> |
+
+
+
+</details>
+
+<details>
+<summary>➕ <strong>null_resource</strong> noise[4]</summary>
+
+\`\`\`
+null_resource.noise[4]
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | <code></code> | <code><ins style="background:#dfd">2177699876287386886</ins></code> |
+| triggers.index | <code></code> | <code><ins style="background:#dfd">4</ins></code> |
+
+
+
+</details>
+
+<details>
+<summary>➕ <strong>null_resource</strong> noise[5]</summary>
+
+\`\`\`
+null_resource.noise[5]
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | <code></code> | <code><ins style="background:#dfd">9059665812576583902</ins></code> |
+| triggers.index | <code></code> | <code><ins style="background:#dfd">5</ins></code> |
+
+
+
+</details>
+
+## Output Changes
+
+| Output | Action | Before | After |
+| --- | --- | --- | --- |
+| noise\\_count | ➕ |  | <code><ins style="background:#dfd">6</ins></code> |
+| noise\\_enabled | ➕ |  | <code><ins style="background:#dfd">true</ins></code> |
+
+<details>
+<summary>➕ noise_banner (large value; +5, -0)</summary>
+
+\`\`\`diff
++ line one
++ line two
++ line three
++ line four
++ line five
+\`\`\`
+
+
+
+</details>
+
+<details>
+<summary>➕ noise_config (large value; +4, -0)</summary>
+
+\`\`\`diff
++ {
++   "enabled": true,
++   "name": "noise"
++ }
+\`\`\`
+
+
+
+</details>
+
+"
+`;
+
+exports[`reportFromSteps integration — generated fixtures > tofu/addressless-plan-error/1 > renders with workspace and matches snapshot 1`] = `
+"<!-- tf-report-action:"test-workspace" -->
+## ❌ \`test-workspace\` Plan Failed
+
+### ❌ \`plan\` failed
+
+Exit code: \`1\`
+
+<details open>
+<summary>stdout</summary>
+
+<details>
+<summary>🚨 <code>Error: Invalid index</code> <code>type=diagnostic</code></summary>
+<br>
+
+\`diagnostic.detail=The given key does not identify an element in this collection value.\`
+
+\`diagnostic.range.end.byte=1103\`
+
+\`diagnostic.range.end.column=56\`
+
+\`diagnostic.range.end.line=53\`
+
+\`diagnostic.range.filename=main.tf\`
+
+\`diagnostic.range.start.byte=1076\`
+
+\`diagnostic.range.start.column=29\`
+
+\`diagnostic.range.start.line=53\`
+
+\`diagnostic.severity=error\`
+
+\`diagnostic.snippet.code=  value = local.present_keys[null_resource.noise[0].id]\`
+
+\`diagnostic.snippet.context=output "broken_index"\`
+
+\`diagnostic.snippet.highlight_end_offset=55\`
+
+\`diagnostic.snippet.highlight_start_offset=28\`
+
+\`diagnostic.snippet.start_line=53\`
+
+\`diagnostic.snippet.values.0.statement=is object with 1 attribute "only"\`
+
+\`diagnostic.snippet.values.0.traversal=local.present_keys\`
+
+\`diagnostic.snippet.values.1.statement=is "6209945319932785212"\`
+
+\`diagnostic.snippet.values.1.traversal=null_resource.noise[0].id\`
+
+\`diagnostic.summary=Invalid index\`
+
+</details>
+
+
+
+</details>
+
+### Steps
+
+| Step | Outcome | Exit Code |
+| --- | --- | --- |
+| \`init\` | success | \`0\` |
+| \`validate\` | success | \`0\` |
+| \`plan\` | failure | \`1\` |
+| \`show-plan\` | skipped | \`0\` |
+| \`apply\` | skipped | \`0\` |
+| \`state\` | skipped | \`0\` |
+
+"
+`;
+
+exports[`reportFromSteps integration — generated fixtures > tofu/addressless-plan-error/1 > renders without error and matches snapshot [default] 1`] = `
+"## ❌ Plan Failed
+
+### ❌ \`plan\` failed
+
+Exit code: \`1\`
+
+<details open>
+<summary>stdout</summary>
+
+<details>
+<summary>🚨 <code>Error: Invalid index</code> <code>type=diagnostic</code></summary>
+<br>
+
+\`diagnostic.detail=The given key does not identify an element in this collection value.\`
+
+\`diagnostic.range.end.byte=1103\`
+
+\`diagnostic.range.end.column=56\`
+
+\`diagnostic.range.end.line=53\`
+
+\`diagnostic.range.filename=main.tf\`
+
+\`diagnostic.range.start.byte=1076\`
+
+\`diagnostic.range.start.column=29\`
+
+\`diagnostic.range.start.line=53\`
+
+\`diagnostic.severity=error\`
+
+\`diagnostic.snippet.code=  value = local.present_keys[null_resource.noise[0].id]\`
+
+\`diagnostic.snippet.context=output "broken_index"\`
+
+\`diagnostic.snippet.highlight_end_offset=55\`
+
+\`diagnostic.snippet.highlight_start_offset=28\`
+
+\`diagnostic.snippet.start_line=53\`
+
+\`diagnostic.snippet.values.0.statement=is object with 1 attribute "only"\`
+
+\`diagnostic.snippet.values.0.traversal=local.present_keys\`
+
+\`diagnostic.snippet.values.1.statement=is "6209945319932785212"\`
+
+\`diagnostic.snippet.values.1.traversal=null_resource.noise[0].id\`
+
+\`diagnostic.summary=Invalid index\`
+
+</details>
+
+
+
+</details>
+
+### Steps
+
+| Step | Outcome | Exit Code |
+| --- | --- | --- |
+| \`init\` | success | \`0\` |
+| \`validate\` | success | \`0\` |
+| \`plan\` | failure | \`1\` |
+| \`show-plan\` | skipped | \`0\` |
+| \`apply\` | skipped | \`0\` |
+| \`state\` | skipped | \`0\` |
+
+"
+`;
+
 exports[`reportFromSteps integration — generated fixtures > tofu/apply-error/0 > renders with workspace and matches snapshot 1`] = `
 "<!-- tf-report-action:"test-workspace" -->
 ## ✅ \`test-workspace\` Apply: 3 added
@@ -12615,16 +13843,6 @@ Exit code: \`1\`
 
 <details open>
 <summary>stdout</summary>
-
-<details>
-<summary><code>OpenTofu 1.11.5</code> <code>type=version</code></summary>
-<br>
-
-\`tofu=1.11.5\`
-
-\`ui=1.2\`
-
-</details>
 
 <details>
 <summary><code>null_resource.will_fail: Plan to replace</code> <code>type=planned_change</code></summary>
@@ -12913,16 +14131,6 @@ Exit code: \`1\`
 
 <details open>
 <summary>stdout</summary>
-
-<details>
-<summary><code>OpenTofu 1.11.5</code> <code>type=version</code></summary>
-<br>
-
-\`tofu=1.11.5\`
-
-\`ui=1.2\`
-
-</details>
 
 <details>
 <summary><code>null_resource.will_fail: Plan to replace</code> <code>type=planned_change</code></summary>
@@ -14463,16 +15671,6 @@ Exit code: \`1\`
 <summary>stdout</summary>
 
 <details>
-<summary><code>OpenTofu 1.11.5</code> <code>type=version</code></summary>
-<br>
-
-\`tofu=1.11.5\`
-
-\`ui=1.2\`
-
-</details>
-
-<details>
 <summary><code>data.local_file.missing: Refreshing...</code> <code>type=apply_start</code></summary>
 <br>
 
@@ -14491,24 +15689,6 @@ Exit code: \`1\`
 \`hook.resource.resource_name=missing\`
 
 \`hook.resource.resource_type=local_file\`
-
-</details>
-
-<details>
-<summary><code>Plan: 0 to add, 0 to change, 0 to destroy.</code> <code>type=change_summary</code></summary>
-<br>
-
-\`changes.add=0\`
-
-\`changes.change=0\`
-
-\`changes.forget=0\`
-
-\`changes.import=0\`
-
-\`changes.operation=plan\`
-
-\`changes.remove=0\`
 
 </details>
 
@@ -14581,16 +15761,6 @@ Exit code: \`1\`
 <summary>stdout</summary>
 
 <details>
-<summary><code>OpenTofu 1.11.5</code> <code>type=version</code></summary>
-<br>
-
-\`tofu=1.11.5\`
-
-\`ui=1.2\`
-
-</details>
-
-<details>
 <summary><code>data.local_file.missing: Refreshing...</code> <code>type=apply_start</code></summary>
 <br>
 
@@ -14609,24 +15779,6 @@ Exit code: \`1\`
 \`hook.resource.resource_name=missing\`
 
 \`hook.resource.resource_type=local_file\`
-
-</details>
-
-<details>
-<summary><code>Plan: 0 to add, 0 to change, 0 to destroy.</code> <code>type=change_summary</code></summary>
-<br>
-
-\`changes.add=0\`
-
-\`changes.change=0\`
-
-\`changes.forget=0\`
-
-\`changes.import=0\`
-
-\`changes.operation=plan\`
-
-\`changes.remove=0\`
 
 </details>
 
@@ -17948,6 +19100,160 @@ No output captured.
 "
 `;
 
+exports[`reportFromSteps integration — no-show fixtures (Tier 3) > terraform/addressless-plan-error/0/no-show > renders without error and matches snapshot 1`] = `
+"## ✅ Plan: 6 to add
+
+> ⚠️ **Warning:** This report was generated without \`terraform show -json <tfplan>\` output. Resource attribute details are not available.
+
+## Plan Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Add | null\\_resource | 6 |
+|  | **Add** | **6** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>➕ <strong>null_resource</strong> noise[5]</summary>
+
+\`\`\`
+null_resource.noise[5]
+\`\`\`
+
+
+
+</details>
+
+<details>
+<summary>➕ <strong>null_resource</strong> noise[3]</summary>
+
+\`\`\`
+null_resource.noise[3]
+\`\`\`
+
+
+
+</details>
+
+<details>
+<summary>➕ <strong>null_resource</strong> noise[0]</summary>
+
+\`\`\`
+null_resource.noise[0]
+\`\`\`
+
+
+
+</details>
+
+<details>
+<summary>➕ <strong>null_resource</strong> noise[1]</summary>
+
+\`\`\`
+null_resource.noise[1]
+\`\`\`
+
+
+
+</details>
+
+<details>
+<summary>➕ <strong>null_resource</strong> noise[4]</summary>
+
+\`\`\`
+null_resource.noise[4]
+\`\`\`
+
+
+
+</details>
+
+<details>
+<summary>➕ <strong>null_resource</strong> noise[2]</summary>
+
+\`\`\`
+null_resource.noise[2]
+\`\`\`
+
+
+
+</details>
+
+"
+`;
+
+exports[`reportFromSteps integration — no-show fixtures (Tier 3) > terraform/addressless-plan-error/1/no-show > renders without error and matches snapshot 1`] = `
+"## ❌ Plan Failed
+
+### ❌ \`plan\` failed
+
+Exit code: \`1\`
+
+<details open>
+<summary>stdout</summary>
+
+<details>
+<summary>🚨 <code>Error: Invalid index</code> <code>type=diagnostic</code></summary>
+<br>
+
+\`diagnostic.detail=The given key does not identify an element in this collection value.\`
+
+\`diagnostic.range.end.byte=1103\`
+
+\`diagnostic.range.end.column=56\`
+
+\`diagnostic.range.end.line=53\`
+
+\`diagnostic.range.filename=main.tf\`
+
+\`diagnostic.range.start.byte=1076\`
+
+\`diagnostic.range.start.column=29\`
+
+\`diagnostic.range.start.line=53\`
+
+\`diagnostic.severity=error\`
+
+\`diagnostic.snippet.code=  value = local.present_keys[null_resource.noise[0].id]\`
+
+\`diagnostic.snippet.context=output "broken_index"\`
+
+\`diagnostic.snippet.highlight_end_offset=55\`
+
+\`diagnostic.snippet.highlight_start_offset=28\`
+
+\`diagnostic.snippet.start_line=53\`
+
+\`diagnostic.snippet.values.0.statement=is object with 1 attribute "only"\`
+
+\`diagnostic.snippet.values.0.traversal=local.present_keys\`
+
+\`diagnostic.snippet.values.1.statement=is "3853406371777912885"\`
+
+\`diagnostic.snippet.values.1.traversal=null_resource.noise[0].id\`
+
+\`diagnostic.summary=Invalid index\`
+
+</details>
+
+
+
+</details>
+
+### Steps
+
+| Step | Outcome | Exit Code |
+| --- | --- | --- |
+| \`init\` | success | \`0\` |
+| \`validate\` | success | \`0\` |
+| \`plan\` | failure | \`1\` |
+
+"
+`;
+
 exports[`reportFromSteps integration — no-show fixtures (Tier 3) > terraform/apply-error/0/no-show > renders without error and matches snapshot 1`] = `
 "## ✅ Plan: 3 to add
 
@@ -18477,16 +19783,6 @@ Exit code: \`1\`
 <summary>stdout</summary>
 
 <details>
-<summary><code>Terraform 1.14.6</code> <code>type=version</code></summary>
-<br>
-
-\`terraform=1.14.6\`
-
-\`ui=1.2\`
-
-</details>
-
-<details>
 <summary><code>data.local_file.missing: Refreshing...</code> <code>type=apply_start</code></summary>
 <br>
 
@@ -18505,24 +19801,6 @@ Exit code: \`1\`
 \`hook.resource.resource_name=missing\`
 
 \`hook.resource.resource_type=local_file\`
-
-</details>
-
-<details>
-<summary><code>Plan: 0 to add, 0 to change, 0 to destroy.</code> <code>type=change_summary</code></summary>
-<br>
-
-\`changes.action_invocation=0\`
-
-\`changes.add=0\`
-
-\`changes.change=0\`
-
-\`changes.import=0\`
-
-\`changes.operation=plan\`
-
-\`changes.remove=0\`
 
 </details>
 
@@ -19531,6 +20809,160 @@ exports[`reportFromSteps integration — no-show fixtures (Tier 3) > terraform/u
 "
 `;
 
+exports[`reportFromSteps integration — no-show fixtures (Tier 3) > tofu/addressless-plan-error/0/no-show > renders without error and matches snapshot 1`] = `
+"## ✅ Plan: 6 to add
+
+> ⚠️ **Warning:** This report was generated without \`tofu show -json <tfplan>\` output. Resource attribute details are not available.
+
+## Plan Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Add | null\\_resource | 6 |
+|  | **Add** | **6** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>➕ <strong>null_resource</strong> noise[1]</summary>
+
+\`\`\`
+null_resource.noise[1]
+\`\`\`
+
+
+
+</details>
+
+<details>
+<summary>➕ <strong>null_resource</strong> noise[0]</summary>
+
+\`\`\`
+null_resource.noise[0]
+\`\`\`
+
+
+
+</details>
+
+<details>
+<summary>➕ <strong>null_resource</strong> noise[2]</summary>
+
+\`\`\`
+null_resource.noise[2]
+\`\`\`
+
+
+
+</details>
+
+<details>
+<summary>➕ <strong>null_resource</strong> noise[4]</summary>
+
+\`\`\`
+null_resource.noise[4]
+\`\`\`
+
+
+
+</details>
+
+<details>
+<summary>➕ <strong>null_resource</strong> noise[3]</summary>
+
+\`\`\`
+null_resource.noise[3]
+\`\`\`
+
+
+
+</details>
+
+<details>
+<summary>➕ <strong>null_resource</strong> noise[5]</summary>
+
+\`\`\`
+null_resource.noise[5]
+\`\`\`
+
+
+
+</details>
+
+"
+`;
+
+exports[`reportFromSteps integration — no-show fixtures (Tier 3) > tofu/addressless-plan-error/1/no-show > renders without error and matches snapshot 1`] = `
+"## ❌ Plan Failed
+
+### ❌ \`plan\` failed
+
+Exit code: \`1\`
+
+<details open>
+<summary>stdout</summary>
+
+<details>
+<summary>🚨 <code>Error: Invalid index</code> <code>type=diagnostic</code></summary>
+<br>
+
+\`diagnostic.detail=The given key does not identify an element in this collection value.\`
+
+\`diagnostic.range.end.byte=1103\`
+
+\`diagnostic.range.end.column=56\`
+
+\`diagnostic.range.end.line=53\`
+
+\`diagnostic.range.filename=main.tf\`
+
+\`diagnostic.range.start.byte=1076\`
+
+\`diagnostic.range.start.column=29\`
+
+\`diagnostic.range.start.line=53\`
+
+\`diagnostic.severity=error\`
+
+\`diagnostic.snippet.code=  value = local.present_keys[null_resource.noise[0].id]\`
+
+\`diagnostic.snippet.context=output "broken_index"\`
+
+\`diagnostic.snippet.highlight_end_offset=55\`
+
+\`diagnostic.snippet.highlight_start_offset=28\`
+
+\`diagnostic.snippet.start_line=53\`
+
+\`diagnostic.snippet.values.0.statement=is object with 1 attribute "only"\`
+
+\`diagnostic.snippet.values.0.traversal=local.present_keys\`
+
+\`diagnostic.snippet.values.1.statement=is "6209945319932785212"\`
+
+\`diagnostic.snippet.values.1.traversal=null_resource.noise[0].id\`
+
+\`diagnostic.summary=Invalid index\`
+
+</details>
+
+
+
+</details>
+
+### Steps
+
+| Step | Outcome | Exit Code |
+| --- | --- | --- |
+| \`init\` | success | \`0\` |
+| \`validate\` | success | \`0\` |
+| \`plan\` | failure | \`1\` |
+
+"
+`;
+
 exports[`reportFromSteps integration — no-show fixtures (Tier 3) > tofu/apply-error/0/no-show > renders without error and matches snapshot 1`] = `
 "## ✅ Plan: 3 to add
 
@@ -20060,16 +21492,6 @@ Exit code: \`1\`
 <summary>stdout</summary>
 
 <details>
-<summary><code>OpenTofu 1.11.5</code> <code>type=version</code></summary>
-<br>
-
-\`tofu=1.11.5\`
-
-\`ui=1.2\`
-
-</details>
-
-<details>
 <summary><code>data.local_file.missing: Refreshing...</code> <code>type=apply_start</code></summary>
 <br>
 
@@ -20088,24 +21510,6 @@ Exit code: \`1\`
 \`hook.resource.resource_name=missing\`
 
 \`hook.resource.resource_type=local_file\`
-
-</details>
-
-<details>
-<summary><code>Plan: 0 to add, 0 to change, 0 to destroy.</code> <code>type=change_summary</code></summary>
-<br>
-
-\`changes.add=0\`
-
-\`changes.change=0\`
-
-\`changes.forget=0\`
-
-\`changes.import=0\`
-
-\`changes.operation=plan\`
-
-\`changes.remove=0\`
 
 </details>
 
@@ -21113,6 +22517,225 @@ exports[`reportFromSteps integration — no-show fixtures (Tier 3) > tofu/update
 "
 `;
 
+exports[`reportFromSteps integration — plan-only fixtures > terraform/addressless-plan-error/0/plan-only > renders plan report and matches snapshot 1`] = `
+"## ✅ Plan: 6 to add
+
+## Plan Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Add | null\\_resource | 6 |
+|  | **Add** | **6** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>➕ <strong>null_resource</strong> noise[0]</summary>
+
+\`\`\`
+null_resource.noise[0]
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | <code></code> | <code>(known after apply)</code> |
+| triggers.index | <code></code> | <code><ins style="background:#dfd">0</ins></code> |
+
+
+
+</details>
+
+<details>
+<summary>➕ <strong>null_resource</strong> noise[1]</summary>
+
+\`\`\`
+null_resource.noise[1]
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | <code></code> | <code>(known after apply)</code> |
+| triggers.index | <code></code> | <code><ins style="background:#dfd">1</ins></code> |
+
+
+
+</details>
+
+<details>
+<summary>➕ <strong>null_resource</strong> noise[2]</summary>
+
+\`\`\`
+null_resource.noise[2]
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | <code></code> | <code>(known after apply)</code> |
+| triggers.index | <code></code> | <code><ins style="background:#dfd">2</ins></code> |
+
+
+
+</details>
+
+<details>
+<summary>➕ <strong>null_resource</strong> noise[3]</summary>
+
+\`\`\`
+null_resource.noise[3]
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | <code></code> | <code>(known after apply)</code> |
+| triggers.index | <code></code> | <code><ins style="background:#dfd">3</ins></code> |
+
+
+
+</details>
+
+<details>
+<summary>➕ <strong>null_resource</strong> noise[4]</summary>
+
+\`\`\`
+null_resource.noise[4]
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | <code></code> | <code>(known after apply)</code> |
+| triggers.index | <code></code> | <code><ins style="background:#dfd">4</ins></code> |
+
+
+
+</details>
+
+<details>
+<summary>➕ <strong>null_resource</strong> noise[5]</summary>
+
+\`\`\`
+null_resource.noise[5]
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | <code></code> | <code>(known after apply)</code> |
+| triggers.index | <code></code> | <code><ins style="background:#dfd">5</ins></code> |
+
+
+
+</details>
+
+## Output Changes
+
+| Output | Action | Before | After |
+| --- | --- | --- | --- |
+| noise\\_count | ➕ |  | <code><ins style="background:#dfd">6</ins></code> |
+| noise\\_enabled | ➕ |  | <code><ins style="background:#dfd">true</ins></code> |
+
+<details>
+<summary>➕ noise_banner (large value; +5, -0)</summary>
+
+\`\`\`diff
++ line one
++ line two
++ line three
++ line four
++ line five
+\`\`\`
+
+
+
+</details>
+
+<details>
+<summary>➕ noise_config (large value; +4, -0)</summary>
+
+\`\`\`diff
++ {
++   "enabled": true,
++   "name": "noise"
++ }
+\`\`\`
+
+
+
+</details>
+
+"
+`;
+
+exports[`reportFromSteps integration — plan-only fixtures > terraform/addressless-plan-error/1/plan-only > renders plan report and matches snapshot 1`] = `
+"## ❌ Plan Failed
+
+### ❌ \`plan\` failed
+
+Exit code: \`1\`
+
+<details open>
+<summary>stdout</summary>
+
+<details>
+<summary>🚨 <code>Error: Invalid index</code> <code>type=diagnostic</code></summary>
+<br>
+
+\`diagnostic.detail=The given key does not identify an element in this collection value.\`
+
+\`diagnostic.range.end.byte=1103\`
+
+\`diagnostic.range.end.column=56\`
+
+\`diagnostic.range.end.line=53\`
+
+\`diagnostic.range.filename=main.tf\`
+
+\`diagnostic.range.start.byte=1076\`
+
+\`diagnostic.range.start.column=29\`
+
+\`diagnostic.range.start.line=53\`
+
+\`diagnostic.severity=error\`
+
+\`diagnostic.snippet.code=  value = local.present_keys[null_resource.noise[0].id]\`
+
+\`diagnostic.snippet.context=output "broken_index"\`
+
+\`diagnostic.snippet.highlight_end_offset=55\`
+
+\`diagnostic.snippet.highlight_start_offset=28\`
+
+\`diagnostic.snippet.start_line=53\`
+
+\`diagnostic.snippet.values.0.statement=is object with 1 attribute "only"\`
+
+\`diagnostic.snippet.values.0.traversal=local.present_keys\`
+
+\`diagnostic.snippet.values.1.statement=is "3853406371777912885"\`
+
+\`diagnostic.snippet.values.1.traversal=null_resource.noise[0].id\`
+
+\`diagnostic.summary=Invalid index\`
+
+</details>
+
+
+
+</details>
+
+### Steps
+
+| Step | Outcome | Exit Code |
+| --- | --- | --- |
+| \`init\` | success | \`0\` |
+| \`validate\` | success | \`0\` |
+| \`plan\` | failure | \`1\` |
+| \`show-plan\` | skipped | \`0\` |
+
+"
+`;
+
 exports[`reportFromSteps integration — plan-only fixtures > terraform/apply-error/0/plan-only > renders plan report and matches snapshot 1`] = `
 "## ✅ Plan: 3 to add
 
@@ -21754,16 +23377,6 @@ Exit code: \`1\`
 <summary>stdout</summary>
 
 <details>
-<summary><code>Terraform 1.14.6</code> <code>type=version</code></summary>
-<br>
-
-\`terraform=1.14.6\`
-
-\`ui=1.2\`
-
-</details>
-
-<details>
 <summary><code>data.local_file.missing: Refreshing...</code> <code>type=apply_start</code></summary>
 <br>
 
@@ -21782,24 +23395,6 @@ Exit code: \`1\`
 \`hook.resource.resource_name=missing\`
 
 \`hook.resource.resource_type=local_file\`
-
-</details>
-
-<details>
-<summary><code>Plan: 0 to add, 0 to change, 0 to destroy.</code> <code>type=change_summary</code></summary>
-<br>
-
-\`changes.action_invocation=0\`
-
-\`changes.add=0\`
-
-\`changes.change=0\`
-
-\`changes.import=0\`
-
-\`changes.operation=plan\`
-
-\`changes.remove=0\`
 
 </details>
 
@@ -23357,6 +24952,225 @@ _No changes._
 "
 `;
 
+exports[`reportFromSteps integration — plan-only fixtures > tofu/addressless-plan-error/0/plan-only > renders plan report and matches snapshot 1`] = `
+"## ✅ Plan: 6 to add
+
+## Plan Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Add | null\\_resource | 6 |
+|  | **Add** | **6** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>➕ <strong>null_resource</strong> noise[0]</summary>
+
+\`\`\`
+null_resource.noise[0]
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | <code></code> | <code>(known after apply)</code> |
+| triggers.index | <code></code> | <code><ins style="background:#dfd">0</ins></code> |
+
+
+
+</details>
+
+<details>
+<summary>➕ <strong>null_resource</strong> noise[1]</summary>
+
+\`\`\`
+null_resource.noise[1]
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | <code></code> | <code>(known after apply)</code> |
+| triggers.index | <code></code> | <code><ins style="background:#dfd">1</ins></code> |
+
+
+
+</details>
+
+<details>
+<summary>➕ <strong>null_resource</strong> noise[2]</summary>
+
+\`\`\`
+null_resource.noise[2]
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | <code></code> | <code>(known after apply)</code> |
+| triggers.index | <code></code> | <code><ins style="background:#dfd">2</ins></code> |
+
+
+
+</details>
+
+<details>
+<summary>➕ <strong>null_resource</strong> noise[3]</summary>
+
+\`\`\`
+null_resource.noise[3]
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | <code></code> | <code>(known after apply)</code> |
+| triggers.index | <code></code> | <code><ins style="background:#dfd">3</ins></code> |
+
+
+
+</details>
+
+<details>
+<summary>➕ <strong>null_resource</strong> noise[4]</summary>
+
+\`\`\`
+null_resource.noise[4]
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | <code></code> | <code>(known after apply)</code> |
+| triggers.index | <code></code> | <code><ins style="background:#dfd">4</ins></code> |
+
+
+
+</details>
+
+<details>
+<summary>➕ <strong>null_resource</strong> noise[5]</summary>
+
+\`\`\`
+null_resource.noise[5]
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | <code></code> | <code>(known after apply)</code> |
+| triggers.index | <code></code> | <code><ins style="background:#dfd">5</ins></code> |
+
+
+
+</details>
+
+## Output Changes
+
+| Output | Action | Before | After |
+| --- | --- | --- | --- |
+| noise\\_count | ➕ |  | <code><ins style="background:#dfd">6</ins></code> |
+| noise\\_enabled | ➕ |  | <code><ins style="background:#dfd">true</ins></code> |
+
+<details>
+<summary>➕ noise_banner (large value; +5, -0)</summary>
+
+\`\`\`diff
++ line one
++ line two
++ line three
++ line four
++ line five
+\`\`\`
+
+
+
+</details>
+
+<details>
+<summary>➕ noise_config (large value; +4, -0)</summary>
+
+\`\`\`diff
++ {
++   "enabled": true,
++   "name": "noise"
++ }
+\`\`\`
+
+
+
+</details>
+
+"
+`;
+
+exports[`reportFromSteps integration — plan-only fixtures > tofu/addressless-plan-error/1/plan-only > renders plan report and matches snapshot 1`] = `
+"## ❌ Plan Failed
+
+### ❌ \`plan\` failed
+
+Exit code: \`1\`
+
+<details open>
+<summary>stdout</summary>
+
+<details>
+<summary>🚨 <code>Error: Invalid index</code> <code>type=diagnostic</code></summary>
+<br>
+
+\`diagnostic.detail=The given key does not identify an element in this collection value.\`
+
+\`diagnostic.range.end.byte=1103\`
+
+\`diagnostic.range.end.column=56\`
+
+\`diagnostic.range.end.line=53\`
+
+\`diagnostic.range.filename=main.tf\`
+
+\`diagnostic.range.start.byte=1076\`
+
+\`diagnostic.range.start.column=29\`
+
+\`diagnostic.range.start.line=53\`
+
+\`diagnostic.severity=error\`
+
+\`diagnostic.snippet.code=  value = local.present_keys[null_resource.noise[0].id]\`
+
+\`diagnostic.snippet.context=output "broken_index"\`
+
+\`diagnostic.snippet.highlight_end_offset=55\`
+
+\`diagnostic.snippet.highlight_start_offset=28\`
+
+\`diagnostic.snippet.start_line=53\`
+
+\`diagnostic.snippet.values.0.statement=is object with 1 attribute "only"\`
+
+\`diagnostic.snippet.values.0.traversal=local.present_keys\`
+
+\`diagnostic.snippet.values.1.statement=is "6209945319932785212"\`
+
+\`diagnostic.snippet.values.1.traversal=null_resource.noise[0].id\`
+
+\`diagnostic.summary=Invalid index\`
+
+</details>
+
+
+
+</details>
+
+### Steps
+
+| Step | Outcome | Exit Code |
+| --- | --- | --- |
+| \`init\` | success | \`0\` |
+| \`validate\` | success | \`0\` |
+| \`plan\` | failure | \`1\` |
+| \`show-plan\` | skipped | \`0\` |
+
+"
+`;
+
 exports[`reportFromSteps integration — plan-only fixtures > tofu/apply-error/0/plan-only > renders plan report and matches snapshot 1`] = `
 "## ✅ Plan: 3 to add
 
@@ -23998,16 +25812,6 @@ Exit code: \`1\`
 <summary>stdout</summary>
 
 <details>
-<summary><code>OpenTofu 1.11.5</code> <code>type=version</code></summary>
-<br>
-
-\`tofu=1.11.5\`
-
-\`ui=1.2\`
-
-</details>
-
-<details>
 <summary><code>data.local_file.missing: Refreshing...</code> <code>type=apply_start</code></summary>
 <br>
 
@@ -24026,24 +25830,6 @@ Exit code: \`1\`
 \`hook.resource.resource_name=missing\`
 
 \`hook.resource.resource_type=local_file\`
-
-</details>
-
-<details>
-<summary><code>Plan: 0 to add, 0 to change, 0 to destroy.</code> <code>type=change_summary</code></summary>
-<br>
-
-\`changes.add=0\`
-
-\`changes.change=0\`
-
-\`changes.forget=0\`
-
-\`changes.import=0\`
-
-\`changes.operation=plan\`
-
-\`changes.remove=0\`
 
 </details>
 
@@ -25600,6 +27386,228 @@ _No changes._
 "
 `;
 
+exports[`reportFromSteps — state enrichment > no-state snapshot: terraform/addressless-plan-error/0/no-state 1`] = `
+"## ✅ Apply: 6 added
+
+> ⚠️ **Warning:** Some attribute values could not be resolved because \`terraform state pull\` output was not available. Add a state step after apply to see the actual values.
+
+## Apply Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Added | null\\_resource | 6 |
+|  | **Added** | **6** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>➕ <strong>null_resource</strong> noise[0]</summary>
+
+\`\`\`
+null_resource.noise[0]
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | <code></code> | <code>(value not in plan)</code> |
+| triggers.index | <code></code> | <code><ins style="background:#dfd">0</ins></code> |
+
+
+
+</details>
+
+<details>
+<summary>➕ <strong>null_resource</strong> noise[1]</summary>
+
+\`\`\`
+null_resource.noise[1]
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | <code></code> | <code>(value not in plan)</code> |
+| triggers.index | <code></code> | <code><ins style="background:#dfd">1</ins></code> |
+
+
+
+</details>
+
+<details>
+<summary>➕ <strong>null_resource</strong> noise[2]</summary>
+
+\`\`\`
+null_resource.noise[2]
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | <code></code> | <code>(value not in plan)</code> |
+| triggers.index | <code></code> | <code><ins style="background:#dfd">2</ins></code> |
+
+
+
+</details>
+
+<details>
+<summary>➕ <strong>null_resource</strong> noise[3]</summary>
+
+\`\`\`
+null_resource.noise[3]
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | <code></code> | <code>(value not in plan)</code> |
+| triggers.index | <code></code> | <code><ins style="background:#dfd">3</ins></code> |
+
+
+
+</details>
+
+<details>
+<summary>➕ <strong>null_resource</strong> noise[4]</summary>
+
+\`\`\`
+null_resource.noise[4]
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | <code></code> | <code>(value not in plan)</code> |
+| triggers.index | <code></code> | <code><ins style="background:#dfd">4</ins></code> |
+
+
+
+</details>
+
+<details>
+<summary>➕ <strong>null_resource</strong> noise[5]</summary>
+
+\`\`\`
+null_resource.noise[5]
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | <code></code> | <code>(value not in plan)</code> |
+| triggers.index | <code></code> | <code><ins style="background:#dfd">5</ins></code> |
+
+
+
+</details>
+
+## Output Changes
+
+| Output | Action | Before | After |
+| --- | --- | --- | --- |
+| noise\\_count | ➕ |  | <code><ins style="background:#dfd">6</ins></code> |
+| noise\\_enabled | ➕ |  | <code><ins style="background:#dfd">true</ins></code> |
+
+<details>
+<summary>➕ noise_banner (large value; +5, -0)</summary>
+
+\`\`\`diff
++ line one
++ line two
++ line three
++ line four
++ line five
+\`\`\`
+
+
+
+</details>
+
+<details>
+<summary>➕ noise_config (large value; +4, -0)</summary>
+
+\`\`\`diff
++ {
++   "enabled": true,
++   "name": "noise"
++ }
+\`\`\`
+
+
+
+</details>
+
+"
+`;
+
+exports[`reportFromSteps — state enrichment > no-state snapshot: terraform/addressless-plan-error/1/no-state 1`] = `
+"## ❌ Plan Failed
+
+### ❌ \`plan\` failed
+
+Exit code: \`1\`
+
+<details open>
+<summary>stdout</summary>
+
+<details>
+<summary>🚨 <code>Error: Invalid index</code> <code>type=diagnostic</code></summary>
+<br>
+
+\`diagnostic.detail=The given key does not identify an element in this collection value.\`
+
+\`diagnostic.range.end.byte=1103\`
+
+\`diagnostic.range.end.column=56\`
+
+\`diagnostic.range.end.line=53\`
+
+\`diagnostic.range.filename=main.tf\`
+
+\`diagnostic.range.start.byte=1076\`
+
+\`diagnostic.range.start.column=29\`
+
+\`diagnostic.range.start.line=53\`
+
+\`diagnostic.severity=error\`
+
+\`diagnostic.snippet.code=  value = local.present_keys[null_resource.noise[0].id]\`
+
+\`diagnostic.snippet.context=output "broken_index"\`
+
+\`diagnostic.snippet.highlight_end_offset=55\`
+
+\`diagnostic.snippet.highlight_start_offset=28\`
+
+\`diagnostic.snippet.start_line=53\`
+
+\`diagnostic.snippet.values.0.statement=is object with 1 attribute "only"\`
+
+\`diagnostic.snippet.values.0.traversal=local.present_keys\`
+
+\`diagnostic.snippet.values.1.statement=is "3853406371777912885"\`
+
+\`diagnostic.snippet.values.1.traversal=null_resource.noise[0].id\`
+
+\`diagnostic.summary=Invalid index\`
+
+</details>
+
+
+
+</details>
+
+### Steps
+
+| Step | Outcome | Exit Code |
+| --- | --- | --- |
+| \`init\` | success | \`0\` |
+| \`validate\` | success | \`0\` |
+| \`plan\` | failure | \`1\` |
+| \`show-plan\` | skipped | \`0\` |
+| \`apply\` | skipped | \`0\` |
+
+"
+`;
+
 exports[`reportFromSteps — state enrichment > no-state snapshot: terraform/apply-error/0/no-state 1`] = `
 "## ✅ Apply: 3 added
 
@@ -25684,16 +27692,6 @@ Exit code: \`1\`
 
 <details open>
 <summary>stdout</summary>
-
-<details>
-<summary><code>Terraform 1.14.6</code> <code>type=version</code></summary>
-<br>
-
-\`terraform=1.14.6\`
-
-\`ui=1.2\`
-
-</details>
 
 <details>
 <summary><code>null_resource.will_fail: Plan to replace</code> <code>type=planned_change</code></summary>
@@ -26435,16 +28433,6 @@ Exit code: \`1\`
 <summary>stdout</summary>
 
 <details>
-<summary><code>Terraform 1.14.6</code> <code>type=version</code></summary>
-<br>
-
-\`terraform=1.14.6\`
-
-\`ui=1.2\`
-
-</details>
-
-<details>
 <summary><code>data.local_file.missing: Refreshing...</code> <code>type=apply_start</code></summary>
 <br>
 
@@ -26463,24 +28451,6 @@ Exit code: \`1\`
 \`hook.resource.resource_name=missing\`
 
 \`hook.resource.resource_type=local_file\`
-
-</details>
-
-<details>
-<summary><code>Plan: 0 to add, 0 to change, 0 to destroy.</code> <code>type=change_summary</code></summary>
-<br>
-
-\`changes.action_invocation=0\`
-
-\`changes.add=0\`
-
-\`changes.change=0\`
-
-\`changes.import=0\`
-
-\`changes.operation=plan\`
-
-\`changes.remove=0\`
 
 </details>
 
@@ -28070,6 +30040,228 @@ _No changes._
 "
 `;
 
+exports[`reportFromSteps — state enrichment > no-state snapshot: tofu/addressless-plan-error/0/no-state 1`] = `
+"## ✅ Apply: 6 added
+
+> ⚠️ **Warning:** Some attribute values could not be resolved because \`tofu state pull\` output was not available. Add a state step after apply to see the actual values.
+
+## Apply Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Added | null\\_resource | 6 |
+|  | **Added** | **6** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>➕ <strong>null_resource</strong> noise[0]</summary>
+
+\`\`\`
+null_resource.noise[0]
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | <code></code> | <code>(value not in plan)</code> |
+| triggers.index | <code></code> | <code><ins style="background:#dfd">0</ins></code> |
+
+
+
+</details>
+
+<details>
+<summary>➕ <strong>null_resource</strong> noise[1]</summary>
+
+\`\`\`
+null_resource.noise[1]
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | <code></code> | <code>(value not in plan)</code> |
+| triggers.index | <code></code> | <code><ins style="background:#dfd">1</ins></code> |
+
+
+
+</details>
+
+<details>
+<summary>➕ <strong>null_resource</strong> noise[2]</summary>
+
+\`\`\`
+null_resource.noise[2]
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | <code></code> | <code>(value not in plan)</code> |
+| triggers.index | <code></code> | <code><ins style="background:#dfd">2</ins></code> |
+
+
+
+</details>
+
+<details>
+<summary>➕ <strong>null_resource</strong> noise[3]</summary>
+
+\`\`\`
+null_resource.noise[3]
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | <code></code> | <code>(value not in plan)</code> |
+| triggers.index | <code></code> | <code><ins style="background:#dfd">3</ins></code> |
+
+
+
+</details>
+
+<details>
+<summary>➕ <strong>null_resource</strong> noise[4]</summary>
+
+\`\`\`
+null_resource.noise[4]
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | <code></code> | <code>(value not in plan)</code> |
+| triggers.index | <code></code> | <code><ins style="background:#dfd">4</ins></code> |
+
+
+
+</details>
+
+<details>
+<summary>➕ <strong>null_resource</strong> noise[5]</summary>
+
+\`\`\`
+null_resource.noise[5]
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | <code></code> | <code>(value not in plan)</code> |
+| triggers.index | <code></code> | <code><ins style="background:#dfd">5</ins></code> |
+
+
+
+</details>
+
+## Output Changes
+
+| Output | Action | Before | After |
+| --- | --- | --- | --- |
+| noise\\_count | ➕ |  | <code><ins style="background:#dfd">6</ins></code> |
+| noise\\_enabled | ➕ |  | <code><ins style="background:#dfd">true</ins></code> |
+
+<details>
+<summary>➕ noise_banner (large value; +5, -0)</summary>
+
+\`\`\`diff
++ line one
++ line two
++ line three
++ line four
++ line five
+\`\`\`
+
+
+
+</details>
+
+<details>
+<summary>➕ noise_config (large value; +4, -0)</summary>
+
+\`\`\`diff
++ {
++   "enabled": true,
++   "name": "noise"
++ }
+\`\`\`
+
+
+
+</details>
+
+"
+`;
+
+exports[`reportFromSteps — state enrichment > no-state snapshot: tofu/addressless-plan-error/1/no-state 1`] = `
+"## ❌ Plan Failed
+
+### ❌ \`plan\` failed
+
+Exit code: \`1\`
+
+<details open>
+<summary>stdout</summary>
+
+<details>
+<summary>🚨 <code>Error: Invalid index</code> <code>type=diagnostic</code></summary>
+<br>
+
+\`diagnostic.detail=The given key does not identify an element in this collection value.\`
+
+\`diagnostic.range.end.byte=1103\`
+
+\`diagnostic.range.end.column=56\`
+
+\`diagnostic.range.end.line=53\`
+
+\`diagnostic.range.filename=main.tf\`
+
+\`diagnostic.range.start.byte=1076\`
+
+\`diagnostic.range.start.column=29\`
+
+\`diagnostic.range.start.line=53\`
+
+\`diagnostic.severity=error\`
+
+\`diagnostic.snippet.code=  value = local.present_keys[null_resource.noise[0].id]\`
+
+\`diagnostic.snippet.context=output "broken_index"\`
+
+\`diagnostic.snippet.highlight_end_offset=55\`
+
+\`diagnostic.snippet.highlight_start_offset=28\`
+
+\`diagnostic.snippet.start_line=53\`
+
+\`diagnostic.snippet.values.0.statement=is object with 1 attribute "only"\`
+
+\`diagnostic.snippet.values.0.traversal=local.present_keys\`
+
+\`diagnostic.snippet.values.1.statement=is "6209945319932785212"\`
+
+\`diagnostic.snippet.values.1.traversal=null_resource.noise[0].id\`
+
+\`diagnostic.summary=Invalid index\`
+
+</details>
+
+
+
+</details>
+
+### Steps
+
+| Step | Outcome | Exit Code |
+| --- | --- | --- |
+| \`init\` | success | \`0\` |
+| \`validate\` | success | \`0\` |
+| \`plan\` | failure | \`1\` |
+| \`show-plan\` | skipped | \`0\` |
+| \`apply\` | skipped | \`0\` |
+
+"
+`;
+
 exports[`reportFromSteps — state enrichment > no-state snapshot: tofu/apply-error/0/no-state 1`] = `
 "## ✅ Apply: 3 added
 
@@ -28154,16 +30346,6 @@ Exit code: \`1\`
 
 <details open>
 <summary>stdout</summary>
-
-<details>
-<summary><code>OpenTofu 1.11.5</code> <code>type=version</code></summary>
-<br>
-
-\`tofu=1.11.5\`
-
-\`ui=1.2\`
-
-</details>
 
 <details>
 <summary><code>null_resource.will_fail: Plan to replace</code> <code>type=planned_change</code></summary>
@@ -28905,16 +31087,6 @@ Exit code: \`1\`
 <summary>stdout</summary>
 
 <details>
-<summary><code>OpenTofu 1.11.5</code> <code>type=version</code></summary>
-<br>
-
-\`tofu=1.11.5\`
-
-\`ui=1.2\`
-
-</details>
-
-<details>
 <summary><code>data.local_file.missing: Refreshing...</code> <code>type=apply_start</code></summary>
 <br>
 
@@ -28933,24 +31105,6 @@ Exit code: \`1\`
 \`hook.resource.resource_name=missing\`
 
 \`hook.resource.resource_type=local_file\`
-
-</details>
-
-<details>
-<summary><code>Plan: 0 to add, 0 to change, 0 to destroy.</code> <code>type=change_summary</code></summary>
-<br>
-
-\`changes.add=0\`
-
-\`changes.change=0\`
-
-\`changes.forget=0\`
-
-\`changes.import=0\`
-
-\`changes.operation=plan\`
-
-\`changes.remove=0\`
 
 </details>
 

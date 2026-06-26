@@ -26,10 +26,7 @@ import {
   StepOutputMissingWarning,
   StepScanFailureWarning,
 } from "./warnings.js";
-import {
-  addScannerWarnings,
-  filterStepIssueStdout,
-} from "./process-helpers.js";
+import { addScannerWarnings, focusStepIssueStdout } from "./process-helpers.js";
 
 /**
  * Process the apply step: scan JSONL for apply statuses and diagnostics,
@@ -55,11 +52,9 @@ export function processApplyStep(
     if (peek.content !== undefined) {
       const firstLines = peek.content.split("\n", 10);
       if (isJsonLines(firstLines)) {
-        const diagsBefore = report.diagnostics?.length ?? 0;
         enrichFromApplyJsonl(path, report, readerOpts, showPlanParsed);
         if (outcome === "failure") {
-          const newDiags = (report.diagnostics ?? []).slice(diagsBefore);
-          filterStepIssueStdout(report, stepId, newDiags);
+          focusStepIssueStdout(report, stepId);
         }
         return;
       }

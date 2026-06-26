@@ -1,5 +1,452 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
+exports[`planToMarkdown integration > terraform/addressless-plan-error/0 > renders without error and matches snapshot [default] 1`] = `
+"## ✅ Plan: 6 to add
+
+## Plan Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Add | null\\_resource | 6 |
+|  | **Add** | **6** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>➕ <strong>null_resource</strong> noise[0]</summary>
+
+\`\`\`
+null_resource.noise[0]
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | <code></code> | <code>(known after apply)</code> |
+| triggers.index | <code></code> | <code><ins style="background:#dfd">0</ins></code> |
+
+
+
+</details>
+
+<details>
+<summary>➕ <strong>null_resource</strong> noise[1]</summary>
+
+\`\`\`
+null_resource.noise[1]
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | <code></code> | <code>(known after apply)</code> |
+| triggers.index | <code></code> | <code><ins style="background:#dfd">1</ins></code> |
+
+
+
+</details>
+
+<details>
+<summary>➕ <strong>null_resource</strong> noise[2]</summary>
+
+\`\`\`
+null_resource.noise[2]
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | <code></code> | <code>(known after apply)</code> |
+| triggers.index | <code></code> | <code><ins style="background:#dfd">2</ins></code> |
+
+
+
+</details>
+
+<details>
+<summary>➕ <strong>null_resource</strong> noise[3]</summary>
+
+\`\`\`
+null_resource.noise[3]
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | <code></code> | <code>(known after apply)</code> |
+| triggers.index | <code></code> | <code><ins style="background:#dfd">3</ins></code> |
+
+
+
+</details>
+
+<details>
+<summary>➕ <strong>null_resource</strong> noise[4]</summary>
+
+\`\`\`
+null_resource.noise[4]
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | <code></code> | <code>(known after apply)</code> |
+| triggers.index | <code></code> | <code><ins style="background:#dfd">4</ins></code> |
+
+
+
+</details>
+
+<details>
+<summary>➕ <strong>null_resource</strong> noise[5]</summary>
+
+\`\`\`
+null_resource.noise[5]
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | <code></code> | <code>(known after apply)</code> |
+| triggers.index | <code></code> | <code><ins style="background:#dfd">5</ins></code> |
+
+
+
+</details>
+
+## Output Changes
+
+| Output | Action | Before | After |
+| --- | --- | --- | --- |
+| noise\\_count | ➕ |  | <code><ins style="background:#dfd">6</ins></code> |
+| noise\\_enabled | ➕ |  | <code><ins style="background:#dfd">true</ins></code> |
+
+<details>
+<summary>➕ noise_banner (large value; +5, -0)</summary>
+
+\`\`\`diff
++ line one
++ line two
++ line three
++ line four
++ line five
+\`\`\`
+
+
+
+</details>
+
+<details>
+<summary>➕ noise_config (large value; +4, -0)</summary>
+
+\`\`\`diff
++ {
++   "enabled": true,
++   "name": "noise"
++ }
+\`\`\`
+
+
+
+</details>
+
+"
+`;
+
+exports[`planToMarkdown integration > terraform/addressless-plan-error/0 > renders without error and matches snapshot [diffFormat-simple] 1`] = `
+"## ✅ Plan: 6 to add
+
+## Plan Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Add | null\\_resource | 6 |
+|  | **Add** | **6** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>➕ <strong>null_resource</strong> noise[0]</summary>
+
+\`\`\`
+null_resource.noise[0]
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | <code></code> | <code>(known after apply)</code> |
+| triggers.index | <code></code> | + 0 |
+
+
+
+</details>
+
+<details>
+<summary>➕ <strong>null_resource</strong> noise[1]</summary>
+
+\`\`\`
+null_resource.noise[1]
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | <code></code> | <code>(known after apply)</code> |
+| triggers.index | <code></code> | + 1 |
+
+
+
+</details>
+
+<details>
+<summary>➕ <strong>null_resource</strong> noise[2]</summary>
+
+\`\`\`
+null_resource.noise[2]
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | <code></code> | <code>(known after apply)</code> |
+| triggers.index | <code></code> | + 2 |
+
+
+
+</details>
+
+<details>
+<summary>➕ <strong>null_resource</strong> noise[3]</summary>
+
+\`\`\`
+null_resource.noise[3]
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | <code></code> | <code>(known after apply)</code> |
+| triggers.index | <code></code> | + 3 |
+
+
+
+</details>
+
+<details>
+<summary>➕ <strong>null_resource</strong> noise[4]</summary>
+
+\`\`\`
+null_resource.noise[4]
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | <code></code> | <code>(known after apply)</code> |
+| triggers.index | <code></code> | + 4 |
+
+
+
+</details>
+
+<details>
+<summary>➕ <strong>null_resource</strong> noise[5]</summary>
+
+\`\`\`
+null_resource.noise[5]
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | <code></code> | <code>(known after apply)</code> |
+| triggers.index | <code></code> | + 5 |
+
+
+
+</details>
+
+## Output Changes
+
+| Output | Action | Before | After |
+| --- | --- | --- | --- |
+| noise\\_count | ➕ |  | + 6 |
+| noise\\_enabled | ➕ |  | + true |
+
+<details>
+<summary>➕ noise_banner (large value; +5, -0)</summary>
+
+\`\`\`diff
++ line one
++ line two
++ line three
++ line four
++ line five
+\`\`\`
+
+
+
+</details>
+
+<details>
+<summary>➕ noise_config (large value; +4, -0)</summary>
+
+\`\`\`diff
++ {
++   "enabled": true,
++   "name": "noise"
++ }
+\`\`\`
+
+
+
+</details>
+
+"
+`;
+
+exports[`planToMarkdown integration > terraform/addressless-plan-error/0 > renders without error and matches snapshot [showUnchangedAttributes] 1`] = `
+"## ✅ Plan: 6 to add
+
+## Plan Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Add | null\\_resource | 6 |
+|  | **Add** | **6** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>➕ <strong>null_resource</strong> noise[0]</summary>
+
+\`\`\`
+null_resource.noise[0]
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | <code></code> | <code>(known after apply)</code> |
+| triggers.index | <code></code> | <code><ins style="background:#dfd">0</ins></code> |
+
+
+
+</details>
+
+<details>
+<summary>➕ <strong>null_resource</strong> noise[1]</summary>
+
+\`\`\`
+null_resource.noise[1]
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | <code></code> | <code>(known after apply)</code> |
+| triggers.index | <code></code> | <code><ins style="background:#dfd">1</ins></code> |
+
+
+
+</details>
+
+<details>
+<summary>➕ <strong>null_resource</strong> noise[2]</summary>
+
+\`\`\`
+null_resource.noise[2]
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | <code></code> | <code>(known after apply)</code> |
+| triggers.index | <code></code> | <code><ins style="background:#dfd">2</ins></code> |
+
+
+
+</details>
+
+<details>
+<summary>➕ <strong>null_resource</strong> noise[3]</summary>
+
+\`\`\`
+null_resource.noise[3]
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | <code></code> | <code>(known after apply)</code> |
+| triggers.index | <code></code> | <code><ins style="background:#dfd">3</ins></code> |
+
+
+
+</details>
+
+<details>
+<summary>➕ <strong>null_resource</strong> noise[4]</summary>
+
+\`\`\`
+null_resource.noise[4]
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | <code></code> | <code>(known after apply)</code> |
+| triggers.index | <code></code> | <code><ins style="background:#dfd">4</ins></code> |
+
+
+
+</details>
+
+<details>
+<summary>➕ <strong>null_resource</strong> noise[5]</summary>
+
+\`\`\`
+null_resource.noise[5]
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | <code></code> | <code>(known after apply)</code> |
+| triggers.index | <code></code> | <code><ins style="background:#dfd">5</ins></code> |
+
+
+
+</details>
+
+## Output Changes
+
+| Output | Action | Before | After |
+| --- | --- | --- | --- |
+| noise\\_count | ➕ |  | <code><ins style="background:#dfd">6</ins></code> |
+| noise\\_enabled | ➕ |  | <code><ins style="background:#dfd">true</ins></code> |
+
+<details>
+<summary>➕ noise_banner (large value; +5, -0)</summary>
+
+\`\`\`diff
++ line one
++ line two
++ line three
++ line four
++ line five
+\`\`\`
+
+
+
+</details>
+
+<details>
+<summary>➕ noise_config (large value; +4, -0)</summary>
+
+\`\`\`diff
++ {
++   "enabled": true,
++   "name": "noise"
++ }
+\`\`\`
+
+
+
+</details>
+
+"
+`;
+
 exports[`planToMarkdown integration > terraform/apply-error/0 > renders without error and matches snapshot [default] 1`] = `
 "## ✅ Plan: 3 to add
 
@@ -6071,6 +6518,453 @@ exports[`planToMarkdown integration > terraform/update-drift/2 > renders without
 ## Plan Summary
 
 _No changes._
+
+"
+`;
+
+exports[`planToMarkdown integration > tofu/addressless-plan-error/0 > renders without error and matches snapshot [default] 1`] = `
+"## ✅ Plan: 6 to add
+
+## Plan Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Add | null\\_resource | 6 |
+|  | **Add** | **6** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>➕ <strong>null_resource</strong> noise[0]</summary>
+
+\`\`\`
+null_resource.noise[0]
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | <code></code> | <code>(known after apply)</code> |
+| triggers.index | <code></code> | <code><ins style="background:#dfd">0</ins></code> |
+
+
+
+</details>
+
+<details>
+<summary>➕ <strong>null_resource</strong> noise[1]</summary>
+
+\`\`\`
+null_resource.noise[1]
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | <code></code> | <code>(known after apply)</code> |
+| triggers.index | <code></code> | <code><ins style="background:#dfd">1</ins></code> |
+
+
+
+</details>
+
+<details>
+<summary>➕ <strong>null_resource</strong> noise[2]</summary>
+
+\`\`\`
+null_resource.noise[2]
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | <code></code> | <code>(known after apply)</code> |
+| triggers.index | <code></code> | <code><ins style="background:#dfd">2</ins></code> |
+
+
+
+</details>
+
+<details>
+<summary>➕ <strong>null_resource</strong> noise[3]</summary>
+
+\`\`\`
+null_resource.noise[3]
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | <code></code> | <code>(known after apply)</code> |
+| triggers.index | <code></code> | <code><ins style="background:#dfd">3</ins></code> |
+
+
+
+</details>
+
+<details>
+<summary>➕ <strong>null_resource</strong> noise[4]</summary>
+
+\`\`\`
+null_resource.noise[4]
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | <code></code> | <code>(known after apply)</code> |
+| triggers.index | <code></code> | <code><ins style="background:#dfd">4</ins></code> |
+
+
+
+</details>
+
+<details>
+<summary>➕ <strong>null_resource</strong> noise[5]</summary>
+
+\`\`\`
+null_resource.noise[5]
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | <code></code> | <code>(known after apply)</code> |
+| triggers.index | <code></code> | <code><ins style="background:#dfd">5</ins></code> |
+
+
+
+</details>
+
+## Output Changes
+
+| Output | Action | Before | After |
+| --- | --- | --- | --- |
+| noise\\_count | ➕ |  | <code><ins style="background:#dfd">6</ins></code> |
+| noise\\_enabled | ➕ |  | <code><ins style="background:#dfd">true</ins></code> |
+
+<details>
+<summary>➕ noise_banner (large value; +5, -0)</summary>
+
+\`\`\`diff
++ line one
++ line two
++ line three
++ line four
++ line five
+\`\`\`
+
+
+
+</details>
+
+<details>
+<summary>➕ noise_config (large value; +4, -0)</summary>
+
+\`\`\`diff
++ {
++   "enabled": true,
++   "name": "noise"
++ }
+\`\`\`
+
+
+
+</details>
+
+"
+`;
+
+exports[`planToMarkdown integration > tofu/addressless-plan-error/0 > renders without error and matches snapshot [diffFormat-simple] 1`] = `
+"## ✅ Plan: 6 to add
+
+## Plan Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Add | null\\_resource | 6 |
+|  | **Add** | **6** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>➕ <strong>null_resource</strong> noise[0]</summary>
+
+\`\`\`
+null_resource.noise[0]
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | <code></code> | <code>(known after apply)</code> |
+| triggers.index | <code></code> | + 0 |
+
+
+
+</details>
+
+<details>
+<summary>➕ <strong>null_resource</strong> noise[1]</summary>
+
+\`\`\`
+null_resource.noise[1]
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | <code></code> | <code>(known after apply)</code> |
+| triggers.index | <code></code> | + 1 |
+
+
+
+</details>
+
+<details>
+<summary>➕ <strong>null_resource</strong> noise[2]</summary>
+
+\`\`\`
+null_resource.noise[2]
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | <code></code> | <code>(known after apply)</code> |
+| triggers.index | <code></code> | + 2 |
+
+
+
+</details>
+
+<details>
+<summary>➕ <strong>null_resource</strong> noise[3]</summary>
+
+\`\`\`
+null_resource.noise[3]
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | <code></code> | <code>(known after apply)</code> |
+| triggers.index | <code></code> | + 3 |
+
+
+
+</details>
+
+<details>
+<summary>➕ <strong>null_resource</strong> noise[4]</summary>
+
+\`\`\`
+null_resource.noise[4]
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | <code></code> | <code>(known after apply)</code> |
+| triggers.index | <code></code> | + 4 |
+
+
+
+</details>
+
+<details>
+<summary>➕ <strong>null_resource</strong> noise[5]</summary>
+
+\`\`\`
+null_resource.noise[5]
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | <code></code> | <code>(known after apply)</code> |
+| triggers.index | <code></code> | + 5 |
+
+
+
+</details>
+
+## Output Changes
+
+| Output | Action | Before | After |
+| --- | --- | --- | --- |
+| noise\\_count | ➕ |  | + 6 |
+| noise\\_enabled | ➕ |  | + true |
+
+<details>
+<summary>➕ noise_banner (large value; +5, -0)</summary>
+
+\`\`\`diff
++ line one
++ line two
++ line three
++ line four
++ line five
+\`\`\`
+
+
+
+</details>
+
+<details>
+<summary>➕ noise_config (large value; +4, -0)</summary>
+
+\`\`\`diff
++ {
++   "enabled": true,
++   "name": "noise"
++ }
+\`\`\`
+
+
+
+</details>
+
+"
+`;
+
+exports[`planToMarkdown integration > tofu/addressless-plan-error/0 > renders without error and matches snapshot [showUnchangedAttributes] 1`] = `
+"## ✅ Plan: 6 to add
+
+## Plan Summary
+
+| Action | Resource | Count |
+| --- | --- | --- |
+| ➕ Add | null\\_resource | 6 |
+|  | **Add** | **6** |
+
+## Resource Changes
+
+### 📦 Module: root
+
+<details>
+<summary>➕ <strong>null_resource</strong> noise[0]</summary>
+
+\`\`\`
+null_resource.noise[0]
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | <code></code> | <code>(known after apply)</code> |
+| triggers.index | <code></code> | <code><ins style="background:#dfd">0</ins></code> |
+
+
+
+</details>
+
+<details>
+<summary>➕ <strong>null_resource</strong> noise[1]</summary>
+
+\`\`\`
+null_resource.noise[1]
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | <code></code> | <code>(known after apply)</code> |
+| triggers.index | <code></code> | <code><ins style="background:#dfd">1</ins></code> |
+
+
+
+</details>
+
+<details>
+<summary>➕ <strong>null_resource</strong> noise[2]</summary>
+
+\`\`\`
+null_resource.noise[2]
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | <code></code> | <code>(known after apply)</code> |
+| triggers.index | <code></code> | <code><ins style="background:#dfd">2</ins></code> |
+
+
+
+</details>
+
+<details>
+<summary>➕ <strong>null_resource</strong> noise[3]</summary>
+
+\`\`\`
+null_resource.noise[3]
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | <code></code> | <code>(known after apply)</code> |
+| triggers.index | <code></code> | <code><ins style="background:#dfd">3</ins></code> |
+
+
+
+</details>
+
+<details>
+<summary>➕ <strong>null_resource</strong> noise[4]</summary>
+
+\`\`\`
+null_resource.noise[4]
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | <code></code> | <code>(known after apply)</code> |
+| triggers.index | <code></code> | <code><ins style="background:#dfd">4</ins></code> |
+
+
+
+</details>
+
+<details>
+<summary>➕ <strong>null_resource</strong> noise[5]</summary>
+
+\`\`\`
+null_resource.noise[5]
+\`\`\`
+
+| Attribute | Before | After |
+| --- | --- | --- |
+| id | <code></code> | <code>(known after apply)</code> |
+| triggers.index | <code></code> | <code><ins style="background:#dfd">5</ins></code> |
+
+
+
+</details>
+
+## Output Changes
+
+| Output | Action | Before | After |
+| --- | --- | --- | --- |
+| noise\\_count | ➕ |  | <code><ins style="background:#dfd">6</ins></code> |
+| noise\\_enabled | ➕ |  | <code><ins style="background:#dfd">true</ins></code> |
+
+<details>
+<summary>➕ noise_banner (large value; +5, -0)</summary>
+
+\`\`\`diff
++ line one
++ line two
++ line three
++ line four
++ line five
+\`\`\`
+
+
+
+</details>
+
+<details>
+<summary>➕ noise_config (large value; +4, -0)</summary>
+
+\`\`\`diff
++ {
++   "enabled": true,
++   "name": "noise"
++ }
+\`\`\`
+
+
+
+</details>
 
 "
 `;

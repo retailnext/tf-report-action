@@ -1,0 +1,117 @@
+{
+  "version": 4,
+  "terraform_version": "1.14.9",
+  "serial": 3,
+  "lineage": "525e2c8c-699d-8cba-37cc-011a77256643",
+  "outputs": {
+    "noise_banner": {
+      "value": "line one\nline two\nline three\nline four\nline five",
+      "type": "string"
+    },
+    "noise_config": {
+      "value": {
+        "enabled": true,
+        "name": "noise"
+      },
+      "type": [
+        "object",
+        {
+          "enabled": "bool",
+          "name": "string"
+        }
+      ]
+    },
+    "noise_count": {
+      "value": 6,
+      "type": "number"
+    },
+    "noise_enabled": {
+      "value": true,
+      "type": "bool"
+    }
+  },
+  "resources": [
+    {
+      "mode": "managed",
+      "type": "null_resource",
+      "name": "noise",
+      "provider": "provider[\"registry.terraform.io/hashicorp/null\"]",
+      "instances": [
+        {
+          "index_key": 0,
+          "schema_version": 0,
+          "attributes": {
+            "id": "3853406371777912885",
+            "triggers": {
+              "index": "0"
+            }
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0
+        },
+        {
+          "index_key": 1,
+          "schema_version": 0,
+          "attributes": {
+            "id": "7769823641427348376",
+            "triggers": {
+              "index": "1"
+            }
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0
+        },
+        {
+          "index_key": 2,
+          "schema_version": 0,
+          "attributes": {
+            "id": "3475655045609791004",
+            "triggers": {
+              "index": "2"
+            }
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0
+        },
+        {
+          "index_key": 3,
+          "schema_version": 0,
+          "attributes": {
+            "id": "4507876836298560482",
+            "triggers": {
+              "index": "3"
+            }
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0
+        },
+        {
+          "index_key": 4,
+          "schema_version": 0,
+          "attributes": {
+            "id": "1567203202823363942",
+            "triggers": {
+              "index": "4"
+            }
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0
+        },
+        {
+          "index_key": 5,
+          "schema_version": 0,
+          "attributes": {
+            "id": "5257056199730408499",
+            "triggers": {
+              "index": "5"
+            }
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0
+        }
+      ]
+    }
+  ],
+  "check_results": null
+}
+

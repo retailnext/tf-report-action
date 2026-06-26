@@ -650,6 +650,118 @@ function parseValidateOutput(json) {
   return parsed;
 }
 
+// src/builder/causal-relevance.ts
+var ERRORED_HOOK_TYPES = /* @__PURE__ */ new Set(["apply_errored", "provision_errored"]);
+var ADDRESSED_HOOK_TYPES = /* @__PURE__ */ new Set([
+  "apply_start",
+  "apply_progress",
+  "apply_complete",
+  "apply_errored",
+  "refresh_start",
+  "refresh_complete",
+  "provision_start",
+  "provision_progress",
+  "provision_complete",
+  "provision_errored"
+]);
+function configForm(addr) {
+  return addr.replace(/\[[^\]]*\]/g, "");
+}
+function asObject(value) {
+  if (typeof value !== "object" || value === null || Array.isArray(value)) {
+    return void 0;
+  }
+  return value;
+}
+function parseLine(line) {
+  let parsed;
+  try {
+    parsed = JSON.parse(line);
+  } catch {
+    return void 0;
+  }
+  return asObject(parsed);
+}
+function lineAddress(obj) {
+  const type = obj["type"];
+  if (typeof type !== "string") return void 0;
+  if (ADDRESSED_HOOK_TYPES.has(type)) {
+    const hook = asObject(obj["hook"]);
+    const resource = hook && asObject(hook["resource"]);
+    const addr = resource?.["addr"];
+    return typeof addr === "string" ? addr : void 0;
+  }
+  if (type === "planned_change" || type === "resource_drift") {
+    const change = asObject(obj["change"]);
+    const resource = change && asObject(change["resource"]);
+    const addr = resource?.["addr"];
+    return typeof addr === "string" ? addr : void 0;
+  }
+  if (type === "diagnostic") {
+    const diagnostic = asObject(obj["diagnostic"]);
+    const addr = diagnostic?.["address"];
+    return typeof addr === "string" ? addr : void 0;
+  }
+  return void 0;
+}
+function diagnosticSeverity(obj) {
+  if (obj["type"] !== "diagnostic") return void 0;
+  const diagnostic = asObject(obj["diagnostic"]);
+  const severity = diagnostic?.["severity"];
+  return typeof severity === "string" ? severity : void 0;
+}
+function isConcernDiagnostic(severity) {
+  return severity === "error" || severity === "warning";
+}
+function buildConcernSeed(content) {
+  const seedAddrs = /* @__PURE__ */ new Set();
+  let hasConcern = false;
+  for (const line of content.split("\n")) {
+    if (line.trim() === "") continue;
+    const obj = parseLine(line);
+    if (obj === void 0) continue;
+    const type = obj["type"];
+    if (typeof type !== "string") continue;
+    if (type === "diagnostic") {
+      if (!isConcernDiagnostic(diagnosticSeverity(obj))) continue;
+      hasConcern = true;
+      const addr = lineAddress(obj);
+      if (addr !== void 0) seedAddrs.add(configForm(addr));
+      continue;
+    }
+    if (ERRORED_HOOK_TYPES.has(type)) {
+      hasConcern = true;
+      const addr = lineAddress(obj);
+      if (addr !== void 0) seedAddrs.add(configForm(addr));
+    }
+  }
+  return { seedAddrs, hasConcern };
+}
+function isRelevant(line, seed) {
+  const obj = parseLine(line);
+  if (obj === void 0) return true;
+  const type = obj["type"];
+  if (typeof type !== "string") return true;
+  if (type === "diagnostic" && isConcernDiagnostic(diagnosticSeverity(obj))) {
+    return true;
+  }
+  if (ERRORED_HOOK_TYPES.has(type)) return true;
+  const addr = lineAddress(obj);
+  if (addr !== void 0 && seed.seedAddrs.has(configForm(addr))) return true;
+  return false;
+}
+function filterJsonlByConcernRelevance(content) {
+  const seed = buildConcernSeed(content);
+  if (!seed.hasConcern) return content;
+  const kept = [];
+  for (const line of content.split("\n")) {
+    if (line.trim() === "" || isRelevant(line, seed)) {
+      kept.push(line);
+    }
+  }
+  return kept.join("\n");
+}
+
 // src/builder/process-helpers.ts
 function uiDiagnosticToModel(d, source) {
   const base = {
@@ -663,72 +775,14 @@ function uiDiagnosticToModel(d, source) {
   if (d.snippet !== void 0) base["snippet"] = d.snippet;
   return base;
 }
-function extractJsonlResourceAddress(obj) {
-  const type = obj["type"];
-  if (typeof type !== "string") return void 0;
-  if (type === "apply_start" || type === "apply_progress" || type === "apply_complete" || type === "apply_errored" || type === "refresh_start" || type === "refresh_complete" || type === "provision_start" || type === "provision_progress" || type === "provision_complete" || type === "provision_errored") {
-    const hook = obj["hook"];
-    if (typeof hook !== "object" || hook === null) return void 0;
-    const resource = hook["resource"];
-    if (typeof resource !== "object" || resource === null) return void 0;
-    const addr = resource["addr"];
-    return typeof addr === "string" ? addr : void 0;
-  }
-  if (type === "planned_change" || type === "resource_drift") {
-    const change = obj["change"];
-    if (typeof change !== "object" || change === null) return void 0;
-    const resource = change["resource"];
-    if (typeof resource !== "object" || resource === null) return void 0;
-    const addr = resource["addr"];
-    return typeof addr === "string" ? addr : void 0;
-  }
-  if (type === "diagnostic") {
-    const diagnostic = obj["diagnostic"];
-    if (typeof diagnostic !== "object" || diagnostic === null) return void 0;
-    const addr = diagnostic["address"];
-    return typeof addr === "string" ? addr : void 0;
-  }
-  return void 0;
-}
-function filterJsonlByAddresses(content, addresses) {
-  const lines = content.split("\n");
-  const filtered = [];
-  for (const line of lines) {
-    if (line.trim() === "") {
-      filtered.push(line);
-      continue;
-    }
-    let parsed;
-    try {
-      parsed = JSON.parse(line);
-    } catch {
-      filtered.push(line);
-      continue;
-    }
-    if (typeof parsed !== "object" || parsed === null || Array.isArray(parsed)) {
-      filtered.push(line);
-      continue;
-    }
-    const addr = extractJsonlResourceAddress(parsed);
-    if (addr === void 0 || addresses.has(addr)) {
-      filtered.push(line);
-    }
-  }
-  return filtered.join("\n");
-}
-function filterStepIssueStdout(report, stepId, diagnostics) {
-  const addresses = /* @__PURE__ */ new Set();
-  for (const d of diagnostics) {
-    if (d.address === void 0) return;
-    addresses.add(d.address);
-  }
-  if (addresses.size === 0) return;
+function focusStepIssueStdout(report, stepId) {
   const idx = report.issues.findIndex((i) => i.id === stepId);
   if (idx < 0) return;
   const issue = report.issues[idx];
   if (issue === void 0) return;
   if (issue.stdout === void 0) return;
-  const filtered = filterJsonlByAddresses(issue.stdout, addresses);
+  const filtered = filterJsonlByConcernRelevance(issue.stdout);
+  if (filtered === issue.stdout) return;
   report.issues[idx] = { ...issue, stdout: filtered };
 }
 function addScannerWarnings(report, scan, role) {
@@ -2008,11 +2062,9 @@ function processPlanStep(step, stepId, report, readerOpts, showPlanParsed) {
     if (peek.content !== void 0) {
       const firstLines = peek.content.split("\n", 10);
       if (isJsonLines(firstLines)) {
-        const diagsBefore = report.diagnostics?.length ?? 0;
         enrichFromPlanJsonl(path, report, readerOpts, showPlanParsed);
         if (outcome === "failure") {
-          const newDiags = (report.diagnostics ?? []).slice(diagsBefore);
-          filterStepIssueStdout(report, stepId, newDiags);
+          focusStepIssueStdout(report, stepId);
         }
         return;
       }
@@ -2082,11 +2134,9 @@ function processApplyStep(step, stepId, report, readerOpts, showPlanParsed) {
     if (peek.content !== void 0) {
       const firstLines = peek.content.split("\n", 10);
       if (isJsonLines(firstLines)) {
-        const diagsBefore = report.diagnostics?.length ?? 0;
         enrichFromApplyJsonl(path, report, readerOpts, showPlanParsed);
         if (outcome === "failure") {
-          const newDiags = (report.diagnostics ?? []).slice(diagsBefore);
-          filterStepIssueStdout(report, stepId, newDiags);
+          focusStepIssueStdout(report, stepId);
         }
         return;
       }

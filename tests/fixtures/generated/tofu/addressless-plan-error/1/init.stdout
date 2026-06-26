@@ -1,0 +1,7 @@
+{"@level":"info","@message":"OpenTofu 1.12.3","@module":"tofu.ui","@timestamp":"2026-06-26T13:21:16.221355-07:00","tofu":"1.12.3","type":"version","ui":"1.2"}
+{"@level":"info","@message":"Initializing the backend...","@module":"tofu.ui","@timestamp":"2026-06-26T13:21:16.222247-07:00"}
+{"@level":"info","@message":"Initializing provider plugins...","@module":"tofu.ui","@timestamp":"2026-06-26T13:21:16.224465-07:00"}
+{"@level":"info","@message":"Finding hashicorp/null versions matching \"~> 3.0\"...","@module":"tofu.ui","@timestamp":"2026-06-26T13:21:16.224534-07:00"}
+{"@level":"info","@message":"Using previously-installed hashicorp/null v3.3.0","@module":"tofu.ui","@timestamp":"2026-06-26T13:21:16.497271-07:00"}
+{"@level":"info","@message":"OpenTofu has been successfully initialized!","@module":"tofu.ui","@timestamp":"2026-06-26T13:21:16.497415-07:00"}
+{"@level":"info","@message":"You may now begin working with OpenTofu. Try running \"tofu plan\" to see any changes that are required for your infrastructure. All OpenTofu commands should now work. If you ever set or change modules or backend configuration for OpenTofu, rerun this command to reinitialize your working directory. If you forget, other commands will detect it and remind you to do so if necessary.","@module":"tofu.ui","@timestamp":"2026-06-26T13:21:16.497424-07:00"}
