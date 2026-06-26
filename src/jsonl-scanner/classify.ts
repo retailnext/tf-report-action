@@ -1,9 +1,17 @@
 /**
- * Shared per-line classification for JSON Lines messages.
+ * Shared per-line concern classification for JSON Lines messages.
  *
- * This is the single owner of wire-format address/severity extraction. Both the
- * scanner's model building and the causal-relevance visitors operate on the
- * already-parsed line object handed to them, so neither re-parses the JSONL.
+ * This module owns two pieces of wire-format knowledge used by the
+ * causal-relevance visitors: the per-line *concern* facts (resource address,
+ * diagnostic severity, errored-hook flag) extracted via {@link lineConcernInfo},
+ * and the *message-type vocabulary* the scanner recognizes (via
+ * {@link isKnownMessageType}). It operates purely on the already-parsed line
+ * object handed to it, so it never re-parses the JSONL.
+ *
+ * It is not the only place addresses are read: the scanner's record builders
+ * (`processDiagnostic`, `processApplyComplete`, …) extract their own richer
+ * records separately. This module exists so the relevance visitors and the
+ * scanner agree on which types are known and how concern facts are derived.
  *
  * @module jsonl-scanner/classify
  */
@@ -24,6 +32,61 @@ const ADDRESSED_HOOK_TYPES = new Set([
 
 /** Hook message types that signal a failed operation (carry an address). */
 const ERRORED_HOOK_TYPES = new Set(["apply_errored", "provision_errored"]);
+
+/**
+ * Message types the scanner extracts a record from (the `switch` cases in
+ * {@link module:jsonl-scanner/scan}). Kept here so the message-type vocabulary
+ * has a single owner.
+ */
+const HANDLED_MESSAGE_TYPES = new Set([
+  "version",
+  "planned_change",
+  "resource_drift",
+  "change_summary",
+  "apply_complete",
+  "apply_errored",
+  "diagnostic",
+  "outputs",
+]);
+
+/**
+ * Message types that are valid JSONL but carry no information the report needs.
+ * The scanner counts them as parsed but extracts no record. Consumed by
+ * `scan.ts`'s dispatch default branch.
+ */
+export const SKIPPABLE_MESSAGE_TYPES = new Set([
+  "log",
+  "apply_start",
+  "apply_progress",
+  "refresh_start",
+  "refresh_complete",
+  "provision_start",
+  "provision_progress",
+  "provision_complete",
+  "provision_errored",
+  "test_abstract",
+  "test_file",
+  "test_run",
+  "test_plan",
+  "test_state",
+  "test_cleanup",
+  "test_summary",
+  "test_interrupt",
+  "test_status",
+  "init_output",
+]);
+
+/**
+ * Whether `type` is a message type the scanner positively recognizes — either
+ * one it builds a record from or one it knowingly skips as noise.
+ *
+ * The causal-relevance emitter uses this for its fail-safe: a line whose type
+ * is *not* known is retained (it may be a new message type carrying failure
+ * context), whereas a known type that matches no concern is dropped as noise.
+ */
+export function isKnownMessageType(type: string): boolean {
+  return HANDLED_MESSAGE_TYPES.has(type) || SKIPPABLE_MESSAGE_TYPES.has(type);
+}
 
 /**
  * The failure-relevance facts about a single classified line.

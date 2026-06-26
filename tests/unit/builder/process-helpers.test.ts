@@ -121,7 +121,7 @@ describe("buildFocusedStepIssue", () => {
     expect(issue.stdout).toBe(content);
   });
 
-  it("returns an issue without stdout when the emit scan fails", () => {
+  it("falls back to buildStepIssue, surfacing the read error, when the emit scan fails", () => {
     const missing = join(tempDir, "does-not-exist.jsonl");
     const step: StepData = {
       outcome: "failure",
@@ -131,7 +131,9 @@ describe("buildFocusedStepIssue", () => {
 
     const issue = buildFocusedStepIssue(step, "plan", opts, missing, seed);
     expect(issue.isFailed).toBe(true);
+    // No focused stdout, but the fallback explains why stdout was unavailable.
     expect(issue.stdout).toBeUndefined();
+    expect(issue.stdoutError).toBeDefined();
   });
 });
 

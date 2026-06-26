@@ -74,9 +74,10 @@ export function buildFocusedStepIssue(
   try {
     scanFile(filePath, readerOpts.maxFileSize, emitter.visit);
   } catch {
-    // Scan failed on the second pass — the issue still describes the failure;
-    // omit stdout rather than attaching unfocused content.
-    return issue;
+    // The emit pass failed to read the file. Fall back to the normal builder
+    // so the user still sees the bounded stdout (or a stdoutError / no-file
+    // explanation) rather than an issue with stdout silently omitted.
+    return buildStepIssue(step, stepId, readerOpts);
   }
   return { ...issue, stdout: emitter.output() };
 }

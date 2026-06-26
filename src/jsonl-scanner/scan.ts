@@ -27,37 +27,10 @@ import type {
   UIOutputsMessage,
 } from "../tfjson/machine-readable-ui.js";
 import type { PlannedChange, ScanResult, ScanVisitor } from "./types.js";
+import { SKIPPABLE_MESSAGE_TYPES } from "./classify.js";
 
 /** Size of each read chunk for file-based scanning. */
 const CHUNK_SIZE = 64 * 1024; // 64 KiB
-
-// ─── Known Skippable Types ──────────────────────────────────────────────────
-
-/**
- * Message types that are valid JSONL but carry no information needed for the
- * report. The scanner counts them as parsed but does not extract records.
- */
-const SKIPPABLE_TYPES = new Set([
-  "log",
-  "apply_start",
-  "apply_progress",
-  "refresh_start",
-  "refresh_complete",
-  "provision_start",
-  "provision_progress",
-  "provision_complete",
-  "provision_errored",
-  "test_abstract",
-  "test_file",
-  "test_run",
-  "test_plan",
-  "test_state",
-  "test_cleanup",
-  "test_summary",
-  "test_interrupt",
-  "test_status",
-  "init_output",
-]);
 
 // ─── Mutable Accumulator ────────────────────────────────────────────────────
 
@@ -264,7 +237,7 @@ function processLine(
       processOutputs(acc, obj);
       break;
     default:
-      if (SKIPPABLE_TYPES.has(type)) {
+      if (SKIPPABLE_MESSAGE_TYPES.has(type)) {
         acc.parsedLines++;
       } else {
         acc.unknownTypeLines++;

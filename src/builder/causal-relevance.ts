@@ -8,10 +8,12 @@
  * This module identifies the actual *concerns* — `error` and `warning`
  * diagnostics, and `*_errored` hooks — derives the resource addresses those
  * concerns are about, and keeps only the lines causally related to them.
- * Everything positively classified as unrelated (unrelated hooks, `version`,
- * `change_summary`, `outputs`, `log`, and non-error/warning diagnostics that
- * match no concern) is dropped. Anything that cannot be classified is retained
- * (fail-safe).
+ * Lines whose type the scanner positively recognizes (unrelated hooks,
+ * `version`, `change_summary`, `outputs`, `log`, non-error/warning diagnostics)
+ * that match no concern are dropped. Anything that cannot be classified — a
+ * non-JSON line, a line with no `type`, or a message type the scanner does not
+ * recognize — is retained (fail-safe), so a new wire-format message carrying
+ * failure context is never silently dropped.
  *
  * It does **not** parse JSONL itself. Both passes are driven by the scanner's
  * per-line visitor ({@link ScanVisitor}): the seed collector piggybacks the
@@ -22,7 +24,10 @@
  * @module builder/causal-relevance
  */
 
-import { lineConcernInfo } from "../jsonl-scanner/classify.js";
+import {
+  isKnownMessageType,
+  lineConcernInfo,
+} from "../jsonl-scanner/classify.js";
 
 /** The set of loci that the failure's concerns are about. */
 export interface ConcernSeed {
@@ -126,7 +131,10 @@ export class RelevanceEmitter {
     ) {
       return true;
     }
-    return false;
+    // Fail-safe: retain any message type the scanner does not positively
+    // recognize — it may be a new type carrying failure context. Only types
+    // we know (handled or known-noise) that match no concern are dropped.
+    return !isKnownMessageType(type);
   }
 
   /** The focused output: the kept raw lines joined by newlines. */

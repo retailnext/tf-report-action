@@ -652,8 +652,32 @@ function parseValidateOutput(json) {
 
 // src/jsonl-scanner/scan.ts
 import { openSync as openSync2, readSync as readSync2, closeSync as closeSync2, fstatSync } from "node:fs";
-var CHUNK_SIZE = 64 * 1024;
-var SKIPPABLE_TYPES = /* @__PURE__ */ new Set([
+
+// src/jsonl-scanner/classify.ts
+var ADDRESSED_HOOK_TYPES = /* @__PURE__ */ new Set([
+  "apply_start",
+  "apply_progress",
+  "apply_complete",
+  "apply_errored",
+  "refresh_start",
+  "refresh_complete",
+  "provision_start",
+  "provision_progress",
+  "provision_complete",
+  "provision_errored"
+]);
+var ERRORED_HOOK_TYPES = /* @__PURE__ */ new Set(["apply_errored", "provision_errored"]);
+var HANDLED_MESSAGE_TYPES = /* @__PURE__ */ new Set([
+  "version",
+  "planned_change",
+  "resource_drift",
+  "change_summary",
+  "apply_complete",
+  "apply_errored",
+  "diagnostic",
+  "outputs"
+]);
+var SKIPPABLE_MESSAGE_TYPES = /* @__PURE__ */ new Set([
   "log",
   "apply_start",
   "apply_progress",
@@ -674,6 +698,57 @@ var SKIPPABLE_TYPES = /* @__PURE__ */ new Set([
   "test_status",
   "init_output"
 ]);
+function isKnownMessageType(type) {
+  return HANDLED_MESSAGE_TYPES.has(type) || SKIPPABLE_MESSAGE_TYPES.has(type);
+}
+function asObject(value) {
+  if (typeof value !== "object" || value === null || Array.isArray(value)) {
+    return void 0;
+  }
+  return value;
+}
+function hookAddress(obj) {
+  const hook = asObject(obj["hook"]);
+  const resource = hook && asObject(hook["resource"]);
+  const addr = resource?.["addr"];
+  return typeof addr === "string" ? addr : void 0;
+}
+function changeAddress(obj) {
+  const change = asObject(obj["change"]);
+  const resource = change && asObject(change["resource"]);
+  const addr = resource?.["addr"];
+  return typeof addr === "string" ? addr : void 0;
+}
+function lineConcernInfo(obj, type) {
+  if (type === "diagnostic") {
+    const diagnostic = asObject(obj["diagnostic"]);
+    const severity = diagnostic?.["severity"];
+    const addr = diagnostic?.["address"];
+    return {
+      isErroredHook: false,
+      ...typeof severity === "string" ? { severity } : {},
+      ...typeof addr === "string" ? { address: addr } : {}
+    };
+  }
+  if (type === "planned_change" || type === "resource_drift") {
+    const addr = changeAddress(obj);
+    return {
+      isErroredHook: false,
+      ...addr !== void 0 ? { address: addr } : {}
+    };
+  }
+  if (ADDRESSED_HOOK_TYPES.has(type)) {
+    const addr = hookAddress(obj);
+    return {
+      isErroredHook: ERRORED_HOOK_TYPES.has(type),
+      ...addr !== void 0 ? { address: addr } : {}
+    };
+  }
+  return { isErroredHook: false };
+}
+
+// src/jsonl-scanner/scan.ts
+var CHUNK_SIZE = 64 * 1024;
 function createAccumulator() {
   return {
     plannedChanges: [],
@@ -791,7 +866,7 @@ function processLine(acc, rawLine, onLine) {
       processOutputs(acc, obj);
       break;
     default:
-      if (SKIPPABLE_TYPES.has(type)) {
+      if (SKIPPABLE_MESSAGE_TYPES.has(type)) {
         acc.parsedLines++;
       } else {
         acc.unknownTypeLines++;
@@ -943,66 +1018,6 @@ function isSnippet(value) {
   return typeof obj["code"] === "string" && typeof obj["start_line"] === "number";
 }
 
-// src/jsonl-scanner/classify.ts
-var ADDRESSED_HOOK_TYPES = /* @__PURE__ */ new Set([
-  "apply_start",
-  "apply_progress",
-  "apply_complete",
-  "apply_errored",
-  "refresh_start",
-  "refresh_complete",
-  "provision_start",
-  "provision_progress",
-  "provision_complete",
-  "provision_errored"
-]);
-var ERRORED_HOOK_TYPES = /* @__PURE__ */ new Set(["apply_errored", "provision_errored"]);
-function asObject(value) {
-  if (typeof value !== "object" || value === null || Array.isArray(value)) {
-    return void 0;
-  }
-  return value;
-}
-function hookAddress(obj) {
-  const hook = asObject(obj["hook"]);
-  const resource = hook && asObject(hook["resource"]);
-  const addr = resource?.["addr"];
-  return typeof addr === "string" ? addr : void 0;
-}
-function changeAddress(obj) {
-  const change = asObject(obj["change"]);
-  const resource = change && asObject(change["resource"]);
-  const addr = resource?.["addr"];
-  return typeof addr === "string" ? addr : void 0;
-}
-function lineConcernInfo(obj, type) {
-  if (type === "diagnostic") {
-    const diagnostic = asObject(obj["diagnostic"]);
-    const severity = diagnostic?.["severity"];
-    const addr = diagnostic?.["address"];
-    return {
-      isErroredHook: false,
-      ...typeof severity === "string" ? { severity } : {},
-      ...typeof addr === "string" ? { address: addr } : {}
-    };
-  }
-  if (type === "planned_change" || type === "resource_drift") {
-    const addr = changeAddress(obj);
-    return {
-      isErroredHook: false,
-      ...addr !== void 0 ? { address: addr } : {}
-    };
-  }
-  if (ADDRESSED_HOOK_TYPES.has(type)) {
-    const addr = hookAddress(obj);
-    return {
-      isErroredHook: ERRORED_HOOK_TYPES.has(type),
-      ...addr !== void 0 ? { address: addr } : {}
-    };
-  }
-  return { isErroredHook: false };
-}
-
 // src/builder/causal-relevance.ts
 function configForm(addr) {
   return addr.replace(/\[[^\]]*\]/g, "");
@@ -1054,7 +1069,7 @@ var RelevanceEmitter = class {
     if (info.address !== void 0 && this.seed.seedAddrs.has(configForm(info.address))) {
       return true;
     }
-    return false;
+    return !isKnownMessageType(type);
   }
   /** The focused output: the kept raw lines joined by newlines. */
   output() {
@@ -1086,7 +1101,7 @@ function buildFocusedStepIssue(step, stepId, readerOpts, filePath, seed) {
   try {
     scanFile(filePath, readerOpts.maxFileSize, emitter.visit);
   } catch {
-    return issue;
+    return buildStepIssue(step, stepId, readerOpts);
   }
   return { ...issue, stdout: emitter.output() };
 }

@@ -181,4 +181,17 @@ describe("RelevanceEmitter", () => {
     expect(out).toContain("real error");
     expect(out).toContain("[1,2,3]");
   });
+
+  it("retains an unknown/new message type (fail-safe)", () => {
+    const content = jsonl(
+      diagnostic("error", { summary: "real error" }),
+      refresh("aws_instance.unrelated"),
+      { type: "future_event", summary: "new wire-format message" },
+    );
+    const out = emit(content);
+    expect(out).toContain("real error");
+    expect(out).toContain("new wire-format message");
+    // A recognized-but-irrelevant type is still dropped.
+    expect(out).not.toContain("aws_instance.unrelated");
+  });
 });

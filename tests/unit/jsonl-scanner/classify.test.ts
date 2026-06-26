@@ -1,5 +1,8 @@
 import { describe, it, expect } from "vitest";
-import { lineConcernInfo } from "../../../src/jsonl-scanner/classify.js";
+import {
+  isKnownMessageType,
+  lineConcernInfo,
+} from "../../../src/jsonl-scanner/classify.js";
 
 describe("lineConcernInfo", () => {
   it("extracts severity and address from an addressed diagnostic", () => {
@@ -116,5 +119,41 @@ describe("lineConcernInfo", () => {
         "diagnostic",
       ).severity,
     ).toBeUndefined();
+  });
+});
+
+describe("isKnownMessageType", () => {
+  it("recognizes handled message types", () => {
+    for (const type of [
+      "version",
+      "planned_change",
+      "resource_drift",
+      "change_summary",
+      "apply_complete",
+      "apply_errored",
+      "diagnostic",
+      "outputs",
+    ]) {
+      expect(isKnownMessageType(type)).toBe(true);
+    }
+  });
+
+  it("recognizes known-skippable message types", () => {
+    for (const type of [
+      "log",
+      "apply_start",
+      "refresh_start",
+      "provision_errored",
+      "test_summary",
+      "init_output",
+    ]) {
+      expect(isKnownMessageType(type)).toBe(true);
+    }
+  });
+
+  it("does not recognize unknown / future message types", () => {
+    for (const type of ["", "made_up", "future_event", "Diagnostic"]) {
+      expect(isKnownMessageType(type)).toBe(false);
+    }
   });
 });
