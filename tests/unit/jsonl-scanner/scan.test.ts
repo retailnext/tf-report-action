@@ -626,3 +626,92 @@ describe("scanFile", () => {
     }
   });
 });
+
+// ─── onLine visitor ───────────────────────────────────────────────────────────
+
+describe("scanString / scanFile onLine visitor", () => {
+  function writeVisitorTempFile(content: string): string {
+    const filePath = path.join(
+      os.tmpdir(),
+      `scan-visitor-${String(Date.now())}-${String(Math.random())}.jsonl`,
+    );
+    fs.writeFileSync(filePath, content, "utf8");
+    return filePath;
+  }
+
+  it("invokes the visitor once per non-empty line, blanks excluded", () => {
+    const content = [
+      JSON.stringify({ type: "version", tofu: "1.8.0" }),
+      "",
+      JSON.stringify({
+        type: "planned_change",
+        change: { resource: { addr: "a.b" }, action: "create" },
+      }),
+    ].join("\n");
+
+    const seen: { type: string | undefined; hasObj: boolean }[] = [];
+    scanString(content, (_raw, obj, type) => {
+      seen.push({ type, hasObj: obj !== undefined });
+    });
+
+    expect(seen).toEqual([
+      { type: "version", hasObj: true },
+      { type: "planned_change", hasObj: true },
+    ]);
+  });
+
+  it("passes raw line text through to the visitor", () => {
+    const raws: string[] = [];
+    const line = JSON.stringify({ type: "version", tofu: "1.8.0" });
+    scanString(line, (raw) => raws.push(raw));
+    expect(raws).toEqual([line]);
+  });
+
+  it("invokes the visitor with undefined obj/type for unparseable lines", () => {
+    const content = [
+      "not json",
+      JSON.stringify([1, 2, 3]),
+      JSON.stringify({ noType: true }),
+    ].join("\n");
+
+    const seen: { type: string | undefined; hasObj: boolean }[] = [];
+    scanString(content, (_raw, obj, type) => {
+      seen.push({ type, hasObj: obj !== undefined });
+    });
+
+    expect(seen).toEqual([
+      { type: undefined, hasObj: false },
+      { type: undefined, hasObj: false },
+      { type: undefined, hasObj: false },
+    ]);
+  });
+
+  it("invokes the visitor during chunked file scanning", () => {
+    const content = jsonl(
+      versionMessage("tofu"),
+      plannedChangeMessage("aws_instance.web", "create"),
+    );
+    const filePath = writeVisitorTempFile(content);
+    try {
+      const types: (string | undefined)[] = [];
+      scanFile(filePath, 256 * 1024 * 1024, (_raw, _obj, type) =>
+        types.push(type),
+      );
+      expect(types).toEqual(["version", "planned_change"]);
+    } finally {
+      fs.unlinkSync(filePath);
+    }
+  });
+
+  it("scans identically whether or not a visitor is supplied", () => {
+    const content = jsonl(
+      versionMessage("tofu"),
+      plannedChangeMessage("aws_instance.web", "create"),
+    );
+    const withVisitor = scanString(content, () => {
+      /* no-op visitor */
+    });
+    const without = scanString(content);
+    expect(withVisitor).toEqual(without);
+  });
+});

@@ -18,6 +18,23 @@ import type {
 } from "../tfjson/machine-readable-ui.js";
 
 /**
+ * Per-line visitor invoked during a scan, once for every non-empty line.
+ *
+ * For a successfully-parsed line carrying a string `type`, `obj` and `type`
+ * are the parsed object and its type. For an unparseable or typeless line
+ * (non-JSON, JSON array/primitive, or missing `type`), both are `undefined` —
+ * letting a visitor apply a fail-safe (e.g. retain the raw line) without
+ * re-parsing.
+ *
+ * The visitor reuses the scanner's single `JSON.parse`; it must not throw.
+ */
+export type ScanVisitor = (
+  raw: string,
+  obj: Record<string, unknown> | undefined,
+  type: string | undefined,
+) => void;
+
+/**
  * A planned resource change extracted from a `planned_change` or
  * `resource_drift` JSONL message. Contains the subset of fields
  * needed for report building without attribute detail.

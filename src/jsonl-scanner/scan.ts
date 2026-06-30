@@ -26,38 +26,11 @@ import type {
   UIChangeSummary,
   UIOutputsMessage,
 } from "../tfjson/machine-readable-ui.js";
-import type { PlannedChange, ScanResult } from "./types.js";
+import type { PlannedChange, ScanResult, ScanVisitor } from "./types.js";
+import { SKIPPABLE_MESSAGE_TYPES } from "./classify.js";
 
 /** Size of each read chunk for file-based scanning. */
 const CHUNK_SIZE = 64 * 1024; // 64 KiB
-
-// ─── Known Skippable Types ──────────────────────────────────────────────────
-
-/**
- * Message types that are valid JSONL but carry no information needed for the
- * report. The scanner counts them as parsed but does not extract records.
- */
-const SKIPPABLE_TYPES = new Set([
-  "log",
-  "apply_start",
-  "apply_progress",
-  "refresh_start",
-  "refresh_complete",
-  "provision_start",
-  "provision_progress",
-  "provision_complete",
-  "provision_errored",
-  "test_abstract",
-  "test_file",
-  "test_run",
-  "test_plan",
-  "test_state",
-  "test_cleanup",
-  "test_summary",
-  "test_interrupt",
-  "test_status",
-  "init_output",
-]);
 
 // ─── Mutable Accumulator ────────────────────────────────────────────────────
 
@@ -122,12 +95,17 @@ function toScanResult(acc: ScanAccumulator): ScanResult {
  *
  * Use this for the library API (`applyToMarkdown`) where the caller has
  * already loaded the JSONL into a string.
+ *
+ * @param content - The JSONL text.
+ * @param onLine  - Optional per-line visitor (see {@link ScanVisitor}). Invoked
+ *                  for every non-empty line during the same single pass that
+ *                  builds the model.
  */
-export function scanString(content: string): ScanResult {
+export function scanString(content: string, onLine?: ScanVisitor): ScanResult {
   const acc = createAccumulator();
   const lines = content.split("\n");
   for (const line of lines) {
-    processLine(acc, line);
+    processLine(acc, line, onLine);
   }
   return toScanResult(acc);
 }
@@ -141,9 +119,16 @@ export function scanString(content: string): ScanResult {
  *                      not scanned (returns an empty ScanResult). This is a
  *                      safety limit, not a memory limit — the scanner uses
  *                      constant memory regardless of file size.
+ * @param onLine      - Optional per-line visitor (see {@link ScanVisitor}).
+ *                      Invoked for every non-empty line during the streaming
+ *                      pass, preserving constant memory.
  * @throws {Error} If the file cannot be opened or read.
  */
-export function scanFile(filePath: string, maxFileSize: number): ScanResult {
+export function scanFile(
+  filePath: string,
+  maxFileSize: number,
+  onLine?: ScanVisitor,
+): ScanResult {
   const acc = createAccumulator();
   const fd = openSync(filePath, "r");
   try {
@@ -167,13 +152,13 @@ export function scanFile(filePath: string, maxFileSize: number): ScanResult {
       remainder = lines.pop() ?? "";
 
       for (const line of lines) {
-        processLine(acc, line);
+        processLine(acc, line, onLine);
       }
     }
 
     // Process the final remainder (last line without trailing newline)
     if (remainder.length > 0) {
-      processLine(acc, remainder);
+      processLine(acc, remainder, onLine);
     }
   } finally {
     closeSync(fd);
@@ -190,7 +175,11 @@ export function scanFile(filePath: string, maxFileSize: number): ScanResult {
  * Error messages never include raw line content (which may contain sensitive
  * plan attribute values).
  */
-function processLine(acc: ScanAccumulator, rawLine: string): void {
+function processLine(
+  acc: ScanAccumulator,
+  rawLine: string,
+  onLine?: ScanVisitor,
+): void {
   const line = rawLine.trim();
   if (line === "") return;
 
@@ -201,11 +190,13 @@ function processLine(acc: ScanAccumulator, rawLine: string): void {
     parsed = JSON.parse(line) as unknown;
   } catch {
     acc.unparseableLines++;
+    if (onLine) onLine(rawLine, undefined, undefined);
     return;
   }
 
   if (typeof parsed !== "object" || parsed === null || Array.isArray(parsed)) {
     acc.unparseableLines++;
+    if (onLine) onLine(rawLine, undefined, undefined);
     return;
   }
 
@@ -213,8 +204,11 @@ function processLine(acc: ScanAccumulator, rawLine: string): void {
   const type = obj["type"];
   if (typeof type !== "string") {
     acc.unparseableLines++;
+    if (onLine) onLine(rawLine, undefined, undefined);
     return;
   }
+
+  if (onLine) onLine(rawLine, obj, type);
 
   // Dispatch based on message type
   switch (type) {
@@ -243,7 +237,7 @@ function processLine(acc: ScanAccumulator, rawLine: string): void {
       processOutputs(acc, obj);
       break;
     default:
-      if (SKIPPABLE_TYPES.has(type)) {
+      if (SKIPPABLE_MESSAGE_TYPES.has(type)) {
         acc.parsedLines++;
       } else {
         acc.unknownTypeLines++;

@@ -1,265 +1,218 @@
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, afterAll } from "vitest";
+import { mkdtempSync, writeFileSync, rmSync } from "node:fs";
+import { join } from "node:path";
+import { tmpdir } from "node:os";
 import {
-  filterJsonlByAddresses,
-  filterStepIssueStdout,
+  buildFocusedStepIssue,
+  uiDiagnosticToModel,
+  addScannerWarnings,
 } from "../../../src/builder/process-helpers.js";
+import type { ConcernSeed } from "../../../src/builder/causal-relevance.js";
+import type { StepData, ReaderOptions } from "../../../src/steps/types.js";
 import type { Report } from "../../../src/model/report.js";
-import type { StepIssue } from "../../../src/model/step-issue.js";
+import type { ScanResult } from "../../../src/jsonl-scanner/types.js";
+import type { UIDiagnostic } from "../../../src/tfjson/machine-readable-ui.js";
 
-// ─── filterJsonlByAddresses ──────────────────────────────────────────────────
+const tempDir = mkdtempSync(join(tmpdir(), "process-helpers-test-"));
 
-describe("filterJsonlByAddresses", () => {
-  const failedAddresses = new Set([
-    "module.foo.aws_instance.web",
-    "module.foo.aws_s3_bucket.logs",
-  ]);
+afterAll(() => {
+  rmSync(tempDir, { recursive: true, force: true });
+});
 
-  it("retains lines whose address is in the filter set", () => {
-    const lines = [
-      JSON.stringify({
-        type: "apply_complete",
-        hook: { resource: { addr: "module.foo.aws_instance.web" } },
-      }),
-      JSON.stringify({
-        type: "apply_complete",
-        hook: { resource: { addr: "module.bar.aws_instance.other" } },
-      }),
-    ].join("\n");
+const opts: ReaderOptions = {
+  allowedDirs: [tempDir],
+  maxFileSize: 1024 * 1024,
+};
 
-    const result = filterJsonlByAddresses(lines, failedAddresses);
-    expect(result).toContain("aws_instance.web");
-    expect(result).not.toContain("aws_instance.other");
-  });
+function writeFixture(name: string, content: string): string {
+  const path = join(tempDir, name);
+  writeFileSync(path, content, "utf-8");
+  return path;
+}
 
-  it("retains lines with no resource address (version, change_summary)", () => {
-    const lines = [
-      JSON.stringify({ type: "version", tofu: "1.0.0" }),
-      JSON.stringify({
-        type: "change_summary",
-        changes: { add: 1, change: 0, remove: 0 },
-      }),
-      JSON.stringify({
-        type: "apply_complete",
-        hook: { resource: { addr: "other.resource" } },
-      }),
-    ].join("\n");
+function jsonl(...objects: Record<string, unknown>[]): string {
+  return objects.map((o) => JSON.stringify(o)).join("\n");
+}
 
-    const result = filterJsonlByAddresses(lines, failedAddresses);
-    expect(result).toContain('"version"');
-    expect(result).toContain('"change_summary"');
-    expect(result).not.toContain("other.resource");
-  });
+// ─── buildFocusedStepIssue ───────────────────────────────────────────────────
 
-  it("filters planned_change messages by change.resource.addr", () => {
-    const kept = JSON.stringify({
-      type: "planned_change",
-      change: { resource: { addr: "module.foo.aws_instance.web" } },
-    });
-    const dropped = JSON.stringify({
-      type: "planned_change",
-      change: { resource: { addr: "module.other.aws_instance.x" } },
-    });
-    const result = filterJsonlByAddresses(
-      [kept, dropped].join("\n"),
-      failedAddresses,
-    );
-    expect(result).toContain("aws_instance.web");
-    expect(result).not.toContain("aws_instance.x");
-  });
-
-  it("filters diagnostic messages by diagnostic.address", () => {
-    const kept = JSON.stringify({
-      type: "diagnostic",
-      diagnostic: { address: "module.foo.aws_instance.web", severity: "error" },
-    });
-    const dropped = JSON.stringify({
-      type: "diagnostic",
-      diagnostic: {
-        address: "module.other.aws_instance.x",
-        severity: "error",
+describe("buildFocusedStepIssue", () => {
+  it("focuses stdout to concern-relevant lines when there is a concern", () => {
+    const content = jsonl(
+      { type: "version", tofu: "1.8.0" },
+      {
+        type: "refresh_start",
+        hook: { resource: { addr: "null_resource.a" } },
       },
-    });
-    const result = filterJsonlByAddresses(
-      [kept, dropped].join("\n"),
-      failedAddresses,
+      {
+        type: "refresh_start",
+        hook: { resource: { addr: "null_resource.b" } },
+      },
+      { type: "change_summary", changes: { add: 0 } },
+      {
+        type: "diagnostic",
+        diagnostic: { severity: "error", summary: "Invalid index", detail: "" },
+      },
     );
-    expect(result).toContain("aws_instance.web");
-    expect(result).not.toContain("aws_instance.x");
+    const path = writeFixture("focus-concern.jsonl", content);
+    const step: StepData = {
+      outcome: "failure",
+      outputs: { stdout_file: path },
+    };
+    const seed: ConcernSeed = { seedAddrs: new Set(), hasConcern: true };
+
+    const issue = buildFocusedStepIssue(step, "plan", opts, path, seed);
+    expect(issue.isFailed).toBe(true);
+    expect(issue.stdout).toContain("Invalid index");
+    expect(issue.stdout).not.toContain("refresh_start");
+    expect(issue.stdout).not.toContain("version");
+    expect(issue.stdout).not.toContain("change_summary");
   });
 
-  it("retains diagnostic messages with no address unconditionally", () => {
-    const line = JSON.stringify({
-      type: "diagnostic",
-      diagnostic: { severity: "error", summary: "Provider error" },
-    });
-    const result = filterJsonlByAddresses(line, failedAddresses);
-    expect(result).toContain("Provider error");
+  it("keeps hooks for a seeded resource", () => {
+    const content = jsonl(
+      { type: "refresh_start", hook: { resource: { addr: "aws_db.main" } } },
+      { type: "refresh_start", hook: { resource: { addr: "aws_db.other" } } },
+      {
+        type: "diagnostic",
+        diagnostic: {
+          severity: "error",
+          summary: "boom",
+          detail: "",
+          address: "aws_db.main",
+        },
+      },
+    );
+    const path = writeFixture("focus-seeded.jsonl", content);
+    const step: StepData = {
+      outcome: "failure",
+      outputs: { stdout_file: path },
+    };
+    const seed: ConcernSeed = {
+      seedAddrs: new Set(["aws_db.main"]),
+      hasConcern: true,
+    };
+
+    const issue = buildFocusedStepIssue(step, "apply", opts, path, seed);
+    expect(issue.stdout).toContain("aws_db.main");
+    expect(issue.stdout).not.toContain("aws_db.other");
   });
 
-  it("retains non-JSON lines as-is", () => {
-    const result = filterJsonlByAddresses("not json at all", failedAddresses);
-    expect(result).toBe("not json at all");
+  it("falls back to full bounded stdout when there is no concern", () => {
+    const content = jsonl(
+      {
+        type: "refresh_start",
+        hook: { resource: { addr: "null_resource.a" } },
+      },
+      {
+        type: "refresh_start",
+        hook: { resource: { addr: "null_resource.b" } },
+      },
+    );
+    const path = writeFixture("focus-noconcern.jsonl", content);
+    const step: StepData = {
+      outcome: "failure",
+      outputs: { stdout_file: path },
+    };
+    const seed: ConcernSeed = { seedAddrs: new Set(), hasConcern: false };
+
+    const issue = buildFocusedStepIssue(step, "plan", opts, path, seed);
+    // Nothing to scope to — the raw content is retained verbatim.
+    expect(issue.stdout).toBe(content);
   });
 
-  it("retains blank lines", () => {
-    const result = filterJsonlByAddresses("line1\n\nline2", new Set(["x"]));
-    expect(result).toBe("line1\n\nline2");
-  });
+  it("falls back to buildStepIssue, surfacing the read error, when the emit scan fails", () => {
+    const missing = join(tempDir, "does-not-exist.jsonl");
+    const step: StepData = {
+      outcome: "failure",
+      outputs: { stdout_file: missing },
+    };
+    const seed: ConcernSeed = { seedAddrs: new Set(), hasConcern: true };
 
-  it("handles all hook-based apply message types", () => {
-    const types = [
-      "apply_start",
-      "apply_progress",
-      "apply_complete",
-      "apply_errored",
-      "refresh_start",
-      "refresh_complete",
-      "provision_start",
-      "provision_progress",
-      "provision_complete",
-      "provision_errored",
-    ];
-    for (const type of types) {
-      const kept = JSON.stringify({
-        type,
-        hook: { resource: { addr: "module.foo.aws_instance.web" } },
-      });
-      const dropped = JSON.stringify({
-        type,
-        hook: { resource: { addr: "unrelated.resource" } },
-      });
-      const result = filterJsonlByAddresses(
-        [kept, dropped].join("\n"),
-        failedAddresses,
-      );
-      expect(result).toContain("aws_instance.web");
-      expect(result).not.toContain("unrelated.resource");
-    }
+    const issue = buildFocusedStepIssue(step, "plan", opts, missing, seed);
+    expect(issue.isFailed).toBe(true);
+    // No focused stdout, but the fallback explains why stdout was unavailable.
+    expect(issue.stdout).toBeUndefined();
+    expect(issue.stdoutError).toBeDefined();
   });
 });
 
-// ─── filterStepIssueStdout ───────────────────────────────────────────────────
+// ─── uiDiagnosticToModel ─────────────────────────────────────────────────────
 
-function makeReport(issue: StepIssue): Report {
-  return {
-    title: { status: "success", body: { kind: "no-changes" } },
-    issues: [issue],
-    steps: [],
-    warnings: [],
-    rawStdout: [],
-  };
-}
-
-describe("filterStepIssueStdout", () => {
-  const addrDiag = {
-    severity: "error" as const,
-    summary: "failed",
-    detail: "",
-    address: "module.foo.aws_instance.web",
-  };
-
-  const noAddrDiag = {
-    severity: "error" as const,
-    summary: "provider error",
-    detail: "",
-  };
-
-  const keptLine = JSON.stringify({
-    type: "apply_complete",
-    hook: { resource: { addr: "module.foo.aws_instance.web" } },
-  });
-  const droppedLine = JSON.stringify({
-    type: "apply_complete",
-    hook: { resource: { addr: "module.other.aws_instance.x" } },
-  });
-
-  it("filters stdout when all diagnostics have addresses", () => {
-    const issue: StepIssue = {
-      id: "apply",
-      reason: "failed",
-      isFailed: true,
-      stdout: [keptLine, droppedLine].join("\n"),
+describe("uiDiagnosticToModel", () => {
+  it("maps required fields and source", () => {
+    const ui: UIDiagnostic = {
+      severity: "error",
+      summary: "broken",
+      detail: "details here",
     };
-    const report = makeReport(issue);
-
-    filterStepIssueStdout(report, "apply", [addrDiag]);
-
-    expect(report.issues[0]?.stdout).toContain("aws_instance.web");
-    expect(report.issues[0]?.stdout).not.toContain("aws_instance.x");
+    const model = uiDiagnosticToModel(ui, "validate");
+    expect(model.severity).toBe("error");
+    expect(model.summary).toBe("broken");
+    expect(model.detail).toBe("details here");
+    expect(model.source).toBe("validate");
+    expect(model.address).toBeUndefined();
   });
 
-  it("is a no-op when any diagnostic lacks an address", () => {
-    const issue: StepIssue = {
-      id: "apply",
-      reason: "failed",
-      isFailed: true,
-      stdout: [keptLine, droppedLine].join("\n"),
+  it("maps optional address, range and snippet when present", () => {
+    const ui: UIDiagnostic = {
+      severity: "warning",
+      summary: "heads up",
+      detail: "",
+      address: "aws_instance.web",
+      range: {
+        filename: "main.tf",
+        start: { line: 1, column: 1, byte: 0 },
+        end: { line: 1, column: 2, byte: 1 },
+      },
+      snippet: {
+        context: "",
+        code: "x",
+        start_line: 1,
+        highlight_start_offset: 0,
+        highlight_end_offset: 1,
+        values: [],
+      },
     };
-    const report = makeReport(issue);
-    const originalStdout = issue.stdout;
+    const model = uiDiagnosticToModel(ui, "plan");
+    expect(model.address).toBe("aws_instance.web");
+    expect(model.range?.filename).toBe("main.tf");
+    expect(model.snippet?.code).toBe("x");
+  });
+});
 
-    filterStepIssueStdout(report, "apply", [addrDiag, noAddrDiag]);
+// ─── addScannerWarnings ──────────────────────────────────────────────────────
 
-    expect(report.issues[0]?.stdout).toBe(originalStdout);
+describe("addScannerWarnings", () => {
+  function emptyReport(): Report {
+    return { warnings: [], issues: [], rawStdout: [] } as unknown as Report;
+  }
+
+  function scanWith(
+    unparseableLines: number,
+    unknownTypeLines: number,
+  ): ScanResult {
+    return {
+      plannedChanges: [],
+      applyStatuses: [],
+      diagnostics: [],
+      driftChanges: [],
+      totalLines: 0,
+      parsedLines: 0,
+      unknownTypeLines,
+      unparseableLines,
+    };
+  }
+
+  it("adds no warnings when counters are zero", () => {
+    const report = emptyReport();
+    addScannerWarnings(report, scanWith(0, 0), "plan");
+    expect(report.warnings).toHaveLength(0);
   });
 
-  it("is a no-op when diagnostics array is empty", () => {
-    const issue: StepIssue = {
-      id: "apply",
-      reason: "failed",
-      isFailed: true,
-      stdout: droppedLine,
-    };
-    const report = makeReport(issue);
-    const originalStdout = issue.stdout;
-
-    filterStepIssueStdout(report, "apply", []);
-
-    expect(report.issues[0]?.stdout).toBe(originalStdout);
-  });
-
-  it("is a no-op when no issue with the given stepId exists", () => {
-    const issue: StepIssue = {
-      id: "plan",
-      reason: "failed",
-      isFailed: true,
-      stdout: droppedLine,
-    };
-    const report = makeReport(issue);
-
-    filterStepIssueStdout(report, "apply", [addrDiag]);
-
-    expect(report.issues[0]?.stdout).toBe(droppedLine);
-  });
-
-  it("is a no-op when the issue has no stdout", () => {
-    const issue: StepIssue = {
-      id: "apply",
-      reason: "failed",
-      isFailed: true,
-    };
-    const report = makeReport(issue);
-
-    filterStepIssueStdout(report, "apply", [addrDiag]);
-
-    expect(report.issues[0]?.stdout).toBeUndefined();
-  });
-
-  it("preserves other StepIssue fields when filtering", () => {
-    const issue: StepIssue = {
-      id: "apply",
-      reason: "failed",
-      isFailed: true,
-      exitCode: "1",
-      stderr: "some error",
-      stdout: [keptLine, droppedLine].join("\n"),
-    };
-    const report = makeReport(issue);
-
-    filterStepIssueStdout(report, "apply", [addrDiag]);
-
-    const result = report.issues[0];
-    expect(result?.exitCode).toBe("1");
-    expect(result?.stderr).toBe("some error");
+  it("adds warnings for unparseable and unknown-type lines", () => {
+    const report = emptyReport();
+    addScannerWarnings(report, scanWith(3, 2), "apply");
+    expect(report.warnings).toHaveLength(2);
   });
 });

@@ -388,7 +388,7 @@ function getStepStdoutPath(step, readerOpts) {
 }
 
 // src/builder/step-issues.ts
-function buildStepIssue(step, stepId, readerOpts, diagnostic) {
+function buildStepIssue(step, stepId, readerOpts, diagnostic, opts) {
   const outcome = getStepOutcome(step);
   const isFailed = outcome === "failure";
   const exitCode = getExitCode(step);
@@ -402,7 +402,7 @@ function buildStepIssue(step, stepId, readerOpts, diagnostic) {
     reason = "outcome";
     stepOutcome = outcome;
   }
-  const stdoutRead = readStepStdout(step, readerOpts);
+  const stdoutRead = opts?.skipStdout ? void 0 : readStepStdout(step, readerOpts);
   const stderrRead = readStepStderr(step, readerOpts);
   const stderrContent = stderrRead.content !== void 0 && stderrRead.content.trim().length > 0 ? stderrRead.content : void 0;
   const issue = {
@@ -412,8 +412,8 @@ function buildStepIssue(step, stepId, readerOpts, diagnostic) {
     isFailed,
     ...exitCode !== void 0 ? { exitCode } : {},
     ...diagnostic !== void 0 ? { diagnostic } : {},
-    ...stdoutRead.content !== void 0 ? { stdout: stdoutRead.content } : {},
-    ...stdoutRead.error !== void 0 ? { stdoutError: stdoutRead.error } : {},
+    ...stdoutRead?.content !== void 0 ? { stdout: stdoutRead.content } : {},
+    ...stdoutRead?.error !== void 0 ? { stdoutError: stdoutRead.error } : {},
     ...stderrContent !== void 0 ? { stderr: stderrContent } : {},
     ...stderrRead.error !== void 0 ? { stderrError: stderrRead.error } : {}
   };
@@ -650,6 +650,433 @@ function parseValidateOutput(json) {
   return parsed;
 }
 
+// src/jsonl-scanner/scan.ts
+import { openSync as openSync2, readSync as readSync2, closeSync as closeSync2, fstatSync } from "node:fs";
+
+// src/jsonl-scanner/classify.ts
+var ADDRESSED_HOOK_TYPES = /* @__PURE__ */ new Set([
+  "apply_start",
+  "apply_progress",
+  "apply_complete",
+  "apply_errored",
+  "refresh_start",
+  "refresh_complete",
+  "provision_start",
+  "provision_progress",
+  "provision_complete",
+  "provision_errored"
+]);
+var ERRORED_HOOK_TYPES = /* @__PURE__ */ new Set(["apply_errored", "provision_errored"]);
+var HANDLED_MESSAGE_TYPES = /* @__PURE__ */ new Set([
+  "version",
+  "planned_change",
+  "resource_drift",
+  "change_summary",
+  "apply_complete",
+  "apply_errored",
+  "diagnostic",
+  "outputs"
+]);
+var SKIPPABLE_MESSAGE_TYPES = /* @__PURE__ */ new Set([
+  "log",
+  "apply_start",
+  "apply_progress",
+  "refresh_start",
+  "refresh_complete",
+  "provision_start",
+  "provision_progress",
+  "provision_complete",
+  "provision_errored",
+  "test_abstract",
+  "test_file",
+  "test_run",
+  "test_plan",
+  "test_state",
+  "test_cleanup",
+  "test_summary",
+  "test_interrupt",
+  "test_status",
+  "init_output"
+]);
+function isKnownMessageType(type) {
+  return HANDLED_MESSAGE_TYPES.has(type) || SKIPPABLE_MESSAGE_TYPES.has(type);
+}
+function asObject(value) {
+  if (typeof value !== "object" || value === null || Array.isArray(value)) {
+    return void 0;
+  }
+  return value;
+}
+function hookAddress(obj) {
+  const hook = asObject(obj["hook"]);
+  const resource = hook && asObject(hook["resource"]);
+  const addr = resource?.["addr"];
+  return typeof addr === "string" ? addr : void 0;
+}
+function changeAddress(obj) {
+  const change = asObject(obj["change"]);
+  const resource = change && asObject(change["resource"]);
+  const addr = resource?.["addr"];
+  return typeof addr === "string" ? addr : void 0;
+}
+function lineConcernInfo(obj, type) {
+  if (type === "diagnostic") {
+    const diagnostic = asObject(obj["diagnostic"]);
+    const severity = diagnostic?.["severity"];
+    const addr = diagnostic?.["address"];
+    return {
+      isErroredHook: false,
+      ...typeof severity === "string" ? { severity } : {},
+      ...typeof addr === "string" ? { address: addr } : {}
+    };
+  }
+  if (type === "planned_change" || type === "resource_drift") {
+    const addr = changeAddress(obj);
+    return {
+      isErroredHook: false,
+      ...addr !== void 0 ? { address: addr } : {}
+    };
+  }
+  if (ADDRESSED_HOOK_TYPES.has(type)) {
+    const addr = hookAddress(obj);
+    return {
+      isErroredHook: ERRORED_HOOK_TYPES.has(type),
+      ...addr !== void 0 ? { address: addr } : {}
+    };
+  }
+  return { isErroredHook: false };
+}
+
+// src/jsonl-scanner/scan.ts
+var CHUNK_SIZE = 64 * 1024;
+function createAccumulator() {
+  return {
+    plannedChanges: [],
+    applyStatuses: [],
+    diagnostics: [],
+    driftChanges: [],
+    changeSummary: void 0,
+    outputsMessage: void 0,
+    tool: void 0,
+    totalLines: 0,
+    parsedLines: 0,
+    unknownTypeLines: 0,
+    unparseableLines: 0
+  };
+}
+function toScanResult(acc) {
+  return {
+    plannedChanges: acc.plannedChanges,
+    applyStatuses: acc.applyStatuses,
+    diagnostics: acc.diagnostics,
+    driftChanges: acc.driftChanges,
+    totalLines: acc.totalLines,
+    parsedLines: acc.parsedLines,
+    unknownTypeLines: acc.unknownTypeLines,
+    unparseableLines: acc.unparseableLines,
+    ...acc.changeSummary !== void 0 ? { changeSummary: acc.changeSummary } : {},
+    ...acc.outputsMessage !== void 0 ? { outputsMessage: acc.outputsMessage } : {},
+    ...acc.tool !== void 0 ? { tool: acc.tool } : {}
+  };
+}
+function scanString(content, onLine) {
+  const acc = createAccumulator();
+  const lines = content.split("\n");
+  for (const line of lines) {
+    processLine(acc, line, onLine);
+  }
+  return toScanResult(acc);
+}
+function scanFile(filePath, maxFileSize, onLine) {
+  const acc = createAccumulator();
+  const fd = openSync2(filePath, "r");
+  try {
+    const stat = fstatSync(fd);
+    if (stat.size > maxFileSize) {
+      return toScanResult(acc);
+    }
+    const buf = Buffer.alloc(CHUNK_SIZE);
+    let remainder = "";
+    while (true) {
+      const bytesRead = readSync2(fd, buf, 0, CHUNK_SIZE, null);
+      if (bytesRead === 0) break;
+      const chunk = remainder + buf.toString("utf8", 0, bytesRead);
+      const lines = chunk.split("\n");
+      remainder = lines.pop() ?? "";
+      for (const line of lines) {
+        processLine(acc, line, onLine);
+      }
+    }
+    if (remainder.length > 0) {
+      processLine(acc, remainder, onLine);
+    }
+  } finally {
+    closeSync2(fd);
+  }
+  return toScanResult(acc);
+}
+function processLine(acc, rawLine, onLine) {
+  const line = rawLine.trim();
+  if (line === "") return;
+  acc.totalLines++;
+  let parsed;
+  try {
+    parsed = JSON.parse(line);
+  } catch {
+    acc.unparseableLines++;
+    if (onLine) onLine(rawLine, void 0, void 0);
+    return;
+  }
+  if (typeof parsed !== "object" || parsed === null || Array.isArray(parsed)) {
+    acc.unparseableLines++;
+    if (onLine) onLine(rawLine, void 0, void 0);
+    return;
+  }
+  const obj = parsed;
+  const type = obj["type"];
+  if (typeof type !== "string") {
+    acc.unparseableLines++;
+    if (onLine) onLine(rawLine, void 0, void 0);
+    return;
+  }
+  if (onLine) onLine(rawLine, obj, type);
+  switch (type) {
+    case "version":
+      processVersion(acc, obj);
+      break;
+    case "planned_change":
+      processPlannedChange(acc, obj, "plannedChanges");
+      break;
+    case "resource_drift":
+      processPlannedChange(acc, obj, "driftChanges");
+      break;
+    case "change_summary":
+      processChangeSummary(acc, obj);
+      break;
+    case "apply_complete":
+      processApplyComplete(acc, obj);
+      break;
+    case "apply_errored":
+      processApplyErrored(acc, obj);
+      break;
+    case "diagnostic":
+      processDiagnostic(acc, obj);
+      break;
+    case "outputs":
+      processOutputs(acc, obj);
+      break;
+    default:
+      if (SKIPPABLE_MESSAGE_TYPES.has(type)) {
+        acc.parsedLines++;
+      } else {
+        acc.unknownTypeLines++;
+      }
+      return;
+  }
+  acc.parsedLines++;
+}
+function processVersion(acc, obj) {
+  if (typeof obj["tofu"] === "string") {
+    acc.tool = "tofu";
+  } else if (typeof obj["terraform"] === "string") {
+    acc.tool = "terraform";
+  }
+}
+function processPlannedChange(acc, obj, target) {
+  const change = obj["change"];
+  if (typeof change !== "object" || change === null) return;
+  const changeObj = change;
+  const resource = changeObj["resource"];
+  if (typeof resource !== "object" || resource === null) return;
+  const resourceObj = resource;
+  const addr = resourceObj["addr"];
+  const resourceType = resourceObj["resource_type"];
+  const module = resourceObj["module"];
+  const action = changeObj["action"];
+  if (typeof addr !== "string" || typeof action !== "string") return;
+  const entry = {
+    address: addr,
+    resourceType: typeof resourceType === "string" ? resourceType : "",
+    module: typeof module === "string" ? module : "",
+    action: uiActionToPlanAction(action),
+    ...typeof changeObj["reason"] === "string" ? { reason: changeObj["reason"] } : {}
+  };
+  acc[target].push(entry);
+}
+function processChangeSummary(acc, obj) {
+  const changes = obj["changes"];
+  if (typeof changes !== "object" || changes === null) return;
+  acc.changeSummary = changes;
+}
+function processApplyComplete(acc, obj) {
+  const hook = obj["hook"];
+  if (typeof hook !== "object" || hook === null) return;
+  const hookObj = hook;
+  const resource = hookObj["resource"];
+  if (typeof resource !== "object" || resource === null) return;
+  const resourceObj = resource;
+  const addr = resourceObj["addr"];
+  const action = hookObj["action"];
+  if (typeof addr !== "string" || typeof action !== "string") return;
+  const status = {
+    address: addr,
+    action: uiActionToPlanAction(action),
+    success: true,
+    ...typeof hookObj["elapsed_seconds"] === "number" ? { elapsed: hookObj["elapsed_seconds"] } : {},
+    ...typeof hookObj["id_key"] === "string" ? { idKey: hookObj["id_key"] } : {},
+    ...typeof hookObj["id_value"] === "string" ? { idValue: hookObj["id_value"] } : {}
+  };
+  const existing = acc.applyStatuses.findIndex((s) => s.address === addr);
+  if (existing >= 0) {
+    acc.applyStatuses[existing] = status;
+  } else {
+    acc.applyStatuses.push(status);
+  }
+}
+function processApplyErrored(acc, obj) {
+  const hook = obj["hook"];
+  if (typeof hook !== "object" || hook === null) return;
+  const hookObj = hook;
+  const resource = hookObj["resource"];
+  if (typeof resource !== "object" || resource === null) return;
+  const resourceObj = resource;
+  const addr = resourceObj["addr"];
+  const action = hookObj["action"];
+  if (typeof addr !== "string" || typeof action !== "string") return;
+  const status = {
+    address: addr,
+    action: uiActionToPlanAction(action),
+    success: false,
+    ...typeof hookObj["elapsed_seconds"] === "number" ? { elapsed: hookObj["elapsed_seconds"] } : {}
+  };
+  const existing = acc.applyStatuses.findIndex((s) => s.address === addr);
+  if (existing >= 0) {
+    acc.applyStatuses[existing] = status;
+  } else {
+    acc.applyStatuses.push(status);
+  }
+}
+function processDiagnostic(acc, obj) {
+  const diagnostic = obj["diagnostic"];
+  if (typeof diagnostic !== "object" || diagnostic === null) return;
+  const diagObj = diagnostic;
+  const severity = diagObj["severity"];
+  const summary = diagObj["summary"];
+  if (severity !== "error" && severity !== "warning") return;
+  if (typeof summary !== "string") return;
+  const range = diagObj["range"];
+  const snippet = diagObj["snippet"];
+  const base = {
+    severity,
+    summary,
+    detail: typeof diagObj["detail"] === "string" ? diagObj["detail"] : ""
+  };
+  if (typeof diagObj["address"] === "string")
+    base["address"] = diagObj["address"];
+  if (isRange(range)) base["range"] = range;
+  if (isSnippet(snippet)) base["snippet"] = snippet;
+  const diag = base;
+  acc.diagnostics.push(diag);
+}
+function processOutputs(acc, obj) {
+  acc.outputsMessage = obj;
+}
+function uiActionToPlanAction(action) {
+  switch (action) {
+    case "create":
+      return "create";
+    case "update":
+      return "update";
+    case "delete":
+      return "delete";
+    case "replace":
+      return "replace";
+    case "read":
+      return "read";
+    case "noop":
+      return "no-op";
+    case "forget":
+      return "forget";
+    case "remove":
+      return "forget";
+    case "move":
+      return "move";
+    case "import":
+      return "import";
+    default:
+      return "unknown";
+  }
+}
+function isRange(value) {
+  if (typeof value !== "object" || value === null) return false;
+  const obj = value;
+  return typeof obj["filename"] === "string" && typeof obj["start"] === "object";
+}
+function isSnippet(value) {
+  if (typeof value !== "object" || value === null) return false;
+  const obj = value;
+  return typeof obj["code"] === "string" && typeof obj["start_line"] === "number";
+}
+
+// src/builder/causal-relevance.ts
+function configForm(addr) {
+  return addr.replace(/\[[^\]]*\]/g, "");
+}
+function isConcernSeverity(severity) {
+  return severity === "error" || severity === "warning";
+}
+var ConcernSeedCollector = class {
+  /** The accumulated seed. Populated as lines are visited. */
+  seed = {
+    seedAddrs: /* @__PURE__ */ new Set(),
+    hasConcern: false
+  };
+  /** Visit one classified line. Bound so it can be passed directly as a callback. */
+  visit = (_raw, obj, type) => {
+    if (obj === void 0 || type === void 0) return;
+    const info = lineConcernInfo(obj, type);
+    if (type === "diagnostic") {
+      if (!isConcernSeverity(info.severity)) return;
+      this.seed.hasConcern = true;
+      if (info.address !== void 0) {
+        this.seed.seedAddrs.add(configForm(info.address));
+      }
+      return;
+    }
+    if (info.isErroredHook) {
+      this.seed.hasConcern = true;
+      if (info.address !== void 0) {
+        this.seed.seedAddrs.add(configForm(info.address));
+      }
+    }
+  };
+};
+var RelevanceEmitter = class {
+  constructor(seed) {
+    this.seed = seed;
+  }
+  seed;
+  kept = [];
+  /** Visit one classified line, keeping its raw text when relevant. */
+  visit = (raw, obj, type) => {
+    if (this.isRelevant(obj, type)) this.kept.push(raw);
+  };
+  isRelevant(obj, type) {
+    if (obj === void 0 || type === void 0) return true;
+    const info = lineConcernInfo(obj, type);
+    if (type === "diagnostic" && isConcernSeverity(info.severity)) return true;
+    if (info.isErroredHook) return true;
+    if (info.address !== void 0 && this.seed.seedAddrs.has(configForm(info.address))) {
+      return true;
+    }
+    return !isKnownMessageType(type);
+  }
+  /** The focused output: the kept raw lines joined by newlines. */
+  output() {
+    return this.kept.join("\n");
+  }
+};
+
 // src/builder/process-helpers.ts
 function uiDiagnosticToModel(d, source) {
   const base = {
@@ -663,73 +1090,20 @@ function uiDiagnosticToModel(d, source) {
   if (d.snippet !== void 0) base["snippet"] = d.snippet;
   return base;
 }
-function extractJsonlResourceAddress(obj) {
-  const type = obj["type"];
-  if (typeof type !== "string") return void 0;
-  if (type === "apply_start" || type === "apply_progress" || type === "apply_complete" || type === "apply_errored" || type === "refresh_start" || type === "refresh_complete" || type === "provision_start" || type === "provision_progress" || type === "provision_complete" || type === "provision_errored") {
-    const hook = obj["hook"];
-    if (typeof hook !== "object" || hook === null) return void 0;
-    const resource = hook["resource"];
-    if (typeof resource !== "object" || resource === null) return void 0;
-    const addr = resource["addr"];
-    return typeof addr === "string" ? addr : void 0;
+function buildFocusedStepIssue(step, stepId, readerOpts, filePath, seed) {
+  if (!seed.hasConcern) {
+    return buildStepIssue(step, stepId, readerOpts);
   }
-  if (type === "planned_change" || type === "resource_drift") {
-    const change = obj["change"];
-    if (typeof change !== "object" || change === null) return void 0;
-    const resource = change["resource"];
-    if (typeof resource !== "object" || resource === null) return void 0;
-    const addr = resource["addr"];
-    return typeof addr === "string" ? addr : void 0;
+  const issue = buildStepIssue(step, stepId, readerOpts, void 0, {
+    skipStdout: true
+  });
+  const emitter = new RelevanceEmitter(seed);
+  try {
+    scanFile(filePath, readerOpts.maxFileSize, emitter.visit);
+  } catch {
+    return buildStepIssue(step, stepId, readerOpts);
   }
-  if (type === "diagnostic") {
-    const diagnostic = obj["diagnostic"];
-    if (typeof diagnostic !== "object" || diagnostic === null) return void 0;
-    const addr = diagnostic["address"];
-    return typeof addr === "string" ? addr : void 0;
-  }
-  return void 0;
-}
-function filterJsonlByAddresses(content, addresses) {
-  const lines = content.split("\n");
-  const filtered = [];
-  for (const line of lines) {
-    if (line.trim() === "") {
-      filtered.push(line);
-      continue;
-    }
-    let parsed;
-    try {
-      parsed = JSON.parse(line);
-    } catch {
-      filtered.push(line);
-      continue;
-    }
-    if (typeof parsed !== "object" || parsed === null || Array.isArray(parsed)) {
-      filtered.push(line);
-      continue;
-    }
-    const addr = extractJsonlResourceAddress(parsed);
-    if (addr === void 0 || addresses.has(addr)) {
-      filtered.push(line);
-    }
-  }
-  return filtered.join("\n");
-}
-function filterStepIssueStdout(report, stepId, diagnostics) {
-  const addresses = /* @__PURE__ */ new Set();
-  for (const d of diagnostics) {
-    if (d.address === void 0) return;
-    addresses.add(d.address);
-  }
-  if (addresses.size === 0) return;
-  const idx = report.issues.findIndex((i) => i.id === stepId);
-  if (idx < 0) return;
-  const issue = report.issues[idx];
-  if (issue === void 0) return;
-  if (issue.stdout === void 0) return;
-  const filtered = filterJsonlByAddresses(issue.stdout, addresses);
-  report.issues[idx] = { ...issue, stdout: filtered };
+  return { ...issue, stdout: emitter.output() };
 }
 function addScannerWarnings(report, scan, role) {
   if (scan.unparseableLines > 0) {
@@ -1619,295 +1993,6 @@ function resolveOutputValues(report, outputsMessage) {
   }
 }
 
-// src/jsonl-scanner/scan.ts
-import { openSync as openSync2, readSync as readSync2, closeSync as closeSync2, fstatSync } from "node:fs";
-var CHUNK_SIZE = 64 * 1024;
-var SKIPPABLE_TYPES = /* @__PURE__ */ new Set([
-  "log",
-  "apply_start",
-  "apply_progress",
-  "refresh_start",
-  "refresh_complete",
-  "provision_start",
-  "provision_progress",
-  "provision_complete",
-  "provision_errored",
-  "test_abstract",
-  "test_file",
-  "test_run",
-  "test_plan",
-  "test_state",
-  "test_cleanup",
-  "test_summary",
-  "test_interrupt",
-  "test_status",
-  "init_output"
-]);
-function createAccumulator() {
-  return {
-    plannedChanges: [],
-    applyStatuses: [],
-    diagnostics: [],
-    driftChanges: [],
-    changeSummary: void 0,
-    outputsMessage: void 0,
-    tool: void 0,
-    totalLines: 0,
-    parsedLines: 0,
-    unknownTypeLines: 0,
-    unparseableLines: 0
-  };
-}
-function toScanResult(acc) {
-  return {
-    plannedChanges: acc.plannedChanges,
-    applyStatuses: acc.applyStatuses,
-    diagnostics: acc.diagnostics,
-    driftChanges: acc.driftChanges,
-    totalLines: acc.totalLines,
-    parsedLines: acc.parsedLines,
-    unknownTypeLines: acc.unknownTypeLines,
-    unparseableLines: acc.unparseableLines,
-    ...acc.changeSummary !== void 0 ? { changeSummary: acc.changeSummary } : {},
-    ...acc.outputsMessage !== void 0 ? { outputsMessage: acc.outputsMessage } : {},
-    ...acc.tool !== void 0 ? { tool: acc.tool } : {}
-  };
-}
-function scanString(content) {
-  const acc = createAccumulator();
-  const lines = content.split("\n");
-  for (const line of lines) {
-    processLine(acc, line);
-  }
-  return toScanResult(acc);
-}
-function scanFile(filePath, maxFileSize) {
-  const acc = createAccumulator();
-  const fd = openSync2(filePath, "r");
-  try {
-    const stat = fstatSync(fd);
-    if (stat.size > maxFileSize) {
-      return toScanResult(acc);
-    }
-    const buf = Buffer.alloc(CHUNK_SIZE);
-    let remainder = "";
-    while (true) {
-      const bytesRead = readSync2(fd, buf, 0, CHUNK_SIZE, null);
-      if (bytesRead === 0) break;
-      const chunk = remainder + buf.toString("utf8", 0, bytesRead);
-      const lines = chunk.split("\n");
-      remainder = lines.pop() ?? "";
-      for (const line of lines) {
-        processLine(acc, line);
-      }
-    }
-    if (remainder.length > 0) {
-      processLine(acc, remainder);
-    }
-  } finally {
-    closeSync2(fd);
-  }
-  return toScanResult(acc);
-}
-function processLine(acc, rawLine) {
-  const line = rawLine.trim();
-  if (line === "") return;
-  acc.totalLines++;
-  let parsed;
-  try {
-    parsed = JSON.parse(line);
-  } catch {
-    acc.unparseableLines++;
-    return;
-  }
-  if (typeof parsed !== "object" || parsed === null || Array.isArray(parsed)) {
-    acc.unparseableLines++;
-    return;
-  }
-  const obj = parsed;
-  const type = obj["type"];
-  if (typeof type !== "string") {
-    acc.unparseableLines++;
-    return;
-  }
-  switch (type) {
-    case "version":
-      processVersion(acc, obj);
-      break;
-    case "planned_change":
-      processPlannedChange(acc, obj, "plannedChanges");
-      break;
-    case "resource_drift":
-      processPlannedChange(acc, obj, "driftChanges");
-      break;
-    case "change_summary":
-      processChangeSummary(acc, obj);
-      break;
-    case "apply_complete":
-      processApplyComplete(acc, obj);
-      break;
-    case "apply_errored":
-      processApplyErrored(acc, obj);
-      break;
-    case "diagnostic":
-      processDiagnostic(acc, obj);
-      break;
-    case "outputs":
-      processOutputs(acc, obj);
-      break;
-    default:
-      if (SKIPPABLE_TYPES.has(type)) {
-        acc.parsedLines++;
-      } else {
-        acc.unknownTypeLines++;
-      }
-      return;
-  }
-  acc.parsedLines++;
-}
-function processVersion(acc, obj) {
-  if (typeof obj["tofu"] === "string") {
-    acc.tool = "tofu";
-  } else if (typeof obj["terraform"] === "string") {
-    acc.tool = "terraform";
-  }
-}
-function processPlannedChange(acc, obj, target) {
-  const change = obj["change"];
-  if (typeof change !== "object" || change === null) return;
-  const changeObj = change;
-  const resource = changeObj["resource"];
-  if (typeof resource !== "object" || resource === null) return;
-  const resourceObj = resource;
-  const addr = resourceObj["addr"];
-  const resourceType = resourceObj["resource_type"];
-  const module = resourceObj["module"];
-  const action = changeObj["action"];
-  if (typeof addr !== "string" || typeof action !== "string") return;
-  const entry = {
-    address: addr,
-    resourceType: typeof resourceType === "string" ? resourceType : "",
-    module: typeof module === "string" ? module : "",
-    action: uiActionToPlanAction(action),
-    ...typeof changeObj["reason"] === "string" ? { reason: changeObj["reason"] } : {}
-  };
-  acc[target].push(entry);
-}
-function processChangeSummary(acc, obj) {
-  const changes = obj["changes"];
-  if (typeof changes !== "object" || changes === null) return;
-  acc.changeSummary = changes;
-}
-function processApplyComplete(acc, obj) {
-  const hook = obj["hook"];
-  if (typeof hook !== "object" || hook === null) return;
-  const hookObj = hook;
-  const resource = hookObj["resource"];
-  if (typeof resource !== "object" || resource === null) return;
-  const resourceObj = resource;
-  const addr = resourceObj["addr"];
-  const action = hookObj["action"];
-  if (typeof addr !== "string" || typeof action !== "string") return;
-  const status = {
-    address: addr,
-    action: uiActionToPlanAction(action),
-    success: true,
-    ...typeof hookObj["elapsed_seconds"] === "number" ? { elapsed: hookObj["elapsed_seconds"] } : {},
-    ...typeof hookObj["id_key"] === "string" ? { idKey: hookObj["id_key"] } : {},
-    ...typeof hookObj["id_value"] === "string" ? { idValue: hookObj["id_value"] } : {}
-  };
-  const existing = acc.applyStatuses.findIndex((s) => s.address === addr);
-  if (existing >= 0) {
-    acc.applyStatuses[existing] = status;
-  } else {
-    acc.applyStatuses.push(status);
-  }
-}
-function processApplyErrored(acc, obj) {
-  const hook = obj["hook"];
-  if (typeof hook !== "object" || hook === null) return;
-  const hookObj = hook;
-  const resource = hookObj["resource"];
-  if (typeof resource !== "object" || resource === null) return;
-  const resourceObj = resource;
-  const addr = resourceObj["addr"];
-  const action = hookObj["action"];
-  if (typeof addr !== "string" || typeof action !== "string") return;
-  const status = {
-    address: addr,
-    action: uiActionToPlanAction(action),
-    success: false,
-    ...typeof hookObj["elapsed_seconds"] === "number" ? { elapsed: hookObj["elapsed_seconds"] } : {}
-  };
-  const existing = acc.applyStatuses.findIndex((s) => s.address === addr);
-  if (existing >= 0) {
-    acc.applyStatuses[existing] = status;
-  } else {
-    acc.applyStatuses.push(status);
-  }
-}
-function processDiagnostic(acc, obj) {
-  const diagnostic = obj["diagnostic"];
-  if (typeof diagnostic !== "object" || diagnostic === null) return;
-  const diagObj = diagnostic;
-  const severity = diagObj["severity"];
-  const summary = diagObj["summary"];
-  if (severity !== "error" && severity !== "warning") return;
-  if (typeof summary !== "string") return;
-  const range = diagObj["range"];
-  const snippet = diagObj["snippet"];
-  const base = {
-    severity,
-    summary,
-    detail: typeof diagObj["detail"] === "string" ? diagObj["detail"] : ""
-  };
-  if (typeof diagObj["address"] === "string")
-    base["address"] = diagObj["address"];
-  if (isRange(range)) base["range"] = range;
-  if (isSnippet(snippet)) base["snippet"] = snippet;
-  const diag = base;
-  acc.diagnostics.push(diag);
-}
-function processOutputs(acc, obj) {
-  acc.outputsMessage = obj;
-}
-function uiActionToPlanAction(action) {
-  switch (action) {
-    case "create":
-      return "create";
-    case "update":
-      return "update";
-    case "delete":
-      return "delete";
-    case "replace":
-      return "replace";
-    case "read":
-      return "read";
-    case "noop":
-      return "no-op";
-    case "forget":
-      return "forget";
-    case "remove":
-      return "forget";
-    case "move":
-      return "move";
-    case "import":
-      return "import";
-    default:
-      return "unknown";
-  }
-}
-function isRange(value) {
-  if (typeof value !== "object" || value === null) return false;
-  const obj = value;
-  return typeof obj["filename"] === "string" && typeof obj["start"] === "object";
-}
-function isSnippet(value) {
-  if (typeof value !== "object" || value === null) return false;
-  const obj = value;
-  return typeof obj["code"] === "string" && typeof obj["start_line"] === "number";
-}
-
 // src/builder/process-show-plan.ts
 function tryProcessShowPlan(showPlanStep, showPlanStepId, applyStep, applyStepId, report, readerOpts, options, tool) {
   const read = readStepStdout(showPlanStep, readerOpts);
@@ -1999,46 +2084,59 @@ function isJsonLines(firstLines) {
 // src/builder/process-plan.ts
 function processPlanStep(step, stepId, report, readerOpts, showPlanParsed) {
   const outcome = getStepOutcome(step);
-  if (outcome === "failure") {
-    report.issues.push(buildStepIssue(step, stepId, readerOpts));
-  }
+  const failed = outcome === "failure";
   const path = getStepStdoutPath(step, readerOpts);
   if (path) {
     const peek = peekStepStdout(step, readerOpts);
     if (peek.content !== void 0) {
       const firstLines = peek.content.split("\n", 10);
       if (isJsonLines(firstLines)) {
-        const diagsBefore = report.diagnostics?.length ?? 0;
-        enrichFromPlanJsonl(path, report, readerOpts, showPlanParsed);
-        if (outcome === "failure") {
-          const newDiags = (report.diagnostics ?? []).slice(diagsBefore);
-          filterStepIssueStdout(report, stepId, newDiags);
+        const collector = failed ? new ConcernSeedCollector() : void 0;
+        enrichFromPlanJsonl(
+          path,
+          report,
+          readerOpts,
+          showPlanParsed,
+          collector?.visit
+        );
+        if (failed && collector) {
+          report.issues.push(
+            buildFocusedStepIssue(
+              step,
+              stepId,
+              readerOpts,
+              path,
+              collector.seed
+            )
+          );
         }
         return;
       }
     }
   }
-  if (outcome !== "failure") {
-    const read = readStepStdout(step, readerOpts);
-    if (read.content !== void 0) {
-      const detectedTool = detectToolFromOutput(read.content);
-      if (detectedTool !== void 0) report.tool = detectedTool;
-      report.rawStdout.push({
-        stepId,
-        label: "Plan Output",
-        content: read.content
-      });
-    } else if (read.error) {
-      report.warnings.push(new StepReadErrorWarning("plan", read.error));
-    } else if (read.noFile) {
-      report.warnings.push(new StepOutputMissingWarning("plan"));
-    }
+  if (failed) {
+    report.issues.push(buildStepIssue(step, stepId, readerOpts));
+    return;
+  }
+  const read = readStepStdout(step, readerOpts);
+  if (read.content !== void 0) {
+    const detectedTool = detectToolFromOutput(read.content);
+    if (detectedTool !== void 0) report.tool = detectedTool;
+    report.rawStdout.push({
+      stepId,
+      label: "Plan Output",
+      content: read.content
+    });
+  } else if (read.error) {
+    report.warnings.push(new StepReadErrorWarning("plan", read.error));
+  } else if (read.noFile) {
+    report.warnings.push(new StepOutputMissingWarning("plan"));
   }
 }
-function enrichFromPlanJsonl(filePath, report, readerOpts, showPlanParsed) {
+function enrichFromPlanJsonl(filePath, report, readerOpts, showPlanParsed, onLine) {
   let scan;
   try {
-    scan = scanFile(filePath, readerOpts.maxFileSize);
+    scan = scanFile(filePath, readerOpts.maxFileSize, onLine);
   } catch {
     report.warnings.push(new StepScanFailureWarning("plan"));
     return;
@@ -2073,26 +2171,39 @@ function enrichFromPlanJsonl(filePath, report, readerOpts, showPlanParsed) {
 // src/builder/process-apply.ts
 function processApplyStep(step, stepId, report, readerOpts, showPlanParsed) {
   const outcome = getStepOutcome(step);
-  if (outcome === "failure") {
-    report.issues.push(buildStepIssue(step, stepId, readerOpts));
-  }
+  const failed = outcome === "failure";
   const path = getStepStdoutPath(step, readerOpts);
   if (path) {
     const peek = peekStepStdout(step, readerOpts);
     if (peek.content !== void 0) {
       const firstLines = peek.content.split("\n", 10);
       if (isJsonLines(firstLines)) {
-        const diagsBefore = report.diagnostics?.length ?? 0;
-        enrichFromApplyJsonl(path, report, readerOpts, showPlanParsed);
-        if (outcome === "failure") {
-          const newDiags = (report.diagnostics ?? []).slice(diagsBefore);
-          filterStepIssueStdout(report, stepId, newDiags);
+        const collector = failed ? new ConcernSeedCollector() : void 0;
+        enrichFromApplyJsonl(
+          path,
+          report,
+          readerOpts,
+          showPlanParsed,
+          collector?.visit
+        );
+        if (failed && collector) {
+          report.issues.push(
+            buildFocusedStepIssue(
+              step,
+              stepId,
+              readerOpts,
+              path,
+              collector.seed
+            )
+          );
         }
         return;
       }
     }
   }
-  if (outcome !== "failure") {
+  if (failed) {
+    report.issues.push(buildStepIssue(step, stepId, readerOpts));
+  } else {
     const read = readStepStdout(step, readerOpts);
     if (read.content !== void 0) {
       const detectedTool = detectToolFromOutput(read.content);
@@ -2110,10 +2221,10 @@ function processApplyStep(step, stepId, report, readerOpts, showPlanParsed) {
   }
   report.operation = "apply";
 }
-function enrichFromApplyJsonl(filePath, report, readerOpts, showPlanParsed) {
+function enrichFromApplyJsonl(filePath, report, readerOpts, showPlanParsed, onLine) {
   let scan;
   try {
-    scan = scanFile(filePath, readerOpts.maxFileSize);
+    scan = scanFile(filePath, readerOpts.maxFileSize, onLine);
   } catch {
     report.warnings.push(new StepScanFailureWarning("apply"));
     return;

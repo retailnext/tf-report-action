@@ -8,7 +8,7 @@
 import type { StepData, ReaderOptions } from "../steps/types.js";
 import type { Report } from "../model/report.js";
 import type { Diagnostic } from "../model/diagnostic.js";
-import type { ScanResult } from "../jsonl-scanner/types.js";
+import type { ScanResult, ScanVisitor } from "../jsonl-scanner/types.js";
 import { getStepOutcome } from "../steps/outcomes.js";
 import {
   readStepStdout,
@@ -21,6 +21,7 @@ import { isJsonLines } from "../jsonl-scanner/detect.js";
 import { buildStepIssue } from "./step-issues.js";
 import { buildSummaryFromScan } from "./summary.js";
 import { buildResourcesFromScan } from "./resources.js";
+import { ConcernSeedCollector } from "./causal-relevance.js";
 import {
   StepReadErrorWarning,
   StepOutputMissingWarning,
@@ -28,7 +29,7 @@ import {
 } from "./warnings.js";
 import {
   addScannerWarnings,
-  filterStepIssueStdout,
+  buildFocusedStepIssue,
 } from "./process-helpers.js";
 
 /**
@@ -43,11 +44,7 @@ export function processApplyStep(
   showPlanParsed: boolean,
 ): void {
   const outcome = getStepOutcome(step);
-
-  // Create StepIssue for failed apply step
-  if (outcome === "failure") {
-    report.issues.push(buildStepIssue(step, stepId, readerOpts));
-  }
+  const failed = outcome === "failure";
 
   const path = getStepStdoutPath(step, readerOpts);
   if (path) {
@@ -55,19 +52,37 @@ export function processApplyStep(
     if (peek.content !== undefined) {
       const firstLines = peek.content.split("\n", 10);
       if (isJsonLines(firstLines)) {
-        const diagsBefore = report.diagnostics?.length ?? 0;
-        enrichFromApplyJsonl(path, report, readerOpts, showPlanParsed);
-        if (outcome === "failure") {
-          const newDiags = (report.diagnostics ?? []).slice(diagsBefore);
-          filterStepIssueStdout(report, stepId, newDiags);
+        // On failure, collect the concern seed during the model scan (pass 1),
+        // then emit only the causally-relevant lines into the issue (pass 2).
+        const collector = failed ? new ConcernSeedCollector() : undefined;
+        enrichFromApplyJsonl(
+          path,
+          report,
+          readerOpts,
+          showPlanParsed,
+          collector?.visit,
+        );
+        if (failed && collector) {
+          report.issues.push(
+            buildFocusedStepIssue(
+              step,
+              stepId,
+              readerOpts,
+              path,
+              collector.seed,
+            ),
+          );
         }
         return;
       }
     }
   }
 
-  // Plaintext or unreadable: show as raw content
-  if (outcome !== "failure") {
+  // Create StepIssue for failed apply step (non-JSONL stdout).
+  if (failed) {
+    report.issues.push(buildStepIssue(step, stepId, readerOpts));
+  } else {
+    // Plaintext or unreadable: show as raw content.
     const read = readStepStdout(step, readerOpts);
     if (read.content !== undefined) {
       const detectedTool = detectToolFromOutput(read.content);
@@ -97,10 +112,11 @@ function enrichFromApplyJsonl(
   report: Report,
   readerOpts: ReaderOptions,
   showPlanParsed: boolean,
+  onLine?: ScanVisitor,
 ): void {
   let scan: ScanResult;
   try {
-    scan = scanFile(filePath, readerOpts.maxFileSize);
+    scan = scanFile(filePath, readerOpts.maxFileSize, onLine);
   } catch {
     report.warnings.push(new StepScanFailureWarning("apply"));
     return;
