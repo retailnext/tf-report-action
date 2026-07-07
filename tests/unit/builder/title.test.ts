@@ -10,6 +10,7 @@ import type {
   Summary,
   SummaryActionGroup,
 } from "../../../src/model/summary.js";
+import type { OutputChange } from "../../../src/model/output.js";
 
 function makeSummary(
   actions: SummaryActionGroup[] = [],
@@ -24,6 +25,18 @@ function makeActionGroup(action: string, total: number): SummaryActionGroup {
     resourceTypes: [{ type: "null_resource", count: total }],
     total,
   };
+}
+
+function makeOutputs(count: number): OutputChange[] {
+  return Array.from({ length: count }, (_unused, i) => ({
+    name: `output_${String(i)}`,
+    action: "create",
+    before: null,
+    after: "value",
+    isSensitive: false,
+    isLarge: false,
+    isKnownAfterApply: false,
+  }));
 }
 
 function makeReport(overrides: Partial<Report> = {}): Report {
@@ -51,6 +64,7 @@ describe("buildTitle", () => {
       counts: [{ action: "create", count: 3 }],
       failures: [],
       failureTotal: 0,
+      outputChanges: 0,
       hasStepFailure: false,
     });
   });
@@ -76,6 +90,7 @@ describe("buildTitle", () => {
       ],
       failures: [],
       failureTotal: 0,
+      outputChanges: 0,
       hasStepFailure: false,
     });
   });
@@ -88,6 +103,80 @@ describe("buildTitle", () => {
     const result = buildTitle(report);
     expect(result.status).toBe("success");
     expect(result.body).toEqual({ kind: "no-changes" });
+  });
+
+  it("returns plan summary (not No Changes) when only outputs change", () => {
+    const report = makeReport({
+      summary: makeSummary(),
+      operation: "plan",
+      outputs: makeOutputs(3),
+    });
+    const result = buildTitle(report);
+    expect(result.status).toBe("success");
+    expect(result.body).toEqual({
+      kind: "summary",
+      operation: "plan",
+      counts: [],
+      failures: [],
+      failureTotal: 0,
+      outputChanges: 3,
+      hasStepFailure: false,
+    });
+  });
+
+  it("includes output count alongside plan resource counts", () => {
+    const report = makeReport({
+      summary: makeSummary([makeActionGroup("create", 2)]),
+      operation: "plan",
+      outputs: makeOutputs(1),
+    });
+    const result = buildTitle(report);
+    expect(result.body).toEqual({
+      kind: "summary",
+      operation: "plan",
+      counts: [{ action: "create", count: 2 }],
+      failures: [],
+      failureTotal: 0,
+      outputChanges: 1,
+      hasStepFailure: false,
+    });
+  });
+
+  it("returns apply summary (not Apply Complete) when only outputs change", () => {
+    const report = makeReport({
+      summary: makeSummary(),
+      operation: "apply",
+      outputs: makeOutputs(2),
+    });
+    const result = buildTitle(report);
+    expect(result.status).toBe("success");
+    expect(result.body).toEqual({
+      kind: "summary",
+      operation: "apply",
+      counts: [],
+      failures: [],
+      failureTotal: 0,
+      outputChanges: 2,
+      hasStepFailure: false,
+    });
+  });
+
+  it("includes output count alongside apply resource counts", () => {
+    const report = makeReport({
+      summary: makeSummary([makeActionGroup("create", 1)]),
+      operation: "apply",
+      outputs: makeOutputs(4),
+    });
+    const result = buildTitle(report);
+    expect(result.body).toEqual({
+      kind: "summary",
+      operation: "apply",
+      counts: [{ action: "create", count: 1 }],
+      failures: [],
+      failureTotal: 0,
+      outputChanges: 4,
+      hasStepFailure: false,
+    });
   });
 
   it("returns 'Plan Failed' when summary has failures", () => {
@@ -132,6 +221,7 @@ describe("buildTitle", () => {
       counts: [{ action: "create", count: 1 }],
       failures: [],
       failureTotal: 0,
+      outputChanges: 0,
       hasStepFailure: false,
     });
   });
@@ -167,6 +257,7 @@ describe("buildTitle", () => {
       ],
       failures: [],
       failureTotal: 0,
+      outputChanges: 0,
       hasStepFailure: false,
     });
   });
@@ -184,6 +275,7 @@ describe("buildTitle", () => {
       counts: [],
       failures: [],
       failureTotal: 0,
+      outputChanges: 0,
       hasStepFailure: false,
     });
   });
@@ -204,6 +296,7 @@ describe("buildTitle", () => {
       counts: [{ action: "create", count: 1 }],
       failures: [{ action: "failed", count: 2 }],
       failureTotal: 2,
+      outputChanges: 0,
       hasStepFailure: false,
     });
   });
@@ -223,6 +316,7 @@ describe("buildTitle", () => {
       counts: [{ action: "delete", count: 1 }],
       failures: [],
       failureTotal: 0,
+      outputChanges: 0,
       hasStepFailure: false,
     });
   });

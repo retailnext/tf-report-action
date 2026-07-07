@@ -1233,6 +1233,22 @@ local_file.readme
 "
 `;
 
+exports[`reportFromSteps integration — apply-no-show fixtures > terraform/local-files/2/apply-no-show > renders without error and matches snapshot 1`] = `
+"## ✅ Apply Succeeded
+
+### Steps
+
+| Step | Outcome | Exit Code |
+| --- | --- | --- |
+| \`init\` | success | \`0\` |
+| \`validate\` | success | \`0\` |
+| \`plan\` | success | \`2\` |
+| \`apply\` | success | \`0\` |
+| \`state\` | success | \`0\` |
+
+"
+`;
+
 exports[`reportFromSteps integration — apply-no-show fixtures > terraform/modules/0/apply-no-show > renders without error and matches snapshot 1`] = `
 "## ✅ Apply: 5 added
 
@@ -3215,6 +3231,22 @@ local_file.readme
 "
 `;
 
+exports[`reportFromSteps integration — apply-no-show fixtures > tofu/local-files/2/apply-no-show > renders without error and matches snapshot 1`] = `
+"## ✅ Apply Succeeded
+
+### Steps
+
+| Step | Outcome | Exit Code |
+| --- | --- | --- |
+| \`init\` | success | \`0\` |
+| \`validate\` | success | \`0\` |
+| \`plan\` | success | \`2\` |
+| \`apply\` | success | \`0\` |
+| \`state\` | success | \`0\` |
+
+"
+`;
+
 exports[`reportFromSteps integration — apply-no-show fixtures > tofu/modules/0/apply-no-show > renders without error and matches snapshot 1`] = `
 "## ✅ Apply: 5 added
 
@@ -5022,6 +5054,21 @@ local_file.readme
 "
 `;
 
+exports[`reportFromSteps integration — apply-only fixtures > terraform/local-files/2/apply-only > renders without error and matches snapshot 1`] = `
+"## ✅ Apply Succeeded
+
+### Steps
+
+| Step | Outcome | Exit Code |
+| --- | --- | --- |
+| \`init\` | success | \`0\` |
+| \`validate\` | success | \`0\` |
+| \`apply\` | success | \`0\` |
+| \`state\` | success | \`0\` |
+
+"
+`;
+
 exports[`reportFromSteps integration — apply-only fixtures > terraform/modules/0/apply-only > renders without error and matches snapshot 1`] = `
 "## ✅ Apply: 5 added
 
@@ -6739,6 +6786,21 @@ local_file.readme
 "
 `;
 
+exports[`reportFromSteps integration — apply-only fixtures > tofu/local-files/2/apply-only > renders without error and matches snapshot 1`] = `
+"## ✅ Apply Succeeded
+
+### Steps
+
+| Step | Outcome | Exit Code |
+| --- | --- | --- |
+| \`init\` | success | \`0\` |
+| \`validate\` | success | \`0\` |
+| \`apply\` | success | \`0\` |
+| \`state\` | success | \`0\` |
+
+"
+`;
+
 exports[`reportFromSteps integration — apply-only fixtures > tofu/modules/0/apply-only > renders without error and matches snapshot 1`] = `
 "## ✅ Apply: 5 added
 
@@ -7399,7 +7461,7 @@ exports[`reportFromSteps integration — apply-only fixtures > tofu/update-drift
 
 exports[`reportFromSteps integration — generated fixtures > terraform/addressless-plan-error/0 > renders with workspace and matches snapshot 1`] = `
 "<!-- tf-report-action:"test-workspace" -->
-## ✅ \`test-workspace\` Apply: 6 added
+## ✅ \`test-workspace\` Apply: 6 added, 4 output changes
 
 ## Apply Summary
 
@@ -7548,7 +7610,7 @@ null_resource.noise[5]
 `;
 
 exports[`reportFromSteps integration — generated fixtures > terraform/addressless-plan-error/0 > renders without error and matches snapshot [default] 1`] = `
-"## ✅ Apply: 6 added
+"## ✅ Apply: 6 added, 4 output changes
 
 ## Apply Summary
 
@@ -7843,7 +7905,7 @@ Exit code: \`1\`
 
 exports[`reportFromSteps integration — generated fixtures > terraform/apply-error/0 > renders with workspace and matches snapshot 1`] = `
 "<!-- tf-report-action:"test-workspace" -->
-## ✅ \`test-workspace\` Apply: 3 added
+## ✅ \`test-workspace\` Apply: 3 added, 2 output changes
 
 ## Apply Summary
 
@@ -7957,7 +8019,7 @@ terraform_data.success
 `;
 
 exports[`reportFromSteps integration — generated fixtures > terraform/apply-error/0 > renders without error and matches snapshot [default] 1`] = `
-"## ✅ Apply: 3 added
+"## ✅ Apply: 3 added, 2 output changes
 
 ## Apply Summary
 
@@ -8649,7 +8711,7 @@ Error running command 'exit 1': exit status 1. Output:
 
 exports[`reportFromSteps integration — generated fixtures > terraform/deferred-data-source/0 > renders with workspace and matches snapshot 1`] = `
 "<!-- tf-report-action:"test-workspace" -->
-## ✅ \`test-workspace\` Apply: 5 added
+## ✅ \`test-workspace\` Apply: 5 added, 1 output change
 
 ## Apply Summary
 
@@ -8883,7 +8945,7 @@ terraform_data.worker_c
 `;
 
 exports[`reportFromSteps integration — generated fixtures > terraform/deferred-data-source/0 > renders without error and matches snapshot [default] 1`] = `
-"## ✅ Apply: 5 added
+"## ✅ Apply: 5 added, 1 output change
 
 ## Apply Summary
 
@@ -9118,7 +9180,7 @@ terraform_data.worker_c
 
 exports[`reportFromSteps integration — generated fixtures > terraform/deferred-data-source/1 > renders with workspace and matches snapshot 1`] = `
 "<!-- tf-report-action:"test-workspace" -->
-## ✅ \`test-workspace\` Apply: 1 added, 1 changed
+## ✅ \`test-workspace\` Apply: 1 added, 1 changed, 1 output change
 
 ## Apply Summary
 
@@ -9210,7 +9272,7 @@ terraform_data.independent
 `;
 
 exports[`reportFromSteps integration — generated fixtures > terraform/deferred-data-source/1 > renders without error and matches snapshot [default] 1`] = `
-"## ✅ Apply: 1 added, 1 changed
+"## ✅ Apply: 1 added, 1 changed, 1 output change
 
 ## Apply Summary
 
@@ -9303,7 +9365,7 @@ terraform_data.independent
 
 exports[`reportFromSteps integration — generated fixtures > terraform/deferred-data-source/2 > renders with workspace and matches snapshot 1`] = `
 "<!-- tf-report-action:"test-workspace" -->
-## ✅ \`test-workspace\` Apply: 1 changed, 1 replaced
+## ✅ \`test-workspace\` Apply: 1 changed, 1 replaced, 1 output change
 
 ## Apply Summary
 
@@ -9419,7 +9481,7 @@ terraform_data.worker_a
 `;
 
 exports[`reportFromSteps integration — generated fixtures > terraform/deferred-data-source/2 > renders without error and matches snapshot [default] 1`] = `
-"## ✅ Apply: 1 changed, 1 replaced
+"## ✅ Apply: 1 changed, 1 replaced, 1 output change
 
 ## Apply Summary
 
@@ -10568,7 +10630,7 @@ tfcoremock_webhook_config.admission
 
 exports[`reportFromSteps integration — generated fixtures > terraform/local-files/0 > renders with workspace and matches snapshot 1`] = `
 "<!-- tf-report-action:"test-workspace" -->
-## ✅ \`test-workspace\` Apply: 1 added
+## ✅ \`test-workspace\` Apply: 1 added, 1 output change
 
 ## Apply Summary
 
@@ -10639,7 +10701,7 @@ local_file.readme
 `;
 
 exports[`reportFromSteps integration — generated fixtures > terraform/local-files/0 > renders without error and matches snapshot [default] 1`] = `
-"## ✅ Apply: 1 added
+"## ✅ Apply: 1 added, 1 output change
 
 ## Apply Summary
 
@@ -10844,9 +10906,42 @@ local_file.readme
 "
 `;
 
+exports[`reportFromSteps integration — generated fixtures > terraform/local-files/2 > renders with workspace and matches snapshot 1`] = `
+"<!-- tf-report-action:"test-workspace" -->
+## ✅ \`test-workspace\` Apply: 1 output change
+
+## Apply Summary
+
+_No changes._
+
+## Output Changes
+
+| Output | Action | Before | After |
+| --- | --- | --- | --- |
+| static\\_note | ➕ |  | <code><ins style="background:#dfd">outputs-only change with no resource changes</ins></code> |
+
+"
+`;
+
+exports[`reportFromSteps integration — generated fixtures > terraform/local-files/2 > renders without error and matches snapshot [default] 1`] = `
+"## ✅ Apply: 1 output change
+
+## Apply Summary
+
+_No changes._
+
+## Output Changes
+
+| Output | Action | Before | After |
+| --- | --- | --- | --- |
+| static\\_note | ➕ |  | <code><ins style="background:#dfd">outputs-only change with no resource changes</ins></code> |
+
+"
+`;
+
 exports[`reportFromSteps integration — generated fixtures > terraform/modules/0 > renders with workspace and matches snapshot 1`] = `
 "<!-- tf-report-action:"test-workspace" -->
-## ✅ \`test-workspace\` Apply: 5 added
+## ✅ \`test-workspace\` Apply: 5 added, 2 output changes
 
 ## Apply Summary
 
@@ -10971,7 +11066,7 @@ module.parent["2"].module.child.null_resource.item[1]
 `;
 
 exports[`reportFromSteps integration — generated fixtures > terraform/modules/0 > renders without error and matches snapshot [default] 1`] = `
-"## ✅ Apply: 5 added
+"## ✅ Apply: 5 added, 2 output changes
 
 ## Apply Summary
 
@@ -11097,7 +11192,7 @@ module.parent["2"].module.child.null_resource.item[1]
 
 exports[`reportFromSteps integration — generated fixtures > terraform/modules/1 > renders with workspace and matches snapshot 1`] = `
 "<!-- tf-report-action:"test-workspace" -->
-## ✅ \`test-workspace\` Apply: 3 added, 2 replaced, 2 destroyed
+## ✅ \`test-workspace\` Apply: 3 added, 2 replaced, 2 destroyed, 2 output changes
 
 ## Apply Summary
 
@@ -11250,7 +11345,7 @@ module.parent["3"].module.child.null_resource.item[2]
 `;
 
 exports[`reportFromSteps integration — generated fixtures > terraform/modules/1 > renders without error and matches snapshot [default] 1`] = `
-"## ✅ Apply: 3 added, 2 replaced, 2 destroyed
+"## ✅ Apply: 3 added, 2 replaced, 2 destroyed, 2 output changes
 
 ## Apply Summary
 
@@ -12423,7 +12518,7 @@ tfcoremock_iam_role.ops
 
 exports[`reportFromSteps integration — generated fixtures > terraform/sensitive-values/0 > renders with workspace and matches snapshot 1`] = `
 "<!-- tf-report-action:"test-workspace" -->
-## ✅ \`test-workspace\` Apply: 1 added
+## ✅ \`test-workspace\` Apply: 1 added, 2 output changes
 
 ## Apply Summary
 
@@ -12473,7 +12568,7 @@ local_sensitive_file.secret
 `;
 
 exports[`reportFromSteps integration — generated fixtures > terraform/sensitive-values/0 > renders without error and matches snapshot [default] 1`] = `
-"## ✅ Apply: 1 added
+"## ✅ Apply: 1 added, 2 output changes
 
 ## Apply Summary
 
@@ -12524,7 +12619,7 @@ local_sensitive_file.secret
 
 exports[`reportFromSteps integration — generated fixtures > terraform/sensitive-values/1 > renders with workspace and matches snapshot 1`] = `
 "<!-- tf-report-action:"test-workspace" -->
-## ✅ \`test-workspace\` Apply: 1 replaced
+## ✅ \`test-workspace\` Apply: 1 replaced, 1 output change
 
 ## Apply Summary
 
@@ -12570,7 +12665,7 @@ local_sensitive_file.secret
 `;
 
 exports[`reportFromSteps integration — generated fixtures > terraform/sensitive-values/1 > renders without error and matches snapshot [default] 1`] = `
-"## ✅ Apply: 1 replaced
+"## ✅ Apply: 1 replaced, 1 output change
 
 ## Apply Summary
 
@@ -13162,7 +13257,7 @@ _No changes._
 
 exports[`reportFromSteps integration — generated fixtures > tofu/addressless-plan-error/0 > renders with workspace and matches snapshot 1`] = `
 "<!-- tf-report-action:"test-workspace" -->
-## ✅ \`test-workspace\` Apply: 6 added
+## ✅ \`test-workspace\` Apply: 6 added, 4 output changes
 
 ## Apply Summary
 
@@ -13311,7 +13406,7 @@ null_resource.noise[5]
 `;
 
 exports[`reportFromSteps integration — generated fixtures > tofu/addressless-plan-error/0 > renders without error and matches snapshot [default] 1`] = `
-"## ✅ Apply: 6 added
+"## ✅ Apply: 6 added, 4 output changes
 
 ## Apply Summary
 
@@ -13606,7 +13701,7 @@ Exit code: \`1\`
 
 exports[`reportFromSteps integration — generated fixtures > tofu/apply-error/0 > renders with workspace and matches snapshot 1`] = `
 "<!-- tf-report-action:"test-workspace" -->
-## ✅ \`test-workspace\` Apply: 3 added
+## ✅ \`test-workspace\` Apply: 3 added, 2 output changes
 
 ## Apply Summary
 
@@ -13720,7 +13815,7 @@ terraform_data.success
 `;
 
 exports[`reportFromSteps integration — generated fixtures > tofu/apply-error/0 > renders without error and matches snapshot [default] 1`] = `
-"## ✅ Apply: 3 added
+"## ✅ Apply: 3 added, 2 output changes
 
 ## Apply Summary
 
@@ -14412,7 +14507,7 @@ Error running command 'exit 1': exit status 1. Output:
 
 exports[`reportFromSteps integration — generated fixtures > tofu/deferred-data-source/0 > renders with workspace and matches snapshot 1`] = `
 "<!-- tf-report-action:"test-workspace" -->
-## ✅ \`test-workspace\` Apply: 5 added
+## ✅ \`test-workspace\` Apply: 5 added, 1 output change
 
 ## Apply Summary
 
@@ -14646,7 +14741,7 @@ terraform_data.worker_c
 `;
 
 exports[`reportFromSteps integration — generated fixtures > tofu/deferred-data-source/0 > renders without error and matches snapshot [default] 1`] = `
-"## ✅ Apply: 5 added
+"## ✅ Apply: 5 added, 1 output change
 
 ## Apply Summary
 
@@ -14881,7 +14976,7 @@ terraform_data.worker_c
 
 exports[`reportFromSteps integration — generated fixtures > tofu/deferred-data-source/1 > renders with workspace and matches snapshot 1`] = `
 "<!-- tf-report-action:"test-workspace" -->
-## ✅ \`test-workspace\` Apply: 1 added, 1 changed
+## ✅ \`test-workspace\` Apply: 1 added, 1 changed, 1 output change
 
 ## Apply Summary
 
@@ -14973,7 +15068,7 @@ terraform_data.independent
 `;
 
 exports[`reportFromSteps integration — generated fixtures > tofu/deferred-data-source/1 > renders without error and matches snapshot [default] 1`] = `
-"## ✅ Apply: 1 added, 1 changed
+"## ✅ Apply: 1 added, 1 changed, 1 output change
 
 ## Apply Summary
 
@@ -15066,7 +15161,7 @@ terraform_data.independent
 
 exports[`reportFromSteps integration — generated fixtures > tofu/deferred-data-source/2 > renders with workspace and matches snapshot 1`] = `
 "<!-- tf-report-action:"test-workspace" -->
-## ✅ \`test-workspace\` Apply: 1 changed, 1 replaced
+## ✅ \`test-workspace\` Apply: 1 changed, 1 replaced, 1 output change
 
 ## Apply Summary
 
@@ -15182,7 +15277,7 @@ terraform_data.worker_a
 `;
 
 exports[`reportFromSteps integration — generated fixtures > tofu/deferred-data-source/2 > renders without error and matches snapshot [default] 1`] = `
-"## ✅ Apply: 1 changed, 1 replaced
+"## ✅ Apply: 1 changed, 1 replaced, 1 output change
 
 ## Apply Summary
 
@@ -16331,7 +16426,7 @@ tfcoremock_webhook_config.admission
 
 exports[`reportFromSteps integration — generated fixtures > tofu/local-files/0 > renders with workspace and matches snapshot 1`] = `
 "<!-- tf-report-action:"test-workspace" -->
-## ✅ \`test-workspace\` Apply: 1 added
+## ✅ \`test-workspace\` Apply: 1 added, 1 output change
 
 ## Apply Summary
 
@@ -16402,7 +16497,7 @@ local_file.readme
 `;
 
 exports[`reportFromSteps integration — generated fixtures > tofu/local-files/0 > renders without error and matches snapshot [default] 1`] = `
-"## ✅ Apply: 1 added
+"## ✅ Apply: 1 added, 1 output change
 
 ## Apply Summary
 
@@ -16607,9 +16702,42 @@ local_file.readme
 "
 `;
 
+exports[`reportFromSteps integration — generated fixtures > tofu/local-files/2 > renders with workspace and matches snapshot 1`] = `
+"<!-- tf-report-action:"test-workspace" -->
+## ✅ \`test-workspace\` Apply: 1 output change
+
+## Apply Summary
+
+_No changes._
+
+## Output Changes
+
+| Output | Action | Before | After |
+| --- | --- | --- | --- |
+| static\\_note | ➕ |  | <code><ins style="background:#dfd">outputs-only change with no resource changes</ins></code> |
+
+"
+`;
+
+exports[`reportFromSteps integration — generated fixtures > tofu/local-files/2 > renders without error and matches snapshot [default] 1`] = `
+"## ✅ Apply: 1 output change
+
+## Apply Summary
+
+_No changes._
+
+## Output Changes
+
+| Output | Action | Before | After |
+| --- | --- | --- | --- |
+| static\\_note | ➕ |  | <code><ins style="background:#dfd">outputs-only change with no resource changes</ins></code> |
+
+"
+`;
+
 exports[`reportFromSteps integration — generated fixtures > tofu/modules/0 > renders with workspace and matches snapshot 1`] = `
 "<!-- tf-report-action:"test-workspace" -->
-## ✅ \`test-workspace\` Apply: 5 added
+## ✅ \`test-workspace\` Apply: 5 added, 2 output changes
 
 ## Apply Summary
 
@@ -16734,7 +16862,7 @@ module.parent["2"].module.child.null_resource.item[1]
 `;
 
 exports[`reportFromSteps integration — generated fixtures > tofu/modules/0 > renders without error and matches snapshot [default] 1`] = `
-"## ✅ Apply: 5 added
+"## ✅ Apply: 5 added, 2 output changes
 
 ## Apply Summary
 
@@ -16860,7 +16988,7 @@ module.parent["2"].module.child.null_resource.item[1]
 
 exports[`reportFromSteps integration — generated fixtures > tofu/modules/1 > renders with workspace and matches snapshot 1`] = `
 "<!-- tf-report-action:"test-workspace" -->
-## ✅ \`test-workspace\` Apply: 3 added, 2 replaced, 2 destroyed
+## ✅ \`test-workspace\` Apply: 3 added, 2 replaced, 2 destroyed, 2 output changes
 
 ## Apply Summary
 
@@ -17013,7 +17141,7 @@ module.parent["3"].module.child.null_resource.item[2]
 `;
 
 exports[`reportFromSteps integration — generated fixtures > tofu/modules/1 > renders without error and matches snapshot [default] 1`] = `
-"## ✅ Apply: 3 added, 2 replaced, 2 destroyed
+"## ✅ Apply: 3 added, 2 replaced, 2 destroyed, 2 output changes
 
 ## Apply Summary
 
@@ -18186,7 +18314,7 @@ tfcoremock_iam_role.ops
 
 exports[`reportFromSteps integration — generated fixtures > tofu/sensitive-values/0 > renders with workspace and matches snapshot 1`] = `
 "<!-- tf-report-action:"test-workspace" -->
-## ✅ \`test-workspace\` Apply: 1 added
+## ✅ \`test-workspace\` Apply: 1 added, 2 output changes
 
 ## Apply Summary
 
@@ -18236,7 +18364,7 @@ local_sensitive_file.secret
 `;
 
 exports[`reportFromSteps integration — generated fixtures > tofu/sensitive-values/0 > renders without error and matches snapshot [default] 1`] = `
-"## ✅ Apply: 1 added
+"## ✅ Apply: 1 added, 2 output changes
 
 ## Apply Summary
 
@@ -18287,7 +18415,7 @@ local_sensitive_file.secret
 
 exports[`reportFromSteps integration — generated fixtures > tofu/sensitive-values/1 > renders with workspace and matches snapshot 1`] = `
 "<!-- tf-report-action:"test-workspace" -->
-## ✅ \`test-workspace\` Apply: 1 replaced
+## ✅ \`test-workspace\` Apply: 1 replaced, 1 output change
 
 ## Apply Summary
 
@@ -18333,7 +18461,7 @@ local_sensitive_file.secret
 `;
 
 exports[`reportFromSteps integration — generated fixtures > tofu/sensitive-values/1 > renders without error and matches snapshot [default] 1`] = `
-"## ✅ Apply: 1 replaced
+"## ✅ Apply: 1 replaced, 1 output change
 
 ## Apply Summary
 
@@ -20066,6 +20194,20 @@ local_file.readme
 "
 `;
 
+exports[`reportFromSteps integration — no-show fixtures (Tier 3) > terraform/local-files/2/no-show > renders without error and matches snapshot 1`] = `
+"## ✅ Plan Succeeded
+
+### Steps
+
+| Step | Outcome | Exit Code |
+| --- | --- | --- |
+| \`init\` | success | \`0\` |
+| \`validate\` | success | \`0\` |
+| \`plan\` | success | \`2\` |
+
+"
+`;
+
 exports[`reportFromSteps integration — no-show fixtures (Tier 3) > terraform/modules/0/no-show > renders without error and matches snapshot 1`] = `
 "## ✅ Plan: 5 to add
 
@@ -21775,6 +21917,20 @@ local_file.readme
 "
 `;
 
+exports[`reportFromSteps integration — no-show fixtures (Tier 3) > tofu/local-files/2/no-show > renders without error and matches snapshot 1`] = `
+"## ✅ Plan Succeeded
+
+### Steps
+
+| Step | Outcome | Exit Code |
+| --- | --- | --- |
+| \`init\` | success | \`0\` |
+| \`validate\` | success | \`0\` |
+| \`plan\` | success | \`2\` |
+
+"
+`;
+
 exports[`reportFromSteps integration — no-show fixtures (Tier 3) > tofu/modules/0/no-show > renders without error and matches snapshot 1`] = `
 "## ✅ Plan: 5 to add
 
@@ -22518,7 +22674,7 @@ exports[`reportFromSteps integration — no-show fixtures (Tier 3) > tofu/update
 `;
 
 exports[`reportFromSteps integration — plan-only fixtures > terraform/addressless-plan-error/0/plan-only > renders plan report and matches snapshot 1`] = `
-"## ✅ Plan: 6 to add
+"## ✅ Plan: 6 to add, 4 output changes
 
 ## Plan Summary
 
@@ -22737,7 +22893,7 @@ Exit code: \`1\`
 `;
 
 exports[`reportFromSteps integration — plan-only fixtures > terraform/apply-error/0/plan-only > renders plan report and matches snapshot 1`] = `
-"## ✅ Plan: 3 to add
+"## ✅ Plan: 3 to add, 2 output changes
 
 ## Plan Summary
 
@@ -22808,7 +22964,7 @@ terraform_data.success
 `;
 
 exports[`reportFromSteps integration — plan-only fixtures > terraform/apply-error/1/plan-only > renders plan report and matches snapshot 1`] = `
-"## ✅ Plan: 1 to change, 1 to replace
+"## ✅ Plan: 1 to change, 1 to replace, 1 output change
 
 ## Plan Summary
 
@@ -22862,7 +23018,7 @@ _all values known after apply_
 `;
 
 exports[`reportFromSteps integration — plan-only fixtures > terraform/deferred-data-source/0/plan-only > renders plan report and matches snapshot 1`] = `
-"## ✅ Plan: 5 to add
+"## ✅ Plan: 5 to add, 1 output change
 
 ## Plan Summary
 
@@ -22982,7 +23138,7 @@ _all values known after apply_
 `;
 
 exports[`reportFromSteps integration — plan-only fixtures > terraform/deferred-data-source/1/plan-only > renders plan report and matches snapshot 1`] = `
-"## ✅ Plan: 1 to add, 4 to change
+"## ✅ Plan: 1 to add, 4 to change, 1 output change
 
 ## Plan Summary
 
@@ -23088,7 +23244,7 @@ _all values known after apply_
 `;
 
 exports[`reportFromSteps integration — plan-only fixtures > terraform/deferred-data-source/2/plan-only > renders plan report and matches snapshot 1`] = `
-"## ✅ Plan: 3 to change, 1 to replace
+"## ✅ Plan: 3 to change, 1 to replace, 1 output change
 
 ## Plan Summary
 
@@ -23692,7 +23848,7 @@ tfcoremock_webhook_config.admission
 `;
 
 exports[`reportFromSteps integration — plan-only fixtures > terraform/local-files/0/plan-only > renders plan report and matches snapshot 1`] = `
-"## ✅ Plan: 1 to add
+"## ✅ Plan: 1 to add, 1 output change
 
 ## Plan Summary
 
@@ -23829,8 +23985,24 @@ local_file.readme
 "
 `;
 
+exports[`reportFromSteps integration — plan-only fixtures > terraform/local-files/2/plan-only > renders plan report and matches snapshot 1`] = `
+"## ✅ Plan: 1 output change
+
+## Plan Summary
+
+_No changes._
+
+## Output Changes
+
+| Output | Action | Before | After |
+| --- | --- | --- | --- |
+| static\\_note | ➕ |  | <code><ins style="background:#dfd">outputs-only change with no resource changes</ins></code> |
+
+"
+`;
+
 exports[`reportFromSteps integration — plan-only fixtures > terraform/modules/0/plan-only > renders plan report and matches snapshot 1`] = `
-"## ✅ Plan: 5 to add
+"## ✅ Plan: 5 to add, 2 output changes
 
 ## Plan Summary
 
@@ -23955,7 +24127,7 @@ module.parent["2"].module.child.null_resource.item[1]
 `;
 
 exports[`reportFromSteps integration — plan-only fixtures > terraform/modules/1/plan-only > renders plan report and matches snapshot 1`] = `
-"## ✅ Plan: 3 to add, 2 to replace, 2 to destroy
+"## ✅ Plan: 3 to add, 2 to replace, 2 to destroy, 2 output changes
 
 ## Plan Summary
 
@@ -24587,7 +24759,7 @@ tfcoremock_iam_role.ops
 `;
 
 exports[`reportFromSteps integration — plan-only fixtures > terraform/sensitive-values/0/plan-only > renders plan report and matches snapshot 1`] = `
-"## ✅ Plan: 1 to add
+"## ✅ Plan: 1 to add, 2 output changes
 
 ## Plan Summary
 
@@ -24637,7 +24809,7 @@ local_sensitive_file.secret
 `;
 
 exports[`reportFromSteps integration — plan-only fixtures > terraform/sensitive-values/1/plan-only > renders plan report and matches snapshot 1`] = `
-"## ✅ Plan: 1 to replace
+"## ✅ Plan: 1 to replace, 1 output change
 
 ## Plan Summary
 
@@ -24953,7 +25125,7 @@ _No changes._
 `;
 
 exports[`reportFromSteps integration — plan-only fixtures > tofu/addressless-plan-error/0/plan-only > renders plan report and matches snapshot 1`] = `
-"## ✅ Plan: 6 to add
+"## ✅ Plan: 6 to add, 4 output changes
 
 ## Plan Summary
 
@@ -25172,7 +25344,7 @@ Exit code: \`1\`
 `;
 
 exports[`reportFromSteps integration — plan-only fixtures > tofu/apply-error/0/plan-only > renders plan report and matches snapshot 1`] = `
-"## ✅ Plan: 3 to add
+"## ✅ Plan: 3 to add, 2 output changes
 
 ## Plan Summary
 
@@ -25243,7 +25415,7 @@ terraform_data.success
 `;
 
 exports[`reportFromSteps integration — plan-only fixtures > tofu/apply-error/1/plan-only > renders plan report and matches snapshot 1`] = `
-"## ✅ Plan: 1 to change, 1 to replace
+"## ✅ Plan: 1 to change, 1 to replace, 1 output change
 
 ## Plan Summary
 
@@ -25297,7 +25469,7 @@ _all values known after apply_
 `;
 
 exports[`reportFromSteps integration — plan-only fixtures > tofu/deferred-data-source/0/plan-only > renders plan report and matches snapshot 1`] = `
-"## ✅ Plan: 5 to add
+"## ✅ Plan: 5 to add, 1 output change
 
 ## Plan Summary
 
@@ -25417,7 +25589,7 @@ _all values known after apply_
 `;
 
 exports[`reportFromSteps integration — plan-only fixtures > tofu/deferred-data-source/1/plan-only > renders plan report and matches snapshot 1`] = `
-"## ✅ Plan: 1 to add, 4 to change
+"## ✅ Plan: 1 to add, 4 to change, 1 output change
 
 ## Plan Summary
 
@@ -25523,7 +25695,7 @@ _all values known after apply_
 `;
 
 exports[`reportFromSteps integration — plan-only fixtures > tofu/deferred-data-source/2/plan-only > renders plan report and matches snapshot 1`] = `
-"## ✅ Plan: 3 to change, 1 to replace
+"## ✅ Plan: 3 to change, 1 to replace, 1 output change
 
 ## Plan Summary
 
@@ -26127,7 +26299,7 @@ tfcoremock_webhook_config.admission
 `;
 
 exports[`reportFromSteps integration — plan-only fixtures > tofu/local-files/0/plan-only > renders plan report and matches snapshot 1`] = `
-"## ✅ Plan: 1 to add
+"## ✅ Plan: 1 to add, 1 output change
 
 ## Plan Summary
 
@@ -26264,8 +26436,24 @@ local_file.readme
 "
 `;
 
+exports[`reportFromSteps integration — plan-only fixtures > tofu/local-files/2/plan-only > renders plan report and matches snapshot 1`] = `
+"## ✅ Plan: 1 output change
+
+## Plan Summary
+
+_No changes._
+
+## Output Changes
+
+| Output | Action | Before | After |
+| --- | --- | --- | --- |
+| static\\_note | ➕ |  | <code><ins style="background:#dfd">outputs-only change with no resource changes</ins></code> |
+
+"
+`;
+
 exports[`reportFromSteps integration — plan-only fixtures > tofu/modules/0/plan-only > renders plan report and matches snapshot 1`] = `
-"## ✅ Plan: 5 to add
+"## ✅ Plan: 5 to add, 2 output changes
 
 ## Plan Summary
 
@@ -26390,7 +26578,7 @@ module.parent["2"].module.child.null_resource.item[1]
 `;
 
 exports[`reportFromSteps integration — plan-only fixtures > tofu/modules/1/plan-only > renders plan report and matches snapshot 1`] = `
-"## ✅ Plan: 3 to add, 2 to replace, 2 to destroy
+"## ✅ Plan: 3 to add, 2 to replace, 2 to destroy, 2 output changes
 
 ## Plan Summary
 
@@ -27022,7 +27210,7 @@ tfcoremock_iam_role.ops
 `;
 
 exports[`reportFromSteps integration — plan-only fixtures > tofu/sensitive-values/0/plan-only > renders plan report and matches snapshot 1`] = `
-"## ✅ Plan: 1 to add
+"## ✅ Plan: 1 to add, 2 output changes
 
 ## Plan Summary
 
@@ -27072,7 +27260,7 @@ local_sensitive_file.secret
 `;
 
 exports[`reportFromSteps integration — plan-only fixtures > tofu/sensitive-values/1/plan-only > renders plan report and matches snapshot 1`] = `
-"## ✅ Plan: 1 to replace
+"## ✅ Plan: 1 to replace, 1 output change
 
 ## Plan Summary
 
@@ -27387,7 +27575,7 @@ _No changes._
 `;
 
 exports[`reportFromSteps — state enrichment > no-state snapshot: terraform/addressless-plan-error/0/no-state 1`] = `
-"## ✅ Apply: 6 added
+"## ✅ Apply: 6 added, 4 output changes
 
 > ⚠️ **Warning:** Some attribute values could not be resolved because \`terraform state pull\` output was not available. Add a state step after apply to see the actual values.
 
@@ -27609,7 +27797,7 @@ Exit code: \`1\`
 `;
 
 exports[`reportFromSteps — state enrichment > no-state snapshot: terraform/apply-error/0/no-state 1`] = `
-"## ✅ Apply: 3 added
+"## ✅ Apply: 3 added, 2 output changes
 
 > ⚠️ **Warning:** Some attribute values could not be resolved because \`terraform state pull\` output was not available. Add a state step after apply to see the actual values.
 
@@ -27972,7 +28160,7 @@ Error running command 'exit 1': exit status 1. Output:
 `;
 
 exports[`reportFromSteps — state enrichment > no-state snapshot: terraform/deferred-data-source/0/no-state 1`] = `
-"## ✅ Apply: 5 added
+"## ✅ Apply: 5 added, 1 output change
 
 > ⚠️ **Warning:** Some attribute values could not be resolved because \`terraform state pull\` output was not available. Add a state step after apply to see the actual values.
 
@@ -28094,7 +28282,7 @@ _all values known after apply_
 `;
 
 exports[`reportFromSteps — state enrichment > no-state snapshot: terraform/deferred-data-source/1/no-state 1`] = `
-"## ✅ Apply: 1 added, 1 changed
+"## ✅ Apply: 1 added, 1 changed, 1 output change
 
 > ⚠️ **Warning:** Some attribute values could not be resolved because \`terraform state pull\` output was not available. Add a state step after apply to see the actual values.
 
@@ -28163,7 +28351,7 @@ terraform_data.independent
 `;
 
 exports[`reportFromSteps — state enrichment > no-state snapshot: terraform/deferred-data-source/2/no-state 1`] = `
-"## ✅ Apply: 1 changed, 1 replaced
+"## ✅ Apply: 1 changed, 1 replaced, 1 output change
 
 > ⚠️ **Warning:** Some attribute values could not be resolved because \`terraform state pull\` output was not available. Add a state step after apply to see the actual values.
 
@@ -28756,7 +28944,7 @@ tfcoremock_webhook_config.admission
 `;
 
 exports[`reportFromSteps — state enrichment > no-state snapshot: terraform/local-files/0/no-state 1`] = `
-"## ✅ Apply: 1 added
+"## ✅ Apply: 1 added, 1 output change
 
 > ⚠️ **Warning:** Some attribute values could not be resolved because \`terraform state pull\` output was not available. Add a state step after apply to see the actual values.
 
@@ -28897,8 +29085,24 @@ local_file.readme
 "
 `;
 
+exports[`reportFromSteps — state enrichment > no-state snapshot: terraform/local-files/2/no-state 1`] = `
+"## ✅ Apply: 1 output change
+
+## Apply Summary
+
+_No changes._
+
+## Output Changes
+
+| Output | Action | Before | After |
+| --- | --- | --- | --- |
+| static\\_note | ➕ |  | <code><ins style="background:#dfd">outputs-only change with no resource changes</ins></code> |
+
+"
+`;
+
 exports[`reportFromSteps — state enrichment > no-state snapshot: terraform/modules/0/no-state 1`] = `
-"## ✅ Apply: 5 added
+"## ✅ Apply: 5 added, 2 output changes
 
 > ⚠️ **Warning:** Some attribute values could not be resolved because \`terraform state pull\` output was not available. Add a state step after apply to see the actual values.
 
@@ -29025,7 +29229,7 @@ module.parent["2"].module.child.null_resource.item[1]
 `;
 
 exports[`reportFromSteps — state enrichment > no-state snapshot: terraform/modules/1/no-state 1`] = `
-"## ✅ Apply: 3 added, 2 replaced, 2 destroyed
+"## ✅ Apply: 3 added, 2 replaced, 2 destroyed, 2 output changes
 
 > ⚠️ **Warning:** Some attribute values could not be resolved because \`terraform state pull\` output was not available. Add a state step after apply to see the actual values.
 
@@ -29667,7 +29871,7 @@ tfcoremock_iam_role.ops
 `;
 
 exports[`reportFromSteps — state enrichment > no-state snapshot: terraform/sensitive-values/0/no-state 1`] = `
-"## ✅ Apply: 1 added
+"## ✅ Apply: 1 added, 2 output changes
 
 > ⚠️ **Warning:** Some attribute values could not be resolved because \`terraform state pull\` output was not available. Add a state step after apply to see the actual values.
 
@@ -29719,7 +29923,7 @@ local_sensitive_file.secret
 `;
 
 exports[`reportFromSteps — state enrichment > no-state snapshot: terraform/sensitive-values/1/no-state 1`] = `
-"## ✅ Apply: 1 replaced
+"## ✅ Apply: 1 replaced, 1 output change
 
 > ⚠️ **Warning:** Some attribute values could not be resolved because \`terraform state pull\` output was not available. Add a state step after apply to see the actual values.
 
@@ -30041,7 +30245,7 @@ _No changes._
 `;
 
 exports[`reportFromSteps — state enrichment > no-state snapshot: tofu/addressless-plan-error/0/no-state 1`] = `
-"## ✅ Apply: 6 added
+"## ✅ Apply: 6 added, 4 output changes
 
 > ⚠️ **Warning:** Some attribute values could not be resolved because \`tofu state pull\` output was not available. Add a state step after apply to see the actual values.
 
@@ -30263,7 +30467,7 @@ Exit code: \`1\`
 `;
 
 exports[`reportFromSteps — state enrichment > no-state snapshot: tofu/apply-error/0/no-state 1`] = `
-"## ✅ Apply: 3 added
+"## ✅ Apply: 3 added, 2 output changes
 
 > ⚠️ **Warning:** Some attribute values could not be resolved because \`tofu state pull\` output was not available. Add a state step after apply to see the actual values.
 
@@ -30626,7 +30830,7 @@ Error running command 'exit 1': exit status 1. Output:
 `;
 
 exports[`reportFromSteps — state enrichment > no-state snapshot: tofu/deferred-data-source/0/no-state 1`] = `
-"## ✅ Apply: 5 added
+"## ✅ Apply: 5 added, 1 output change
 
 > ⚠️ **Warning:** Some attribute values could not be resolved because \`tofu state pull\` output was not available. Add a state step after apply to see the actual values.
 
@@ -30748,7 +30952,7 @@ _all values known after apply_
 `;
 
 exports[`reportFromSteps — state enrichment > no-state snapshot: tofu/deferred-data-source/1/no-state 1`] = `
-"## ✅ Apply: 1 added, 1 changed
+"## ✅ Apply: 1 added, 1 changed, 1 output change
 
 > ⚠️ **Warning:** Some attribute values could not be resolved because \`tofu state pull\` output was not available. Add a state step after apply to see the actual values.
 
@@ -30817,7 +31021,7 @@ terraform_data.independent
 `;
 
 exports[`reportFromSteps — state enrichment > no-state snapshot: tofu/deferred-data-source/2/no-state 1`] = `
-"## ✅ Apply: 1 changed, 1 replaced
+"## ✅ Apply: 1 changed, 1 replaced, 1 output change
 
 > ⚠️ **Warning:** Some attribute values could not be resolved because \`tofu state pull\` output was not available. Add a state step after apply to see the actual values.
 
@@ -31410,7 +31614,7 @@ tfcoremock_webhook_config.admission
 `;
 
 exports[`reportFromSteps — state enrichment > no-state snapshot: tofu/local-files/0/no-state 1`] = `
-"## ✅ Apply: 1 added
+"## ✅ Apply: 1 added, 1 output change
 
 > ⚠️ **Warning:** Some attribute values could not be resolved because \`tofu state pull\` output was not available. Add a state step after apply to see the actual values.
 
@@ -31551,8 +31755,24 @@ local_file.readme
 "
 `;
 
+exports[`reportFromSteps — state enrichment > no-state snapshot: tofu/local-files/2/no-state 1`] = `
+"## ✅ Apply: 1 output change
+
+## Apply Summary
+
+_No changes._
+
+## Output Changes
+
+| Output | Action | Before | After |
+| --- | --- | --- | --- |
+| static\\_note | ➕ |  | <code><ins style="background:#dfd">outputs-only change with no resource changes</ins></code> |
+
+"
+`;
+
 exports[`reportFromSteps — state enrichment > no-state snapshot: tofu/modules/0/no-state 1`] = `
-"## ✅ Apply: 5 added
+"## ✅ Apply: 5 added, 2 output changes
 
 > ⚠️ **Warning:** Some attribute values could not be resolved because \`tofu state pull\` output was not available. Add a state step after apply to see the actual values.
 
@@ -31679,7 +31899,7 @@ module.parent["2"].module.child.null_resource.item[1]
 `;
 
 exports[`reportFromSteps — state enrichment > no-state snapshot: tofu/modules/1/no-state 1`] = `
-"## ✅ Apply: 3 added, 2 replaced, 2 destroyed
+"## ✅ Apply: 3 added, 2 replaced, 2 destroyed, 2 output changes
 
 > ⚠️ **Warning:** Some attribute values could not be resolved because \`tofu state pull\` output was not available. Add a state step after apply to see the actual values.
 
@@ -32321,7 +32541,7 @@ tfcoremock_iam_role.ops
 `;
 
 exports[`reportFromSteps — state enrichment > no-state snapshot: tofu/sensitive-values/0/no-state 1`] = `
-"## ✅ Apply: 1 added
+"## ✅ Apply: 1 added, 2 output changes
 
 > ⚠️ **Warning:** Some attribute values could not be resolved because \`tofu state pull\` output was not available. Add a state step after apply to see the actual values.
 
@@ -32373,7 +32593,7 @@ local_sensitive_file.secret
 `;
 
 exports[`reportFromSteps — state enrichment > no-state snapshot: tofu/sensitive-values/1/no-state 1`] = `
-"## ✅ Apply: 1 replaced
+"## ✅ Apply: 1 replaced, 1 output change
 
 > ⚠️ **Warning:** Some attribute values could not be resolved because \`tofu state pull\` output was not available. Add a state step after apply to see the actual values.
 

@@ -1,7 +1,7 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
 exports[`applyToMarkdown integration > terraform/addressless-plan-error/0 > renders without error and matches snapshot [default] 1`] = `
-"## ✅ Apply: 6 added
+"## ✅ Apply: 6 added, 4 output changes
 
 ## Apply Summary
 
@@ -150,7 +150,7 @@ null_resource.noise[5]
 `;
 
 exports[`applyToMarkdown integration > terraform/apply-error/0 > renders without error and matches snapshot [default] 1`] = `
-"## ✅ Apply: 3 added
+"## ✅ Apply: 3 added, 2 output changes
 
 ## Apply Summary
 
@@ -266,7 +266,7 @@ Error running command 'exit 1': exit status 1. Output:
 `;
 
 exports[`applyToMarkdown integration > terraform/deferred-data-source/0 > renders without error and matches snapshot [default] 1`] = `
-"## ✅ Apply: 5 added
+"## ✅ Apply: 5 added, 1 output change
 
 ## Apply Summary
 
@@ -386,7 +386,7 @@ _all values known after apply_
 `;
 
 exports[`applyToMarkdown integration > terraform/deferred-data-source/1 > renders without error and matches snapshot [default] 1`] = `
-"## ✅ Apply: 1 added, 1 changed
+"## ✅ Apply: 1 added, 1 changed, 1 output change
 
 ## Apply Summary
 
@@ -453,7 +453,7 @@ terraform_data.independent
 `;
 
 exports[`applyToMarkdown integration > terraform/deferred-data-source/2 > renders without error and matches snapshot [default] 1`] = `
-"## ✅ Apply: 1 changed, 1 replaced
+"## ✅ Apply: 1 changed, 1 replaced, 1 output change
 
 ## Apply Summary
 
@@ -771,7 +771,7 @@ tfcoremock_webhook_config.admission
 `;
 
 exports[`applyToMarkdown integration > terraform/local-files/0 > renders without error and matches snapshot [default] 1`] = `
-"## ✅ Apply: 1 added
+"## ✅ Apply: 1 added, 1 output change
 
 ## Apply Summary
 
@@ -908,8 +908,24 @@ local_file.readme
 "
 `;
 
+exports[`applyToMarkdown integration > terraform/local-files/2 > renders without error and matches snapshot [default] 1`] = `
+"## ✅ Apply: 1 output change
+
+## Apply Summary
+
+_No changes._
+
+## Output Changes
+
+| Output | Action | Before | After |
+| --- | --- | --- | --- |
+| static\\_note | ➕ |  | <code><ins style="background:#dfd">outputs-only change with no resource changes</ins></code> |
+
+"
+`;
+
 exports[`applyToMarkdown integration > terraform/modules/0 > renders without error and matches snapshot [default] 1`] = `
-"## ✅ Apply: 5 added
+"## ✅ Apply: 5 added, 2 output changes
 
 ## Apply Summary
 
@@ -1034,7 +1050,7 @@ module.parent["2"].module.child.null_resource.item[1]
 `;
 
 exports[`applyToMarkdown integration > terraform/modules/1 > renders without error and matches snapshot [default] 1`] = `
-"## ✅ Apply: 3 added, 2 replaced, 2 destroyed
+"## ✅ Apply: 3 added, 2 replaced, 2 destroyed, 2 output changes
 
 ## Apply Summary
 
@@ -1644,7 +1660,7 @@ tfcoremock_iam_role.ops
 `;
 
 exports[`applyToMarkdown integration > terraform/sensitive-values/0 > renders without error and matches snapshot [default] 1`] = `
-"## ✅ Apply: 1 added
+"## ✅ Apply: 1 added, 2 output changes
 
 ## Apply Summary
 
@@ -1694,7 +1710,7 @@ local_sensitive_file.secret
 `;
 
 exports[`applyToMarkdown integration > terraform/sensitive-values/1 > renders without error and matches snapshot [default] 1`] = `
-"## ✅ Apply: 1 replaced
+"## ✅ Apply: 1 replaced, 1 output change
 
 ## Apply Summary
 
@@ -2000,7 +2016,7 @@ _No changes._
 `;
 
 exports[`applyToMarkdown integration > tofu/addressless-plan-error/0 > renders without error and matches snapshot [default] 1`] = `
-"## ✅ Apply: 6 added
+"## ✅ Apply: 6 added, 4 output changes
 
 ## Apply Summary
 
@@ -2149,7 +2165,7 @@ null_resource.noise[5]
 `;
 
 exports[`applyToMarkdown integration > tofu/apply-error/0 > renders without error and matches snapshot [default] 1`] = `
-"## ✅ Apply: 3 added
+"## ✅ Apply: 3 added, 2 output changes
 
 ## Apply Summary
 
@@ -2265,7 +2281,7 @@ Error running command 'exit 1': exit status 1. Output:
 `;
 
 exports[`applyToMarkdown integration > tofu/deferred-data-source/0 > renders without error and matches snapshot [default] 1`] = `
-"## ✅ Apply: 5 added
+"## ✅ Apply: 5 added, 1 output change
 
 ## Apply Summary
 
@@ -2385,7 +2401,7 @@ _all values known after apply_
 `;
 
 exports[`applyToMarkdown integration > tofu/deferred-data-source/1 > renders without error and matches snapshot [default] 1`] = `
-"## ✅ Apply: 1 added, 1 changed
+"## ✅ Apply: 1 added, 1 changed, 1 output change
 
 ## Apply Summary
 
@@ -2452,7 +2468,7 @@ terraform_data.independent
 `;
 
 exports[`applyToMarkdown integration > tofu/deferred-data-source/2 > renders without error and matches snapshot [default] 1`] = `
-"## ✅ Apply: 1 changed, 1 replaced
+"## ✅ Apply: 1 changed, 1 replaced, 1 output change
 
 ## Apply Summary
 
@@ -2770,7 +2786,7 @@ tfcoremock_webhook_config.admission
 `;
 
 exports[`applyToMarkdown integration > tofu/local-files/0 > renders without error and matches snapshot [default] 1`] = `
-"## ✅ Apply: 1 added
+"## ✅ Apply: 1 added, 1 output change
 
 ## Apply Summary
 
@@ -2907,8 +2923,24 @@ local_file.readme
 "
 `;
 
+exports[`applyToMarkdown integration > tofu/local-files/2 > renders without error and matches snapshot [default] 1`] = `
+"## ✅ Apply: 1 output change
+
+## Apply Summary
+
+_No changes._
+
+## Output Changes
+
+| Output | Action | Before | After |
+| --- | --- | --- | --- |
+| static\\_note | ➕ |  | <code><ins style="background:#dfd">outputs-only change with no resource changes</ins></code> |
+
+"
+`;
+
 exports[`applyToMarkdown integration > tofu/modules/0 > renders without error and matches snapshot [default] 1`] = `
-"## ✅ Apply: 5 added
+"## ✅ Apply: 5 added, 2 output changes
 
 ## Apply Summary
 
@@ -3033,7 +3065,7 @@ module.parent["2"].module.child.null_resource.item[1]
 `;
 
 exports[`applyToMarkdown integration > tofu/modules/1 > renders without error and matches snapshot [default] 1`] = `
-"## ✅ Apply: 3 added, 2 replaced, 2 destroyed
+"## ✅ Apply: 3 added, 2 replaced, 2 destroyed, 2 output changes
 
 ## Apply Summary
 
@@ -3643,7 +3675,7 @@ tfcoremock_iam_role.ops
 `;
 
 exports[`applyToMarkdown integration > tofu/sensitive-values/0 > renders without error and matches snapshot [default] 1`] = `
-"## ✅ Apply: 1 added
+"## ✅ Apply: 1 added, 2 output changes
 
 ## Apply Summary
 
@@ -3693,7 +3725,7 @@ local_sensitive_file.secret
 `;
 
 exports[`applyToMarkdown integration > tofu/sensitive-values/1 > renders without error and matches snapshot [default] 1`] = `
-"## ✅ Apply: 1 replaced
+"## ✅ Apply: 1 replaced, 1 output change
 
 ## Apply Summary
 
@@ -3999,7 +4031,7 @@ _No changes._
 `;
 
 exports[`applyToMarkdown — state enrichment > state-enriched snapshot: terraform/addressless-plan-error/0 1`] = `
-"## ✅ Apply: 6 added
+"## ✅ Apply: 6 added, 4 output changes
 
 ## Apply Summary
 
@@ -4148,7 +4180,7 @@ null_resource.noise[5]
 `;
 
 exports[`applyToMarkdown — state enrichment > state-enriched snapshot: terraform/apply-error/0 1`] = `
-"## ✅ Apply: 3 added
+"## ✅ Apply: 3 added, 2 output changes
 
 ## Apply Summary
 
@@ -4307,7 +4339,7 @@ Error running command 'exit 1': exit status 1. Output:
 `;
 
 exports[`applyToMarkdown — state enrichment > state-enriched snapshot: terraform/deferred-data-source/0 1`] = `
-"## ✅ Apply: 5 added
+"## ✅ Apply: 5 added, 1 output change
 
 ## Apply Summary
 
@@ -4541,7 +4573,7 @@ terraform_data.worker_c
 `;
 
 exports[`applyToMarkdown — state enrichment > state-enriched snapshot: terraform/deferred-data-source/1 1`] = `
-"## ✅ Apply: 1 added, 1 changed
+"## ✅ Apply: 1 added, 1 changed, 1 output change
 
 ## Apply Summary
 
@@ -4633,7 +4665,7 @@ terraform_data.independent
 `;
 
 exports[`applyToMarkdown — state enrichment > state-enriched snapshot: terraform/deferred-data-source/2 1`] = `
-"## ✅ Apply: 1 changed, 1 replaced
+"## ✅ Apply: 1 changed, 1 replaced, 1 output change
 
 ## Apply Summary
 
@@ -4991,7 +5023,7 @@ tfcoremock_webhook_config.admission
 `;
 
 exports[`applyToMarkdown — state enrichment > state-enriched snapshot: terraform/local-files/0 1`] = `
-"## ✅ Apply: 1 added
+"## ✅ Apply: 1 added, 1 output change
 
 ## Apply Summary
 
@@ -5128,8 +5160,24 @@ local_file.readme
 "
 `;
 
+exports[`applyToMarkdown — state enrichment > state-enriched snapshot: terraform/local-files/2 1`] = `
+"## ✅ Apply: 1 output change
+
+## Apply Summary
+
+_No changes._
+
+## Output Changes
+
+| Output | Action | Before | After |
+| --- | --- | --- | --- |
+| static\\_note | ➕ |  | <code><ins style="background:#dfd">outputs-only change with no resource changes</ins></code> |
+
+"
+`;
+
 exports[`applyToMarkdown — state enrichment > state-enriched snapshot: terraform/modules/0 1`] = `
-"## ✅ Apply: 5 added
+"## ✅ Apply: 5 added, 2 output changes
 
 ## Apply Summary
 
@@ -5254,7 +5302,7 @@ module.parent["2"].module.child.null_resource.item[1]
 `;
 
 exports[`applyToMarkdown — state enrichment > state-enriched snapshot: terraform/modules/1 1`] = `
-"## ✅ Apply: 3 added, 2 replaced, 2 destroyed
+"## ✅ Apply: 3 added, 2 replaced, 2 destroyed, 2 output changes
 
 ## Apply Summary
 
@@ -5891,7 +5939,7 @@ tfcoremock_iam_role.ops
 `;
 
 exports[`applyToMarkdown — state enrichment > state-enriched snapshot: terraform/sensitive-values/0 1`] = `
-"## ✅ Apply: 1 added
+"## ✅ Apply: 1 added, 2 output changes
 
 ## Apply Summary
 
@@ -5941,7 +5989,7 @@ local_sensitive_file.secret
 `;
 
 exports[`applyToMarkdown — state enrichment > state-enriched snapshot: terraform/sensitive-values/1 1`] = `
-"## ✅ Apply: 1 replaced
+"## ✅ Apply: 1 replaced, 1 output change
 
 ## Apply Summary
 
@@ -6247,7 +6295,7 @@ _No changes._
 `;
 
 exports[`applyToMarkdown — state enrichment > state-enriched snapshot: tofu/addressless-plan-error/0 1`] = `
-"## ✅ Apply: 6 added
+"## ✅ Apply: 6 added, 4 output changes
 
 ## Apply Summary
 
@@ -6396,7 +6444,7 @@ null_resource.noise[5]
 `;
 
 exports[`applyToMarkdown — state enrichment > state-enriched snapshot: tofu/apply-error/0 1`] = `
-"## ✅ Apply: 3 added
+"## ✅ Apply: 3 added, 2 output changes
 
 ## Apply Summary
 
@@ -6555,7 +6603,7 @@ Error running command 'exit 1': exit status 1. Output:
 `;
 
 exports[`applyToMarkdown — state enrichment > state-enriched snapshot: tofu/deferred-data-source/0 1`] = `
-"## ✅ Apply: 5 added
+"## ✅ Apply: 5 added, 1 output change
 
 ## Apply Summary
 
@@ -6789,7 +6837,7 @@ terraform_data.worker_c
 `;
 
 exports[`applyToMarkdown — state enrichment > state-enriched snapshot: tofu/deferred-data-source/1 1`] = `
-"## ✅ Apply: 1 added, 1 changed
+"## ✅ Apply: 1 added, 1 changed, 1 output change
 
 ## Apply Summary
 
@@ -6881,7 +6929,7 @@ terraform_data.independent
 `;
 
 exports[`applyToMarkdown — state enrichment > state-enriched snapshot: tofu/deferred-data-source/2 1`] = `
-"## ✅ Apply: 1 changed, 1 replaced
+"## ✅ Apply: 1 changed, 1 replaced, 1 output change
 
 ## Apply Summary
 
@@ -7239,7 +7287,7 @@ tfcoremock_webhook_config.admission
 `;
 
 exports[`applyToMarkdown — state enrichment > state-enriched snapshot: tofu/local-files/0 1`] = `
-"## ✅ Apply: 1 added
+"## ✅ Apply: 1 added, 1 output change
 
 ## Apply Summary
 
@@ -7376,8 +7424,24 @@ local_file.readme
 "
 `;
 
+exports[`applyToMarkdown — state enrichment > state-enriched snapshot: tofu/local-files/2 1`] = `
+"## ✅ Apply: 1 output change
+
+## Apply Summary
+
+_No changes._
+
+## Output Changes
+
+| Output | Action | Before | After |
+| --- | --- | --- | --- |
+| static\\_note | ➕ |  | <code><ins style="background:#dfd">outputs-only change with no resource changes</ins></code> |
+
+"
+`;
+
 exports[`applyToMarkdown — state enrichment > state-enriched snapshot: tofu/modules/0 1`] = `
-"## ✅ Apply: 5 added
+"## ✅ Apply: 5 added, 2 output changes
 
 ## Apply Summary
 
@@ -7502,7 +7566,7 @@ module.parent["2"].module.child.null_resource.item[1]
 `;
 
 exports[`applyToMarkdown — state enrichment > state-enriched snapshot: tofu/modules/1 1`] = `
-"## ✅ Apply: 3 added, 2 replaced, 2 destroyed
+"## ✅ Apply: 3 added, 2 replaced, 2 destroyed, 2 output changes
 
 ## Apply Summary
 
@@ -8139,7 +8203,7 @@ tfcoremock_iam_role.ops
 `;
 
 exports[`applyToMarkdown — state enrichment > state-enriched snapshot: tofu/sensitive-values/0 1`] = `
-"## ✅ Apply: 1 added
+"## ✅ Apply: 1 added, 2 output changes
 
 ## Apply Summary
 
@@ -8189,7 +8253,7 @@ local_sensitive_file.secret
 `;
 
 exports[`applyToMarkdown — state enrichment > state-enriched snapshot: tofu/sensitive-values/1 1`] = `
-"## ✅ Apply: 1 replaced
+"## ✅ Apply: 1 replaced, 1 output change
 
 ## Apply Summary
 

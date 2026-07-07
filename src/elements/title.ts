@@ -122,6 +122,7 @@ function renderSummaryBody(
       return `Apply Failed: ${[...failParts, ...countParts].join(", ")}`;
     }
     const parts = formatApplyCountParts(body.counts);
+    appendOutputChangesPart(parts, body.outputChanges);
     if (parts.length === 0) {
       return "Apply Complete";
     }
@@ -130,7 +131,15 @@ function renderSummaryBody(
 
   // Plan
   const parts = formatPlanCountParts(body.counts);
+  appendOutputChangesPart(parts, body.outputChanges);
   return `Plan: ${parts.join(", ")}`;
+}
+
+/** Append an "N output change(s)" part when there are output changes. */
+function appendOutputChangesPart(parts: string[], outputChanges: number): void {
+  if (outputChanges <= 0) return;
+  const noun = outputChanges === 1 ? "output change" : "output changes";
+  parts.push(`${String(outputChanges)} ${noun}`);
 }
 
 // ---------------------------------------------------------------------------

@@ -1,11 +1,15 @@
 {
   "version": 4,
   "terraform_version": "1.14.9",
-  "serial": 4,
+  "serial": 5,
   "lineage": "9edb313b-5261-fd6f-b5d7-c93707947f59",
   "outputs": {
     "readme_path": {
       "value": "./output/readme.txt",
+      "type": "string"
+    },
+    "static_note": {
+      "value": "outputs-only change with no resource changes",
       "type": "string"
     }
   },
