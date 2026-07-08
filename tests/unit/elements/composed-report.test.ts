@@ -339,6 +339,7 @@ describe("ComposedReport", () => {
               counts: [{ action: "create", count: 1 }],
               failures: [],
               failureTotal: 0,
+              outputChanges: 0,
               hasStepFailure: false,
             },
           },

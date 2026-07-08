@@ -56,6 +56,12 @@ export interface TitleBodySummary {
   /** Total number of failures (sum of failures[].count). */
   readonly failureTotal: number;
   /**
+   * Number of changed output values (create/update/delete). Rendered as a
+   * trailing "N output change(s)" part so the title reflects output-only
+   * plans/applies instead of falsely reading "No Changes".
+   */
+  readonly outputChanges: number;
+  /**
    * Whether any step failed (used for icon determination when
    * failures[] comes from non-summary sources like step outcomes).
    */

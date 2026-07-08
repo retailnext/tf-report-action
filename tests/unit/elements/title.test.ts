@@ -93,6 +93,124 @@ describe("TitleElement", () => {
     );
     assertElementSizeInvariant(el, "title-with-entities");
   });
+
+  it("renders output changes for an outputs-only plan", () => {
+    const el = new TitleElement({
+      status: "success",
+      body: {
+        kind: "summary",
+        operation: "plan",
+        counts: [],
+        failures: [],
+        failureTotal: 0,
+        outputChanges: 13,
+        hasStepFailure: false,
+      },
+    });
+    expect(el.render("markdown", 0)).toBe("## ✅ Plan: 13 output changes\n\n");
+  });
+
+  it("uses singular wording for a single output change", () => {
+    const el = new TitleElement({
+      status: "success",
+      body: {
+        kind: "summary",
+        operation: "plan",
+        counts: [],
+        failures: [],
+        failureTotal: 0,
+        outputChanges: 1,
+        hasStepFailure: false,
+      },
+    });
+    expect(el.render("markdown", 0)).toBe("## ✅ Plan: 1 output change\n\n");
+  });
+
+  it("appends output changes after plan resource counts", () => {
+    const el = new TitleElement({
+      status: "success",
+      body: {
+        kind: "summary",
+        operation: "plan",
+        counts: [{ action: "create", count: 3 }],
+        failures: [],
+        failureTotal: 0,
+        outputChanges: 2,
+        hasStepFailure: false,
+      },
+    });
+    expect(el.render("markdown", 0)).toBe(
+      "## ✅ Plan: 3 to add, 2 output changes\n\n",
+    );
+  });
+
+  it("renders output changes for an outputs-only apply", () => {
+    const el = new TitleElement({
+      status: "success",
+      body: {
+        kind: "summary",
+        operation: "apply",
+        counts: [],
+        failures: [],
+        failureTotal: 0,
+        outputChanges: 2,
+        hasStepFailure: false,
+      },
+    });
+    expect(el.render("markdown", 0)).toBe("## ✅ Apply: 2 output changes\n\n");
+  });
+
+  it("appends output changes after apply resource counts", () => {
+    const el = new TitleElement({
+      status: "success",
+      body: {
+        kind: "summary",
+        operation: "apply",
+        counts: [{ action: "create", count: 3 }],
+        failures: [],
+        failureTotal: 0,
+        outputChanges: 1,
+        hasStepFailure: false,
+      },
+    });
+    expect(el.render("markdown", 0)).toBe(
+      "## ✅ Apply: 3 added, 1 output change\n\n",
+    );
+  });
+
+  it("still shows Apply Complete when there are no output changes", () => {
+    const el = new TitleElement({
+      status: "success",
+      body: {
+        kind: "summary",
+        operation: "apply",
+        counts: [],
+        failures: [],
+        failureTotal: 0,
+        outputChanges: 0,
+        hasStepFailure: false,
+      },
+    });
+    expect(el.render("markdown", 0)).toBe("## ✅ Apply Complete\n\n");
+  });
+
+  it("does not append output changes to an apply-failed title", () => {
+    const el = new TitleElement({
+      status: "failure",
+      body: {
+        kind: "summary",
+        operation: "apply",
+        counts: [],
+        failures: [{ action: "failed", count: 1 }],
+        failureTotal: 1,
+        outputChanges: 5,
+        hasStepFailure: false,
+      },
+    });
+    const md = el.render("markdown", 0);
+    expect(md).toContain("Apply Failed: 1 failed");
+    expect(md).not.toContain("output change");
+  });
 });
 
 // ---------------------------------------------------------------------------

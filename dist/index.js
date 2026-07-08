@@ -452,7 +452,8 @@ function buildTitle(report) {
       report.summary,
       report.operation ?? "plan",
       workspace,
-      hasAnyStepFailure
+      hasAnyStepFailure,
+      report.outputs?.length ?? 0
     );
   }
   if (report.operationOutcome === "skipped") {
@@ -513,7 +514,7 @@ function buildFailureCounts(summary) {
   if (total === 0) return [];
   return [{ action: "failed", count: total }];
 }
-function buildSummaryTitle(summary, operation, workspace, hasAnyStepFailure) {
+function buildSummaryTitle(summary, operation, workspace, hasAnyStepFailure, outputChanges) {
   const hasFailures = summary.failures.length > 0;
   const status = hasFailures || hasAnyStepFailure ? "failure" : "success";
   if (operation === "apply" || operation === "destroy") {
@@ -530,6 +531,7 @@ function buildSummaryTitle(summary, operation, workspace, hasAnyStepFailure) {
           counts: counts2,
           failures,
           failureTotal,
+          outputChanges,
           hasStepFailure: hasAnyStepFailure
         }
       };
@@ -543,12 +545,13 @@ function buildSummaryTitle(summary, operation, workspace, hasAnyStepFailure) {
         counts: counts2,
         failures: [],
         failureTotal: 0,
+        outputChanges,
         hasStepFailure: hasAnyStepFailure
       }
     };
   }
   const totalActions = summary.actions.reduce((sum, g) => sum + g.total, 0);
-  if (totalActions === 0 && !hasFailures && !hasAnyStepFailure) {
+  if (totalActions === 0 && outputChanges === 0 && !hasFailures && !hasAnyStepFailure) {
     return {
       status,
       ...workspace !== void 0 ? { workspace } : {},
@@ -575,6 +578,7 @@ function buildSummaryTitle(summary, operation, workspace, hasAnyStepFailure) {
       counts,
       failures: [],
       failureTotal: 0,
+      outputChanges,
       hasStepFailure: false
     }
   };
@@ -2949,13 +2953,20 @@ function renderSummaryBody(body) {
       return `Apply Failed: ${[...failParts, ...countParts].join(", ")}`;
     }
     const parts2 = formatApplyCountParts(body.counts);
+    appendOutputChangesPart(parts2, body.outputChanges);
     if (parts2.length === 0) {
       return "Apply Complete";
     }
     return `Apply: ${parts2.join(", ")}`;
   }
   const parts = formatPlanCountParts(body.counts);
+  appendOutputChangesPart(parts, body.outputChanges);
   return `Plan: ${parts.join(", ")}`;
+}
+function appendOutputChangesPart(parts, outputChanges) {
+  if (outputChanges <= 0) return;
+  const noun = outputChanges === 1 ? "output change" : "output changes";
+  parts.push(`${String(outputChanges)} ${noun}`);
 }
 function formatPlanCountParts(counts) {
   return counts.map(

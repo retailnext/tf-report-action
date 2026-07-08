@@ -75,6 +75,7 @@ export function buildTitle(report: Report): ReportTitle {
       report.operation ?? "plan",
       workspace,
       hasAnyStepFailure,
+      report.outputs?.length ?? 0,
     );
   }
 
@@ -163,6 +164,7 @@ function buildSummaryTitle(
   operation: TitleOperation,
   workspace: string | undefined,
   hasAnyStepFailure: boolean,
+  outputChanges: number,
 ): ReportTitle {
   const hasFailures = summary.failures.length > 0;
   const status: TitleStatus =
@@ -183,6 +185,7 @@ function buildSummaryTitle(
           counts,
           failures,
           failureTotal,
+          outputChanges,
           hasStepFailure: hasAnyStepFailure,
         },
       };
@@ -198,6 +201,7 @@ function buildSummaryTitle(
         counts,
         failures: [],
         failureTotal: 0,
+        outputChanges,
         hasStepFailure: hasAnyStepFailure,
       },
     };
@@ -205,7 +209,12 @@ function buildSummaryTitle(
 
   // Plan mode
   const totalActions = summary.actions.reduce((sum, g) => sum + g.total, 0);
-  if (totalActions === 0 && !hasFailures && !hasAnyStepFailure) {
+  if (
+    totalActions === 0 &&
+    outputChanges === 0 &&
+    !hasFailures &&
+    !hasAnyStepFailure
+  ) {
     return {
       status,
       ...(workspace !== undefined ? { workspace } : {}),
@@ -234,6 +243,7 @@ function buildSummaryTitle(
       counts,
       failures: [],
       failureTotal: 0,
+      outputChanges,
       hasStepFailure: false,
     },
   };
