@@ -10,12 +10,7 @@
  * covering all JSON types: null, boolean, number, string, array, object.
  */
 export type JsonValue =
-  | null
-  | boolean
-  | number
-  | string
-  | JsonArray
-  | JsonObject;
+  null | boolean | number | string | JsonArray | JsonObject;
 
 export interface JsonArray extends Array<JsonValue> {}
 
