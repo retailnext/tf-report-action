@@ -124,8 +124,8 @@ describe("findCycle (self-tests)", () => {
 // ---------------------------------------------------------------------------
 
 interface BoundariesRule {
-  from?: { type?: string };
-  allow?: ({ to?: { type?: string } } | string)[];
+  from?: { element?: { type?: string } };
+  allow?: ({ to?: { element?: { type?: string } } } | string)[];
 }
 
 interface EslintConfig {
@@ -133,7 +133,10 @@ interface EslintConfig {
     "boundaries/elements"?: { type: string }[];
   };
   rules?: {
-    "boundaries/dependencies"?: [string | number, { rules?: BoundariesRule[] }];
+    "boundaries/dependencies"?: [
+      string | number,
+      { policies?: BoundariesRule[] },
+    ];
   };
 }
 
@@ -141,9 +144,10 @@ interface EslintConfig {
  * Loads `eslint.config.mjs` and extracts the folder-level dependency graph
  * as declared in the `boundaries/dependencies` rule.
  *
- * Each key in the returned map is a `from.type` value; the set contains
- * every `to.type` value that is explicitly allowed. Only entries with both
- * `from.type` and `to.type` (local → local edges) are included.
+ * Each key in the returned map is a `from.element.type` value; the set contains
+ * every `to.element.type` value that is explicitly allowed. Only entries with
+ * both `from.element.type` and `to.element.type` (local → local edges) are
+ * included.
  */
 async function loadGraph(): Promise<Map<string, Set<string>>> {
   const configPath = resolve(import.meta.dirname, "../../../eslint.config.mjs");
@@ -158,13 +162,13 @@ async function loadGraph(): Promise<Map<string, Set<string>>> {
   for (const block of configs) {
     const rule = block.rules?.["boundaries/dependencies"];
     if (rule) {
-      depRules = rule[1].rules;
+      depRules = rule[1].policies;
       break;
     }
   }
   if (!depRules) {
     throw new Error(
-      "Could not find boundaries/dependencies rules in eslint.config.mjs",
+      "Could not find boundaries/dependencies policies in eslint.config.mjs",
     );
   }
 
@@ -183,17 +187,17 @@ async function loadGraph(): Promise<Map<string, Set<string>>> {
     );
   }
 
-  // Build adjacency map: only local→local edges (to.type entries)
+  // Build adjacency map: only local→local edges (to.element.type entries)
   const graph = new Map<string, Set<string>>();
   for (const type of elementTypes) graph.set(type, new Set());
 
   for (const rule of depRules) {
-    const fromType = rule.from?.type;
+    const fromType = rule.from?.element?.type;
     if (!fromType || !elementTypes.has(fromType)) continue;
 
     for (const entry of rule.allow ?? []) {
       if (typeof entry !== "object") continue;
-      const toType = entry.to?.type;
+      const toType = entry.to?.element?.type;
       if (toType && elementTypes.has(toType)) {
         graph.get(fromType)?.add(toType);
       }
@@ -243,7 +247,7 @@ describe("folder dependency graph (boundaries config)", () => {
         );
       }
       if (block.rules?.["boundaries/dependencies"]) {
-        depRules = block.rules["boundaries/dependencies"][1].rules;
+        depRules = block.rules["boundaries/dependencies"][1].policies;
       }
     }
 
@@ -252,15 +256,15 @@ describe("folder dependency graph (boundaries config)", () => {
 
     const unknownRefs: string[] = [];
     for (const rule of depRules ?? []) {
-      const fromType = rule.from?.type;
+      const fromType = rule.from?.element?.type;
       if (fromType && !elementTypes!.has(fromType)) {
-        unknownRefs.push(`from.type "${fromType}"`);
+        unknownRefs.push(`from.element.type "${fromType}"`);
       }
       for (const entry of rule.allow ?? []) {
         if (typeof entry !== "object") continue;
-        const toType = entry.to?.type;
+        const toType = entry.to?.element?.type;
         if (toType && !elementTypes!.has(toType)) {
-          unknownRefs.push(`to.type "${toType}"`);
+          unknownRefs.push(`to.element.type "${toType}"`);
         }
       }
     }

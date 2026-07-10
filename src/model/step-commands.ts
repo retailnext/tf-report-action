@@ -8,12 +8,7 @@ import type { Tool } from "./report.js";
  * that future parsers can reuse `expectedCommand()` without model changes.
  */
 export type StepRole =
-  | "show-plan"
-  | "plan"
-  | "apply"
-  | "validate"
-  | "init"
-  | "state";
+  "show-plan" | "plan" | "apply" | "validate" | "init" | "state";
 
 /**
  * Returns the expected CLI command (with `-json` flag) for a given step role.

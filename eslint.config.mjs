@@ -2,8 +2,259 @@ import eslint from "@eslint/js";
 import tseslint from "typescript-eslint";
 import importPlugin from "eslint-plugin-import-x";
 import noBarrelFiles from "eslint-plugin-no-barrel-files";
-import boundaries from "eslint-plugin-boundaries";
+import { createConfig, strict } from "eslint-plugin-boundaries/config";
 import { resolve } from "node:path";
+
+// ---------------------------------------------------------------------------
+// Folder dependency graph — enforced by eslint-plugin-boundaries.
+//
+// Every src/ folder is declared as an element type. The boundaries/dependencies
+// rule uses an allowlist (default: "disallow") so any import not listed below
+// is an error. This statically guarantees the folder-level dependency graph is
+// acyclic; a governance test (tests/unit/governance/no-folder-cycles.test.ts)
+// additionally verifies that the declared policies cannot form a cycle.
+//
+// Built with the official createConfig helper, which registers the plugin and
+// validates every settings/rule key. We deliberately do NOT set
+// boundaries/include: classification is done entirely via element descriptors,
+// and the flat-config `files` field below scopes the rules to architecture
+// source files (root config files are simply not linted by this entry). Setting
+// `include` would classify resolved node_modules targets as ignored files, which
+// would make boundaries/no-ignored-dependencies fire on every external import.
+//
+// We start from the `strict` preset (all four rules at severity 2) and override
+// boundaries/elements and boundaries/dependencies with the project graph.
+// ---------------------------------------------------------------------------
+const boundariesConfig = createConfig({
+  files: ["src/**/*.ts", "tests/**/*.ts", "scripts/**/*.ts"],
+  settings: {
+    "boundaries/root-path": resolve(import.meta.dirname),
+    "boundaries/legacy-templates": false,
+    "boundaries/elements": [
+      { type: "action", pattern: "src/action" },
+      { type: "artifact", pattern: "src/artifact" },
+      { type: "builder", pattern: "src/builder" },
+      { type: "comment", pattern: "src/comment" },
+      { type: "diff", pattern: "src/diff" },
+      { type: "drift-filter", pattern: "src/drift-filter" },
+      { type: "elements", pattern: "src/elements" },
+      { type: "env", pattern: "src/env" },
+      { type: "flattener", pattern: "src/flattener" },
+      { type: "github", pattern: "src/github" },
+      { type: "html", pattern: "src/html" },
+      { type: "http", pattern: "src/http" },
+      { type: "inputs", pattern: "src/inputs" },
+      { type: "jsonl-scanner", pattern: "src/jsonl-scanner" },
+      { type: "logger", pattern: "src/logger" },
+      { type: "model", pattern: "src/model" },
+      { type: "parser", pattern: "src/parser" },
+      { type: "pipelines", pattern: "src/pipelines" },
+      { type: "raw-formatter", pattern: "src/raw-formatter" },
+      { type: "renderable", pattern: "src/renderable" },
+      { type: "sensitivity", pattern: "src/sensitivity" },
+      { type: "steps", pattern: "src/steps" },
+      { type: "tfjson", pattern: "src/tfjson" },
+      { type: "tests", pattern: "tests" },
+      { type: "scripts", pattern: "scripts" },
+    ],
+  },
+  rules: {
+    ...strict.rules,
+    "boundaries/dependencies": [
+      "error",
+      {
+        default: "disallow",
+        checkAllOrigins: true,
+        checkUnknownLocals: true,
+        policies: [
+          // Folders with no local dependencies
+          { from: { element: { type: "tfjson" } }, allow: [] },
+          { from: { element: { type: "env" } }, allow: [] },
+          { from: { element: { type: "diff" } }, allow: [] },
+          { from: { element: { type: "sensitivity" } }, allow: [] },
+          { from: { element: { type: "raw-formatter" } }, allow: [] },
+          { from: { element: { type: "logger" } }, allow: [] },
+          { from: { element: { type: "html" } }, allow: [] },
+
+          {
+            from: { element: { type: "model" } },
+            allow: [{ to: { element: { type: "tfjson" } } }],
+          },
+
+          {
+            from: { element: { type: "renderable" } },
+            allow: [{ to: { element: { type: "model" } } }],
+          },
+
+          {
+            from: { element: { type: "flattener" } },
+            allow: [{ to: { element: { type: "tfjson" } } }],
+          },
+
+          {
+            from: { element: { type: "jsonl-scanner" } },
+            allow: [
+              { to: { element: { type: "model" } } },
+              { to: { element: { type: "tfjson" } } },
+              { to: { module: { origin: "core", source: "node:fs" } } },
+            ],
+          },
+
+          {
+            from: { element: { type: "http" } },
+            allow: [
+              { to: { element: { type: "env" } } },
+              { to: { module: { origin: "core", source: "node:http" } } },
+              { to: { module: { origin: "core", source: "node:https" } } },
+              { to: { module: { origin: "core", source: "node:tls" } } },
+            ],
+          },
+
+          {
+            from: { element: { type: "parser" } },
+            allow: [
+              { to: { element: { type: "model" } } },
+              { to: { element: { type: "tfjson" } } },
+            ],
+          },
+
+          {
+            from: { element: { type: "steps" } },
+            allow: [
+              { to: { element: { type: "env" } } },
+              { to: { element: { type: "model" } } },
+              { to: { module: { origin: "core", source: "node:fs" } } },
+              { to: { module: { origin: "core", source: "node:path" } } },
+            ],
+          },
+
+          {
+            from: { element: { type: "github" } },
+            allow: [{ to: { element: { type: "http" } } }],
+          },
+
+          {
+            from: { element: { type: "inputs" } },
+            allow: [
+              { to: { element: { type: "env" } } },
+              { to: { module: { origin: "core", source: "node:fs" } } },
+            ],
+          },
+
+          {
+            from: { element: { type: "drift-filter" } },
+            allow: [{ to: { element: { type: "model" } } }],
+          },
+
+          {
+            from: { element: { type: "artifact" } },
+            allow: [
+              { to: { element: { type: "http" } } },
+              { to: { module: { origin: "core", source: "node:crypto" } } },
+            ],
+          },
+
+          {
+            from: { element: { type: "comment" } },
+            allow: [
+              { to: { element: { type: "env" } } },
+              { to: { element: { type: "model" } } },
+            ],
+          },
+
+          {
+            from: { element: { type: "builder" } },
+            allow: [
+              { to: { element: { type: "diff" } } },
+              { to: { element: { type: "drift-filter" } } },
+              { to: { element: { type: "env" } } },
+              { to: { element: { type: "flattener" } } },
+              { to: { element: { type: "jsonl-scanner" } } },
+              { to: { element: { type: "model" } } },
+              { to: { element: { type: "parser" } } },
+              { to: { element: { type: "renderable" } } },
+              { to: { element: { type: "sensitivity" } } },
+              { to: { element: { type: "steps" } } },
+              { to: { element: { type: "tfjson" } } },
+              { to: { module: { origin: "core", source: "node:os" } } },
+            ],
+          },
+
+          {
+            from: { element: { type: "elements" } },
+            allow: [
+              { to: { element: { type: "builder" } } },
+              { to: { element: { type: "diff" } } },
+              { to: { element: { type: "model" } } },
+              { to: { element: { type: "renderable" } } },
+              { to: { element: { type: "tfjson" } } },
+            ],
+          },
+
+          {
+            from: { element: { type: "pipelines" } },
+            allow: [
+              { to: { element: { type: "builder" } } },
+              { to: { element: { type: "elements" } } },
+              { to: { element: { type: "jsonl-scanner" } } },
+              { to: { element: { type: "model" } } },
+              { to: { element: { type: "parser" } } },
+              { to: { element: { type: "renderable" } } },
+            ],
+          },
+
+          {
+            from: { element: { type: "action" } },
+            allow: [
+              { to: { element: { type: "artifact" } } },
+              { to: { element: { type: "builder" } } },
+              { to: { element: { type: "comment" } } },
+              { to: { element: { type: "env" } } },
+              { to: { element: { type: "github" } } },
+              { to: { element: { type: "html" } } },
+              { to: { element: { type: "http" } } },
+              { to: { element: { type: "inputs" } } },
+              { to: { element: { type: "logger" } } },
+              { to: { element: { type: "pipelines" } } },
+              { to: { module: { origin: "core", source: "node:crypto" } } },
+            ],
+          },
+
+          // tests and scripts may import anything
+          {
+            from: { element: { type: "tests" } },
+            allow: [
+              { to: { module: { origin: "local" } } },
+              { to: { module: { origin: "core" } } },
+              { to: { module: { origin: "external" } } },
+            ],
+          },
+          {
+            from: { element: { type: "scripts" } },
+            allow: [
+              { to: { module: { origin: "local" } } },
+              { to: { module: { origin: "core" } } },
+              { to: { module: { origin: "external" } } },
+            ],
+          },
+        ],
+      },
+    ],
+  },
+});
+
+// The import/resolver setting is not a boundaries/* key, so createConfig cannot
+// accept it. Merge it onto the generated entry (it resolves .js specifiers to
+// their .ts sources so boundaries can classify imports).
+const boundariesEntry = {
+  ...boundariesConfig,
+  settings: {
+    ...boundariesConfig.settings,
+    "import/resolver": {
+      typescript: { project: "./tsconfig.test.json" },
+    },
+  },
+};
 
 export default tseslint.config(
   // .mjs files in scripts/ use plain JS and can't be included in tsconfig —
@@ -85,236 +336,7 @@ export default tseslint.config(
       "@typescript-eslint/explicit-module-boundary-types": "off",
     },
   },
-  // ---------------------------------------------------------------------------
-  // Folder dependency graph — enforced by eslint-plugin-boundaries
-  //
-  // Every src/ folder is declared as an element type. The boundaries/dependencies
-  // rule uses an allowlist (default: "disallow") so any import not listed below
-  // is an error. This statically guarantees the folder-level dependency graph
-  // is acyclic; a governance test (tests/unit/governance/no-folder-cycles.test.ts)
-  // additionally verifies that the declared rules cannot form a cycle.
-  // ---------------------------------------------------------------------------
-  {
-    settings: {
-      // Resolve .js extensions to .ts files so boundaries can classify imports
-      "import/resolver": {
-        typescript: { project: "./tsconfig.test.json" },
-      },
-      "boundaries/root-path": resolve(import.meta.dirname),
-      "boundaries/include": ["src/**/*.ts", "tests/**/*.ts", "scripts/**/*.ts"],
-      "boundaries/legacy-templates": false,
-      "boundaries/elements": [
-        { type: "action", pattern: "src/action", mode: "folder" },
-        { type: "artifact", pattern: "src/artifact", mode: "folder" },
-        { type: "builder", pattern: "src/builder", mode: "folder" },
-        { type: "comment", pattern: "src/comment", mode: "folder" },
-        { type: "diff", pattern: "src/diff", mode: "folder" },
-        { type: "drift-filter", pattern: "src/drift-filter", mode: "folder" },
-        { type: "elements", pattern: "src/elements", mode: "folder" },
-        { type: "env", pattern: "src/env", mode: "folder" },
-        { type: "flattener", pattern: "src/flattener", mode: "folder" },
-        { type: "github", pattern: "src/github", mode: "folder" },
-        { type: "html", pattern: "src/html", mode: "folder" },
-        { type: "http", pattern: "src/http", mode: "folder" },
-        { type: "inputs", pattern: "src/inputs", mode: "folder" },
-        { type: "jsonl-scanner", pattern: "src/jsonl-scanner", mode: "folder" },
-        { type: "logger", pattern: "src/logger", mode: "folder" },
-        { type: "model", pattern: "src/model", mode: "folder" },
-        { type: "parser", pattern: "src/parser", mode: "folder" },
-        { type: "pipelines", pattern: "src/pipelines", mode: "folder" },
-        { type: "raw-formatter", pattern: "src/raw-formatter", mode: "folder" },
-        { type: "renderable", pattern: "src/renderable", mode: "folder" },
-        { type: "sensitivity", pattern: "src/sensitivity", mode: "folder" },
-        { type: "steps", pattern: "src/steps", mode: "folder" },
-        { type: "tfjson", pattern: "src/tfjson", mode: "folder" },
-        { type: "tests", pattern: "tests", mode: "folder" },
-        { type: "scripts", pattern: "scripts", mode: "folder" },
-      ],
-    },
-    plugins: { boundaries },
-    rules: {
-      "boundaries/no-unknown": [2],
-      "boundaries/no-unknown-files": [2],
-      "boundaries/no-ignored": [2],
-      "boundaries/dependencies": [
-        "error",
-        {
-          default: "disallow",
-          checkAllOrigins: true,
-          checkUnknownLocals: true,
-          rules: [
-            // Folders with no local dependencies
-            { from: { type: "tfjson" }, allow: [] },
-            { from: { type: "env" }, allow: [] },
-            { from: { type: "diff" }, allow: [] },
-            { from: { type: "sensitivity" }, allow: [] },
-            { from: { type: "raw-formatter" }, allow: [] },
-            { from: { type: "logger" }, allow: [] },
-            { from: { type: "html" }, allow: [] },
-
-            { from: { type: "model" }, allow: [{ to: { type: "tfjson" } }] },
-
-            {
-              from: { type: "renderable" },
-              allow: [{ to: { type: "model" } }],
-            },
-
-            {
-              from: { type: "flattener" },
-              allow: [{ to: { type: "tfjson" } }],
-            },
-
-            {
-              from: { type: "jsonl-scanner" },
-              allow: [
-                { to: { type: "model" } },
-                { to: { type: "tfjson" } },
-                { to: { origin: "core" }, dependency: { module: "node:fs" } },
-              ],
-            },
-
-            {
-              from: { type: "http" },
-              allow: [
-                { to: { type: "env" } },
-                { to: { origin: "core" }, dependency: { module: "node:http" } },
-                {
-                  to: { origin: "core" },
-                  dependency: { module: "node:https" },
-                },
-                { to: { origin: "core" }, dependency: { module: "node:tls" } },
-              ],
-            },
-
-            {
-              from: { type: "parser" },
-              allow: [{ to: { type: "model" } }, { to: { type: "tfjson" } }],
-            },
-
-            {
-              from: { type: "steps" },
-              allow: [
-                { to: { type: "env" } },
-                { to: { type: "model" } },
-                { to: { origin: "core" }, dependency: { module: "node:fs" } },
-                { to: { origin: "core" }, dependency: { module: "node:path" } },
-              ],
-            },
-
-            { from: { type: "github" }, allow: [{ to: { type: "http" } }] },
-
-            {
-              from: { type: "inputs" },
-              allow: [
-                { to: { type: "env" } },
-                { to: { origin: "core" }, dependency: { module: "node:fs" } },
-              ],
-            },
-
-            {
-              from: { type: "drift-filter" },
-              allow: [{ to: { type: "model" } }],
-            },
-
-            {
-              from: { type: "artifact" },
-              allow: [
-                { to: { type: "http" } },
-                {
-                  to: { origin: "core" },
-                  dependency: { module: "node:crypto" },
-                },
-              ],
-            },
-
-            {
-              from: { type: "comment" },
-              allow: [{ to: { type: "env" } }, { to: { type: "model" } }],
-            },
-
-            {
-              from: { type: "builder" },
-              allow: [
-                { to: { type: "diff" } },
-                { to: { type: "drift-filter" } },
-                { to: { type: "env" } },
-                { to: { type: "flattener" } },
-                { to: { type: "jsonl-scanner" } },
-                { to: { type: "model" } },
-                { to: { type: "parser" } },
-                { to: { type: "renderable" } },
-                { to: { type: "sensitivity" } },
-                { to: { type: "steps" } },
-                { to: { type: "tfjson" } },
-                { to: { origin: "core" }, dependency: { module: "node:os" } },
-              ],
-            },
-
-            {
-              from: { type: "elements" },
-              allow: [
-                { to: { type: "builder" } },
-                { to: { type: "diff" } },
-                { to: { type: "model" } },
-                { to: { type: "renderable" } },
-                { to: { type: "tfjson" } },
-              ],
-            },
-
-            {
-              from: { type: "pipelines" },
-              allow: [
-                { to: { type: "builder" } },
-                { to: { type: "elements" } },
-                { to: { type: "jsonl-scanner" } },
-                { to: { type: "model" } },
-                { to: { type: "parser" } },
-                { to: { type: "renderable" } },
-              ],
-            },
-
-            {
-              from: { type: "action" },
-              allow: [
-                { to: { type: "artifact" } },
-                { to: { type: "builder" } },
-                { to: { type: "comment" } },
-                { to: { type: "env" } },
-                { to: { type: "github" } },
-                { to: { type: "html" } },
-                { to: { type: "http" } },
-                { to: { type: "inputs" } },
-                { to: { type: "logger" } },
-                { to: { type: "pipelines" } },
-                {
-                  to: { origin: "core" },
-                  dependency: { module: "node:crypto" },
-                },
-              ],
-            },
-
-            // tests and scripts may import anything
-            {
-              from: { type: "tests" },
-              allow: [
-                { to: { origin: "local" } },
-                { to: { origin: "core" } },
-                { to: { origin: "external" } },
-              ],
-            },
-            {
-              from: { type: "scripts" },
-              allow: [
-                { to: { origin: "local" } },
-                { to: { origin: "core" } },
-                { to: { origin: "external" } },
-              ],
-            },
-          ],
-        },
-      ],
-    },
-  },
+  boundariesEntry,
   {
     // Forbid direct process/console access in source files — all I/O must go
     // through the injected Logger interface. The only exception is
