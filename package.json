@@ -33,28 +33,27 @@
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
-    "@types/node": "^24.12.4",
-    "@vitest/coverage-v8": "^4.1.10",
-    "esbuild": "^0.28.1",
-    "eslint": "^10.6.0",
+    "@types/node": "^24.19.2",
+    "@vitest/coverage-v8": "^5.0.4",
+    "esbuild": "^0.28.2",
+    "eslint": "^10.12.0",
     "eslint-import-resolver-typescript": "^4.4.5",
-    "eslint-plugin-boundaries": "^7.0.2",
+    "eslint-plugin-boundaries": "^7.2.0",
     "eslint-plugin-import-x": "^4.17.1",
     "eslint-plugin-no-barrel-files": "^2.2.0",
-    "markdownlint-cli2": "^0.23.0",
-    "prettier": "^3.9.4",
-    "textlint": "^15.7.1",
+    "markdownlint-cli2": "^0.23.3",
+    "prettier": "^3.9.10",
+    "textlint": "^15.8.0",
     "textlint-filter-rule-comments": "^1.3.0",
     "textlint-rule-terminology": "^5.2.16",
-    "tsx": "^4.23.0",
+    "tsx": "^4.23.15",
     "typescript": "^6.0.3",
-    "typescript-eslint": "^8.63.0",
-    "vitest": "^4.1.10"
+    "typescript-eslint": "^8.71.2",
+    "vitest": "^5.0.4"
   },
   "overrides": {
-    "brace-expansion": "^5.0.7",
-    "glob": "^13.0.6",
-    "js-yaml": "^4.2.0",
-    "markdown-it": "^14.2.0"
+    "handlebars": "^4.7.10",
+    "katex": "^0.18.2",
+    "smol-toml": "^1.9.1"
   }
 }
