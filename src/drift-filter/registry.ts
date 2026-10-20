@@ -14,6 +14,9 @@ import { suppressGoogleStorageBucketUpdated } from "./rules/google-storage-bucke
  * Called with the resource type, mode, and the full set of attribute values
  * for the drift entry — including attributes that did not change. Use
  * `before !== after` to distinguish changed attributes from unchanged ones.
+ * Sensitive values are masked; a sensitive attribute whose underlying value
+ * changed has `SENSITIVE_CHANGED_MASK` as its `after` value, so this
+ * comparison also detects sensitive changes.
  *
  * Returns `true` if the drift should be omitted from the report.
  * Rules are pure predicates with no side effects.

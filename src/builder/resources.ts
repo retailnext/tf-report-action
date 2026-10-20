@@ -4,6 +4,8 @@ import type { ResourceChange as ModelResourceChange } from "../model/resource.js
 import type { PlanAction } from "../model/plan-action.js";
 import type { BuildOptions } from "./options.js";
 import type { PlannedChange } from "../jsonl-scanner/types.js";
+import type { AttributeChange } from "../model/attribute.js";
+import { SENSITIVE_CHANGED_MASK } from "../model/sentinels.js";
 import { determineAction } from "./action.js";
 import { buildAttributeChanges } from "./attributes.js";
 import { flatten } from "../flattener/index.js";
@@ -95,10 +97,10 @@ export function buildDriftChanges(
       rc.address ?? `${rc.type ?? "unknown"}.${rc.name ?? "unknown"}`;
 
     const attributes = buildAttributeChanges(rc.change, options);
-    const allAttributesForSuppression = buildAttributeChanges(rc.change, {
-      ...options,
-      showUnchangedAttributes: true,
-    });
+    const allAttributesForSuppression = buildSuppressionAttributes(
+      rc.change,
+      options,
+    );
     const allUnknownAfterApply = isAllUnknownAfterApply(rc, attributes);
 
     if (
@@ -208,6 +210,55 @@ function hasRawValueChanges(change: Change): boolean {
   }
 
   return false;
+}
+
+/**
+ * Builds the attribute list passed to drift suppression rules.
+ *
+ * Includes unchanged attributes so rules can tell changed attributes from
+ * unchanged ones with `before !== after`. Sensitive values stay masked, but
+ * masking collapses both sides of a sensitive attribute to the same
+ * placeholder even when the underlying value changed. For such attributes the
+ * raw values are compared, and a changed one gets `SENSITIVE_CHANGED_MASK` as
+ * its `after` value so that rules see it as changed.
+ */
+function buildSuppressionAttributes(
+  change: Change,
+  options: BuildOptions,
+): AttributeChange[] {
+  const attributes = buildAttributeChanges(change, {
+    ...options,
+    showUnchangedAttributes: true,
+  });
+  const beforeFlat = flatten(change.before ?? null);
+  const afterFlat = flatten(change.after ?? null);
+
+  return attributes.map((a) =>
+    a.isSensitive &&
+    a.before === a.after &&
+    rawSubtree(beforeFlat, a.name) !== rawSubtree(afterFlat, a.name)
+      ? { ...a, after: SENSITIVE_CHANGED_MASK }
+      : a,
+  );
+}
+
+/**
+ * Returns the non-null flattened entries at or below an attribute name, as a
+ * comparable string.
+ *
+ * A flattened attribute matches its own entry. A collection attribute is
+ * reported under its top-level key, so it matches the entries of its elements.
+ * Null entries are dropped because null and absent both mean "no value".
+ */
+function rawSubtree(flat: Map<string, string | null>, name: string): string {
+  const entries = [...flat].filter(
+    ([key, value]) =>
+      value !== null &&
+      (key === name ||
+        key.startsWith(`${name}[`) ||
+        key.startsWith(`${name}.`)),
+  );
+  return JSON.stringify(entries);
 }
 
 function isAllUnknownAfterApply(

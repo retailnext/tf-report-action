@@ -1214,6 +1214,12 @@ function detectFromRawText(content) {
   return void 0;
 }
 
+// src/model/sentinels.ts
+var SENSITIVE_MASK = "(sensitive)";
+var SENSITIVE_CHANGED_MASK = "(sensitive, changed)";
+var KNOWN_AFTER_APPLY = "(known after apply)";
+var VALUE_NOT_IN_PLAN = "(value not in plan)";
+
 // src/builder/action.ts
 function determineAction(actions) {
   const [first, second] = actions;
@@ -1335,11 +1341,6 @@ function isSensitive(key, beforeSensitive, afterSensitive) {
   }
   return false;
 }
-
-// src/model/sentinels.ts
-var SENSITIVE_MASK = "(sensitive)";
-var KNOWN_AFTER_APPLY = "(known after apply)";
-var VALUE_NOT_IN_PLAN = "(value not in plan)";
 
 // src/builder/attributes.ts
 var LARGE_LINE_THRESHOLD = 3;
@@ -1647,10 +1648,10 @@ function buildDriftChanges(plan, options) {
     const action = refineAction(determineAction(rc.change.actions), rc);
     const address = rc.address ?? `${rc.type ?? "unknown"}.${rc.name ?? "unknown"}`;
     const attributes = buildAttributeChanges(rc.change, options);
-    const allAttributesForSuppression = buildAttributeChanges(rc.change, {
-      ...options,
-      showUnchangedAttributes: true
-    });
+    const allAttributesForSuppression = buildSuppressionAttributes(
+      rc.change,
+      options
+    );
     const allUnknownAfterApply = isAllUnknownAfterApply(rc, attributes);
     if (registry.shouldSuppressDrift(
       rc.type ?? "unknown",
@@ -1706,6 +1707,23 @@ function hasRawValueChanges(change) {
     }
   }
   return false;
+}
+function buildSuppressionAttributes(change, options) {
+  const attributes = buildAttributeChanges(change, {
+    ...options,
+    showUnchangedAttributes: true
+  });
+  const beforeFlat = flatten(change.before ?? null);
+  const afterFlat = flatten(change.after ?? null);
+  return attributes.map(
+    (a) => a.isSensitive && a.before === a.after && rawSubtree(beforeFlat, a.name) !== rawSubtree(afterFlat, a.name) ? { ...a, after: SENSITIVE_CHANGED_MASK } : a
+  );
+}
+function rawSubtree(flat, name) {
+  const entries = [...flat].filter(
+    ([key, value]) => value !== null && (key === name || key.startsWith(`${name}[`) || key.startsWith(`${name}.`))
+  );
+  return JSON.stringify(entries);
 }
 function isAllUnknownAfterApply(rc, attributes) {
   if (rc.change.after_unknown === true) return true;

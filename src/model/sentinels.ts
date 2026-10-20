@@ -7,6 +7,14 @@
 /** Placeholder used when an attribute or output value is sensitive. */
 export const SENSITIVE_MASK = "(sensitive)";
 
+/**
+ * Placeholder used as the `after` value of a sensitive attribute whose
+ * underlying value changed, in the attribute list given to drift suppression
+ * rules. It lets rules detect the change without seeing the value. It is
+ * never rendered.
+ */
+export const SENSITIVE_CHANGED_MASK = "(sensitive, changed)";
+
 /** Placeholder used when an attribute or output value will only be known after apply. */
 export const KNOWN_AFTER_APPLY = "(known after apply)";
 

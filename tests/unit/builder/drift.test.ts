@@ -7,6 +7,11 @@ import {
 } from "../../../src/drift-filter/registry.js";
 import type { Plan } from "../../../src/tfjson/plan.js";
 import type { ResourceChange as TFResourceChange } from "../../../src/tfjson/resource.js";
+import type { AttributeChange } from "../../../src/model/attribute.js";
+import {
+  SENSITIVE_MASK,
+  SENSITIVE_CHANGED_MASK,
+} from "../../../src/model/sentinels.js";
 
 function basePlan(resourceDrift: Plan["resource_drift"]): Plan {
   return {
@@ -130,6 +135,187 @@ describe("buildDriftChanges", () => {
       driftRuleRegistry: registryWith(suppressNone),
     });
     expect(result).toHaveLength(1);
+  });
+
+  describe("sensitive attributes in suppression rule input", () => {
+    /** Captures the attributes that the registry passes to a rule. */
+    function captureRuleInput(plan: Plan): AttributeChange[] {
+      let captured: AttributeChange[] = [];
+      const capture: DriftRule = (_type, _mode, attributes) => {
+        captured = attributes;
+        return false;
+      };
+      buildDriftChanges(plan, { driftRuleRegistry: registryWith(capture) });
+      return captured;
+    }
+
+    it("keeps Cloud Run job drift when a sensitive configuration value also changed", () => {
+      const plan = basePlan([
+        makeDriftEntry({
+          address: "google_cloud_run_v2_job.this",
+          type: "google_cloud_run_v2_job",
+          name: "this",
+          change: {
+            actions: ["update"],
+            before: {
+              execution_count: 1,
+              latest_created_execution: [{ name: "job-abc" }],
+              template: [{ env: [{ name: "TOKEN", value: "old-secret" }] }],
+            },
+            after: {
+              execution_count: 2,
+              latest_created_execution: [{ name: "job-def" }],
+              template: [{ env: [{ name: "TOKEN", value: "new-secret" }] }],
+            },
+            before_sensitive: { template: [{ env: [{ value: true }] }] },
+            after_sensitive: { template: [{ env: [{ value: true }] }] },
+            after_unknown: false,
+          },
+        }),
+      ]);
+
+      // Default registry: the Cloud Run execution rule must not match.
+      expect(buildDriftChanges(plan, {})).toHaveLength(1);
+    });
+
+    it("suppresses Cloud Run job drift when a sensitive value is unchanged", () => {
+      const plan = basePlan([
+        makeDriftEntry({
+          address: "google_cloud_run_v2_job.this",
+          type: "google_cloud_run_v2_job",
+          name: "this",
+          change: {
+            actions: ["update"],
+            before: {
+              execution_count: 1,
+              template: [{ env: [{ name: "TOKEN", value: "same-secret" }] }],
+            },
+            after: {
+              execution_count: 2,
+              template: [{ env: [{ name: "TOKEN", value: "same-secret" }] }],
+            },
+            before_sensitive: { template: [{ env: [{ value: true }] }] },
+            after_sensitive: { template: [{ env: [{ value: true }] }] },
+            after_unknown: false,
+          },
+        }),
+      ]);
+
+      expect(buildDriftChanges(plan, {})).toHaveLength(0);
+    });
+
+    it("marks a changed sensitive attribute as changed without exposing values", () => {
+      const attributes = captureRuleInput(
+        basePlan([
+          makeDriftEntry({
+            change: {
+              actions: ["update"],
+              before: { id: "abc", secret: "old-secret" },
+              after: { id: "abc", secret: "new-secret" },
+              before_sensitive: { secret: true },
+              after_sensitive: { secret: true },
+              after_unknown: false,
+            },
+          }),
+        ]),
+      );
+
+      const secret = attributes.find((a) => a.name === "secret");
+      expect(secret).toEqual(
+        expect.objectContaining({
+          before: SENSITIVE_MASK,
+          after: SENSITIVE_CHANGED_MASK,
+          isSensitive: true,
+        }),
+      );
+      expect(JSON.stringify(attributes)).not.toContain("old-secret");
+      expect(JSON.stringify(attributes)).not.toContain("new-secret");
+    });
+
+    it("keeps an unchanged sensitive attribute equal on both sides", () => {
+      const attributes = captureRuleInput(
+        basePlan([
+          makeDriftEntry({
+            change: {
+              actions: ["update"],
+              before: { id: "abc", secret: "same", value: "old" },
+              after: { id: "abc", secret: "same", value: "new" },
+              before_sensitive: { secret: true },
+              after_sensitive: { secret: true },
+              after_unknown: false,
+            },
+          }),
+        ]),
+      );
+
+      const secret = attributes.find((a) => a.name === "secret");
+      expect(secret?.before).toBe(SENSITIVE_MASK);
+      expect(secret?.after).toBe(SENSITIVE_MASK);
+    });
+
+    it("marks a changed sensitive collection attribute as changed", () => {
+      const attributes = captureRuleInput(
+        basePlan([
+          makeDriftEntry({
+            change: {
+              actions: ["update"],
+              before: { id: "abc", keys: ["a", "b", "c", "d"] },
+              after: { id: "abc", keys: ["a", "b", "c", "e"] },
+              before_sensitive: { keys: true },
+              after_sensitive: { keys: true },
+              after_unknown: false,
+            },
+          }),
+        ]),
+      );
+
+      const keys = attributes.find((a) => a.name === "keys");
+      expect(keys?.before).toBe(SENSITIVE_MASK);
+      expect(keys?.after).toBe(SENSITIVE_CHANGED_MASK);
+    });
+
+    it("keeps an unchanged sensitive collection attribute equal on both sides", () => {
+      const attributes = captureRuleInput(
+        basePlan([
+          makeDriftEntry({
+            change: {
+              actions: ["update"],
+              before: { id: "abc", keys: ["a", "b", "c", "d"], value: "old" },
+              after: { id: "abc", keys: ["a", "b", "c", "d"], value: "new" },
+              before_sensitive: { keys: true },
+              after_sensitive: { keys: true },
+              after_unknown: false,
+            },
+          }),
+        ]),
+      );
+
+      const keys = attributes.find((a) => a.name === "keys");
+      expect(keys?.before).toBe(SENSITIVE_MASK);
+      expect(keys?.after).toBe(SENSITIVE_MASK);
+    });
+
+    it("does not change the masked values shown in the report", () => {
+      const result = buildDriftChanges(
+        basePlan([
+          makeDriftEntry({
+            change: {
+              actions: ["update"],
+              before: { id: "abc", secret: "old-secret" },
+              after: { id: "abc", secret: "new-secret" },
+              before_sensitive: { secret: true },
+              after_sensitive: { secret: true },
+              after_unknown: false,
+            },
+          }),
+        ]),
+        {},
+      );
+
+      const secret = result[0]?.attributes.find((a) => a.name === "secret");
+      expect(secret?.before).toBe(SENSITIVE_MASK);
+      expect(secret?.after).toBe(SENSITIVE_MASK);
+    });
   });
 
   describe("no-visible-changes suppression", () => {
