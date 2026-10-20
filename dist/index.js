@@ -1538,6 +1538,16 @@ var suppressGoogleArtifactRegistryRepositoryUpdateTime = (type, _mode, attribute
   return changed.length > 0 && changed.every((a) => a.name === "update_time");
 };
 
+// src/drift-filter/rules/google-cloud-run-v2-job.ts
+var suppressGoogleCloudRunV2JobExecution = (type, _mode, attributes) => {
+  if (type !== "google_cloud_run_v2_job") return false;
+  const changed = attributes.filter((a) => a.before !== a.after);
+  return changed.length > 0 && changed.every((a) => isExecutionAttribute(a.name));
+};
+function isExecutionAttribute(name) {
+  return name === "execution_count" || name === "latest_created_execution" || name.startsWith("latest_created_execution[");
+}
+
 // src/drift-filter/rules/google-compute-managed-ssl-certificate.ts
 var suppressGoogleComputeManagedSslCertificateExpireTime = (type, _mode, attributes) => {
   if (type !== "google_compute_managed_ssl_certificate") return false;
@@ -1595,7 +1605,7 @@ var DriftRuleRegistry = class {
   }
 };
 function createDefaultDriftRuleRegistry() {
-  return new DriftRuleRegistry().register(suppressDataSourceDrift).register(suppressEtagOnlyDrift).register(suppressGoogleStorageManagedFolderMetaBoring).register(suppressGoogleComputeManagedSslCertificateExpireTime).register(suppressGoogleComputeUrlMapFingerprint).register(suppressGoogleArtifactRegistryRepositoryUpdateTime).register(suppressGoogleStorageBucketUpdated);
+  return new DriftRuleRegistry().register(suppressDataSourceDrift).register(suppressEtagOnlyDrift).register(suppressGoogleStorageManagedFolderMetaBoring).register(suppressGoogleComputeManagedSslCertificateExpireTime).register(suppressGoogleComputeUrlMapFingerprint).register(suppressGoogleArtifactRegistryRepositoryUpdateTime).register(suppressGoogleStorageBucketUpdated).register(suppressGoogleCloudRunV2JobExecution);
 }
 
 // src/builder/resources.ts

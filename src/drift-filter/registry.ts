@@ -1,5 +1,6 @@
 import type { AttributeChange } from "../model/attribute.js";
 import { suppressGoogleArtifactRegistryRepositoryUpdateTime } from "./rules/google-artifact-registry-repository.js";
+import { suppressGoogleCloudRunV2JobExecution } from "./rules/google-cloud-run-v2-job.js";
 import { suppressGoogleComputeManagedSslCertificateExpireTime } from "./rules/google-compute-managed-ssl-certificate.js";
 import { suppressGoogleComputeUrlMapFingerprint } from "./rules/google-compute-url-map.js";
 import { suppressDataSourceDrift } from "./rules/data-source.js";
@@ -71,6 +72,8 @@ export class DriftRuleRegistry {
  *   changed are suppressed.
  * - `google_storage_bucket` resources where only `updated` changed are
  *   suppressed.
+ * - `google_cloud_run_v2_job` resources where only `execution_count` and/or
+ *   `latest_created_execution` attributes changed are suppressed.
  */
 export function createDefaultDriftRuleRegistry(): DriftRuleRegistry {
   return new DriftRuleRegistry()
@@ -80,5 +83,6 @@ export function createDefaultDriftRuleRegistry(): DriftRuleRegistry {
     .register(suppressGoogleComputeManagedSslCertificateExpireTime)
     .register(suppressGoogleComputeUrlMapFingerprint)
     .register(suppressGoogleArtifactRegistryRepositoryUpdateTime)
-    .register(suppressGoogleStorageBucketUpdated);
+    .register(suppressGoogleStorageBucketUpdated)
+    .register(suppressGoogleCloudRunV2JobExecution);
 }

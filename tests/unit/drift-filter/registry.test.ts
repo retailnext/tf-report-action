@@ -143,6 +143,16 @@ describe("createDefaultDriftRuleRegistry", () => {
     ).toBe(true);
   });
 
+  it("suppresses google_cloud_run_v2_job execution-only drift", () => {
+    const registry = createDefaultDriftRuleRegistry();
+    expect(
+      registry.shouldSuppressDrift("google_cloud_run_v2_job", "managed", [
+        attr("execution_count"),
+        attr("latest_created_execution[0].name"),
+      ]),
+    ).toBe(true);
+  });
+
   it("does not suppress managed resource with non-boring changes", () => {
     const registry = createDefaultDriftRuleRegistry();
     expect(
