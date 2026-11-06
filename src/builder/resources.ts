@@ -5,6 +5,7 @@ import type { PlanAction } from "../model/plan-action.js";
 import type { BuildOptions } from "./options.js";
 import type { PlannedChange } from "../jsonl-scanner/types.js";
 import type { AttributeChange } from "../model/attribute.js";
+import type { JsonValue } from "../tfjson/common.js";
 import { SENSITIVE_CHANGED_MASK } from "../model/sentinels.js";
 import { determineAction } from "./action.js";
 import { buildAttributeChanges } from "./attributes.js";
@@ -230,35 +231,58 @@ function buildSuppressionAttributes(
     ...options,
     showUnchangedAttributes: true,
   });
-  const beforeFlat = flatten(change.before ?? null);
-  const afterFlat = flatten(change.after ?? null);
+  let indexes: [SubtreeIndex, SubtreeIndex] | undefined;
 
-  return attributes.map((a) =>
-    a.isSensitive &&
-    a.before === a.after &&
-    rawSubtree(beforeFlat, a.name) !== rawSubtree(afterFlat, a.name)
+  return attributes.map((a) => {
+    if (!a.isSensitive || a.before !== a.after) return a;
+    indexes ??= [
+      indexSubtrees(change.before ?? null),
+      indexSubtrees(change.after ?? null),
+    ];
+    const [beforeIndex, afterIndex] = indexes;
+    return rawSubtree(beforeIndex, a.name) !== rawSubtree(afterIndex, a.name)
       ? { ...a, after: SENSITIVE_CHANGED_MASK }
-      : a,
-  );
+      : a;
+  });
+}
+
+/** Non-null flattened entries grouped under every attribute name they belong to. */
+type SubtreeIndex = Map<string, [string, string][]>;
+
+/**
+ * Flattens a value and indexes each non-null entry under its own key and
+ * under every prefix that ends before a `.` or `[`.
+ *
+ * A flattened attribute is found under its own key. A collection attribute is
+ * reported under its top-level key, so it is found with the entries of its
+ * elements. Null entries are dropped because null and absent both mean
+ * "no value".
+ */
+function indexSubtrees(value: JsonValue): SubtreeIndex {
+  const index: SubtreeIndex = new Map();
+  const add = (name: string, entry: [string, string]): void => {
+    const entries = index.get(name);
+    if (entries) entries.push(entry);
+    else index.set(name, [entry]);
+  };
+
+  for (const [key, val] of flatten(value)) {
+    if (val === null) continue;
+    const entry: [string, string] = [key, val];
+    for (let i = 0; i < key.length; i++) {
+      if (key[i] === "." || key[i] === "[") add(key.slice(0, i), entry);
+    }
+    add(key, entry);
+  }
+  return index;
 }
 
 /**
  * Returns the non-null flattened entries at or below an attribute name, as a
  * comparable string.
- *
- * A flattened attribute matches its own entry. A collection attribute is
- * reported under its top-level key, so it matches the entries of its elements.
- * Null entries are dropped because null and absent both mean "no value".
  */
-function rawSubtree(flat: Map<string, string | null>, name: string): string {
-  const entries = [...flat].filter(
-    ([key, value]) =>
-      value !== null &&
-      (key === name ||
-        key.startsWith(`${name}[`) ||
-        key.startsWith(`${name}.`)),
-  );
-  return JSON.stringify(entries);
+function rawSubtree(index: SubtreeIndex, name: string): string {
+  return JSON.stringify(index.get(name) ?? []);
 }
 
 function isAllUnknownAfterApply(

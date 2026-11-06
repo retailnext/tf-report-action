@@ -1713,17 +1713,36 @@ function buildSuppressionAttributes(change, options) {
     ...options,
     showUnchangedAttributes: true
   });
-  const beforeFlat = flatten(change.before ?? null);
-  const afterFlat = flatten(change.after ?? null);
-  return attributes.map(
-    (a) => a.isSensitive && a.before === a.after && rawSubtree(beforeFlat, a.name) !== rawSubtree(afterFlat, a.name) ? { ...a, after: SENSITIVE_CHANGED_MASK } : a
-  );
+  let indexes;
+  return attributes.map((a) => {
+    if (!a.isSensitive || a.before !== a.after) return a;
+    indexes ??= [
+      indexSubtrees(change.before ?? null),
+      indexSubtrees(change.after ?? null)
+    ];
+    const [beforeIndex, afterIndex] = indexes;
+    return rawSubtree(beforeIndex, a.name) !== rawSubtree(afterIndex, a.name) ? { ...a, after: SENSITIVE_CHANGED_MASK } : a;
+  });
 }
-function rawSubtree(flat, name) {
-  const entries = [...flat].filter(
-    ([key, value]) => value !== null && (key === name || key.startsWith(`${name}[`) || key.startsWith(`${name}.`))
-  );
-  return JSON.stringify(entries);
+function indexSubtrees(value) {
+  const index = /* @__PURE__ */ new Map();
+  const add = (name, entry) => {
+    const entries = index.get(name);
+    if (entries) entries.push(entry);
+    else index.set(name, [entry]);
+  };
+  for (const [key, val] of flatten(value)) {
+    if (val === null) continue;
+    const entry = [key, val];
+    for (let i = 0; i < key.length; i++) {
+      if (key[i] === "." || key[i] === "[") add(key.slice(0, i), entry);
+    }
+    add(key, entry);
+  }
+  return index;
+}
+function rawSubtree(index, name) {
+  return JSON.stringify(index.get(name) ?? []);
 }
 function isAllUnknownAfterApply(rc, attributes) {
   if (rc.change.after_unknown === true) return true;
