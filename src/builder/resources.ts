@@ -4,6 +4,9 @@ import type { ResourceChange as ModelResourceChange } from "../model/resource.js
 import type { PlanAction } from "../model/plan-action.js";
 import type { BuildOptions } from "./options.js";
 import type { PlannedChange } from "../jsonl-scanner/types.js";
+import type { AttributeChange } from "../model/attribute.js";
+import type { JsonValue } from "../tfjson/common.js";
+import { SENSITIVE_CHANGED_MASK } from "../model/sentinels.js";
 import { determineAction } from "./action.js";
 import { buildAttributeChanges } from "./attributes.js";
 import { flatten } from "../flattener/index.js";
@@ -95,10 +98,10 @@ export function buildDriftChanges(
       rc.address ?? `${rc.type ?? "unknown"}.${rc.name ?? "unknown"}`;
 
     const attributes = buildAttributeChanges(rc.change, options);
-    const allAttributesForSuppression = buildAttributeChanges(rc.change, {
-      ...options,
-      showUnchangedAttributes: true,
-    });
+    const allAttributesForSuppression = buildSuppressionAttributes(
+      rc.change,
+      options,
+    );
     const allUnknownAfterApply = isAllUnknownAfterApply(rc, attributes);
 
     if (
@@ -208,6 +211,95 @@ function hasRawValueChanges(change: Change): boolean {
   }
 
   return false;
+}
+
+/**
+ * Builds the attribute list passed to drift suppression rules.
+ *
+ * Includes unchanged attributes so rules can tell changed attributes from
+ * unchanged ones with `before !== after`. Sensitive values stay masked, but
+ * masking collapses both sides of a sensitive attribute to the same
+ * placeholder even when the underlying value changed. For such attributes the
+ * raw values are compared, and a changed one gets `SENSITIVE_CHANGED_MASK` as
+ * its `after` value so that rules see it as changed.
+ */
+function buildSuppressionAttributes(
+  change: Change,
+  options: BuildOptions,
+): AttributeChange[] {
+  const attributes = buildAttributeChanges(change, {
+    ...options,
+    showUnchangedAttributes: true,
+  });
+  let indexes: [RawIndex, RawIndex] | undefined;
+
+  return attributes.map((a) => {
+    if (!a.isSensitive || a.before !== a.after) return a;
+    indexes ??= [
+      indexRaw(change.before ?? null),
+      indexRaw(change.after ?? null),
+    ];
+    const [beforeIndex, afterIndex] = indexes;
+    return isRawChanged(beforeIndex, afterIndex, a.name)
+      ? { ...a, after: SENSITIVE_CHANGED_MASK }
+      : a;
+  });
+}
+
+/** Raw flattened values of one side of a change, indexed for attribute lookup. */
+interface RawIndex {
+  /** Every flattened entry by its exact key, including null entries. */
+  readonly values: Map<string, string | null>;
+  /** Non-null flattened entries grouped under every proper prefix of their key. */
+  readonly subtrees: Map<string, [string, string][]>;
+}
+
+/**
+ * Flattens a value and indexes each entry by its exact key, and each non-null
+ * entry under every prefix that ends before a `.` or `[`.
+ */
+function indexRaw(value: JsonValue): RawIndex {
+  const values = flatten(value);
+  const subtrees = new Map<string, [string, string][]>();
+
+  for (const [key, val] of values) {
+    if (val === null) continue;
+    const entry: [string, string] = [key, val];
+    for (let i = 0; i < key.length; i++) {
+      if (key[i] !== "." && key[i] !== "[") continue;
+      const name = key.slice(0, i);
+      const entries = subtrees.get(name);
+      if (entries) entries.push(entry);
+      else subtrees.set(name, [entry]);
+    }
+  }
+  return { values, subtrees };
+}
+
+/**
+ * Reports whether the raw value of an attribute differs between two sides.
+ *
+ * A flattened attribute is compared by its exact entry. Map keys may contain
+ * `.`, so a sibling such as `token.expiry` shares the `token` prefix without
+ * belonging to `token`. A collection attribute is reported under its
+ * top-level key and has no exact entry unless it holds no non-null elements,
+ * so it is compared by the entries of its elements. Null and absent both mean
+ * "no value".
+ */
+function isRawChanged(
+  before: RawIndex,
+  after: RawIndex,
+  name: string,
+): boolean {
+  if (before.values.has(name) || after.values.has(name)) {
+    return (
+      (before.values.get(name) ?? null) !== (after.values.get(name) ?? null)
+    );
+  }
+  return (
+    JSON.stringify(before.subtrees.get(name) ?? []) !==
+    JSON.stringify(after.subtrees.get(name) ?? [])
+  );
 }
 
 function isAllUnknownAfterApply(

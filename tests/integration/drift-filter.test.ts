@@ -8,6 +8,10 @@
  *   `options.driftRuleRegistry`; the drift section disappears from output.
  * - Unsuppressed path: the default registry is used; no built-in rule matches
  *   `local_file` drift, so the section appears in the output.
+ * - Sensitive path: `update-drift/1` drift changes the non-sensitive `size`
+ *   and the sensitive `contents`. A rule that suppresses `size`-only drift must
+ *   see `contents` as changed, even though both of its sides are masked, so
+ *   the drift stays in the output.
  *
  * Individual rule implementations live in `src/drift-filter/rules/` and are
  * covered by unit tests. This file only exercises the registry mechanism and
@@ -57,4 +61,47 @@ describe("drift filter integration", () => {
     const result = planToMarkdown(json, {});
     expect(result).toContain("Resource Drift");
   });
+
+  // update-drift/1 has one resource_drift entry: filesystem_file_writer whose
+  // `contents` (sensitive on both sides) and `size` (not sensitive) changed.
+  describe.each(["terraform", "tofu"])(
+    "sensitive attribute changes (%s update-drift/1)",
+    (tool) => {
+      const sensitivePath = join(
+        __dirname,
+        `../fixtures/generated/${tool}/update-drift/1/show-plan.stdout`,
+      );
+
+      const sizeOnly: DriftRule = (type, _mode, attributes) => {
+        if (type !== "filesystem_file_writer") return false;
+        const changed = attributes.filter((a) => a.before !== a.after);
+        return changed.length > 0 && changed.every((a) => a.name === "size");
+      };
+
+      it("keeps drift when a sensitive attribute also changed", () => {
+        const json = readFileSync(sensitivePath, "utf-8");
+        const result = planToMarkdown(json, {
+          driftRuleRegistry: new DriftRuleRegistry().register(sizeOnly),
+        });
+        expect(result).toContain("Resource Drift");
+        expect(result).toContain("filesystem_file_writer.managed");
+      });
+
+      it("suppresses drift when the rule also accepts the sensitive attribute", () => {
+        const json = readFileSync(sensitivePath, "utf-8");
+        const sizeAndContents: DriftRule = (type, _mode, attributes) => {
+          if (type !== "filesystem_file_writer") return false;
+          const changed = attributes.filter((a) => a.before !== a.after);
+          return (
+            changed.length > 0 &&
+            changed.every((a) => a.name === "size" || a.name === "contents")
+          );
+        };
+        const result = planToMarkdown(json, {
+          driftRuleRegistry: new DriftRuleRegistry().register(sizeAndContents),
+        });
+        expect(result).not.toContain("Resource Drift");
+      });
+    },
+  );
 });

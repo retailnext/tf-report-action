@@ -1214,6 +1214,12 @@ function detectFromRawText(content) {
   return void 0;
 }
 
+// src/model/sentinels.ts
+var SENSITIVE_MASK = "(sensitive)";
+var SENSITIVE_CHANGED_MASK = "(sensitive, changed)";
+var KNOWN_AFTER_APPLY = "(known after apply)";
+var VALUE_NOT_IN_PLAN = "(value not in plan)";
+
 // src/builder/action.ts
 function determineAction(actions) {
   const [first, second] = actions;
@@ -1335,11 +1341,6 @@ function isSensitive(key, beforeSensitive, afterSensitive) {
   }
   return false;
 }
-
-// src/model/sentinels.ts
-var SENSITIVE_MASK = "(sensitive)";
-var KNOWN_AFTER_APPLY = "(known after apply)";
-var VALUE_NOT_IN_PLAN = "(value not in plan)";
 
 // src/builder/attributes.ts
 var LARGE_LINE_THRESHOLD = 3;
@@ -1538,6 +1539,16 @@ var suppressGoogleArtifactRegistryRepositoryUpdateTime = (type, _mode, attribute
   return changed.length > 0 && changed.every((a) => a.name === "update_time");
 };
 
+// src/drift-filter/rules/google-cloud-run-v2-job.ts
+var suppressGoogleCloudRunV2JobExecution = (type, _mode, attributes) => {
+  if (type !== "google_cloud_run_v2_job") return false;
+  const changed = attributes.filter((a) => a.before !== a.after);
+  return changed.length > 0 && changed.every((a) => isExecutionAttribute(a.name));
+};
+function isExecutionAttribute(name) {
+  return name === "execution_count" || name === "latest_created_execution" || name.startsWith("latest_created_execution[");
+}
+
 // src/drift-filter/rules/google-compute-managed-ssl-certificate.ts
 var suppressGoogleComputeManagedSslCertificateExpireTime = (type, _mode, attributes) => {
   if (type !== "google_compute_managed_ssl_certificate") return false;
@@ -1595,7 +1606,7 @@ var DriftRuleRegistry = class {
   }
 };
 function createDefaultDriftRuleRegistry() {
-  return new DriftRuleRegistry().register(suppressDataSourceDrift).register(suppressEtagOnlyDrift).register(suppressGoogleStorageManagedFolderMetaBoring).register(suppressGoogleComputeManagedSslCertificateExpireTime).register(suppressGoogleComputeUrlMapFingerprint).register(suppressGoogleArtifactRegistryRepositoryUpdateTime).register(suppressGoogleStorageBucketUpdated);
+  return new DriftRuleRegistry().register(suppressDataSourceDrift).register(suppressEtagOnlyDrift).register(suppressGoogleStorageManagedFolderMetaBoring).register(suppressGoogleComputeManagedSslCertificateExpireTime).register(suppressGoogleComputeUrlMapFingerprint).register(suppressGoogleArtifactRegistryRepositoryUpdateTime).register(suppressGoogleStorageBucketUpdated).register(suppressGoogleCloudRunV2JobExecution);
 }
 
 // src/builder/resources.ts
@@ -1637,10 +1648,10 @@ function buildDriftChanges(plan, options) {
     const action = refineAction(determineAction(rc.change.actions), rc);
     const address = rc.address ?? `${rc.type ?? "unknown"}.${rc.name ?? "unknown"}`;
     const attributes = buildAttributeChanges(rc.change, options);
-    const allAttributesForSuppression = buildAttributeChanges(rc.change, {
-      ...options,
-      showUnchangedAttributes: true
-    });
+    const allAttributesForSuppression = buildSuppressionAttributes(
+      rc.change,
+      options
+    );
     const allUnknownAfterApply = isAllUnknownAfterApply(rc, attributes);
     if (registry.shouldSuppressDrift(
       rc.type ?? "unknown",
@@ -1696,6 +1707,44 @@ function hasRawValueChanges(change) {
     }
   }
   return false;
+}
+function buildSuppressionAttributes(change, options) {
+  const attributes = buildAttributeChanges(change, {
+    ...options,
+    showUnchangedAttributes: true
+  });
+  let indexes;
+  return attributes.map((a) => {
+    if (!a.isSensitive || a.before !== a.after) return a;
+    indexes ??= [
+      indexRaw(change.before ?? null),
+      indexRaw(change.after ?? null)
+    ];
+    const [beforeIndex, afterIndex] = indexes;
+    return isRawChanged(beforeIndex, afterIndex, a.name) ? { ...a, after: SENSITIVE_CHANGED_MASK } : a;
+  });
+}
+function indexRaw(value) {
+  const values = flatten(value);
+  const subtrees = /* @__PURE__ */ new Map();
+  for (const [key, val] of values) {
+    if (val === null) continue;
+    const entry = [key, val];
+    for (let i = 0; i < key.length; i++) {
+      if (key[i] !== "." && key[i] !== "[") continue;
+      const name = key.slice(0, i);
+      const entries = subtrees.get(name);
+      if (entries) entries.push(entry);
+      else subtrees.set(name, [entry]);
+    }
+  }
+  return { values, subtrees };
+}
+function isRawChanged(before, after, name) {
+  if (before.values.has(name) || after.values.has(name)) {
+    return (before.values.get(name) ?? null) !== (after.values.get(name) ?? null);
+  }
+  return JSON.stringify(before.subtrees.get(name) ?? []) !== JSON.stringify(after.subtrees.get(name) ?? []);
 }
 function isAllUnknownAfterApply(rc, attributes) {
   if (rc.change.after_unknown === true) return true;
