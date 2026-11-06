@@ -295,6 +295,68 @@ describe("buildDriftChanges", () => {
       expect(keys?.after).toBe(SENSITIVE_MASK);
     });
 
+    it("ignores a changed map key that extends a sensitive key with a dot", () => {
+      const attributes = captureRuleInput(
+        basePlan([
+          makeDriftEntry({
+            change: {
+              actions: ["update"],
+              before: { creds: { token: "same", "token.expiry": "1" } },
+              after: { creds: { token: "same", "token.expiry": "2" } },
+              before_sensitive: { creds: { token: true } },
+              after_sensitive: { creds: { token: true } },
+              after_unknown: false,
+            },
+          }),
+        ]),
+      );
+
+      const token = attributes.find((a) => a.name === "creds.token");
+      expect(token?.before).toBe(SENSITIVE_MASK);
+      expect(token?.after).toBe(SENSITIVE_MASK);
+    });
+
+    it("marks a changed sensitive key that has a dotted sibling as changed", () => {
+      const attributes = captureRuleInput(
+        basePlan([
+          makeDriftEntry({
+            change: {
+              actions: ["update"],
+              before: { creds: { token: "old", "token.expiry": "1" } },
+              after: { creds: { token: "new", "token.expiry": "1" } },
+              before_sensitive: { creds: { token: true } },
+              after_sensitive: { creds: { token: true } },
+              after_unknown: false,
+            },
+          }),
+        ]),
+      );
+
+      const token = attributes.find((a) => a.name === "creds.token");
+      expect(token?.before).toBe(SENSITIVE_MASK);
+      expect(token?.after).toBe(SENSITIVE_CHANGED_MASK);
+    });
+
+    it("treats a null sensitive value and an absent one as equal", () => {
+      const attributes = captureRuleInput(
+        basePlan([
+          makeDriftEntry({
+            change: {
+              actions: ["update"],
+              before: { creds: { token: null, "token.expiry": "1" } },
+              after: { creds: { "token.expiry": "1" }, value: "new" },
+              before_sensitive: { creds: { token: true } },
+              after_sensitive: { creds: { token: true } },
+              after_unknown: false,
+            },
+          }),
+        ]),
+      );
+
+      const token = attributes.find((a) => a.name === "creds.token");
+      expect(token?.after).not.toBe(SENSITIVE_CHANGED_MASK);
+    });
+
     it("does not change the masked values shown in the report", () => {
       const result = buildDriftChanges(
         basePlan([

@@ -231,58 +231,75 @@ function buildSuppressionAttributes(
     ...options,
     showUnchangedAttributes: true,
   });
-  let indexes: [SubtreeIndex, SubtreeIndex] | undefined;
+  let indexes: [RawIndex, RawIndex] | undefined;
 
   return attributes.map((a) => {
     if (!a.isSensitive || a.before !== a.after) return a;
     indexes ??= [
-      indexSubtrees(change.before ?? null),
-      indexSubtrees(change.after ?? null),
+      indexRaw(change.before ?? null),
+      indexRaw(change.after ?? null),
     ];
     const [beforeIndex, afterIndex] = indexes;
-    return rawSubtree(beforeIndex, a.name) !== rawSubtree(afterIndex, a.name)
+    return isRawChanged(beforeIndex, afterIndex, a.name)
       ? { ...a, after: SENSITIVE_CHANGED_MASK }
       : a;
   });
 }
 
-/** Non-null flattened entries grouped under every attribute name they belong to. */
-type SubtreeIndex = Map<string, [string, string][]>;
-
-/**
- * Flattens a value and indexes each non-null entry under its own key and
- * under every prefix that ends before a `.` or `[`.
- *
- * A flattened attribute is found under its own key. A collection attribute is
- * reported under its top-level key, so it is found with the entries of its
- * elements. Null entries are dropped because null and absent both mean
- * "no value".
- */
-function indexSubtrees(value: JsonValue): SubtreeIndex {
-  const index: SubtreeIndex = new Map();
-  const add = (name: string, entry: [string, string]): void => {
-    const entries = index.get(name);
-    if (entries) entries.push(entry);
-    else index.set(name, [entry]);
-  };
-
-  for (const [key, val] of flatten(value)) {
-    if (val === null) continue;
-    const entry: [string, string] = [key, val];
-    for (let i = 0; i < key.length; i++) {
-      if (key[i] === "." || key[i] === "[") add(key.slice(0, i), entry);
-    }
-    add(key, entry);
-  }
-  return index;
+/** Raw flattened values of one side of a change, indexed for attribute lookup. */
+interface RawIndex {
+  /** Every flattened entry by its exact key, including null entries. */
+  readonly values: Map<string, string | null>;
+  /** Non-null flattened entries grouped under every proper prefix of their key. */
+  readonly subtrees: Map<string, [string, string][]>;
 }
 
 /**
- * Returns the non-null flattened entries at or below an attribute name, as a
- * comparable string.
+ * Flattens a value and indexes each entry by its exact key, and each non-null
+ * entry under every prefix that ends before a `.` or `[`.
  */
-function rawSubtree(index: SubtreeIndex, name: string): string {
-  return JSON.stringify(index.get(name) ?? []);
+function indexRaw(value: JsonValue): RawIndex {
+  const values = flatten(value);
+  const subtrees = new Map<string, [string, string][]>();
+
+  for (const [key, val] of values) {
+    if (val === null) continue;
+    const entry: [string, string] = [key, val];
+    for (let i = 0; i < key.length; i++) {
+      if (key[i] !== "." && key[i] !== "[") continue;
+      const name = key.slice(0, i);
+      const entries = subtrees.get(name);
+      if (entries) entries.push(entry);
+      else subtrees.set(name, [entry]);
+    }
+  }
+  return { values, subtrees };
+}
+
+/**
+ * Reports whether the raw value of an attribute differs between two sides.
+ *
+ * A flattened attribute is compared by its exact entry. Map keys may contain
+ * `.`, so a sibling such as `token.expiry` shares the `token` prefix without
+ * belonging to `token`. A collection attribute is reported under its
+ * top-level key and has no exact entry unless it holds no non-null elements,
+ * so it is compared by the entries of its elements. Null and absent both mean
+ * "no value".
+ */
+function isRawChanged(
+  before: RawIndex,
+  after: RawIndex,
+  name: string,
+): boolean {
+  if (before.values.has(name) || after.values.has(name)) {
+    return (
+      (before.values.get(name) ?? null) !== (after.values.get(name) ?? null)
+    );
+  }
+  return (
+    JSON.stringify(before.subtrees.get(name) ?? []) !==
+    JSON.stringify(after.subtrees.get(name) ?? [])
+  );
 }
 
 function isAllUnknownAfterApply(

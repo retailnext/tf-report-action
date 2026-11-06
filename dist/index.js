@@ -1717,32 +1717,34 @@ function buildSuppressionAttributes(change, options) {
   return attributes.map((a) => {
     if (!a.isSensitive || a.before !== a.after) return a;
     indexes ??= [
-      indexSubtrees(change.before ?? null),
-      indexSubtrees(change.after ?? null)
+      indexRaw(change.before ?? null),
+      indexRaw(change.after ?? null)
     ];
     const [beforeIndex, afterIndex] = indexes;
-    return rawSubtree(beforeIndex, a.name) !== rawSubtree(afterIndex, a.name) ? { ...a, after: SENSITIVE_CHANGED_MASK } : a;
+    return isRawChanged(beforeIndex, afterIndex, a.name) ? { ...a, after: SENSITIVE_CHANGED_MASK } : a;
   });
 }
-function indexSubtrees(value) {
-  const index = /* @__PURE__ */ new Map();
-  const add = (name, entry) => {
-    const entries = index.get(name);
-    if (entries) entries.push(entry);
-    else index.set(name, [entry]);
-  };
-  for (const [key, val] of flatten(value)) {
+function indexRaw(value) {
+  const values = flatten(value);
+  const subtrees = /* @__PURE__ */ new Map();
+  for (const [key, val] of values) {
     if (val === null) continue;
     const entry = [key, val];
     for (let i = 0; i < key.length; i++) {
-      if (key[i] === "." || key[i] === "[") add(key.slice(0, i), entry);
+      if (key[i] !== "." && key[i] !== "[") continue;
+      const name = key.slice(0, i);
+      const entries = subtrees.get(name);
+      if (entries) entries.push(entry);
+      else subtrees.set(name, [entry]);
     }
-    add(key, entry);
   }
-  return index;
+  return { values, subtrees };
 }
-function rawSubtree(index, name) {
-  return JSON.stringify(index.get(name) ?? []);
+function isRawChanged(before, after, name) {
+  if (before.values.has(name) || after.values.has(name)) {
+    return (before.values.get(name) ?? null) !== (after.values.get(name) ?? null);
+  }
+  return JSON.stringify(before.subtrees.get(name) ?? []) !== JSON.stringify(after.subtrees.get(name) ?? []);
 }
 function isAllUnknownAfterApply(rc, attributes) {
   if (rc.change.after_unknown === true) return true;
