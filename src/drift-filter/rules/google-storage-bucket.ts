@@ -14,6 +14,6 @@ export const suppressGoogleStorageBucketUpdated: DriftRule = (
   attributes,
 ): boolean => {
   if (type !== "google_storage_bucket") return false;
-  const changed = attributes.filter((a) => a.before !== a.after);
+  const changed = attributes.filter((a) => a.changed);
   return changed.length > 0 && changed.every((a) => a.name === "updated");
 };

@@ -15,7 +15,7 @@ export const suppressGoogleStorageManagedFolderMetaBoring: DriftRule = (
   attributes,
 ): boolean => {
   if (type !== "google_storage_managed_folder") return false;
-  const changed = attributes.filter((a) => a.before !== a.after);
+  const changed = attributes.filter((a) => a.changed);
   return (
     changed.length > 0 && changed.every((a) => BORING_ATTRIBUTES.has(a.name))
   );

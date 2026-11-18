@@ -4,13 +4,13 @@ import type { ResourceChange as ModelResourceChange } from "../model/resource.js
 import type { PlanAction } from "../model/plan-action.js";
 import type { BuildOptions } from "./options.js";
 import type { PlannedChange } from "../jsonl-scanner/types.js";
-import type { AttributeChange } from "../model/attribute.js";
-import type { JsonValue } from "../tfjson/common.js";
-import { SENSITIVE_CHANGED_MASK } from "../model/sentinels.js";
 import { determineAction } from "./action.js";
 import { buildAttributeChanges } from "./attributes.js";
 import { flatten } from "../flattener/index.js";
-import { createDefaultDriftRuleRegistry } from "../drift-filter/registry.js";
+import {
+  createDefaultDriftRuleRegistry,
+  type DriftAttribute,
+} from "../drift-filter/registry.js";
 
 /**
  * Refine a base action using resource metadata.
@@ -98,17 +98,14 @@ export function buildDriftChanges(
       rc.address ?? `${rc.type ?? "unknown"}.${rc.name ?? "unknown"}`;
 
     const attributes = buildAttributeChanges(rc.change, options);
-    const allAttributesForSuppression = buildSuppressionAttributes(
-      rc.change,
-      options,
-    );
+    const driftAttributes = buildDriftAttributes(rc.change);
     const allUnknownAfterApply = isAllUnknownAfterApply(rc, attributes);
 
     if (
       registry.shouldSuppressDrift(
         rc.type ?? "unknown",
         rc.mode ?? "managed",
-        allAttributesForSuppression,
+        driftAttributes,
       )
     )
       continue;
@@ -118,7 +115,7 @@ export function buildDriftChanges(
     // correctly detected. Independent of showUnchangedAttributes. Move/import
     // entries are kept because they carry meaningful non-attribute information.
     if (
-      !hasRawValueChanges(rc.change) &&
+      !hasRawValueChanges(rc.change, driftAttributes) &&
       action !== "move" &&
       action !== "import"
     )
@@ -150,34 +147,25 @@ function shouldSkip(rc: TFResourceChange): boolean {
 }
 
 /**
- * Compares raw (unmasked) before/after values to detect actual changes.
+ * Reports whether a drift entry has an actual value change.
  *
- * Flattens `change.before` and `change.after` into string maps and compares
- * them directly — no masking, no sensitivity handling. This ensures the
- * suppression decision reflects real value differences, not display artifacts.
- *
- * Null-valued entries in the flattened map are treated as equivalent to absent
- * entries — Terraform/OpenTofu providers may serialize unset attributes as
- * explicit null in one direction and omit them in the other. Both represent
- * "no value" and should not count as drift.
- *
- * Empty block markers (`"{}"`) are treated as equivalent to an absent block or
- * a block with all-null children — providers may normalize `{ attr: null }` to
- * `{}` or vice versa across plan/refresh cycles.
+ * One side null and the other not means a create or a delete. Any
+ * after_unknown value means equality cannot be determined, so the entry is
+ * treated as changed. Otherwise the raw per-attribute comparison of
+ * `buildDriftAttributes` decides.
  *
  * Returns `true` if the values actually differ (drift should be kept).
  */
-function hasRawValueChanges(change: Change): boolean {
+function hasRawValueChanges(
+  change: Change,
+  attributes: readonly DriftAttribute[],
+): boolean {
   const before = change.before ?? null;
   const after = change.after ?? null;
 
-  // One side null, other not — definitely changed (create/delete)
   if ((before === null) !== (after === null)) return true;
-
-  // Both null — no change
   if (before === null && after === null) return false;
 
-  // Any after_unknown values mean we can't determine equality — assume changed
   if (change.after_unknown === true) return true;
   if (
     typeof change.after_unknown === "object" &&
@@ -185,121 +173,46 @@ function hasRawValueChanges(change: Change): boolean {
   )
     return true;
 
-  const beforeFlat = flatten(before);
-  const afterFlat = flatten(after);
-
-  // Check all before keys — a non-null before value must match after
-  for (const [key, beforeVal] of beforeFlat) {
-    if (beforeVal === null) {
-      // Null in before is equivalent to absent — only a change if after has
-      // a non-null value for this key.
-      const afterVal = afterFlat.get(key);
-      if (afterVal !== undefined && afterVal !== null) return true;
-    } else {
-      // Non-null before value — after must have the same value
-      if (!afterFlat.has(key)) return true;
-      if (beforeVal !== afterFlat.get(key)) return true;
-    }
-  }
-
-  // Check after keys not present in before — only a change if non-null
-  for (const [key, afterVal] of afterFlat) {
-    if (!beforeFlat.has(key)) {
-      if (afterVal === null) continue;
-      return true;
-    }
-  }
-
-  return false;
+  return attributes.some((a) => a.changed);
 }
 
 /**
  * Builds the attribute list passed to drift suppression rules.
  *
- * Includes unchanged attributes so rules can tell changed attributes from
- * unchanged ones with `before !== after`. Sensitive values stay masked, but
- * masking collapses both sides of a sensitive attribute to the same
- * placeholder even when the underlying value changed. For such attributes the
- * raw values are compared, and a changed one gets `SENSITIVE_CHANGED_MASK` as
- * its `after` value so that rules see it as changed.
- */
-function buildSuppressionAttributes(
-  change: Change,
-  options: BuildOptions,
-): AttributeChange[] {
-  const attributes = buildAttributeChanges(change, {
-    ...options,
-    showUnchangedAttributes: true,
-  });
-  let indexes: [RawIndex, RawIndex] | undefined;
-
-  return attributes.map((a) => {
-    if (!a.isSensitive || a.before !== a.after) return a;
-    indexes ??= [
-      indexRaw(change.before ?? null),
-      indexRaw(change.after ?? null),
-    ];
-    const [beforeIndex, afterIndex] = indexes;
-    return isRawChanged(beforeIndex, afterIndex, a.name)
-      ? { ...a, after: SENSITIVE_CHANGED_MASK }
-      : a;
-  });
-}
-
-/** Raw flattened values of one side of a change, indexed for attribute lookup. */
-interface RawIndex {
-  /** Every flattened entry by its exact key, including null entries. */
-  readonly values: Map<string, string | null>;
-  /** Non-null flattened entries grouped under every proper prefix of their key. */
-  readonly subtrees: Map<string, [string, string][]>;
-}
-
-/**
- * Flattens a value and indexes each entry by its exact key, and each non-null
- * entry under every prefix that ends before a `.` or `[`.
- */
-function indexRaw(value: JsonValue): RawIndex {
-  const values = flatten(value);
-  const subtrees = new Map<string, [string, string][]>();
-
-  for (const [key, val] of values) {
-    if (val === null) continue;
-    const entry: [string, string] = [key, val];
-    for (let i = 0; i < key.length; i++) {
-      if (key[i] !== "." && key[i] !== "[") continue;
-      const name = key.slice(0, i);
-      const entries = subtrees.get(name);
-      if (entries) entries.push(entry);
-      else subtrees.set(name, [entry]);
-    }
-  }
-  return { values, subtrees };
-}
-
-/**
- * Reports whether the raw value of an attribute differs between two sides.
+ * Compares the raw (unmasked) flattened before and after values, so a
+ * sensitive attribute is compared by its real value, but no value reaches a
+ * rule. Each flattened path on either side is one attribute, including the
+ * paths that did not change.
  *
- * A flattened attribute is compared by its exact entry. Map keys may contain
- * `.`, so a sibling such as `token.expiry` shares the `token` prefix without
- * belonging to `token`. A collection attribute is reported under its
- * top-level key and has no exact entry unless it holds no non-null elements,
- * so it is compared by the entries of its elements. Null and absent both mean
- * "no value".
+ * Null-valued entries in the flattened map are equivalent to absent entries —
+ * Terraform/OpenTofu providers may serialize unset attributes as explicit null
+ * in one direction and omit them in the other. Both represent "no value".
+ * Because `flatten` emits a `"{}"` marker for a block whose children are all
+ * null, an empty block and a block with all-null children are also equal.
+ *
+ * A path that is unknown after apply counts as changed.
  */
-function isRawChanged(
-  before: RawIndex,
-  after: RawIndex,
-  name: string,
-): boolean {
-  if (before.values.has(name) || after.values.has(name)) {
-    return (
-      (before.values.get(name) ?? null) !== (after.values.get(name) ?? null)
-    );
+function buildDriftAttributes(change: Change): DriftAttribute[] {
+  const beforeFlat = flatten(change.before ?? {});
+  const afterFlat = flatten(change.after ?? {});
+  const unknown = change.after_unknown;
+  const unknownFlat =
+    typeof unknown === "object"
+      ? flatten(unknown)
+      : new Map<string, string | null>();
+
+  const names = new Set([...beforeFlat.keys(), ...afterFlat.keys()]);
+  for (const [name, value] of unknownFlat) {
+    if (value === "true") names.add(name);
   }
-  return (
-    JSON.stringify(before.subtrees.get(name) ?? []) !==
-    JSON.stringify(after.subtrees.get(name) ?? [])
-  );
+
+  return [...names].sort().map((name) => ({
+    name,
+    changed:
+      unknown === true ||
+      unknownFlat.get(name) === "true" ||
+      (beforeFlat.get(name) ?? null) !== (afterFlat.get(name) ?? null),
+  }));
 }
 
 function isAllUnknownAfterApply(

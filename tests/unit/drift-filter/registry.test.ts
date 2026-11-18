@@ -2,19 +2,12 @@ import { describe, it, expect, vi } from "vitest";
 import {
   DriftRuleRegistry,
   createDefaultDriftRuleRegistry,
+  type DriftAttribute,
   type DriftRule,
 } from "../../../src/drift-filter/registry.js";
-import type { AttributeChange } from "../../../src/model/attribute.js";
 
-function changed(name: string): AttributeChange {
-  return {
-    name,
-    before: "old",
-    after: "new",
-    isSensitive: false,
-    isLarge: false,
-    isKnownAfterApply: false,
-  };
+function changed(name: string): DriftAttribute {
+  return { name, changed: true };
 }
 
 // Keep `attr` as an alias so existing tests don't need rewriting.
@@ -165,14 +158,7 @@ describe("createDefaultDriftRuleRegistry", () => {
 
   it("suppresses etag-only drift when unchanged attrs are also present", () => {
     const registry = createDefaultDriftRuleRegistry();
-    const unchangedAttr = {
-      name: "bucket",
-      before: "same",
-      after: "same",
-      isSensitive: false,
-      isLarge: false,
-      isKnownAfterApply: false,
-    };
+    const unchangedAttr = { name: "bucket", changed: false };
     expect(
       registry.shouldSuppressDrift("aws_s3_bucket", "managed", [
         attr("etag"),

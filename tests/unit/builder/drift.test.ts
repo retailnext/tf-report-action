@@ -3,15 +3,12 @@ import { buildDriftChanges } from "../../../src/builder/resources.js";
 import { buildReport } from "../../../src/builder/index.js";
 import {
   DriftRuleRegistry,
+  type DriftAttribute,
   type DriftRule,
 } from "../../../src/drift-filter/registry.js";
 import type { Plan } from "../../../src/tfjson/plan.js";
 import type { ResourceChange as TFResourceChange } from "../../../src/tfjson/resource.js";
-import type { AttributeChange } from "../../../src/model/attribute.js";
-import {
-  SENSITIVE_MASK,
-  SENSITIVE_CHANGED_MASK,
-} from "../../../src/model/sentinels.js";
+import { SENSITIVE_MASK } from "../../../src/model/sentinels.js";
 
 function basePlan(resourceDrift: Plan["resource_drift"]): Plan {
   return {
@@ -137,10 +134,10 @@ describe("buildDriftChanges", () => {
     expect(result).toHaveLength(1);
   });
 
-  describe("sensitive attributes in suppression rule input", () => {
+  describe("suppression rule input", () => {
     /** Captures the attributes that the registry passes to a rule. */
-    function captureRuleInput(plan: Plan): AttributeChange[] {
-      let captured: AttributeChange[] = [];
+    function captureRuleInput(plan: Plan): readonly DriftAttribute[] {
+      let captured: readonly DriftAttribute[] = [];
       const capture: DriftRule = (_type, _mode, attributes) => {
         captured = attributes;
         return false;
@@ -204,6 +201,31 @@ describe("buildDriftChanges", () => {
       expect(buildDriftChanges(plan, {})).toHaveLength(0);
     });
 
+    /** Returns the names of the changed attributes in a rule input. */
+    function changedNames(attributes: readonly DriftAttribute[]): string[] {
+      return attributes.filter((a) => a.changed).map((a) => a.name);
+    }
+
+    it("lists unchanged attributes with changed set to false", () => {
+      const attributes = captureRuleInput(
+        basePlan([
+          makeDriftEntry({
+            change: {
+              actions: ["update"],
+              before: { id: "abc", value: "old" },
+              after: { id: "abc", value: "new" },
+              after_unknown: false,
+            },
+          }),
+        ]),
+      );
+
+      expect(attributes).toEqual([
+        { name: "id", changed: false },
+        { name: "value", changed: true },
+      ]);
+    });
+
     it("marks a changed sensitive attribute as changed without exposing values", () => {
       const attributes = captureRuleInput(
         basePlan([
@@ -220,19 +242,12 @@ describe("buildDriftChanges", () => {
         ]),
       );
 
-      const secret = attributes.find((a) => a.name === "secret");
-      expect(secret).toEqual(
-        expect.objectContaining({
-          before: SENSITIVE_MASK,
-          after: SENSITIVE_CHANGED_MASK,
-          isSensitive: true,
-        }),
-      );
+      expect(changedNames(attributes)).toEqual(["secret"]);
       expect(JSON.stringify(attributes)).not.toContain("old-secret");
       expect(JSON.stringify(attributes)).not.toContain("new-secret");
     });
 
-    it("keeps an unchanged sensitive attribute equal on both sides", () => {
+    it("marks an unchanged sensitive attribute as unchanged", () => {
       const attributes = captureRuleInput(
         basePlan([
           makeDriftEntry({
@@ -248,12 +263,10 @@ describe("buildDriftChanges", () => {
         ]),
       );
 
-      const secret = attributes.find((a) => a.name === "secret");
-      expect(secret?.before).toBe(SENSITIVE_MASK);
-      expect(secret?.after).toBe(SENSITIVE_MASK);
+      expect(changedNames(attributes)).toEqual(["value"]);
     });
 
-    it("marks a changed sensitive collection attribute as changed", () => {
+    it("marks the changed element of a sensitive collection as changed", () => {
       const attributes = captureRuleInput(
         basePlan([
           makeDriftEntry({
@@ -269,12 +282,10 @@ describe("buildDriftChanges", () => {
         ]),
       );
 
-      const keys = attributes.find((a) => a.name === "keys");
-      expect(keys?.before).toBe(SENSITIVE_MASK);
-      expect(keys?.after).toBe(SENSITIVE_CHANGED_MASK);
+      expect(changedNames(attributes)).toEqual(["keys[3]"]);
     });
 
-    it("keeps an unchanged sensitive collection attribute equal on both sides", () => {
+    it("marks an unchanged sensitive collection as unchanged", () => {
       const attributes = captureRuleInput(
         basePlan([
           makeDriftEntry({
@@ -290,12 +301,10 @@ describe("buildDriftChanges", () => {
         ]),
       );
 
-      const keys = attributes.find((a) => a.name === "keys");
-      expect(keys?.before).toBe(SENSITIVE_MASK);
-      expect(keys?.after).toBe(SENSITIVE_MASK);
+      expect(changedNames(attributes)).toEqual(["value"]);
     });
 
-    it("ignores a changed map key that extends a sensitive key with a dot", () => {
+    it("does not mark a sensitive key changed when a dotted sibling key changed", () => {
       const attributes = captureRuleInput(
         basePlan([
           makeDriftEntry({
@@ -311,9 +320,7 @@ describe("buildDriftChanges", () => {
         ]),
       );
 
-      const token = attributes.find((a) => a.name === "creds.token");
-      expect(token?.before).toBe(SENSITIVE_MASK);
-      expect(token?.after).toBe(SENSITIVE_MASK);
+      expect(changedNames(attributes)).toEqual(["creds.token.expiry"]);
     });
 
     it("marks a changed sensitive key that has a dotted sibling as changed", () => {
@@ -332,12 +339,10 @@ describe("buildDriftChanges", () => {
         ]),
       );
 
-      const token = attributes.find((a) => a.name === "creds.token");
-      expect(token?.before).toBe(SENSITIVE_MASK);
-      expect(token?.after).toBe(SENSITIVE_CHANGED_MASK);
+      expect(changedNames(attributes)).toEqual(["creds.token"]);
     });
 
-    it("treats a null sensitive value and an absent one as equal", () => {
+    it("marks a sensitive value that is null on one side and absent on the other as unchanged", () => {
       const attributes = captureRuleInput(
         basePlan([
           makeDriftEntry({
@@ -353,8 +358,69 @@ describe("buildDriftChanges", () => {
         ]),
       );
 
-      const token = attributes.find((a) => a.name === "creds.token");
-      expect(token?.after).not.toBe(SENSITIVE_CHANGED_MASK);
+      expect(changedNames(attributes)).toEqual(["value"]);
+    });
+
+    it("marks a sensitive block with all-null children and an empty block as unchanged", () => {
+      const attributes = captureRuleInput(
+        basePlan([
+          makeDriftEntry({
+            change: {
+              actions: ["update"],
+              before: { auth: { token: null }, value: "old" },
+              after: { auth: {}, value: "new" },
+              before_sensitive: { auth: true },
+              after_sensitive: { auth: true },
+              after_unknown: false,
+            },
+          }),
+        ]),
+      );
+
+      expect(changedNames(attributes)).toEqual(["value"]);
+    });
+
+    it("marks an attribute that is unknown after apply as changed", () => {
+      const attributes = captureRuleInput(
+        basePlan([
+          makeDriftEntry({
+            change: {
+              actions: ["update"],
+              before: { id: "abc", value: "same" },
+              after: { id: "abc", value: "same" },
+              after_unknown: { pending: true },
+            },
+          }),
+        ]),
+      );
+
+      expect(changedNames(attributes)).toEqual(["pending"]);
+    });
+
+    it("suppresses Cloud Run job execution drift when a sensitive value is null on one side and absent on the other", () => {
+      const plan = basePlan([
+        makeDriftEntry({
+          address: "google_cloud_run_v2_job.this",
+          type: "google_cloud_run_v2_job",
+          name: "this",
+          change: {
+            actions: ["update"],
+            before: {
+              execution_count: 1,
+              template: [{ env: [{ name: "TOKEN", value: null }] }],
+            },
+            after: {
+              execution_count: 2,
+              template: [{ env: [{ name: "TOKEN" }] }],
+            },
+            before_sensitive: { template: [{ env: [{ value: true }] }] },
+            after_sensitive: { template: [{ env: [{ value: true }] }] },
+            after_unknown: false,
+          },
+        }),
+      ]);
+
+      expect(buildDriftChanges(plan, {})).toHaveLength(0);
     });
 
     it("does not change the masked values shown in the report", () => {

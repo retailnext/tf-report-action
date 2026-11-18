@@ -74,7 +74,7 @@ describe("drift filter integration", () => {
 
       const sizeOnly: DriftRule = (type, _mode, attributes) => {
         if (type !== "filesystem_file_writer") return false;
-        const changed = attributes.filter((a) => a.before !== a.after);
+        const changed = attributes.filter((a) => a.changed);
         return changed.length > 0 && changed.every((a) => a.name === "size");
       };
 
@@ -91,7 +91,7 @@ describe("drift filter integration", () => {
         const json = readFileSync(sensitivePath, "utf-8");
         const sizeAndContents: DriftRule = (type, _mode, attributes) => {
           if (type !== "filesystem_file_writer") return false;
-          const changed = attributes.filter((a) => a.before !== a.after);
+          const changed = attributes.filter((a) => a.changed);
           return (
             changed.length > 0 &&
             changed.every((a) => a.name === "size" || a.name === "contents")
