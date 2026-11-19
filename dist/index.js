@@ -1534,21 +1534,31 @@ function belongsToCollection(flatKey, collectionKeys) {
 // src/drift-filter/rules/google-artifact-registry-repository.ts
 var suppressGoogleArtifactRegistryRepositoryUpdateTime = (type, _mode, attributes) => {
   if (type !== "google_artifact_registry_repository") return false;
-  const changed = attributes.filter((a) => a.before !== a.after);
+  const changed = attributes.filter((a) => a.changed);
   return changed.length > 0 && changed.every((a) => a.name === "update_time");
 };
+
+// src/drift-filter/rules/google-cloud-run-v2-job.ts
+var suppressGoogleCloudRunV2JobExecution = (type, _mode, attributes) => {
+  if (type !== "google_cloud_run_v2_job") return false;
+  const changed = attributes.filter((a) => a.changed);
+  return changed.length > 0 && changed.every((a) => isExecutionAttribute(a.name));
+};
+function isExecutionAttribute(name) {
+  return name === "execution_count" || name === "latest_created_execution" || name.startsWith("latest_created_execution[");
+}
 
 // src/drift-filter/rules/google-compute-managed-ssl-certificate.ts
 var suppressGoogleComputeManagedSslCertificateExpireTime = (type, _mode, attributes) => {
   if (type !== "google_compute_managed_ssl_certificate") return false;
-  const changed = attributes.filter((a) => a.before !== a.after);
+  const changed = attributes.filter((a) => a.changed);
   return changed.length > 0 && changed.every((a) => a.name === "expire_time");
 };
 
 // src/drift-filter/rules/google-compute-url-map.ts
 var suppressGoogleComputeUrlMapFingerprint = (type, _mode, attributes) => {
   if (type !== "google_compute_url_map") return false;
-  const changed = attributes.filter((a) => a.before !== a.after);
+  const changed = attributes.filter((a) => a.changed);
   return changed.length > 0 && changed.every((a) => a.name === "fingerprint");
 };
 
@@ -1557,7 +1567,7 @@ var suppressDataSourceDrift = (_type, mode) => mode === "data";
 
 // src/drift-filter/rules/etag-only.ts
 var suppressEtagOnlyDrift = (_type, _mode, attributes) => {
-  const changed = attributes.filter((a) => a.before !== a.after);
+  const changed = attributes.filter((a) => a.changed);
   return changed.length > 0 && changed.every((a) => a.name === "etag");
 };
 
@@ -1565,14 +1575,14 @@ var suppressEtagOnlyDrift = (_type, _mode, attributes) => {
 var BORING_ATTRIBUTES = /* @__PURE__ */ new Set(["metageneration", "update_time"]);
 var suppressGoogleStorageManagedFolderMetaBoring = (type, _mode, attributes) => {
   if (type !== "google_storage_managed_folder") return false;
-  const changed = attributes.filter((a) => a.before !== a.after);
+  const changed = attributes.filter((a) => a.changed);
   return changed.length > 0 && changed.every((a) => BORING_ATTRIBUTES.has(a.name));
 };
 
 // src/drift-filter/rules/google-storage-bucket.ts
 var suppressGoogleStorageBucketUpdated = (type, _mode, attributes) => {
   if (type !== "google_storage_bucket") return false;
-  const changed = attributes.filter((a) => a.before !== a.after);
+  const changed = attributes.filter((a) => a.changed);
   return changed.length > 0 && changed.every((a) => a.name === "updated");
 };
 
@@ -1595,7 +1605,7 @@ var DriftRuleRegistry = class {
   }
 };
 function createDefaultDriftRuleRegistry() {
-  return new DriftRuleRegistry().register(suppressDataSourceDrift).register(suppressEtagOnlyDrift).register(suppressGoogleStorageManagedFolderMetaBoring).register(suppressGoogleComputeManagedSslCertificateExpireTime).register(suppressGoogleComputeUrlMapFingerprint).register(suppressGoogleArtifactRegistryRepositoryUpdateTime).register(suppressGoogleStorageBucketUpdated);
+  return new DriftRuleRegistry().register(suppressDataSourceDrift).register(suppressEtagOnlyDrift).register(suppressGoogleStorageManagedFolderMetaBoring).register(suppressGoogleComputeManagedSslCertificateExpireTime).register(suppressGoogleComputeUrlMapFingerprint).register(suppressGoogleArtifactRegistryRepositoryUpdateTime).register(suppressGoogleStorageBucketUpdated).register(suppressGoogleCloudRunV2JobExecution);
 }
 
 // src/builder/resources.ts
@@ -1637,18 +1647,15 @@ function buildDriftChanges(plan, options) {
     const action = refineAction(determineAction(rc.change.actions), rc);
     const address = rc.address ?? `${rc.type ?? "unknown"}.${rc.name ?? "unknown"}`;
     const attributes = buildAttributeChanges(rc.change, options);
-    const allAttributesForSuppression = buildAttributeChanges(rc.change, {
-      ...options,
-      showUnchangedAttributes: true
-    });
+    const driftAttributes = buildDriftAttributes(rc.change);
     const allUnknownAfterApply = isAllUnknownAfterApply(rc, attributes);
     if (registry.shouldSuppressDrift(
       rc.type ?? "unknown",
       rc.mode ?? "managed",
-      allAttributesForSuppression
+      driftAttributes
     ))
       continue;
-    if (!hasRawValueChanges(rc.change) && action !== "move" && action !== "import")
+    if (!hasRawValueChanges(rc.change, driftAttributes) && action !== "move" && action !== "import")
       continue;
     result.push({
       address,
@@ -1670,7 +1677,7 @@ function shouldSkip(rc) {
   }
   return false;
 }
-function hasRawValueChanges(change) {
+function hasRawValueChanges(change, attributes) {
   const before = change.before ?? null;
   const after = change.after ?? null;
   if (before === null !== (after === null)) return true;
@@ -1678,24 +1685,21 @@ function hasRawValueChanges(change) {
   if (change.after_unknown === true) return true;
   if (typeof change.after_unknown === "object" && Object.keys(change.after_unknown).length > 0)
     return true;
-  const beforeFlat = flatten(before);
-  const afterFlat = flatten(after);
-  for (const [key, beforeVal] of beforeFlat) {
-    if (beforeVal === null) {
-      const afterVal = afterFlat.get(key);
-      if (afterVal !== void 0 && afterVal !== null) return true;
-    } else {
-      if (!afterFlat.has(key)) return true;
-      if (beforeVal !== afterFlat.get(key)) return true;
-    }
+  return attributes.some((a) => a.changed);
+}
+function buildDriftAttributes(change) {
+  const beforeFlat = flatten(change.before ?? {});
+  const afterFlat = flatten(change.after ?? {});
+  const unknown = change.after_unknown;
+  const unknownFlat = typeof unknown === "object" ? flatten(unknown) : /* @__PURE__ */ new Map();
+  const names = /* @__PURE__ */ new Set([...beforeFlat.keys(), ...afterFlat.keys()]);
+  for (const [name, value] of unknownFlat) {
+    if (value === "true") names.add(name);
   }
-  for (const [key, afterVal] of afterFlat) {
-    if (!beforeFlat.has(key)) {
-      if (afterVal === null) continue;
-      return true;
-    }
-  }
-  return false;
+  return [...names].sort().map((name) => ({
+    name,
+    changed: unknown === true || unknownFlat.get(name) === "true" || (beforeFlat.get(name) ?? null) !== (afterFlat.get(name) ?? null)
+  }));
 }
 function isAllUnknownAfterApply(rc, attributes) {
   if (rc.change.after_unknown === true) return true;
