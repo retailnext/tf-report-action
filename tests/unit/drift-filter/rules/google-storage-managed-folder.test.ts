@@ -1,29 +1,15 @@
 import { describe, it, expect } from "vitest";
 import { suppressGoogleStorageManagedFolderMetaBoring } from "../../../../src/drift-filter/rules/google-storage-managed-folder.js";
-import type { AttributeChange } from "../../../../src/model/attribute.js";
+import type { DriftAttribute } from "../../../../src/drift-filter/registry.js";
 
 const TYPE = "google_storage_managed_folder";
 
-function changed(name: string): AttributeChange {
-  return {
-    name,
-    before: "old",
-    after: "new",
-    isSensitive: false,
-    isLarge: false,
-    isKnownAfterApply: false,
-  };
+function changed(name: string): DriftAttribute {
+  return { name, changed: true };
 }
 
-function unchanged(name: string): AttributeChange {
-  return {
-    name,
-    before: "same",
-    after: "same",
-    isSensitive: false,
-    isLarge: false,
-    isKnownAfterApply: false,
-  };
+function unchanged(name: string): DriftAttribute {
+  return { name, changed: false };
 }
 
 describe("suppressGoogleStorageManagedFolderMetaBoring", () => {

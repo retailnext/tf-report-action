@@ -21,16 +21,7 @@ describe("suppressDataSourceDrift", () => {
   });
 
   it("ignores attributes entirely", () => {
-    const attrs = [
-      {
-        name: "id",
-        before: "old",
-        after: "new",
-        isSensitive: false,
-        isLarge: false,
-        isKnownAfterApply: false,
-      },
-    ];
+    const attrs = [{ name: "id", changed: true }];
     expect(suppressDataSourceDrift("aws_s3_bucket", "data", attrs)).toBe(true);
     expect(suppressDataSourceDrift("aws_s3_bucket", "managed", attrs)).toBe(
       false,

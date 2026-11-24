@@ -14,6 +14,6 @@ export const suppressGoogleComputeManagedSslCertificateExpireTime: DriftRule = (
   attributes,
 ): boolean => {
   if (type !== "google_compute_managed_ssl_certificate") return false;
-  const changed = attributes.filter((a) => a.before !== a.after);
+  const changed = attributes.filter((a) => a.changed);
   return changed.length > 0 && changed.every((a) => a.name === "expire_time");
 };

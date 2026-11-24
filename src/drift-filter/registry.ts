@@ -1,5 +1,5 @@
-import type { AttributeChange } from "../model/attribute.js";
 import { suppressGoogleArtifactRegistryRepositoryUpdateTime } from "./rules/google-artifact-registry-repository.js";
+import { suppressGoogleCloudRunV2JobExecution } from "./rules/google-cloud-run-v2-job.js";
 import { suppressGoogleComputeManagedSslCertificateExpireTime } from "./rules/google-compute-managed-ssl-certificate.js";
 import { suppressGoogleComputeUrlMapFingerprint } from "./rules/google-compute-url-map.js";
 import { suppressDataSourceDrift } from "./rules/data-source.js";
@@ -8,11 +8,28 @@ import { suppressGoogleStorageManagedFolderMetaBoring } from "./rules/google-sto
 import { suppressGoogleStorageBucketUpdated } from "./rules/google-storage-bucket.js";
 
 /**
+ * One attribute of a drift entry, as drift suppression rules see it.
+ *
+ * Rules get no attribute values. `changed` comes from a comparison of the raw
+ * (unmasked) values, so a change to a sensitive attribute is detected without
+ * exposing it.
+ */
+export interface DriftAttribute {
+  /** Flattened attribute path, for example `latest_created_execution[0].name`. */
+  readonly name: string;
+  /**
+   * True when the raw value differs between before and after, or is unknown
+   * after apply. Null and absent both mean "no value".
+   */
+  readonly changed: boolean;
+}
+
+/**
  * A drift suppression rule.
  *
- * Called with the resource type, mode, and the full set of attribute values
- * for the drift entry — including attributes that did not change. Use
- * `before !== after` to distinguish changed attributes from unchanged ones.
+ * Called with the resource type, mode, and every flattened attribute path of
+ * the drift entry — including attributes that did not change. Use `changed`
+ * to distinguish changed attributes from unchanged ones.
  *
  * Returns `true` if the drift should be omitted from the report.
  * Rules are pure predicates with no side effects.
@@ -20,7 +37,7 @@ import { suppressGoogleStorageBucketUpdated } from "./rules/google-storage-bucke
 export type DriftRule = (
   type: string,
   mode: string,
-  attributes: AttributeChange[],
+  attributes: readonly DriftAttribute[],
 ) => boolean;
 
 /**
@@ -50,7 +67,7 @@ export class DriftRuleRegistry {
   shouldSuppressDrift(
     type: string,
     mode: string,
-    attributes: AttributeChange[],
+    attributes: readonly DriftAttribute[],
   ): boolean {
     return this.rules.some((rule) => rule(type, mode, attributes));
   }
@@ -71,6 +88,8 @@ export class DriftRuleRegistry {
  *   changed are suppressed.
  * - `google_storage_bucket` resources where only `updated` changed are
  *   suppressed.
+ * - `google_cloud_run_v2_job` resources where only `execution_count` and/or
+ *   `latest_created_execution` attributes changed are suppressed.
  */
 export function createDefaultDriftRuleRegistry(): DriftRuleRegistry {
   return new DriftRuleRegistry()
@@ -80,5 +99,6 @@ export function createDefaultDriftRuleRegistry(): DriftRuleRegistry {
     .register(suppressGoogleComputeManagedSslCertificateExpireTime)
     .register(suppressGoogleComputeUrlMapFingerprint)
     .register(suppressGoogleArtifactRegistryRepositoryUpdateTime)
-    .register(suppressGoogleStorageBucketUpdated);
+    .register(suppressGoogleStorageBucketUpdated)
+    .register(suppressGoogleCloudRunV2JobExecution);
 }

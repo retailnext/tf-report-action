@@ -12,6 +12,6 @@ export const suppressEtagOnlyDrift: DriftRule = (
   _mode: string,
   attributes,
 ): boolean => {
-  const changed = attributes.filter((a) => a.before !== a.after);
+  const changed = attributes.filter((a) => a.changed);
   return changed.length > 0 && changed.every((a) => a.name === "etag");
 };
